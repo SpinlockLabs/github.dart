@@ -1,7 +1,7 @@
-import "package:github/github.dart";
+import "package:github/client.dart";
 
 void main() {
-  var github = new GitHub();
+  var github = new GitHub(new ClientFetcher());
   
   github.user("Google").then((User user) {
     print("User: ${user.name}");

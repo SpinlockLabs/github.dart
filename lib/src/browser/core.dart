@@ -1,30 +1,22 @@
 part of github.browser;
 
-class HttpResponse {
-  final int statusCode;
-  final String body;
-  final Map<String, String> headers;
+class BrowserFetcher extends Fetcher {
+  @override
+  GitHub github;
   
-  HttpResponse(this.statusCode, this.body, this.headers);
-}
-
-class GitHub {
-  final Authentication auth;
-  final String endpoint;
+  BrowserFetcher();
   
-  GitHub({Authentication auth, this.endpoint: "https://api.github.com"}) :
-    this.auth = auth == null ? new Authentication.anonymous() : auth;
-  
+  @override
   Future<HttpResponse> get(String path) {
     var headers = {};
     
-    if (auth.token != null) {
-      headers['Authorization'] = "token ${auth.token}";
+    if (github.auth.token != null) {
+      headers['Authorization'] = "token ${github.auth.token}";
     }
     
     var request = new HttpRequest();
     
-    request.open("GET", "${endpoint}${path}");
+    request.open("GET", "${github.endpoint}${path}");
     
     var completer = new Completer();
     
@@ -37,30 +29,5 @@ class GitHub {
     request.send();
     
     return completer.future;
-  }
-  
-  Future<dynamic> fetchJSON(String path, Type objType) {
-    return get(path).then((response) {
-      
-      if (response.statusCode != 200) {
-        return null;
-      }
-      
-      var content = response.body;
-      
-      return jsonx.decode(content, type: objType);
-    });
-  }
-  
-  Future<User> user(String name) {
-    return fetchJSON("/users/${name}", User);
-  }
-  
-  Future<List<User>> users(List<String> names) {
-    var group = new FutureGroup<User>();
-    names.forEach((name) {
-      group.add(user(name));
-    });
-    return group.future;
   }
 }

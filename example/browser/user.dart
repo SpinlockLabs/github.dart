@@ -3,13 +3,33 @@ import "dart:html";
 import "package:github/browser.dart";
 
 GitHub github;
+DivElement $users;
 
 void main() {
-  github = new GitHub();
+  var stopwatch = new Stopwatch();
+  stopwatch.start();
+  github = new GitHub(new BrowserFetcher());
   
-  var $user = document.querySelector("#user");
+  $users = querySelector("#users");
   
-  github.user("kaendfinger").then((User user) {
-    $user.querySelector(".name").appendText(user.name);
+  document.onReadyStateChange.listen((event) {
+    if (document.readyState == ReadyState.COMPLETE) {
+      stopwatch.stop();
+      print("Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
+      loadUsers();
+    }
+  });
+}
+
+void loadUsers() {
+  github.users(["kaendfinger", "samrg472", "TrainerGuy22", "logangorence"]).then((List<User> users) {
+    users.forEach((User user) {
+      var element = new DivElement();
+      var out = """
+      <img width="64" height="64" src="${user.avatar_url}"> <b>${user.login}</b>
+      """;
+      element.append(new ParagraphElement()..appendHtml(out));
+      $users.append(element);
+    });
   });
 }
