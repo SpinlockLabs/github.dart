@@ -25,23 +25,27 @@ void main() {
   init("repository.dart");
 }
 
-void loadRepos() {
-  var repos = [
-    new RepositorySlug("DirectMyFile", "irc.dart"),
-    new RepositorySlug("DirectMyFile", "github.dart"),
-    new RepositorySlug("DirectMyFile", "pub-toolkit"),
-    new RepositorySlug("DirectMyFile", "devtools")
-  ];
-  
-  github.repositories(repos).then((List<Repository> repositories) {
+void loadRepos() {  
+  github.userRepositories("DirectMyFile").then((List<Repository> repositories) {
+    repositories.sort((a, b) => a.name.compareTo(b.name));
     for (var repo in repositories) {
+      if (repo.fork) {
+        continue;
+      }
+      
       $repos.appendHtml("""
         <div class="repo">
           <div class="line"></div>
-          <h2>${repo.fullName}</h2>
-          <p><b>Description</b>: ${repo.description}, <b>Owner</b>: ${repo.owner.login}</p>
-          <p><b>Language</b>: ${repo.language}, <b>Default Branch</b>: ${repo.defaultBranch}</p>
-          <p><b>Subscribers</b>: ${repo.subscribersCount}, <b>Forks</b>: ${repo.forksCount}</p>
+          <h2><a href="${repo.url}">${repo.fullName}</a></h2>
+          <b>Description</b>: ${repo.description}
+          <br/>
+          <b>Language</b>: ${repo.language != null ? repo.language : "Unknown"}
+          <br/>
+          <b>Default Branch</b>: ${repo.defaultBranch}
+          <br/>
+          <b>Stars</b>: ${repo.stargazersCount}
+          <br/>
+          <b>Forks</b>: ${repo.forksCount}
           ${ repositories.indexOf(repo) == repositories.length - 1 ? '<div class="line"></div>' : "" }  
       </div>
       """);

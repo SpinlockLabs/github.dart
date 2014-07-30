@@ -13,16 +13,15 @@ abstract class Fetcher {
   
   Future<HttpResponse> get(String path);
   
-  Future<dynamic> fetchJSON(String path, Type objType) {
+  Future<dynamic> fetchJSON(String path, [dynamic convert(input)]) {
+    
+    if (convert == null) {
+      convert = (it) => it;
+    }
+    
     return get(path).then((response) {
-      
-      if (response.statusCode != 200) {
-        return null;
-      }
-      
-      var content = response.body;
-      
-      return jsonx.decode(content, type: objType);
+      var json = JSON.decode(response.body);
+      return convert(json);
     });
   }
 }

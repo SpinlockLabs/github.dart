@@ -7,11 +7,10 @@ class GitHub {
 
   GitHub(this.fetcher, {Authentication auth, this.endpoint: "https://api.github.com"}) : this.auth = auth == null ? new Authentication.anonymous() : auth {
     fetcher.github = this;
-    _init();
   }
   
   Future<User> user(String name) {
-    return fetcher.fetchJSON("/users/${name}", User);
+    return fetcher.fetchJSON("/users/${name}", User.fromJSON);
   }
 
   Future<List<User>> users(List<String> names) {
@@ -23,7 +22,7 @@ class GitHub {
   }
   
   Future<Repository> repository(String owner, String name) {
-    return fetcher.fetchJSON("/repos/${owner}/${name}", Repository);
+    return fetcher.fetchJSON("/repos/${owner}/${name}", Repository.fromJSON);
   }
   
   Future<List<Repository>> repositories(List<RepositorySlug> slugs) {
@@ -34,12 +33,9 @@ class GitHub {
     return group.future;
   }
   
-  void _init() {
-    void register(Type type, jsonx.ConvertFunction func) {
-      jsonx.jsonToObjects[type] = func; 
-    }
-    
-    register(Repository, Repository.fromJSON);
-    register(RepositoryOwner, RepositoryOwner.fromJSON);
+  Future<List<Repository>> userRepositories(String user) {
+    return fetcher.fetchJSON("/users/${user}/repos").then((List json) {
+      return new List.from(json.map((it) => Repository.fromJSON(it)));
+    });
   }
 }

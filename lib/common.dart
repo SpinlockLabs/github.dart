@@ -1,9 +1,9 @@
 library github.common;
 
 import 'dart:async';
+import 'dart:convert' show JSON;
 
 import 'package:quiver/async.dart';
-import 'package:jsonx/jsonx.dart' as jsonx;
 
 part 'src/common/auth.dart';
 part 'src/common/repo.dart';
