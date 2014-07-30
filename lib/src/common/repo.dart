@@ -86,3 +86,10 @@ class RepositoryOwner {
     return owner;
   }
 }
+
+class RepositorySlug {
+  final String owner;
+  final String name;
+  
+  RepositorySlug(this.owner, this.name);
+}

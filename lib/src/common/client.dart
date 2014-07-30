@@ -26,6 +26,14 @@ class GitHub {
     return fetcher.fetchJSON("/repos/${owner}/${name}", Repository);
   }
   
+  Future<List<Repository>> repositories(List<RepositorySlug> slugs) {
+    var group = new FutureGroup<Repository>();
+    slugs.forEach((repo) {
+      group.add(repository(repo.owner, repo.name));
+    });
+    return group.future;
+  }
+  
   void _init() {
     void register(Type type, jsonx.ConvertFunction func) {
       jsonx.jsonToObjects[type] = func; 
