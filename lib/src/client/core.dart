@@ -14,7 +14,7 @@ class ClientFetcher extends Fetcher {
       headers['Authorization'] = "token ${github.auth.token}";
     }
     
-    return http.get(path, headers: headers).then((http.Response resp) {
+    return http.get("https://api.github.com" + path, headers: headers).then((http.Response resp) {
       return new HttpResponse(resp.statusCode, resp.body, resp.headers);
     });
   }
