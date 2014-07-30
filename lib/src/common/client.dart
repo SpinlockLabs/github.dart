@@ -34,7 +34,7 @@ class GitHub {
   }
   
   Future<List<Repository>> userRepositories(String user) {
-    return fetcher.fetchJSON("/users/${user}/repos").then((List json) {
+    return fetcher.fetchJSON("/users/${user}/repos?per_page=5000").then((List json) {
       return new List.from(json.map((it) => Repository.fromJSON(it)));
     });
   }
