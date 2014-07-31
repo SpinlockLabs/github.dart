@@ -1,6 +1,7 @@
 part of github.common;
 
 class User {
+  GitHub github;
   String login;
   int id;
   String avatar_url;
@@ -21,8 +22,10 @@ class User {
   DateTime created_at;
   DateTime updated_at;
   
-  static User fromJSON(input) {
-    var user = new User();
+  User(this.github);
+  
+  static User fromJSON(GitHub github, input) {
+    var user = new User(github);
     user.login = input['login'];
     user.id = input['id'];
     user.avatar_url = input['avatar_url'];
@@ -43,4 +46,6 @@ class User {
     user.updated_at = DateTime.parse(input['updated_at']);
     return user;
   }
+  
+  Future<List<Repository>> get repos => github.userRepositories(login);
 }

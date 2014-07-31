@@ -12,3 +12,4 @@ part 'src/common/fetcher.dart';
 part 'src/common/client.dart';
 part 'src/common/stats.dart';
 part 'src/common/util.dart';
+part 'src/common/organization.dart';

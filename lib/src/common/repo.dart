@@ -1,6 +1,8 @@
 part of github.common;
 
 class Repository {
+  final GitHub github;
+    
   String name;
   int id;
   String fullName;
@@ -27,8 +29,10 @@ class Repository {
   DateTime pushedAt;
   Map<String, dynamic> json;
   
-  static Repository fromJSON(input) {
-    var repo = new Repository();
+  Repository(this.github);
+  
+  static Repository fromJSON(GitHub github, input) {
+    var repo = new Repository(github);
     repo.name = input['name'];
     repo.id = input['id'];
     repo.fullName = input['full_name'];

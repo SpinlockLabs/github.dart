@@ -35,7 +35,19 @@ class GitHub {
   
   Future<List<Repository>> userRepositories(String user) {
     return fetcher.fetchJSON("/users/${user}/repos?per_page=5000").then((List json) {
-      return new List.from(json.map((it) => Repository.fromJSON(it)));
+      return new List.from(json.map((it) => Repository.fromJSON(this, it)));
     });
+  }
+  
+  Future<Organization> organization(String name) {
+    return fetcher.fetchJSON("/orgs/${name}", Organization.fromJSON);
+  }
+  
+  Future<List<Organization>> organizations(List<String> names) {
+    var group = new FutureGroup<Organization>();
+    names.forEach((name) {
+      group.add(organization(name));
+    });
+    return group.future;
   }
 }
