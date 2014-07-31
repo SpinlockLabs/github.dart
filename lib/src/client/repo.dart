@@ -118,6 +118,12 @@ class Repository {
     github.getJSON(path, convert: handle);
     return completer.future;
   }
+  
+  Future<List<Repository>> get forks {
+    return github.getJSON("/repos/${fullName}/forks").then((forks) {
+      return forks.map((it) => Repository.fromJSON(github, it));
+    });
+  }
 }
 
 class CloneUrls {
