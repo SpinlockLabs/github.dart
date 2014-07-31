@@ -45,7 +45,7 @@ void main() {
     loadRepos(sorts['created']);
   });
   
-  init("repository.dart");
+  init("repos.dart");
 }
 
 void loadRepos([int compare(Repository a, Repository b)]) {
