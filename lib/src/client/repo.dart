@@ -100,6 +100,24 @@ class Repository {
   });
   
   Future<List<Commit>> get commits => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
+  
+  Future<List<ContributorStatistics>> get contributorStatistics {
+    var completer = new Completer<List<ContributorStatistics>>();
+    var path = "/repos/${fullName}/stats/contributors";
+    var handle;
+    handle = (GitHub gh, json) {
+      if (json is Map) {
+        new Future.delayed(new Duration(milliseconds: 200), () {
+          github.getJSON(path, convert: handle);
+        });
+        return null;
+      } else {
+        completer.complete(json.map((it) => ContributorStatistics.fromJSON(github, it)));
+      }
+    };
+    github.getJSON(path, convert: handle);
+    return completer.future;
+  }
 }
 
 class CloneUrls {
