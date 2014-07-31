@@ -7,7 +7,7 @@ void main() {
   GitHub github;
   
   setUp(() {
-    github = new GitHub(new ClientFetcher(), auth: new Authentication.anonymous());
+    github = new GitHub(auth: new Authentication.anonymous());
   });
   
   test('repository fetches correctly', () {

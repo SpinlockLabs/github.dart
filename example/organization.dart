@@ -7,8 +7,9 @@ GitHub github;
 DivElement $org;
 
 void main() {  
+  initGitHub();
   init("organization.dart", onReady: () {
-    github = new GitHub(new BrowserFetcher(), auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
+    github = new GitHub(auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
     $org = querySelector("#org");
     loadOrganization();
   });

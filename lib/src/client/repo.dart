@@ -1,4 +1,4 @@
-part of github.common;
+part of github.client;
 
 /**
  * The Repository Model

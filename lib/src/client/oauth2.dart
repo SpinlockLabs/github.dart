@@ -20,7 +20,7 @@ class OAuth2Flow {
   }
   
   Future<ExchangeResponse> exchange(String code) {
-    return new BrowserFetcher().post("${baseUrl}/access_token", params: {
+    return GitHub.defaultClient().post("${baseUrl}/access_token", params: {
       "client_id": clientId,
       "client_secret": clientSecret,
       "code": code,

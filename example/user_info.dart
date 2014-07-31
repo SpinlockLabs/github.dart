@@ -6,6 +6,7 @@ import "common.dart";
 DivElement info;
 
 void main() {
+  initGitHub();
   init("user_info.dart", onReady: () {
     info = document.getElementById("info");
     loadUser();
@@ -13,7 +14,7 @@ void main() {
 }
 
 GitHub createClient(String token) {
-  return new GitHub(new BrowserFetcher(), auth: new Authentication.withToken(token));
+  return new GitHub(auth: new Authentication.withToken(token));
 }
 
 void loadUser() {

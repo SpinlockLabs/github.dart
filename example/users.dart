@@ -1,14 +1,16 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+
 import "common.dart";
 
 GitHub github;
 DivElement $users;
 
 void main() {
+  initGitHub();
   init("users.dart", onReady: () {
-    github = new GitHub(new BrowserFetcher());
+    github = new GitHub();
     $users = querySelector("#users");
     loadUsers();
   });

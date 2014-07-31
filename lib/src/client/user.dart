@@ -1,4 +1,4 @@
-part of github.common;
+part of github.client;
 
 /**
  * The User Model
@@ -146,6 +146,6 @@ class CurrentUser extends User {
   }
   
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
-    return github.fetcher.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
+    return github.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
   }
 }

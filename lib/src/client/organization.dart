@@ -1,4 +1,4 @@
-part of github.common;
+part of github.client;
 
 class Organization {
   GitHub github;
@@ -63,7 +63,7 @@ class Organization {
   Future<List<Team>> get teams => github.teams(login);
   
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
-    return github.fetcher.postJSON("/orgs/${login}/repos", body: request.toJSON(), convert: TeamRepository.fromJSON);
+    return github.postJSON("/orgs/${login}/repos", body: request.toJSON(), convert: TeamRepository.fromJSON);
   }
 }
 
