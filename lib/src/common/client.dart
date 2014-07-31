@@ -37,7 +37,7 @@ class GitHub {
    * Fetches the user specified by [name].
    */
   Future<User> user(String name) {
-    return fetcher.fetchJSON("/users/${name}", convert: User.fromJSON);
+    return fetcher.getJSON("/users/${name}", convert: User.fromJSON);
   }
 
   /**
@@ -55,7 +55,7 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return fetcher.fetchJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON);
+    return fetcher.getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON);
   }
   
   /**
@@ -83,7 +83,7 @@ class GitHub {
       "sort": sort,
       "direction": direction
     };
-    return fetcher.fetchJSON("/users/${user}/repos", params: params).then((List json) {
+    return fetcher.getJSON("/users/${user}/repos", params: params).then((List json) {
       return new List.from(json.map((it) => Repository.fromJSON(this, it)));
     });
   }
@@ -92,7 +92,7 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return fetcher.fetchJSON("/orgs/${name}", convert: Organization.fromJSON);
+    return fetcher.getJSON("/orgs/${name}", convert: Organization.fromJSON);
   }
   
   /**
@@ -111,9 +111,9 @@ class GitHub {
    */
   Future<List<Team>> teams(String name) {
     var group = new FutureGroup<Team>();
-    fetcher.fetchJSON("/orgs/${name}/teams").then((teams) {
+    fetcher.getJSON("/orgs/${name}/teams").then((teams) {
       for (var team in teams) {
-        group.add(fetcher.fetchJSON(team['url'], convert: Team.fromJSON));
+        group.add(fetcher.getJSON(team['url'], convert: Team.fromJSON));
       }
     });
     return group.future;
@@ -123,7 +123,7 @@ class GitHub {
    * Fetches the team members of the team specified by [id].
    */
   Future<List<TeamMember>> teamMembers(int id) {
-    return fetcher.fetchJSON("/teams/${id}/members").then((List json) {
+    return fetcher.getJSON("/teams/${id}/members").then((List json) {
       return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
     });
   }

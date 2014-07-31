@@ -16,13 +16,27 @@ abstract class Fetcher {
   
   Future<HttpResponse> get(String path, {Map<String, String> headers, Map<String, String> params});
   
-  Future<dynamic> fetchJSON(String path, {JSONConverter convert, Map<String, String> headers, Map<String, String> params}) {
+  Future<HttpResponse> post(String path, {Map<String, String> headers, Map<String, String> params, String body});
+  
+  Future<dynamic> getJSON(String path, {JSONConverter convert, Map<String, String> headers, Map<String, String> params}) {
     
     if (convert == null) {
       convert = (github, it) => it;
     }
     
     return get(path, headers: headers, params: params).then((response) {
+      var json = JSON.decode(response.body);
+      return convert(github, json);
+    });
+  }
+  
+  Future<dynamic> postJSON(String path, {JSONConverter convert, Map<String, String> headers, Map<String, String> params, String body}) {
+    
+    if (convert == null) {
+      convert = (github, it) => it;
+    }
+    
+    return post(path, headers: headers, params: params, body: body).then((response) {
       var json = JSON.decode(response.body);
       return convert(github, json);
     });
