@@ -1,10 +1,15 @@
 part of github.common;
 
+/**
+ * The Repository Model
+ */
 class Repository {
   final GitHub github;
-    
+  
   String name;
   int id;
+  
+  @ApiName("full_name")
   String fullName;
   RepositoryOwner owner;
   bool private;
@@ -14,19 +19,44 @@ class Repository {
   CloneUrls cloneUrls;
   String homepage;
   int size;
+  
+  @ApiName("stargazers_count")
   int stargazersCount;
+  
+  @ApiName("watchers_count")
   int watchersCount;
+  
   String language;
+  
+  @ApiName("has_issues")
   bool hasIssues;
+  
+  @ApiName("has_wiki")
   bool hasWiki;
+  
+  @ApiName("has_downloads")
   bool hasDownloads;
+  
+  @ApiName("forks_count")
   int forksCount;
+  
+  @ApiName("open_issues_count")
   int openIssuesCount;
+  
   String defaultBranch;
+  
+  @ApiName("subscribers_count")
   int subscribersCount;
+  
+  @ApiName("network_count")
   int networkCount;
+  
+  @ApiName("created_at")
   DateTime createdAt;
+  
+  @ApiName("pushed_at")
   DateTime pushedAt;
+  
   Map<String, dynamic> json;
   
   Repository(this.github);
@@ -57,10 +87,8 @@ class Repository {
     repo.networkCount = input['network_count'];
     repo.subscribersCount = input['subscribers_count'];
     repo.forksCount = input['forks_count'];
-    var createdAt = input['created_at'];
-    var pushedAt = input['pushed_at'];
-    repo.createdAt = createdAt != null ? DateTime.parse(createdAt) : null;
-    repo.pushedAt = pushedAt != null ? DateTime.parse(pushedAt) : null;
+    repo.createdAt = parse_date(input['created_at']);
+    repo.pushedAt = parse_date(input['pushed_at']);
     repo.json = input;
     repo.owner = RepositoryOwner.fromJSON(input['owner']);
     return repo;
@@ -77,7 +105,11 @@ class CloneUrls {
 class RepositoryOwner {
   String login;
   int id;
-  String avatar_url;
+  
+  @ApiName("avatar_url")
+  String avatarUrl;
+  
+  @ApiName("html_url")
   String url;
 
   static RepositoryOwner fromJSON(input) {
@@ -85,7 +117,7 @@ class RepositoryOwner {
     owner
         ..login = input['login']
         ..id = input['id']
-        ..avatar_url = input['avatar_url']
+        ..avatarUrl = input['avatar_url']
         ..url = input['html_url'];
     return owner;
   }
