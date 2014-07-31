@@ -12,7 +12,7 @@ void main() {
   
   test('repository fetches correctly', () {
     schedule(() {
-      return github.repository("DirectMyFile", "github.dart").then((repo) {
+      return github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((repo) {
         expect(repo.name, equals("github.dart"), reason: "repo name should be 'github.dart'");
       });
     }, "Fetch Repository");
