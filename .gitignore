@@ -1,3 +1,4 @@
+build/
 packages
 pubspec.lock
 .idea/
