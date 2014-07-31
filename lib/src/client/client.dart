@@ -114,6 +114,16 @@ class GitHub {
     });
     return group.future;
   }
+  
+  Future<String> renderMarkdown(String input, {String mode: "markdown", String context}) {
+    return request("POST", "/markdown", body: JSON.encode({
+      "text": input,
+      "mode": mode,
+      "context": context
+    })).then((response) {
+      return response.body;
+    });
+  }
 
   /**
    * Fetches the team members of the team specified by [id].
