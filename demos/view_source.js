@@ -37,16 +37,16 @@ if (window.opener !== null) {
     }
   }
 } else {
-  if (Object.keys(argsParsed).indexOf("script") !== -1) {
+  if (Object.keys(argsParsed).indexOf("path") !== -1) {
     var req = new XMLHttpRequest();
-    req.open("GET", argsParsed['script']);
+    req.open("GET", argsParsed['path']);
     req.onreadystatechange = function() {
       if (req.readyState === XMLHttpRequest.DONE) {
         if (req.status === 200) {
           createEditor(req.responseText);
 
         } else {
-          createEditor("ERROR: " + argsParsed['script'] + " was not found.");
+          createEditor("ERROR: " + argsParsed['path'] + " was not found.");
         }
       }
     }
