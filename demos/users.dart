@@ -7,21 +7,11 @@ GitHub github;
 DivElement $users;
 
 void main() {
-  var stopwatch = new Stopwatch();
-  stopwatch.start();
-  github = new GitHub(new BrowserFetcher());
-  
-  $users = querySelector("#users");
-  
-  document.onReadyStateChange.listen((event) {
-    if (document.readyState == ReadyState.COMPLETE) {
-      stopwatch.stop();
-      print("Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
-      loadUsers();
-    }
+  init("users.dart", onReady: () {
+    github = new GitHub(new BrowserFetcher());
+    $users = querySelector("#users");
+    loadUsers();
   });
-  
-  init("users.dart");
 }
 
 void loadUsers() {

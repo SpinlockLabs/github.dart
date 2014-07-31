@@ -26,7 +26,10 @@ class GitHub {
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
    */
-  GitHub(this.fetcher, {Authentication auth, this.endpoint: "https://api.github.com"}) : this.auth = auth == null ? new Authentication.anonymous() : auth {
+  GitHub(this.fetcher, {
+    Authentication auth,
+    this.endpoint: "https://api.github.com"
+  }) : this.auth = auth == null ? new Authentication.anonymous() : auth {
     fetcher.github = this;
   }
   
@@ -34,7 +37,7 @@ class GitHub {
    * Fetches the user specified by [name].
    */
   Future<User> user(String name) {
-    return fetcher.fetchJSON("/users/${name}", User.fromJSON);
+    return fetcher.fetchJSON("/users/${name}", convert: User.fromJSON);
   }
 
   /**
@@ -52,7 +55,7 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return fetcher.fetchJSON("/repos/${slug.owner}/${slug.name}", Repository.fromJSON);
+    return fetcher.fetchJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON);
   }
   
   /**
@@ -69,8 +72,18 @@ class GitHub {
   /**
    * Fetches the repositories of the user specified by [user].
    */
-  Future<List<Repository>> userRepositories(String user) {
-    return fetcher.fetchJSON("/users/${user}/repos?per_page=5000").then((List json) {
+  Future<List<Repository>> userRepositories(String user, {
+    String type: "owner",
+    int limit: 5000,
+    String sort: "full_name",
+    String direction: "asc"
+  }) {
+    var params = {
+      "per_page": limit.toString(),
+      "sort": sort,
+      "direction": direction
+    };
+    return fetcher.fetchJSON("/users/${user}/repos", params: params).then((List json) {
       return new List.from(json.map((it) => Repository.fromJSON(this, it)));
     });
   }
@@ -79,7 +92,7 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return fetcher.fetchJSON("/orgs/${name}", Organization.fromJSON);
+    return fetcher.fetchJSON("/orgs/${name}", convert: Organization.fromJSON);
   }
   
   /**
@@ -100,9 +113,18 @@ class GitHub {
     var group = new FutureGroup<Team>();
     fetcher.fetchJSON("/orgs/${name}/teams").then((teams) {
       for (var team in teams) {
-        group.add(fetcher.fetchJSON(team['url'], Team.fromJSON));
+        group.add(fetcher.fetchJSON(team['url'], convert: Team.fromJSON));
       }
     });
     return group.future;
+  }
+  
+  /**
+   * Fetches the team members of the team specified by [id].
+   */
+  Future<List<TeamMember>> teamMembers(int id) {
+    return fetcher.fetchJSON("/teams/${id}/members").then((List json) {
+      return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
+    });
   }
 }

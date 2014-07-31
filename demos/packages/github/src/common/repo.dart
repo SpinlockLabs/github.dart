@@ -89,6 +89,7 @@ class Repository {
     repo.forksCount = input['forks_count'];
     repo.createdAt = parse_date(input['created_at']);
     repo.pushedAt = parse_date(input['pushed_at']);
+    repo.private = input['private'];
     repo.json = input;
     repo.owner = RepositoryOwner.fromJSON(input['owner']);
     return repo;

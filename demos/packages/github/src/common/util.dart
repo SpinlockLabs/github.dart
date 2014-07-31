@@ -32,3 +32,19 @@ DateTime parse_date(String input) {
   
   return DateTime.parse(input);
 }
+
+String buildQueryString(Map<String, String> params) {
+  var queryString = new StringBuffer();
+  if (params.isNotEmpty) {
+    queryString.write("?");
+  }
+  var i = 0;
+  for (var key in params.keys) {
+    i++;
+    queryString.write("${key}=${Uri.encodeComponent(params[key])}");
+    if (i != params.keys.length) {
+      queryString.write("&");
+    }
+  }
+  return queryString.toString();
+}

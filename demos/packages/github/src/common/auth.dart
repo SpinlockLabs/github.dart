@@ -1,9 +1,9 @@
 part of github.common;
 
 class Authentication {
-  String token;
+  final String token;
   
   Authentication.withToken(this.token);
   
-  Authentication.anonymous();
+  Authentication.anonymous() : this.token = null;
 }

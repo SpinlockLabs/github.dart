@@ -6,4 +6,6 @@ export 'package:github/common.dart';
 import 'dart:async';
 import 'dart:html';
 
+import 'src/common/util.dart';
+
 part 'src/browser/core.dart';
