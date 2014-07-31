@@ -144,4 +144,8 @@ class CurrentUser extends User {
     user.plan = UserPlan.fromJSON(github, input['plan']);
     return user;
   }
+  
+  Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
+    return github.fetcher.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
+  }
 }
