@@ -59,4 +59,38 @@ class Organization {
     org.json = input;
     return org;
   }
+  
+  Future<List<Team>> get teams => github.teams(login);
+}
+
+class Team {
+  final GitHub github;
+  
+  String name;
+  int id;
+  String permission;
+  
+  @ApiName("members_count")
+  int membersCount;
+  
+  @ApiName("repos_count")
+  int reposCount;
+  
+  Organization organization;
+  
+  Team(this.github);
+  
+  Map<String, dynamic> json;
+  
+  static Team fromJSON(GitHub github, input) {
+    var team = new Team(github);
+    
+    team.name = input['name'];
+    team.id = input['id'];
+    team.membersCount = input['members_count'];
+    team.reposCount = input['repos_count'];
+    team.organization = Organization.fromJSON(github, input['organization']);
+    team.json = input;
+    return team;
+  }
 }

@@ -92,4 +92,17 @@ class GitHub {
     });
     return group.future;
   }
+  
+  /**
+   * Fetches the teams for the organization specified by [name].
+   */
+  Future<List<Team>> teams(String name) {
+    var group = new FutureGroup<Team>();
+    fetcher.fetchJSON("/orgs/${name}/teams").then((teams) {
+      for (var team in teams) {
+        group.add(fetcher.fetchJSON(team['url'], Team.fromJSON));
+      }
+    });
+    return group.future;
+  }
 }
