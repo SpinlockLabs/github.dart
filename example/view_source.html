@@ -22,19 +22,19 @@
     <div id="editor"></div>
 
     <script>
-        var editor = ace.edit("editor");
-        editor.focus();
-        editor.setReadOnly(true);
-        
-        editor.setTheme("ace/theme/github");
-        editor.getSession().setMode("ace/mode/dart");
-        editor.setShowPrintMargin(false);
         window.addEventListener("message", receiveMessage);
 
         function receiveMessage(event) {
             var msg = event.data;
 
             if (msg.command === "code") {
+                var editor = ace.edit("editor");
+                editor.focus();
+                editor.setReadOnly(true);
+
+                editor.setTheme("ace/theme/github");
+                editor.getSession().setMode("ace/mode/dart");
+                editor.setShowPrintMargin(false);
                 editor.setValue(msg.code, 0);
                 editor.clearSelection();
                 editor.moveCursorTo(0, 0);

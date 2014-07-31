@@ -1,4 +1,5 @@
 import "dart:html";
+import "dart:async" show Timer;
 
 void init(String script) {
 
@@ -6,10 +7,12 @@ void init(String script) {
     var popup = window.open("view_source.html", "View Source");
     
     HttpRequest.getString(script).then((code) {
-      popup.postMessage({
-        "command": "code",
-        "code": code
-      }, window.location.href);
+      new Timer(new Duration(seconds: 1), () {
+        popup.postMessage({
+          "command": "code",
+          "code": code
+        }, window.location.href);
+      });
     });
   });
 }
