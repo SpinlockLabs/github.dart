@@ -55,6 +55,7 @@ class User {
   User(this.github);
   
   static User fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var user = new User(github);
     user.login = input['login'];
     user.id = input['id'];

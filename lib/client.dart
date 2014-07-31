@@ -17,3 +17,4 @@ part 'src/client/client.dart';
 part 'src/client/stats.dart';
 part 'src/client/organization.dart';
 part 'src/client/api.dart';
+part 'src/client/issues.dart';

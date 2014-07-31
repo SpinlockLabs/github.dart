@@ -94,6 +94,10 @@ class Repository {
     repo.owner = RepositoryOwner.fromJSON(input['owner']);
     return repo;
   }
+  
+  Future<List<Issue>> get issues => github.getJSON("/repos/${fullName}/issues").then((json) {
+    return json.map((it) => Issue.fromJSON(github, it));
+  });
 }
 
 class CloneUrls {
