@@ -124,6 +124,14 @@ class GitHub {
       return response.body;
     });
   }
+  
+  Future<List<String>> gitignoreTemplates() {
+    return getJSON("/gitignore/templates");
+  }
+  
+  Future<GitignoreTemplate> gitignoreTemplate(String name) {
+    return getJSON("/gitignore/templates/${name}", convert: GitignoreTemplate.fromJSON);
+  }
 
   /**
    * Fetches the team members of the team specified by [id].
