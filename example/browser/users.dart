@@ -1,6 +1,7 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+import "common.dart";
 
 GitHub github;
 DivElement $users;
@@ -19,6 +20,8 @@ void main() {
       loadUsers();
     }
   });
+  
+  init("users.dart");
 }
 
 void loadUsers() {
@@ -26,7 +29,7 @@ void loadUsers() {
     users.forEach((User user) {
       var element = new DivElement();
       var out = """
-      <img width="64" height="64" src="${user.avatar_url}"> <b>${user.login}</b>
+        <img width="64" height="64" src="${user.avatar_url}">&nbsp;&nbsp;<b>${user.login}</b>
       """;
       element.append(new ParagraphElement()..appendHtml(out));
       $users.append(element);
