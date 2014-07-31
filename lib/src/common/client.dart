@@ -118,4 +118,13 @@ class GitHub {
     });
     return group.future;
   }
+  
+  /**
+   * Fetches the team members of the team specified by [id].
+   */
+  Future<List<TeamMember>> teamMembers(int id) {
+    return fetcher.fetchJSON("/teams/${id}/members").then((List json) {
+      return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
+    });
+  }
 }

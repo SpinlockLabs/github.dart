@@ -27,7 +27,20 @@ class BrowserFetcher extends Fetcher {
       queryString = buildQueryString(params);
     }
     
-    request.open("GET", "${github.endpoint}${path}${queryString}");
+    var url = new StringBuffer();
+    
+    if (path.startsWith("http")) {
+      url.write(path);
+      url.write(queryString);
+    } else {
+      url.write(github.endpoint);
+      url.write(path);
+      url.write(queryString);
+    }
+    
+    request.open("GET", url.toString());
+    
+    headers.forEach(request.setRequestHeader);
     
     var completer = new Completer();
     
