@@ -1,0 +1,12 @@
+analyzer.files: 
+  - lib/common.dart
+  - lib/client.dart
+  - lib/browser.dart
+  - example/repos.dart
+  - example/common.dart
+  - example/users.dart
+check.tasks: 
+  - analyze
+  - test
+docs.output: out/docs
+test.file: test/all_tests.dart
