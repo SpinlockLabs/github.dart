@@ -98,6 +98,8 @@ class Repository {
   Future<List<Issue>> get issues => github.getJSON("/repos/${fullName}/issues").then((json) {
     return json.map((it) => Issue.fromJSON(github, it));
   });
+  
+  Future<List<Commit>> get commits => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
 }
 
 class CloneUrls {
