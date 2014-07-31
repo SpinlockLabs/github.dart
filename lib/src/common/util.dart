@@ -23,6 +23,18 @@ class ApiName {
 }
 
 /**
+ * Specifies that something should be only used when the specified condition is met.
+ */
+class OnlyWhen {
+  /**
+   * Condition
+   */
+  final String condition;
+  
+  const OnlyWhen(this.condition);
+}
+
+/**
  * Internal method to handle null for parsing dates.
  */
 DateTime parse_date(String input) {

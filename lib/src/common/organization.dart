@@ -61,6 +61,10 @@ class Organization {
   }
   
   Future<List<Team>> get teams => github.teams(login);
+  
+  Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
+    return github.fetcher.postJSON("/orgs/${login}/repos", body: request.toJSON(), convert: TeamRepository.fromJSON);
+  }
 }
 
 class Team {
