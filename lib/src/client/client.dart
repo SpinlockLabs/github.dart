@@ -165,6 +165,8 @@ class GitHub {
       var userAndPass = UTF8.encode("${auth.username}:${auth.password}");
       headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
     }
+    
+    headers.putIfAbsent("User-Agent", () => "GitHub for Dart");
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
