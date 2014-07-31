@@ -124,6 +124,10 @@ class Repository {
       return forks.map((it) => Repository.fromJSON(github, it));
     });
   }
+  
+  Future<RepositoryPages> get pages {
+    return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
+  }
 }
 
 class CloneUrls {
