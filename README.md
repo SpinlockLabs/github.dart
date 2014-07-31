@@ -16,7 +16,7 @@ First, add the following to your pubspec.yaml:
 
 ```
 dependencies:
-  github: ">=0.2.0 <1.0.0"
+  github: ">=0.3.0 <1.0.0"
 ```
 
 Then import the library and use it:
