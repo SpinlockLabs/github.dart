@@ -127,4 +127,8 @@ class GitHub {
       return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
     });
   }
+  
+  Future<CurrentUser> currentUser() {
+    return fetcher.getJSON("/user", convert: CurrentUser.fromJSON);
+  }
 }
