@@ -1,25 +1,33 @@
 var args = document.location.search.substring(1).split('&');
 
-argsParsed = {};
+var opts = {};
 
 for (i = 0; i < args.length; i++) {
   arg = unescape(args[i]);
 
   if (arg.indexOf('=') == -1) {
-    argsParsed[arg.trim()] = true;
+    opts[arg.trim()] = true;
   } else {
     kvp = arg.split('=');
-    argsParsed[kvp[0].trim()] = kvp[1].trim();
+    opts[kvp[0].trim()] = kvp[1].trim();
+  }
+}
+
+function opt(name, def) {
+  if (Object.keys(opts).indexOf(name) !== -1) {
+    return opts[name];
+  } else {
+    return def;
   }
 }
 
 function createEditor(code) {
   var editor = ace.edit("editor");
   editor.focus();
-  editor.setReadOnly(true);
+  editor.setReadOnly(opts['editable'] ? true : false);
 
-  editor.setTheme("ace/theme/github");
-  editor.getSession().setMode("ace/mode/dart");
+  editor.setTheme("ace/theme/" + opt("theme", "github"));
+  editor.getSession().setMode("ace/mode/" + opt("mode", "dart"));
   editor.setShowPrintMargin(false);
   editor.setValue(code, 0);
   editor.clearSelection();
@@ -37,16 +45,15 @@ if (window.opener !== null) {
     }
   }
 } else {
-  if (Object.keys(argsParsed).indexOf("path") !== -1) {
+  if (Object.keys(opts).indexOf("path") !== -1) {
     var req = new XMLHttpRequest();
-    req.open("GET", argsParsed['path']);
+    req.open("GET", opts['path']);
     req.onreadystatechange = function() {
       if (req.readyState === XMLHttpRequest.DONE) {
         if (req.status === 200) {
           createEditor(req.responseText);
-
         } else {
-          createEditor("ERROR: " + argsParsed['path'] + " was not found.");
+          createEditor("ERROR: " + opts['path'] + " was not found.");
         }
       }
     }
