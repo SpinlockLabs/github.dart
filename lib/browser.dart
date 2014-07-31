@@ -9,3 +9,4 @@ import 'dart:html';
 import 'src/common/util.dart';
 
 part 'src/browser/core.dart';
+part 'src/browser/oauth2.dart';

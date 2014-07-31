@@ -47,12 +47,17 @@ DateTime parse_date(String input) {
 
 String buildQueryString(Map<String, String> params) {
   var queryString = new StringBuffer();
-  if (params.isNotEmpty) {
+  
+  if (params.isNotEmpty && !params.values.every((value) => value == null)) {
     queryString.write("?");
   }
+  
   var i = 0;
   for (var key in params.keys) {
     i++;
+    if (params[key] == null) {
+      continue;
+    }
     queryString.write("${key}=${Uri.encodeComponent(params[key])}");
     if (i != params.keys.length) {
       queryString.write("&");

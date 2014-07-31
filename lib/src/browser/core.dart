@@ -16,7 +16,7 @@ class BrowserFetcher extends Fetcher {
       headers = {};
     }
 
-    if (github.auth.token != null) {
+    if (github != null && github.auth.token != null) {
       headers.putIfAbsent("Authorization", () => "token ${github.auth.token}");
     }
 
