@@ -123,6 +123,12 @@ class GitHub {
       return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
     });
   }
+  
+  Future<RateLimit> rateLimit() {
+    return request("GET", "/").then((response) {
+      return RateLimit.fromHeaders(response.headers);
+    });
+  }
 
   Future<CurrentUser> currentUser() {
     return getJSON("/user", convert: CurrentUser.fromJSON);
