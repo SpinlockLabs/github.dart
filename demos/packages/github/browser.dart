@@ -1,11 +1,10 @@
 library github.browser;
 
-import 'package:github/common.dart';
-export 'package:github/common.dart';
+import 'package:http/browser_client.dart';
 
-import 'dart:async';
-import 'dart:html';
+import 'client.dart';
+export 'client.dart';
 
-import 'src/common/util.dart';
-
-part 'src/browser/core.dart';
+void initGitHub() {
+  GitHub.defaultClient = () => new BrowserClient();
+}

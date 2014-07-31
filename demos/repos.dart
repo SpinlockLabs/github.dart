@@ -17,7 +17,8 @@ Map<String, Comparator<Repository>> sorts = {
 void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
-  github = new GitHub(new BrowserFetcher());
+  initGitHub();
+  github = new GitHub();
 
   $repos = querySelector("#repos");
 

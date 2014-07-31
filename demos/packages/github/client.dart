@@ -1,12 +1,18 @@
 library github.client;
 
-import 'package:github/common.dart';
-export 'package:github/common.dart';
-
 import 'dart:async';
+import 'dart:convert' show JSON, UTF8;
+import 'package:crypto/crypto.dart' show CryptoUtils;
 
+import 'package:quiver/async.dart';
 import 'package:http/http.dart' as http;
 
-import 'src/common/util.dart';
+import 'src/client/util.dart';
 
-part 'src/client/core.dart';
+part 'src/client/auth.dart';
+part 'src/client/repo.dart';
+part 'src/client/user.dart';
+part 'src/client/json.dart';
+part 'src/client/client.dart';
+part 'src/client/stats.dart';
+part 'src/client/organization.dart';

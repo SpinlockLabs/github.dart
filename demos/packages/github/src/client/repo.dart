@@ -1,4 +1,4 @@
-part of github.common;
+part of github.client;
 
 /**
  * The Repository Model
@@ -129,4 +129,51 @@ class RepositorySlug {
   final String name;
   
   RepositorySlug(this.owner, this.name);
+}
+
+class CreateRepositoryRequest {
+  final String name;
+  String description;
+  String homepage;
+  bool private = false;
+  
+  @ApiName("has_issues")
+  bool hasIssues = true;
+  
+  @ApiName("has_wiki")
+  bool hasWiki = true;
+  
+  @ApiName("has_downloads")
+  bool hasDownloads = true;
+
+  @OnlyWhen("Creating a repository for an organization")
+  @ApiName("team_id")
+  int teamID;
+  
+  @ApiName("auto_init")
+  bool autoInit = false;
+  
+  @OnlyWhen("autoInit is true")
+  String gitignoreTemplate;
+  
+  @OnlyWhen("autoInit is true")
+  String licenseTemplate;
+  
+  CreateRepositoryRequest(this.name);
+  
+  String toJSON() {
+    return JSON.encode({
+      "name": name,
+      "description": description,
+      "homepage": homepage,
+      "private": private,
+      "has_issues": hasIssues,
+      "has_wiki": hasWiki,
+      "has_downloads": hasDownloads,
+      "team_id": teamID,
+      "auto_init": autoInit,
+      "gitignore_template": gitignoreTemplate,
+      "license_template": licenseTemplate
+    });
+  }
 }
