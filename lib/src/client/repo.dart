@@ -128,6 +128,16 @@ class Repository {
   Future<RepositoryPages> get pages {
     return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
   }
+  
+  Future<List<Hook>> get hooks {
+    return github.getJSON("/repos/${fullName}/hooks").then((hooks) {
+      return hooks.map((it) => Hook.fromJSON(github, fullName, it));
+    });
+  }
+  
+  Future<Hook> createHook(CreateHookRequest request) {
+    return github.postJSON("/repos/${fullName}/hooks", convert: (g, i) => Hook.fromJSON(g, fullName, i), body: request.toJSON());
+  }
 }
 
 class CloneUrls {

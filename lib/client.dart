@@ -21,3 +21,4 @@ part 'src/client/issues.dart';
 part 'src/client/misc.dart';
 part 'src/client/commits.dart';
 part 'src/client/pages.dart';
+part 'src/client/hooks.dart';
