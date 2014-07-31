@@ -42,7 +42,7 @@ String buildQueryString(Map<String, String> params) {
   for (var key in params.keys) {
     i++;
     queryString.write("${key}=${Uri.encodeComponent(params[key])}");
-    if (i != params.keys) {
+    if (i != params.keys.length) {
       queryString.write("&");
     }
   }

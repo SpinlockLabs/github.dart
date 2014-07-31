@@ -26,7 +26,10 @@ class GitHub {
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
    */
-  GitHub(this.fetcher, {Authentication auth, this.endpoint: "https://api.github.com"}) : this.auth = auth == null ? new Authentication.anonymous() : auth {
+  GitHub(this.fetcher, {
+    Authentication auth,
+    this.endpoint: "https://api.github.com"
+  }) : this.auth = auth == null ? new Authentication.anonymous() : auth {
     fetcher.github = this;
   }
   
@@ -69,8 +72,18 @@ class GitHub {
   /**
    * Fetches the repositories of the user specified by [user].
    */
-  Future<List<Repository>> userRepositories(String user) {
-    return fetcher.fetchJSON("/users/${user}/repos?per_page=5000").then((List json) {
+  Future<List<Repository>> userRepositories(String user, {
+    String type: "owner",
+    int limit: 5000,
+    String sort: "full_name",
+    String direction: "asc"
+  }) {
+    var params = {
+      "per_page": limit.toString(),
+      "sort": sort,
+      "direction": direction
+    };
+    return fetcher.fetchJSON("/users/${user}/repos", params: params).then((List json) {
       return new List.from(json.map((it) => Repository.fromJSON(this, it)));
     });
   }
