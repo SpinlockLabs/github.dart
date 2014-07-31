@@ -8,7 +8,7 @@ This is a Client Library for GitHub in Dart.
 - Fast, really fast.
 - Customizable
 - Fully Tested
-- Support Authentication
+- Supports Authentication
 
 ## Getting Started
 
