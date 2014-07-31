@@ -7,4 +7,6 @@ import 'dart:async';
 
 import 'package:http/http.dart' as http;
 
+import 'src/common/util.dart';
+
 part 'src/client/core.dart';

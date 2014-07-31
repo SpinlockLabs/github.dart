@@ -34,7 +34,7 @@ class GitHub {
    * Fetches the user specified by [name].
    */
   Future<User> user(String name) {
-    return fetcher.fetchJSON("/users/${name}", User.fromJSON);
+    return fetcher.fetchJSON("/users/${name}", convert: User.fromJSON);
   }
 
   /**
@@ -52,7 +52,7 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return fetcher.fetchJSON("/repos/${slug.owner}/${slug.name}", Repository.fromJSON);
+    return fetcher.fetchJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON);
   }
   
   /**
@@ -79,7 +79,7 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return fetcher.fetchJSON("/orgs/${name}", Organization.fromJSON);
+    return fetcher.fetchJSON("/orgs/${name}", convert: Organization.fromJSON);
   }
   
   /**
@@ -100,7 +100,7 @@ class GitHub {
     var group = new FutureGroup<Team>();
     fetcher.fetchJSON("/orgs/${name}/teams").then((teams) {
       for (var team in teams) {
-        group.add(fetcher.fetchJSON(team['url'], Team.fromJSON));
+        group.add(fetcher.fetchJSON(team['url'], convert: Team.fromJSON));
       }
     });
     return group.future;
