@@ -65,6 +65,10 @@ class Organization {
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
     return github.postJSON("/orgs/${login}/repos", body: request.toJSON(), convert: TeamRepository.fromJSON);
   }
+  
+  Future<List<Issue>> get issues => github.getJSON("/orgs/${login}/issues").then((json) {
+    return json.map((it) => Issue.fromJSON(github, it));
+  });
 }
 
 class Team {

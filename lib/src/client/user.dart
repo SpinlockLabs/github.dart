@@ -149,4 +149,8 @@ class CurrentUser extends User {
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
     return github.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
   }
+  
+  Future<List<Issue>> get issues => github.getJSON("/issues").then((json) {
+    return json.map((it) => Issue.fromJSON(github, it));
+  });
 }
