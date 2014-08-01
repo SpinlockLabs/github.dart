@@ -40,6 +40,9 @@ class OAuth2Flow {
       "redirect_uri": redirectUri
     }), headers: headers).then((response) {
       var json = JSON.decode(response.body);
+      if (json['error'] != null) {
+        throw json;
+      }
       return new ExchangeResponse(json['access_token'], json['token_type'], json['scope'].split(","));
     });
   }
