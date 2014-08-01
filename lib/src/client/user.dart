@@ -96,6 +96,7 @@ class UserPlan {
   UserPlan(this.github);
   
   static UserPlan fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var plan = new UserPlan(github);
     plan.name = input['name'];
     plan.space = input['space'];
@@ -120,6 +121,7 @@ class CurrentUser extends User {
   CurrentUser(GitHub github) : super(github);
   
   static CurrentUser fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var user = new CurrentUser(github);
     user.login = input['login'];
     user.id = input['id'];

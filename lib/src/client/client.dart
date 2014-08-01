@@ -149,25 +149,35 @@ class GitHub {
   }
 
   Future<CurrentUser> currentUser() {
-    return getJSON("/user", convert: CurrentUser.fromJSON);
+    return getJSON("/user", statusCode: 200, fail: (response) {
+      throw "Not Authenticated";
+    }, convert: CurrentUser.fromJSON);
   }
 
-  Future<dynamic> getJSON(String path, {Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
+  Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
     if (convert == null) {
       convert = (github, input) => input;
     }
 
     return request("GET", path, headers: headers, params: params).then((response) {
+      if (statusCode != null && statusCode != response.statusCode) {
+        fail(response);
+        return new Future.value(null);
+      }
       return convert(this, JSON.decode(response.body));
     });
   }
 
-  Future<dynamic> postJSON(String path, {Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
+  Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
     if (convert == null) {
       convert = (github, input) => input;
     }
 
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
+      if (statusCode != null && statusCode != response.statusCode) {
+        fail(response);
+        return new Future.value(null);
+      }
       return convert(this, JSON.decode(response.body));
     });
   }
