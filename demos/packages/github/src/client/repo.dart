@@ -94,6 +94,50 @@ class Repository {
     repo.owner = RepositoryOwner.fromJSON(input['owner']);
     return repo;
   }
+  
+  Future<List<Issue>> get issues => github.getJSON("/repos/${fullName}/issues").then((json) {
+    return json.map((it) => Issue.fromJSON(github, it));
+  });
+  
+  Future<List<Commit>> get commits => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
+  
+  Future<List<ContributorStatistics>> get contributorStatistics {
+    var completer = new Completer<List<ContributorStatistics>>();
+    var path = "/repos/${fullName}/stats/contributors";
+    var handle;
+    handle = (GitHub gh, json) {
+      if (json is Map) {
+        new Future.delayed(new Duration(milliseconds: 200), () {
+          github.getJSON(path, convert: handle);
+        });
+        return null;
+      } else {
+        completer.complete(json.map((it) => ContributorStatistics.fromJSON(github, it)));
+      }
+    };
+    github.getJSON(path, convert: handle);
+    return completer.future;
+  }
+  
+  Future<List<Repository>> get forks {
+    return github.getJSON("/repos/${fullName}/forks").then((forks) {
+      return forks.map((it) => Repository.fromJSON(github, it));
+    });
+  }
+  
+  Future<RepositoryPages> get pages {
+    return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
+  }
+  
+  Future<List<Hook>> get hooks {
+    return github.getJSON("/repos/${fullName}/hooks").then((hooks) {
+      return hooks.map((it) => Hook.fromJSON(github, fullName, it));
+    });
+  }
+  
+  Future<Hook> createHook(CreateHookRequest request) {
+    return github.postJSON("/repos/${fullName}/hooks", convert: (g, i) => Hook.fromJSON(g, fullName, i), body: request.toJSON());
+  }
 }
 
 class CloneUrls {

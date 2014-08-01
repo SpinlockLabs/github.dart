@@ -114,6 +114,24 @@ class GitHub {
     });
     return group.future;
   }
+  
+  Future<String> renderMarkdown(String input, {String mode: "markdown", String context}) {
+    return request("POST", "/markdown", body: JSON.encode({
+      "text": input,
+      "mode": mode,
+      "context": context
+    })).then((response) {
+      return response.body;
+    });
+  }
+  
+  Future<List<String>> gitignoreTemplates() {
+    return getJSON("/gitignore/templates");
+  }
+  
+  Future<GitignoreTemplate> gitignoreTemplate(String name) {
+    return getJSON("/gitignore/templates/${name}", convert: GitignoreTemplate.fromJSON);
+  }
 
   /**
    * Fetches the team members of the team specified by [id].
@@ -123,27 +141,43 @@ class GitHub {
       return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
     });
   }
-
-  Future<CurrentUser> currentUser() {
-    return getJSON("/user", convert: CurrentUser.fromJSON);
+  
+  Future<RateLimit> rateLimit() {
+    return request("GET", "/").then((response) {
+      return RateLimit.fromHeaders(response.headers);
+    });
   }
 
-  Future<dynamic> getJSON(String path, {Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
+  Future<CurrentUser> currentUser() {
+    return getJSON("/user", statusCode: 200, fail: (response) {
+      throw "Not Authenticated";
+    }, convert: CurrentUser.fromJSON);
+  }
+
+  Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
     if (convert == null) {
       convert = (github, input) => input;
     }
 
     return request("GET", path, headers: headers, params: params).then((response) {
+      if (statusCode != null && statusCode != response.statusCode) {
+        fail(response);
+        return new Future.value(null);
+      }
       return convert(this, JSON.decode(response.body));
     });
   }
 
-  Future<dynamic> postJSON(String path, {Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
+  Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
     if (convert == null) {
       convert = (github, input) => input;
     }
 
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
+      if (statusCode != null && statusCode != response.statusCode) {
+        fail(response);
+        return new Future.value(null);
+      }
       return convert(this, JSON.decode(response.body));
     });
   }
@@ -159,7 +193,11 @@ class GitHub {
       var userAndPass = UTF8.encode("${auth.username}:${auth.password}");
       headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
     }
-
+    
+    if (client is http.IOClient) {
+      headers.putIfAbsent("User-Agent", () => "GitHub for Dart");
+    }
+    
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     var queryString = "";

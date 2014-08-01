@@ -14753,13 +14753,13 @@ var $$ = {};
       H.IterableMixinWorkaround_forEach(names, new T.GitHub_users_closure(this, group));
       return group._completer.future;
     },
-    getJSON$4$convert$headers$params: function(path, convert, headers, params) {
+    getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1 = {};
       t1.convert_0 = convert;
-      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure(t1, this));
+      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure(t1, this, statusCode, fail));
     },
     getJSON$2$convert: function(path, convert) {
-      return this.getJSON$4$convert$headers$params(path, convert, null, null);
+      return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, null, null, null, null);
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14771,7 +14771,10 @@ var $$ = {};
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
       }
-      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure1());
+      t1 = this.client;
+      if (!!J.getInterceptor(t1).$isIOClient)
+        headers.putIfAbsent$2("User-Agent", new T.GitHub_request_closure1());
+      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure2());
       url = P.StringBuffer$("");
       if (C.JSString_methods.startsWith$1(path, "http")) {
         url.write$1(path);
@@ -14783,9 +14786,9 @@ var $$ = {};
       }
       switch (method) {
         case "GET":
-          return this.client.get$2$headers(url._contents, headers);
+          return t1.get$2$headers(url._contents, headers);
         case "POST":
-          return this.client.post$3$body$headers(url._contents, body, headers);
+          return t1.post$3$body$headers(url._contents, body, headers);
         default:
           throw H.wrapException(P.UnsupportedError$("Method '" + method + "' not supported"));
       }
@@ -14815,7 +14818,7 @@ var $$ = {};
     }
   },
   GitHub_getJSON_closure: {
-    "^": "Closure:23;box_0,this_1",
+    "^": "Closure:23;box_0,this_1,statusCode_2,fail_3",
     call$1: function(response) {
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
@@ -14835,6 +14838,12 @@ var $$ = {};
   GitHub_request_closure1: {
     "^": "Closure:20;",
     call$0: function() {
+      return "GitHub for Dart";
+    }
+  },
+  GitHub_request_closure2: {
+    "^": "Closure:20;",
+    call$0: function() {
       return "application/vnd.github.v3+json";
     }
   },
@@ -14843,6 +14852,8 @@ var $$ = {};
     $isUser: true,
     static: {User_fromJSON: [function(github, input) {
         var user, t1;
+        if (input == null)
+          return;
         user = new T.User(github, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         t1 = J.getInterceptor$asx(input);
         user.login = t1.$index(input, "login");
@@ -15340,6 +15351,7 @@ var $$ = {};
       Y.assertSupported("IOClient");
       this._inner = $.get$_httpClient().newInstance$2(C.Symbol_0c4, []).reflectee;
     },
+    $isIOClient: true,
     static: {IOClient$: function(innerClient) {
         var t1 = new R.IOClient(null);
         t1.IOClient$1(innerClient);

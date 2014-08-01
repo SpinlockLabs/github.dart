@@ -9,14 +9,30 @@ DivElement $org;
 void main() {  
   initGitHub();
   init("organization.dart", onReady: () {
-    github = new GitHub(auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
     $org = querySelector("#org");
     loadOrganization();
   });
 }
 
 void loadOrganization() {
-  github.organization("DirectMyFile").then((Organization org) {
+  var org = "DirectMyFile";
+  var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
+  var url = window.location.href;
+  
+  if (url.contains("?")) {
+    var params = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
+    if (params.containsKey("name")) {
+      org = params["name"];
+    }
+    
+    if (params.containsKey("token")) {
+      token = params["token"];
+    }
+  }
+  
+  github = new GitHub(auth: new Authentication.withToken(token));
+  
+  github.organization(org).then((Organization org) {
     return org.teams;
   }).then((List<Team> teams) {
     for (var team in teams) {
@@ -31,7 +47,7 @@ void loadOrganization() {
           h.classes.add("user");
           h.style.textAlign = "center";
           h.append(new ImageElement(src: member.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
-          h.append(new AnchorElement(href: member.url)..append(new ParagraphElement()..text = "${member.login}"));
+          h.append(new AnchorElement(href: member.url)..append(new ParagraphElement()..text = member.login));
           return h;
         });
         divs.forEach(e.append);

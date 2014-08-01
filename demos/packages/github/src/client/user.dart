@@ -55,6 +55,7 @@ class User {
   User(this.github);
   
   static User fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var user = new User(github);
     user.login = input['login'];
     user.id = input['id'];
@@ -95,6 +96,7 @@ class UserPlan {
   UserPlan(this.github);
   
   static UserPlan fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var plan = new UserPlan(github);
     plan.name = input['name'];
     plan.space = input['space'];
@@ -119,6 +121,7 @@ class CurrentUser extends User {
   CurrentUser(GitHub github) : super(github);
   
   static CurrentUser fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var user = new CurrentUser(github);
     user.login = input['login'];
     user.id = input['id'];
@@ -148,4 +151,8 @@ class CurrentUser extends User {
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
     return github.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
   }
+  
+  Future<List<Issue>> get issues => github.getJSON("/issues").then((json) {
+    return json.map((it) => Issue.fromJSON(github, it));
+  });
 }

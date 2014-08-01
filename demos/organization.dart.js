@@ -4514,15 +4514,15 @@ var $$ = {};
     }
   },
   MappedListIterable: {
-    "^": "ListIterable;_source,_f",
+    "^": "ListIterable;__internal$_source,_f",
     _f$1: function(arg0) {
       return this._f.call$1(arg0);
     },
     get$length: function(_) {
-      return J.get$length$asx(this._source);
+      return J.get$length$asx(this.__internal$_source);
     },
     elementAt$1: function(_, index) {
-      return this._f$1(J.elementAt$1$ax(this._source, index));
+      return this._f$1(J.elementAt$1$ax(this.__internal$_source, index));
     },
     $asListIterable: function($S, $T) {
       return [$T];
@@ -4696,6 +4696,11 @@ var $$ = {};
         var t1;
         for (t1 = H.setRuntimeTypeInfo(new H.ListIterator(iterable, iterable.length, 0, null), [H.getTypeArgumentByIndex(iterable, 0)]); t1.moveNext$0();)
           f.call$1(t1._current);
+      }, IterableMixinWorkaround_fold: function(iterable, initialValue, combine) {
+        var t1;
+        for (t1 = H.setRuntimeTypeInfo(new H.ListIterator(iterable, iterable.length, 0, null), [H.getTypeArgumentByIndex(iterable, 0)]); t1.moveNext$0();)
+          initialValue = combine.call$2(initialValue, t1._current);
+        return initialValue;
       }, IterableMixinWorkaround__rangeCheck: function(list, start, end) {
         var t1;
         if (start < 0 || start > list.length)
@@ -8261,14 +8266,14 @@ var $$ = {};
       var t1, t2;
       t1 = this.get$_handleData();
       t2 = this.get$_handleError();
-      this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
+      this._subscription = this._stream._source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
     },
     $as_BufferingStreamSubscription: function($S, $T) {
       return [$T];
     }
   },
   _MapStream: {
-    "^": "_ForwardingStream;_transform,_async$_source",
+    "^": "_ForwardingStream;_transform,_source",
     _transform$1: function(arg0) {
       return this._transform.call$1(arg0);
     },
@@ -8289,7 +8294,7 @@ var $$ = {};
     }
   },
   _SkipStream: {
-    "^": "_ForwardingStream;_remaining,_async$_source",
+    "^": "_ForwardingStream;_remaining,_source",
     _handleData$2: function(inputEvent, sink) {
       var t1 = this._remaining;
       if (t1 > 0) {
@@ -9821,6 +9826,9 @@ var $$ = {};
     },
     $indexSet: function(_, key, value) {
       this._map.$indexSet(0, key, value);
+    },
+    containsKey$1: function(key) {
+      return this._map.containsKey$1(key);
     },
     forEach$1: function(_, action) {
       this._map.forEach$1(0, action);
@@ -12493,7 +12501,9 @@ var $$ = {};
         return buffer.toString$0(0);
       }, Uri_decodeComponent: [function(encodedComponent) {
         return P.Uri__uriDecode(encodedComponent, C.Utf8Codec_false, false);
-      }, "call$1", "Uri_decodeComponent$closure", 2, 0, 3], Uri_parseIPv4Address: function(host) {
+      }, "call$1", "Uri_decodeComponent$closure", 2, 0, 3], Uri_splitQueryString: function(query, encoding) {
+        return H.IterableMixinWorkaround_fold(query.split("&"), P.LinkedHashMap_LinkedHashMap$_empty(null, null), new P.Uri_splitQueryString_closure(encoding));
+      }, Uri_parseIPv4Address: function(host) {
         var t1, bytes;
         t1 = new P.Uri_parseIPv4Address_error();
         bytes = host.split(".");
@@ -12842,6 +12852,24 @@ var $$ = {};
     "^": "Closure:45;",
     call$2: function(part, current) {
       return current * 31 + J.get$hashCode$(part) & 1073741823;
+    }
+  },
+  Uri_splitQueryString_closure: {
+    "^": "Closure:22;encoding_0",
+    call$2: function(map, element) {
+      var t1, index, key, value;
+      t1 = J.getInterceptor$asx(element);
+      index = t1.indexOf$1(element, "=");
+      if (index === -1) {
+        if (!t1.$eq(element, ""))
+          J.$indexSet$ax(map, P.Uri__uriDecode(element, this.encoding_0, true), "");
+      } else if (index !== 0) {
+        key = t1.substring$2(element, 0, index);
+        value = C.JSString_methods.substring$1(element, index + 1);
+        t1 = this.encoding_0;
+        J.$indexSet$ax(map, P.Uri__uriDecode(key, t1, true), P.Uri__uriDecode(value, t1, true));
+      }
+      return map;
     }
   },
   Uri_parseIPv4Address_error: {
@@ -13916,6 +13944,9 @@ var $$ = {};
     $indexSet: function(_, key, value) {
       this._base.$indexSet(0, key, value);
     },
+    containsKey$1: function(key) {
+      return this._base.containsKey$1(key);
+    },
     forEach$1: function(_, f) {
       this._base.forEach$1(0, f);
     },
@@ -14418,7 +14449,7 @@ var $$ = {};
     teamMembers$1: function(id) {
       return this.getJSON$1("/teams/" + H.S(id) + "/members").then$1(new T.GitHub_teamMembers_closure(this));
     },
-    getJSON$4$convert$headers$params: function(path, convert, headers, params) {
+    getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1, t2, t3, result;
       t1 = {};
       t1.convert_0 = convert;
@@ -14427,16 +14458,16 @@ var $$ = {};
       t2 = this.request$4$headers$params(0, "GET", path, headers, params);
       t3 = $.Zone__current;
       t3.toString;
-      result = new P._Future(0, t3, null, null, new T.GitHub_getJSON_closure0(t1, this), null, P._registerErrorHandler(null, t3), null);
+      result = new P._Future(0, t3, null, null, new T.GitHub_getJSON_closure0(t1, this, statusCode, fail), null, P._registerErrorHandler(null, t3), null);
       result.$builtinTypeInfo = [null];
       t2._addListener$1(result);
       return result;
     },
     getJSON$2$convert: function(path, convert) {
-      return this.getJSON$4$convert$headers$params(path, convert, null, null);
+      return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, null, null, null, null);
     },
     getJSON$1: function(path) {
-      return this.getJSON$4$convert$headers$params(path, null, null, null);
+      return this.getJSON$6$convert$fail$headers$params$statusCode(path, null, null, null, null, null);
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14448,7 +14479,10 @@ var $$ = {};
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
       }
-      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure1());
+      t1 = this.client;
+      if (!!J.getInterceptor(t1).$isIOClient)
+        headers.putIfAbsent$2("User-Agent", new T.GitHub_request_closure1());
+      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure2());
       url = P.StringBuffer$("");
       if (J.startsWith$1$s(path, "http")) {
         url.write$1(path);
@@ -14460,9 +14494,9 @@ var $$ = {};
       }
       switch (method) {
         case "GET":
-          return this.client.get$2$headers(url._contents, headers);
+          return t1.get$2$headers(url._contents, headers);
         case "POST":
-          return this.client.post$3$body$headers(url._contents, body, headers);
+          return t1.post$3$body$headers(url._contents, body, headers);
         default:
           throw H.wrapException(P.UnsupportedError$("Method '" + method + "' not supported"));
       }
@@ -14515,7 +14549,7 @@ var $$ = {};
     }
   },
   GitHub_getJSON_closure0: {
-    "^": "Closure:24;box_0,this_1",
+    "^": "Closure:24;box_0,this_1,statusCode_2,fail_3",
     call$1: function(response) {
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
@@ -14533,6 +14567,12 @@ var $$ = {};
     }
   },
   GitHub_request_closure1: {
+    "^": "Closure:21;",
+    call$0: function() {
+      return "GitHub for Dart";
+    }
+  },
+  GitHub_request_closure2: {
     "^": "Closure:21;",
     call$0: function() {
       return "application/vnd.github.v3+json";
@@ -15138,6 +15178,7 @@ var $$ = {};
       Y.assertSupported("IOClient");
       this._inner = $.get$_httpClient().newInstance$2(C.Symbol_0c4, []).reflectee;
     },
+    $isIOClient: true,
     static: {IOClient$: function(innerClient) {
         var t1 = new R.IOClient(null);
         t1.IOClient$1(innerClient);
@@ -15261,13 +15302,24 @@ var $$ = {};
     R.init("organization.dart", new S.main_closure());
   }, "call$0", "main$closure", 0, 0, 6],
   loadOrganization: function() {
-    $.github.getJSON$2$convert("/orgs/DirectMyFile", T.Organization_fromJSON$closure()).then$1(new S.loadOrganization_closure()).then$1(new S.loadOrganization_closure0());
+    var url, params, org, token, t1;
+    url = window.location.href;
+    if (J.getInterceptor$asx(url).contains$1(url, "?")) {
+      params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
+      org = params.containsKey$1("name") === true ? params.$index(0, "name") : "DirectMyFile";
+      token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
+    } else {
+      org = "DirectMyFile";
+      token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
+    }
+    t1 = $.get$GitHub_defaultClient().call$0();
+    t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
+    $.github = t1;
+    t1.getJSON$2$convert("/orgs/" + H.S(org), T.Organization_fromJSON$closure()).then$1(new S.loadOrganization_closure()).then$1(new S.loadOrganization_closure0());
   },
   main_closure: {
     "^": "Closure:21;",
     call$0: function() {
-      var t1 = $.get$GitHub_defaultClient().call$0();
-      $.github = new T.GitHub(new T.Authentication("5fdec2b77527eae85f188b7b2bfeeda170f26883", null, null, false, false, true), "https://api.github.com", t1);
       $.$$org = document.querySelector("#org");
       S.loadOrganization();
     }
@@ -15329,7 +15381,7 @@ var $$ = {};
       if (t1 != null)
         J.set$href$x(e, t1);
       t1 = document.createElement("p", null);
-      t1.textContent = H.S(member.get$login());
+      t1.textContent = member.get$login();
       e.appendChild(t1);
       h.appendChild(e);
       return h;
@@ -17136,9 +17188,6 @@ $$ = null;
   _ = P.bool;
   _.$isbool = TRUE;
   _.$isObject = TRUE;
-  _ = T.Team;
-  _.$isTeam = TRUE;
-  _.$isObject = TRUE;
   P.Encoding.$isObject = TRUE;
   _ = P.LibraryMirror;
   _.$isLibraryMirror = TRUE;
@@ -17180,6 +17229,9 @@ $$ = null;
   _ = P.TypeMirror;
   _.$isTypeMirror = TRUE;
   _.$isMirror = TRUE;
+  _.$isObject = TRUE;
+  _ = T.Team;
+  _.$isTeam = TRUE;
   _.$isObject = TRUE;
   W.MouseEvent.$isObject = TRUE;
   _ = R.Trace;

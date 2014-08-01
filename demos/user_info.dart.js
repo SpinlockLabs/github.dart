@@ -6828,11 +6828,11 @@ var $$ = {};
       t1.toString;
       P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncCompleteError_closure(this, error, stackTrace));
     },
-    _async$_Future$immediate$1: function(value, $T) {
-      this._asyncComplete$1(value);
-    },
     _async$_Future$immediateError$2: function(error, stackTrace, $T) {
       this._asyncCompleteError$2(error, stackTrace);
+    },
+    _async$_Future$immediate$1: function(value, $T) {
+      this._asyncComplete$1(value);
     },
     $is_Future: true,
     $isFuture: true,
@@ -13139,7 +13139,7 @@ var $$ = {};
   Event: {
     "^": "Interceptor;",
     $isEvent: true,
-    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyNeededEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SecurityPolicyViolationEvent|SpeechInputEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
+    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyNeededEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SpeechInputEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
   },
   EventTarget: {
     "^": "Interceptor;",
@@ -13406,6 +13406,10 @@ var $$ = {};
       return receiver.toString();
     },
     "%": "Range"
+  },
+  SecurityPolicyViolationEvent: {
+    "^": "Event;statusCode=",
+    "%": "SecurityPolicyViolationEvent"
   },
   SelectElement: {
     "^": "HtmlElement;length=,name=,value=",
@@ -14706,13 +14710,16 @@ var $$ = {};
   },
   GitHub: {
     "^": "Object;auth,endpoint,client",
-    getJSON$4$convert$headers$params: function(path, convert, headers, params) {
+    currentUser$0: function() {
+      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(), 200);
+    },
+    getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1 = {};
       t1.convert_0 = convert;
-      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure(t1, this));
+      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure(t1, this, statusCode, fail));
     },
-    getJSON$2$convert: function(path, convert) {
-      return this.getJSON$4$convert$headers$params(path, convert, null, null);
+    getJSON$4$convert$fail$statusCode: function(path, convert, fail, statusCode) {
+      return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, fail, null, null, statusCode);
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14724,7 +14731,10 @@ var $$ = {};
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
       }
-      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure1());
+      t1 = this.client;
+      if (!!J.getInterceptor(t1).$isIOClient)
+        headers.putIfAbsent$2("User-Agent", new T.GitHub_request_closure1());
+      headers.putIfAbsent$2("Accept", new T.GitHub_request_closure2());
       url = P.StringBuffer$("");
       if (C.JSString_methods.startsWith$1(path, "http")) {
         url.write$1(path);
@@ -14736,9 +14746,9 @@ var $$ = {};
       }
       switch (method) {
         case "GET":
-          return this.client.get$2$headers(url._contents, headers);
+          return t1.get$2$headers(url._contents, headers);
         case "POST":
-          return this.client.post$3$body$headers(url._contents, body, headers);
+          return t1.post$3$body$headers(url._contents, body, headers);
         default:
           throw H.wrapException(P.UnsupportedError$("Method '" + method + "' not supported"));
       }
@@ -14755,6 +14765,12 @@ var $$ = {};
       return R.IOClient$(null);
     }
   },
+  GitHub_currentUser_closure: {
+    "^": "Closure:23;",
+    call$1: function(response) {
+      throw H.wrapException("Not Authenticated");
+    }
+  },
   GitHub_getJSON_closure0: {
     "^": "Closure:21;",
     call$2: function(github, input) {
@@ -14762,8 +14778,12 @@ var $$ = {};
     }
   },
   GitHub_getJSON_closure: {
-    "^": "Closure:23;box_0,this_1",
+    "^": "Closure:23;box_0,this_1,statusCode_2,fail_3",
     call$1: function(response) {
+      if (this.statusCode_2 !== J.get$statusCode$x(response)) {
+        this.fail_3.call$1(response);
+        return P._Future$immediate(null, null);
+      }
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
   },
@@ -14782,6 +14802,12 @@ var $$ = {};
   GitHub_request_closure1: {
     "^": "Closure:20;",
     call$0: function() {
+      return "GitHub for Dart";
+    }
+  },
+  GitHub_request_closure2: {
+    "^": "Closure:20;",
+    call$0: function() {
       return "application/vnd.github.v3+json";
     }
   },
@@ -14789,12 +14815,26 @@ var $$ = {};
     "^": "Object;name>,location>,bio<"
   },
   UserPlan: {
-    "^": "Object;github,name>,space,privateReposCount,collaboratorsCount"
+    "^": "Object;github,name>,space,privateReposCount,collaboratorsCount",
+    static: {UserPlan_fromJSON: function(github, input) {
+        var plan, t1;
+        if (input == null)
+          return;
+        plan = new T.UserPlan(github, null, null, null, null);
+        t1 = J.getInterceptor$asx(input);
+        plan.name = t1.$index(input, "name");
+        plan.space = t1.$index(input, "space");
+        plan.privateReposCount = t1.$index(input, "private_repos");
+        plan.collaboratorsCount = t1.$index(input, "collaborators");
+        return plan;
+      }}
   },
   CurrentUser: {
     "^": "User;privateReposCount,ownedPrivateReposCount,diskUsage<,plan,github,login,id,avatar_url,url,siteAdmin,name,company,blog,location,email,hirable,bio,publicReposCount,publicGistsCount,followersCount,followingCount,createdAt,updatedAt,json",
     static: {CurrentUser_fromJSON: [function(github, input) {
-        var user, t1, plan, t2;
+        var user, t1;
+        if (input == null)
+          return;
         user = new T.CurrentUser(null, null, null, null, github, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         t1 = J.getInterceptor$asx(input);
         user.login = t1.$index(input, "login");
@@ -14818,14 +14858,7 @@ var $$ = {};
         user.json = input;
         user.privateReposCount = t1.$index(input, "total_private_repos");
         user.ownedPrivateReposCount = t1.$index(input, "owned_private_repos");
-        t1 = t1.$index(input, "plan");
-        plan = new T.UserPlan(github, null, null, null, null);
-        t2 = J.getInterceptor$asx(t1);
-        plan.name = t2.$index(t1, "name");
-        plan.space = t2.$index(t1, "space");
-        plan.privateReposCount = t2.$index(t1, "private_repos");
-        plan.collaboratorsCount = t2.$index(t1, "collaborators");
-        user.plan = plan;
+        user.plan = T.UserPlan_fromJSON(github, t1.$index(input, "plan"));
         return user;
       }, "call$2", "CurrentUser_fromJSON$closure", 4, 0, 17]}
   }
@@ -15302,6 +15335,7 @@ var $$ = {};
       Y.assertSupported("IOClient");
       this._inner = $.get$_httpClient().newInstance$2(C.Symbol_0c4, []).reflectee;
     },
+    $isIOClient: true,
     static: {IOClient$: function(innerClient) {
         var t1 = new R.IOClient(null);
         t1.IOClient$1(innerClient);
@@ -17104,7 +17138,7 @@ var $$ = {};
         return;
       }
       t2 = $.get$GitHub_defaultClient().call$0();
-      new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).getJSON$2$convert("/user", T.CurrentUser_fromJSON$closure()).then$1(new U.loadUser__closure());
+      new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).currentUser$0().then$1(new U.loadUser__closure());
     }
   },
   loadUser__closure: {
