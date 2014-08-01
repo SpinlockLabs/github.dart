@@ -62,6 +62,7 @@ class Repository {
   Repository(this.github);
   
   static Repository fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var repo = new Repository(github);
     repo.name = input['name'];
     repo.id = input['id'];
@@ -127,6 +128,12 @@ class Repository {
     });
   }
   
+  Future<List<PullRequest>> pullRequests([int limit = 30]) {
+    return github.getJSON("/repos/${fullName}/pulls", params: { "per_page": limit }).then((List<Map> pulls) {
+      return copyOf(pulls.map((it) => PullRequest.fromJSON(github, it)));
+    });
+  }
+  
   Future<RepositoryPages> pages() {
     return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
   }
@@ -151,6 +158,10 @@ class Repository {
   
   Future<Hook> createRelease(CreateReleaseRequest request) {
     return github.postJSON("/repos/${fullName}/releases", convert: Release.fromJSON, body: request.toJSON());
+  }
+  
+  Future<PullRequest> createPullRequest(CreateReleaseRequest request) {
+    return github.postJSON("/repos/${fullName}/pulls", convert: PullRequest.fromJSON, body: request.toJSON());
   }
 }
 

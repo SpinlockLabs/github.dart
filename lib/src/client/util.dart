@@ -81,3 +81,8 @@ void putValue(String name, dynamic value, Map map) {
     map[name] = value;
   }
 }
+
+String fullNameFromRepoApiUrl(String url) {
+  var split = url.split("/");
+  return split[4] + "/" + split[5];
+}
