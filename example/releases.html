@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHub Releases</title>
+    
+    <style>
+      .line {
+        border-top: 1px;
+        border-style: solid;
+      }
+      
+      .box {
+        border: 2px solid;
+      }
+      
+      .repo {
+        display: inline-block;
+        margin-top: 5px;
+        margin-left: 5px;
+        width: 256px;
+        margin-bottom: 5px;
+      }
+      
+      .info {}
+    </style>
+  </head>
+  
+  <body>
+    <div class="header">
+      <h1>GitHub Releases</h1>
+      <button id="view-source">View the Source</button>
+      <p></p>
+    </div>
+    
+    <div id="releases">
+    </div>
+    
+    <script type="application/dart" src="releases.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>

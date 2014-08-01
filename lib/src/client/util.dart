@@ -45,7 +45,7 @@ DateTime parse_date(String input) {
   return DateTime.parse(input);
 }
 
-String buildQueryString(Map<String, String> params) {
+String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();
   
   if (params.isNotEmpty && !params.values.every((value) => value == null)) {
@@ -58,7 +58,7 @@ String buildQueryString(Map<String, String> params) {
     if (params[key] == null) {
       continue;
     }
-    queryString.write("${key}=${Uri.encodeComponent(params[key])}");
+    queryString.write("${key}=${Uri.encodeComponent(params[key].toString())}");
     if (i != params.keys.length) {
       queryString.write("&");
     }

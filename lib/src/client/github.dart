@@ -192,7 +192,7 @@ class GitHub {
     });
   }
 
-  Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, String> params, String body}) {
+  Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
     if (headers == null) {
       headers = {};
     }
