@@ -65,3 +65,19 @@ String buildQueryString(Map<String, String> params) {
   }
   return queryString.toString();
 }
+
+dynamic copyOf(dynamic input) {
+  if (input is Iterable) {
+    return new List.from(input);
+  } else if (input is Map) {
+    return new Map.from(input);
+  } else {
+    throw "type could not be copied";
+  }
+}
+
+void putValue(String name, dynamic value, Map map) {
+  if (value != null) {
+    map[name] = value;
+  }
+}

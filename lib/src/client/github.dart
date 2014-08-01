@@ -142,6 +142,16 @@ class GitHub {
     });
   }
   
+  Future<List<Release>> releases(RepositorySlug slug, [int limit = 30]) {
+    return getJSON("/repos/${slug.fullName}/releases", params: { "per_page": limit }).then((releases) {
+      return copyOf(releases.map((it) => Release.fromJSON(this, it)));
+    });
+  }
+  
+  Future<Release> release(RepositorySlug slug, int id) {
+    return getJSON("/repos/${slug.fullName}/releases/${id}", convert: Release.fromJSON);
+  }
+  
   Future<RateLimit> rateLimit() {
     return request("GET", "/").then((response) {
       return RateLimit.fromHeaders(response.headers);
