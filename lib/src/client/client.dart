@@ -184,8 +184,10 @@ class GitHub {
       headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
     }
     
-    headers.putIfAbsent("User-Agent", () => "GitHub for Dart");
-
+    if (client is http.IOClient) {
+      headers.putIfAbsent("User-Agent", () => "GitHub for Dart");
+    }
+    
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     var queryString = "";
