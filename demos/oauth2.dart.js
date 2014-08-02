@@ -996,13 +996,13 @@ var $$ = {};
       }}
   },
   _CodeUnits: {
-    "^": "UnmodifiableListBase;__interceptors$_string",
+    "^": "UnmodifiableListBase;_string",
     get$length: function(_) {
-      return this.__interceptors$_string.length;
+      return this._string.length;
     },
     $index: function(_, i) {
       var t1, t2;
-      t1 = this.__interceptors$_string;
+      t1 = this._string;
       if (typeof i !== "number" || Math.floor(i) !== i)
         H.throwExpression(P.ArgumentError$(i));
       t2 = J.getInterceptor$n(i);
@@ -3800,22 +3800,22 @@ var $$ = {};
       }}
   },
   _AllMatchesIterable: {
-    "^": "IterableBase;_re,_string",
+    "^": "IterableBase;_re,__js_helper$_string",
     get$iterator: function(_) {
-      return new H._AllMatchesIterator(this._re, this._string, null);
+      return new H._AllMatchesIterator(this._re, this.__js_helper$_string, null);
     },
     $asIterableBase: function() {
       return [P.Match];
     }
   },
   _AllMatchesIterator: {
-    "^": "Object;_regExp,_string,__js_helper$_current",
+    "^": "Object;_regExp,__js_helper$_string,__js_helper$_current",
     get$current: function() {
       return this.__js_helper$_current;
     },
     moveNext$0: function() {
       var t1, t2, index;
-      if (this._string == null)
+      if (this.__js_helper$_string == null)
         return false;
       t1 = this.__js_helper$_current;
       if (t1 != null) {
@@ -3831,10 +3831,10 @@ var $$ = {};
           ++index;
       } else
         index = 0;
-      t1 = this._regExp._execGlobal$2(this._string, index);
+      t1 = this._regExp._execGlobal$2(this.__js_helper$_string, index);
       this.__js_helper$_current = t1;
       if (t1 == null) {
-        this._string = null;
+        this.__js_helper$_string = null;
         return false;
       }
       return true;
@@ -4355,7 +4355,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   SubListIterable: {
-    "^": "ListIterable;_iterable,_start,_endOrLength",
+    "^": "ListIterable;_iterable,__internal$_start,_endOrLength",
     get$_endIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
@@ -4367,7 +4367,7 @@ var $$ = {};
     get$_startIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (typeof $length !== "number")
         return H.iae($length);
       if (t1 > $length)
@@ -4377,7 +4377,7 @@ var $$ = {};
     get$length: function(_) {
       var $length, t1, t2;
       $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (typeof $length !== "number")
         return H.iae($length);
       if (t1 >= $length)
@@ -4397,7 +4397,7 @@ var $$ = {};
       var newStart, t1, t2;
       if (count < 0)
         throw H.wrapException(P.RangeError$value(count));
-      newStart = this._start + count;
+      newStart = this.__internal$_start + count;
       t1 = this._endOrLength;
       if (t1 != null) {
         if (typeof t1 !== "number")
@@ -4414,7 +4414,7 @@ var $$ = {};
     },
     SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
       var t1, t2;
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (t1 < 0)
         throw H.wrapException(P.RangeError$value(t1));
       t2 = this._endOrLength;
@@ -5185,7 +5185,7 @@ var $$ = {};
       return;
     },
     get$typeVariables: function() {
-      return C.List_empty0;
+      return C.List_empty1;
     },
     get$typeArguments: function() {
       return C.List_empty2;
@@ -6089,12 +6089,12 @@ var $$ = {};
         positionalArguments = C.JSArray_methods.toList$0(positionalArguments);
         i = positionalLength;
         while (true) {
-          t1 = J.get$length$asx(this.get$parameters()._collection$_source);
+          t1 = J.get$length$asx(this.get$parameters()._source);
           if (typeof t1 !== "number")
             return H.iae(t1);
           if (!(i < t1))
             break;
-          C.JSArray_methods.add$1(positionalArguments, J.get$defaultValue$x(J.elementAt$1$ax(this.get$parameters()._collection$_source, i)).get$reflectee());
+          C.JSArray_methods.add$1(positionalArguments, J.get$defaultValue$x(J.elementAt$1$ax(this.get$parameters()._source, i)).get$reflectee());
           ++i;
         }
       }
@@ -6231,19 +6231,19 @@ var $$ = {};
       if ("args" in t1)
         for (t2 = t1.args, t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]), parameterCount = 0; t2.moveNext$0(); parameterCount = parameterCount0) {
           parameterCount0 = parameterCount + 1;
-          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty1, H.s("argument" + parameterCount)));
+          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty0, H.s("argument" + parameterCount)));
         }
       else
         parameterCount = 0;
       if ("opt" in t1)
         for (t2 = t1.opt, t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]); t2.moveNext$0(); parameterCount = parameterCount0) {
           parameterCount0 = parameterCount + 1;
-          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty1, H.s("argument" + parameterCount)));
+          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty0, H.s("argument" + parameterCount)));
         }
       if ("named" in t1)
         for (t2 = H.extractKeys(t1.named), t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]); t2.moveNext$0();) {
           $name = t2._current;
-          result.push(new H.JsParameterMirror(this, t1.named[$name], false, false, null, C.List_empty1, H.s($name)));
+          result.push(new H.JsParameterMirror(this, t1.named[$name], false, false, null, C.List_empty0, H.s($name)));
         }
       t1 = H.setRuntimeTypeInfo(new P.UnmodifiableListView(result), [P.ParameterMirror]);
       this._cachedParameters = t1;
@@ -8275,14 +8275,14 @@ var $$ = {};
       var t1, t2;
       t1 = this.get$_handleData();
       t2 = this.get$_handleError();
-      this._subscription = this._stream._source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
+      this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
     },
     $as_BufferingStreamSubscription: function($S, $T) {
       return [$T];
     }
   },
   _MapStream: {
-    "^": "_ForwardingStream;_transform,_source",
+    "^": "_ForwardingStream;_transform,_async$_source",
     _transform$1: function(arg0) {
       return this._transform.call$1(arg0);
     },
@@ -8303,7 +8303,7 @@ var $$ = {};
     }
   },
   _SkipStream: {
-    "^": "_ForwardingStream;_remaining,_source",
+    "^": "_ForwardingStream;_remaining,_async$_source",
     _handleData$2: function(inputEvent, sink) {
       var t1 = this._remaining;
       if (t1 > 0) {
@@ -9320,14 +9320,14 @@ var $$ = {};
       index = this._findBucketIndex$2(bucket, object);
       if (index < 0)
         return;
-      return J.$index$asx(bucket, index).get$_collection$_element();
+      return J.$index$asx(bucket, index).get$_element();
     },
     forEach$1: function(_, action) {
       var cell, modifications;
       cell = this._first;
       modifications = this._modifications;
       for (; cell != null;) {
-        action.call$1(cell.get$_collection$_element());
+        action.call$1(cell.get$_element());
         if (modifications !== this._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(this));
         cell = cell._next;
@@ -9337,7 +9337,7 @@ var $$ = {};
       var t1 = this._last;
       if (t1 == null)
         throw H.wrapException(P.StateError$("No elements"));
-      return t1.get$_collection$_element();
+      return t1.get$_element();
     },
     add$1: function(_, element) {
       var strings, table, nums;
@@ -9470,7 +9470,7 @@ var $$ = {};
         return -1;
       $length = bucket.length;
       for (i = 0; i < $length; ++i)
-        if (J.$eq(bucket[i].get$_collection$_element(), element))
+        if (J.$eq(bucket[i].get$_element(), element))
           return i;
       return -1;
     },
@@ -9483,7 +9483,7 @@ var $$ = {};
       }}
   },
   LinkedHashSetCell: {
-    "^": "Object;_collection$_element<,_next@,_previous@"
+    "^": "Object;_element<,_next@,_previous@"
   },
   LinkedHashSetIterator: {
     "^": "Object;_set,_modifications,_cell,_collection$_current",
@@ -9500,7 +9500,7 @@ var $$ = {};
           this._collection$_current = null;
           return false;
         } else {
-          this._collection$_current = t1.get$_collection$_element();
+          this._collection$_current = t1.get$_element();
           this._cell = this._cell.get$_next();
           return true;
         }
@@ -9508,12 +9508,12 @@ var $$ = {};
     }
   },
   UnmodifiableListView: {
-    "^": "UnmodifiableListBase;_collection$_source",
+    "^": "UnmodifiableListBase;_source",
     get$length: function(_) {
-      return J.get$length$asx(this._collection$_source);
+      return J.get$length$asx(this._source);
     },
     $index: function(_, index) {
-      return J.elementAt$1$ax(this._collection$_source, index);
+      return J.elementAt$1$ax(this._source, index);
     }
   },
   _HashSetBase: {
@@ -11014,6 +11014,9 @@ var $$ = {};
       return "Deprecated feature. Will be removed " + this.expires;
     }
   },
+  _Override: {
+    "^": "Object;"
+  },
   bool: {
     "^": "Object;",
     toString$0: function(_) {
@@ -11578,32 +11581,32 @@ var $$ = {};
     "^": "Object;"
   },
   Stopwatch: {
-    "^": "Object;_core$_start,_stop",
+    "^": "Object;_start,_stop",
     start$0: [function(_) {
       var t1, t2;
-      t1 = this._core$_start == null;
+      t1 = this._start == null;
       if (!t1 && this._stop == null)
         return;
       t2 = $.Primitives_timerTicks;
       if (t1)
-        this._core$_start = t2.call$0();
+        this._start = t2.call$0();
       else {
-        this._core$_start = J.$sub$n(t2.call$0(), J.$sub$n(this._stop, this._core$_start));
+        this._start = J.$sub$n(t2.call$0(), J.$sub$n(this._stop, this._start));
         this._stop = null;
       }
     }, "call$0", "get$start", 0, 0, 6],
     stop$0: function(_) {
-      if (!(this._core$_start != null && this._stop == null))
+      if (!(this._start != null && this._stop == null))
         return;
       this._stop = $.Primitives_timerTicks.call$0();
     },
     get$elapsedTicks: function() {
       var t1, t2;
-      t1 = this._core$_start;
+      t1 = this._start;
       if (t1 == null)
         return 0;
       t2 = this._stop;
-      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._core$_start) : J.$sub$n(t2, t1);
+      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._start) : J.$sub$n(t2, t1);
     },
     static: {"^": "Stopwatch__frequency"}
   },
@@ -13783,7 +13786,7 @@ var $$ = {};
     },
     get$keys: function() {
       var attributes, keys, len, i;
-      attributes = this._element.attributes;
+      attributes = this._html$_element.attributes;
       keys = H.setRuntimeTypeInfo([], [P.String]);
       for (len = attributes.length, i = 0; i < len; ++i) {
         if (i >= attributes.length)
@@ -13798,7 +13801,7 @@ var $$ = {};
     },
     get$values: function(_) {
       var attributes, values, len, i;
-      attributes = this._element.attributes;
+      attributes = this._html$_element.attributes;
       values = H.setRuntimeTypeInfo([], [P.String]);
       for (len = attributes.length, i = 0; i < len; ++i) {
         if (i >= attributes.length)
@@ -13823,12 +13826,12 @@ var $$ = {};
     }
   },
   _ElementAttributeMap: {
-    "^": "_AttributeMap;_element",
+    "^": "_AttributeMap;_html$_element",
     $index: function(_, key) {
-      return this._element.getAttribute(key);
+      return this._html$_element.getAttribute(key);
     },
     $indexSet: function(_, key, value) {
-      this._element.setAttribute(key, value);
+      this._html$_element.setAttribute(key, value);
     },
     get$length: function(_) {
       return this.get$keys().length;
@@ -14139,7 +14142,7 @@ var $$ = {};
             t1.remove$0(node);
             break;
           }
-          t2 = attrs._element;
+          t2 = attrs._html$_element;
           isAttr = t2.getAttribute("is");
           if (isAttr != null)
             if (!this.validator.allowsAttribute$3(node, "is", isAttr)) {
@@ -14884,10 +14887,34 @@ var $$ = {};
   Authentication: {
     "^": "Object;token<,username,password,isAnonymous,isBasic,isToken"
   },
+  GitHubError: {
+    "^": "Object;message>",
+    toString$0: function(_) {
+      return "GitHub Error (message: " + this.message + ", api url: " + H.S(this.apiUrl) + ")";
+    }
+  },
+  NotFound: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {NotFound$: function(github, msg) {
+        return new T.NotFound(msg, null, github, null);
+      }}
+  },
+  AccessForbidden: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {AccessForbidden$: function(github) {
+        return new T.AccessForbidden("Access Forbbidden", null, github, null);
+      }}
+  },
+  UnknownError: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {UnknownError$: function(github) {
+        return new T.UnknownError("Unknown Error", null, github, null);
+      }}
+  },
   GitHub: {
     "^": "Object;auth,endpoint,client",
     currentUser$0: function() {
-      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(), 200);
+      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(this), 200);
     },
     getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1 = {};
@@ -14896,6 +14923,16 @@ var $$ = {};
     },
     getJSON$4$convert$fail$statusCode: function(path, convert, fail, statusCode) {
       return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, fail, null, null, statusCode);
+    },
+    _handleStatusCode$2: function(response, code) {
+      switch (code) {
+        case 404:
+          throw H.wrapException(T.NotFound$(this, "Requested Resource was Not Found"));
+        case 401:
+          throw H.wrapException(T.AccessForbidden$(this));
+        default:
+          throw H.wrapException(T.UnknownError$(this));
+      }
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14942,9 +14979,10 @@ var $$ = {};
     }
   },
   GitHub_currentUser_closure: {
-    "^": "Closure:23;",
+    "^": "Closure:49;this_0",
     call$1: function(response) {
-      throw H.wrapException("Not Authenticated");
+      if (J.get$statusCode$x(response) === 403)
+        throw H.wrapException(T.AccessForbidden$(this.this_0));
     }
   },
   GitHub_getJSON_closure0: {
@@ -14958,7 +14996,7 @@ var $$ = {};
     call$1: function(response) {
       if (this.statusCode_2 !== J.get$statusCode$x(response)) {
         this.fail_3.call$1(response);
-        return P._Future$immediate(null, null);
+        this.this_1._handleStatusCode$2(response, J.get$statusCode$x(response));
       }
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
@@ -15003,6 +15041,8 @@ var $$ = {};
       var json, t1, t2, t3;
       json = C.JsonCodec_null_null.decode$1(J.get$body$x(response));
       t1 = J.getInterceptor$asx(json);
+      if (t1.$index(json, "error") != null)
+        throw H.wrapException(json);
       t2 = t1.$index(json, "access_token");
       t3 = t1.$index(json, "token_type");
       return new T.ExchangeResponse(t2, J.split$1$s(t1.$index(json, "scope"), ","), t3);
@@ -15113,7 +15153,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_4",
+    "^": "Closure:50;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -15223,7 +15263,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_3",
+    "^": "Closure:50;copies_3",
     call$2: function(i, x) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -15655,36 +15695,51 @@ var $$ = {};
 ["", "oauth2.dart", , T, {
   "^": "",
   main: [function() {
-    var t1, url, t2, t3;
+    var t1, url, t2, flow;
     t1 = {};
     url = window.location.href;
-    t2 = ["user:email"];
     if (url == null)
-      t3 = null;
+      t2 = null;
     else
-      t3 = C.JSString_methods.contains$1(url, "?") ? C.JSString_methods.substring$2(url, 0, C.JSString_methods.indexOf$1(url, "?")) : url;
+      t2 = C.JSString_methods.contains$1(url, "?") ? C.JSString_methods.substring$2(url, 0, C.JSString_methods.indexOf$1(url, "?")) : url;
+    flow = new T.OAuth2Flow("ff718b16cbfc71defcba", ["user:email"], t2, null, "a0c004e014feed76bdd659fcef0445e8f632c236", "https://github.com/login/oauth");
+    t2 = new T.main_authorize(flow);
     t1.params_0 = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
     if (!J.getInterceptor$asx(url).contains$1(url, "?"))
-      window.location.href = "https://github.com/login/oauth/authorize" + M.buildQueryString(P.LinkedHashMap_LinkedHashMap$_literal(["client_id", "ff718b16cbfc71defcba", "scopes", C.JSArray_methods.join$1(t2, ","), "redirect_uri", t3, "state", null], null, null));
+      t2.call$0();
     else
       t1.params_0 = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
     M.initGitHub();
-    R.init("oauth2.dart", new T.main_closure(t1, new T.OAuth2Flow("ff718b16cbfc71defcba", t2, t3, null, "a0c004e014feed76bdd659fcef0445e8f632c236", "https://github.com/login/oauth")));
+    R.init("oauth2.dart", new T.main_closure(t1, flow, t2));
   }, "call$0", "main$closure", 0, 0, 6],
   loadUsername: function(token) {
     var t1 = $.get$GitHub_defaultClient().call$0();
     new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1).currentUser$0().then$1(new T.loadUsername_closure());
   },
-  main_closure: {
-    "^": "Closure:20;box_0,flow_1",
+  main_authorize: {
+    "^": "Closure:6;flow_1",
     call$0: function() {
-      this.flow_1.exchange$1(J.$index$asx(this.box_0.params_0, "code")).then$1(new T.main__closure());
+      var t1 = this.flow_1;
+      window.location.href = t1.baseUrl + "/authorize" + M.buildQueryString(P.LinkedHashMap_LinkedHashMap$_literal(["client_id", t1.clientId, "scopes", C.JSArray_methods.join$1(t1.scopes, ","), "redirect_uri", t1.redirectUri, "state", t1.state], null, null));
+    }
+  },
+  main_closure: {
+    "^": "Closure:20;box_0,flow_2,authorize_3",
+    call$0: function() {
+      this.flow_2.exchange$1(J.$index$asx(this.box_0.params_0, "code")).then$1(new T.main__closure()).catchError$1(new T.main__closure0(this.authorize_3));
     }
   },
   main__closure: {
     "^": "Closure:23;",
     call$1: function(response) {
       T.loadUsername(response.get$token());
+    }
+  },
+  main__closure0: {
+    "^": "Closure:23;authorize_4",
+    call$1: function(error) {
+      if (!!J.getInterceptor(error).$isMap)
+        this.authorize_4.call$0();
     }
   },
   loadUsername_closure: {
@@ -16551,7 +16606,7 @@ var $$ = {};
       if (J.$gt$n(offset, this._decodedChars.length))
         H.throwExpression(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + this.get$length(this) + "."));
       return t1;
-    }, "call$1", "get$location", 2, 0, 50],
+    }, "call$1", "get$location", 2, 0, 51],
     getLine$1: function(offset) {
       var t1 = J.getInterceptor$n(offset);
       if (t1.$lt(offset, 0))
@@ -16717,7 +16772,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9]
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9]
   }
 }],
 ["source_span.location", "package:source_span/src/location.dart", , O, {
@@ -16845,7 +16900,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9],
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9],
     $eq: function(_, other) {
       var t1, t2;
       if (other == null)
@@ -17093,7 +17148,7 @@ var $$ = {};
       return this.error$4$length$match$position($receiver, message, length, null, position);
     }, "error$3$length$position", function($receiver, message) {
       return this.error$4$length$match$position($receiver, message, null, null, null);
-    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 52, 9, 9, 9],
+    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 53, 9, 9, 9],
     StringScanner$3$position$sourceUrl: function(string, position, sourceUrl) {
     }
   }
@@ -17369,7 +17424,7 @@ var $$ = {};
       ++i;
       if (params.$index(0, key) == null)
         continue;
-      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, params.$index(0, key), C.Utf8Codec_false, false);
+      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, J.toString$0(params.$index(0, key)), C.Utf8Codec_false, false);
       queryString._contents += t2;
       t2 = params.get$keys();
       if (i !== t2.get$length(t2))
@@ -17461,6 +17516,9 @@ $$ = null;
   O.SourceLocation.$isObject = TRUE;
   T.SourceSpan.$isObject = TRUE;
   W.Event.$isObject = TRUE;
+  W.MouseEvent.$isObject = TRUE;
+  W.HttpRequest.$isObject = TRUE;
+  W.ProgressEvent.$isObject = TRUE;
   _ = P.LibraryMirror;
   _.$isLibraryMirror = TRUE;
   _.$isMirror = TRUE;
@@ -17494,46 +17552,43 @@ $$ = null;
   _.$isMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  _ = P.TypeVariableMirror;
-  _.$isTypeMirror = TRUE;
+  _ = P.ParameterMirror;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  _ = P.ParameterMirror;
+  _ = P.TypeVariableMirror;
+  _.$isTypeMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
   _ = P.TypeMirror;
   _.$isTypeMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  P.Encoding.$isObject = TRUE;
-  _ = W.NodeValidator;
-  _.$isNodeValidator = TRUE;
-  _.$isObject = TRUE;
-  W.MouseEvent.$isObject = TRUE;
-  W.HttpRequest.$isObject = TRUE;
-  W.ProgressEvent.$isObject = TRUE;
   _ = R.Trace;
   _.$isStackTrace = TRUE;
   _.$isObject = TRUE;
   S.Frame.$isObject = TRUE;
+  P.Encoding.$isObject = TRUE;
+  _ = W.NodeValidator;
+  _.$isNodeValidator = TRUE;
+  _.$isObject = TRUE;
   H.RawReceivePortImpl.$isObject = TRUE;
   H._IsolateEvent.$isObject = TRUE;
   H._IsolateContext.$isObject = TRUE;
   _ = P.StackTrace;
   _.$isStackTrace = TRUE;
   _.$isObject = TRUE;
-  _ = P.Future;
-  _.$isFuture = TRUE;
-  _.$isObject = TRUE;
   _ = L.Response;
   _.$isResponse = TRUE;
-  _.$isObject = TRUE;
-  _ = Z.StreamedResponse;
-  _.$isStreamedResponse = TRUE;
   _.$isObject = TRUE;
   _ = P.InstanceMirror;
   _.$isInstanceMirror = TRUE;
   _.$isMirror = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Future;
+  _.$isFuture = TRUE;
+  _.$isObject = TRUE;
+  _ = Z.StreamedResponse;
+  _.$isStreamedResponse = TRUE;
   _.$isObject = TRUE;
   _ = T.CurrentUser;
   _.$isCurrentUser = TRUE;
@@ -18061,8 +18116,8 @@ C.List_KIf = Isolate.makeConstantList([0, 0, 26498, 1023, 65534, 34815, 65534, 1
 C.List_WnV = Isolate.makeConstantList(["/", "\\"]);
 C.List_cSk = Isolate.makeConstantList(["/"]);
 C.List_empty = Isolate.makeConstantList([]);
-C.List_empty0 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeVariableMirror]);
-C.List_empty1 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.$int]);
+C.List_empty0 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.$int]);
+C.List_empty1 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeVariableMirror]);
 C.List_empty2 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeMirror]);
 C.List_empty3 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.String]);
 C.List_gRj = Isolate.makeConstantList([0, 0, 32722, 12287, 65534, 34815, 65534, 18431]);
@@ -18388,6 +18443,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "void__String__dynamic", void: true, args: [P.String], opt: [null]},
 {func: "int__int_int", ret: P.$int, args: [P.$int, P.$int]},
 {func: "void__Node", void: true, args: [W.Node]},
+{func: "dynamic__Response", args: [L.Response]},
 {func: "dynamic__int_dynamic", args: [P.$int, null]},
 {func: "FileLocation__int", ret: G.FileLocation, args: [P.$int]},
 {func: "String__String__dynamic", ret: P.String, args: [P.String], named: {color: null}},

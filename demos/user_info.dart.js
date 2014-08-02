@@ -6828,11 +6828,11 @@ var $$ = {};
       t1.toString;
       P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncCompleteError_closure(this, error, stackTrace));
     },
-    _async$_Future$immediateError$2: function(error, stackTrace, $T) {
-      this._asyncCompleteError$2(error, stackTrace);
-    },
     _async$_Future$immediate$1: function(value, $T) {
       this._asyncComplete$1(value);
+    },
+    _async$_Future$immediateError$2: function(error, stackTrace, $T) {
+      this._asyncCompleteError$2(error, stackTrace);
     },
     $is_Future: true,
     $isFuture: true,
@@ -11020,6 +11020,9 @@ var $$ = {};
       return "Deprecated feature. Will be removed " + this.expires;
     }
   },
+  _Override: {
+    "^": "Object;"
+  },
   bool: {
     "^": "Object;",
     toString$0: function(_) {
@@ -14708,10 +14711,34 @@ var $$ = {};
   Authentication: {
     "^": "Object;token,username,password,isAnonymous,isBasic,isToken"
   },
+  GitHubError: {
+    "^": "Object;message>",
+    toString$0: function(_) {
+      return "GitHub Error (message: " + this.message + ", api url: " + H.S(this.apiUrl) + ")";
+    }
+  },
+  NotFound: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {NotFound$: function(github, msg) {
+        return new T.NotFound(msg, null, github, null);
+      }}
+  },
+  AccessForbidden: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {AccessForbidden$: function(github) {
+        return new T.AccessForbidden("Access Forbbidden", null, github, null);
+      }}
+  },
+  UnknownError: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {UnknownError$: function(github) {
+        return new T.UnknownError("Unknown Error", null, github, null);
+      }}
+  },
   GitHub: {
     "^": "Object;auth,endpoint,client",
     currentUser$0: function() {
-      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(), 200);
+      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(this), 200);
     },
     getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1 = {};
@@ -14720,6 +14747,16 @@ var $$ = {};
     },
     getJSON$4$convert$fail$statusCode: function(path, convert, fail, statusCode) {
       return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, fail, null, null, statusCode);
+    },
+    _handleStatusCode$2: function(response, code) {
+      switch (code) {
+        case 404:
+          throw H.wrapException(T.NotFound$(this, "Requested Resource was Not Found"));
+        case 401:
+          throw H.wrapException(T.AccessForbidden$(this));
+        default:
+          throw H.wrapException(T.UnknownError$(this));
+      }
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14766,9 +14803,10 @@ var $$ = {};
     }
   },
   GitHub_currentUser_closure: {
-    "^": "Closure:23;",
+    "^": "Closure:49;this_0",
     call$1: function(response) {
-      throw H.wrapException("Not Authenticated");
+      if (J.get$statusCode$x(response) === 403)
+        throw H.wrapException(T.AccessForbidden$(this.this_0));
     }
   },
   GitHub_getJSON_closure0: {
@@ -14782,7 +14820,7 @@ var $$ = {};
     call$1: function(response) {
       if (this.statusCode_2 !== J.get$statusCode$x(response)) {
         this.fail_3.call$1(response);
-        return P._Future$immediate(null, null);
+        this.this_1._handleStatusCode$2(response, J.get$statusCode$x(response));
       }
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
@@ -14913,7 +14951,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_4",
+    "^": "Closure:50;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -15023,7 +15061,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_3",
+    "^": "Closure:50;copies_3",
     call$2: function(i, x) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -16308,7 +16346,7 @@ var $$ = {};
       if (J.$gt$n(offset, this._decodedChars.length))
         H.throwExpression(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + this.get$length(this) + "."));
       return t1;
-    }, "call$1", "get$location", 2, 0, 50],
+    }, "call$1", "get$location", 2, 0, 51],
     getLine$1: function(offset) {
       var t1 = J.getInterceptor$n(offset);
       if (t1.$lt(offset, 0))
@@ -16474,7 +16512,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9]
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9]
   }
 }],
 ["source_span.location", "package:source_span/src/location.dart", , O, {
@@ -16602,7 +16640,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9],
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9],
     $eq: function(_, other) {
       var t1, t2;
       if (other == null)
@@ -16850,7 +16888,7 @@ var $$ = {};
       return this.error$4$length$match$position($receiver, message, length, null, position);
     }, "error$3$length$position", function($receiver, message) {
       return this.error$4$length$match$position($receiver, message, null, null, null);
-    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 52, 9, 9, 9],
+    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 53, 9, 9, 9],
     StringScanner$3$position$sourceUrl: function(string, position, sourceUrl) {
     }
   }
@@ -17142,7 +17180,7 @@ var $$ = {};
     }
   },
   loadUser__closure: {
-    "^": "Closure:53;",
+    "^": "Closure:54;",
     call$1: function(user) {
       var t1 = $.info;
       t1.hidden = false;
@@ -17161,7 +17199,7 @@ var $$ = {};
     }
   },
   loadUser___append: {
-    "^": "Closure:54;",
+    "^": "Closure:55;",
     call$2: function($name, value) {
       if (value != null)
         J.insertAdjacentHtml$2$x($.info, "beforeend", "            <br/>\n            <b>" + $name + "</b>: " + H.S(J.toString$0(value)) + "\n          ");
@@ -17318,14 +17356,14 @@ $$ = null;
   _ = T.CurrentUser;
   _.$isCurrentUser = TRUE;
   _.$isObject = TRUE;
+  _ = L.Response;
+  _.$isResponse = TRUE;
+  _.$isObject = TRUE;
   _ = T.GitHub;
   _.$isGitHub = TRUE;
   _.$isObject = TRUE;
   _ = P.Future;
   _.$isFuture = TRUE;
-  _.$isObject = TRUE;
-  _ = L.Response;
-  _.$isResponse = TRUE;
   _.$isObject = TRUE;
   _ = Z.StreamedResponse;
   _.$isStreamedResponse = TRUE;
@@ -18174,6 +18212,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "void__String__dynamic", void: true, args: [P.String], opt: [null]},
 {func: "int__int_int", ret: P.$int, args: [P.$int, P.$int]},
 {func: "void__Node", void: true, args: [W.Node]},
+{func: "dynamic__Response", args: [L.Response]},
 {func: "dynamic__int_dynamic", args: [P.$int, null]},
 {func: "FileLocation__int", ret: G.FileLocation, args: [P.$int]},
 {func: "String__String__dynamic", ret: P.String, args: [P.String], named: {color: null}},

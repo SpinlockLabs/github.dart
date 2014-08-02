@@ -45,7 +45,7 @@ DateTime parse_date(String input) {
   return DateTime.parse(input);
 }
 
-String buildQueryString(Map<String, String> params) {
+String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();
   
   if (params.isNotEmpty && !params.values.every((value) => value == null)) {
@@ -58,10 +58,31 @@ String buildQueryString(Map<String, String> params) {
     if (params[key] == null) {
       continue;
     }
-    queryString.write("${key}=${Uri.encodeComponent(params[key])}");
+    queryString.write("${key}=${Uri.encodeComponent(params[key].toString())}");
     if (i != params.keys.length) {
       queryString.write("&");
     }
   }
   return queryString.toString();
+}
+
+dynamic copyOf(dynamic input) {
+  if (input is Iterable) {
+    return new List.from(input);
+  } else if (input is Map) {
+    return new Map.from(input);
+  } else {
+    throw "type could not be copied";
+  }
+}
+
+void putValue(String name, dynamic value, Map map) {
+  if (value != null) {
+    map[name] = value;
+  }
+}
+
+String fullNameFromRepoApiUrl(String url) {
+  var split = url.split("/");
+  return split[4] + "/" + split[5];
 }

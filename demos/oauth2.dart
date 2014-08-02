@@ -14,10 +14,14 @@ void main() {
       ]
   );
   
+  void authorize() {
+    window.location.href = flow.createAuthorizeUrl();
+  }
+  
   var params = {};
   
   if (!url.contains("?")) {
-    window.location.href = flow.createAuthorizeUrl();
+    authorize();
   } else {
     params = Uri.splitQueryString(url.substring(url.indexOf("?") + 1));
   }
@@ -27,6 +31,10 @@ void main() {
   init("oauth2.dart", onReady: () {
     flow.exchange(params['code']).then((response) {
       loadUsername(response.token);
+    }).catchError((error) {
+      if (error is Map) {
+        authorize(); 
+      }
     });
   });
 }

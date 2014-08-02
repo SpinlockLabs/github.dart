@@ -996,13 +996,13 @@ var $$ = {};
       }}
   },
   _CodeUnits: {
-    "^": "UnmodifiableListBase;__interceptors$_string",
+    "^": "UnmodifiableListBase;_string",
     get$length: function(_) {
-      return this.__interceptors$_string.length;
+      return this._string.length;
     },
     $index: function(_, i) {
       var t1, t2;
-      t1 = this.__interceptors$_string;
+      t1 = this._string;
       if (typeof i !== "number" || Math.floor(i) !== i)
         H.throwExpression(P.ArgumentError$(i));
       t2 = J.getInterceptor$n(i);
@@ -3800,22 +3800,22 @@ var $$ = {};
       }}
   },
   _AllMatchesIterable: {
-    "^": "IterableBase;_re,_string",
+    "^": "IterableBase;_re,__js_helper$_string",
     get$iterator: function(_) {
-      return new H._AllMatchesIterator(this._re, this._string, null);
+      return new H._AllMatchesIterator(this._re, this.__js_helper$_string, null);
     },
     $asIterableBase: function() {
       return [P.Match];
     }
   },
   _AllMatchesIterator: {
-    "^": "Object;_regExp,_string,__js_helper$_current",
+    "^": "Object;_regExp,__js_helper$_string,__js_helper$_current",
     get$current: function() {
       return this.__js_helper$_current;
     },
     moveNext$0: function() {
       var t1, t2, index;
-      if (this._string == null)
+      if (this.__js_helper$_string == null)
         return false;
       t1 = this.__js_helper$_current;
       if (t1 != null) {
@@ -3831,10 +3831,10 @@ var $$ = {};
           ++index;
       } else
         index = 0;
-      t1 = this._regExp._execGlobal$2(this._string, index);
+      t1 = this._regExp._execGlobal$2(this.__js_helper$_string, index);
       this.__js_helper$_current = t1;
       if (t1 == null) {
-        this._string = null;
+        this.__js_helper$_string = null;
         return false;
       }
       return true;
@@ -4355,7 +4355,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   SubListIterable: {
-    "^": "ListIterable;_iterable,_start,_endOrLength",
+    "^": "ListIterable;_iterable,__internal$_start,_endOrLength",
     get$_endIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
@@ -4367,7 +4367,7 @@ var $$ = {};
     get$_startIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (typeof $length !== "number")
         return H.iae($length);
       if (t1 > $length)
@@ -4377,7 +4377,7 @@ var $$ = {};
     get$length: function(_) {
       var $length, t1, t2;
       $length = J.get$length$asx(this._iterable);
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (typeof $length !== "number")
         return H.iae($length);
       if (t1 >= $length)
@@ -4397,7 +4397,7 @@ var $$ = {};
       var newStart, t1, t2;
       if (count < 0)
         throw H.wrapException(P.RangeError$value(count));
-      newStart = this._start + count;
+      newStart = this.__internal$_start + count;
       t1 = this._endOrLength;
       if (t1 != null) {
         if (typeof t1 !== "number")
@@ -4414,7 +4414,7 @@ var $$ = {};
     },
     SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
       var t1, t2;
-      t1 = this._start;
+      t1 = this.__internal$_start;
       if (t1 < 0)
         throw H.wrapException(P.RangeError$value(t1));
       t2 = this._endOrLength;
@@ -5185,7 +5185,7 @@ var $$ = {};
       return;
     },
     get$typeVariables: function() {
-      return C.List_empty0;
+      return C.List_empty1;
     },
     get$typeArguments: function() {
       return C.List_empty2;
@@ -6089,12 +6089,12 @@ var $$ = {};
         positionalArguments = C.JSArray_methods.toList$0(positionalArguments);
         i = positionalLength;
         while (true) {
-          t1 = J.get$length$asx(this.get$parameters()._collection$_source);
+          t1 = J.get$length$asx(this.get$parameters()._source);
           if (typeof t1 !== "number")
             return H.iae(t1);
           if (!(i < t1))
             break;
-          C.JSArray_methods.add$1(positionalArguments, J.get$defaultValue$x(J.elementAt$1$ax(this.get$parameters()._collection$_source, i)).get$reflectee());
+          C.JSArray_methods.add$1(positionalArguments, J.get$defaultValue$x(J.elementAt$1$ax(this.get$parameters()._source, i)).get$reflectee());
           ++i;
         }
       }
@@ -6231,19 +6231,19 @@ var $$ = {};
       if ("args" in t1)
         for (t2 = t1.args, t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]), parameterCount = 0; t2.moveNext$0(); parameterCount = parameterCount0) {
           parameterCount0 = parameterCount + 1;
-          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty1, H.s("argument" + parameterCount)));
+          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty0, H.s("argument" + parameterCount)));
         }
       else
         parameterCount = 0;
       if ("opt" in t1)
         for (t2 = t1.opt, t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]); t2.moveNext$0(); parameterCount = parameterCount0) {
           parameterCount0 = parameterCount + 1;
-          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty1, H.s("argument" + parameterCount)));
+          result.push(new H.JsParameterMirror(this, t2._current, false, false, null, C.List_empty0, H.s("argument" + parameterCount)));
         }
       if ("named" in t1)
         for (t2 = H.extractKeys(t1.named), t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.length, 0, null), [H.getTypeArgumentByIndex(t2, 0)]); t2.moveNext$0();) {
           $name = t2._current;
-          result.push(new H.JsParameterMirror(this, t1.named[$name], false, false, null, C.List_empty1, H.s($name)));
+          result.push(new H.JsParameterMirror(this, t1.named[$name], false, false, null, C.List_empty0, H.s($name)));
         }
       t1 = H.setRuntimeTypeInfo(new P.UnmodifiableListView(result), [P.ParameterMirror]);
       this._cachedParameters = t1;
@@ -8275,14 +8275,14 @@ var $$ = {};
       var t1, t2;
       t1 = this.get$_handleData();
       t2 = this.get$_handleError();
-      this._subscription = this._stream._source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
+      this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
     },
     $as_BufferingStreamSubscription: function($S, $T) {
       return [$T];
     }
   },
   _MapStream: {
-    "^": "_ForwardingStream;_transform,_source",
+    "^": "_ForwardingStream;_transform,_async$_source",
     _transform$1: function(arg0) {
       return this._transform.call$1(arg0);
     },
@@ -8303,7 +8303,7 @@ var $$ = {};
     }
   },
   _SkipStream: {
-    "^": "_ForwardingStream;_remaining,_source",
+    "^": "_ForwardingStream;_remaining,_async$_source",
     _handleData$2: function(inputEvent, sink) {
       var t1 = this._remaining;
       if (t1 > 0) {
@@ -9320,14 +9320,14 @@ var $$ = {};
       index = this._findBucketIndex$2(bucket, object);
       if (index < 0)
         return;
-      return J.$index$asx(bucket, index).get$_collection$_element();
+      return J.$index$asx(bucket, index).get$_element();
     },
     forEach$1: function(_, action) {
       var cell, modifications;
       cell = this._first;
       modifications = this._modifications;
       for (; cell != null;) {
-        action.call$1(cell.get$_collection$_element());
+        action.call$1(cell.get$_element());
         if (modifications !== this._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(this));
         cell = cell._next;
@@ -9337,7 +9337,7 @@ var $$ = {};
       var t1 = this._last;
       if (t1 == null)
         throw H.wrapException(P.StateError$("No elements"));
-      return t1.get$_collection$_element();
+      return t1.get$_element();
     },
     add$1: function(_, element) {
       var strings, table, nums;
@@ -9470,7 +9470,7 @@ var $$ = {};
         return -1;
       $length = bucket.length;
       for (i = 0; i < $length; ++i)
-        if (J.$eq(bucket[i].get$_collection$_element(), element))
+        if (J.$eq(bucket[i].get$_element(), element))
           return i;
       return -1;
     },
@@ -9483,7 +9483,7 @@ var $$ = {};
       }}
   },
   LinkedHashSetCell: {
-    "^": "Object;_collection$_element<,_next@,_previous@"
+    "^": "Object;_element<,_next@,_previous@"
   },
   LinkedHashSetIterator: {
     "^": "Object;_set,_modifications,_cell,_collection$_current",
@@ -9500,7 +9500,7 @@ var $$ = {};
           this._collection$_current = null;
           return false;
         } else {
-          this._collection$_current = t1.get$_collection$_element();
+          this._collection$_current = t1.get$_element();
           this._cell = this._cell.get$_next();
           return true;
         }
@@ -9508,12 +9508,12 @@ var $$ = {};
     }
   },
   UnmodifiableListView: {
-    "^": "UnmodifiableListBase;_collection$_source",
+    "^": "UnmodifiableListBase;_source",
     get$length: function(_) {
-      return J.get$length$asx(this._collection$_source);
+      return J.get$length$asx(this._source);
     },
     $index: function(_, index) {
-      return J.elementAt$1$ax(this._collection$_source, index);
+      return J.elementAt$1$ax(this._source, index);
     }
   },
   _HashSetBase: {
@@ -11014,6 +11014,9 @@ var $$ = {};
       return "Deprecated feature. Will be removed " + this.expires;
     }
   },
+  _Override: {
+    "^": "Object;"
+  },
   bool: {
     "^": "Object;",
     toString$0: function(_) {
@@ -11578,32 +11581,32 @@ var $$ = {};
     "^": "Object;"
   },
   Stopwatch: {
-    "^": "Object;_core$_start,_stop",
+    "^": "Object;_start,_stop",
     start$0: [function(_) {
       var t1, t2;
-      t1 = this._core$_start == null;
+      t1 = this._start == null;
       if (!t1 && this._stop == null)
         return;
       t2 = $.Primitives_timerTicks;
       if (t1)
-        this._core$_start = t2.call$0();
+        this._start = t2.call$0();
       else {
-        this._core$_start = J.$sub$n(t2.call$0(), J.$sub$n(this._stop, this._core$_start));
+        this._start = J.$sub$n(t2.call$0(), J.$sub$n(this._stop, this._start));
         this._stop = null;
       }
     }, "call$0", "get$start", 0, 0, 6],
     stop$0: function(_) {
-      if (!(this._core$_start != null && this._stop == null))
+      if (!(this._start != null && this._stop == null))
         return;
       this._stop = $.Primitives_timerTicks.call$0();
     },
     get$elapsedTicks: function() {
       var t1, t2;
-      t1 = this._core$_start;
+      t1 = this._start;
       if (t1 == null)
         return 0;
       t2 = this._stop;
-      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._core$_start) : J.$sub$n(t2, t1);
+      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._start) : J.$sub$n(t2, t1);
     },
     static: {"^": "Stopwatch__frequency"}
   },
@@ -13783,7 +13786,7 @@ var $$ = {};
     },
     get$keys: function() {
       var attributes, keys, len, i;
-      attributes = this._element.attributes;
+      attributes = this._html$_element.attributes;
       keys = H.setRuntimeTypeInfo([], [P.String]);
       for (len = attributes.length, i = 0; i < len; ++i) {
         if (i >= attributes.length)
@@ -13798,7 +13801,7 @@ var $$ = {};
     },
     get$values: function(_) {
       var attributes, values, len, i;
-      attributes = this._element.attributes;
+      attributes = this._html$_element.attributes;
       values = H.setRuntimeTypeInfo([], [P.String]);
       for (len = attributes.length, i = 0; i < len; ++i) {
         if (i >= attributes.length)
@@ -13823,12 +13826,12 @@ var $$ = {};
     }
   },
   _ElementAttributeMap: {
-    "^": "_AttributeMap;_element",
+    "^": "_AttributeMap;_html$_element",
     $index: function(_, key) {
-      return this._element.getAttribute(key);
+      return this._html$_element.getAttribute(key);
     },
     $indexSet: function(_, key, value) {
-      this._element.setAttribute(key, value);
+      this._html$_element.setAttribute(key, value);
     },
     get$length: function(_) {
       return this.get$keys().length;
@@ -14139,7 +14142,7 @@ var $$ = {};
             t1.remove$0(node);
             break;
           }
-          t2 = attrs._element;
+          t2 = attrs._html$_element;
           isAttr = t2.getAttribute("is");
           if (isAttr != null)
             if (!this.validator.allowsAttribute$3(node, "is", isAttr)) {
@@ -14884,10 +14887,34 @@ var $$ = {};
   Authentication: {
     "^": "Object;token<,username,password,isAnonymous,isBasic,isToken"
   },
+  GitHubError: {
+    "^": "Object;message>",
+    toString$0: function(_) {
+      return "GitHub Error (message: " + this.message + ", api url: " + H.S(this.apiUrl) + ")";
+    }
+  },
+  NotFound: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {NotFound$: function(github, msg) {
+        return new T.NotFound(msg, null, github, null);
+      }}
+  },
+  AccessForbidden: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {AccessForbidden$: function(github) {
+        return new T.AccessForbidden("Access Forbbidden", null, github, null);
+      }}
+  },
+  UnknownError: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {UnknownError$: function(github) {
+        return new T.UnknownError("Unknown Error", null, github, null);
+      }}
+  },
   GitHub: {
     "^": "Object;auth,endpoint,client",
     currentUser$0: function() {
-      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(), 200);
+      return this.getJSON$4$convert$fail$statusCode("/user", T.CurrentUser_fromJSON$closure(), new T.GitHub_currentUser_closure(this), 200);
     },
     getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
       var t1 = {};
@@ -14896,6 +14923,16 @@ var $$ = {};
     },
     getJSON$4$convert$fail$statusCode: function(path, convert, fail, statusCode) {
       return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, fail, null, null, statusCode);
+    },
+    _handleStatusCode$2: function(response, code) {
+      switch (code) {
+        case 404:
+          throw H.wrapException(T.NotFound$(this, "Requested Resource was Not Found"));
+        case 401:
+          throw H.wrapException(T.AccessForbidden$(this));
+        default:
+          throw H.wrapException(T.UnknownError$(this));
+      }
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14942,9 +14979,10 @@ var $$ = {};
     }
   },
   GitHub_currentUser_closure: {
-    "^": "Closure:23;",
+    "^": "Closure:49;this_0",
     call$1: function(response) {
-      throw H.wrapException("Not Authenticated");
+      if (J.get$statusCode$x(response) === 403)
+        throw H.wrapException(T.AccessForbidden$(this.this_0));
     }
   },
   GitHub_getJSON_closure0: {
@@ -14958,7 +14996,7 @@ var $$ = {};
     call$1: function(response) {
       if (this.statusCode_2 !== J.get$statusCode$x(response)) {
         this.fail_3.call$1(response);
-        return P._Future$immediate(null, null);
+        this.this_1._handleStatusCode$2(response, J.get$statusCode$x(response));
       }
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
@@ -15003,6 +15041,8 @@ var $$ = {};
       var json, t1, t2, t3;
       json = C.JsonCodec_null_null.decode$1(J.get$body$x(response));
       t1 = J.getInterceptor$asx(json);
+      if (t1.$index(json, "error") != null)
+        throw H.wrapException(json);
       t2 = t1.$index(json, "access_token");
       t3 = t1.$index(json, "token_type");
       return new T.ExchangeResponse(t2, J.split$1$s(t1.$index(json, "scope"), ","), t3);
@@ -15113,7 +15153,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_4",
+    "^": "Closure:50;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -15223,7 +15263,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_writeSlot: {
-    "^": "Closure:49;copies_3",
+    "^": "Closure:50;copies_3",
     call$2: function(i, x) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -15655,36 +15695,51 @@ var $$ = {};
 ["", "oauth2.dart", , T, {
   "^": "",
   main: [function() {
-    var t1, url, t2, t3;
+    var t1, url, t2, flow;
     t1 = {};
     url = window.location.href;
-    t2 = ["user:email"];
     if (url == null)
-      t3 = null;
+      t2 = null;
     else
-      t3 = C.JSString_methods.contains$1(url, "?") ? C.JSString_methods.substring$2(url, 0, C.JSString_methods.indexOf$1(url, "?")) : url;
+      t2 = C.JSString_methods.contains$1(url, "?") ? C.JSString_methods.substring$2(url, 0, C.JSString_methods.indexOf$1(url, "?")) : url;
+    flow = new T.OAuth2Flow("ff718b16cbfc71defcba", ["user:email"], t2, null, "a0c004e014feed76bdd659fcef0445e8f632c236", "https://github.com/login/oauth");
+    t2 = new T.main_authorize(flow);
     t1.params_0 = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
     if (!J.getInterceptor$asx(url).contains$1(url, "?"))
-      window.location.href = "https://github.com/login/oauth/authorize" + M.buildQueryString(P.LinkedHashMap_LinkedHashMap$_literal(["client_id", "ff718b16cbfc71defcba", "scopes", C.JSArray_methods.join$1(t2, ","), "redirect_uri", t3, "state", null], null, null));
+      t2.call$0();
     else
       t1.params_0 = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
     M.initGitHub();
-    R.init("oauth2.dart", new T.main_closure(t1, new T.OAuth2Flow("ff718b16cbfc71defcba", t2, t3, null, "a0c004e014feed76bdd659fcef0445e8f632c236", "https://github.com/login/oauth")));
+    R.init("oauth2.dart", new T.main_closure(t1, flow, t2));
   }, "call$0", "main$closure", 0, 0, 6],
   loadUsername: function(token) {
     var t1 = $.get$GitHub_defaultClient().call$0();
     new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1).currentUser$0().then$1(new T.loadUsername_closure());
   },
-  main_closure: {
-    "^": "Closure:20;box_0,flow_1",
+  main_authorize: {
+    "^": "Closure:6;flow_1",
     call$0: function() {
-      this.flow_1.exchange$1(J.$index$asx(this.box_0.params_0, "code")).then$1(new T.main__closure());
+      var t1 = this.flow_1;
+      window.location.href = t1.baseUrl + "/authorize" + M.buildQueryString(P.LinkedHashMap_LinkedHashMap$_literal(["client_id", t1.clientId, "scopes", C.JSArray_methods.join$1(t1.scopes, ","), "redirect_uri", t1.redirectUri, "state", t1.state], null, null));
+    }
+  },
+  main_closure: {
+    "^": "Closure:20;box_0,flow_2,authorize_3",
+    call$0: function() {
+      this.flow_2.exchange$1(J.$index$asx(this.box_0.params_0, "code")).then$1(new T.main__closure()).catchError$1(new T.main__closure0(this.authorize_3));
     }
   },
   main__closure: {
     "^": "Closure:23;",
     call$1: function(response) {
       T.loadUsername(response.get$token());
+    }
+  },
+  main__closure0: {
+    "^": "Closure:23;authorize_4",
+    call$1: function(error) {
+      if (!!J.getInterceptor(error).$isMap)
+        this.authorize_4.call$0();
     }
   },
   loadUsername_closure: {
@@ -16551,7 +16606,7 @@ var $$ = {};
       if (J.$gt$n(offset, this._decodedChars.length))
         H.throwExpression(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + this.get$length(this) + "."));
       return t1;
-    }, "call$1", "get$location", 2, 0, 50],
+    }, "call$1", "get$location", 2, 0, 51],
     getLine$1: function(offset) {
       var t1 = J.getInterceptor$n(offset);
       if (t1.$lt(offset, 0))
@@ -16717,7 +16772,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9]
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9]
   }
 }],
 ["source_span.location", "package:source_span/src/location.dart", , O, {
@@ -16845,7 +16900,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 51, 9],
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 52, 9],
     $eq: function(_, other) {
       var t1, t2;
       if (other == null)
@@ -17093,7 +17148,7 @@ var $$ = {};
       return this.error$4$length$match$position($receiver, message, length, null, position);
     }, "error$3$length$position", function($receiver, message) {
       return this.error$4$length$match$position($receiver, message, null, null, null);
-    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 52, 9, 9, 9],
+    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 53, 9, 9, 9],
     StringScanner$3$position$sourceUrl: function(string, position, sourceUrl) {
     }
   }
@@ -17369,7 +17424,7 @@ var $$ = {};
       ++i;
       if (params.$index(0, key) == null)
         continue;
-      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, params.$index(0, key), C.Utf8Codec_false, false);
+      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, J.toString$0(params.$index(0, key)), C.Utf8Codec_false, false);
       queryString._contents += t2;
       t2 = params.get$keys();
       if (i !== t2.get$length(t2))
@@ -17461,6 +17516,9 @@ $$ = null;
   O.SourceLocation.$isObject = TRUE;
   T.SourceSpan.$isObject = TRUE;
   W.Event.$isObject = TRUE;
+  W.MouseEvent.$isObject = TRUE;
+  W.HttpRequest.$isObject = TRUE;
+  W.ProgressEvent.$isObject = TRUE;
   _ = P.LibraryMirror;
   _.$isLibraryMirror = TRUE;
   _.$isMirror = TRUE;
@@ -17494,46 +17552,43 @@ $$ = null;
   _.$isMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  _ = P.TypeVariableMirror;
-  _.$isTypeMirror = TRUE;
+  _ = P.ParameterMirror;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  _ = P.ParameterMirror;
+  _ = P.TypeVariableMirror;
+  _.$isTypeMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
   _ = P.TypeMirror;
   _.$isTypeMirror = TRUE;
   _.$isMirror = TRUE;
   _.$isObject = TRUE;
-  P.Encoding.$isObject = TRUE;
-  _ = W.NodeValidator;
-  _.$isNodeValidator = TRUE;
-  _.$isObject = TRUE;
-  W.MouseEvent.$isObject = TRUE;
-  W.HttpRequest.$isObject = TRUE;
-  W.ProgressEvent.$isObject = TRUE;
   _ = R.Trace;
   _.$isStackTrace = TRUE;
   _.$isObject = TRUE;
   S.Frame.$isObject = TRUE;
+  P.Encoding.$isObject = TRUE;
+  _ = W.NodeValidator;
+  _.$isNodeValidator = TRUE;
+  _.$isObject = TRUE;
   H.RawReceivePortImpl.$isObject = TRUE;
   H._IsolateEvent.$isObject = TRUE;
   H._IsolateContext.$isObject = TRUE;
   _ = P.StackTrace;
   _.$isStackTrace = TRUE;
   _.$isObject = TRUE;
-  _ = P.Future;
-  _.$isFuture = TRUE;
-  _.$isObject = TRUE;
   _ = L.Response;
   _.$isResponse = TRUE;
-  _.$isObject = TRUE;
-  _ = Z.StreamedResponse;
-  _.$isStreamedResponse = TRUE;
   _.$isObject = TRUE;
   _ = P.InstanceMirror;
   _.$isInstanceMirror = TRUE;
   _.$isMirror = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Future;
+  _.$isFuture = TRUE;
+  _.$isObject = TRUE;
+  _ = Z.StreamedResponse;
+  _.$isStreamedResponse = TRUE;
   _.$isObject = TRUE;
   _ = T.CurrentUser;
   _.$isCurrentUser = TRUE;
@@ -18061,8 +18116,8 @@ C.List_KIf = Isolate.makeConstantList([0, 0, 26498, 1023, 65534, 34815, 65534, 1
 C.List_WnV = Isolate.makeConstantList(["/", "\\"]);
 C.List_cSk = Isolate.makeConstantList(["/"]);
 C.List_empty = Isolate.makeConstantList([]);
-C.List_empty0 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeVariableMirror]);
-C.List_empty1 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.$int]);
+C.List_empty0 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.$int]);
+C.List_empty1 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeVariableMirror]);
 C.List_empty2 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.TypeMirror]);
 C.List_empty3 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.String]);
 C.List_gRj = Isolate.makeConstantList([0, 0, 32722, 12287, 65534, 34815, 65534, 18431]);
@@ -18388,6 +18443,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "void__String__dynamic", void: true, args: [P.String], opt: [null]},
 {func: "int__int_int", ret: P.$int, args: [P.$int, P.$int]},
 {func: "void__Node", void: true, args: [W.Node]},
+{func: "dynamic__Response", args: [L.Response]},
 {func: "dynamic__int_dynamic", args: [P.$int, null]},
 {func: "FileLocation__int", ret: G.FileLocation, args: [P.$int]},
 {func: "String__String__dynamic", ret: P.String, args: [P.String], named: {color: null}},
@@ -21597,8 +21653,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   JSString.prototype = $desc;
-  function _CodeUnits(__interceptors$_string) {
-    this.__interceptors$_string = __interceptors$_string;
+  function _CodeUnits(_string) {
+    this._string = _string;
   }
   _CodeUnits.builtin$cls = "_CodeUnits";
   if (!"name" in _CodeUnits)
@@ -22353,9 +22409,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _MatchImplementation.prototype = $desc;
-  function _AllMatchesIterable(_re, _string) {
+  function _AllMatchesIterable(_re, __js_helper$_string) {
     this._re = _re;
-    this._string = _string;
+    this.__js_helper$_string = __js_helper$_string;
   }
   _AllMatchesIterable.builtin$cls = "_AllMatchesIterable";
   if (!"name" in _AllMatchesIterable)
@@ -22364,9 +22420,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _AllMatchesIterable.prototype = $desc;
-  function _AllMatchesIterator(_regExp, _string, __js_helper$_current) {
+  function _AllMatchesIterator(_regExp, __js_helper$_string, __js_helper$_current) {
     this._regExp = _regExp;
-    this._string = _string;
+    this.__js_helper$_string = __js_helper$_string;
     this.__js_helper$_current = __js_helper$_current;
   }
   _AllMatchesIterator.builtin$cls = "_AllMatchesIterator";
@@ -22538,9 +22594,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ListIterable.prototype = $desc;
-  function SubListIterable(_iterable, _start, _endOrLength) {
+  function SubListIterable(_iterable, __internal$_start, _endOrLength) {
     this._iterable = _iterable;
-    this._start = _start;
+    this.__internal$_start = __internal$_start;
     this._endOrLength = _endOrLength;
   }
   SubListIterable.builtin$cls = "SubListIterable";
@@ -24268,9 +24324,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _ForwardingStreamSubscription.prototype = $desc;
-  function _MapStream(_transform, _source) {
+  function _MapStream(_transform, _async$_source) {
     this._transform = _transform;
-    this._source = _source;
+    this._async$_source = _async$_source;
   }
   _MapStream.builtin$cls = "_MapStream";
   if (!"name" in _MapStream)
@@ -24279,9 +24335,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _MapStream.prototype = $desc;
-  function _SkipStream(_remaining, _source) {
+  function _SkipStream(_remaining, _async$_source) {
     this._remaining = _remaining;
-    this._source = _source;
+    this._async$_source = _async$_source;
   }
   _SkipStream.builtin$cls = "_SkipStream";
   if (!"name" in _SkipStream)
@@ -24564,8 +24620,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _LinkedHashSet.prototype = $desc;
-  function LinkedHashSetCell(_collection$_element, _next, _previous) {
-    this._collection$_element = _collection$_element;
+  function LinkedHashSetCell(_element, _next, _previous) {
+    this._element = _element;
     this._next = _next;
     this._previous = _previous;
   }
@@ -24576,8 +24632,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   LinkedHashSetCell.prototype = $desc;
-  LinkedHashSetCell.prototype.get$_collection$_element = function() {
-    return this._collection$_element;
+  LinkedHashSetCell.prototype.get$_element = function() {
+    return this._element;
   };
   LinkedHashSetCell.prototype.get$_next = function() {
     return this._next;
@@ -24604,8 +24660,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   LinkedHashSetIterator.prototype = $desc;
-  function UnmodifiableListView(_collection$_source) {
-    this._collection$_source = _collection$_source;
+  function UnmodifiableListView(_source) {
+    this._source = _source;
   }
   UnmodifiableListView.builtin$cls = "UnmodifiableListView";
   if (!"name" in UnmodifiableListView)
@@ -25031,6 +25087,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Deprecated.prototype = $desc;
+  function _Override() {
+  }
+  _Override.builtin$cls = "_Override";
+  if (!"name" in _Override)
+    _Override.name = "_Override";
+  $desc = $collectedClasses._Override;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _Override.prototype = $desc;
   function bool() {
   }
   bool.builtin$cls = "bool";
@@ -25390,8 +25455,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   StackTrace.prototype = $desc;
-  function Stopwatch(_core$_start, _stop) {
-    this._core$_start = _core$_start;
+  function Stopwatch(_start, _stop) {
+    this._start = _start;
     this._stop = _stop;
   }
   Stopwatch.builtin$cls = "Stopwatch";
@@ -25720,8 +25785,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _AttributeMap.prototype = $desc;
-  function _ElementAttributeMap(_element) {
-    this._element = _element;
+  function _ElementAttributeMap(_html$_element) {
+    this._html$_element = _html$_element;
   }
   _ElementAttributeMap.builtin$cls = "_ElementAttributeMap";
   if (!"name" in _ElementAttributeMap)
@@ -26215,6 +26280,58 @@ function dart_precompiled($collectedClasses) {
   Authentication.prototype.get$token = function() {
     return this.token;
   };
+  function GitHubError(message) {
+    this.message = message;
+  }
+  GitHubError.builtin$cls = "GitHubError";
+  if (!"name" in GitHubError)
+    GitHubError.name = "GitHubError";
+  $desc = $collectedClasses.GitHubError;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  GitHubError.prototype = $desc;
+  GitHubError.prototype.get$message = function(receiver) {
+    return this.message;
+  };
+  function NotFound(message, apiUrl, github, source) {
+    this.message = message;
+    this.apiUrl = apiUrl;
+    this.github = github;
+    this.source = source;
+  }
+  NotFound.builtin$cls = "NotFound";
+  if (!"name" in NotFound)
+    NotFound.name = "NotFound";
+  $desc = $collectedClasses.NotFound;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  NotFound.prototype = $desc;
+  function AccessForbidden(message, apiUrl, github, source) {
+    this.message = message;
+    this.apiUrl = apiUrl;
+    this.github = github;
+    this.source = source;
+  }
+  AccessForbidden.builtin$cls = "AccessForbidden";
+  if (!"name" in AccessForbidden)
+    AccessForbidden.name = "AccessForbidden";
+  $desc = $collectedClasses.AccessForbidden;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  AccessForbidden.prototype = $desc;
+  function UnknownError(message, apiUrl, github, source) {
+    this.message = message;
+    this.apiUrl = apiUrl;
+    this.github = github;
+    this.source = source;
+  }
+  UnknownError.builtin$cls = "UnknownError";
+  if (!"name" in UnknownError)
+    UnknownError.name = "UnknownError";
+  $desc = $collectedClasses.UnknownError;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  UnknownError.prototype = $desc;
   function GitHub(auth, endpoint, client) {
     this.auth = auth;
     this.endpoint = endpoint;
@@ -26236,7 +26353,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   closure.prototype = $desc;
-  function GitHub_currentUser_closure() {
+  function GitHub_currentUser_closure(this_0) {
+    this.this_0 = this_0;
   }
   GitHub_currentUser_closure.builtin$cls = "GitHub_currentUser_closure";
   if (!"name" in GitHub_currentUser_closure)
@@ -26791,9 +26909,20 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Unstable.prototype = $desc;
-  function main_closure(box_0, flow_1) {
-    this.box_0 = box_0;
+  function main_authorize(flow_1) {
     this.flow_1 = flow_1;
+  }
+  main_authorize.builtin$cls = "main_authorize";
+  if (!"name" in main_authorize)
+    main_authorize.name = "main_authorize";
+  $desc = $collectedClasses.main_authorize;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  main_authorize.prototype = $desc;
+  function main_closure(box_0, flow_2, authorize_3) {
+    this.box_0 = box_0;
+    this.flow_2 = flow_2;
+    this.authorize_3 = authorize_3;
   }
   main_closure.builtin$cls = "main_closure";
   if (!"name" in main_closure)
@@ -26811,6 +26940,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   main__closure.prototype = $desc;
+  function main__closure0(authorize_4) {
+    this.authorize_4 = authorize_4;
+  }
+  main__closure0.builtin$cls = "main__closure0";
+  if (!"name" in main__closure0)
+    main__closure0.name = "main__closure0";
+  $desc = $collectedClasses.main__closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  main__closure0.prototype = $desc;
   function loadUsername_closure() {
   }
   loadUsername_closure.builtin$cls = "loadUsername_closure";
@@ -27413,5 +27552,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   buildQueryString_closure.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FileReader, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, Range, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement0, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSPositiveInt, JSUInt32, JSUInt31, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, NoSideEffects, NoThrows, NoInline, Native, _Patch, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, Creates, Returns, JSName, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, _AllMatchesIterable, _AllMatchesIterator, StringMatch, BaseClient, BaseClient__sendUnstreamed_closure, BaseRequest, BaseRequest_closure, BaseRequest_closure0, BaseResponse, ByteStream, ByteStream_toBytes_closure, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, SkipIterable, EfficientLengthSkipIterable, SkipIterator, SkipWhileIterable, SkipWhileIterator, EmptyIterable, EmptyIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, Symbol, JsMirrorSystem, JsMirrorSystem_computeLibrariesByName_closure, JsMirror, JsIsolateMirror, JsDeclarationMirror, JsTypeVariableMirror, JsTypeMirror, JsLibraryMirror, JsDeclarationMirror_JsObjectMirror, JsLibraryMirror___members_addToResult, JsLibraryMirror_declarations_addToResult, filterMembers_closure, JsMixinApplication, JsTypeMirror_JsObjectMirror, JsObjectMirror, JsInstanceMirror, JsTypeBoundClassMirror, JsTypeBoundClassMirror_typeArguments_addTypeArgument, JsTypeBoundClassMirror_typeArguments_addTypeArgument_closure, JsTypeBoundClassMirror_typeArguments_closure, JsTypeBoundClassMirror_declarations_closure, JsTypeBoundClassMirror_newInstance_closure, JsTypeBoundClassMirror__asRuntimeType_closure, JsClassMirror, JsTypeMirror_JsObjectMirror0, JsClassMirror_declarations_addToResult, JsClassMirror_declarations_closure, JsClassMirror__getInvokedInstance_closure, JsClassMirror__getInvokedInstance_closure0, JsVariableMirror, JsClosureMirror, JsMethodMirror, JsParameterMirror, JsTypedefMirror, BrokenClassMirror, JsFunctionTypeMirror, typeMirrorFromRuntimeTypeRepresentation_getTypeArgument, typeMirrorFromRuntimeTypeRepresentation_substituteTypeVariable, extractMetadata_closure, extractMetadata_closure0, NoSuchStaticMethodError, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_pipe_closure, Stream_join_closure, Stream_join_closure1, Stream_join_closure0, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, Stream_first_closure, Stream_first_closure0, Stream_last_closure, Stream_last_closure0, Stream_single_closure, Stream_single_closure0, Stream_elementAt_closure, Stream_elementAt_closure0, StreamSubscription, StreamView, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _AddStreamState, _AddStreamState_makeErrorHandler_closure, _AddStreamState_cancel_closure, _StreamControllerAddStreamState, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _SkipStream, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, _LinkedHashMap_addAll_closure, _LinkedIdentityHashMap, _LinkedCustomHashMap, _LinkedCustomHashMap_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, UnmodifiableListView, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, _UnmodifiableMapMixin, MapView, UnmodifiableMapView, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, AsciiCodec, _UnicodeSubsetEncoder, AsciiEncoder, _UnicodeSubsetDecoder, AsciiDecoder, ByteConversionSink, ByteConversionSinkBase, _ByteCallbackSink, ChunkedConversionSink, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Latin1Codec, Latin1Encoder, Latin1Decoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, Deprecated, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterable, Iterator, List, Map, Null, num, Object, Match, StackTrace, Stopwatch, String, Runes, RuneIterator, StringBuffer, Symbol0, Uri, Uri_parse_isRegName, Uri_parse_parseAuth, Uri__checkNonWindowsPathReservedCharacters_closure, Uri__checkWindowsPathReservedCharacters_closure, Uri__makePath_closure, Uri__makeQuery_closure, Uri_hashCode_combine, Uri_splitQueryString_closure, Uri_parseIPv4Address_error, Uri_parseIPv4Address_closure, Uri_parseIPv6Address_error, Uri_parseIPv6Address_parseHex, Uri__uriEncode_byteToHex, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Element_Element$html_closure, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, _ChildNodeListLazy, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _AttributeMap, _ElementAttributeMap, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, _SvgNodeValidator, FixedSizeListIterator, _DOMWindowCrossFrame, _LocationCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, Mirror, DeclarationMirror, InstanceMirror, LibraryMirror, TypeMirror, ClassMirror, TypeVariableMirror, MethodMirror, VariableMirror, ParameterMirror, MirrorsUsed, UnmodifiableMapView0, DelegatingMap_UnmodifiableMapMixin, UnmodifiableMapMixin, DelegatingMap, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, Frame, Frame_Frame$parseV8_parseLocation, initGitHub_closure, Authentication, GitHub, closure, GitHub_currentUser_closure, GitHub_getJSON_closure0, GitHub_getJSON_closure, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, GitHub_request_closure2, OAuth2Flow, OAuth2Flow_exchange_closure, ExchangeResponse, User, UserPlan, CurrentUser, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, BrowserClient, BrowserClient_send_closure, BrowserClient_send__closure, BrowserClient_send___closure, BrowserClient_send___closure0, BrowserClient_send__closure0, BrowserClient_send__closure1, ClientException, MediaType, MediaType_MediaType$parse_closure, MediaType_toString_closure, MediaType_toString__closure, IOClient, IOClient_send_closure, IOClient_send__closure2, IOClient_send_closure0, IOClient_send__closure, IOClient_send__closure0, IOClient_send__closure1, IOClient_send_closure1, LazyTrace, SupportedBrowser, Experimental, DomName, DocsEditable, Unstable, main_closure, main__closure, loadUsername_closure, Context, Context_join_closure, Context_joinAll_closure, Context_split_closure, _validateArgList_closure, InternalStyle, ParsedPath, ParsedPath_normalize_closure, PathException, Style, PosixStyle, UrlStyle, WindowsStyle, WindowsStyle_absolutePathToUri_closure, Request, Response, Response_fromStream_closure, SourceFile, SourceFile_getLine_closure, FileLocation, FileSpan, SourceLocation, SourceSpan, SourceSpanException, SourceSpanFormatException, SourceSpanMixin, Chain, Chain_toTrace_closure, flatten_helper, StreamedResponse, StringScannerException, StringScanner, Trace, Trace_Trace$current_closure, Trace_Trace$from_closure, Trace$parseVM_closure, Trace$parseVM_closure0, Trace$parseV8_closure, Trace$parseV8_closure0, Trace$parseSafari6_1_closure, Trace$parseSafari6_1_closure0, Trace$parseSafari6_0_closure, Trace$parseSafari6_0_closure0, Trace$parseFriendly_closure, Trace$parseFriendly_closure0, Trace_toString_closure0, Trace_toString_closure, ApiName, buildQueryString_closure];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FileReader, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, Range, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement0, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSMutableArray, JSFixedArray, JSExtendableArray, JSNumber, JSInt, JSDouble, JSPositiveInt, JSUInt32, JSUInt31, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, NoSideEffects, NoThrows, NoInline, Native, _Patch, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, Creates, Returns, JSName, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, _AllMatchesIterable, _AllMatchesIterator, StringMatch, BaseClient, BaseClient__sendUnstreamed_closure, BaseRequest, BaseRequest_closure, BaseRequest_closure0, BaseResponse, ByteStream, ByteStream_toBytes_closure, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, SkipIterable, EfficientLengthSkipIterable, SkipIterator, SkipWhileIterable, SkipWhileIterator, EmptyIterable, EmptyIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, Symbol, JsMirrorSystem, JsMirrorSystem_computeLibrariesByName_closure, JsMirror, JsIsolateMirror, JsDeclarationMirror, JsTypeVariableMirror, JsTypeMirror, JsLibraryMirror, JsDeclarationMirror_JsObjectMirror, JsLibraryMirror___members_addToResult, JsLibraryMirror_declarations_addToResult, filterMembers_closure, JsMixinApplication, JsTypeMirror_JsObjectMirror, JsObjectMirror, JsInstanceMirror, JsTypeBoundClassMirror, JsTypeBoundClassMirror_typeArguments_addTypeArgument, JsTypeBoundClassMirror_typeArguments_addTypeArgument_closure, JsTypeBoundClassMirror_typeArguments_closure, JsTypeBoundClassMirror_declarations_closure, JsTypeBoundClassMirror_newInstance_closure, JsTypeBoundClassMirror__asRuntimeType_closure, JsClassMirror, JsTypeMirror_JsObjectMirror0, JsClassMirror_declarations_addToResult, JsClassMirror_declarations_closure, JsClassMirror__getInvokedInstance_closure, JsClassMirror__getInvokedInstance_closure0, JsVariableMirror, JsClosureMirror, JsMethodMirror, JsParameterMirror, JsTypedefMirror, BrokenClassMirror, JsFunctionTypeMirror, typeMirrorFromRuntimeTypeRepresentation_getTypeArgument, typeMirrorFromRuntimeTypeRepresentation_substituteTypeVariable, extractMetadata_closure, extractMetadata_closure0, NoSuchStaticMethodError, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_pipe_closure, Stream_join_closure, Stream_join_closure1, Stream_join_closure0, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, Stream_first_closure, Stream_first_closure0, Stream_last_closure, Stream_last_closure0, Stream_single_closure, Stream_single_closure0, Stream_elementAt_closure, Stream_elementAt_closure0, StreamSubscription, StreamView, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _AddStreamState, _AddStreamState_makeErrorHandler_closure, _AddStreamState_cancel_closure, _StreamControllerAddStreamState, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _SkipStream, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, _LinkedHashMap_addAll_closure, _LinkedIdentityHashMap, _LinkedCustomHashMap, _LinkedCustomHashMap_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, UnmodifiableListView, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, _UnmodifiableMapMixin, MapView, UnmodifiableMapView, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, AsciiCodec, _UnicodeSubsetEncoder, AsciiEncoder, _UnicodeSubsetDecoder, AsciiDecoder, ByteConversionSink, ByteConversionSinkBase, _ByteCallbackSink, ChunkedConversionSink, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Latin1Codec, Latin1Encoder, Latin1Decoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, Deprecated, _Override, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterable, Iterator, List, Map, Null, num, Object, Match, StackTrace, Stopwatch, String, Runes, RuneIterator, StringBuffer, Symbol0, Uri, Uri_parse_isRegName, Uri_parse_parseAuth, Uri__checkNonWindowsPathReservedCharacters_closure, Uri__checkWindowsPathReservedCharacters_closure, Uri__makePath_closure, Uri__makeQuery_closure, Uri_hashCode_combine, Uri_splitQueryString_closure, Uri_parseIPv4Address_error, Uri_parseIPv4Address_closure, Uri_parseIPv6Address_error, Uri_parseIPv6Address_parseHex, Uri__uriEncode_byteToHex, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, Element_Element$html_closure, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, _ChildNodeListLazy, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _AttributeMap, _ElementAttributeMap, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, _SvgNodeValidator, FixedSizeListIterator, _DOMWindowCrossFrame, _LocationCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, Mirror, DeclarationMirror, InstanceMirror, LibraryMirror, TypeMirror, ClassMirror, TypeVariableMirror, MethodMirror, VariableMirror, ParameterMirror, MirrorsUsed, UnmodifiableMapView0, DelegatingMap_UnmodifiableMapMixin, UnmodifiableMapMixin, DelegatingMap, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, Frame, Frame_Frame$parseV8_parseLocation, initGitHub_closure, Authentication, GitHubError, NotFound, AccessForbidden, UnknownError, GitHub, closure, GitHub_currentUser_closure, GitHub_getJSON_closure0, GitHub_getJSON_closure, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, GitHub_request_closure2, OAuth2Flow, OAuth2Flow_exchange_closure, ExchangeResponse, User, UserPlan, CurrentUser, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, BrowserClient, BrowserClient_send_closure, BrowserClient_send__closure, BrowserClient_send___closure, BrowserClient_send___closure0, BrowserClient_send__closure0, BrowserClient_send__closure1, ClientException, MediaType, MediaType_MediaType$parse_closure, MediaType_toString_closure, MediaType_toString__closure, IOClient, IOClient_send_closure, IOClient_send__closure2, IOClient_send_closure0, IOClient_send__closure, IOClient_send__closure0, IOClient_send__closure1, IOClient_send_closure1, LazyTrace, SupportedBrowser, Experimental, DomName, DocsEditable, Unstable, main_authorize, main_closure, main__closure, main__closure0, loadUsername_closure, Context, Context_join_closure, Context_joinAll_closure, Context_split_closure, _validateArgList_closure, InternalStyle, ParsedPath, ParsedPath_normalize_closure, PathException, Style, PosixStyle, UrlStyle, WindowsStyle, WindowsStyle_absolutePathToUri_closure, Request, Response, Response_fromStream_closure, SourceFile, SourceFile_getLine_closure, FileLocation, FileSpan, SourceLocation, SourceSpan, SourceSpanException, SourceSpanFormatException, SourceSpanMixin, Chain, Chain_toTrace_closure, flatten_helper, StreamedResponse, StringScannerException, StringScanner, Trace, Trace_Trace$current_closure, Trace_Trace$from_closure, Trace$parseVM_closure, Trace$parseVM_closure0, Trace$parseV8_closure, Trace$parseV8_closure0, Trace$parseSafari6_1_closure, Trace$parseSafari6_1_closure0, Trace$parseSafari6_0_closure, Trace$parseSafari6_0_closure0, Trace$parseFriendly_closure, Trace$parseFriendly_closure0, Trace_toString_closure0, Trace_toString_closure, ApiName, buildQueryString_closure];
 }

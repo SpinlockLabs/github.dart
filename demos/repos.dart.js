@@ -11691,6 +11691,9 @@ var $$ = {};
       return "Deprecated feature. Will be removed " + this.expires;
     }
   },
+  _Override: {
+    "^": "Object;"
+  },
   bool: {
     "^": "Object;",
     toString$0: function(_) {
@@ -15718,47 +15721,7 @@ var $$ = {};
   GitHub_userRepositories__closure: {
     "^": "Closure:36;this_1",
     call$1: function(it) {
-      var repo, t1, t2, owner;
-      repo = new T.Repository(this.this_1, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-      t1 = J.getInterceptor$asx(it);
-      repo.name = t1.$index(it, "name");
-      repo.id = t1.$index(it, "id");
-      repo.fullName = t1.$index(it, "full_name");
-      repo.fork = t1.$index(it, "fork");
-      repo.url = t1.$index(it, "html_url");
-      repo.description = t1.$index(it, "description");
-      t2 = new T.CloneUrls(null, null, null, null);
-      repo.cloneUrls = t2;
-      t2.git = t1.$index(it, "git_url");
-      t2.ssh = t1.$index(it, "ssh_url");
-      t2.https = t1.$index(it, "clone_url");
-      t2.svn = t1.$index(it, "svn_url");
-      repo.homepage = t1.$index(it, "homepage");
-      repo.size = t1.$index(it, "size");
-      repo.stargazersCount = t1.$index(it, "stargazers_count");
-      repo.watchersCount = t1.$index(it, "watchers_count");
-      repo.language = t1.$index(it, "language");
-      repo.hasIssues = t1.$index(it, "has_issues");
-      repo.hasDownloads = t1.$index(it, "has_downloads");
-      repo.hasWiki = t1.$index(it, "has_wiki");
-      repo.defaultBranch = t1.$index(it, "default_branch");
-      repo.openIssuesCount = t1.$index(it, "open_issues_count");
-      repo.networkCount = t1.$index(it, "network_count");
-      repo.subscribersCount = t1.$index(it, "subscribers_count");
-      repo.forksCount = t1.$index(it, "forks_count");
-      repo.createdAt = M.parse_date(t1.$index(it, "created_at"));
-      repo.pushedAt = M.parse_date(t1.$index(it, "pushed_at"));
-      repo.$private = t1.$index(it, "private");
-      repo.json = it;
-      t1 = t1.$index(it, "owner");
-      owner = new T.RepositoryOwner(null, null, null, null);
-      t2 = J.getInterceptor$asx(t1);
-      owner.login = t2.$index(t1, "login");
-      owner.id = t2.$index(t1, "id");
-      owner.avatarUrl = t2.$index(t1, "avatar_url");
-      owner.url = t2.$index(t1, "html_url");
-      repo.owner = owner;
-      return repo;
+      return T.Repository_fromJSON(this.this_1, it);
     }
   },
   GitHub_getJSON_closure: {
@@ -15798,13 +15761,63 @@ var $$ = {};
     }
   },
   Repository: {
-    "^": "Object;github,name>,id,fullName,owner<,$private,fork<,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt,json"
+    "^": "Object;github,name>,id,fullName,owner<,$private,fork<,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt,json",
+    static: {Repository_fromJSON: function(github, input) {
+        var repo, t1, t2;
+        if (input == null)
+          return;
+        repo = new T.Repository(github, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        t1 = J.getInterceptor$asx(input);
+        repo.name = t1.$index(input, "name");
+        repo.id = t1.$index(input, "id");
+        repo.fullName = t1.$index(input, "full_name");
+        repo.fork = t1.$index(input, "fork");
+        repo.url = t1.$index(input, "html_url");
+        repo.description = t1.$index(input, "description");
+        t2 = new T.CloneUrls(null, null, null, null);
+        repo.cloneUrls = t2;
+        t2.git = t1.$index(input, "git_url");
+        t2.ssh = t1.$index(input, "ssh_url");
+        t2.https = t1.$index(input, "clone_url");
+        t2.svn = t1.$index(input, "svn_url");
+        repo.homepage = t1.$index(input, "homepage");
+        repo.size = t1.$index(input, "size");
+        repo.stargazersCount = t1.$index(input, "stargazers_count");
+        repo.watchersCount = t1.$index(input, "watchers_count");
+        repo.language = t1.$index(input, "language");
+        repo.hasIssues = t1.$index(input, "has_issues");
+        repo.hasDownloads = t1.$index(input, "has_downloads");
+        repo.hasWiki = t1.$index(input, "has_wiki");
+        repo.defaultBranch = t1.$index(input, "default_branch");
+        repo.openIssuesCount = t1.$index(input, "open_issues_count");
+        repo.networkCount = t1.$index(input, "network_count");
+        repo.subscribersCount = t1.$index(input, "subscribers_count");
+        repo.forksCount = t1.$index(input, "forks_count");
+        repo.createdAt = M.parse_date(t1.$index(input, "created_at"));
+        repo.pushedAt = M.parse_date(t1.$index(input, "pushed_at"));
+        repo.$private = t1.$index(input, "private");
+        repo.json = input;
+        repo.owner = T.RepositoryOwner_fromJSON(t1.$index(input, "owner"));
+        return repo;
+      }}
   },
   CloneUrls: {
     "^": "Object;git,ssh,https,svn"
   },
   RepositoryOwner: {
-    "^": "Object;login,id,avatarUrl,url>"
+    "^": "Object;login,id,avatarUrl,url>",
+    static: {RepositoryOwner_fromJSON: function(input) {
+        var owner, t1;
+        if (input == null)
+          return;
+        owner = new T.RepositoryOwner(null, null, null, null);
+        t1 = J.getInterceptor$asx(input);
+        owner.login = t1.$index(input, "login");
+        owner.id = t1.$index(input, "id");
+        owner.avatarUrl = t1.$index(input, "avatar_url");
+        owner.url = t1.$index(input, "html_url");
+        return owner;
+      }}
   }
 }],
 ["html_common", "dart:html_common", , P, {
@@ -18294,7 +18307,7 @@ var $$ = {};
       ++i;
       if (params.$index(0, key) == null)
         continue;
-      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, params.$index(0, key), C.Utf8Codec_false, false);
+      t2 = H.S(key) + "=" + P.Uri__uriEncode(C.List_KIf, J.toString$0(params.$index(0, key)), C.Utf8Codec_false, false);
       queryString._contents += t2;
       t2 = params.get$keys();
       if (i !== t2.get$length(t2))

@@ -10998,6 +10998,9 @@ var $$ = {};
       return "Deprecated feature. Will be removed " + this.expires;
     }
   },
+  _Override: {
+    "^": "Object;"
+  },
   bool: {
     "^": "Object;",
     toString$0: function(_) {
@@ -13066,7 +13069,7 @@ var $$ = {};
   Event: {
     "^": "Interceptor;",
     $isEvent: true,
-    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyNeededEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SecurityPolicyViolationEvent|SpeechInputEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
+    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MIDIMessageEvent|MediaKeyNeededEvent|MediaStreamTrackEvent|MessageEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SpeechInputEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
   },
   EventTarget: {
     "^": "Interceptor;",
@@ -13315,6 +13318,10 @@ var $$ = {};
   ScriptElement: {
     "^": "HtmlElement;src}",
     "%": "HTMLScriptElement"
+  },
+  SecurityPolicyViolationEvent: {
+    "^": "Event;statusCode=",
+    "%": "SecurityPolicyViolationEvent"
   },
   SelectElement: {
     "^": "HtmlElement;length=,name=",
@@ -14437,15 +14444,57 @@ var $$ = {};
   Authentication: {
     "^": "Object;token,username,password,isAnonymous,isBasic,isToken"
   },
+  GitHubError: {
+    "^": "Object;message>",
+    toString$0: function(_) {
+      return "GitHub Error (message: " + this.message + ", api url: " + H.S(this.apiUrl) + ")";
+    }
+  },
+  NotFound: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {NotFound$: function(github, msg) {
+        return new T.NotFound(msg, null, github, null);
+      }}
+  },
+  OrganizationNotFound: {
+    "^": "NotFound;message,apiUrl,github,source",
+    $isOrganizationNotFound: true,
+    static: {OrganizationNotFound$: function(github, organization) {
+        return new T.OrganizationNotFound("Organization Not Found: " + H.S(organization), null, github, null);
+      }}
+  },
+  TeamNotFound: {
+    "^": "NotFound;message,apiUrl,github,source",
+    static: {TeamNotFound$: function(github, id) {
+        return new T.TeamNotFound("Team Not Found: " + H.S(id), null, github, null);
+      }}
+  },
+  AccessForbidden: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {AccessForbidden$: function(github) {
+        return new T.AccessForbidden("Access Forbbidden", null, github, null);
+      }}
+  },
+  UnknownError: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {UnknownError$: function(github) {
+        return new T.UnknownError("Unknown Error", null, github, null);
+      }}
+  },
   GitHub: {
     "^": "Object;auth,endpoint,client",
-    teams$1: [function($name) {
+    organization$1: function($name) {
+      return this.getJSON$4$convert$fail$statusCode("/orgs/" + H.S($name), T.Organization_fromJSON$closure(), new T.GitHub_organization_closure(this, $name), 200);
+    },
+    teams$2: [function($name, limit) {
       var t1, group;
       t1 = P.List;
       group = H.setRuntimeTypeInfo(new M.FutureGroup(0, null, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]), []), [T.Team]);
       this.getJSON$1("/orgs/" + H.S($name) + "/teams").then$1(new T.GitHub_teams_closure(this, group));
       return group._completer.future;
-    }, "call$1", "get$teams", 2, 0, 49],
+    }, function(name) {
+      return this.teams$2(name, null);
+    }, "teams$1", "call$2", "call$1", "get$teams", 2, 2, 49, 9],
     teamMembers$1: function(id) {
       return this.getJSON$1("/teams/" + H.S(id) + "/members").then$1(new T.GitHub_teamMembers_closure(this));
     },
@@ -14463,11 +14512,21 @@ var $$ = {};
       t2._addListener$1(result);
       return result;
     },
-    getJSON$2$convert: function(path, convert) {
-      return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, null, null, null, null);
+    getJSON$4$convert$fail$statusCode: function(path, convert, fail, statusCode) {
+      return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, fail, null, null, statusCode);
     },
     getJSON$1: function(path) {
       return this.getJSON$6$convert$fail$headers$params$statusCode(path, null, null, null, null, null);
+    },
+    _handleStatusCode$2: function(response, code) {
+      switch (code) {
+        case 404:
+          throw H.wrapException(T.NotFound$(this, "Requested Resource was Not Found"));
+        case 401:
+          throw H.wrapException(T.AccessForbidden$(this));
+        default:
+          throw H.wrapException(T.UnknownError$(this));
+      }
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -14513,16 +14572,32 @@ var $$ = {};
       return R.IOClient$(null);
     }
   },
+  GitHub_organization_closure: {
+    "^": "Closure:50;this_0,name_1",
+    call$1: function(response) {
+      if (J.get$statusCode$x(response) === 404)
+        throw H.wrapException(T.OrganizationNotFound$(this.this_0, this.name_1));
+    }
+  },
   GitHub_teams_closure: {
     "^": "Closure:24;this_0,group_1",
     call$1: function(teams) {
-      var t1, t2, t3;
-      for (t1 = J.get$iterator$ax(teams), t2 = this.group_1, t3 = this.this_0; t1.moveNext$0();)
-        t2.add$1(0, t3.getJSON$2$convert(J.$index$asx(t1.get$current(), "url"), T.Team_fromJSON$closure()));
+      var t1, t2, t3, team;
+      for (t1 = J.get$iterator$ax(teams), t2 = this.group_1, t3 = this.this_0; t1.moveNext$0();) {
+        team = t1.get$current();
+        t2.add$1(0, t3.getJSON$4$convert$fail$statusCode(J.$index$asx(team, "url"), T.Team_fromJSON$closure(), new T.GitHub_teams__closure(t3, team), 200));
+      }
+    }
+  },
+  GitHub_teams__closure: {
+    "^": "Closure:50;this_2,team_3",
+    call$1: function(response) {
+      if (J.get$statusCode$x(response) === 404)
+        throw H.wrapException(T.TeamNotFound$(this.this_2, J.$index$asx(this.team_3, "id")));
     }
   },
   GitHub_teamMembers_closure: {
-    "^": "Closure:50;this_0",
+    "^": "Closure:51;this_0",
     call$1: function(json) {
       return P.List_List$from(J.map$1$ax(json, new T.GitHub_teamMembers__closure(this.this_0)), true, null);
     }
@@ -14551,6 +14626,18 @@ var $$ = {};
   GitHub_getJSON_closure0: {
     "^": "Closure:24;box_0,this_1,statusCode_2,fail_3",
     call$1: function(response) {
+      var t1, t2;
+      t1 = this.statusCode_2;
+      if (t1 != null) {
+        t2 = J.get$statusCode$x(response);
+        t2 = t1 == null ? t2 != null : t1 !== t2;
+        t1 = t2;
+      } else
+        t1 = false;
+      if (t1) {
+        this.fail_3.call$1(response);
+        this.this_1._handleStatusCode$2(response, J.get$statusCode$x(response));
+      }
       return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
   },
@@ -14679,7 +14766,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:51;copies_4",
+    "^": "Closure:52;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -14789,7 +14876,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_writeSlot: {
-    "^": "Closure:51;copies_3",
+    "^": "Closure:52;copies_3",
     call$2: function(i, x) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -15315,7 +15402,7 @@ var $$ = {};
     t1 = $.get$GitHub_defaultClient().call$0();
     t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
     $.github = t1;
-    t1.getJSON$2$convert("/orgs/" + H.S(org), T.Organization_fromJSON$closure()).then$1(new S.loadOrganization_closure()).then$1(new S.loadOrganization_closure0());
+    t1.organization$1(org).then$1(new S.loadOrganization_closure()).then$1(new S.loadOrganization_closure0()).catchError$1(new S.loadOrganization_closure1());
   },
   main_closure: {
     "^": "Closure:21;",
@@ -15325,13 +15412,13 @@ var $$ = {};
     }
   },
   loadOrganization_closure: {
-    "^": "Closure:52;",
+    "^": "Closure:53;",
     call$1: function(org) {
       return org.get$teams();
     }
   },
   loadOrganization_closure0: {
-    "^": "Closure:53;",
+    "^": "Closure:54;",
     call$1: function(teams) {
       var t1, team, e, t2, t3, result;
       for (t1 = J.get$iterator$ax(teams); t1.moveNext$0();) {
@@ -15354,7 +15441,7 @@ var $$ = {};
     }
   },
   loadOrganization__closure: {
-    "^": "Closure:54;e_0",
+    "^": "Closure:55;e_0",
     call$1: function(members) {
       J.map$1$ax(members, new S.loadOrganization___closure()).forEach$1(0, J.get$append$x(this.e_0));
     }
@@ -15385,6 +15472,13 @@ var $$ = {};
       e.appendChild(t1);
       h.appendChild(e);
       return h;
+    }
+  },
+  loadOrganization_closure1: {
+    "^": "Closure:24;",
+    call$1: function(error) {
+      if (!!J.getInterceptor(error).$isOrganizationNotFound)
+        window.alert(error.message);
     }
   }
 },
@@ -16296,7 +16390,7 @@ var $$ = {};
       if (J.$gt$n(offset, this._decodedChars.length))
         H.throwExpression(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + this.get$length(this) + "."));
       return t1;
-    }, "call$1", "get$location", 2, 0, 55],
+    }, "call$1", "get$location", 2, 0, 56],
     getLine$1: function(offset) {
       var t1 = J.getInterceptor$n(offset);
       if (t1.$lt(offset, 0))
@@ -16462,7 +16556,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 56, 9]
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 57, 9]
   }
 }],
 ["source_span.location", "package:source_span/src/location.dart", , O, {
@@ -16590,7 +16684,7 @@ var $$ = {};
       return buffer._contents;
     }, function($receiver, message) {
       return this.message$2$color($receiver, message, null);
-    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 56, 9],
+    }, "message$1", "call$2$color", "call$1", "get$message", 2, 3, 57, 9],
     $eq: function(_, other) {
       var t1, t2;
       if (other == null)
@@ -16838,7 +16932,7 @@ var $$ = {};
       return this.error$4$length$match$position($receiver, message, length, null, position);
     }, "error$3$length$position", function($receiver, message) {
       return this.error$4$length$match$position($receiver, message, null, null, null);
-    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 57, 9, 9, 9],
+    }, "error$1", "call$4$length$match$position", "call$3$length$position", "call$1", "get$error", 2, 7, 58, 9, 9, 9],
     StringScanner$3$position$sourceUrl: function(string, position, sourceUrl) {
     }
   }
@@ -17247,6 +17341,9 @@ $$ = null;
   _ = T.Organization;
   _.$isOrganization = TRUE;
   _.$isObject = TRUE;
+  _ = L.Response;
+  _.$isResponse = TRUE;
+  _.$isObject = TRUE;
   _ = T.TeamMember;
   _.$isTeamMember = TRUE;
   _.$isObject = TRUE;
@@ -17255,9 +17352,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.Future;
   _.$isFuture = TRUE;
-  _.$isObject = TRUE;
-  _ = L.Response;
-  _.$isResponse = TRUE;
   _.$isObject = TRUE;
   _ = Z.StreamedResponse;
   _.$isStreamedResponse = TRUE;
@@ -18094,7 +18188,8 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "void__String", void: true, args: [P.String]},
 {func: "void__String__dynamic", void: true, args: [P.String], opt: [null]},
 {func: "int__int_int", ret: P.$int, args: [P.$int, P.$int]},
-{func: "Future__String", ret: [P.Future, [P.List, T.Team]], args: [P.String]},
+{func: "Future__String__int", ret: [P.Future, [P.List, T.Team]], args: [P.String], opt: [P.$int]},
+{func: "dynamic__Response", args: [L.Response]},
 {func: "dynamic__List", args: [P.List]},
 {func: "dynamic__int_dynamic", args: [P.$int, null]},
 {func: "dynamic__Organization", args: [T.Organization]},
