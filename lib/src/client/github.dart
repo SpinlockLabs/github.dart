@@ -56,8 +56,10 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON, statusCode: 200, fail: (response) {
-      throw new RepositoryNotFound(this, slug.fullName);
+    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON, statusCode: 200, fail: (http.Response response) {
+      if (response.statusCode == 404) {
+        throw new RepositoryNotFound(this, slug.fullName);
+      }
     });
   }
 
@@ -90,8 +92,10 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return getJSON("/orgs/${name}", convert: Organization.fromJSON, statusCode: 200, fail: (response) {
-      throw new OrganizationNotFound(this, name);
+    return getJSON("/orgs/${name}", convert: Organization.fromJSON, statusCode: 200, fail: (http.Response response) {
+      if (response.statusCode == 404) {
+        throw new OrganizationNotFound(this, name);
+      }
     });
   }
 
@@ -117,7 +121,6 @@ class GitHub {
           if (response.statusCode == 404) {
             throw new TeamNotFound(this, team['id']);
           }
-          throw new UnknownError(this);
         }));
       }
     });
@@ -209,6 +212,7 @@ class GitHub {
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail(response);
+        _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -226,10 +230,23 @@ class GitHub {
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail(response);
+        _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
     });
+  }
+  
+  void _handleStatusCode(http.Response response, int code) {
+    switch (code) {
+      case 404:
+        throw new NotFound(this, "Requested Resource was Not Found");
+        break;
+      case 401:
+        throw new AccessForbidden(this);
+      default:
+        throw new UnknownError(this);
+    }
   }
 
   /**
