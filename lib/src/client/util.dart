@@ -82,6 +82,23 @@ void putValue(String name, dynamic value, Map map) {
   }
 }
 
+Map<String, String> parseLinkHeader(String input) {
+  var out = {};
+  var parts = input.split(", ");
+  for (var part in parts) {
+    if (part[0] != "<") {
+      throw new FormatException("Invalid Link Header");
+    }
+    var kv = part.split("; ");
+    var url = kv[0].substring(1);
+    url = url.substring(0, url.length - 1);
+    var key = kv[1];
+    key = key.replaceAll('"', "").substring(4);
+    out[key] = url;
+  }
+  return out;
+}
+
 String fullNameFromRepoApiUrl(String url) {
   var split = url.split("/");
   return split[4] + "/" + split[5];

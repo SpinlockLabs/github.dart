@@ -98,13 +98,13 @@ class Repository {
   
   RepositorySlug get slug => new RepositorySlug(owner.login, name);
   
-  Future<List<Issue>> issues([int limit = 30]) => github.getJSON("/repos/${fullName}/issues", params: { "per_page": limit }).then((json) {
+  Future<List<Issue>> issues({int limit: 30}) => github.getJSON("/repos/${fullName}/issues", params: { "per_page": limit }).then((json) {
     return json.map((it) => Issue.fromJSON(github, it));
   });
   
   Future<List<Commit>> get commits => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
   
-  Future<List<ContributorStatistics>> contributorStatistics([int limit = 30]) {
+  Future<List<ContributorStatistics>> contributorStatistics({int limit: 30}) {
     var completer = new Completer<List<ContributorStatistics>>();
     var path = "/repos/${fullName}/stats/contributors";
     var handle;
@@ -122,13 +122,13 @@ class Repository {
     return completer.future;
   }
   
-  Future<List<Repository>> forks([int limit = 30]) {
+  Future<List<Repository>> forks({int limit: 30}) {
     return github.getJSON("/repos/${fullName}/forks", params: { "per_page": limit }).then((forks) {
       return copyOf(forks.map((it) => Repository.fromJSON(github, it)));
     });
   }
   
-  Future<List<PullRequest>> pullRequests([int limit = 30]) {
+  Future<List<PullRequest>> pullRequests({int limit: 30}) {
     return github.getJSON("/repos/${fullName}/pulls", params: { "per_page": limit }).then((List<Map> pulls) {
       return copyOf(pulls.map((it) => PullRequest.fromJSON(github, it)));
     });
@@ -138,13 +138,13 @@ class Repository {
     return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
   }
   
-  Future<List<Hook>> hooks([int limit = 30]) {
+  Future<List<Hook>> hooks({int limit: 30}) {
     return github.getJSON("/repos/${fullName}/hooks", params: { "per_page": limit }).then((hooks) {
       return copyOf(hooks.map((it) => Hook.fromJSON(github, fullName, it)));
     });
   }
   
-  Future<List<Release>> releases([int limit = 30]) => github.releases(slug, limit);
+  Future<List<Release>> releases({int limit}) => github.releases(slug, limit: limit);
   
   Future<Release> release(int id) => github.release(slug, id);
   

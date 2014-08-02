@@ -77,14 +77,20 @@ class GitHub {
   /**
    * Fetches the repositories of the user specified by [user].
    */
-  Future<List<Repository>> userRepositories(String user, {String type: "owner", int limit: 5000, String sort: "full_name", String direction: "asc"}) {
+  Future<List<Repository>> userRepositories(String user, {String type: "owner", int limit, String sort: "full_name", String direction: "asc"}) {
     var params = {
-      "per_page": limit.toString(),
       "sort": sort,
       "direction": direction
     };
-    return getJSON("/users/${user}/repos", params: params).then((List json) {
-      return new List.from(json.map((it) => Repository.fromJSON(this, it)));
+    
+    var pages = limit != null ? (limit / 30).ceil() : null;
+    
+    return new PaginationHelper(this).fetch("GET", "/users/${user}/repos", pages: pages, params: params).then((List<http.Response> responses) {
+      var list = <dynamic>[];
+      for (var response in responses) {
+        list.addAll(JSON.decode(response.body));
+      }
+      return new List.from(list.map((it) => Repository.fromJSON(this, it)));
     });
   }
 
@@ -115,11 +121,10 @@ class GitHub {
    * 
    * [name] is the organization name.
    * [limit] is the maximum number of teams to provide.
-   * Currently the highest you can go is 30.
    */
   Future<List<Team>> teams(String name, [int limit]) {
     var group = new FutureGroup<Team>();
-    getJSON("/orgs/${name}/teams").then((teams) {
+    getJSON("/orgs/${name}/teams?per_page=${limit}").then((teams) {
       for (var team in teams) {
         group.add(getJSON(team['url'], convert: Team.fromJSON, statusCode: 200, fail: (http.Response response) {
           if (response.statusCode == 404) {
@@ -178,12 +183,17 @@ class GitHub {
    * Gets a Repositories Releases.
    * 
    * [slug] is the repository to fetch releases from.
-   * [limit] is the maximum number of pages.
-   * Currently the maximum limit is 100.
+   * [limit] is the maximum number of releases to show.
    */
-  Future<List<Release>> releases(RepositorySlug slug, [int limit = 30]) {
-    return getJSON("/repos/${slug.fullName}/releases", params: { "per_page": limit }).then((releases) {
-      return copyOf(releases.map((it) => Release.fromJSON(this, it)));
+  Future<List<Release>> releases(RepositorySlug slug, {int limit}) {
+    var pages = limit != null ? (limit / 30).ceil() : null;
+    
+    return new PaginationHelper(this).fetch("GET", "/repos/${slug.fullName}/releases", pages: pages, params: {}).then((List<http.Response> responses) {
+      var list = <dynamic>[];
+      for (var response in responses) {
+        list.addAll(JSON.decode(response.body));
+      }
+      return new List.from(list.map((it) => Repository.fromJSON(this, it)));
     });
   }
   
@@ -358,5 +368,54 @@ class GitHub {
       default:
         throw new UnsupportedError("Method '${method}' not supported");
     }
+  }
+}
+
+class PaginationHelper {
+  final GitHub github;
+  final List<http.Response> responses;
+  final Completer<List<http.Response>> completer;
+  
+  PaginationHelper(this.github) : responses = [], completer = new Completer<List<http.Response>>();
+  
+  Future<List<http.Response>> fetch(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    Future<http.Response> actualFetch(String realPath) {
+      return github.request(method, realPath, headers: headers, params: params, body: body);
+    }
+    
+    void done() => completer.complete(responses);
+    
+    var count = 0;
+    
+    var handleResponse;
+    handleResponse = (http.Response response) {
+      count++;
+      responses.add(response);
+      
+      if (!response.headers.containsKey("link")) {
+        done();
+        return;
+      }
+      
+      var info = parseLinkHeader(response.headers['link']);
+      
+      if (!info.containsKey("next")) {
+        done();
+        return;
+      }
+      
+      if (pages != null && count == pages) {
+        done();
+        return;
+      }
+      
+      var nextUrl = info['next'];
+      
+      actualFetch(nextUrl).then(handleResponse);
+    };
+    
+    actualFetch(path).then(handleResponse);
+    
+    return completer.future;
   }
 }
