@@ -111,7 +111,11 @@ class GitHub {
   }
 
   /**
-   * Fetches the teams for the organization specified by [name].
+   * Fetches the teams for the specified organization.
+   * 
+   * [name] is the organization name.
+   * [limit] is the maximum number of teams to provide.
+   * Currently the highest you can go is 30.
    */
   Future<List<Team>> teams(String name, [int limit]) {
     var group = new FutureGroup<Team>();
@@ -129,6 +133,9 @@ class GitHub {
   
   /**
    * Renders Markdown from the [input].
+   * 
+   * [mode] is the markdown mode. (either 'gfm', or 'markdown')
+   * [context] is the repository context. Only take into account when [mode] is 'gfm'.
    */
   Future<String> renderMarkdown(String input, {String mode: "markdown", String context}) {
     return request("POST", "/markdown", body: JSON.encode({
@@ -149,13 +156,17 @@ class GitHub {
   
   /**
    * Gets a .gitignore template by [name].
+   * 
+   * All template names can be fetched using [gitignoreTemplates].
    */
   Future<GitignoreTemplate> gitignoreTemplate(String name) {
     return getJSON("/gitignore/templates/${name}", convert: GitignoreTemplate.fromJSON);
   }
 
   /**
-   * Fetches the team members of the team specified by [id].
+   * Fetches the team members of a specified team.
+   * 
+   * [id] is the team id.
    */
   Future<List<TeamMember>> teamMembers(int id) {
     return getJSON("/teams/${id}/members").then((List json) {
@@ -164,7 +175,11 @@ class GitHub {
   }
   
   /**
-   * Gets a Repositories Releases
+   * Gets a Repositories Releases.
+   * 
+   * [slug] is the repository to fetch releases from.
+   * [limit] is the maximum number of pages.
+   * Currently the maximum limit is 100.
    */
   Future<List<Release>> releases(RepositorySlug slug, [int limit = 30]) {
     return getJSON("/repos/${slug.fullName}/releases", params: { "per_page": limit }).then((releases) {
@@ -174,6 +189,9 @@ class GitHub {
   
   /**
    * Fetches a GitHub Release.
+   * 
+   * [slug] is the repository to fetch the release from.
+   * [id] is the release id.
    */
   Future<Release> release(RepositorySlug slug, int id) {
     return getJSON("/repos/${slug.fullName}/releases/${id}", convert: Release.fromJSON);
@@ -203,6 +221,23 @@ class GitHub {
 
   /**
    * Handles Get Requests that respond with JSON
+   * 
+   * [path] can either be a path like '/repos' or a full url.
+   * 
+   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   * If the status code that the response returns is not the status code you provide
+   * then the [fail] function will be called with the HTTP Response.
+   * If you don't throw an error or break out somehow, it will go into some error checking
+   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+   * for errors, it throws an Unknown Error.
+   * 
+   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+   * 
+   * [params] are query string parameters.
+   * 
+   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+   * The future will pass the object returned from this function to the then method.
+   * The default [convert] function returns the input object.
    */
   Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
     if (convert == null) {
@@ -221,6 +256,25 @@ class GitHub {
 
   /**
    * Handles Post Requests that respond with JSON
+   * 
+   * [path] can either be a path like '/repos' or a full url.
+   * 
+   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   * If the status code that the response returns is not the status code you provide
+   * then the [fail] function will be called with the HTTP Response.
+   * If you don't throw an error or break out somehow, it will go into some error checking
+   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+   * for errors, it throws an Unknown Error.
+   * 
+   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+   * 
+   * [params] are query string parameters.
+   * 
+   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+   * The future will pass the object returned from this function to the then method.
+   * The default [convert] function returns the input object.
+   * 
+   * [body] is the data to send to the server.
    */
   Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
     if (convert == null) {
@@ -237,6 +291,9 @@ class GitHub {
     });
   }
   
+  /**
+   * Internal method to handle status codes
+   */
   void _handleStatusCode(http.Response response, int code) {
     switch (code) {
       case 404:
@@ -250,7 +307,13 @@ class GitHub {
   }
 
   /**
-   * Handles Authenticated Requests
+   * Handles Authenticated Requests in an easy to understand way.
+   * 
+   * [method] is the HTTP method.
+   * [path] can either be a path like '/repos' or a full url.
+   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+   * [params] are query string parameters.
+   * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
     if (headers == null) {
