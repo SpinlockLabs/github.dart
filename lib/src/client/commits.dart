@@ -10,7 +10,7 @@ class Commit {
   @ApiName("commit/message")
   String message;
   User author;
-  User commiter;
+  User committer;
   
   @ApiName("stats/additions")
   int additionsCount;
@@ -27,8 +27,8 @@ class Commit {
     var commit = new Commit(github);
     commit.url = input['html_url'];
     commit.author = User.fromJSON(github, input['author']);
-    commit.commiter = User.fromJSON(github, input['commiter']);
-    commit.message = input['message'];
+    commit.committer = User.fromJSON(github, input['committer']);
+    commit.message = input['commit']['message'];
     
     if (input['stats'] != null) {
       commit.additionsCount = input['stats']['additions'];
