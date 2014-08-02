@@ -4,7 +4,7 @@ import 'package:github/client.dart';
 void main() {
   var github = new GitHub();
   github.repository(new RepositorySlug("groovy", "groovy-core")).then((repo) {
-    return repo.pullRequests(1);
+    return repo.pullRequests(limit: 1);
   }).then((pulls) {
     var first = pulls.first;
     if (first.isFullPullRequest) {
