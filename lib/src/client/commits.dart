@@ -21,6 +21,9 @@ class Commit {
   @ApiName("commit/comments_count")
   int commentsCount;
   
+  DateTime authoredAt;
+  DateTime committedAt;
+  
   Commit(this.github);
   
   static Commit fromJSON(GitHub github, input) {
@@ -30,10 +33,13 @@ class Commit {
     commit.committer = User.fromJSON(github, input['committer']);
     commit.message = input['commit']['message'];
     
+    commit.authoredAt = parse_date(input['commit']['author']['date']);
+    commit.committedAt = parse_date(input['commit']['committer']['date']);
+    
     if (input['stats'] != null) {
       commit.additionsCount = input['stats']['additions'];
       commit.deletionsCount = input['stats']['deletions'];
-      commit.commentsCount = input['commit']['comments_count']; 
+      commit.commentsCount = input['commit']['comments_count'];
     }
     
     return commit;
