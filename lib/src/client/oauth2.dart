@@ -13,7 +13,7 @@ part of github.client;
  *        // Use the GitHub Client
  *      });
  *      
- *      
+ * Due to Cross Origin Policy, it is not possible to do this completely client side.
  */
 class OAuth2Flow {
   /**
