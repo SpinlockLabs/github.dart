@@ -24,6 +24,9 @@ class Commit {
   DateTime authoredAt;
   DateTime committedAt;
   
+  String committerEmail;
+  String authorEmail;
+  
   Commit(this.github);
   
   static Commit fromJSON(GitHub github, input) {
@@ -35,6 +38,8 @@ class Commit {
     
     commit.authoredAt = parse_date(input['commit']['author']['date']);
     commit.committedAt = parse_date(input['commit']['committer']['date']);
+    commit.committerEmail = input['commit']['committer']['email'];
+    commit.authorEmail = input['commit']['author']['email'];
     
     if (input['stats'] != null) {
       commit.additionsCount = input['stats']['additions'];
