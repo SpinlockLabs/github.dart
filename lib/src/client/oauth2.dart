@@ -1,11 +1,37 @@
 part of github.client;
 
+/**
+ * OAuth2 Flow Helper
+ */
 class OAuth2Flow {
+  /**
+   * OAuth2 Client ID
+   */
   final String clientId;
+  
+  /**
+   * Requested Scopes
+   */
   final List<String> scopes;
+  
+  /**
+   * Redirect URI
+   */
   final String redirectUri;
+  
+  /**
+   * State
+   */
   final String state;
+  
+  /**
+   * Client Secret
+   */
   final String clientSecret;
+  
+  /**
+   * OAuth2 Base URL
+   */
   final String baseUrl;
   
   OAuth2Flow(this.clientId, this.clientSecret, {String redirectUri, this.scopes: const [], this.state, this.baseUrl: "https://github.com/login/oauth"})
@@ -15,6 +41,11 @@ class OAuth2Flow {
     return uri.contains("?") ? uri.substring(0, uri.indexOf("?")) : uri;
   }
   
+  /**
+   * Generates an Authorization URL
+   * 
+   * This should be displayed to the user.
+   */
   String createAuthorizeUrl() {
     return baseUrl + "/authorize" + buildQueryString({
       "client_id": clientId,
@@ -24,6 +55,9 @@ class OAuth2Flow {
     });
   }
   
+  /**
+   * Exchanges the given [code] for a token.
+   */
   Future<ExchangeResponse> exchange(String code, [String origin]) {
     var headers = {
       "Accept": "application/json"
@@ -48,6 +82,9 @@ class OAuth2Flow {
   }
 }
 
+/**
+ * Represents a response for exchanging a code for a token.
+ */
 class ExchangeResponse {
   final String token;
   final List<String> scopes;
