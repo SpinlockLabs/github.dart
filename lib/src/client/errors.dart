@@ -1,5 +1,8 @@
 part of github.client;
 
+/**
+ * A error from [GitHub].
+ */
 class GitHubError {
   final String message;
   final String apiUrl;
@@ -9,7 +12,7 @@ class GitHubError {
   GitHubError(this.github, this.message, {this.apiUrl, this.source});
   
   @override
-  String toString() => "GitHub Error (message: ${message}, api url: ${apiUrl})";
+  String toString() => "GitHub Error: ${message}";
 }
 
 class NotFound extends GitHubError {
