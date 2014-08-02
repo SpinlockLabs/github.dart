@@ -29,9 +29,12 @@ class Commit {
     commit.author = User.fromJSON(github, input['author']);
     commit.commiter = User.fromJSON(github, input['commiter']);
     commit.message = input['message'];
-    commit.additionsCount = input['stats']['additions'];
-    commit.deletionsCount = input['stats']['deletions'];
-    commit.commentsCount = input['commit']['comments_count'];
+    
+    if (input['stats'] != null) {
+      commit.additionsCount = input['stats']['additions'];
+      commit.deletionsCount = input['stats']['deletions'];
+      commit.commentsCount = input['commit']['comments_count']; 
+    }
     
     return commit;
   }
