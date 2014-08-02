@@ -26,7 +26,7 @@ Please submit issues and pull requests, join my IRC channel, help out, or just g
 
 First, add the following to your pubspec.yaml:
 
-```
+```yaml
 dependencies:
   github: ">=0.5.1 <1.0.0"
 ```
