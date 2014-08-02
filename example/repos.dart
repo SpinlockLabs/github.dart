@@ -89,18 +89,8 @@ void loadRepos([int compare(Repository a, Repository b)]) {
     compare = (a, b) => a.name.compareTo(b.name);
   }
   
-  window.location.pathname;
-  github.userRepositories(user).then((List<Repository> repositories) {
-    repos = repositories;
-    var count = 0;
-    repositories.sort(compare);
-    for (var repo in repositories) {
-      if (repo.fork && !showForks) {
-        continue;
-      }
-      count++;
-      
-      $repos.appendHtml("""
+  github.userRepositoriesStreamed(user).listen((repo) {
+    $repos.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.url}">${repo.name}</a></h2>
@@ -114,11 +104,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
           <b>Forks</b>: ${repo.forksCount}
           <br/>
           <b>Created</b>: ${repo.createdAt.toString()}
-          ${ repositories.indexOf(repo) == repositories.length - 1 ? '<div class="line"></div>' : "" }  
       </div>
       """);
-    }
-    
-    document.querySelector("#title").appendText(" (${count} repositories)");
   });
 }

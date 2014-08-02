@@ -93,6 +93,28 @@ class GitHub {
       return new List.from(list.map((it) => Repository.fromJSON(this, it)));
     });
   }
+  
+  /**
+   * Fetches the repositories of the user specified by [user] in a streamed fashion.
+   */
+  Stream<Repository> userRepositoriesStreamed(String user, {String type: "owner", int limit, String sort: "full_name", String direction: "asc"}) {
+    var params = {
+      "sort": sort,
+      "direction": direction
+    };
+    
+    var pages = limit != null ? (limit / 30).ceil() : null;
+    
+    var controller = new StreamController.broadcast();
+    
+    new PaginationHelper(this).fetchStreamed("GET", "/users/${user}/repos", pages: pages, params: params).listen((http.Response response) {
+      var list = JSON.decode(response.body);
+      var repos = new List.from(list.map((it) => Repository.fromJSON(this, it)));
+      for (var repo in repos) controller.add(repo);
+    });
+    
+    return controller.stream;
+  }
 
   /**
    * Fetches the organization specified by [name].
@@ -417,5 +439,45 @@ class PaginationHelper {
     actualFetch(path).then(handleResponse);
     
     return completer.future;
+  }
+  
+  Stream<http.Response> fetchStreamed(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    var controller = new StreamController.broadcast();
+    Future<http.Response> actualFetch(String realPath) {
+      return github.request(method, realPath, headers: headers, params: params, body: body);
+    }
+    
+    var count = 0;
+    
+    var handleResponse;
+    handleResponse = (http.Response response) {
+      count++;
+      controller.add(response);
+      
+      if (!response.headers.containsKey("link")) {
+        controller.close();
+        return;
+      }
+      
+      var info = parseLinkHeader(response.headers['link']);
+      
+      if (!info.containsKey("next")) {
+        controller.close();
+        return;
+      }
+      
+      if (pages != null && count == pages) {
+        controller.close();
+        return;
+      }
+      
+      var nextUrl = info['next'];
+      
+      actualFetch(nextUrl).then(handleResponse);
+    };
+    
+    actualFetch(path).then(handleResponse);
+    
+    return controller.stream;
   }
 }
