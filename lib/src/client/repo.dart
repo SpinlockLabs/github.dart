@@ -183,6 +183,7 @@ class RepositoryOwner {
   String url;
 
   static RepositoryOwner fromJSON(input) {
+    if (input == null) return null;
     var owner = new RepositoryOwner();
     owner
         ..login = input['login']

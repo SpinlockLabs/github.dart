@@ -56,7 +56,9 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON);
+    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON, statusCode: 200, fail: (response) {
+      throw new RepositoryNotFound(this, slug.fullName);
+    });
   }
 
   /**
@@ -88,7 +90,9 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return getJSON("/orgs/${name}", convert: Organization.fromJSON);
+    return getJSON("/orgs/${name}", convert: Organization.fromJSON, statusCode: 200, fail: (response) {
+      throw new OrganizationNotFound(this, name);
+    });
   }
 
   /**
@@ -109,7 +113,9 @@ class GitHub {
     var group = new FutureGroup<Team>();
     getJSON("/orgs/${name}/teams").then((teams) {
       for (var team in teams) {
-        group.add(getJSON(team['url'], convert: Team.fromJSON));
+        group.add(getJSON(team['url'], convert: Team.fromJSON, statusCode: 200, fail: (error) {
+          throw new TeamNotFound(this, team['id']);
+        }));
       }
     });
     return group.future;

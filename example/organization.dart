@@ -53,5 +53,9 @@ void loadOrganization() {
         divs.forEach(e.append);
       });
     }
+  }).catchError((error) {
+    if (error is OrganizationNotFound) {
+      window.alert(error.message);
+    }
   });
 }

@@ -26,3 +26,4 @@ part 'src/client/oauth2.dart';
 part 'src/client/pull_request.dart';
 part 'src/client/contents.dart';
 part 'src/client/releases.dart';
+part 'src/client/errors.dart';
