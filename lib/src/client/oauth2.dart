@@ -2,6 +2,18 @@ part of github.client;
 
 /**
  * OAuth2 Flow Helper
+ * 
+ * **Example**:
+ * 
+ *      var flow = new OAuth2Flow("ClientID", "ClientSecret");
+ *      var authUrl = flow.createAuthorizationURL();
+ *      // Display to the User and handle the redirect URI, and also get the code.
+ *      flow.exchange(code).then((response) {
+ *        var github = new GitHub(auth: new Authentication.withToken(response.token));
+ *        // Use the GitHub Client
+ *      });
+ *      
+ *      
  */
 class OAuth2Flow {
   /**
