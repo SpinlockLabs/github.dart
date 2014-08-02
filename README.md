@@ -1,14 +1,26 @@
 # GitHub for Dart
 
-This is a Client Library for GitHub in Dart.
+This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
+Please submit issues and pull requests, join my IRC channel, help out, or just give me encouragement, I will surely do everything you ask.
 
 ## Features
 
-- Works on the Server and in the Browser.
-- Fast, really fast.
-- Customizable
-- Fully Tested
+### Current
+
+- Works on the Server and in the Browser
+- Really Fast
+- Plugable API
 - Supports Authentication
+- Builtin OAuth2 Flow
+
+### Work in Progress
+
+- Support all the GitHub APIs (Progress: 70%)
+- Full Documentation (Progress: 5%)
+
+### Planned
+
+- Hook Server Helper
 
 ## Getting Started
 
