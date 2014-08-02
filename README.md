@@ -3,6 +3,11 @@
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
 Please submit issues and pull requests, join my IRC channel, help out, or just give me encouragement, I will surely do everything you ask.
 
+## Links
+
+- [Library Demos](http://github4dart.directcode.org/demos/)
+- [Pub Package](https://pub.dartlang.org/packages/github)
+
 ## Features
 
 ### Current
@@ -67,11 +72,6 @@ To use a GitHub token:
 ```dart
 var github = new GitHub(auth: new Authentication.withToken("YourTokenHere"));
 ```
-
-## Links
-
-- [Demos](http://github4dart.directcode.org/demos/)
-- [Pub Package](https://pub.dartlang.org/packages/github)
 
 ## Contacting Us
 
