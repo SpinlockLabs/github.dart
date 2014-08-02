@@ -27,3 +27,11 @@ class OrganizationNotFound extends GitHubError {
 class TeamNotFound extends GitHubError {
   TeamNotFound(GitHub github, int id) : super(github, "Team Not Found: ${id}");
 }
+
+class AccessForbidden extends GitHubError {
+  AccessForbidden(GitHub github) : super(github, "Client not Authenticated");
+}
+
+class UnknownError extends GitHubError {
+  UnknownError(GitHub github) : super(github, "Unknown Error");
+}

@@ -109,18 +109,24 @@ class GitHub {
   /**
    * Fetches the teams for the organization specified by [name].
    */
-  Future<List<Team>> teams(String name) {
+  Future<List<Team>> teams(String name, [int limit]) {
     var group = new FutureGroup<Team>();
     getJSON("/orgs/${name}/teams").then((teams) {
       for (var team in teams) {
-        group.add(getJSON(team['url'], convert: Team.fromJSON, statusCode: 200, fail: (error) {
-          throw new TeamNotFound(this, team['id']);
+        group.add(getJSON(team['url'], convert: Team.fromJSON, statusCode: 200, fail: (http.Response response) {
+          if (response.statusCode == 404) {
+            throw new TeamNotFound(this, team['id']);
+          }
+          throw new UnknownError(this);
         }));
       }
     });
     return group.future;
   }
   
+  /**
+   * Renders Markdown from the [input].
+   */
   Future<String> renderMarkdown(String input, {String mode: "markdown", String context}) {
     return request("POST", "/markdown", body: JSON.encode({
       "text": input,
@@ -131,10 +137,16 @@ class GitHub {
     });
   }
   
+  /**
+   * Gets .gitignore template names.
+   */
   Future<List<String>> gitignoreTemplates() {
     return getJSON("/gitignore/templates");
   }
   
+  /**
+   * Gets a .gitignore template by [name].
+   */
   Future<GitignoreTemplate> gitignoreTemplate(String name) {
     return getJSON("/gitignore/templates/${name}", convert: GitignoreTemplate.fromJSON);
   }
@@ -148,28 +160,47 @@ class GitHub {
     });
   }
   
+  /**
+   * Gets a Repositories Releases
+   */
   Future<List<Release>> releases(RepositorySlug slug, [int limit = 30]) {
     return getJSON("/repos/${slug.fullName}/releases", params: { "per_page": limit }).then((releases) {
       return copyOf(releases.map((it) => Release.fromJSON(this, it)));
     });
   }
   
+  /**
+   * Fetches a GitHub Release.
+   */
   Future<Release> release(RepositorySlug slug, int id) {
     return getJSON("/repos/${slug.fullName}/releases/${id}", convert: Release.fromJSON);
   }
   
+  /**
+   * Gets API Rate Limit Information
+   */
   Future<RateLimit> rateLimit() {
     return request("GET", "/").then((response) {
       return RateLimit.fromHeaders(response.headers);
     });
   }
 
+  /**
+   * Gets the Currently Authenticated User
+   * 
+   * Throws [AccessForbidden] if we are not authenticated.
+   */
   Future<CurrentUser> currentUser() {
-    return getJSON("/user", statusCode: 200, fail: (response) {
-      throw "Not Authenticated";
+    return getJSON("/user", statusCode: 200, fail: (http.Response response) {
+      if (response.statusCode == 403) {
+        throw new AccessForbidden(this);
+      }
     }, convert: CurrentUser.fromJSON);
   }
 
+  /**
+   * Handles Get Requests that respond with JSON
+   */
   Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
     if (convert == null) {
       convert = (github, input) => input;
@@ -184,6 +215,9 @@ class GitHub {
     });
   }
 
+  /**
+   * Handles Post Requests that respond with JSON
+   */
   Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
     if (convert == null) {
       convert = (github, input) => input;
@@ -198,6 +232,9 @@ class GitHub {
     });
   }
 
+  /**
+   * Handles Authenticated Requests
+   */
   Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
     if (headers == null) {
       headers = {};
