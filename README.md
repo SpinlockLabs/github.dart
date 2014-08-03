@@ -33,7 +33,7 @@ First, add the following to your pubspec.yaml:
 
 ```yaml
 dependencies:
-  github: ">=0.5.5 <1.0.0"
+  github: ">=0.5.6 <1.0.0"
 ```
 
 Then import the library and use it:
