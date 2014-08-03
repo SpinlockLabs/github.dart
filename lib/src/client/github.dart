@@ -278,7 +278,7 @@ class GitHub {
 
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
-        fail(response);
+        fail != null ? fail(response) : null;
         _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }
@@ -315,7 +315,7 @@ class GitHub {
 
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
-        fail(response);
+        fail != null ? fail(response) : null;
         _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }

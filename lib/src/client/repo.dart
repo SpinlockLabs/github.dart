@@ -98,7 +98,7 @@ class Repository {
   
   RepositorySlug get slug => new RepositorySlug(owner.login, name);
   
-  Future<List<Issue>> issues({int limit: 30}) => github.getJSON("/repos/${fullName}/issues", params: { "per_page": limit }).then((json) {
+  Future<List<Issue>> issues({int limit: 30}) => github.getJSON("/repos/${fullName}/issues", statusCode: 200, params: { "per_page": limit }).then((json) {
     return json.map((it) => Issue.fromJSON(github, it));
   });
   
@@ -111,7 +111,7 @@ class Repository {
     handle = (GitHub gh, json) {
       if (json is Map) {
         new Future.delayed(new Duration(milliseconds: 200), () {
-          github.getJSON(path, convert: handle, params: { "per_page": limit });
+          github.getJSON(path, statusCode: 200, convert: handle, params: { "per_page": limit });
         });
         return null;
       } else {
@@ -123,23 +123,23 @@ class Repository {
   }
   
   Future<List<Repository>> forks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/forks", params: { "per_page": limit }).then((forks) {
+    return github.getJSON("/repos/${fullName}/forks", statusCode: 200, params: { "per_page": limit }).then((forks) {
       return copyOf(forks.map((it) => Repository.fromJSON(github, it)));
     });
   }
   
   Future<List<PullRequest>> pullRequests({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/pulls", params: { "per_page": limit }).then((List<Map> pulls) {
+    return github.getJSON("/repos/${fullName}/pulls", statusCode: 200, params: { "per_page": limit }).then((List<Map> pulls) {
       return copyOf(pulls.map((it) => PullRequest.fromJSON(github, it)));
     });
   }
   
   Future<RepositoryPages> pages() {
-    return github.getJSON("/repos/${fullName}/pages", convert: RepositoryPages.fromJSON);
+    return github.getJSON("/repos/${fullName}/pages", statusCode: 200, convert: RepositoryPages.fromJSON);
   }
   
   Future<List<Hook>> hooks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/hooks", params: { "per_page": limit }).then((hooks) {
+    return github.getJSON("/repos/${fullName}/hooks", statusCode: 200, params: { "per_page": limit }).then((hooks) {
       return copyOf(hooks.map((it) => Hook.fromJSON(github, fullName, it)));
     });
   }
