@@ -23,6 +23,7 @@ class HookServer {
       request.response.write(JSON.encode({
         "handled": true
       }));
+      request.response.close();
     });
   }
   
