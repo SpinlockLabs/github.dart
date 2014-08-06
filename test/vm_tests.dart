@@ -1,4 +1,4 @@
-library all_tests;
+library vm_tests;
 
 import 'package:unittest/unittest.dart';
 
