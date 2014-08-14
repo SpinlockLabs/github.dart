@@ -27,14 +27,11 @@ class File {
   @ApiName("sha")
   String sha;
 
-  @ApiName("url")
+  @ApiName("html_url")
   String url;
 
   @ApiName("git_url")
   String gitUrl;
-
-  @ApiName("html_url")
-  String htmlUrl;
 
   @ApiName("_links")
   FileLinks links;
@@ -52,9 +49,8 @@ class File {
     file.path = input['path'];
     file.content = input['content'];
     file.sha = input['sha'];
-    file.url = input['url'];
     file.gitUrl = input['git_url'];
-    file.htmlUrl = input['html_url'];
+    file.url = input['html_url'];
     file.links = FileLinks.fromJSON(input['_links']);
     return file;
   }
@@ -78,5 +74,4 @@ class FileLinks {
     fileLinks.html = input['html'];
     return fileLinks;
   }
-
 }
