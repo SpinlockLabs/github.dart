@@ -281,6 +281,14 @@ class LanguageBreakdown {
   
   Map<String, int> get info => _data;
   
+  List<List<dynamic>> toList() {
+    var out = [];
+    for (var key in info.keys) {
+      out.add([key, info[key]]);
+    }
+    return out;
+  }
+  
   @override
   String toString() {
     var buffer = new StringBuffer();
