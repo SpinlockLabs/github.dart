@@ -103,3 +103,18 @@ String fullNameFromRepoApiUrl(String url) {
   var split = url.split("/");
   return split[4] + "/" + split[5];
 }
+
+class MapEntry<K, V> {
+  final K key;
+  final V value;
+  
+  MapEntry(this.key, this.value);
+}
+
+List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
+  var out = [];
+  for (var key in input.keys) {
+    out.add(new MapEntry<dynamic, dynamic>(key, input[key]));
+  }
+  return out;
+}

@@ -161,9 +161,8 @@ class Repository {
 
   Future<Release> release(int id) => github.release(slug, id);
 
-  Future<Hook> hook(int id) {
-    return github.getJSON("/repos/${fullName}/hooks/${id}", convert: (g, i) => Hook.fromJSON(g, fullName, i));
-  }
+  Future<Hook> hook(int id) =>
+    github.getJSON("/repos/${fullName}/hooks/${id}", convert: (g, i) => Hook.fromJSON(g, fullName, i));
 
   Future<Hook> createHook(CreateHookRequest request) {
     return github.postJSON("/repos/${fullName}/hooks", convert: (g, i) => Hook.fromJSON(g, fullName, i), body: request.toJSON());
@@ -262,5 +261,32 @@ class CreateRepositoryRequest {
       "gitignore_template": gitignoreTemplate,
       "license_template": licenseTemplate
     });
+  }
+}
+
+class LanguageBreakdown {
+  final Map<String, int> _data;
+  
+  LanguageBreakdown(Map<String, int> data) : _data = data;
+  
+  String get primary {
+    var list = mapToList(_data);
+    list.sort((a, b) {
+      return a.value.compareTo(b.value);
+    });
+    return list.first.key;
+  }
+  
+  List<String> get names => _data.keys.toList()..sort();
+  
+  Map<String, int> get info => _data;
+  
+  @override
+  String toString() {
+    var buffer = new StringBuffer();
+    _data.forEach((key, value) {
+      buffer.writeln("${key}: ${value}");
+    });
+    return buffer.toString();
   }
 }

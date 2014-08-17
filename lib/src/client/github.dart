@@ -287,8 +287,13 @@ class GitHub {
   }
 
   /**
-   * Gets the readme file for a repository
-   *
+   * Gets a language breakdown for the specified repository.
+   */
+  Future<LanguageBreakdown> languages(RepositorySlug slug) =>
+      getJSON("/repos/${slug.fullName}/languages", statusCode: 200, convert: (github, input) => new LanguageBreakdown(input));
+  
+  /**
+   * Gets the readme file for a repository.
    */
   Future<File> readme(RepositorySlug slug) {
     return getJSON("/repos/${slug.fullName}/readme", statusCode: 200, fail: (http.Response response) {
