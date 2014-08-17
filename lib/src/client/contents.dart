@@ -41,18 +41,17 @@ class File {
 
   static File fromJSON(GitHub github, input) {
     if (input == null) return null;
-    var file = new File(github);
-    file.type = input['type'];
-    file.encoding = input['encoding'];
-    file.size = input['size'];
-    file.name = input['name'];
-    file.path = input['path'];
-    file.content = input['content'];
-    file.sha = input['sha'];
-    file.gitUrl = input['git_url'];
-    file.url = input['html_url'];
-    file.links = FileLinks.fromJSON(input['_links']);
-    return file;
+    return new File(github)
+        ..type = input['type']
+        ..encoding = input['encoding']
+        ..size = input['size']
+        ..name = input['name']
+        ..path = input['path']
+        ..content = input['content']
+        ..sha = input['sha']
+        ..gitUrl = input['git_url']
+        ..url = input['html_url']
+        ..links = FileLinks.fromJSON(input['_links']);
   }
 }
 

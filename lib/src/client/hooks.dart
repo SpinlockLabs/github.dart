@@ -15,33 +15,34 @@ class Hook {
   int id;
   String name;
   
+  @ApiName("created_at")
   DateTime createdAt;
+  
+  @ApiName("updated_at")
   DateTime updatedAt;
+  
   String repoName;
   
   Hook(this.github);
   
   static Hook fromJSON(GitHub github, repoName, input) {
-    var hook = new Hook(github);
-    hook.events = input['events'];
-    hook.url = input['config']['url'];
-    hook.active = input['active'];
-    hook.name = input['name'];
-    hook.id = input['id'];
-    hook.repoName = repoName;
-    hook.updatedAt = parse_date(input['updated_at']);
-    hook.createdAt = parse_date(input['created_at']);
-    hook.contentType = input['config']['content_type'];
-    return hook;
+    return new Hook(github)
+      ..events = input['events']
+      ..url = input['config']['url']
+      ..active = input['active']
+      ..name = input['name']
+      ..id = input['id']
+      ..repoName = repoName
+      ..updatedAt = parse_date(input['updated_at'])
+      ..createdAt = parse_date(input['created_at'])
+      ..contentType = input['config']['content_type'];
   }
   
-  Future<bool> ping() {
-    return github.request("POST", "/repos/${repoName}/hooks/${id}/pings").then((response) => response.statusCode == 204);
-  }
+  Future<bool> ping() =>
+      github.request("POST", "/repos/${repoName}/hooks/${id}/pings").then((response) => response.statusCode == 204);
   
-  Future<bool> testPush() {
-    return github.request("POST", "/repos/${repoName}/hooks/${id}/tests").then((response) => response.statusCode == 204);
-  }
+  Future<bool> testPush() =>
+      github.request("POST", "/repos/${repoName}/hooks/${id}/tests").then((response) => response.statusCode == 204);
 }
 
 class CreateHookRequest {
