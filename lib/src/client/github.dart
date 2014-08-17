@@ -11,7 +11,7 @@ class GitHub {
   /**
    * Authentication Information
    */
-  final Authentication auth;
+  Authentication auth;
 
   /**
    * API Endpoint
