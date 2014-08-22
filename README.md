@@ -1,7 +1,8 @@
 # GitHub for Dart
 
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
-Please submit issues and pull requests, join my IRC channel, help out, or just give me encouragement, I will surely do everything you ask.
+
+Please submit issues and pull requests, join my IRC channel (#directcode on irc.esper.net), help out, or just give me encouragement.
 
 ## Links
 
