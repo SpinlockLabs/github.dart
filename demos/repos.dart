@@ -10,9 +10,10 @@ DivElement $repos;
 List<Repository> repos;
 
 Map<String, Comparator<Repository>> sorts = {
-  "stars": (a, b) => b.stargazersCount.compareTo(a.stargazersCount),
-  "forks": (a, b) => b.forksCount.compareTo(a.forksCount),
-  "created": (a, b) => b.createdAt.compareTo(a.createdAt)
+  "stars": (Repository a, Repository b) => b.stargazersCount.compareTo(a.stargazersCount),
+  "forks": (Repository a, Repository b) => b.forksCount.compareTo(a.forksCount),
+  "created": (Repository a, Repository b) => b.createdAt.compareTo(a.createdAt),
+  "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt)
 };
 
 void main() {
@@ -45,6 +46,10 @@ void main() {
 
   querySelector("#sort-created").onClick.listen((event) {
     loadRepos(sorts['created']);
+  });
+  
+  querySelector("#sort-pushed").onClick.listen((event) {
+    loadRepos(sorts['pushed']);
   });
 
   init("repos.dart");
@@ -92,8 +97,11 @@ void loadRepos([int compare(Repository a, Repository b)]) {
     compare = (a, b) => a.name.compareTo(b.name);
   }
 
-  github.userRepositoriesStreamed(user).listen((repo) {
-    $repos.appendHtml("""
+  github.userRepositories(user).then((repos) {
+    repos.sort(compare);
+    
+    for (var repo in repos) {
+      $repos.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.url}">${repo.name}</a></h2>
@@ -109,5 +117,6 @@ void loadRepos([int compare(Repository a, Repository b)]) {
           <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
         </div>
       """);
+    }
   });
 }
