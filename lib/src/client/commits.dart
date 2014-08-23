@@ -1,36 +1,77 @@
 part of github.client;
 
+/**
+ * A GitHub Commit
+ */
 class Commit {
   final GitHub github;
 
+  /**
+   * Url to Commit Page
+   */
   @ApiName("html_url")
   String url;
+  
+  /**
+   * Commit SHA
+   */
   String sha;
 
+  /**
+   * Commit Message
+   */
   @ApiName("commit/message")
   String message;
   
+  /**
+   * Commit Author
+   */
   User author;
+  
+  /**
+   * Commit Commiter
+   */
   User committer;
 
+  /**
+   * Number of Additions
+   */
   @ApiName("stats/additions")
   int additionsCount;
 
+  /**
+   * Number of Deletions
+   */
   @ApiName("stats/deletions")
   int deletionsCount;
 
+  /**
+   * Number of Comments
+   */
   @ApiName("commit/comments_count")
   int commentsCount;
 
+  /**
+   * Time this commit was authored at
+   */
   @ApiName("commit/author/date")
   DateTime authoredAt;
   
+  /**
+   * Time this commit was committed at
+   */
   @ApiName("commit/commiter/email")
   DateTime committedAt;
 
+  /**
+   * Commiter Email
+   */
   @ApiName("commit/commiter/email")
   String committerEmail;
   
+  /**
+   * Author Email
+   */
   @ApiName("commit/author/email")
   String authorEmail;
 
