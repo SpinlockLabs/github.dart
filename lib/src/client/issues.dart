@@ -1,35 +1,85 @@
 part of github.client;
 
+/**
+ * An Issue on the Tracker
+ */
 class Issue {
   final GitHub github;
 
+  /**
+   * Url to the Issue Page
+   */
   @ApiName("html_url")
   String url;
 
+  /**
+   * Issue Number
+   */
   int number;
+  
+  /**
+   * Issue State
+   */
   String state;
+  
+  /**
+   * Issue Title
+   */
   String title;
+  
+  /**
+   * User who created the issue.
+   */
   User user;
   
+  /**
+   * Issue Labels
+   */
   List<IssueLabel> labels;
+  
+  /**
+   * The User that the issue is assigned to
+   */
   User assignee;
+  
+  /**
+   * The Milestone
+   */
   Milestone milestone;
 
+  /**
+   * Number of Comments
+   */
   @ApiName("comments")
   int commentsCount;
 
+  /**
+   * A Pull Request
+   */
   @ApiName("pull_request")
   IssuePullRequest pullRequest;
 
+  /**
+   * Time that the issue was created at
+   */
   @ApiName("created_at")
   DateTime createdAt;
 
+  /**
+   * The time that the issue was closed at
+   */
   @ApiName("closed_at")
   DateTime closedAt;
 
+  /**
+   * The time that the issue was updated at
+   */
   @ApiName("updated_at")
   DateTime updatedAt;
 
+  /**
+   * The user who closed the issue
+   */
   @ApiName("closed_by")
   User closedBy;
 
@@ -55,15 +105,27 @@ class Issue {
   }
 }
 
+/**
+ * A Pull Request for an Issue
+ */
 class IssuePullRequest {
   final GitHub github;
 
+  /**
+   * Url to the Page for this Issue Pull Request
+   */
   @ApiName("html_url")
   String url;
 
+  /**
+   * Diff Url
+   */
   @ApiName("diff_url")
   String diffUrl;
 
+  /**
+   * Patch Url
+   */
   @ApiName("patch_url")
   String patchUrl;
 
@@ -78,10 +140,20 @@ class IssuePullRequest {
   }
 }
 
+/**
+ * An Issue Label
+ */
 class IssueLabel {
   final GitHub github;
 
+  /**
+   * Label Name
+   */
   String name;
+  
+  /**
+   * Label Color
+   */
   String color;
 
   IssueLabel(this.github);
@@ -94,27 +166,64 @@ class IssueLabel {
   }
 }
 
+/**
+ * Milestone
+ */
 class Milestone {
   final GitHub github;
 
+  /**
+   * Milestone Number
+   */
   int number;
+  
+  /**
+   * Milestone State
+   */
   String state;
+  
+  /**
+   * Milestone Title
+   */
   String title;
+  
+  /**
+   * Milestone Description
+   */
   String description;
+  
+  /**
+   * Milestone Creator
+   */
   User creator;
 
+  /**
+   * Number of Open Issues
+   */
   @ApiName("open_issues")
   int openIssuesCount;
 
+  /**
+   * Number of Closed Issues
+   */
   @ApiName("closed_issues")
   int closedIssuesCount;
 
+  /**
+   * Time the milestone was created at
+   */
   @ApiName("created_at")
   DateTime createdAt;
 
+  /**
+   * The last time the milestone was updated at
+   */
   @ApiName("updated_at")
   DateTime updatedAt;
 
+  /**
+   * The due date for this milestone
+   */
   @ApiName("due_on")
   DateTime dueOn;
 
