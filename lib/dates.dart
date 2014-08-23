@@ -3,15 +3,24 @@
  */
 library github.dates;
 
+/**
+ * Creates a Friendly Date and Time
+ */
 String friendlyDateTime(DateTime time) {
   return "${friendlyDate(time)} at ${friendlyTime(time)}";
 }
 
+/**
+ * Creates a Friendly Date
+ */
 String friendlyDate(DateTime time) {
   return
       "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
 }
 
+/**
+ * Creates a Friendly Time
+ */
 String friendlyTime(DateTime time) {
   var suffix = time.hour >= 12 ? "PM" : "AM";
   var hour = ((time.hour + 11) % 12 + 1);
@@ -19,6 +28,9 @@ String friendlyTime(DateTime time) {
   return "${hour}:${time.minute}:${friendlySecond(time.second)} ${suffix} (in ${time.timeZoneName})";
 }
 
+/**
+ * Creates a friendly second
+ */
 String friendlySecond(int second) {
   if (second > 9) {
     return second.toString();
@@ -27,6 +39,9 @@ String friendlySecond(int second) {
   }
 }
 
+/**
+ * Creates a Friendly Day Suffix
+ */
 String friendlyDaySuffix(int day) {
   switch (day) {
     case 1:
@@ -44,6 +59,9 @@ String friendlyDaySuffix(int day) {
   }
 }
 
+/**
+ * Gets a Month Name
+ */
 String monthName(int number) {
   switch (number) {
     case 1:
