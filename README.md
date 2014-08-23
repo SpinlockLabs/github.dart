@@ -18,15 +18,11 @@ Please submit issues and pull requests, join my IRC channel (#directcode on irc.
 - Plugable API
 - Supports Authentication
 - Builtin OAuth2 Flow
+- Hook Server Helper
 
 ### Work in Progress
 
-- Support all the GitHub APIs (Progress: 70%)
-- Full Documentation (Progress: 5%)
-
-### Planned
-
-- Hook Server Helper
+- Support all the GitHub APIs (Progress: 80%)
 
 ## Getting Started
 
@@ -41,9 +37,11 @@ Then import the library and use it:
 
 **For the Server**
 ```dart
-import 'package:github/client.dart';
+import 'package:github/server.dart';
 
 void main() {
+  /* Required to setup GitHub */
+  initGitHub();
   var github = new GitHub();
   github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
     /* Do Something */
@@ -56,7 +54,7 @@ void main() {
 import 'package:github/browser.dart';
 
 void main() {
-  /* Required to setup GitHub for the Browser */
+  /* Required to setup GitHub */
   initGitHub();
   
   var github = new GitHub();
