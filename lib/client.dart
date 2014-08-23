@@ -27,3 +27,4 @@ part 'src/client/pull_request.dart';
 part 'src/client/contents.dart';
 part 'src/client/releases.dart';
 part 'src/client/errors.dart';
+part 'src/client/gists.dart';
