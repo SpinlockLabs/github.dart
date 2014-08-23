@@ -6,47 +6,102 @@ part of github.client;
 class User {
   final GitHub github;
 
+  /**
+   * User's Username
+   */
   String login;
 
+  /**
+   * User ID
+   */
   int id;
 
-  String avatar_url;
+  /**
+   * Avatar URL
+   */
+  @ApiName("avatar_url")
+  String avatarUrl;
 
+  /**
+   * Url to this user's profile.
+   */
   @ApiName("html_url")
   String url;
 
+  /**
+   * If the user is a site administrator
+   */
   @ApiName("site_admin")
   bool siteAdmin;
 
+  /**
+   * User's Name
+   */
   String name;
 
+  /**
+   * Name of User's Company
+   */
   String company;
 
+  /**
+   * Link to User's Blog
+   */
   String blog;
 
+  /**
+   * User's Location
+   */
   String location;
 
+  /**
+   * User's Email
+   */
   String email;
 
+  /**
+   * If this user is hirable
+   */
   bool hirable;
 
+  /**
+   * The User's Biography
+   */
   String bio;
 
+  /**
+   * Number of public repositories that this user has
+   */
   @ApiName("public_repos")
   int publicReposCount;
 
+  /**
+   * Number of public gists that this user has
+   */
   @ApiName("public_gists")
   int publicGistsCount;
 
+  /**
+   * Number of followers that this user has
+   */
   @ApiName("followers")
   int followersCount;
 
+  /**
+   * Number of Users that this user follows
+   */
   @ApiName("following")
   int followingCount;
 
+  /**
+   * The time this [User] was created.
+   */
   @ApiName("created_at")
   DateTime createdAt;
 
+  /**
+   * Last time this [User] was updated.
+   */
   @ApiName("updated_at")
   DateTime updatedAt;
 
@@ -59,7 +114,7 @@ class User {
     return new User(github)
         ..login = input['login']
         ..id = input['id']
-        ..avatar_url = input['avatar_url']
+        ..avatarUrl = input['avatar_url']
         ..url = input['html_url']
         ..bio = input['bio']
         ..name = input['name']
@@ -78,17 +133,39 @@ class User {
         ..json = input;
   }
 
-  Future<List<Repository>> get repositories => github.userRepositories(login);
+  /**
+   * Fetches the [User]'s repositories.
+   * 
+   * [limit] is the maximum number of repositories to fetch.
+   */
+  Future<List<Repository>> repositories({int limit: 100}) => github.userRepositories(login, limit: limit);
 }
 
+/**
+ * A Users GitHub Plan
+ */
 class UserPlan {
   final GitHub github;
 
+  /**
+   * Plan Name
+   */
   String name;
+  
+  /**
+   * Plan Space
+   */
   int space;
+  
+  /**
+   * Number of Private Repositories
+   */
   @ApiName("private_repos")
   int privateReposCount;
 
+  /**
+   * Number of Collaborators
+   */
   @ApiName("collaborators")
   int collaboratorsCount;
 
@@ -104,16 +181,31 @@ class UserPlan {
   }
 }
 
+/**
+ * The Currently Authenticated User
+ */
 class CurrentUser extends User {
+  /**
+   * Number of Private Repositories
+   */
   @ApiName("total_private_repos")
   int privateReposCount;
 
+  /**
+   * Number of Owned Private Repositories that the user owns
+   */
   @ApiName("owned_private_repos")
   int ownedPrivateReposCount;
 
+  /**
+   * The User's Disk Usage
+   */
   @ApiName("disk_usage")
   int diskUsage;
 
+  /**
+   * The User's GitHub Plan
+   */
   UserPlan plan;
 
   CurrentUser(GitHub github) : super(github);
@@ -123,7 +215,7 @@ class CurrentUser extends User {
     return new CurrentUser(github)
         ..login = input['login']
         ..id = input['id']
-        ..avatar_url = input['avatar_url']
+        ..avatarUrl = input['avatar_url']
         ..url = input['html_url']
         ..bio = input['bio']
         ..name = input['name']
@@ -145,11 +237,17 @@ class CurrentUser extends User {
         ..plan = UserPlan.fromJSON(github, input['plan']);
   }
 
-  Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
+  /**
+   * Creates a repository based on the [request].
+   */
+  Future<Repository> createRepository(CreateRepositoryRequest request) {
     return github.postJSON("/users/repos", body: request.toJSON(), convert: Repository.fromJSON);
   }
 
-  Future<List<Issue>> get issues => github.getJSON("/issues").then((json) {
+  /**
+   * Gets the User's Issues
+   */
+  Future<List<Issue>> issues() => github.getJSON("/issues").then((json) {
     return json.map((it) => Issue.fromJSON(github, it));
   });
 }

@@ -21,7 +21,7 @@ void loadUsers() {
     users.forEach((User user) {
       var element = new DivElement();
       var out = """
-        <img width="64" height="64" src="${user.avatar_url}">&nbsp;&nbsp;<b>${user.login}</b>
+        <img width="64" height="64" src="${user.avatarUrl}">&nbsp;&nbsp;<b>${user.login}</b>
       """;
       element.append(new ParagraphElement()..appendHtml(out));
       $users.append(element);

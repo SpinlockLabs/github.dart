@@ -3,9 +3,17 @@ part of github.client;
 typedef http.Client ClientCreator();
 
 /**
- * Main GitHub Client
+ * The Main GitHub Client
+ * 
+ * ## Example
+ * 
+ *      var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
+ *      // Use the Client
  */
 class GitHub {
+  /**
+   * Default Client Creator
+   */
   static ClientCreator defaultClient = () => new http.Client();
 
   /**
