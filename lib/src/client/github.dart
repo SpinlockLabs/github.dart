@@ -37,9 +37,14 @@ class GitHub {
   /**
    * Fetches the user specified by [name].
    */
-  Future<User> user(String name) {
-    return getJSON("/users/${name}", convert: User.fromJSON);
-  }
+  Future<User> user(String name) =>
+      getJSON("/users/${name}", convert: User.fromJSON);
+  
+  /**
+   * Checks if a user exists.
+   */
+  Future<bool> userExists(String name) =>
+      request("GET", "/users/${name}").then((resp) => resp.statusCode == 200);
 
   /**
    * Fetches the users specified by [name].
