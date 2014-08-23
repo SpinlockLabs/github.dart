@@ -228,7 +228,7 @@ class GitHub {
       for (var response in responses) {
         list.addAll(JSON.decode(response.body));
       }
-      return new List.from(list.map((it) => Repository.fromJSON(this, it)));
+      return new List.from(list.map((it) => Release.fromJSON(this, it)));
     });
   }
   
