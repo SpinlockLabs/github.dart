@@ -1,6 +1,7 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+import "package:github/dates.dart";
 
 import "common.dart";
 
@@ -103,7 +104,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
           <br/>
           <b>Forks</b>: ${repo.forksCount}
           <br/>
-          <b>Created</b>: ${repo.createdAt.toString()}
+          <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
       </div>
       """);
   });
