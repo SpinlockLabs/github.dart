@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 # Publishes a GitHub.dart release
-if [ ${1} != "--keep-version" ]
-then
-  ./tool/build.dart publish
-fi
-
+./tool/build.dart publish
 VERSION=`grep 'version:' pubspec.yaml | sed 's/version: //'`
 echo Releasing ${VERSION}
 git add .
