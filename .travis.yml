@@ -1,0 +1,27 @@
+# Travis CI Build for GitHub.dart
+
+# Since Travis CI doesn't support Dart out of the box
+# we use this as a placeholder. Not really a big deal.
+language: node_js
+
+# Build Matrix Configurations
+env:
+- DART_CHANNEL=stable DART_VERSION=latest # Latest Dart Release
+- DART_CHANNEL=dev DART_VERSION=latest # Dart Development Channel
+- DART_CHANNEL=be DART_VERSION=latest # Dart Bleeding Edge Channel
+
+# Setup Dart
+install:
+- "mkdir tools"
+- "cd tools"
+- "wget http://gsdview.appspot.com/dart-archive/channels/${DART_CHANNEL}/raw/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip -O sdk.zip"
+- "unzip sdk.zip"
+- "cd .."
+- "export DART_SDK=${PWD}/tools/dart-sdk"
+- "export PATH=${PATH}:${DART_SDK}/bin"
+- "dart --version"
+
+# Run the Build
+script:
+- "pub get" # Get Dependencies
+- "./tool/build.dart check" # Run Build System
