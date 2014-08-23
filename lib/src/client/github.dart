@@ -364,6 +364,13 @@ class GitHub {
   }
   
   /**
+   * Gets the GitHub API Status.
+   */
+  Future<APIStatus> apiStatus() {
+    return getJSON("https://status.github.com/api/status.json", statusCode: 200, convert: APIStatus.fromJSON);
+  }
+  
+  /**
    * Handles Post Requests that respond with JSON
    * 
    * [path] can either be a path like '/repos' or a full url.
