@@ -1,10 +1,24 @@
 part of github.client;
 
+/**
+ * A Contributor's Statistics for a Repository
+ */
 class ContributorStatistics {
   final GitHub github;
 
+  /**
+   * The Author
+   */
   User author;
+  
+  /**
+   * Total Commits
+   */
   int total;
+  
+  /**
+   * Weekly Statistics
+   */
   List<ContributorWeekStatistics> weeks;
 
   ContributorStatistics(this.github);
@@ -20,9 +34,24 @@ class ContributorStatistics {
 class ContributorWeekStatistics {
   final GitHub github;
 
+  /**
+   * Beginning of the Week
+   */
   DateTime start;
+  
+  /**
+   * Number of Additions
+   */
   int additions;
+  
+  /**
+   * Number of Deletions
+   */
   int deletions;
+  
+  /**
+   * Number of Commits
+   */
   int commits;
 
   ContributorWeekStatistics(this.github);
@@ -36,9 +65,20 @@ class ContributorWeekStatistics {
   }
 }
 
+/**
+ * Weekly Commit Counts
+ */
 class WeeklyCommitCounts {
   final GitHub github;
+  
+  /**
+   * Commit Counts for All Users
+   */
   List<int> all;
+  
+  /**
+   * Commit Counts for the Owner
+   */
   List<int> owner;
 
   WeeklyCommitCounts(this.github);
