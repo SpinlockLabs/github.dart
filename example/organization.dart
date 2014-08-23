@@ -6,7 +6,7 @@ import "common.dart";
 GitHub github;
 DivElement $org;
 
-void main() {  
+void main() {
   initGitHub();
   init("organization.dart", onReady: () {
     $org = querySelector("#org");
@@ -18,20 +18,20 @@ void loadOrganization() {
   var org = "DirectMyFile";
   var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
   var url = window.location.href;
-  
+
   if (url.contains("?")) {
     var params = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
     if (params.containsKey("name")) {
       org = params["name"];
     }
-    
+
     if (params.containsKey("token")) {
       token = params["token"];
     }
   }
-  
+
   github = new GitHub(auth: new Authentication.withToken(token));
-  
+
   github.organization(org).then((Organization org) {
     return org.teams();
   }).then((List<Team> teams) {

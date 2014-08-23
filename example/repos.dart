@@ -30,46 +30,48 @@ void main() {
       loadRepos();
     }
   });
-  
+
   querySelector("#reload").onClick.listen((event) {
     loadRepos();
   });
-  
+
   querySelector("#sort-stars").onClick.listen((event) {
     loadRepos(sorts['stars']);
   });
-  
+
   querySelector("#sort-forks").onClick.listen((event) {
     loadRepos(sorts['forks']);
   });
-  
+
   querySelector("#sort-created").onClick.listen((event) {
     loadRepos(sorts['created']);
   });
-  
+
   init("repos.dart");
 }
 
 void loadRepos([int compare(Repository a, Repository b)]) {
-  
+
   var title = querySelector("#title");
   if (title.text.contains("(")) {
-    title.replaceWith(new HeadingElement.h2()..text = "GitHub for Dart - Repositories"..id = "title");
+    title.replaceWith(new HeadingElement.h2()
+        ..text = "GitHub for Dart - Repositories"
+        ..id = "title");
   }
-  
+
   document.querySelector("#repos").children.clear();
-  
+
   var user = "DirectMyFile";
-  
+
   var url = window.location.href;
   var showForks = true;
-  
+
   if (url.contains("?")) {
     var queryString = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
     if (queryString.containsKey("user")) {
       user = queryString['user'];
     }
-    
+
     if (queryString.containsKey("forks")) {
       if (["1", "true", "yes", "sure"].contains(queryString['forks'])) {
         showForks = true;
@@ -77,7 +79,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
         showForks = false;
       }
     }
-    
+
     if (queryString.containsKey("sort") && compare == null) {
       var sorter = queryString['sort'];
       if (sorts.containsKey(sorter)) {
@@ -85,11 +87,11 @@ void loadRepos([int compare(Repository a, Repository b)]) {
       }
     }
   }
-  
+
   if (compare == null) {
     compare = (a, b) => a.name.compareTo(b.name);
   }
-  
+
   github.userRepositoriesStreamed(user).listen((repo) {
     $repos.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
