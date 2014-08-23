@@ -1,8 +1,22 @@
 part of github.client;
 
+/**
+ * GitHub Rate Limit Information
+ */
 class RateLimit {
+  /**
+   * Maximum number of requests
+   */
   final int limit;
+  
+  /**
+   * Remaining number of requests
+   */
   final int remaining;
+  
+  /**
+   * Time when the limit expires
+   */
   final DateTime resets;
   
   RateLimit(this.limit, this.remaining, this.resets);

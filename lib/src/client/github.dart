@@ -411,6 +411,9 @@ class GitHub {
   }
 }
 
+/**
+ * Internal Helper for dealing with GitHub Pagination
+ */
 class PaginationHelper {
   final GitHub github;
   final List<http.Response> responses;
