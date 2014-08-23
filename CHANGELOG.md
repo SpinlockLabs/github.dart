@@ -6,6 +6,10 @@ The most up-to-date changelog is available [here](https://github.com/DirectMyFil
 
 - Added Repository Languages Breakdown
 - Ability to change authentication on-the-fly.
+- Everything has been documented.
+- Gists Support
+- API Status Information
+- Major Bug Fixes
 
 ## v0.5.9
 
