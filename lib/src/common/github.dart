@@ -1,4 +1,4 @@
-part of github.client;
+part of github.common;
 
 typedef http.Client ClientCreator();
 
@@ -14,7 +14,7 @@ class GitHub {
   /**
    * Default Client Creator
    */
-  static ClientCreator defaultClient = () => new http.Client();
+  static ClientCreator defaultClient;
 
   /**
    * Authentication Information
@@ -462,16 +462,7 @@ class GitHub {
       url.write(queryString);
     }
 
-    switch (method) {
-      case "GET":
-        return client.get(url.toString(), headers: headers);
-      case "POST":
-        return client.post(url.toString(), headers: headers, body: body);
-      case "PUT":
-        return client.put(url.toString(), headers: headers, body: body);
-      default:
-        throw new UnsupportedError("Method '${method}' not supported");
-    }
+    return client.request(new http.Request(url.toString(), method: method, headers: headers, body: body));
   }
 }
 
@@ -528,6 +519,7 @@ class PaginationHelper {
   
   Stream<http.Response> fetchStreamed(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
     var controller = new StreamController.broadcast();
+    
     Future<http.Response> actualFetch(String realPath) {
       return github.request(method, realPath, headers: headers, params: params, body: body);
     }

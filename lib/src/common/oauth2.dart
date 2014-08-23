@@ -1,4 +1,4 @@
-part of github.client;
+part of github.common;
 
 /**
  * OAuth2 Flow Helper
@@ -79,12 +79,12 @@ class OAuth2Flow {
       headers['Origin'] = origin;
     }
     
-    return GitHub.defaultClient().post("${baseUrl}/access_token" + buildQueryString({
+    return GitHub.defaultClient().request(new http.Request("${baseUrl}/access_token" + buildQueryString({
       "client_id": clientId,
       "client_secret": clientSecret,
       "code": code,
       "redirect_uri": redirectUri
-    }), headers: headers).then((response) {
+    }), method: "POST", headers: headers)).then((response) {
       var json = JSON.decode(response.body);
       if (json['error'] != null) {
         throw json;

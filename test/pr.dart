@@ -1,7 +1,8 @@
 import 'dart:io';
-import 'package:github/client.dart';
+import "package:github/server.dart";
 
 void main() {
+  initGitHub();
   var github = new GitHub();
   github.repository(new RepositorySlug("groovy", "groovy-core")).then((repo) {
     return repo.pullRequests(limit: 1);

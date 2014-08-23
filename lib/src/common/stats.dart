@@ -1,4 +1,4 @@
-part of github.client;
+part of github.common;
 
 /**
  * A Contributor's Statistics for a Repository
