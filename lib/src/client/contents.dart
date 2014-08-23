@@ -6,33 +6,63 @@ part of github.client;
 class File {
   final GitHub github;
 
+  /**
+   * Type of File
+   */
   @ApiName("type")
   String type;
 
+  /**
+   * File Encoding
+   */
   @ApiName("encoding")
   String encoding;
 
+  /**
+   * File Size
+   */
   @ApiName("size")
   int size;
 
+  /**
+   * File Name
+   */
   @ApiName("name")
   String name;
 
+  /**
+   * File Path
+   */
   @ApiName("path")
   String path;
 
+  /**
+   * File Content
+   */
   @ApiName("content")
   String content;
 
+  /**
+   * SHA
+   */
   @ApiName("sha")
   String sha;
 
+  /**
+   * Url to file
+   */
   @ApiName("html_url")
   String url;
 
+  /**
+   * Git Url
+   */
   @ApiName("git_url")
   String gitUrl;
 
+  /**
+   * Links
+   */
   @ApiName("_links")
   FileLinks links;
 
@@ -55,13 +85,25 @@ class File {
   }
 }
 
+/**
+ * File Links
+ */
 class FileLinks {
+  /**
+   * Git Link
+   */
   @ApiName("git")
   String git;
 
+  /**
+   * Self Link
+   */
   @ApiName("self")
   String self;
 
+  /**
+   * HTML Link
+   */
   @ApiName("html")
   String html;
 

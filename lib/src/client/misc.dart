@@ -1,8 +1,19 @@
 part of github.client;
 
+/**
+ * A Gitignore Template
+ */
 class GitignoreTemplate {
   final GitHub github;
+  
+  /**
+   * Template Name
+   */
   String name;
+  
+  /**
+   * Template Source
+   */
   String source;
   
   GitignoreTemplate(this.github);

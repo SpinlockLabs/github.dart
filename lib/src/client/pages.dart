@@ -1,11 +1,24 @@
 part of github.client;
 
+/**
+ * GitHub Pages Information
+ */
 class RepositoryPages {
   final GitHub github;
   
+  /**
+   * Pages CNAME
+   */
   String cname;
+  
+  /**
+   * Pages Status
+   */
   String status;
   
+  /**
+   * If the repo has a custom 404
+   */
   @ApiName("custom_404")
   bool custom404;
   
