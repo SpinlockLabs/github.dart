@@ -26,7 +26,8 @@ void loadReleases() {
       """);
       var rel = $releases.querySelector("#release-${release.id}");
       void append(String key, value) {
-        rel.appendHtml("<br/><b>${key}</b>: ${value.toString()}");
+        if (value == null) return;
+        rel.appendHtml("<br/><b>${key}</b>: ${value}");
       }
       append("Tag Name", release.tagName);
       append("Tarball", '<a href="${release.tarballUrl}">Download</a>');

@@ -16323,7 +16323,9 @@ var $$ = {};
   loadReleases__append: {
     "^": "Closure:51;rel_0",
     call$2: function(key, value) {
-      J.insertAdjacentHtml$2$x(this.rel_0, "beforeend", "<br/><b>" + key + "</b>: " + J.toString$0(value));
+      if (value == null)
+        return;
+      J.insertAdjacentHtml$2$x(this.rel_0, "beforeend", "<br/><b>" + key + "</b>: " + value);
     }
   }
 },
