@@ -2,13 +2,13 @@ var args = document.location.search.substring(1).split('&');
 
 var opts = {};
 
-for (i = 0; i < args.length; i++) {
-    arg = unescape(args[i]);
+for (var i = 0; i < args.length; i++) {
+    var arg = window.unescape(args[i]);
 
     if (arg.indexOf('=') == -1) {
         opts[arg.trim()] = true;
     } else {
-        kvp = arg.split('=');
+        var kvp = arg.split('=');
         opts[kvp[0].trim()] = kvp[1].trim();
     }
 }
@@ -33,8 +33,7 @@ function createEditor(code) {
             mac: 'Command-S',
             sender: 'editor|cli'
         },
-        exec: function(env, args, request) {
-            // Ignore
+        exec: function() {
         }
     });
 
