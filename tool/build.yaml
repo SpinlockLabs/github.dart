@@ -1,9 +1,15 @@
 analyzer.files: 
-  - lib/client.dart
+  - lib/common.dart
+  - lib/server.dart
+  - lib/browser.dart
   - example/repos.dart
   - example/organization.dart
   - example/users.dart
   - example/user_info.dart
+  - example/languages.dart
+  - example/oauth2.dart
+  - example/releases.dart
+  - example/common.dart
 check.tasks: 
   - analyze
   - test
