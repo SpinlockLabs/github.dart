@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
-import 'package:quiver/async.dart';
 import 'http.dart' as http;
 
 import 'src/common/util.dart';
