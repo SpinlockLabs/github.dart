@@ -1,37 +1,91 @@
 part of github.client;
 
+/**
+ * A GitHub Organization
+ */
 class Organization {
-  GitHub github;
+  final GitHub github;
+  
+  /**
+   * Organization Login
+   */
   String login;
+  
+  /**
+   * Organization ID
+   */
   int id;
 
+  /**
+   * Url to Organization Profile
+   */
   @ApiName("html_url")
   String url;
 
+  /**
+   * Url to the Organization Avatar
+   */
   @ApiName("avatar_url")
   String avatarUrl;
 
+  /**
+   * Organization Name
+   */
   String name;
+  
+  /**
+   * Organization Company
+   */
   String company;
+  
+  /**
+   * Organization Blog
+   */
   String blog;
+  
+  /**
+   * Organization Location
+   */
   String location;
+  
+  /**
+   * Organization Email
+   */
   String email;
 
+  /**
+   * Number of Public Repositories
+   */
   @ApiName("public_repos")
   int publicReposCount;
 
+  /**
+   * Number of Public Gists
+   */
   @ApiName("public_gists")
   int publicGistsCount;
 
+  /**
+   * Number of Followers
+   */
   @ApiName("followers")
   int followersCount;
 
+  /**
+   * Number of People this Organization is Following
+   */
   @ApiName("following")
   int followingCount;
 
+  /**
+   * Time this organization was created
+   */
   @ApiName("created_at")
   DateTime createdAt;
 
+  /**
+   * Time this organization was updated
+   */
   @ApiName("updated_at")
   DateTime updatedAt;
 
@@ -59,30 +113,62 @@ class Organization {
         ..json = input;
   }
 
-  Future<List<Team>> get teams => github.teams(login);
+  /**
+   * Gets the Organization's Teams
+   */
+  Future<List<Team>> teams() => github.teams(login);
 
+  /**
+   * Creates a Repository on this Organization
+   */
   Future<TeamRepository> createRepository(CreateRepositoryRequest request) {
     return github.postJSON("/orgs/${login}/repos", body: request.toJSON(), convert: TeamRepository.fromJSON);
   }
 
-  Future<List<Issue>> get issues => github.getJSON("/orgs/${login}/issues").then((json) {
+  /**
+   * Gets the Organization's Issues
+   */
+  Future<List<Issue>> issues() => github.getJSON("/orgs/${login}/issues").then((json) {
     return copyOf(json.map((it) => Issue.fromJSON(github, it)));
   });
 }
 
+/**
+ * A GitHub Team
+ */
 class Team {
   final GitHub github;
 
+  /**
+   * Team Name
+   */
   String name;
+  
+  /**
+   * Team ID
+   */
   int id;
+  
+  /**
+   * Team Permission
+   */
   String permission;
 
+  /**
+   * Number of Members
+   */
   @ApiName("members_count")
   int membersCount;
 
+  /**
+   * Number of Repositories
+   */
   @ApiName("repos_count")
   int reposCount;
 
+  /**
+   * Organization
+   */
   Organization organization;
 
   Team(this.github);
@@ -99,23 +185,45 @@ class Team {
         ..json = input;
   }
 
-  Future<List<TeamMember>> get members => github.teamMembers(id);
+  /**
+   * Gets the Members of this Team
+   */
+  Future<List<TeamMember>> members() => github.teamMembers(id);
 }
 
 class TeamMember {
   final GitHub github;
 
+  /**
+   * Member Username
+   */
   String login;
+  
+  /**
+   * Member ID
+   */
   int id;
 
+  /**
+   * Url to Member Avatar
+   */
   @ApiName("avatar_url")
   String avatarUrl;
 
+  /**
+   * Member Type
+   */
   String type;
 
+  /**
+   * If the member is a site administrator
+   */
   @ApiName("site_admin")
   bool siteAdmin;
 
+  /**
+   * Profile of the Member
+   */
   @ApiName("html_url")
   String url;
 
@@ -134,10 +242,19 @@ class TeamMember {
     return member;
   }
 
+  /**
+   * Fetches this Member as a User
+   */
   Future<User> asUser() => github.user(login);
 }
 
+/**
+ * A Team Repository
+ */
 class TeamRepository extends Repository {
+  /**
+   * Repository Permissions
+   */
   TeamRepositoryPermissions permissions;
 
   TeamRepository(GitHub github) : super(github);
@@ -177,11 +294,25 @@ class TeamRepository extends Repository {
   }
 }
 
+/**
+ * Team Repository Permissions
+ */
 class TeamRepositoryPermissions {
   final GitHub github;
 
+  /**
+   * Administrative Access
+   */
   bool admin;
+  
+  /**
+   * Push Access
+   */
   bool push;
+  
+  /**
+   * Pull Access
+   */
   bool pull;
 
   TeamRepositoryPermissions(this.github);
