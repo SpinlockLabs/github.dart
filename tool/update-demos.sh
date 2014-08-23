@@ -12,7 +12,7 @@ rm -rf build
 rm -rf ${1}
 
 pub build example --mode=debug
-cp -R build/web ${1}
+cp -R build/example ${1}
 
 cd ${1}
 git add .
