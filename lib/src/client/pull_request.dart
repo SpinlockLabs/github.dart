@@ -1,39 +1,91 @@
 part of github.client;
 
+/**
+ * A Pull Request
+ */
 class PullRequest {
   final GitHub github;
   
+  /**
+   * If this is a full pull request
+   */
   final bool isFullPullRequest;
   
+  /**
+   * Url to the Pull Request Page
+   */
   @ApiName("html_url")
   String url;
   
+  /**
+   * Url to the diff for this Pull Request
+   */
   @ApiName("diff_url")
   String diffUrl;
   
+  /**
+   * Url to the patch for this Pull Request
+   */
   @ApiName("patch_url")
   String patchUrl;
   
+  /**
+   * Pull Request Number
+   */
   int number;
+  
+  /**
+   * Pull Request State
+   */
   String state;
+  
+  /**
+   * Pull Request Title
+   */
   String title;
+  
+  /**
+   * Pull Request Body
+   */
   String body;
   
+  /**
+   * Time the pull request was created
+   */
   @ApiName("created_at")
   DateTime createdAt;
   
+  /**
+   * Time the pull request was updated
+   */
   @ApiName("updated_at")
   DateTime updatedAt;
   
+  /**
+   * Time the pull request was closed
+   */
   @ApiName("closed_at")
   DateTime closedAt;
   
+  /**
+   * Time the pull request was merged
+   */
   @ApiName("merged_at")
   DateTime mergedAt;
   
+  /**
+   * The Pull Request Head
+   */
   PullRequestHead head;
+  
+  /**
+   * Pull Request Base
+   */
   PullRequestHead base;
   
+  /**
+   * The User who created the Pull Request
+   */
   User user;
   
   Map<String, dynamic> json;
@@ -60,6 +112,9 @@ class PullRequest {
     return pr;
   }
   
+  /**
+   * Fetches the Full Pull Request
+   */
   Future<FullPullRequest> fetchFullRequest() {
     if (isFullPullRequest) {
       return new Future.value(this);
@@ -68,23 +123,53 @@ class PullRequest {
   }
 }
 
+/**
+ * A Complete Pull Request
+ */
 class FullPullRequest extends PullRequest {
   @ApiName("merge_commit_sha")
   String mergeCommitSha;
   
+  /**
+   * If the pull request was merged
+   */
   bool merged;
+  
+  /**
+   * If the pull request is mergable
+   */
   bool mergeable;
   
+  /**
+   * The user who merged the pull request
+   */
   @ApiName("merged_by")
   User mergedBy;
   
+  /**
+   * Number of comments
+   */
   int commentsCount;
-  int commitsCount;
-  int additionsCount;
-  int deletionsCount;
-  int changedFilesCount;
   
-  User user;
+  /**
+   * Number of commits
+   */
+  int commitsCount;
+  
+  /**
+   * Number of additions
+   */
+  int additionsCount;
+  
+  /**
+   * Number of deletions
+   */
+  int deletionsCount;
+  
+  /**
+   * Number of changed files
+   */
+  int changedFilesCount;
   
   FullPullRequest(GitHub github) : super(github, true);
   
@@ -104,14 +189,35 @@ class FullPullRequest extends PullRequest {
   }
 }
 
+/**
+ * A Pull Request Head
+ */
 class PullRequestHead {
   final GitHub github;
   
+  /**
+   * Label
+   */
   String label;
+  
+  /**
+   * Ref
+   */
   String ref;
+  
+  /**
+   * Commit SHA
+   */
   String sha;
   
+  /**
+   * User
+   */
   User user;
+  
+  /**
+   * Repository
+   */
   Repository repo;
   
   PullRequestHead(this.github);
@@ -128,10 +234,28 @@ class PullRequestHead {
   }
 }
 
+/**
+ * Request to Create a Pull Request
+ */
 class CreatePullRequest {
+  /**
+   * Pull Request Title
+   */
   final String title;
+  
+  /**
+   * Pull Request Head
+   */
   final String head;
+  
+  /**
+   * Pull Request Base
+   */
   final String base;
+  
+  /**
+   * Pull Request Body
+   */
   String body;
   
   CreatePullRequest(this.title, this.head, this.base, {this.body});
