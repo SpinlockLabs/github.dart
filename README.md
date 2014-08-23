@@ -1,4 +1,4 @@
-# GitHub for Dart
+# GitHub for Dart [![Build Status](https://travis-ci.org/DirectMyFile/github.dart.svg)](https://travis-ci.org/DirectMyFile/github.dart)
 
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
 
