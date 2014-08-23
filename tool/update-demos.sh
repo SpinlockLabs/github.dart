@@ -7,5 +7,8 @@ then
 fi
 
 rm -rf build
+
+rm -rf ${1}
+
 pub build example --mode=debug
 cp -R build/web ${1}
