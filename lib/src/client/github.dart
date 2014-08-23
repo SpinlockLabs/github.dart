@@ -263,6 +263,53 @@ class GitHub {
       }
     }, convert: CurrentUser.fromJSON);
   }
+  
+  /**
+   * Fetches Gists for a User
+   * 
+   * [username] is the user's username.
+   */
+  Future<List<Gist>> userGists(String username) {
+    return getJSON("/users/${username}/gists", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Fetches the Gists for the currently Authenticated User.
+   * 
+   * If the user is not authenticated, this returns all public gists.
+   */
+  Future<List<Gist>> currentUserGists() {
+    return getJSON("/gists", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Fetches a Gist by the specified [id].
+   */
+  Future<Gist> gist(String id) {
+    return getJSON("/gist/${id}", statusCode: 200, convert: Gist.fromJSON);
+  }
+  
+  /**
+   * Fetches the Currently Authenticated User's Public Gists
+   */
+  Future<List<Gist>> currentUserPublicGists() {
+    return getJSON("/gists/public", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Fetches the Currently Authenticated User's Starred Gists
+   */
+  Future<List<Gist>> currentUserStarredGists() {
+    return getJSON("/gists/starred", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
+    });
+  }
 
   /**
    * Handles Get Requests that respond with JSON
