@@ -24,15 +24,15 @@ void loadUser() {
       window.alert("Please Enter a Token");
       return;
     }
-    
+
     var github = createClient(token.value);
-    
+
     github.currentUser().then((CurrentUser user) {
       info.hidden = false;
       info.appendHtml("""
       <b>Name</b>: ${user.name}
       """);
-      
+
       void append(String name, value) {
         if (value != null) {
           info.appendHtml("""

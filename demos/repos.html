@@ -1,36 +1,35 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>GitHub for Dart - Repositories</title>
-    
-    <style>
-      .repo {
-        display: block;
-        text-align: left;
-      }
-      
-      .line {
-        border-top: 1px;
-        border-style: solid;
-      }
-    </style>
-  </head>
-  
-  <body>
-    <div class="header">
-      <h2 id="title">GitHub for Dart - Repositories</h2>
-      <button id="view-source">View the Source</button>
-      <button id="reload">Reload</button>
-      <button id="sort-stars">Sort by Stars</button>
-      <button id="sort-forks">Sort by Forks</button>
-      <button id="sort-created">Sort by Creation Date</button>
-      <p></p>
-    </div>
-    
-    <div id="repos">
-    </div>
-    
-    <script type="application/dart" src="repos.dart"></script>
-    <script src="packages/browser/dart.js"></script>
-  </body>
+<head>
+<title>GitHub for Dart - Repositories</title>
+
+<style>
+.repo {
+	display: block;
+	text-align: left;
+}
+
+.line {
+	border-top: 1px;
+	border-style: solid;
+}
+</style>
+</head>
+
+<body>
+	<div class="header">
+		<h2 id="title">GitHub for Dart - Repositories</h2>
+		<button id="view-source">View the Source</button>
+		<button id="reload">Reload</button>
+		<button id="sort-stars">Sort by Stars</button>
+		<button id="sort-forks">Sort by Forks</button>
+		<button id="sort-created">Sort by Creation Date</button>
+		<p></p>
+	</div>
+
+	<div id="repos"></div>
+
+	<script type="application/dart" src="repos.dart"></script>
+	<script src="packages/browser/dart.js"></script>
+</body>
 </html>

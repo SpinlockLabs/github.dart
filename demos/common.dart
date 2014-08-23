@@ -15,7 +15,7 @@ void init(String script, {void onReady()}) {
 
   document.querySelector("#view-source").onClick.listen((_) {
     var popup = window.open("view_source.html", "View Source");
-    
+
     HttpRequest.getString(script).then((code) {
       new Timer(new Duration(seconds: 1), () {
         popup.postMessage({
