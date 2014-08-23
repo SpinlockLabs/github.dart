@@ -4,6 +4,7 @@ The most up-to-date changelog is available [here](https://github.com/DirectMyFil
 
 ## v0.6.0
 
+- Custom HTTP System!
 - Added Repository Languages Breakdown
 - Ability to change authentication on-the-fly.
 - Everything has been documented.
