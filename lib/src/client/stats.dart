@@ -61,7 +61,7 @@ class ContributorWeekStatistics {
         ..additions = input['a']
         ..deletions = input['d']
         ..commits = input['c']
-        ..start = parse_date(input['w']);
+        ..start = parseDateTime(input['w']);
   }
 }
 

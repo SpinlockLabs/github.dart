@@ -103,10 +103,10 @@ class PullRequest {
     pr.state = input['state'];
     pr.title = input['title'];
     pr.body = input['body'];
-    pr.createdAt = parse_date(input['created_at']);
-    pr.updatedAt = parse_date(input['updated_at']);
-    pr.closedAt = parse_date(input['closed_at']);
-    pr.mergedAt = parse_date(input['merged_at']);
+    pr.createdAt = parseDateTime(input['created_at']);
+    pr.updatedAt = parseDateTime(input['updated_at']);
+    pr.closedAt = parseDateTime(input['closed_at']);
+    pr.mergedAt = parseDateTime(input['merged_at']);
     pr.user = User.fromJSON(github, input['user']);
     pr.json = input;
     return pr;

@@ -56,8 +56,8 @@ class Gist {
         ..commentsCount = input['comments']
         ..gitPullUrl = input['git_pull_url']
         ..gitPushUrl = input['git_push_url']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at']);
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at']);
 
     return gist;
   }
@@ -109,8 +109,8 @@ class GistFork {
     return new GistFork(github)
         ..user = User.fromJSON(github, input['user'])
         ..id = input['id']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at']);
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
 
@@ -143,6 +143,6 @@ class GistHistoryEntry {
         ..deletions = input['change_status']['deletions']
         ..additions = input['change_status']['additions']
         ..totalChanges = input['change_status']['total']
-        ..committedAt = parse_date(input['committed_at']);
+        ..committedAt = parseDateTime(input['committed_at']);
   }
 }

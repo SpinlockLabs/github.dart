@@ -102,8 +102,8 @@ class Release {
         ..author = input['author']
         ..assets = new List.from(input['assets'].map((it) => ReleaseAsset.fromJSON(github, it)))
         ..name = input['name']
-        ..createdAt = parse_date(input['created_at'])
-        ..publishedAt = parse_date(input['published_at']);
+        ..createdAt = parseDateTime(input['created_at'])
+        ..publishedAt = parseDateTime(input['published_at']);
   }
 }
 
@@ -177,8 +177,8 @@ class ReleaseAsset {
         ..contentType = input['content_type']
         ..size = input['size']
         ..downloadCount = input['download_count']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at']);
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
 

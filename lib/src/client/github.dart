@@ -460,6 +460,8 @@ class GitHub {
         return client.get(url.toString(), headers: headers);
       case "POST":
         return client.post(url.toString(), headers: headers, body: body);
+      case "PUT":
+        return client.put(url.toString(), headers: headers, body: body);
       default:
         throw new UnsupportedError("Method '${method}' not supported");
     }

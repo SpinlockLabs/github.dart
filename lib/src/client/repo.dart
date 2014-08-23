@@ -171,8 +171,8 @@ class Repository {
         ..networkCount = input['network_count']
         ..subscribersCount = input['subscribers_count']
         ..forksCount = input['forks_count']
-        ..createdAt = parse_date(input['created_at'])
-        ..pushedAt = parse_date(input['pushed_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..pushedAt = parseDateTime(input['pushed_at'])
         ..private = input['private']
         ..json = input
         ..owner = RepositoryOwner.fromJSON(input['owner']);

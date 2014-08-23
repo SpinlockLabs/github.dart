@@ -37,7 +37,7 @@ class OnlyWhen {
 /**
  * Internal method to handle null for parsing dates.
  */
-DateTime parse_date(String input) {
+DateTime parseDateTime(String input) {
   if (input == null) {
     return null;
   }

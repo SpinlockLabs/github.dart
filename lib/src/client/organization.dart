@@ -101,8 +101,8 @@ class Organization {
         ..avatarUrl = input['avatar_url']
         ..name = input['name']
         ..company = input['company']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
         ..publicGistsCount = input['public_gists']
         ..publicReposCount = input['public_repos']
         ..followersCount = input['followers']
@@ -285,8 +285,8 @@ class TeamRepository extends Repository {
         ..networkCount = input['network_count']
         ..subscribersCount = input['subscribers_count']
         ..forksCount = input['forks_count']
-        ..createdAt = parse_date(input['created_at'])
-        ..pushedAt = parse_date(input['pushed_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..pushedAt = parseDateTime(input['pushed_at'])
         ..json = input
         ..owner = RepositoryOwner.fromJSON(input['owner'])
         ..private = input['private']

@@ -98,9 +98,9 @@ class Issue {
         ..milestone = Milestone.fromJSON(github, input['milestone'])
         ..commentsCount = input['comments']
         ..pullRequest = IssuePullRequest.fromJSON(github, input['pull_request'])
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at'])
-        ..closedAt = parse_date(input['closed_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..closedAt = parseDateTime(input['closed_at'])
         ..closedBy = User.fromJSON(github, input['closed_by']);
   }
 }
@@ -239,8 +239,8 @@ class Milestone {
         ..creator = User.fromJSON(github, input['creator'])
         ..openIssuesCount = input['open_issues']
         ..closedIssuesCount = input['closed_issues']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at'])
-        ..dueOn = parse_date(input['due_on']);
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..dueOn = parseDateTime(input['due_on']);
   }
 }

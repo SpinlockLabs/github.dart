@@ -128,8 +128,8 @@ class User {
         ..publicReposCount = input['public_repos']
         ..followersCount = input['followers']
         ..followingCount = input['following']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
         ..json = input;
   }
 
@@ -229,8 +229,8 @@ class CurrentUser extends User {
         ..publicReposCount = input['public_repos']
         ..followersCount = input['followers']
         ..followingCount = input['following']
-        ..createdAt = parse_date(input['created_at'])
-        ..updatedAt = parse_date(input['updated_at'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
         ..json = input
         ..privateReposCount = input['total_private_repos']
         ..ownedPrivateReposCount = input['owned_private_repos']

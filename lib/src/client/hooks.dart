@@ -65,8 +65,8 @@ class Hook {
       ..name = input['name']
       ..id = input['id']
       ..repoName = repoName
-      ..updatedAt = parse_date(input['updated_at'])
-      ..createdAt = parse_date(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..createdAt = parseDateTime(input['created_at'])
       ..contentType = input['config']['content_type'];
   }
   

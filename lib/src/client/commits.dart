@@ -83,8 +83,8 @@ class Commit {
         ..author = User.fromJSON(github, input['author'])
         ..committer = User.fromJSON(github, input['committer'])
         ..message = input['commit']['message']
-        ..authoredAt = parse_date(input['commit']['author']['date'])
-        ..committedAt = parse_date(input['commit']['committer']['date'])
+        ..authoredAt = parseDateTime(input['commit']['author']['date'])
+        ..committedAt = parseDateTime(input['commit']['committer']['date'])
         ..committerEmail = input['commit']['committer']['email']
         ..authorEmail = input['commit']['author']['email'];
 
