@@ -3,6 +3,8 @@
  */
 library github.dates;
 
+import "package:quiver/time.dart";
+
 /**
  * Creates a Friendly Date and Time
  */
