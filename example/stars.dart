@@ -10,11 +10,11 @@ void main() {
   initGitHub();
   init("stars.dart", onReady: () {
     $stars = querySelector("#stars");
-    loadOrganization();
+    loadStars();
   });
 }
 
-void loadOrganization() {
+void loadStars() {
   var user = "DirectMyFile";
   var repo = "github.dart";
   var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
