@@ -64,7 +64,7 @@ class File {
    * Links
    */
   @ApiName("_links")
-  FileLinks links;
+  Links links;
 
   /**
    * Text Content
@@ -92,7 +92,7 @@ class File {
         ..sha = input['sha']
         ..gitUrl = input['git_url']
         ..url = input['html_url']
-        ..links = FileLinks.fromJSON(input['_links'])
+        ..links = Links.fromJSON(input['_links'])
         ..sourceRepository = slug
         ..json = input;
   }
@@ -110,7 +110,7 @@ class File {
 /**
  * File Links
  */
-class FileLinks {
+class Links {
   /**
    * Git Link
    */
@@ -129,13 +129,13 @@ class FileLinks {
   @ApiName("html")
   String html;
 
-  static FileLinks fromJSON(input) {
+  static Links fromJSON(input) {
     if (input == null) return null;
-    var fileLinks = new FileLinks();
-    fileLinks.git = input['git'];
-    fileLinks.self = input['self'];
-    fileLinks.html = input['html'];
-    return fileLinks;
+    var links = new Links();
+    links.git = input['git'];
+    links.self = input['self'];
+    links.html = input['html'];
+    return links;
   }
 }
 

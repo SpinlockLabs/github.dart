@@ -269,3 +269,62 @@ class CreatePullRequest {
     return JSON.encode(map);
   }
 }
+
+class PullRequestComment {
+  final GitHub github;
+  
+  int id;
+  @ApiName("diff_hunk")
+  String diffHunk;
+  String path;
+  int position;
+  
+  @ApiName("original_position")
+  int originalPosition;
+  
+  @ApiName("commit_id")
+  String commitID;
+  
+  @ApiName("original_commit_id")
+  String originalCommitID;
+  
+  User user;
+  String body;
+  
+  @ApiName("created_at")
+  DateTime createdAt;
+  
+  @ApiName("updated_at")
+  DateTime updatedAt;
+  
+  @ApiName("html_url")
+  String url;
+  
+  @ApiName("pull_request_url")
+  String pullRequestUrl;
+  
+  @ApiName("_links")
+  Links links;
+  
+  PullRequestComment(this.github);
+  
+  static PullRequestComment fromJSON(GitHub github, input) {
+    if (input == null) return null;
+    
+    return new PullRequestComment(github)
+    ..id = input['id']
+    ..diffHunk = input['diff_hunk']
+    ..path = input['path']
+    ..position = input['position']
+    ..originalPosition = input['original_position']
+    ..commitID = input['commit_id']
+    ..originalCommitID = input['original_commit_id']
+    ..user = User.fromJSON(github, input['user'])
+    ..body = input['body']
+    ..createdAt = parseDateTime(input['created_at'])
+    ..updatedAt = parseDateTime(input['updated_at'])
+    ..url = input['html_url']
+    ..pullRequestUrl = input['pull_request_url']
+    ..links = Links.fromJSON(input['_links']);
+  }
+}
