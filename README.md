@@ -22,7 +22,7 @@ Please submit issues and pull requests, join my IRC channel (#directcode on irc.
 
 ### Work in Progress
 
-- Support all the GitHub APIs (Progress: 80%)
+- Support all the GitHub APIs (Progress: 90%)
 
 ## Getting Started
 
