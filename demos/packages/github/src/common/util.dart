@@ -1,3 +1,5 @@
+import 'dart:async';
+
 /**
  * Marks something as not being ready or complete.
  */
@@ -117,4 +119,56 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
     out.add(new MapEntry<dynamic, dynamic>(key, input[key]));
   }
   return out;
+}
+
+class FutureGroup<E> {
+  static const _FINISHED = -1;
+
+  int _pending = 0;
+  Future _failedTask;
+  final Completer<List> _completer = new Completer<List>();
+  final List results = [];
+
+  /** Gets the task that failed, if any. */
+  Future get failedTask => _failedTask;
+
+  /**
+   * Wait for [task] to complete.
+   *
+   * If this group has already been marked as completed, a [StateError] will be
+   * thrown.
+   *
+   * If this group has a [failedTask], new tasks will be ignored, because the
+   * error has already been signaled.
+   */
+  void add(Future task) {
+    if (_failedTask != null) return;
+    if (_pending == _FINISHED) throw new StateError("Future already completed");
+
+    _pending++;
+    var i = results.length;
+    results.add(null);
+    task.then((res) {
+      results[i] = res;
+      if (_failedTask != null) return;
+      _pending--;
+      if (_pending == 0) {
+        _pending = _FINISHED;
+        _completer.complete(results);
+      }
+    }, onError: (e, s) {
+      if (_failedTask != null) return;
+      _failedTask = task;
+      _completer.completeError(e, s);
+    });
+  }
+
+  /**
+   * A Future that complets with a List of the values from all the added
+   * tasks, when they have all completed.
+   *
+   * If any task fails, this Future will receive the error. Only the first
+   * error will be sent to the Future.
+   */
+  Future<List<E>> get future => _completer.future;
 }

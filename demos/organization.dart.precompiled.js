@@ -8940,18 +8940,23 @@ var $$ = {};
   }
 },
 1],
-["quiver.async", "package:quiver/async.dart", , M, {
+["", "package:github/src/common/util.dart", , M, {
   "^": "",
+  parseDateTime: function(input) {
+    if (input == null)
+      return;
+    return P.DateTime_parse(input);
+  },
   FutureGroup: {
-    "^": "Object;_async0$_pending,_failedTask,_completer,results",
+    "^": "Object;_util$_pending,_failedTask,_completer,results",
     add$1: function(_, task) {
       var t1, i;
       if (this._failedTask != null)
         return;
-      t1 = this._async0$_pending;
+      t1 = this._util$_pending;
       if (t1 === -1)
         throw H.wrapException(P.StateError$("Future already completed"));
-      this._async0$_pending = t1 + 1;
+      this._util$_pending = t1 + 1;
       t1 = this.results;
       i = t1.length;
       t1.push(null);
@@ -8971,8 +8976,8 @@ var $$ = {};
       t2[t3] = res;
       if (t1._failedTask != null)
         return;
-      if (--t1._async0$_pending === 0) {
-        t1._async0$_pending = -1;
+      if (--t1._util$_pending === 0) {
+        t1._util$_pending = -1;
         t1 = t1._completer.future;
         if (t1._state !== 0)
           H.throwExpression(P.StateError$("Future already completed"));
@@ -8989,14 +8994,6 @@ var $$ = {};
       t1._failedTask = this.task_3;
       t1._completer.completeError$2(e, s);
     }
-  }
-}],
-["", "package:github/src/common/util.dart", , M, {
-  "^": "",
-  parseDateTime: function(input) {
-    if (input == null)
-      return;
-    return P.DateTime_parse(input);
   }
 }],
 ]);
@@ -15523,8 +15520,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   loadOrganization_closure1.prototype = $desc;
-  function FutureGroup(_async0$_pending, _failedTask, _completer, results) {
-    this._async0$_pending = _async0$_pending;
+  function FutureGroup(_util$_pending, _failedTask, _completer, results) {
+    this._util$_pending = _util$_pending;
     this._failedTask = _failedTask;
     this._completer = _completer;
     this.results = results;

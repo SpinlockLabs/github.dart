@@ -310,7 +310,100 @@ class GitHub {
       return copyOf(input.map((it) => Gist.fromJSON(github, it)));
     });
   }
+  
+  /**
+   * Fetches the Stargazers for a Repository
+   * 
+   * [slug] is a repository slug.
+   */
+  Future<List<User>> stargazers(RepositorySlug slug) {
+    return new PaginationHelper(this).fetch("GET", "/repos/${slug.fullName}/stargazers").then((responses) {
+      var users = [];
+      for (var response in responses) {
+        var json = JSON.decode(response.body);
+        users.addAll(json.map((it) => User.fromJSON(this, it)));
+      }
+      return users;
+    });
+  }
+  
+  /**
+   * Fetches the repositories that [user] has starred.
+   */
+  Future<List<Repository>> starred(String user) {
+    return getJSON("/users/${user}/starred", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Repository.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Checks if the currently authenticated user has starred the specified repository.
+   */
+  Future<bool> hasStarred(RepositorySlug slug) {
+    return request("GET", "/user/starred/${slug.fullName}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  /**
+   * Stars the specified repository for the currently authenticated user.
+   */
+  Future star(RepositorySlug slug) {
+    return request("PUT", "/user/starred/${slug.fullName}", headers: { "Content-Length": 0 }).then((response) {
+      return null;
+    });
+  }
+  
+  /**
+   * Unstars the specified repository for the currently authenticated user.
+   */
+  Future unstar(RepositorySlug slug) {
+    return request("DELETE", "/user/starred/${slug.fullName}", headers: { "Content-Length": 0 }).then((response) {
+      return null;
+    });
+  }
+  
+  /**
+   * Fetches a Single Notification
+   */
+  Future<Notification> notification(String id) {
+    return getJSON("/notification/threads/${id}", statusCode: 200, convert: Notification.fromJSON);
+  }
+  
+  /**
+   * Fetches notifications for the current user. If [repository] is specified, it fetches notifications for that repository.
+   */
+  Future<List<Notification>> notifications({RepositorySlug repository, bool all: false, bool participating: false}) {
+    var url = repository != null ? "/repos/${repository.fullName}/notifications" : "/notifications";
+    return getJSON(url, params: { "all": all, "participating": participating }, convert: (github, input) => copyOf(input.map((it) => Notification.fromJSON(github, it))));
+  }
+  
+  /**
+   * Fetches repository subscription information.
+   */
+  Future<RepositorySubscription> subscription(RepositorySlug slug) {
+    return getJSON("/repos/${slug.fullName}/subscription", statusCode: 200, convert: RepositorySubscription.fromJSON);
+  }
+  
+  /**
+   * Fetches the Watchers of the specified repository.
+   */
+  Future<List<User>> watchers(RepositorySlug slug) {
+    return getJSON("/repos/${slug.fullName}/subscribers", statusCode: 200, convert: (GitHub github, input) {
+      return input.map((it) => User.fromJSON(github, it));
+    });
+  }
 
+  /**
+   * Fetches repositories that the current user is watching. If [user] is specified, it will get the watched repositories for that user.
+   */
+  Future<List<Repository>> watching({String user}) {
+    var path = user != null ? "/users/${user}/subscribers" : "/subscribers";
+    return getJSON(path, statusCode: 200, convert: (GitHub github, input) {
+      return input.map((it) => Repository.fromJSON(github, it));
+    });
+  }
+  
   /**
    * Handles Get Requests that respond with JSON
    * 
