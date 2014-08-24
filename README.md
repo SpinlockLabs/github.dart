@@ -4,6 +4,8 @@ This is a Client Library for GitHub in Dart. I wrote this out of necessity, and 
 
 Please submit issues and pull requests, join my IRC channel (#directcode on irc.esper.net), help out, or just give me encouragement.
 
+**Notice**: We are looking for major contributors. Contact us by email or on IRC!
+
 ## Links
 
 - [Library Demos](http://github.directcode.org/demos/)
