@@ -66,10 +66,21 @@ class File {
   @ApiName("_links")
   FileLinks links;
 
+  /**
+   * Text Content
+   */
+  String get text => new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
 
+  /**
+   * Source Repository
+   */
+  RepositorySlug sourceRepository;
+  
+  Map<String, dynamic> json;
+  
   File(this.github);
 
-  static File fromJSON(GitHub github, input) {
+  static File fromJSON(GitHub github, input, [RepositorySlug slug]) {
     if (input == null) return null;
     return new File(github)
         ..type = input['type']
@@ -81,7 +92,18 @@ class File {
         ..sha = input['sha']
         ..gitUrl = input['git_url']
         ..url = input['html_url']
-        ..links = FileLinks.fromJSON(input['_links']);
+        ..links = FileLinks.fromJSON(input['_links'])
+        ..sourceRepository = slug
+        ..json = input;
+  }
+  
+  /**
+   * Renders this file as markdown.
+   */
+  Future<String> renderMarkdown() {
+    return github.request("GET", json['url'], headers: { "Accept": "application/vnd.github.v3.html" }).then((response) {
+      return response.body;
+    });
   }
 }
 
@@ -115,4 +137,12 @@ class FileLinks {
     fileLinks.html = input['html'];
     return fileLinks;
   }
+}
+
+class RepositoryContents {
+  bool isFile;
+  bool isDirectory;
+  
+  File file;
+  List<File> tree;
 }

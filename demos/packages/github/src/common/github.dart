@@ -512,11 +512,29 @@ class GitHub {
    * Gets the readme file for a repository.
    */
   Future<File> readme(RepositorySlug slug) {
-    return getJSON("/repos/${slug.fullName}/readme", statusCode: 200, fail: (http.Response response) {
+    var headers = {};
+    
+    return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: 200, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
-    }, convert: File.fromJSON);
+    }, convert: (gh, input) => File.fromJSON(gh, input, slug));
+  }
+  
+  Future<RepositoryContents> contents(RepositorySlug slug, String path) {
+    return getJSON("/repos/${slug.fullName}/contents/${path}", convert: (github, input) {
+      var contents = new RepositoryContents();
+      if (input is Map) {
+        contents.isFile = true;
+        contents.isDirectory = false;
+        contents.file = File.fromJSON(github, input);
+      } else {
+        contents.isFile = false;
+        contents.isDirectory = true;
+        contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
+      }
+      return contents;
+    });
   }
   
   /**
