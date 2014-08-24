@@ -372,7 +372,33 @@ class GitHub {
     var url = repository != null ? "/repos/${repository.fullName}/notifications" : "/notifications";
     return getJSON(url, params: { "all": all, "participating": participating }, convert: (github, input) => copyOf(input.map((it) => Notification.fromJSON(github, it))));
   }
+  
+  /**
+   * Fetches repository subscription information.
+   */
+  Future<RepositorySubscription> subscription(RepositorySlug slug) {
+    return getJSON("/repos/${slug.fullName}/subscription", statusCode: 200, convert: RepositorySubscription.fromJSON);
+  }
+  
+  /**
+   * Fetches the Watchers of the specified repository.
+   */
+  Future<List<User>> watchers(RepositorySlug slug) {
+    return getJSON("/repos/${slug.fullName}/subscribers", statusCode: 200, convert: (GitHub github, input) {
+      return input.map((it) => User.fromJSON(github, it));
+    });
+  }
 
+  /**
+   * Fetches repositories that the current user is watching. If [user] is specified, it will get the watched repositories for that user.
+   */
+  Future<List<Repository>> watching({String user}) {
+    var path = user != null ? "/users/${user}/subscribers" : "/subscribers";
+    return getJSON(path, statusCode: 200, convert: (GitHub github, input) {
+      return input.map((it) => Repository.fromJSON(github, it));
+    });
+  }
+  
   /**
    * Handles Get Requests that respond with JSON
    * 
