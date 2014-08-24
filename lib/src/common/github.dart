@@ -395,6 +395,14 @@ class GitHub {
     return postJSON("/user/keys", body: request.toJSON());
   }
   
+  Stream<PublicKey> deployKeys(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/keys", PublicKey.fromJSON);
+  }
+  
+  Future<PublicKey> createDeployKey(RepositorySlug slug, CreatePublicKey request) {
+    return postJSON("/repos/${slug.fullName}/keys", body: request.toJSON());
+  }
+  
   /**
    * Search for Repositories using [query].
    * 
