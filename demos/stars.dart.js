@@ -9136,7 +9136,7 @@ var $$ = {};
     M.initGitHub();
     R.init("stars.dart", new G.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
-  loadOrganization: function() {
+  loadStars: function() {
     var url, params, user, repo, token, t1;
     url = window.location.href;
     if (J.getInterceptor$asx(url).contains$1(url, "?")) {
@@ -9152,16 +9152,16 @@ var $$ = {};
     t1 = $.GitHub_defaultClient.call$0();
     $.github = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
     J.insertAdjacentText$2$x(document.querySelector("#title"), "beforeend", " for " + H.S(user) + "/" + H.S(repo));
-    $.github.stargazersStreamed$1(new T.RepositorySlug(user, repo)).listen$1(new G.loadOrganization_closure()).onDone$1(new G.loadOrganization_closure0());
+    $.github.stargazersStreamed$1(new T.RepositorySlug(user, repo)).listen$1(new G.loadStars_closure()).onDone$1(new G.loadStars_closure0());
   },
   main_closure: {
     "^": "Closure:11;",
     call$0: function() {
       $.$$stars = document.querySelector("#stars");
-      G.loadOrganization();
+      G.loadStars();
     }
   },
-  loadOrganization_closure: {
+  loadStars_closure: {
     "^": "Closure:13;",
     call$1: function(stargazer) {
       var h, t1, e;
@@ -9189,7 +9189,7 @@ var $$ = {};
       $.$$stars.appendChild(h);
     }
   },
-  loadOrganization_closure0: {
+  loadStars_closure0: {
     "^": "Closure:11;",
     call$0: function() {
       J.insertAdjacentText$2$x(document.querySelector("#total"), "beforeend", C.JSInt_methods.toString$0(W._FrozenElementList$_wrap(document.querySelectorAll(".user"), null)._nodeList.length) + " stars");
