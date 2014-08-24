@@ -33,6 +33,10 @@ void loadUsers() {
       
       var h = new DivElement()..classes.add("middle");
       
+      for (int i = 1; i <= 2; i++) {
+        h.append(new BRElement());
+      }
+      
       h.append(new ImageElement(src: user.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
       var buff = new StringBuffer();
       
