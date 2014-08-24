@@ -26,14 +26,14 @@ class Gist {
 
   @ApiName("updated_at")
   DateTime updatedAt;
-  
+
   Map<String, dynamic> json;
 
   Gist(this.github);
 
   static Gist fromJSON(GitHub github, input) {
     if (input == null) return null;
-    
+
     var gist = new Gist(github)
         ..json = input
         ..description = input['description']
@@ -61,6 +61,8 @@ class Gist {
 
     return gist;
   }
+  
+  Future<List<GistComment>> comments() => github.gistComments(json['id']);
 }
 
 class GistFile {
@@ -111,6 +113,34 @@ class GistFork {
         ..id = input['id']
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at']);
+  }
+}
+
+class GistComment {
+  final GitHub github;
+
+  int id;
+  User user;
+
+  @ApiName("created_at")
+  DateTime createdAt;
+
+  @ApiName("updated_at")
+  DateTime updatedAt;
+
+  String body;
+
+  GistComment(this.github);
+
+  static GistComment fromJSON(GitHub github, input) {
+    if (input == null) return null;
+
+    return new GistComment(github)
+        ..id = input['id']
+        ..user = User.fromJSON(github, input['user'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..body = input['body'];
   }
 }
 

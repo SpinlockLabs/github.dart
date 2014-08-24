@@ -174,6 +174,12 @@ class GitHub {
     return group.future;
   }
   
+  Future<List<GistComment>> gistComments(String id) {
+    return getJSON("/gists/${id}/comments", convert: (github, input) {
+      return input.map((it) => GistComment.fromJSON(github, it));
+    });
+  }
+  
   /**
    * Renders Markdown from the [input].
    * 
