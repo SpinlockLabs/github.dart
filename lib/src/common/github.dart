@@ -413,7 +413,7 @@ class GitHub {
     }
     
     return new PaginationHelper(this).fetch("GET", "/search/repositories", params: params, pages: pages).then((responses) {
-      var repos = [];
+      List<Repository> repos = [];
       var isFirst = true;
       for (var response in responses) {
         
@@ -432,6 +432,9 @@ class GitHub {
         
         repos.addAll(items.map((item) => Repository.fromJSON(this, item)));
       }
+      
+      repos.sort((a, b) => b.json['score'].compareTo(a.json['score']));
+      
       return repos;
     });
   }
