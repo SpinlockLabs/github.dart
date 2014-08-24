@@ -202,6 +202,35 @@ class GitHub {
   Future<GitignoreTemplate> gitignoreTemplate(String name) {
     return getJSON("/gitignore/templates/${name}", convert: GitignoreTemplate.fromJSON);
   }
+  
+  /**
+   * Fetches all the public repositories on GitHub.
+   * 
+   * If [limit] is not null, it is used to specify the amount of repositories to fetch.
+   * 
+   * If [limit] is null, it will fetch ALL the repositories on GitHub.
+   */
+  Stream<Repository> publicRepositories({int limit: 50, DateTime since}) {
+    var params = {};
+    
+    if (since != null) {
+      params['since'] = since.toIso8601String();
+    }
+    
+    var pages = limit != null ? (limit / 30).ceil() : null;
+    
+    var controller = new StreamController.broadcast();
+    
+    new PaginationHelper(this)
+      .fetchStreamed("GET", "/repositories", pages: pages, params: params)
+      .listen((http.Response response) {
+      var list = JSON.decode(response.body);
+      var repos = new List.from(list.map((it) => Repository.fromJSON(this, it)));
+      for (var repo in repos) controller.add(repo);
+    });
+    
+    return controller.stream.take(limit);
+  }
 
   /**
    * Fetches the team members of a specified team.
