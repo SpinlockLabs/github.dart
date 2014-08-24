@@ -190,16 +190,12 @@ class Repository {
    * 
    * [limit] is the number of issues to get
    */
-  Stream<Issue> issues() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/issues", Issue.fromJSON);
-  }
+  Stream<Issue> issues() => github.issues(slug());
 
   /**
    * Gets the Repository Commits
    */
-  Stream<Commit> commits() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/commits", Commit.fromJSON);
-  }
+  Stream<Commit> commits() => github.commits(slug());
 
   /**
    * Gets Repository Contributor Statistics
@@ -229,9 +225,7 @@ class Repository {
   /**
    * Gets the Repository Forks
    */
-  Stream<Repository> forks() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/forks", Repository.fromJSON);
-  }
+  Stream<Repository> forks() => github.forks(slug());
 
   /**
    * Gets the Repository Pull Requests

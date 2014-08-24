@@ -7253,13 +7253,16 @@ var $$ = {};
     "^": "Converter;",
     convert$1: function(string) {
       var t1, t2, encoder;
-      t1 = string.length;
-      t2 = Array(t1 * 3);
+      t1 = J.getInterceptor$asx(string);
+      t2 = J.$mul$ns(t1.get$length(string), 3);
+      if (typeof t2 !== "number")
+        return H.iae(t2);
+      t2 = Array(t2);
       t2.fixed$length = init;
       t2 = H.setRuntimeTypeInfo(t2, [P.$int]);
       encoder = new P._Utf8Encoder(0, 0, t2);
-      if (encoder._fillBuffer$3(string, 0, t1) !== t1)
-        encoder._writeSurrogate$2(C.JSString_methods.codeUnitAt$1(string, t1 - 1), 0);
+      if (encoder._fillBuffer$3(string, 0, t1.get$length(string)) !== t1.get$length(string))
+        encoder._writeSurrogate$2(t1.codeUnitAt$1(string, J.$sub$n(t1.get$length(string), 1)), 0);
       return C.JSArray_methods.sublist$2(t2, 0, encoder._bufferIndex);
     }
   },
@@ -7313,12 +7316,16 @@ var $$ = {};
     },
     _fillBuffer$3: function(str, start, end) {
       var t1, t2, t3, stringIndex, codeUnit, t4, stringIndex0, t5;
-      if (start !== end && (C.JSString_methods.codeUnitAt$1(str, end - 1) & 64512) === 55296)
-        --end;
-      for (t1 = this._buffer, t2 = t1.length, t3 = str.length, stringIndex = start; stringIndex < end; ++stringIndex) {
-        if (stringIndex >= t3)
-          H.throwExpression(P.RangeError$value(stringIndex));
-        codeUnit = str.charCodeAt(stringIndex);
+      if (start !== end && (J.codeUnitAt$1$s(str, J.$sub$n(end, 1)) & 64512) === 55296)
+        end = J.$sub$n(end, 1);
+      if (typeof end !== "number")
+        return H.iae(end);
+      t1 = this._buffer;
+      t2 = t1.length;
+      t3 = J.getInterceptor$s(str);
+      stringIndex = start;
+      for (; stringIndex < end; ++stringIndex) {
+        codeUnit = t3.codeUnitAt$1(str, stringIndex);
         if (codeUnit <= 127) {
           t4 = this._bufferIndex;
           if (t4 >= t2)
@@ -7329,7 +7336,7 @@ var $$ = {};
           if (this._bufferIndex + 3 >= t2)
             break;
           stringIndex0 = stringIndex + 1;
-          if (stringIndex0 >= t3)
+          if (stringIndex0 >= str.length)
             H.throwExpression(P.RangeError$value(stringIndex0));
           if (this._writeSurrogate$2(codeUnit, str.charCodeAt(stringIndex0)))
             stringIndex = stringIndex0;
@@ -9604,41 +9611,46 @@ var $$ = {};
   },
   PaginationHelper: {
     "^": "Object;github,responses,completer",
-    fetchStreamed$6$body$headers$pages$params: function(method, path, body, headers, pages, params) {
+    fetchStreamed$8$body$headers$pages$params$reverse$start: function(method, path, body, headers, pages, params, reverse, start) {
       var t1, controller, t2;
       t1 = {};
       controller = H.setRuntimeTypeInfo(new P._AsyncBroadcastStreamController(null, null, 0, null, null, null, null), [null]);
       controller._previous = controller;
       controller._next = controller;
-      t2 = new T.PaginationHelper_fetchStreamed_actualFetch(this, method, headers, params, body);
+      t2 = new T.PaginationHelper_fetchStreamed_actualFetch(this, method, start, headers, params, body);
       t1.count_0 = 0;
       t1.handleResponse_1 = null;
-      t1.handleResponse_1 = new T.PaginationHelper_fetchStreamed_closure(t1, pages, controller, t2);
-      t2.call$1(path).then$1(t1.handleResponse_1);
+      t1.handleResponse_1 = new T.PaginationHelper_fetchStreamed_closure(t1, pages, reverse, controller, t2);
+      t2.call$2(path, true).then$1(new T.PaginationHelper_fetchStreamed_closure0(t1, reverse, controller, t2));
       return H.setRuntimeTypeInfo(new P._BroadcastStream(controller), [H.getTypeArgumentByIndex(controller, 0)]);
     },
-    objects$7$body$headers$pages$params: function(method, path, converter, body, headers, pages, params) {
+    objects$9$body$headers$pages$params$reverse$start: function(method, path, converter, body, headers, pages, params, reverse, start) {
       var controller = P.StreamController_StreamController(null, null, null, null, false, null);
-      this.fetchStreamed$6$body$headers$pages$params(method, path, body, headers, pages, params).listen$1(new T.PaginationHelper_objects_closure(this, converter, controller)).onDone$1(new T.PaginationHelper_objects_closure0(controller));
+      this.fetchStreamed$8$body$headers$pages$params$reverse$start(method, path, body, headers, pages, params, reverse, start).listen$1(new T.PaginationHelper_objects_closure(this, converter, controller)).onDone$1(new T.PaginationHelper_objects_closure0(controller));
       return H.setRuntimeTypeInfo(new P._ControllerStream(controller), [null]);
     },
     objects$4$params: function(method, path, converter, params) {
-      return this.objects$7$body$headers$pages$params(method, path, converter, null, null, null, params);
+      return this.objects$9$body$headers$pages$params$reverse$start(method, path, converter, null, null, null, params, false, null);
     }
   },
   PaginationHelper_fetchStreamed_actualFetch: {
-    "^": "Closure:30;this_1,method_2,headers_3,params_4,body_5",
+    "^": "Closure:30;this_1,method_2,start_3,headers_4,params_5,body_6",
+    call$2: function(realPath, first) {
+      if (first)
+        ;
+      return this.this_1.github.request$5$body$headers$params(0, this.method_2, realPath, this.body_6, this.headers_4, this.params_5);
+    },
     call$1: function(realPath) {
-      return this.this_1.github.request$5$body$headers$params(0, this.method_2, realPath, this.body_5, this.headers_3, this.params_4);
+      return this.call$2(realPath, false);
     }
   },
   PaginationHelper_fetchStreamed_closure: {
-    "^": "Closure:31;box_0,pages_6,controller_7,actualFetch_8",
+    "^": "Closure:31;box_0,pages_7,reverse_8,controller_9,actualFetch_10",
     call$1: function(response) {
-      var t1, t2, t3, info;
+      var t1, t2, t3, info, nextUrl;
       t1 = this.box_0;
       ++t1.count_0;
-      t2 = this.controller_7;
+      t2 = this.controller_9;
       if (t2._state >= 4)
         H.throwExpression(t2._addEventError$0());
       t2._sendData$1(response);
@@ -9648,11 +9660,29 @@ var $$ = {};
         return;
       }
       info = M.parseLinkHeader(J.$index$asx(t3.get$headers(response), "link"));
-      if (!info.containsKey$1("next")) {
+      t3 = this.reverse_8;
+      if (!info.containsKey$1(t3 ? "prev" : "next")) {
         t2.close$0(0);
         return;
       }
-      this.actualFetch_8.call$1(info.$index(0, "next")).then$1(t1.handleResponse_1);
+      nextUrl = t3 ? info.$index(0, "prev") : info.$index(0, "next");
+      this.actualFetch_10.call$1(nextUrl).then$1(t1.handleResponse_1);
+    }
+  },
+  PaginationHelper_fetchStreamed_closure0: {
+    "^": "Closure:16;box_0,reverse_11,controller_12,actualFetch_13",
+    call$1: function(response) {
+      var t1, info;
+      t1 = this.box_0;
+      if (t1.count_0 === 0 && this.reverse_11) {
+        info = M.parseLinkHeader(J.$index$asx(J.get$headers$x(response), "link"));
+        if (!info.containsKey$1("last")) {
+          this.controller_12.close$0(0);
+          return;
+        }
+        this.actualFetch_13.call$2(info.$index(0, "last"), true);
+      } else
+        t1.handleResponse_1.call$1(response);
     }
   },
   PaginationHelper_objects_closure: {
@@ -10494,6 +10524,9 @@ J._replaceChild$2$x = function(receiver, a0, a1) {
 J.addEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).addEventListener$3(receiver, a0, a1, a2);
 };
+J.codeUnitAt$1$s = function(receiver, a0) {
+  return J.getInterceptor$s(receiver).codeUnitAt$1(receiver, a0);
+};
 J.compareTo$1$ns = function(receiver, a0) {
   return J.getInterceptor$ns(receiver).compareTo$1(receiver, a0);
 };
@@ -10523,6 +10556,9 @@ J.get$error$x = function(receiver) {
 };
 J.get$hashCode$ = function(receiver) {
   return J.getInterceptor(receiver).get$hashCode(receiver);
+};
+J.get$headers$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$headers(receiver);
 };
 J.get$isEmpty$asx = function(receiver) {
   return J.getInterceptor$asx(receiver).get$isEmpty(receiver);
@@ -10926,7 +10962,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "double__String", ret: P.$double, args: [P.String]},
 {func: "String__int", ret: P.String, args: [P.$int]},
 {func: "void__Node", void: true, args: [W.Node]},
-{func: "Future__String", ret: [P.Future, T.Response], args: [P.String]},
+{func: "Future__String__bool", ret: [P.Future, T.Response], args: [P.String], opt: [P.bool]},
 {func: "dynamic__Response", args: [T.Response]},
 {func: "dynamic__int", args: [P.$int]},
 {func: "dynamic__int_dynamic", args: [P.$int, null]},

@@ -65,21 +65,27 @@ class GitHub {
       request("GET", "/users/${name}").then((resp) => resp.statusCode == 200);
 
   /**
-   * Fetches the users specified by [name].
+   * Fetches the users specified by [names].
+   * 
+   * If [names] is null, it will fetch all the users.
    */
-  Stream<User> users(List<String> names) {
-    var controller = new StreamController();
-    
-    for (var i = 0; i < names.length; i++) {
-      user(names[i]).then((user) {
-        controller.add(user);
-        if (i == names.length - 1) {
-          controller.close();      
-        }
-      });
+  Stream<User> users({List<String> names, int pages}) {
+    if (names != null) {
+      var controller = new StreamController();
+      
+      for (var i = 0; i < names.length; i++) {
+        user(names[i]).then((user) {
+          controller.add(user);
+          if (i == names.length - 1) {
+            controller.close();
+          }
+        });
+      }
+      
+      return controller.stream;
     }
     
-    return controller.stream;
+    return new PaginationHelper(this).objects("GET", "/users", User.fromJSON, pages: pages);
   }
 
   /**
@@ -239,6 +245,10 @@ class GitHub {
     return new PaginationHelper(this).objects("GET", "/teams/${id}/members", TeamMember.fromJSON);
   }
   
+  Stream<Commit> commits(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/commits", Commit.fromJSON);
+  }
+  
   /**
    * Gets a Repositories Releases.
    * 
@@ -267,6 +277,14 @@ class GitHub {
       return RateLimit.fromHeaders(response.headers);
     });
   }
+  
+  Stream<Repository> forks(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/forks", Repository.fromJSON);
+  }
+  
+  Stream<Hook> hooks(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/hooks", (gh, input) => Hook.fromJSON(gh, slug.fullName, input));
+  }
 
   /**
    * Gets the Currently Authenticated User
@@ -288,7 +306,20 @@ class GitHub {
    */
   Stream<Gist> userGists(String username) {
     return new PaginationHelper(this).objects("GET", "/users/${username}/gists", Gist.fromJSON);
-
+  }
+  
+  /**
+   * Fetches Issues for a Repository
+   */
+  Stream<Issue> issues(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/issues", Issue.fromJSON);
+  }
+  
+  /**
+   * Fetches emails for the currently authenticated user
+   */
+  Stream<UserEmail> emails() {
+    return new PaginationHelper(this).objects("GET", "/user/emails", UserEmail.fromJSON);
   }
   
   /**
@@ -384,6 +415,23 @@ class GitHub {
    */
   Future<RepositorySubscription> subscription(RepositorySlug slug) {
     return getJSON("/repos/${slug.fullName}/subscription", statusCode: 200, convert: RepositorySubscription.fromJSON);
+  }
+  
+  Stream<PublicKey> publicKeys([String user]) {
+    var path = user == null ? "/user/keys" : "/users/${user}/keys";
+    return new PaginationHelper(this).objects("GET", path, PublicKey.fromJSON);
+  }
+  
+  Future<PublicKey> createPublicKey(CreatePublicKey request) {
+    return postJSON("/user/keys", body: request.toJSON());
+  }
+  
+  Stream<PublicKey> deployKeys(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/keys", PublicKey.fromJSON);
+  }
+  
+  Future<PublicKey> createDeployKey(RepositorySlug slug, CreatePublicKey request) {
+    return postJSON("/repos/${slug.fullName}/keys", body: request.toJSON());
   }
   
   /**
@@ -622,5 +670,9 @@ class GitHub {
     }
 
     return client.request(new http.Request(url.toString(), method: method, headers: headers, body: body));
+  }
+  
+  Stream<Issue> currentUserIssues() {
+    return new PaginationHelper(this).objects("GET", "/issues", Issue.fromJSON);
   }
 }
