@@ -51,11 +51,18 @@ class PaginationHelper<T> {
     return completer.future;
   }
   
-  Stream<http.Response> fetchStreamed(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+  Stream<http.Response> fetchStreamed(String method, String path, {int pages, bool reverse: false, int start, Map<String, String> headers, Map<String, dynamic> params, String body}) {
     var controller = new StreamController.broadcast();
     
-    Future<http.Response> actualFetch(String realPath) {
-      return github.request(method, realPath, headers: headers, params: params, body: body);
+    Future<http.Response> actualFetch(String realPath, [bool first = false]) {
+      var p = params;
+      
+      if (first && start != null) {
+        p = new Map.from(params);
+        p['page'] = start;
+      }
+      
+      return github.request(method, realPath, headers: headers, params: p, body: body);
     }
     
     var count = 0;
@@ -72,7 +79,7 @@ class PaginationHelper<T> {
       
       var info = parseLinkHeader(response.headers['link']);
       
-      if (!info.containsKey("next")) {
+      if (!info.containsKey(reverse ? "prev" : "next")) {
         controller.close();
         return;
       }
@@ -82,19 +89,30 @@ class PaginationHelper<T> {
         return;
       }
       
-      var nextUrl = info['next'];
+      var nextUrl = reverse ? info['prev'] : info['next'];
       
       actualFetch(nextUrl).then(handleResponse);
     };
     
-    actualFetch(path).then(handleResponse);
+    actualFetch(path, true).then((response) {
+      if (count == 0 && reverse) {
+        var info = parseLinkHeader(response.headers['link']);
+        if (!info.containsKey("last")) {
+          controller.close();
+          return;
+        }
+        actualFetch(info['last'], true);
+      } else {
+        handleResponse(response);
+      }
+    });
     
     return controller.stream;
   }
   
-  Stream<T> objects(String method, String path, JSONConverter converter, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+  Stream<T> objects(String method, String path, JSONConverter converter, {int pages, bool reverse: false, int start, Map<String, String> headers, Map<String, dynamic> params, String body}) {
     var controller = new StreamController();
-    fetchStreamed(method, path, pages: pages, headers: headers, params: params, body: body).listen((response) {
+    fetchStreamed(method, path, pages: pages, start: start, reverse: reverse, headers: headers, params: params, body: body).listen((response) {
       var json = JSON.decode(response.body);
       for (var item in json) {
         controller.add(converter(github, item));

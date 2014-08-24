@@ -1,0 +1,45 @@
+.header {
+  display: block;
+}
+
+.line {
+  border-top: 1px;
+  border-style: solid;
+}
+
+.box {
+  border: 2px solid;
+  word-wrap: break-word;
+}
+
+.user {
+  display: inline-block;
+  margin-top: 30px;
+  width: 512px;
+  height: 256px;
+}
+
+.column {
+  width: 50%;
+  display: inline-block;
+}
+
+.center {
+  text-align: center;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.middle {
+  vertical-align: middle;
+}
+
+.avatar {
+  margin-top: 5px;
+}

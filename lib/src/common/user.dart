@@ -111,6 +111,12 @@ class User {
 
   static User fromJSON(GitHub github, input) {
     if (input == null) return null;
+    
+    if (input['avatar_url'] == null) {
+      print(input);
+      return null;
+    }
+    
     return new User(github)
         ..login = input['login']
         ..id = input['id']

@@ -65,21 +65,27 @@ class GitHub {
       request("GET", "/users/${name}").then((resp) => resp.statusCode == 200);
 
   /**
-   * Fetches the users specified by [name].
+   * Fetches the users specified by [names].
+   * 
+   * If [names] is null, it will fetch all the users.
    */
-  Stream<User> users(List<String> names) {
-    var controller = new StreamController();
-    
-    for (var i = 0; i < names.length; i++) {
-      user(names[i]).then((user) {
-        controller.add(user);
-        if (i == names.length - 1) {
-          controller.close();      
-        }
-      });
+  Stream<User> users({List<String> names, int pages}) {
+    if (names != null) {
+      var controller = new StreamController();
+      
+      for (var i = 0; i < names.length; i++) {
+        user(names[i]).then((user) {
+          controller.add(user);
+          if (i == names.length - 1) {
+            controller.close();
+          }
+        });
+      }
+      
+      return controller.stream;
     }
     
-    return controller.stream;
+    return new PaginationHelper(this).objects("GET", "/users", User.fromJSON, pages: pages);
   }
 
   /**
