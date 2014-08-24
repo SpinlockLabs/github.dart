@@ -516,7 +516,7 @@ class GitHub {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
-    }, convert: File.fromJSON);
+    }, convert: (gh, input) => File.fromJSON(gh, input, slug));
   }
   
   /**
