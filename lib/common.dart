@@ -4,6 +4,9 @@ import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
+import "package:html5lib/parser.dart" as htmlParser;
+import "package:html5lib/dom.dart" as html;
+
 import 'http.dart' as http;
 
 import 'src/common/util.dart';
@@ -29,3 +32,4 @@ part 'src/common/errors.dart';
 part 'src/common/gists.dart';
 part 'src/common/notifications.dart';
 part 'src/common/watchers.dart';
+part 'src/common/trending.dart';
