@@ -306,6 +306,10 @@ class Repository {
   Future<PullRequest> createPullRequest(CreateReleaseRequest request) {
     return github.postJSON("/repos/${fullName}/pulls", convert: PullRequest.fromJSON, body: request.toJSON());
   }
+  
+  Future<Commit> merge(CreateMerge request) {
+    return github.postJSON("/repos/${fullName}/merges", body: request.toJSON(), convert: Commit.fromJSON, statusCode: 201);
+  }
 }
 
 /**
@@ -551,6 +555,24 @@ class CreateFork {
   String toJSON() {
     var map = {};
     putValue("organization", organization, map);
+    return JSON.encode(map);
+  }
+}
+
+class CreateMerge {
+  final String base;
+  final String head;
+  
+  @ApiName("commit_message")
+  String commitMessage;
+  
+  CreateMerge(this.base, this.head);
+  
+  String toJSON() {
+    var map = {};
+    putValue("base", base, map);
+    putValue("head", head, map);
+    putValue("commit_message", commitMessage, map);
     return JSON.encode(map);
   }
 }
