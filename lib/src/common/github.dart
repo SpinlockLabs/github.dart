@@ -447,6 +447,15 @@ class GitHub {
       return input.map((it) => User.fromJSON(github, it));
     });
   }
+  
+  /**
+   * Fetches all emojis available on GitHub
+   * 
+   * Returns a map of the name to a url of the image.
+   */
+  Future<Map<String, String>> emojis() {
+    return getJSON("/emojis", statusCode: 200);
+  }
 
   /**
    * Fetches repositories that the current user is watching. If [user] is specified, it will get the watched repositories for that user.
