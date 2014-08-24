@@ -519,6 +519,22 @@ class GitHub {
     }, convert: (gh, input) => File.fromJSON(gh, input, slug));
   }
   
+  Future<RepositoryContents> contents(RepositorySlug slug, String path) {
+    return getJSON("/repos/${slug.fullName}/contents/${path}", convert: (github, input) {
+      var contents = new RepositoryContents();
+      if (input is Map) {
+        contents.isFile = true;
+        contents.isDirectory = false;
+        contents.file = File.fromJSON(github, input);
+      } else {
+        contents.isFile = false;
+        contents.isDirectory = true;
+        contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
+      }
+      return contents;
+    });
+  }
+  
   /**
    * Gets the GitHub API Status.
    */

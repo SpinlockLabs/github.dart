@@ -139,3 +139,11 @@ class FileLinks {
     return fileLinks;
   }
 }
+
+class RepositoryContents {
+  bool isFile;
+  bool isDirectory;
+  
+  File file;
+  List<File> tree;
+}
