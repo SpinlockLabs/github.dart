@@ -402,6 +402,41 @@ class GitHub {
   }
   
   /**
+   * Search for Repositories using [query].
+   * 
+   * Since the Search Rate Limit is small, this is a best effort implementation.
+   */
+  Future<List<Repository>> searchRepositories(String query, {String sort, int pages: 2}) {
+    var params = { "q": query };
+    if (sort != null) {
+      params["sort"] = sort;
+    }
+    
+    return new PaginationHelper(this).fetch("GET", "/search/repositories", params: params, pages: pages).then((responses) {
+      var repos = [];
+      var isFirst = true;
+      for (var response in responses) {
+        
+        if (response.statusCode == 403 && response.body.contains("rate limit")) {
+          if (isFirst) {
+            throw new RateLimitHit(this);
+          } else {
+            continue;
+          }
+        }
+        
+        isFirst = false;
+        
+        var input = JSON.decode(response.body);
+        List<dynamic> items = input['items'];
+        
+        repos.addAll(items.map((item) => Repository.fromJSON(this, item)));
+      }
+      return repos;
+    });
+  }
+  
+  /**
    * Fetches the Watchers of the specified repository.
    */
   Future<List<User>> watchers(RepositorySlug slug) {

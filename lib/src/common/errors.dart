@@ -57,6 +57,14 @@ class AccessForbidden extends GitHubError {
   AccessForbidden(GitHub github) : super(github, "Access Forbbidden");
 }
 
+
+/**
+ * Client hit the rate limit.
+ */
+class RateLimitHit extends GitHubError {
+  RateLimitHit(GitHub github) : super(github, "Rate Limit Hit");
+}
+
 /**
  * An Unknown Error
  */
