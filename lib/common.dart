@@ -38,3 +38,4 @@ part 'src/common/watchers.dart';
 part 'src/common/trending.dart';
 part 'src/common/pagination.dart';
 part 'src/common/search.dart';
+part 'src/common/events.dart';
