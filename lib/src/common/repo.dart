@@ -145,9 +145,10 @@ class Repository {
 
   Repository(this.github);
 
-  static Repository fromJSON(GitHub github, input) {
+  static Repository fromJSON(GitHub github, input, [Repository instance]) {
     if (input == null) return null;
-    return new Repository(github)
+    if (instance == null) instance = new Repository(github);
+    return instance
         ..name = input['name']
         ..id = input['id']
         ..fullName = input['full_name']
