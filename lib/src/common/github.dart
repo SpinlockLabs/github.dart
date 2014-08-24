@@ -357,6 +357,21 @@ class GitHub {
       return null;
     });
   }
+  
+  /**
+   * Fetches a Single Notification
+   */
+  Future<Notification> notification(String id) {
+    return getJSON("/notification/threads/${id}", statusCode: 200, convert: Notification.fromJSON);
+  }
+  
+  /**
+   * Fetches notifications for the current user. If [repository] is specified, it fetches notifications for that repository.
+   */
+  Future<List<Notification>> notifications({RepositorySlug repository, bool all: false, bool participating: false}) {
+    var url = repository != null ? "/repos/${repository.fullName}/notifications" : "/notifications";
+    return getJSON(url, params: { "all": all, "participating": participating }, convert: (github, input) => copyOf(input.map((it) => Notification.fromJSON(github, it))));
+  }
 
   /**
    * Handles Get Requests that respond with JSON

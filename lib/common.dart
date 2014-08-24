@@ -27,3 +27,4 @@ part 'src/common/contents.dart';
 part 'src/common/releases.dart';
 part 'src/common/errors.dart';
 part 'src/common/gists.dart';
+part 'src/common/notifications.dart';
