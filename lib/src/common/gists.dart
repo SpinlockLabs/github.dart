@@ -63,6 +63,10 @@ class Gist {
   }
   
   Future<List<GistComment>> comments() => github.gistComments(json['id']);
+  
+  Future<GistComment> comment(CreateGistComment request) {
+    return github.postJSON("/gists/${json['id']}/comments", body: request.toJSON(), convert: GistComment.fromJSON);
+  }
 }
 
 class GistFile {
@@ -141,6 +145,18 @@ class GistComment {
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at'])
         ..body = input['body'];
+  }
+}
+
+class CreateGistComment {
+  final String body;
+  
+  CreateGistComment(this.body);
+  
+  String toJSON() {
+    var map = {};
+    map['body'] = body;
+    return JSON.encode(map);
   }
 }
 
