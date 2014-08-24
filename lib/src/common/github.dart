@@ -2,6 +2,16 @@ part of github.common;
 
 typedef http.Client ClientCreator();
 
+String __timezoneName;
+
+String get _timezoneName {
+  if (__timezoneName == null) {
+    __timezoneName = new DateTime.now().timeZoneName;
+  }
+  
+  return __timezoneName;
+}
+
 /**
  * The Main GitHub Client
  * 

@@ -20,7 +20,7 @@ void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
   initGitHub();
-  github = new GitHub();
+  github = new GitHub(auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
 
   $repos = querySelector("#repos");
 
