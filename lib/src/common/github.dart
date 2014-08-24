@@ -386,6 +386,15 @@ class GitHub {
     return getJSON("/repos/${slug.fullName}/subscription", statusCode: 200, convert: RepositorySubscription.fromJSON);
   }
   
+  Stream<PublicKey> publicKeys([String user]) {
+    var path = user == null ? "/user/keys" : "/users/${user}/keys";
+    return new PaginationHelper(this).objects("GET", path, PublicKey.fromJSON);
+  }
+  
+  Future<PublicKey> createPublicKey(CreatePublicKey request) {
+    return postJSON("/user/keys", body: request.toJSON());
+  }
+  
   /**
    * Search for Repositories using [query].
    * 
