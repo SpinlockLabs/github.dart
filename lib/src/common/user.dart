@@ -149,12 +149,12 @@ class UserPlan {
    * Plan Name
    */
   String name;
-  
+
   /**
    * Plan Space
    */
   int space;
-  
+
   /**
    * Number of Private Repositories
    */
@@ -245,7 +245,26 @@ class CurrentUser extends User {
   /**
    * Gets the User's Issues
    */
-  Future<List<Issue>> issues() => github.getJSON("/issues").then((json) {
-    return json.map((it) => Issue.fromJSON(github, it));
-  });
+  Stream<Issue> issues() {
+    return github.currentUserIssues();
+  }
+}
+
+class UserEmail {
+  final GitHub github;
+
+  String email;
+  bool verified;
+  bool primary;
+
+  UserEmail(this.github);
+
+  static UserEmail fromJSON(GitHub github, input) {
+    if (input == null) return null;
+
+    return new UserEmail(github)
+        ..email = input['email']
+        ..primary = input['primary']
+        ..verified = input['verified'];
+  }
 }

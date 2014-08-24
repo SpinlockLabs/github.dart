@@ -239,6 +239,10 @@ class GitHub {
     return new PaginationHelper(this).objects("GET", "/teams/${id}/members", TeamMember.fromJSON);
   }
   
+  Stream<Commit> commits(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/commits", Commit.fromJSON);
+  }
+  
   /**
    * Gets a Repositories Releases.
    * 
@@ -267,6 +271,14 @@ class GitHub {
       return RateLimit.fromHeaders(response.headers);
     });
   }
+  
+  Stream<Repository> forks(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/forks", Repository.fromJSON);
+  }
+  
+  Stream<Hook> hooks(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/hooks", (gh, input) => Hook.fromJSON(gh, slug.fullName, input));
+  }
 
   /**
    * Gets the Currently Authenticated User
@@ -288,7 +300,20 @@ class GitHub {
    */
   Stream<Gist> userGists(String username) {
     return new PaginationHelper(this).objects("GET", "/users/${username}/gists", Gist.fromJSON);
-
+  }
+  
+  /**
+   * Fetches Issues for a Repository
+   */
+  Stream<Issue> issues(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/issues", Issue.fromJSON);
+  }
+  
+  /**
+   * Fetches emails for the currently authenticated user
+   */
+  Stream<UserEmail> emails() {
+    return new PaginationHelper(this).objects("GET", "/user/emails", UserEmail.fromJSON);
   }
   
   /**
@@ -639,5 +664,9 @@ class GitHub {
     }
 
     return client.request(new http.Request(url.toString(), method: method, headers: headers, body: body));
+  }
+  
+  Stream<Issue> currentUserIssues() {
+    return new PaginationHelper(this).objects("GET", "/issues", Issue.fromJSON);
   }
 }
