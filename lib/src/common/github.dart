@@ -493,6 +493,9 @@ class GitHub {
     }, convert: (gh, input) => File.fromJSON(gh, input, slug));
   }
   
+  /**
+   * Fetches content in a repository at the specified [path].
+   */
   Future<RepositoryContents> contents(RepositorySlug slug, String path) {
     return getJSON("/repos/${slug.fullName}/contents/${path}", convert: (github, input) {
       var contents = new RepositoryContents();
