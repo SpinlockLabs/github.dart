@@ -310,6 +310,53 @@ class GitHub {
       return copyOf(input.map((it) => Gist.fromJSON(github, it)));
     });
   }
+  
+  /**
+   * Fetches the Stargazers for a Repository
+   * 
+   * [slug] is a repository slug.
+   */
+  Future<List<User>> stargazers(RepositorySlug slug) {
+    return getJSON("/repos/${slug.fullName}/stargazers", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => User.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Fetches the repositories that [user] has starred.
+   */
+  Future<List<Repository>> starred(String user) {
+    return getJSON("/users/${user}/starred", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
+      return copyOf(input.map((it) => Repository.fromJSON(github, it)));
+    });
+  }
+  
+  /**
+   * Checks if the currently authenticated user has starred the specified repository.
+   */
+  Future<bool> hasStarred(RepositorySlug slug) {
+    return request("GET", "/user/starred/${slug.fullName}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  /**
+   * Stars the specified repository for the currently authenticated user.
+   */
+  Future star(RepositorySlug slug) {
+    return request("PUT", "/user/starred/${slug.fullName}", headers: { "Content-Length": 0 }).then((response) {
+      return null;
+    });
+  }
+  
+  /**
+   * Unstars the specified repository for the currently authenticated user.
+   */
+  Future unstar(RepositorySlug slug) {
+    return request("DELETE", "/user/starred/${slug.fullName}", headers: { "Content-Length": 0 }).then((response) {
+      return null;
+    });
+  }
 
   /**
    * Handles Get Requests that respond with JSON
