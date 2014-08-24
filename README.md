@@ -6,7 +6,7 @@ Please submit issues and pull requests, join my IRC channel (#directcode on irc.
 
 ## Links
 
-- [Library Demos](http://github4dart.directcode.org/demos/)
+- [Library Demos](http://github.directcode.org/demos/)
 - [Pub Package](https://pub.dartlang.org/packages/github)
 
 ## Features
