@@ -76,6 +76,8 @@ class File {
    */
   RepositorySlug sourceRepository;
   
+  Map<String, dynamic> json;
+  
   File(this.github);
 
   static File fromJSON(GitHub github, input, [RepositorySlug slug]) {
@@ -91,20 +93,17 @@ class File {
         ..gitUrl = input['git_url']
         ..url = input['html_url']
         ..links = FileLinks.fromJSON(input['_links'])
-        ..sourceRepository = slug;
+        ..sourceRepository = slug
+        ..json = input;
   }
   
   /**
    * Renders this file as markdown.
    */
-  Future<String> renderMarkdown([RepositorySlug context]) {
-    if (sourceRepository != null) context = sourceRepository;
-    
-    if (context != null) {
-      return github.renderMarkdown(text, mode: "gfm", context: context.fullName);
-    } else {
-      return github.renderMarkdown(text);
-    }
+  Future<String> renderMarkdown() {
+    return github.request("GET", json['url'], headers: { "Accept": "application/vnd.github.v3.html" }).then((response) {
+      return response.body;
+    });
   }
 }
 

@@ -512,7 +512,9 @@ class GitHub {
    * Gets the readme file for a repository.
    */
   Future<File> readme(RepositorySlug slug) {
-    return getJSON("/repos/${slug.fullName}/readme", statusCode: 200, fail: (http.Response response) {
+    var headers = {};
+    
+    return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: 200, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
