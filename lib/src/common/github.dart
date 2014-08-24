@@ -317,8 +317,13 @@ class GitHub {
    * [slug] is a repository slug.
    */
   Future<List<User>> stargazers(RepositorySlug slug) {
-    return getJSON("/repos/${slug.fullName}/stargazers", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => User.fromJSON(github, it)));
+    return new PaginationHelper(this).fetch("GET", "/repos/${slug.fullName}/stargazers").then((responses) {
+      var users = [];
+      for (var response in responses) {
+        var json = JSON.decode(response.body);
+        users.addAll(json.map((it) => User.fromJSON(this, it)));
+      }
+      return users;
     });
   }
   
