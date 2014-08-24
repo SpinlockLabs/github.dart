@@ -35,7 +35,8 @@ class Repository {
   /**
    * If the Repository is a fork
    */
-  bool fork;
+  @ApiName("fork")
+  bool isFork;
   
   /**
    * Url to the GitHub Repository Page
@@ -150,7 +151,7 @@ class Repository {
         ..name = input['name']
         ..id = input['id']
         ..fullName = input['full_name']
-        ..fork = input['fork']
+        ..isFork = input['fork']
         ..url = input['html_url']
         ..description = input['description']
         ..cloneUrls = new CloneUrls()
@@ -262,6 +263,11 @@ class Repository {
     }).then((hooks) {
       return copyOf(hooks.map((it) => Hook.fromJSON(github, fullName, it)));
     });
+  }
+  
+  Future<Repository> fork([CreateFork request]) {
+    if (request == null) request = new CreateFork();
+    return github.postJSON("/repos/${fullName}/forks", body: request.toJSON(), convert: Repository.fromJSON);
   }
 
   /**
@@ -534,5 +540,17 @@ class LanguageBreakdown {
       buffer.writeln("${key}: ${value}");
     });
     return buffer.toString();
+  }
+}
+
+class CreateFork {
+  final String organization;
+  
+  CreateFork([this.organization]);
+  
+  String toJSON() {
+    var map = {};
+    putValue("organization", organization, map);
+    return JSON.encode(map);
   }
 }

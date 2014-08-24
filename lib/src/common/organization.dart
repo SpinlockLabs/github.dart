@@ -264,7 +264,7 @@ class TeamRepository extends Repository {
         ..name = input['name']
         ..id = input['id']
         ..fullName = input['full_name']
-        ..fork = input['fork']
+        ..isFork = input['fork']
         ..url = input['html_url']
         ..description = input['description']
         ..cloneUrls = new CloneUrls()
