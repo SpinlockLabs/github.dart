@@ -7422,7 +7422,7 @@ var $$ = {};
         t1.sha = t2.$index(input, "sha");
         t1.gitUrl = t2.$index(input, "git_url");
         t1.url = t2.$index(input, "html_url");
-        t1.links = T.FileLinks_fromJSON(t2.$index(input, "_links"));
+        t1.links = T.Links_fromJSON(t2.$index(input, "_links"));
         t1.sourceRepository = slug;
         t1.json = input;
         return t1;
@@ -7434,18 +7434,18 @@ var $$ = {};
       return J.get$body$x(response);
     }
   },
-  FileLinks: {
+  Links: {
     "^": "Object;git,self,html",
-    static: {FileLinks_fromJSON: function(input) {
-        var fileLinks, t1;
+    static: {Links_fromJSON: function(input) {
+        var links, t1;
         if (input == null)
           return;
-        fileLinks = new T.FileLinks(null, null, null);
+        links = new T.Links(null, null, null);
         t1 = J.getInterceptor$asx(input);
-        fileLinks.git = t1.$index(input, "git");
-        fileLinks.self = t1.$index(input, "self");
-        fileLinks.html = t1.$index(input, "html");
-        return fileLinks;
+        links.git = t1.$index(input, "git");
+        links.self = t1.$index(input, "self");
+        links.html = t1.$index(input, "html");
+        return links;
       }}
   },
   GitHubError: {

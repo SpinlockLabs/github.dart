@@ -9679,44 +9679,46 @@ var $$ = {};
   },
   Repository: {
     "^": "Object;github,name>,id,fullName,owner,$private,isFork,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt<,json",
-    static: {Repository_fromJSON: [function(github, input) {
-        var t1, t2, t3;
+    static: {Repository_fromJSON: [function(github, input, instance) {
+        var t1, t2;
         if (input == null)
           return;
-        t1 = new T.Repository(github, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        t2 = J.getInterceptor$asx(input);
-        t1.name = t2.$index(input, "name");
-        t1.id = t2.$index(input, "id");
-        t1.fullName = t2.$index(input, "full_name");
-        t1.isFork = t2.$index(input, "fork");
-        t1.url = t2.$index(input, "html_url");
-        t1.description = t2.$index(input, "description");
-        t3 = new T.CloneUrls(null, null, null, null);
-        t1.cloneUrls = t3;
-        t3.git = t2.$index(input, "git_url");
-        t3.ssh = t2.$index(input, "ssh_url");
-        t3.https = t2.$index(input, "clone_url");
-        t3.svn = t2.$index(input, "svn_url");
-        t1.homepage = t2.$index(input, "homepage");
-        t1.size = t2.$index(input, "size");
-        t1.stargazersCount = t2.$index(input, "stargazers_count");
-        t1.watchersCount = t2.$index(input, "watchers_count");
-        t1.language = t2.$index(input, "language");
-        t1.hasIssues = t2.$index(input, "has_issues");
-        t1.hasDownloads = t2.$index(input, "has_downloads");
-        t1.hasWiki = t2.$index(input, "has_wiki");
-        t1.defaultBranch = t2.$index(input, "default_branch");
-        t1.openIssuesCount = t2.$index(input, "open_issues_count");
-        t1.networkCount = t2.$index(input, "network_count");
-        t1.subscribersCount = t2.$index(input, "subscribers_count");
-        t1.forksCount = t2.$index(input, "forks_count");
-        t1.createdAt = M.parseDateTime(t2.$index(input, "created_at"));
-        t1.pushedAt = M.parseDateTime(t2.$index(input, "pushed_at"));
-        t1.$private = t2.$index(input, "private");
-        t1.json = input;
-        t1.owner = T.RepositoryOwner_fromJSON(t2.$index(input, "owner"));
-        return t1;
-      }, "call$2", "Repository_fromJSON$closure", 4, 0, 13]}
+        instance = new T.Repository(github, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        t1 = J.getInterceptor$asx(input);
+        instance.name = t1.$index(input, "name");
+        instance.id = t1.$index(input, "id");
+        instance.fullName = t1.$index(input, "full_name");
+        instance.isFork = t1.$index(input, "fork");
+        instance.url = t1.$index(input, "html_url");
+        instance.description = t1.$index(input, "description");
+        t2 = new T.CloneUrls(null, null, null, null);
+        instance.cloneUrls = t2;
+        t2.git = t1.$index(input, "git_url");
+        instance.cloneUrls.ssh = t1.$index(input, "ssh_url");
+        instance.cloneUrls.https = t1.$index(input, "clone_url");
+        instance.cloneUrls.svn = t1.$index(input, "svn_url");
+        instance.homepage = t1.$index(input, "homepage");
+        instance.size = t1.$index(input, "size");
+        instance.stargazersCount = t1.$index(input, "stargazers_count");
+        instance.watchersCount = t1.$index(input, "watchers_count");
+        instance.language = t1.$index(input, "language");
+        instance.hasIssues = t1.$index(input, "has_issues");
+        instance.hasDownloads = t1.$index(input, "has_downloads");
+        instance.hasWiki = t1.$index(input, "has_wiki");
+        instance.defaultBranch = t1.$index(input, "default_branch");
+        instance.openIssuesCount = t1.$index(input, "open_issues_count");
+        instance.networkCount = t1.$index(input, "network_count");
+        instance.subscribersCount = t1.$index(input, "subscribers_count");
+        instance.forksCount = t1.$index(input, "forks_count");
+        instance.createdAt = M.parseDateTime(t1.$index(input, "created_at"));
+        instance.pushedAt = M.parseDateTime(t1.$index(input, "pushed_at"));
+        instance.$private = t1.$index(input, "private");
+        instance.json = input;
+        instance.owner = T.RepositoryOwner_fromJSON(t1.$index(input, "owner"));
+        return instance;
+      }, function(github, input) {
+        return T.Repository_fromJSON(github, input, null);
+      }, null, "call$3", "call$2", "Repository_fromJSON$closure", 4, 2, 13, 6]}
   },
   CloneUrls: {
     "^": "Object;git,ssh,https,svn"
@@ -10908,7 +10910,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "bool__Object_Object", ret: P.bool, args: [P.Object, P.Object]},
 {func: "int__Object", ret: P.$int, args: [P.Object]},
 {func: "bool__Element_String_String__Html5NodeValidator", ret: P.bool, args: [W.Element, P.String, P.String, W._Html5NodeValidator]},
-{func: "Repository__GitHub_dynamic", ret: T.Repository, args: [T.GitHub, null]},
+{func: "Repository__GitHub_dynamic__Repository", ret: T.Repository, args: [T.GitHub, null], opt: [T.Repository]},
 {func: "args0"},
 {func: "args2", args: [null, null]},
 {func: "args1", args: [null]},

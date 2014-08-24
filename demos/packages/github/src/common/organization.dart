@@ -94,6 +94,7 @@ class Organization {
   Organization(this.github);
 
   static Organization fromJSON(GitHub github, input) {
+    if (input == null) return null;
     return new Organization(github)
         ..login = input['login']
         ..id = input['id']
@@ -176,6 +177,7 @@ class Team {
   Map<String, dynamic> json;
 
   static Team fromJSON(GitHub github, input) {
+    if (input == null) return null;
     return new Team(github)
         ..name = input['name']
         ..id = input['id']
@@ -232,6 +234,7 @@ class TeamMember {
   TeamMember(this.github);
 
   static TeamMember fromJSON(GitHub github, input) {
+    if (input == null) return null;
     var member = new TeamMember(github);
     member.login = input['login'];
     member.id = input['id'];
@@ -260,6 +263,7 @@ class TeamRepository extends Repository {
   TeamRepository(GitHub github) : super(github);
 
   static TeamRepository fromJSON(GitHub github, input) {
+    if (input == null) return null;
     return new TeamRepository(github)
         ..name = input['name']
         ..id = input['id']
@@ -318,6 +322,7 @@ class TeamRepositoryPermissions {
   TeamRepositoryPermissions(this.github);
 
   static TeamRepositoryPermissions fromJSON(GitHub github, input) {
+    if (input == null) return null;
     return new TeamRepositoryPermissions(github)
         ..admin = input['admin']
         ..push = input['push']
