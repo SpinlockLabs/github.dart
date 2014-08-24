@@ -39,7 +39,7 @@ void loadStars() {
 
   querySelector("#title").appendText(" for ${user}/${repo}");
   
-  github.stargazersStreamed(new RepositorySlug(user, repo)).listen((stargazer) {
+  github.stargazers(new RepositorySlug(user, repo)).listen((stargazer) {
     var h = new DivElement();
     h.classes.add("box");
     h.classes.add("user");

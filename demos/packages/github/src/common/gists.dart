@@ -26,14 +26,14 @@ class Gist {
 
   @ApiName("updated_at")
   DateTime updatedAt;
-  
+
   Map<String, dynamic> json;
 
   Gist(this.github);
 
   static Gist fromJSON(GitHub github, input) {
     if (input == null) return null;
-    
+
     var gist = new Gist(github)
         ..json = input
         ..description = input['description']
@@ -60,6 +60,12 @@ class Gist {
         ..updatedAt = parseDateTime(input['updated_at']);
 
     return gist;
+  }
+  
+  Stream<GistComment> comments() => github.gistComments(json['id']);
+  
+  Future<GistComment> comment(CreateGistComment request) {
+    return github.postJSON("/gists/${json['id']}/comments", body: request.toJSON(), convert: GistComment.fromJSON);
   }
 }
 
@@ -111,6 +117,46 @@ class GistFork {
         ..id = input['id']
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at']);
+  }
+}
+
+class GistComment {
+  final GitHub github;
+
+  int id;
+  User user;
+
+  @ApiName("created_at")
+  DateTime createdAt;
+
+  @ApiName("updated_at")
+  DateTime updatedAt;
+
+  String body;
+
+  GistComment(this.github);
+
+  static GistComment fromJSON(GitHub github, input) {
+    if (input == null) return null;
+
+    return new GistComment(github)
+        ..id = input['id']
+        ..user = User.fromJSON(github, input['user'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..body = input['body'];
+  }
+}
+
+class CreateGistComment {
+  final String body;
+  
+  CreateGistComment(this.body);
+  
+  String toJSON() {
+    var map = {};
+    map['body'] = body;
+    return JSON.encode(map);
   }
 }
 

@@ -35,7 +35,8 @@ class Repository {
   /**
    * If the Repository is a fork
    */
-  bool fork;
+  @ApiName("fork")
+  bool isFork;
   
   /**
    * Url to the GitHub Repository Page
@@ -150,7 +151,7 @@ class Repository {
         ..name = input['name']
         ..id = input['id']
         ..fullName = input['full_name']
-        ..fork = input['fork']
+        ..isFork = input['fork']
         ..url = input['html_url']
         ..description = input['description']
         ..cloneUrls = new CloneUrls()
@@ -188,16 +189,16 @@ class Repository {
    * 
    * [limit] is the number of issues to get
    */
-  Future<List<Issue>> issues({int limit: 30}) => github.getJSON("/repos/${fullName}/issues", statusCode: 200, params: {
-    "per_page": limit
-  }).then((json) {
-    return json.map((it) => Issue.fromJSON(github, it));
-  });
+  Stream<Issue> issues() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/issues", Issue.fromJSON);
+  }
 
   /**
    * Gets the Repository Commits
    */
-  Future<List<Commit>> commits() => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
+  Stream<Commit> commits() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/commits", Commit.fromJSON);
+  }
 
   /**
    * Gets Repository Contributor Statistics
@@ -227,23 +228,15 @@ class Repository {
   /**
    * Gets the Repository Forks
    */
-  Future<List<Repository>> forks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/forks", statusCode: 200, params: {
-      "per_page": limit
-    }).then((forks) {
-      return copyOf(forks.map((it) => Repository.fromJSON(github, it)));
-    });
+  Stream<Repository> forks() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/forks", Repository.fromJSON);
   }
 
   /**
    * Gets the Repository Pull Requests
    */
-  Future<List<PullRequest>> pullRequests({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/pulls", statusCode: 200, params: {
-      "per_page": limit
-    }).then((List<Map> pulls) {
-      return copyOf(pulls.map((it) => PullRequest.fromJSON(github, it)));
-    });
+  Stream<PullRequest> pullRequests() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequest.fromJSON);
   }
 
   /**
@@ -252,22 +245,27 @@ class Repository {
   Future<RepositoryPages> pages() {
     return github.getJSON("/repos/${fullName}/pages", statusCode: 200, convert: RepositoryPages.fromJSON);
   }
+  
+  Stream<User> collaborators() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/collaborators", User.fromJSON);
+  }
 
   /**
    * Gets the Repository Hooks
    */
-  Future<List<Hook>> hooks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/hooks", statusCode: 200, params: {
-      "per_page": limit
-    }).then((hooks) {
-      return copyOf(hooks.map((it) => Hook.fromJSON(github, fullName, it)));
-    });
+  Stream<Hook> hooks({int limit: 30}) {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/hooks", (gh, input) => Hook.fromJSON(gh, fullName, input));
+  }
+  
+  Future<Repository> fork([CreateFork request]) {
+    if (request == null) request = new CreateFork();
+    return github.postJSON("/repos/${fullName}/forks", body: request.toJSON(), convert: Repository.fromJSON);
   }
 
   /**
    * Gets the Repository Releases
    */
-  Future<List<Release>> releases({int limit}) => github.releases(slug(), limit: limit);
+  Stream<Release> releases() => github.releases(slug());
 
   /**
    * Gets a Repository Release by [id].
@@ -299,6 +297,10 @@ class Repository {
    */
   Future<PullRequest> createPullRequest(CreateReleaseRequest request) {
     return github.postJSON("/repos/${fullName}/pulls", convert: PullRequest.fromJSON, body: request.toJSON());
+  }
+  
+  Future<Commit> merge(CreateMerge request) {
+    return github.postJSON("/repos/${fullName}/merges", body: request.toJSON(), convert: Commit.fromJSON, statusCode: 201);
   }
 }
 
@@ -534,5 +536,35 @@ class LanguageBreakdown {
       buffer.writeln("${key}: ${value}");
     });
     return buffer.toString();
+  }
+}
+
+class CreateFork {
+  final String organization;
+  
+  CreateFork([this.organization]);
+  
+  String toJSON() {
+    var map = {};
+    putValue("organization", organization, map);
+    return JSON.encode(map);
+  }
+}
+
+class CreateMerge {
+  final String base;
+  final String head;
+  
+  @ApiName("commit_message")
+  String commitMessage;
+  
+  CreateMerge(this.base, this.head);
+  
+  String toJSON() {
+    var map = {};
+    putValue("base", base, map);
+    putValue("head", head, map);
+    putValue("commit_message", commitMessage, map);
+    return JSON.encode(map);
   }
 }

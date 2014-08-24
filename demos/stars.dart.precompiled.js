@@ -1005,13 +1005,13 @@ var $$ = {};
     return x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean";
   },
   startRootIsolate_closure: {
-    "^": "Closure:11;box_0,entry_1",
+    "^": "Closure:12;box_0,entry_1",
     call$0: function() {
       this.entry_1.call$1(this.box_0.args_0);
     }
   },
   startRootIsolate_closure0: {
-    "^": "Closure:11;box_0,entry_2",
+    "^": "Closure:12;box_0,entry_2",
     call$0: function() {
       this.entry_2.call$2(this.box_0.args_0, null);
     }
@@ -1336,7 +1336,7 @@ var $$ = {};
     "^": "Object;"
   },
   IsolateNatives__processWorkerMessage_closure: {
-    "^": "Closure:11;entryPoint_0,args_1,message_2,isSpawnUri_3,startPaused_4,replyTo_5",
+    "^": "Closure:12;entryPoint_0,args_1,message_2,isSpawnUri_3,startPaused_4,replyTo_5",
     call$0: function() {
       H.IsolateNatives__startIsolate(this.entryPoint_0, this.args_1, this.message_2, this.isSpawnUri_3, this.startPaused_4, this.replyTo_5);
     }
@@ -1438,7 +1438,7 @@ var $$ = {};
     $isCapability: true
   },
   _NativeJsSendPort_send_closure: {
-    "^": "Closure:11;box_0,this_1,shouldSerialize_2",
+    "^": "Closure:12;box_0,this_1,shouldSerialize_2",
     call$0: function() {
       var t1, t2;
       t1 = this.this_1._receivePort;
@@ -1665,7 +1665,7 @@ var $$ = {};
     }
   },
   _Copier_visitMap_closure: {
-    "^": "Closure:12;box_0,this_1",
+    "^": "Closure:13;box_0,this_1",
     call$2: function(key, val) {
       var t1 = this.this_1;
       J.$indexSet$ax(this.box_0.copy_0, t1._dispatch$1(key), t1._dispatch$1(val));
@@ -2881,7 +2881,7 @@ var $$ = {};
       }}
   },
   Primitives_initTicker_closure: {
-    "^": "Closure:11;performance_0",
+    "^": "Closure:12;performance_0",
     call$0: function() {
       return C.JSNumber_methods.toInt$0(Math.floor(1000 * this.performance_0.now()));
     }
@@ -2983,7 +2983,7 @@ var $$ = {};
     }
   },
   unwrapException_saveStackTrace: {
-    "^": "Closure:13;ex_0",
+    "^": "Closure:14;ex_0",
     call$1: function(error) {
       if (!!J.getInterceptor(error).$isError)
         if (error.$thrownJsError == null)
@@ -3006,31 +3006,31 @@ var $$ = {};
     }
   },
   invokeClosure_closure: {
-    "^": "Closure:11;closure_0",
+    "^": "Closure:12;closure_0",
     call$0: function() {
       return this.closure_0.call$0();
     }
   },
   invokeClosure_closure0: {
-    "^": "Closure:11;closure_1,arg1_2",
+    "^": "Closure:12;closure_1,arg1_2",
     call$0: function() {
       return this.closure_1.call$1(this.arg1_2);
     }
   },
   invokeClosure_closure1: {
-    "^": "Closure:11;closure_3,arg1_4,arg2_5",
+    "^": "Closure:12;closure_3,arg1_4,arg2_5",
     call$0: function() {
       return this.closure_3.call$2(this.arg1_4, this.arg2_5);
     }
   },
   invokeClosure_closure2: {
-    "^": "Closure:11;closure_6,arg1_7,arg2_8,arg3_9",
+    "^": "Closure:12;closure_6,arg1_7,arg2_8,arg3_9",
     call$0: function() {
       return this.closure_6.call$3(this.arg1_7, this.arg2_8, this.arg3_9);
     }
   },
   invokeClosure_closure3: {
-    "^": "Closure:11;closure_10,arg1_11,arg2_12,arg3_13,arg4_14",
+    "^": "Closure:12;closure_10,arg1_11,arg2_12,arg3_13,arg4_14",
     call$0: function() {
       return this.closure_10.call$4(this.arg1_11, this.arg2_12, this.arg3_13, this.arg4_14);
     }
@@ -3227,13 +3227,13 @@ var $$ = {};
     $isTypeImpl: true
   },
   initHooks_closure: {
-    "^": "Closure:13;getTag_0",
+    "^": "Closure:14;getTag_0",
     call$1: function(o) {
       return this.getTag_0(o);
     }
   },
   initHooks_closure0: {
-    "^": "Closure:14;getUnknownTag_1",
+    "^": "Closure:15;getUnknownTag_1",
     call$2: function(o, tag) {
       return this.getUnknownTag_1(o, tag);
     }
@@ -3304,7 +3304,7 @@ var $$ = {};
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
   init_closure: {
-    "^": "Closure:13;onReady_0,stopwatch_1",
+    "^": "Closure:14;onReady_0,stopwatch_1",
     call$1: function($event) {
       var t1;
       if (document.readyState === "complete") {
@@ -3316,20 +3316,20 @@ var $$ = {};
     }
   },
   init_closure0: {
-    "^": "Closure:13;script_2",
+    "^": "Closure:14;script_2",
     call$1: function(_) {
       var popup = C.Window_methods.open$2(window, "view_source.html", "View Source");
       W.HttpRequest_getString(this.script_2, null, null).then$1(new R.init__closure(popup));
     }
   },
   init__closure: {
-    "^": "Closure:13;popup_3",
+    "^": "Closure:14;popup_3",
     call$1: function(code) {
       P.Timer_Timer(P.Duration$(0, 0, 0, 0, 0, 1), new R.init___closure(this.popup_3, code));
     }
   },
   init___closure: {
-    "^": "Closure:11;popup_4,code_5",
+    "^": "Closure:12;popup_4,code_5",
     call$0: function() {
       J.postMessage$2$x(this.popup_4, P.LinkedHashMap_LinkedHashMap$_literal(["command", "code", "code", this.code_5], null, null), window.location.href);
     }
@@ -3989,7 +3989,7 @@ var $$ = {};
     }
   },
   _AsyncRun__initializeScheduleImmediate_internalCallback: {
-    "^": "Closure:13;box_0",
+    "^": "Closure:14;box_0",
     call$1: function(_) {
       var t1, f;
       H.leaveJsAsync();
@@ -4000,7 +4000,7 @@ var $$ = {};
     }
   },
   _AsyncRun__initializeScheduleImmediate_closure: {
-    "^": "Closure:15;box_0,div_1,span_2",
+    "^": "Closure:16;box_0,div_1,span_2",
     call$1: function(callback) {
       var t1, t2;
       ++init.globalState.topEventLoop._activeJsAsyncCount;
@@ -4011,7 +4011,7 @@ var $$ = {};
     }
   },
   _AsyncRun__scheduleImmediateJsOverride_internalCallback: {
-    "^": "Closure:11;callback_0",
+    "^": "Closure:12;callback_0",
     call$0: function() {
       H.leaveJsAsync();
       this.callback_0.call$0();
@@ -4267,7 +4267,7 @@ var $$ = {};
       t1._asyncCompleteError$2(error, stackTrace);
     }, function(error) {
       return this.completeError$2(error, null);
-    }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 16, 6]
+    }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 17, 6]
   },
   _Future: {
     "^": "Object;_state,_zone<,_resultOrListeners,_nextListener<,_onValueCallback,_errorTestCallback,_onErrorCallback,_whenCompleteActionCallback",
@@ -4549,19 +4549,19 @@ var $$ = {};
       }}
   },
   _Future__addListener_closure: {
-    "^": "Closure:11;this_0,listener_1",
+    "^": "Closure:12;this_0,listener_1",
     call$0: function() {
       P._Future__propagateToListeners(this.this_0, this.listener_1);
     }
   },
   _Future__chainForeignFuture_closure: {
-    "^": "Closure:13;target_0",
+    "^": "Closure:14;target_0",
     call$1: function(value) {
       this.target_0._completeWithValue$1(value);
     }
   },
   _Future__chainForeignFuture_closure0: {
-    "^": "Closure:17;target_1",
+    "^": "Closure:18;target_1",
     call$2: function(error, stackTrace) {
       this.target_1._completeError$2(error, stackTrace);
     },
@@ -4570,25 +4570,25 @@ var $$ = {};
     }
   },
   _Future__asyncComplete_closure: {
-    "^": "Closure:11;this_0,coreFuture_1",
+    "^": "Closure:12;this_0,coreFuture_1",
     call$0: function() {
       P._Future__chainCoreFuture(this.coreFuture_1, this.this_0);
     }
   },
   _Future__asyncComplete_closure0: {
-    "^": "Closure:11;this_2,value_3",
+    "^": "Closure:12;this_2,value_3",
     call$0: function() {
       this.this_2._completeWithValue$1(this.value_3);
     }
   },
   _Future__asyncCompleteError_closure: {
-    "^": "Closure:11;this_0,error_1,stackTrace_2",
+    "^": "Closure:12;this_0,error_1,stackTrace_2",
     call$0: function() {
       this.this_0._completeError$2(this.error_1, this.stackTrace_2);
     }
   },
   _Future__propagateToListeners_handleValueCallback: {
-    "^": "Closure:18;box_1,listener_3,sourceValue_4,zone_5",
+    "^": "Closure:19;box_1,listener_3,sourceValue_4,zone_5",
     call$0: function() {
       var e, s, t1, exception;
       try {
@@ -4701,13 +4701,13 @@ var $$ = {};
     }
   },
   _Future__propagateToListeners_handleWhenCompleteCallback_closure: {
-    "^": "Closure:13;box_2,listener_11",
+    "^": "Closure:14;box_2,listener_11",
     call$1: function(ignored) {
       P._Future__propagateToListeners(this.box_2.source_4, this.listener_11);
     }
   },
   _Future__propagateToListeners_handleWhenCompleteCallback_closure0: {
-    "^": "Closure:17;box_0,listener_12",
+    "^": "Closure:18;box_0,listener_12",
     call$2: function(error, stackTrace) {
       var t1, completeResult;
       t1 = this.box_0;
@@ -4767,42 +4767,42 @@ var $$ = {};
     }
   },
   Stream_forEach__closure: {
-    "^": "Closure:11;action_4,element_5",
+    "^": "Closure:12;action_4,element_5",
     call$0: function() {
       return this.action_4.call$1(this.element_5);
     }
   },
   Stream_forEach__closure0: {
-    "^": "Closure:13;",
+    "^": "Closure:14;",
     call$1: function(_) {
     }
   },
   Stream_forEach_closure0: {
-    "^": "Closure:11;future_6",
+    "^": "Closure:12;future_6",
     call$0: function() {
       this.future_6._complete$1(null);
     }
   },
   Stream_length_closure: {
-    "^": "Closure:13;box_0",
+    "^": "Closure:14;box_0",
     call$1: function(_) {
       ++this.box_0.count_0;
     }
   },
   Stream_length_closure0: {
-    "^": "Closure:11;box_0,future_1",
+    "^": "Closure:12;box_0,future_1",
     call$0: function() {
       this.future_1._complete$1(this.box_0.count_0);
     }
   },
   Stream_isEmpty_closure: {
-    "^": "Closure:13;box_0,future_1",
+    "^": "Closure:14;box_0,future_1",
     call$1: function(_) {
       P._cancelAndValue(this.box_0.subscription_0, this.future_1, false);
     }
   },
   Stream_isEmpty_closure0: {
-    "^": "Closure:11;future_2",
+    "^": "Closure:12;future_2",
     call$0: function() {
       this.future_2._complete$1(true);
     }
@@ -4862,13 +4862,6 @@ var $$ = {};
       else if ((t1 & 3) === 0)
         this._ensurePendingEvents$0().add$1(0, C.C__DelayedDone);
       return this._ensureDoneFuture$0();
-    },
-    _async$_add$1: function(value) {
-      var t1 = this._state;
-      if ((t1 & 1) !== 0)
-        this._sendData$1(value);
-      else if ((t1 & 3) === 0)
-        this._ensurePendingEvents$0().add$1(0, new P._DelayedData(value, null));
     },
     _subscribe$4: function(onData, onError, onDone, cancelOnError) {
       var t1, t2, subscription, pendingEvents, addState;
@@ -4931,7 +4924,7 @@ var $$ = {};
     }
   },
   _StreamController__subscribe_closure: {
-    "^": "Closure:11;this_0",
+    "^": "Closure:12;this_0",
     call$0: function() {
       P._runGuarded(this.this_0.get$_onListen());
     }
@@ -5311,7 +5304,7 @@ var $$ = {};
     }
   },
   _PendingEvents_schedule_closure: {
-    "^": "Closure:11;this_0,dispatch_1",
+    "^": "Closure:12;this_0,dispatch_1",
     call$0: function() {
       var t1, oldState;
       t1 = this.this_0;
@@ -5376,19 +5369,19 @@ var $$ = {};
     static: {"^": "_DoneStreamSubscription__DONE_SENT,_DoneStreamSubscription__SCHEDULED,_DoneStreamSubscription__PAUSED"}
   },
   _cancelAndError_closure: {
-    "^": "Closure:11;future_0,error_1,stackTrace_2",
+    "^": "Closure:12;future_0,error_1,stackTrace_2",
     call$0: function() {
       return this.future_0._completeError$2(this.error_1, this.stackTrace_2);
     }
   },
   _cancelAndErrorClosure_closure: {
-    "^": "Closure:19;subscription_0,future_1",
+    "^": "Closure:20;subscription_0,future_1",
     call$2: function(error, stackTrace) {
       return P._cancelAndError(this.subscription_0, this.future_1, error, stackTrace);
     }
   },
   _cancelAndValue_closure: {
-    "^": "Closure:11;future_0,value_1",
+    "^": "Closure:12;future_0,value_1",
     call$0: function() {
       return this.future_0._complete$1(this.value_1);
     }
@@ -5397,7 +5390,7 @@ var $$ = {};
     "^": "Object;"
   },
   _rootHandleUncaughtError_closure: {
-    "^": "Closure:11;error_0,stackTrace_1",
+    "^": "Closure:12;error_0,stackTrace_1",
     call$0: function() {
       throw H.wrapException(P._UncaughtAsyncError$(this.error_0, this.stackTrace_1));
     }
@@ -5477,25 +5470,25 @@ var $$ = {};
     static: {"^": "_RootZone__rootMap,_RootZone__rootDelegate"}
   },
   _RootZone_bindCallback_closure: {
-    "^": "Closure:11;this_0,f_1",
+    "^": "Closure:12;this_0,f_1",
     call$0: function() {
       return this.this_0.runGuarded$1(this.f_1);
     }
   },
   _RootZone_bindCallback_closure0: {
-    "^": "Closure:11;this_2,f_3",
+    "^": "Closure:12;this_2,f_3",
     call$0: function() {
       return this.this_2.run$1(this.f_3);
     }
   },
   _RootZone_bindUnaryCallback_closure: {
-    "^": "Closure:13;this_0,f_1",
+    "^": "Closure:14;this_0,f_1",
     call$1: function(arg) {
       return this.this_0.runUnaryGuarded$2(this.f_1, arg);
     }
   },
   _RootZone_bindUnaryCallback_closure0: {
-    "^": "Closure:13;this_2,f_3",
+    "^": "Closure:14;this_2,f_3",
     call$1: function(arg) {
       return this.this_2.runUnary$2(this.f_3, arg);
     }
@@ -5863,7 +5856,7 @@ var $$ = {};
       }}
   },
   _HashMap_values_closure: {
-    "^": "Closure:13;this_0",
+    "^": "Closure:14;this_0",
     call$1: function(each) {
       return this.this_0.$index(0, each);
     }
@@ -6140,7 +6133,7 @@ var $$ = {};
       }}
   },
   _LinkedHashMap_values_closure: {
-    "^": "Closure:13;this_0",
+    "^": "Closure:14;this_0",
     call$1: function(each) {
       return this.this_0.$index(0, each);
     }
@@ -6565,7 +6558,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   Maps_mapToString_closure: {
-    "^": "Closure:12;box_0,result_1",
+    "^": "Closure:13;box_0,result_1",
     call$2: function(k, v) {
       var t1 = this.box_0;
       if (!t1.first_0)
@@ -6944,7 +6937,7 @@ var $$ = {};
     }
   },
   _JsonMap_values_closure: {
-    "^": "Closure:13;this_0",
+    "^": "Closure:14;this_0",
     call$1: function(each) {
       return this.this_0.$index(0, each);
     }
@@ -7237,7 +7230,7 @@ var $$ = {};
     static: {"^": "_Utf8Decoder__LIMITS"}
   },
   _Utf8Decoder_convert_scanOneByteCharacters: {
-    "^": "Closure:20;endIndex_0",
+    "^": "Closure:21;endIndex_0",
     call$2: function(units, from) {
       var to, t1, i, unit;
       to = this.endIndex_0;
@@ -7252,7 +7245,7 @@ var $$ = {};
     }
   },
   _Utf8Decoder_convert_addSingleBytes: {
-    "^": "Closure:21;this_1,codeUnits_2,startIndex_3,endIndex_4",
+    "^": "Closure:22;this_1,codeUnits_2,startIndex_3,endIndex_4",
     call$2: function(from, to) {
       var t1, t2, t3;
       t1 = from === 0 && to === J.get$length$asx(this.codeUnits_2);
@@ -7408,7 +7401,7 @@ var $$ = {};
     return new P.Utf8Decoder(allowMalformed).convert$1(bytes);
   },
   NoSuchMethodError_toString_closure: {
-    "^": "Closure:22;box_0",
+    "^": "Closure:23;box_0",
     call$2: function(key, value) {
       var t1 = this.box_0;
       if (t1.i_1 > 0)
@@ -7544,7 +7537,7 @@ var $$ = {};
       }}
   },
   DateTime_parse_parseIntOrZero: {
-    "^": "Closure:23;",
+    "^": "Closure:24;",
     call$1: function(matched) {
       if (matched == null)
         return 0;
@@ -7552,7 +7545,7 @@ var $$ = {};
     }
   },
   DateTime_parse_parseDoubleOrZero: {
-    "^": "Closure:24;",
+    "^": "Closure:25;",
     call$1: function(matched) {
       if (matched == null)
         return 0;
@@ -7623,7 +7616,7 @@ var $$ = {};
       }}
   },
   Duration_toString_sixDigits: {
-    "^": "Closure:25;",
+    "^": "Closure:26;",
     call$1: function(n) {
       if (n >= 100000)
         return "" + n;
@@ -7639,7 +7632,7 @@ var $$ = {};
     }
   },
   Duration_toString_twoDigits: {
-    "^": "Closure:25;",
+    "^": "Closure:26;",
     call$1: function(n) {
       if (n >= 10)
         return "" + n;
@@ -7933,7 +7926,7 @@ var $$ = {};
     "^": "Object;"
   },
   Uri_splitQueryString_closure: {
-    "^": "Closure:12;encoding_0",
+    "^": "Closure:13;encoding_0",
     call$2: function(map, element) {
       var t1, index, key, value;
       t1 = J.getInterceptor$asx(element);
@@ -8401,25 +8394,25 @@ var $$ = {};
       }}
   },
   _FrozenElementList$_wrap_closure: {
-    "^": "Closure:13;",
+    "^": "Closure:14;",
     call$1: function(e) {
       return !!J.getInterceptor(e).$isElement;
     }
   },
   HttpRequest_getString_closure: {
-    "^": "Closure:13;",
+    "^": "Closure:14;",
     call$1: function(xhr) {
       return J.get$responseText$x(xhr);
     }
   },
   HttpRequest_request_closure0: {
-    "^": "Closure:12;xhr_0",
+    "^": "Closure:13;xhr_0",
     call$2: function(header, value) {
       this.xhr_0.setRequestHeader(header, value);
     }
   },
   HttpRequest_request_closure: {
-    "^": "Closure:13;completer_1,xhr_2",
+    "^": "Closure:14;completer_1,xhr_2",
     call$1: function(e) {
       var t1, t2, t3;
       t1 = this.xhr_2;
@@ -8735,7 +8728,7 @@ var $$ = {};
     }
   },
   _BrowserHttpClient_request_closure: {
-    "^": "Closure:13;req_0,completer_1",
+    "^": "Closure:14;req_0,completer_1",
     call$1: function($event) {
       var t1, t2, t3, t4;
       t1 = this.req_0;
@@ -8751,7 +8744,7 @@ var $$ = {};
     }
   },
   initGitHub_closure: {
-    "^": "Closure:11;",
+    "^": "Closure:12;",
     call$0: function() {
       return new M._BrowserHttpClient();
     }
@@ -8764,13 +8757,6 @@ var $$ = {};
   },
   GitHub: {
     "^": "Object;auth,endpoint,client",
-    stargazersStreamed$1: function(slug) {
-      var controller, t1;
-      controller = P.StreamController_StreamController(null, null, null, null, false, null);
-      t1 = [P.List, T.Response];
-      new T.PaginationHelper(this, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1])).fetchStreamed$2("GET", "/repos/" + (H.S(slug.owner) + "/" + H.S(slug.name)) + "/stargazers").listen$1(new T.GitHub_stargazersStreamed_closure(this, controller)).onDone$1(new T.GitHub_stargazersStreamed_closure0(controller));
-      return H.setRuntimeTypeInfo(new P._ControllerStream(controller), [null]);
-    },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
       headers = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
@@ -8795,43 +8781,20 @@ var $$ = {};
     },
     static: {"^": "GitHub_defaultClient"}
   },
-  GitHub_stargazersStreamed_closure: {
-    "^": "Closure:13;this_0,controller_1",
-    call$1: function(response) {
-      J.forEach$1$ax(C.JsonCodec_null_null.decode$1(J.get$body$x(response)), new T.GitHub_stargazersStreamed__closure(this.this_0, this.controller_1));
-    }
-  },
-  GitHub_stargazersStreamed__closure: {
-    "^": "Closure:13;this_2,controller_3",
-    call$1: function(it) {
-      var t1, t2;
-      t1 = this.controller_3;
-      t2 = T.User_fromJSON(this.this_2, it);
-      if (t1._state >= 4)
-        H.throwExpression(t1._badEventState$0());
-      t1._async$_add$1(t2);
-    }
-  },
-  GitHub_stargazersStreamed_closure0: {
-    "^": "Closure:11;controller_4",
-    call$0: function() {
-      return this.controller_4.close$0(0);
-    }
-  },
   GitHub_request_closure: {
-    "^": "Closure:11;this_0",
+    "^": "Closure:12;this_0",
     call$0: function() {
       return "token " + H.S(this.this_0.auth.token);
     }
   },
   GitHub_request_closure0: {
-    "^": "Closure:11;userAndPass_1",
+    "^": "Closure:12;userAndPass_1",
     call$0: function() {
       return "basic " + M._CryptoUtils_bytesToBase64(this.userAndPass_1, false, false);
     }
   },
   GitHub_request_closure1: {
-    "^": "Closure:11;",
+    "^": "Closure:12;",
     call$0: function() {
       return "application/vnd.github.v3+json";
     }
@@ -8849,18 +8812,23 @@ var $$ = {};
       t2.call$1(path).then$1(t1.handleResponse_1);
       return H.setRuntimeTypeInfo(new P._BroadcastStream(controller), [H.getTypeArgumentByIndex(controller, 0)]);
     },
-    fetchStreamed$2: function(method, path) {
-      return this.fetchStreamed$6$body$headers$pages$params(method, path, null, null, null, null);
+    objects$7$body$headers$pages$params: function(method, path, converter, body, headers, pages, params) {
+      var controller = P.StreamController_StreamController(null, null, null, null, false, null);
+      this.fetchStreamed$6$body$headers$pages$params(method, path, body, headers, pages, params).listen$1(new T.PaginationHelper_objects_closure(this, converter, controller)).onDone$1(new T.PaginationHelper_objects_closure0(controller));
+      return H.setRuntimeTypeInfo(new P._ControllerStream(controller), [null]);
+    },
+    objects$3: function(method, path, converter) {
+      return this.objects$7$body$headers$pages$params(method, path, converter, null, null, null, null);
     }
   },
   PaginationHelper_fetchStreamed_actualFetch: {
-    "^": "Closure:26;this_1,method_2,headers_3,params_4,body_5",
+    "^": "Closure:27;this_1,method_2,headers_3,params_4,body_5",
     call$1: function(realPath) {
       return this.this_1.github.request$5$body$headers$params(0, this.method_2, realPath, this.body_5, this.headers_3, this.params_4);
     }
   },
   PaginationHelper_fetchStreamed_closure: {
-    "^": "Closure:27;box_0,pages_6,controller_7,actualFetch_8",
+    "^": "Closure:28;box_0,pages_6,controller_7,actualFetch_8",
     call$1: function(response) {
       var t1, t2, t3, info;
       t1 = this.box_0;
@@ -8882,18 +8850,31 @@ var $$ = {};
       this.actualFetch_8.call$1(info.$index(0, "next")).then$1(t1.handleResponse_1);
     }
   },
-  RepositorySlug: {
-    "^": "Object;owner,name",
-    $eq: function(_, obj) {
-      if (obj == null)
-        return false;
-      return !!J.getInterceptor(obj).$isRepositorySlug && H.S(obj.owner) + "/" + H.S(obj.name) === H.S(this.owner) + "/" + H.S(this.name);
-    },
-    $isRepositorySlug: true
+  PaginationHelper_objects_closure: {
+    "^": "Closure:14;this_0,converter_1,controller_2",
+    call$1: function(response) {
+      var t1, t2, t3, t4, t5, t6;
+      for (t1 = J.get$iterator$ax(C.JsonCodec_null_null.decode$1(J.get$body$x(response))), t2 = this.controller_2, t3 = this.converter_1, t4 = this.this_0.github; t1.moveNext$0();) {
+        t5 = t3.call$2(t4, t1.get$current());
+        if (t2._state >= 4)
+          H.throwExpression(t2._badEventState$0());
+        t6 = t2._state;
+        if ((t6 & 1) !== 0)
+          t2._sendData$1(t5);
+        else if ((t6 & 3) === 0)
+          t2._ensurePendingEvents$0().add$1(0, new P._DelayedData(t5, null));
+      }
+    }
+  },
+  PaginationHelper_objects_closure0: {
+    "^": "Closure:12;controller_3",
+    call$0: function() {
+      return this.controller_3.close$0(0);
+    }
   },
   User: {
     "^": "Object;github,login,id,avatarUrl<,url,siteAdmin,name,company,blog,location,email,hirable,bio,publicReposCount,publicGistsCount,followersCount,followingCount,createdAt,updatedAt,json",
-    static: {User_fromJSON: function(github, input) {
+    static: {User_fromJSON: [function(github, input) {
         var t1, t2;
         if (input == null)
           return;
@@ -8919,7 +8900,7 @@ var $$ = {};
         t1.updatedAt = M.parseDateTime(t2.$index(input, "updated_at"));
         t1.json = input;
         return t1;
-      }}
+      }, "call$2", "User_fromJSON$closure", 4, 0, 11]}
   }
 }],
 ["github.http", "package:github/http.dart", , T, {
@@ -8997,7 +8978,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_readSlot: {
-    "^": "Closure:28;copies_3",
+    "^": "Closure:29;copies_3",
     call$1: function(i) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -9006,7 +8987,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:29;copies_4",
+    "^": "Closure:30;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -9015,12 +8996,12 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_cleanupSlots: {
-    "^": "Closure:11;",
+    "^": "Closure:12;",
     call$0: function() {
     }
   },
   _convertDartToNative_PrepareForStructuredClone_walk: {
-    "^": "Closure:13;findSlot_5,readSlot_6,writeSlot_7",
+    "^": "Closure:14;findSlot_5,readSlot_6,writeSlot_7",
     call$1: function(e) {
       var t1, t2, slot, copy, $length, i;
       t1 = {};
@@ -9076,7 +9057,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_walk_closure: {
-    "^": "Closure:12;box_0,walk_8",
+    "^": "Closure:13;box_0,walk_8",
     call$2: function(key, value) {
       this.box_0.copy_0[key] = this.walk_8.call$1(value);
     }
@@ -9124,7 +9105,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   CssClassSetImpl_add_closure: {
-    "^": "Closure:13;value_0",
+    "^": "Closure:14;value_0",
     call$1: function(s) {
       return s.add$1(0, this.value_0);
     }
@@ -9137,7 +9118,7 @@ var $$ = {};
     R.init("stars.dart", new G.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
   loadStars: function() {
-    var url, params, user, repo, token, t1;
+    var url, params, user, repo, token, t1, t2;
     url = window.location.href;
     if (J.getInterceptor$asx(url).contains$1(url, "?")) {
       params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
@@ -9152,17 +9133,20 @@ var $$ = {};
     t1 = $.GitHub_defaultClient.call$0();
     $.github = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
     J.insertAdjacentText$2$x(document.querySelector("#title"), "beforeend", " for " + H.S(user) + "/" + H.S(repo));
-    $.github.stargazersStreamed$1(new T.RepositorySlug(user, repo)).listen$1(new G.loadStars_closure()).onDone$1(new G.loadStars_closure0());
+    t1 = $.github;
+    t1.toString;
+    t2 = [P.List, T.Response];
+    new T.PaginationHelper(t1, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t2)), [t2])).objects$3("GET", "/repos/" + (H.S(user) + "/" + H.S(repo)) + "/stargazers", T.User_fromJSON$closure()).listen$1(new G.loadStars_closure()).onDone$1(new G.loadStars_closure0());
   },
   main_closure: {
-    "^": "Closure:11;",
+    "^": "Closure:12;",
     call$0: function() {
       $.$$stars = document.querySelector("#stars");
       G.loadStars();
     }
   },
   loadStars_closure: {
-    "^": "Closure:13;",
+    "^": "Closure:14;",
     call$1: function(stargazer) {
       var h, t1, e;
       h = document.createElement("div", null);
@@ -9190,7 +9174,7 @@ var $$ = {};
     }
   },
   loadStars_closure0: {
-    "^": "Closure:11;",
+    "^": "Closure:12;",
     call$0: function() {
       J.insertAdjacentText$2$x(document.querySelector("#total"), "beforeend", C.JSInt_methods.toString$0(W._FrozenElementList$_wrap(document.querySelectorAll(".user"), null)._nodeList.length) + " stars");
     }
@@ -9283,6 +9267,12 @@ $$ = null;
   _ = P.$double;
   _.$is$double = TRUE;
   _.$isnum = TRUE;
+  _.$isObject = TRUE;
+  _ = T.User;
+  _.$isUser = TRUE;
+  _.$isObject = TRUE;
+  _ = T.GitHub;
+  _.$isGitHub = TRUE;
   _.$isObject = TRUE;
   _ = P._EventSink;
   _.$is_EventSink = TRUE;
@@ -9826,6 +9816,7 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "int__dynamic", ret: P.$int, args: [null]},
 {func: "bool__Object_Object", ret: P.bool, args: [P.Object, P.Object]},
 {func: "int__Object", ret: P.$int, args: [P.Object]},
+{func: "User__GitHub_dynamic", ret: T.User, args: [T.GitHub, null]},
 {func: "args0"},
 {func: "args2", args: [null, null]},
 {func: "args1", args: [null]},
@@ -15555,38 +15546,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   GitHub.prototype = $desc;
-  function GitHub_stargazersStreamed_closure(this_0, controller_1) {
-    this.this_0 = this_0;
-    this.controller_1 = controller_1;
-  }
-  GitHub_stargazersStreamed_closure.builtin$cls = "GitHub_stargazersStreamed_closure";
-  if (!"name" in GitHub_stargazersStreamed_closure)
-    GitHub_stargazersStreamed_closure.name = "GitHub_stargazersStreamed_closure";
-  $desc = $collectedClasses.GitHub_stargazersStreamed_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_stargazersStreamed_closure.prototype = $desc;
-  function GitHub_stargazersStreamed__closure(this_2, controller_3) {
-    this.this_2 = this_2;
-    this.controller_3 = controller_3;
-  }
-  GitHub_stargazersStreamed__closure.builtin$cls = "GitHub_stargazersStreamed__closure";
-  if (!"name" in GitHub_stargazersStreamed__closure)
-    GitHub_stargazersStreamed__closure.name = "GitHub_stargazersStreamed__closure";
-  $desc = $collectedClasses.GitHub_stargazersStreamed__closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_stargazersStreamed__closure.prototype = $desc;
-  function GitHub_stargazersStreamed_closure0(controller_4) {
-    this.controller_4 = controller_4;
-  }
-  GitHub_stargazersStreamed_closure0.builtin$cls = "GitHub_stargazersStreamed_closure0";
-  if (!"name" in GitHub_stargazersStreamed_closure0)
-    GitHub_stargazersStreamed_closure0.name = "GitHub_stargazersStreamed_closure0";
-  $desc = $collectedClasses.GitHub_stargazersStreamed_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_stargazersStreamed_closure0.prototype = $desc;
   function GitHub_request_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -15655,17 +15614,28 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   PaginationHelper_fetchStreamed_closure.prototype = $desc;
-  function RepositorySlug(owner, name) {
-    this.owner = owner;
-    this.name = name;
+  function PaginationHelper_objects_closure(this_0, converter_1, controller_2) {
+    this.this_0 = this_0;
+    this.converter_1 = converter_1;
+    this.controller_2 = controller_2;
   }
-  RepositorySlug.builtin$cls = "RepositorySlug";
-  if (!"name" in RepositorySlug)
-    RepositorySlug.name = "RepositorySlug";
-  $desc = $collectedClasses.RepositorySlug;
+  PaginationHelper_objects_closure.builtin$cls = "PaginationHelper_objects_closure";
+  if (!"name" in PaginationHelper_objects_closure)
+    PaginationHelper_objects_closure.name = "PaginationHelper_objects_closure";
+  $desc = $collectedClasses.PaginationHelper_objects_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  RepositorySlug.prototype = $desc;
+  PaginationHelper_objects_closure.prototype = $desc;
+  function PaginationHelper_objects_closure0(controller_3) {
+    this.controller_3 = controller_3;
+  }
+  PaginationHelper_objects_closure0.builtin$cls = "PaginationHelper_objects_closure0";
+  if (!"name" in PaginationHelper_objects_closure0)
+    PaginationHelper_objects_closure0.name = "PaginationHelper_objects_closure0";
+  $desc = $collectedClasses.PaginationHelper_objects_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PaginationHelper_objects_closure0.prototype = $desc;
   function User(github, login, id, avatarUrl, url, siteAdmin, name, company, blog, location, email, hirable, bio, publicReposCount, publicGistsCount, followersCount, followingCount, createdAt, updatedAt, json) {
     this.github = github;
     this.login = login;
@@ -15853,5 +15823,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   loadStars_closure0.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeTypedData, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendDone_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _DoneStreamSubscription, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri_splitQueryString_closure, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, NativeTypedArray, NativeTypedArrayOfInt, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHub, GitHub_stargazersStreamed_closure, GitHub_stargazersStreamed__closure, GitHub_stargazersStreamed_closure0, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, PaginationHelper, PaginationHelper_fetchStreamed_actualFetch, PaginationHelper_fetchStreamed_closure, RepositorySlug, User, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, CssClassSetImpl, CssClassSetImpl_add_closure, main_closure, loadStars_closure, loadStars_closure0];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeTypedData, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendDone_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _DoneStreamSubscription, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri_splitQueryString_closure, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, NativeTypedArray, NativeTypedArrayOfInt, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHub, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, PaginationHelper, PaginationHelper_fetchStreamed_actualFetch, PaginationHelper_fetchStreamed_closure, PaginationHelper_objects_closure, PaginationHelper_objects_closure0, User, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, CssClassSetImpl, CssClassSetImpl_add_closure, main_closure, loadStars_closure, loadStars_closure0];
 }
