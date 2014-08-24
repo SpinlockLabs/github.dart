@@ -37,17 +37,17 @@ void loadOrganization() {
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.stargazers(new RepositorySlug(user, repo)).then((stargazers) {
-    querySelector("#title").appendText(" for ${user}/${repo}");
-    querySelector("#total").appendText(stargazers.length.toString() + " stars");
-    for (var stargazer in stargazers) {
-      var h = new DivElement();
-      h.classes.add("box");
-      h.classes.add("user");
-      h.style.textAlign = "center";
-      h.append(new ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
-      h.append(new AnchorElement(href: stargazer.url)..append(new ParagraphElement()..text = stargazer.login));
-      $stars.append(h);
-    }
+  querySelector("#title").appendText(" for ${user}/${repo}");
+  
+  github.stargazersStreamed(new RepositorySlug(user, repo)).listen((stargazer) {
+    var h = new DivElement();
+    h.classes.add("box");
+    h.classes.add("user");
+    h.style.textAlign = "center";
+    h.append(new ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
+    h.append(new AnchorElement(href: stargazer.url)..append(new ParagraphElement()..text = stargazer.login));
+    $stars.append(h);
+  }).onDone(() {
+    querySelector("#total").appendText(querySelectorAll(".user").length.toString() + " stars");
   });
 }

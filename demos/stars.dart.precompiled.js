@@ -369,11 +369,6 @@ var $$ = {};
   },
   JSArray: {
     "^": "Interceptor;",
-    add$1: function(receiver, value) {
-      if (!!receiver.fixed$length)
-        H.throwExpression(P.UnsupportedError$("add"));
-      receiver.push(value);
-    },
     remove$1: function(receiver, element) {
       var i;
       if (!!receiver.fixed$length)
@@ -385,16 +380,8 @@ var $$ = {};
         }
       return false;
     },
-    addAll$1: function(receiver, collection) {
-      var t1;
-      for (t1 = collection.get$iterator(collection); t1.moveNext$0();)
-        this.add$1(receiver, t1.get$current());
-    },
     forEach$1: function(receiver, f) {
       return H.IterableMixinWorkaround_forEach(receiver, f);
-    },
-    map$1: function(receiver, f) {
-      return H.setRuntimeTypeInfo(new H.MappedListIterable(receiver, f), [null, null]);
     },
     elementAt$1: function(receiver, index) {
       if (index < 0 || index >= receiver.length)
@@ -3549,9 +3536,6 @@ var $$ = {};
     get$isEmpty: function(_) {
       return this.get$length(this) === 0;
     },
-    map$1: function(_, f) {
-      return H.setRuntimeTypeInfo(new H.MappedListIterable(this, f), [null, null]);
-    },
     toList$1$growable: function(_, growable) {
       var result, i, t1;
       if (growable) {
@@ -3685,24 +3669,28 @@ var $$ = {};
       return this._current;
     }
   },
-  MappedListIterable: {
-    "^": "ListIterable;_source,_f",
+  WhereIterable: {
+    "^": "IterableBase;_iterable,_f",
+    get$iterator: function(_) {
+      var t1 = new H.WhereIterator(J.get$iterator$ax(this._iterable), this._f);
+      t1.$builtinTypeInfo = this.$builtinTypeInfo;
+      return t1;
+    }
+  },
+  WhereIterator: {
+    "^": "Iterator;_iterator,_f",
     _f$1: function(arg0) {
       return this._f.call$1(arg0);
     },
-    get$length: function(_) {
-      return J.get$length$asx(this._source);
+    moveNext$0: function() {
+      for (var t1 = this._iterator; t1.moveNext$0();)
+        if (this._f$1(t1.get$current()) === true)
+          return true;
+      return false;
     },
-    elementAt$1: function(_, index) {
-      return this._f$1(J.elementAt$1$ax(this._source, index));
-    },
-    $asListIterable: function($S, $T) {
-      return [$T];
-    },
-    $asIterableBase: function($S, $T) {
-      return [$T];
-    },
-    $isEfficientLength: true
+    get$current: function() {
+      return this._iterator.get$current();
+    }
   },
   IterableMixinWorkaround: {
     "^": "Object;",
@@ -3828,6 +3816,43 @@ var $$ = {};
       return;
     }
     P._rootScheduleMicrotask(null, null, t1, t1.bindCallback$2$runGuarded(callback, true));
+  },
+  StreamController_StreamController: function(onCancel, onListen, onPause, onResume, sync, $T) {
+    if (onCancel == null)
+      return sync ? new P._NoCallbackSyncStreamController(null, 0, null) : new P._NoCallbackAsyncStreamController(null, 0, null);
+    return sync ? H.setRuntimeTypeInfo(new P._SyncStreamController(onListen, onPause, onResume, onCancel, null, 0, null), [$T]) : H.setRuntimeTypeInfo(new P._AsyncStreamController(onListen, onPause, onResume, onCancel, null, 0, null), [$T]);
+  },
+  StreamController_StreamController$broadcast: function(onCancel, onListen, sync, $T) {
+    var t1;
+    if (sync) {
+      t1 = H.setRuntimeTypeInfo(new P._SyncBroadcastStreamController(onListen, onCancel, 0, null, null, null, null), [$T]);
+      t1._previous = t1;
+      t1._next = t1;
+    } else {
+      t1 = H.setRuntimeTypeInfo(new P._AsyncBroadcastStreamController(onListen, onCancel, 0, null, null, null, null), [$T]);
+      t1._previous = t1;
+      t1._next = t1;
+    }
+    return t1;
+  },
+  _runGuarded: function(notificationHandler) {
+    var result, e, s, exception, t1;
+    if (notificationHandler == null)
+      return;
+    try {
+      result = notificationHandler.call$0();
+      if (!!J.getInterceptor(result).$isFuture)
+        return result;
+      return;
+    } catch (exception) {
+      t1 = H.unwrapException(exception);
+      e = t1;
+      s = new H._StackTrace(exception, null);
+      t1 = $.Zone__current;
+      t1.toString;
+      P._rootHandleUncaughtError(null, null, t1, e, s);
+    }
+
   },
   _nullDataHandler: [function(value) {
   }, "call$1", "_nullDataHandler$closure", 2, 0, 4],
@@ -4014,6 +4039,215 @@ var $$ = {};
         return;
       }}
   },
+  _BroadcastStream: {
+    "^": "_ControllerStream;_controller"
+  },
+  _BroadcastSubscription: {
+    "^": "_ControllerSubscription;_eventState,_next@,_previous?,_controller,_onData,_onError,_onDone,_zone,_state,_cancelFuture,_pending",
+    get$_controller: function() {
+      return this._controller;
+    },
+    _expectsEvent$1: function(eventId) {
+      var t1 = this._eventState;
+      if (typeof t1 !== "number")
+        return t1.$and();
+      return (t1 & 1) === eventId;
+    },
+    _onPause$0: [function() {
+    }, "call$0", "get$_onPause", 0, 0, 3],
+    _onResume$0: [function() {
+    }, "call$0", "get$_onResume", 0, 0, 3],
+    static: {"^": "_BroadcastSubscription__STATE_EVENT_ID,_BroadcastSubscription__STATE_FIRING,_BroadcastSubscription__STATE_REMOVE_AFTER_FIRING"}
+  },
+  _BroadcastStreamController: {
+    "^": "Object;_next@,_previous?",
+    _ensureDoneFuture$0: function() {
+      var t1 = this._doneFuture;
+      if (t1 != null)
+        return t1;
+      t1 = P._Future$(null);
+      this._doneFuture = t1;
+      return t1;
+    },
+    _removeListener$1: function(subscription) {
+      var previous, next;
+      previous = subscription._previous;
+      next = subscription._next;
+      previous.set$_next(next);
+      next.set$_previous(previous);
+      subscription._previous = subscription;
+      subscription._next = subscription;
+    },
+    _subscribe$4: function(onData, onError, onDone, cancelOnError) {
+      var t1, t2, subscription;
+      if ((this._state & 4) !== 0) {
+        if (onDone == null)
+          onDone = P._nullDoneHandler$closure();
+        t1 = new P._DoneStreamSubscription($.Zone__current, 0, onDone);
+        t1.$builtinTypeInfo = this.$builtinTypeInfo;
+        t1._schedule$0();
+        return t1;
+      }
+      t1 = $.Zone__current;
+      t2 = cancelOnError ? 1 : 0;
+      subscription = new P._BroadcastSubscription(null, null, null, this, null, null, null, t1, t2, null, null);
+      subscription.$builtinTypeInfo = this.$builtinTypeInfo;
+      subscription._BufferingStreamSubscription$4(onData, onError, onDone, cancelOnError, H.getTypeArgumentByIndex(this, 0));
+      subscription._previous = subscription;
+      subscription._next = subscription;
+      t2 = this._previous;
+      subscription._previous = t2;
+      subscription._next = this;
+      t2.set$_next(subscription);
+      this._previous = subscription;
+      subscription._eventState = this._state & 1;
+      if (this._next === subscription)
+        P._runGuarded(this._onListen);
+      return subscription;
+    },
+    _recordCancel$1: function(subscription) {
+      var t1;
+      if (subscription.get$_next() === subscription)
+        return;
+      t1 = subscription._eventState;
+      if (typeof t1 !== "number")
+        return t1.$and();
+      if ((t1 & 2) !== 0)
+        subscription._eventState = t1 | 4;
+      else {
+        this._removeListener$1(subscription);
+        if ((this._state & 2) === 0 && this._next === this)
+          this._callOnCancel$0();
+      }
+      return;
+    },
+    _recordPause$1: function(subscription) {
+    },
+    _recordResume$1: function(subscription) {
+    },
+    _addEventError$0: function() {
+      if ((this._state & 4) !== 0)
+        return new P.StateError("Cannot add new events after calling close");
+      return new P.StateError("Cannot add new events while doing an addStream");
+    },
+    close$0: function(_) {
+      var t1, doneFuture;
+      t1 = this._state;
+      if ((t1 & 4) !== 0)
+        return this._doneFuture;
+      if (t1 >= 4)
+        throw H.wrapException(this._addEventError$0());
+      this._state = t1 | 4;
+      doneFuture = this._ensureDoneFuture$0();
+      this._sendDone$0();
+      return doneFuture;
+    },
+    _async$_add$1: function(data) {
+      this._sendData$1(data);
+    },
+    _forEachListener$1: function(action) {
+      var t1, link, id, link0;
+      t1 = this._state;
+      if ((t1 & 2) !== 0)
+        throw H.wrapException(P.StateError$("Cannot fire new event. Controller is already firing an event"));
+      link = this._next;
+      if (link === this)
+        return;
+      id = t1 & 1;
+      this._state = t1 ^ 3;
+      for (; link !== this;)
+        if (link._expectsEvent$1(id)) {
+          t1 = link._eventState;
+          if (typeof t1 !== "number")
+            return t1.$or();
+          link._eventState = t1 | 2;
+          action.call$1(link);
+          t1 = link._eventState;
+          if (typeof t1 !== "number")
+            return t1.$xor();
+          t1 ^= 1;
+          link._eventState = t1;
+          link0 = link._next;
+          if ((t1 & 4) !== 0)
+            this._removeListener$1(link);
+          t1 = link._eventState;
+          if (typeof t1 !== "number")
+            return t1.$and();
+          link._eventState = t1 & 4294967293;
+          link = link0;
+        } else
+          link = link._next;
+      this._state &= 4294967293;
+      if (this._next === this)
+        this._callOnCancel$0();
+    },
+    _callOnCancel$0: function() {
+      if ((this._state & 4) !== 0 && this._doneFuture._state === 0)
+        this._doneFuture._asyncComplete$1(null);
+      P._runGuarded(this._onCancel);
+    }
+  },
+  _SyncBroadcastStreamController: {
+    "^": "_BroadcastStreamController;_onListen,_onCancel,_state,_next,_previous,_addStreamState,_doneFuture",
+    _sendData$1: function(data) {
+      var t1 = this._next;
+      if (t1 === this)
+        return;
+      if (t1.get$_next() === this) {
+        this._state |= 2;
+        this._next._async$_add$1(data);
+        this._state &= 4294967293;
+        if (this._next === this)
+          this._callOnCancel$0();
+        return;
+      }
+      this._forEachListener$1(new P._SyncBroadcastStreamController__sendData_closure(this, data));
+    },
+    _sendDone$0: function() {
+      if (this._next !== this)
+        this._forEachListener$1(new P._SyncBroadcastStreamController__sendDone_closure(this));
+      else
+        this._doneFuture._asyncComplete$1(null);
+    }
+  },
+  _SyncBroadcastStreamController__sendData_closure: {
+    "^": "Closure;this_0,data_1",
+    call$1: function(subscription) {
+      subscription._async$_add$1(this.data_1);
+    },
+    $signature: function() {
+      return H.computeSignature(function(T) {
+        return {func: "dynamic___BufferingStreamSubscription", args: [[P._BufferingStreamSubscription, T]]};
+      }, this.this_0, "_SyncBroadcastStreamController");
+    }
+  },
+  _SyncBroadcastStreamController__sendDone_closure: {
+    "^": "Closure;this_0",
+    call$1: function(subscription) {
+      subscription._close$0();
+    },
+    $signature: function() {
+      return H.computeSignature(function(T) {
+        return {func: "dynamic___BroadcastSubscription", args: [[P._BroadcastSubscription, T]]};
+      }, this.this_0, "_SyncBroadcastStreamController");
+    }
+  },
+  _AsyncBroadcastStreamController: {
+    "^": "_BroadcastStreamController;_onListen,_onCancel,_state,_next,_previous,_addStreamState,_doneFuture",
+    _sendData$1: function(data) {
+      var link;
+      for (link = this._next; link !== this; link = link._next)
+        link._addPending$1(new P._DelayedData(data, null));
+    },
+    _sendDone$0: function() {
+      var link = this._next;
+      if (link !== this)
+        for (; link !== this; link = link._next)
+          link._addPending$1(C.C__DelayedDone);
+      else
+        this._doneFuture._asyncComplete$1(null);
+    }
+  },
   Future: {
     "^": "Object;",
     $isFuture: true
@@ -4171,6 +4405,9 @@ var $$ = {};
       t1 = this._zone;
       t1.toString;
       P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncCompleteError_closure(this, error, stackTrace));
+    },
+    _async$_Future$immediate$1: function(value, $T) {
+      this._asyncComplete$1(value);
     },
     $is_Future: true,
     $isFuture: true,
@@ -4493,9 +4730,6 @@ var $$ = {};
   },
   Stream: {
     "^": "Object;",
-    map$1: function(_, convert) {
-      return H.setRuntimeTypeInfo(new P._MapStream(convert, this), [H.getRuntimeTypeArgument(this, "Stream", 0), null]);
-    },
     forEach$1: function(_, action) {
       var t1, future;
       t1 = {};
@@ -4576,11 +4810,263 @@ var $$ = {};
   StreamSubscription: {
     "^": "Object;"
   },
+  _StreamController: {
+    "^": "Object;",
+    get$_pendingEvents: function() {
+      if ((this._state & 8) === 0)
+        return this._varData;
+      return this._varData.get$varData();
+    },
+    _ensurePendingEvents$0: function() {
+      var t1, state;
+      if ((this._state & 8) === 0) {
+        t1 = this._varData;
+        if (t1 == null) {
+          t1 = new P._StreamImplEvents(null, null, 0);
+          this._varData = t1;
+        }
+        return t1;
+      }
+      state = this._varData;
+      state.get$varData();
+      return state.get$varData();
+    },
+    get$_subscription: function() {
+      if ((this._state & 8) !== 0)
+        return this._varData.get$varData();
+      return this._varData;
+    },
+    _badEventState$0: function() {
+      if ((this._state & 4) !== 0)
+        return new P.StateError("Cannot add event after closing");
+      return new P.StateError("Cannot add event while adding a stream");
+    },
+    _ensureDoneFuture$0: function() {
+      var t1 = this._doneFuture;
+      if (t1 == null) {
+        t1 = (this._state & 2) !== 0 ? $.get$Future__nullFuture() : P._Future$(null);
+        this._doneFuture = t1;
+      }
+      return t1;
+    },
+    close$0: function(_) {
+      var t1 = this._state;
+      if ((t1 & 4) !== 0)
+        return this._ensureDoneFuture$0();
+      if (t1 >= 4)
+        throw H.wrapException(this._badEventState$0());
+      t1 |= 4;
+      this._state = t1;
+      if ((t1 & 1) !== 0)
+        this._sendDone$0();
+      else if ((t1 & 3) === 0)
+        this._ensurePendingEvents$0().add$1(0, C.C__DelayedDone);
+      return this._ensureDoneFuture$0();
+    },
+    _async$_add$1: function(value) {
+      var t1 = this._state;
+      if ((t1 & 1) !== 0)
+        this._sendData$1(value);
+      else if ((t1 & 3) === 0)
+        this._ensurePendingEvents$0().add$1(0, new P._DelayedData(value, null));
+    },
+    _subscribe$4: function(onData, onError, onDone, cancelOnError) {
+      var t1, t2, subscription, pendingEvents, addState;
+      if ((this._state & 3) !== 0)
+        throw H.wrapException(P.StateError$("Stream has already been listened to."));
+      t1 = $.Zone__current;
+      t2 = cancelOnError ? 1 : 0;
+      subscription = H.setRuntimeTypeInfo(new P._ControllerSubscription(this, null, null, null, t1, t2, null, null), [null]);
+      subscription._BufferingStreamSubscription$4(onData, onError, onDone, cancelOnError, null);
+      pendingEvents = this.get$_pendingEvents();
+      t2 = this._state |= 1;
+      if ((t2 & 8) !== 0) {
+        addState = this._varData;
+        addState.set$varData(subscription);
+        addState.resume$0();
+      } else
+        this._varData = subscription;
+      subscription._setPendingEvents$1(pendingEvents);
+      subscription._guardCallback$1(new P._StreamController__subscribe_closure(this));
+      return subscription;
+    },
+    _recordCancel$1: function(subscription) {
+      var result, e, s, exception, t1, result0;
+      result = null;
+      if ((this._state & 8) !== 0)
+        result = this._varData.cancel$0();
+      this._varData = null;
+      this._state = this._state & 4294967286 | 2;
+      if (this.get$_onCancel() != null)
+        if (result == null)
+          try {
+            result = this._onCancel$0();
+          } catch (exception) {
+            t1 = H.unwrapException(exception);
+            e = t1;
+            s = new H._StackTrace(exception, null);
+            result0 = P._Future$(null);
+            result0._asyncCompleteError$2(e, s);
+            result = result0;
+          }
+
+        else
+          result = result.whenComplete$1(this.get$_onCancel());
+      t1 = new P._StreamController__recordCancel_complete(this);
+      if (result != null)
+        result = result.whenComplete$1(t1);
+      else
+        t1.call$0();
+      return result;
+    },
+    _recordPause$1: function(subscription) {
+      if ((this._state & 8) !== 0)
+        this._varData.pause$0(0);
+      P._runGuarded(this.get$_onPause());
+    },
+    _recordResume$1: function(subscription) {
+      if ((this._state & 8) !== 0)
+        this._varData.resume$0();
+      P._runGuarded(this.get$_onResume());
+    }
+  },
+  _StreamController__subscribe_closure: {
+    "^": "Closure:11;this_0",
+    call$0: function() {
+      P._runGuarded(this.this_0.get$_onListen());
+    }
+  },
+  _StreamController__recordCancel_complete: {
+    "^": "Closure:3;this_0",
+    call$0: function() {
+      var t1 = this.this_0._doneFuture;
+      if (t1 != null && t1._state === 0)
+        t1._asyncComplete$1(null);
+    }
+  },
+  _SyncStreamControllerDispatch: {
+    "^": "Object;",
+    _sendData$1: function(data) {
+      this.get$_subscription()._async$_add$1(data);
+    },
+    _sendDone$0: function() {
+      this.get$_subscription()._close$0();
+    }
+  },
+  _AsyncStreamControllerDispatch: {
+    "^": "Object;",
+    _sendData$1: function(data) {
+      this.get$_subscription()._addPending$1(new P._DelayedData(data, null));
+    },
+    _sendDone$0: function() {
+      this.get$_subscription()._addPending$1(C.C__DelayedDone);
+    }
+  },
+  _AsyncStreamController: {
+    "^": "_StreamController__AsyncStreamControllerDispatch;_onListen<,_onPause<,_onResume<,_onCancel<,_varData,_state,_doneFuture",
+    _onCancel$0: function() {
+      return this._onCancel.call$0();
+    }
+  },
+  _StreamController__AsyncStreamControllerDispatch: {
+    "^": "_StreamController+_AsyncStreamControllerDispatch;"
+  },
+  _SyncStreamController: {
+    "^": "_StreamController__SyncStreamControllerDispatch;_onListen<,_onPause<,_onResume<,_onCancel<,_varData,_state,_doneFuture",
+    _onCancel$0: function() {
+      return this._onCancel.call$0();
+    }
+  },
+  _StreamController__SyncStreamControllerDispatch: {
+    "^": "_StreamController+_SyncStreamControllerDispatch;"
+  },
+  _NoCallbacks: {
+    "^": "Object;",
+    get$_onListen: function() {
+      return;
+    },
+    get$_onPause: function() {
+      return;
+    },
+    get$_onResume: function() {
+      return;
+    },
+    get$_onCancel: function() {
+      return;
+    },
+    _onCancel$0: function() {
+      return this.get$_onCancel().call$0();
+    }
+  },
+  _NoCallbackAsyncStreamController: {
+    "^": "_StreamController__AsyncStreamControllerDispatch0+_NoCallbacks;_varData,_state,_doneFuture"
+  },
+  _StreamController__AsyncStreamControllerDispatch0: {
+    "^": "_StreamController+_AsyncStreamControllerDispatch;",
+    $as_StreamController: function() {
+      return [null];
+    }
+  },
+  _NoCallbackSyncStreamController: {
+    "^": "_StreamController__SyncStreamControllerDispatch0+_NoCallbacks;_varData,_state,_doneFuture"
+  },
+  _StreamController__SyncStreamControllerDispatch0: {
+    "^": "_StreamController+_SyncStreamControllerDispatch;",
+    $as_StreamController: function() {
+      return [null];
+    }
+  },
+  _ControllerStream: {
+    "^": "_StreamImpl;_controller",
+    _createSubscription$4: function(onData, onError, onDone, cancelOnError) {
+      return this._controller._subscribe$4(onData, onError, onDone, cancelOnError);
+    },
+    get$hashCode: function(_) {
+      return (H.Primitives_objectHashCode(this._controller) ^ 892482866) >>> 0;
+    },
+    $eq: function(_, other) {
+      if (other == null)
+        return false;
+      if (this === other)
+        return true;
+      if (!J.getInterceptor(other).$is_ControllerStream)
+        return false;
+      return other._controller === this._controller;
+    },
+    $is_ControllerStream: true
+  },
+  _ControllerSubscription: {
+    "^": "_BufferingStreamSubscription;_controller<,_onData,_onError,_onDone,_zone,_state,_cancelFuture,_pending",
+    _onCancel$0: function() {
+      return this.get$_controller()._recordCancel$1(this);
+    },
+    _onPause$0: [function() {
+      this.get$_controller()._recordPause$1(this);
+    }, "call$0", "get$_onPause", 0, 0, 3],
+    _onResume$0: [function() {
+      this.get$_controller()._recordResume$1(this);
+    }, "call$0", "get$_onResume", 0, 0, 3]
+  },
   _EventSink: {
     "^": "Object;"
   },
   _BufferingStreamSubscription: {
-    "^": "Object;_zone<",
+    "^": "Object;_onData,_onError,_onDone,_zone<,_state,_cancelFuture,_pending",
+    _setPendingEvents$1: function(pendingEvents) {
+      if (pendingEvents == null)
+        return;
+      this._pending = pendingEvents;
+      if (!pendingEvents.get$isEmpty(pendingEvents)) {
+        this._state = (this._state | 64) >>> 0;
+        this._pending.schedule$1(this);
+      }
+    },
+    onDone$1: function(handleDone) {
+      if (handleDone == null)
+        handleDone = P._nullDoneHandler$closure();
+      this._zone.toString;
+      this._onDone = handleDone;
+    },
     pause$1: function(_, resumeSignal) {
       var t1 = this._state;
       if ((t1 & 8) !== 0)
@@ -4644,15 +5130,6 @@ var $$ = {};
       else
         this._addPending$1(new P._DelayedData(data, null));
     },
-    _addError$2: function(error, stackTrace) {
-      var t1 = this._state;
-      if ((t1 & 8) !== 0)
-        return;
-      if (t1 < 32)
-        this._sendError$2(error, stackTrace);
-      else
-        this._addPending$1(new P._DelayedError(error, stackTrace, null));
-    },
     _close$0: function() {
       var t1 = this._state;
       if ((t1 & 8) !== 0)
@@ -4690,26 +5167,9 @@ var $$ = {};
     _sendData$1: function(data) {
       var t1 = this._state;
       this._state = (t1 | 32) >>> 0;
-      this._zone.runUnaryGuarded$2(this._async$_onData, data);
+      this._zone.runUnaryGuarded$2(this._onData, data);
       this._state = (this._state & 4294967263) >>> 0;
       this._checkState$1((t1 & 4) !== 0);
-    },
-    _sendError$2: function(error, stackTrace) {
-      var t1, t2;
-      t1 = this._state;
-      t2 = new P._BufferingStreamSubscription__sendError_sendError(this, error, stackTrace);
-      if ((t1 & 1) !== 0) {
-        this._state = (t1 | 16) >>> 0;
-        this._cancel$0();
-        t1 = this._cancelFuture;
-        if (!!J.getInterceptor(t1).$isFuture)
-          t1.whenComplete$1(t2);
-        else
-          t2.call$0();
-      } else {
-        t2.call$0();
-        this._checkState$1((t1 & 4) !== 0);
-      }
     },
     _sendDone$0: function() {
       var t1, t2;
@@ -4770,35 +5230,21 @@ var $$ = {};
       if ((t1 & 64) !== 0 && t1 < 128)
         this._pending.schedule$1(this);
     },
-    _BufferingStreamSubscription$4: function(onData, onError, onDone, cancelOnError) {
+    _BufferingStreamSubscription$4: function(onData, onError, onDone, cancelOnError, $T) {
       var t1 = this._zone;
       t1.toString;
-      this._async$_onData = onData;
-      this._onError = P._registerErrorHandler(onError, t1);
-      this._onDone = onDone;
-    }
-  },
-  _BufferingStreamSubscription__sendError_sendError: {
-    "^": "Closure:3;this_0,error_1,stackTrace_2",
-    call$0: function() {
-      var t1, t2, t3, t4, t5, t6;
-      t1 = this.this_0;
-      t2 = t1._state;
-      if ((t2 & 8) !== 0 && (t2 & 16) === 0)
-        return;
-      t1._state = (t2 | 32) >>> 0;
-      t2 = t1._onError;
-      t3 = H.getDynamicRuntimeType();
-      t3 = H.buildFunctionType(t3, [t3, t3])._isTest$1(t2);
-      t4 = t1._zone;
-      t5 = this.error_1;
-      t6 = t1._onError;
-      if (t3)
-        t4.runBinaryGuarded$3(t6, t5, this.stackTrace_2);
-      else
-        t4.runUnaryGuarded$2(t6, t5);
-      t1._state = (t1._state & 4294967263) >>> 0;
-    }
+      this._onData = onData;
+      this._onError = P._registerErrorHandler(onError == null ? P._nullErrorHandler$closure() : onError, t1);
+      this.onDone$1(onDone);
+    },
+    static: {"^": "_BufferingStreamSubscription__STATE_CANCEL_ON_ERROR,_BufferingStreamSubscription__STATE_CLOSED,_BufferingStreamSubscription__STATE_INPUT_PAUSED,_BufferingStreamSubscription__STATE_CANCELED,_BufferingStreamSubscription__STATE_WAIT_FOR_CANCEL,_BufferingStreamSubscription__STATE_IN_CALLBACK,_BufferingStreamSubscription__STATE_HAS_PENDING,_BufferingStreamSubscription__STATE_PAUSE_COUNT,_BufferingStreamSubscription__STATE_PAUSE_COUNT_SHIFT", _BufferingStreamSubscription$: function(onData, onError, onDone, cancelOnError, $T) {
+        var t1, t2;
+        t1 = $.Zone__current;
+        t2 = cancelOnError ? 1 : 0;
+        t2 = H.setRuntimeTypeInfo(new P._BufferingStreamSubscription(null, null, null, t1, t2, null, null), [$T]);
+        t2._BufferingStreamSubscription$4(onData, onError, onDone, cancelOnError, $T);
+        return t2;
+      }}
   },
   _BufferingStreamSubscription__sendDone_sendDone: {
     "^": "Closure:3;this_0",
@@ -4813,6 +5259,18 @@ var $$ = {};
       t1._state = (t1._state & 4294967263) >>> 0;
     }
   },
+  _StreamImpl: {
+    "^": "Stream;",
+    listen$4$cancelOnError$onDone$onError: function(onData, cancelOnError, onDone, onError) {
+      return this._createSubscription$4(onData, onError, onDone, true === cancelOnError);
+    },
+    listen$1: function(onData) {
+      return this.listen$4$cancelOnError$onDone$onError(onData, null, null, null);
+    },
+    _createSubscription$4: function(onData, onError, onDone, cancelOnError) {
+      return P._BufferingStreamSubscription$(onData, onError, onDone, cancelOnError, H.getTypeArgumentByIndex(this, 0));
+    }
+  },
   _DelayedEvent: {
     "^": "Object;next@"
   },
@@ -4820,12 +5278,6 @@ var $$ = {};
     "^": "_DelayedEvent;value,next",
     perform$1: function(dispatch) {
       dispatch._sendData$1(this.value);
-    }
-  },
-  _DelayedError: {
-    "^": "_DelayedEvent;error>,stackTrace<,next",
-    perform$1: function(dispatch) {
-      dispatch._sendError$2(this.error, this.stackTrace);
     }
   },
   _DelayedDone: {
@@ -4895,6 +5347,34 @@ var $$ = {};
       $event.perform$1(dispatch);
     }
   },
+  _DoneStreamSubscription: {
+    "^": "Object;_zone<,_state,_onDone",
+    _schedule$0: function() {
+      var t1, t2;
+      if ((this._state & 2) !== 0)
+        return;
+      t1 = this._zone;
+      t2 = this.get$_sendDone();
+      t1.toString;
+      P._rootScheduleMicrotask(null, null, t1, t2);
+      this._state = (this._state | 2) >>> 0;
+    },
+    onDone$1: function(handleDone) {
+      this._onDone = handleDone;
+    },
+    cancel$0: function() {
+      return;
+    },
+    _sendDone$0: [function() {
+      var t1 = (this._state & 4294967293) >>> 0;
+      this._state = t1;
+      if (t1 >= 4)
+        return;
+      this._state = (t1 | 1) >>> 0;
+      this._zone.runGuarded$1(this._onDone);
+    }, "call$0", "get$_sendDone", 0, 0, 3],
+    static: {"^": "_DoneStreamSubscription__DONE_SENT,_DoneStreamSubscription__SCHEDULED,_DoneStreamSubscription__PAUSED"}
+  },
   _cancelAndError_closure: {
     "^": "Closure:11;future_0,error_1,stackTrace_2",
     call$0: function() {
@@ -4911,103 +5391,6 @@ var $$ = {};
     "^": "Closure:11;future_0,value_1",
     call$0: function() {
       return this.future_0._complete$1(this.value_1);
-    }
-  },
-  _ForwardingStream: {
-    "^": "Stream;",
-    listen$4$cancelOnError$onDone$onError: function(onData, cancelOnError, onDone, onError) {
-      var t1, t2, t3, t4;
-      cancelOnError = true === cancelOnError;
-      t1 = H.getRuntimeTypeArgument(this, "_ForwardingStream", 0);
-      t2 = H.getRuntimeTypeArgument(this, "_ForwardingStream", 1);
-      t3 = $.Zone__current;
-      t4 = cancelOnError ? 1 : 0;
-      t4 = H.setRuntimeTypeInfo(new P._ForwardingStreamSubscription(this, null, null, null, null, t3, t4, null, null), [t1, t2]);
-      t4._BufferingStreamSubscription$4(onData, onError, onDone, cancelOnError);
-      t4._ForwardingStreamSubscription$5(this, onData, onError, onDone, cancelOnError, t1, t2);
-      return t4;
-    },
-    listen$3$onDone$onError: function(onData, onDone, onError) {
-      return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
-    },
-    _handleData$2: function(data, sink) {
-      sink._async$_add$1(data);
-    },
-    $asStream: function($S, $T) {
-      return [$T];
-    }
-  },
-  _ForwardingStreamSubscription: {
-    "^": "_BufferingStreamSubscription;_stream,_subscription,_async$_onData,_onError,_onDone,_zone,_state,_cancelFuture,_pending",
-    _async$_add$1: function(data) {
-      if ((this._state & 2) !== 0)
-        return;
-      P._BufferingStreamSubscription.prototype._async$_add$1.call(this, data);
-    },
-    _addError$2: function(error, stackTrace) {
-      if ((this._state & 2) !== 0)
-        return;
-      P._BufferingStreamSubscription.prototype._addError$2.call(this, error, stackTrace);
-    },
-    _onPause$0: [function() {
-      var t1 = this._subscription;
-      if (t1 == null)
-        return;
-      t1.pause$0(0);
-    }, "call$0", "get$_onPause", 0, 0, 3],
-    _onResume$0: [function() {
-      var t1 = this._subscription;
-      if (t1 == null)
-        return;
-      t1.resume$0();
-    }, "call$0", "get$_onResume", 0, 0, 3],
-    _onCancel$0: function() {
-      var t1 = this._subscription;
-      if (t1 != null) {
-        this._subscription = null;
-        t1.cancel$0();
-      }
-      return;
-    },
-    _handleData$1: [function(data) {
-      this._stream._handleData$2(data, this);
-    }, "call$1", "get$_handleData", 2, 0, function() {
-      return H.computeSignature(function(S, T) {
-        return {func: "void__S", void: true, args: [S]};
-      }, this.$receiver, "_ForwardingStreamSubscription");
-    }],
-    _handleError$2: [function(error, stackTrace) {
-      this._addError$2(error, stackTrace);
-    }, "call$2", "get$_handleError", 4, 0, 20],
-    _handleDone$0: [function() {
-      this._close$0();
-    }, "call$0", "get$_handleDone", 0, 0, 3],
-    _ForwardingStreamSubscription$5: function(_stream, onData, onError, onDone, cancelOnError, $S, $T) {
-      var t1, t2;
-      t1 = this.get$_handleData();
-      t2 = this.get$_handleError();
-      this._subscription = this._stream._async$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
-    }
-  },
-  _MapStream: {
-    "^": "_ForwardingStream;_transform,_async$_source",
-    _transform$1: function(arg0) {
-      return this._transform.call$1(arg0);
-    },
-    _handleData$2: function(inputEvent, sink) {
-      var outputEvent, e, s, exception, t1;
-      outputEvent = null;
-      try {
-        outputEvent = this._transform$1(inputEvent);
-      } catch (exception) {
-        t1 = H.unwrapException(exception);
-        e = t1;
-        s = new H._StackTrace(exception, null);
-        sink._addError$2(e, s);
-        return;
-      }
-
-      sink._async$_add$1(outputEvent);
     }
   },
   _Zone: {
@@ -5049,23 +5432,6 @@ var $$ = {};
           return t1;
         }
         t1 = P._rootRunUnary(null, null, this, f, arg);
-        return t1;
-      } catch (exception) {
-        t1 = H.unwrapException(exception);
-        e = t1;
-        s = new H._StackTrace(exception, null);
-        return P._rootHandleUncaughtError(null, null, this, e, s);
-      }
-
-    },
-    runBinaryGuarded$3: function(f, arg1, arg2) {
-      var e, s, t1, exception;
-      try {
-        if (C.C__RootZone === $.Zone__current) {
-          t1 = f.call$2(arg1, arg2);
-          return t1;
-        }
-        t1 = P._rootRunBinary(null, null, this, f, arg1, arg2);
         return t1;
       } catch (exception) {
         t1 = H.unwrapException(exception);
@@ -5697,7 +6063,7 @@ var $$ = {};
         action.call$2(cell.get$_key(), cell._collection$_value);
         if (modifications !== this._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(this));
-        cell = cell._next;
+        cell = cell._collection$_next;
       }
     },
     _addHashTableEntry$3: function(table, key, value) {
@@ -5726,8 +6092,8 @@ var $$ = {};
         this._first = cell;
       } else {
         last = this._last;
-        cell._previous = last;
-        last.set$_next(cell);
+        cell._collection$_previous = last;
+        last.set$_collection$_next(cell);
         this._last = cell;
       }
       ++this._collection$_length;
@@ -5736,16 +6102,16 @@ var $$ = {};
     },
     _unlinkCell$1: function(cell) {
       var previous, next;
-      previous = cell.get$_previous();
-      next = cell.get$_next();
+      previous = cell.get$_collection$_previous();
+      next = cell.get$_collection$_next();
       if (previous == null)
         this._first = next;
       else
-        previous.set$_next(next);
+        previous.set$_collection$_next(next);
       if (next == null)
         this._last = previous;
       else
-        next.set$_previous(previous);
+        next.set$_collection$_previous(previous);
       --this._collection$_length;
       this._modifications = this._modifications + 1 & 67108863;
     },
@@ -5780,7 +6146,7 @@ var $$ = {};
     }
   },
   LinkedHashMapCell: {
-    "^": "Object;_key<,_collection$_value@,_next@,_previous@"
+    "^": "Object;_key<,_collection$_value@,_collection$_next@,_collection$_previous@"
   },
   LinkedHashMapKeyIterable: {
     "^": "IterableBase;_map",
@@ -5806,7 +6172,7 @@ var $$ = {};
         f.call$1(cell.get$_key());
         if (modifications !== t1._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(t1));
-        cell = cell._next;
+        cell = cell._collection$_next;
       }
     },
     $isEfficientLength: true
@@ -5827,7 +6193,7 @@ var $$ = {};
           return false;
         } else {
           this._collection$_current = t1.get$_key();
-          this._cell = this._cell.get$_next();
+          this._cell = this._cell.get$_collection$_next();
           return true;
         }
       }
@@ -5897,7 +6263,7 @@ var $$ = {};
         action.call$1(cell.get$_collection$_element());
         if (modifications !== this._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(this));
-        cell = cell._next;
+        cell = cell._collection$_next;
       }
     },
     add$1: function(_, element) {
@@ -5999,8 +6365,8 @@ var $$ = {};
         this._first = cell;
       } else {
         last = this._last;
-        cell._previous = last;
-        last.set$_next(cell);
+        cell._collection$_previous = last;
+        last.set$_collection$_next(cell);
         this._last = cell;
       }
       ++this._collection$_length;
@@ -6009,16 +6375,16 @@ var $$ = {};
     },
     _unlinkCell$1: function(cell) {
       var previous, next;
-      previous = cell.get$_previous();
-      next = cell.get$_next();
+      previous = cell.get$_collection$_previous();
+      next = cell.get$_collection$_next();
       if (previous == null)
         this._first = next;
       else
-        previous.set$_next(next);
+        previous.set$_collection$_next(next);
       if (next == null)
         this._last = previous;
       else
-        next.set$_previous(previous);
+        next.set$_collection$_previous(previous);
       --this._collection$_length;
       this._modifications = this._modifications + 1 & 67108863;
     },
@@ -6044,7 +6410,7 @@ var $$ = {};
       }}
   },
   LinkedHashSetCell: {
-    "^": "Object;_collection$_element<,_next@,_previous@"
+    "^": "Object;_collection$_element<,_collection$_next@,_collection$_previous@"
   },
   LinkedHashSetIterator: {
     "^": "Object;_set,_modifications,_cell,_collection$_current",
@@ -6062,7 +6428,7 @@ var $$ = {};
           return false;
         } else {
           this._collection$_current = t1.get$_collection$_element();
-          this._cell = this._cell.get$_next();
+          this._cell = this._cell.get$_collection$_next();
           return true;
         }
       }
@@ -6073,9 +6439,6 @@ var $$ = {};
   },
   IterableBase: {
     "^": "Object;",
-    map$1: function(_, f) {
-      return H.MappedIterable_MappedIterable(this, f, H.getRuntimeTypeArgument(this, "IterableBase", 0), null);
-    },
     forEach$1: function(_, f) {
       var t1;
       for (t1 = this.get$iterator(this); t1.moveNext$0();)
@@ -6142,8 +6505,8 @@ var $$ = {};
     get$isEmpty: function(receiver) {
       return this.get$length(receiver) === 0;
     },
-    map$1: function(receiver, f) {
-      return H.setRuntimeTypeInfo(new H.MappedListIterable(receiver, f), [null, null]);
+    where$1: function(receiver, test) {
+      return H.setRuntimeTypeInfo(new H.WhereIterable(receiver, test), [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
     },
     toList$1$growable: function(receiver, growable) {
       var result, i, t1;
@@ -6389,9 +6752,6 @@ var $$ = {};
     },
     toList$0: function($receiver) {
       return this.toList$1$growable($receiver, true);
-    },
-    map$1: function(_, f) {
-      return H.setRuntimeTypeInfo(new H.EfficientLengthMappedIterable(this, f), [H.getTypeArgumentByIndex(this, 0), null]);
     },
     toString$0: function(_) {
       return P.IterableBase_iterableToFullString(this, "{", "}");
@@ -6877,7 +7237,7 @@ var $$ = {};
     static: {"^": "_Utf8Decoder__LIMITS"}
   },
   _Utf8Decoder_convert_scanOneByteCharacters: {
-    "^": "Closure:21;endIndex_0",
+    "^": "Closure:20;endIndex_0",
     call$2: function(units, from) {
       var to, t1, i, unit;
       to = this.endIndex_0;
@@ -6892,7 +7252,7 @@ var $$ = {};
     }
   },
   _Utf8Decoder_convert_addSingleBytes: {
-    "^": "Closure:22;this_1,codeUnits_2,startIndex_3,endIndex_4",
+    "^": "Closure:21;this_1,codeUnits_2,startIndex_3,endIndex_4",
     call$2: function(from, to) {
       var t1, t2, t3;
       t1 = from === 0 && to === J.get$length$asx(this.codeUnits_2);
@@ -7048,7 +7408,7 @@ var $$ = {};
     return new P.Utf8Decoder(allowMalformed).convert$1(bytes);
   },
   NoSuchMethodError_toString_closure: {
-    "^": "Closure:23;box_0",
+    "^": "Closure:22;box_0",
     call$2: function(key, value) {
       var t1 = this.box_0;
       if (t1.i_1 > 0)
@@ -7184,7 +7544,7 @@ var $$ = {};
       }}
   },
   DateTime_parse_parseIntOrZero: {
-    "^": "Closure:24;",
+    "^": "Closure:23;",
     call$1: function(matched) {
       if (matched == null)
         return 0;
@@ -7192,7 +7552,7 @@ var $$ = {};
     }
   },
   DateTime_parse_parseDoubleOrZero: {
-    "^": "Closure:25;",
+    "^": "Closure:24;",
     call$1: function(matched) {
       if (matched == null)
         return 0;
@@ -7263,7 +7623,7 @@ var $$ = {};
       }}
   },
   Duration_toString_sixDigits: {
-    "^": "Closure:26;",
+    "^": "Closure:25;",
     call$1: function(n) {
       if (n >= 100000)
         return "" + n;
@@ -7279,7 +7639,7 @@ var $$ = {};
     }
   },
   Duration_toString_twoDigits: {
-    "^": "Closure:26;",
+    "^": "Closure:25;",
     call$1: function(n) {
       if (n >= 10)
         return "" + n;
@@ -7695,7 +8055,7 @@ var $$ = {};
     "%": "DOMException"
   },
   Element: {
-    "^": "Node;",
+    "^": "Node;className%",
     get$classes: function(receiver) {
       return new W._ElementCssClassSet(receiver);
     },
@@ -7736,6 +8096,7 @@ var $$ = {};
     get$onClick: function(receiver) {
       return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
     },
+    $isElement: true,
     "%": ";Element"
   },
   EmbedElement: {
@@ -7822,6 +8183,7 @@ var $$ = {};
   },
   InputElement: {
     "^": "HtmlElement;height},src},width}",
+    $isElement: true,
     "%": "HTMLInputElement"
   },
   LinkElement: {
@@ -8011,6 +8373,39 @@ var $$ = {};
       this.setProperty$3(receiver, "text-align", value, "");
     }
   },
+  _FrozenElementList: {
+    "^": "ListBase;_nodeList,_elementList",
+    get$length: function(_) {
+      return this._nodeList.length;
+    },
+    $index: function(_, index) {
+      var t1 = this._nodeList;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    $indexSet: function(_, index, value) {
+      throw H.wrapException(P.UnsupportedError$("Cannot modify list"));
+    },
+    _html$_FrozenElementList$_wrap$1: function(_nodeList, $T) {
+      var t1 = C.NodeList_methods.where$1(this._nodeList, new W._FrozenElementList$_wrap_closure());
+      this._elementList = P.List_List$from(t1, true, H.getRuntimeTypeArgument(t1, "IterableBase", 0));
+    },
+    $isList: true,
+    $asList: null,
+    $isEfficientLength: true,
+    static: {_FrozenElementList$_wrap: function(_nodeList, $T) {
+        var t1 = H.setRuntimeTypeInfo(new W._FrozenElementList(_nodeList, null), [$T]);
+        t1._html$_FrozenElementList$_wrap$1(_nodeList, $T);
+        return t1;
+      }}
+  },
+  _FrozenElementList$_wrap_closure: {
+    "^": "Closure:13;",
+    call$1: function(e) {
+      return !!J.getInterceptor(e).$isElement;
+    }
+  },
   HttpRequest_getString_closure: {
     "^": "Closure:13;",
     call$1: function(xhr) {
@@ -8079,7 +8474,7 @@ var $$ = {};
     readClasses$0: function() {
       var s, t1, trimmed;
       s = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-      for (t1 = this._element.className.split(" "), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
+      for (t1 = J.get$className$x(this._element).split(" "), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
         trimmed = J.trim$0$s(t1._current);
         if (trimmed.length !== 0)
           s.add$1(0, trimmed);
@@ -8088,7 +8483,7 @@ var $$ = {};
     },
     writeClasses$1: function(s) {
       P.List_List$from(s, true, null);
-      this._element.className = s.join$1(0, " ");
+      J.set$className$x(this._element, s.join$1(0, " "));
     }
   },
   _EventStream: {
@@ -8098,46 +8493,28 @@ var $$ = {};
       t1.$builtinTypeInfo = this.$builtinTypeInfo;
       t1._tryResume$0();
       return t1;
-    },
-    listen$3$onDone$onError: function(onData, onDone, onError) {
-      return this.listen$4$cancelOnError$onDone$onError(onData, null, onDone, onError);
     }
   },
   _ElementEventStreamImpl: {
     "^": "_EventStream;_target,_eventType,_useCapture"
   },
   _EventStreamSubscription: {
-    "^": "StreamSubscription;_pauseCount,_target,_eventType,_onData,_useCapture",
+    "^": "StreamSubscription;_pauseCount,_target,_eventType,_html$_onData,_useCapture",
     cancel$0: function() {
       if (this._target == null)
         return;
       this._unlisten$0();
       this._target = null;
-      this._onData = null;
+      this._html$_onData = null;
       return;
     },
-    pause$1: function(_, resumeSignal) {
-      if (this._target == null)
-        return;
-      ++this._pauseCount;
-      this._unlisten$0();
-    },
-    pause$0: function($receiver) {
-      return this.pause$1($receiver, null);
-    },
-    resume$0: function() {
-      if (this._target == null || this._pauseCount <= 0)
-        return;
-      --this._pauseCount;
-      this._tryResume$0();
-    },
     _tryResume$0: function() {
-      var t1 = this._onData;
+      var t1 = this._html$_onData;
       if (t1 != null && this._pauseCount <= 0)
         J.addEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
     },
     _unlisten$0: function() {
-      var t1 = this._onData;
+      var t1 = this._html$_onData;
       if (t1 != null)
         J.removeEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
     }
@@ -8177,6 +8554,12 @@ var $$ = {};
     },
     postMessage$2: function($receiver, message, targetOrigin) {
       return this.postMessage$3($receiver, message, targetOrigin, null);
+    },
+    addEventListener$3: function(_, type, listener, useCapture) {
+      return H.throwExpression(P.UnsupportedError$("You can only attach EventListeners to your own window."));
+    },
+    removeEventListener$3: function(_, type, listener, useCapture) {
+      return H.throwExpression(P.UnsupportedError$("You can only attach EventListeners to your own window."));
     },
     static: {_DOMWindowCrossFrame__createSafe: function(w) {
         if (w === window)
@@ -8381,9 +8764,12 @@ var $$ = {};
   },
   GitHub: {
     "^": "Object;auth,endpoint,client",
-    stargazers$1: function(slug) {
-      var t1 = [P.List, T.Response];
-      return new T.PaginationHelper(this, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1])).fetch$2("GET", "/repos/" + (H.S(slug.owner) + "/" + H.S(slug.name)) + "/stargazers").then$1(new T.GitHub_stargazers_closure(this));
+    stargazersStreamed$1: function(slug) {
+      var controller, t1;
+      controller = P.StreamController_StreamController(null, null, null, null, false, null);
+      t1 = [P.List, T.Response];
+      new T.PaginationHelper(this, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1])).fetchStreamed$2("GET", "/repos/" + (H.S(slug.owner) + "/" + H.S(slug.name)) + "/stargazers").listen$1(new T.GitHub_stargazersStreamed_closure(this, controller)).onDone$1(new T.GitHub_stargazersStreamed_closure0(controller));
+      return H.setRuntimeTypeInfo(new P._ControllerStream(controller), [null]);
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, url;
@@ -8409,20 +8795,27 @@ var $$ = {};
     },
     static: {"^": "GitHub_defaultClient"}
   },
-  GitHub_stargazers_closure: {
-    "^": "Closure:13;this_0",
-    call$1: function(responses) {
-      var users, t1, t2;
-      users = [];
-      for (t1 = J.get$iterator$ax(responses), t2 = this.this_0; t1.moveNext$0();)
-        C.JSArray_methods.addAll$1(users, J.map$1$ax(C.JsonCodec_null_null.decode$1(J.get$body$x(t1.get$current())), new T.GitHub_stargazers__closure(t2)));
-      return users;
+  GitHub_stargazersStreamed_closure: {
+    "^": "Closure:13;this_0,controller_1",
+    call$1: function(response) {
+      J.forEach$1$ax(C.JsonCodec_null_null.decode$1(J.get$body$x(response)), new T.GitHub_stargazersStreamed__closure(this.this_0, this.controller_1));
     }
   },
-  GitHub_stargazers__closure: {
-    "^": "Closure:13;this_1",
+  GitHub_stargazersStreamed__closure: {
+    "^": "Closure:13;this_2,controller_3",
     call$1: function(it) {
-      return T.User_fromJSON(this.this_1, it);
+      var t1, t2;
+      t1 = this.controller_3;
+      t2 = T.User_fromJSON(this.this_2, it);
+      if (t1._state >= 4)
+        H.throwExpression(t1._badEventState$0());
+      t1._async$_add$1(t2);
+    }
+  },
+  GitHub_stargazersStreamed_closure0: {
+    "^": "Closure:11;controller_4",
+    call$0: function() {
+      return this.controller_4.close$0(0);
     }
   },
   GitHub_request_closure: {
@@ -8445,56 +8838,48 @@ var $$ = {};
   },
   PaginationHelper: {
     "^": "Object;github,responses,completer",
-    fetch$6$body$headers$pages$params: function(method, path, body, headers, pages, params) {
-      var t1, t2;
+    fetchStreamed$6$body$headers$pages$params: function(method, path, body, headers, pages, params) {
+      var t1, controller, t2;
       t1 = {};
-      t2 = new T.PaginationHelper_fetch_actualFetch(this, method, headers, params, body);
+      controller = P.StreamController_StreamController$broadcast(null, null, false, null);
+      t2 = new T.PaginationHelper_fetchStreamed_actualFetch(this, method, headers, params, body);
       t1.count_0 = 0;
       t1.handleResponse_1 = null;
-      t1.handleResponse_1 = new T.PaginationHelper_fetch_closure(t1, this, pages, t2, new T.PaginationHelper_fetch_done(this));
+      t1.handleResponse_1 = new T.PaginationHelper_fetchStreamed_closure(t1, pages, controller, t2);
       t2.call$1(path).then$1(t1.handleResponse_1);
-      return this.completer.future;
+      return H.setRuntimeTypeInfo(new P._BroadcastStream(controller), [H.getTypeArgumentByIndex(controller, 0)]);
     },
-    fetch$2: function(method, path) {
-      return this.fetch$6$body$headers$pages$params(method, path, null, null, null, null);
+    fetchStreamed$2: function(method, path) {
+      return this.fetchStreamed$6$body$headers$pages$params(method, path, null, null, null, null);
     }
   },
-  PaginationHelper_fetch_actualFetch: {
-    "^": "Closure:27;this_1,method_2,headers_3,params_4,body_5",
+  PaginationHelper_fetchStreamed_actualFetch: {
+    "^": "Closure:26;this_1,method_2,headers_3,params_4,body_5",
     call$1: function(realPath) {
       return this.this_1.github.request$5$body$headers$params(0, this.method_2, realPath, this.body_5, this.headers_3, this.params_4);
     }
   },
-  PaginationHelper_fetch_done: {
-    "^": "Closure:3;this_6",
-    call$0: function() {
-      var t1, t2;
-      t1 = this.this_6;
-      t2 = t1.completer.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1.responses);
-      return;
-    }
-  },
-  PaginationHelper_fetch_closure: {
-    "^": "Closure:28;box_0,this_7,pages_8,actualFetch_9,done_10",
+  PaginationHelper_fetchStreamed_closure: {
+    "^": "Closure:27;box_0,pages_6,controller_7,actualFetch_8",
     call$1: function(response) {
-      var t1, t2, info;
+      var t1, t2, t3, info;
       t1 = this.box_0;
       ++t1.count_0;
-      this.this_7.responses.push(response);
-      t2 = J.getInterceptor$x(response);
-      if (!t2.get$headers(response).containsKey$1("link")) {
-        this.done_10.call$0();
+      t2 = this.controller_7;
+      if (t2._state >= 4)
+        H.throwExpression(t2._addEventError$0());
+      t2._sendData$1(response);
+      t3 = J.getInterceptor$x(response);
+      if (!t3.get$headers(response).containsKey$1("link")) {
+        t2.close$0(0);
         return;
       }
-      info = M.parseLinkHeader(J.$index$asx(t2.get$headers(response), "link"));
+      info = M.parseLinkHeader(J.$index$asx(t3.get$headers(response), "link"));
       if (!info.containsKey$1("next")) {
-        this.done_10.call$0();
+        t2.close$0(0);
         return;
       }
-      this.actualFetch_9.call$1(info.$index(0, "next")).then$1(t1.handleResponse_1);
+      this.actualFetch_8.call$1(info.$index(0, "next")).then$1(t1.handleResponse_1);
     }
   },
   RepositorySlug: {
@@ -8612,7 +8997,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_readSlot: {
-    "^": "Closure:29;copies_3",
+    "^": "Closure:28;copies_3",
     call$1: function(i) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -8621,7 +9006,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:30;copies_4",
+    "^": "Closure:29;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -8711,10 +9096,6 @@ var $$ = {};
     forEach$1: function(_, f) {
       this.readClasses$0().forEach$1(0, f);
     },
-    map$1: function(_, f) {
-      var t1 = this.readClasses$0();
-      return H.setRuntimeTypeInfo(new H.EfficientLengthMappedIterable(t1, f), [H.getTypeArgumentByIndex(t1, 0), null]);
-    },
     get$isEmpty: function(_) {
       return this.readClasses$0()._collection$_length === 0;
     },
@@ -8756,24 +9137,22 @@ var $$ = {};
     R.init("stars.dart", new G.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
   loadOrganization: function() {
-    var t1, url, params, token, t2;
-    t1 = {};
-    t1.user_0 = "DirectMyFile";
-    t1.repo_1 = "github.dart";
+    var url, params, user, repo, token, t1;
     url = window.location.href;
     if (J.getInterceptor$asx(url).contains$1(url, "?")) {
       params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
-      if (params.containsKey$1("user") === true)
-        t1.user_0 = params.$index(0, "user");
-      if (params.containsKey$1("repo") === true)
-        t1.repo_1 = params.$index(0, "repo");
+      user = params.containsKey$1("user") === true ? params.$index(0, "user") : "DirectMyFile";
+      repo = params.containsKey$1("repo") === true ? params.$index(0, "repo") : "github.dart";
       token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    } else
+    } else {
+      user = "DirectMyFile";
+      repo = "github.dart";
       token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    t2 = $.GitHub_defaultClient.call$0();
-    t2 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t2);
-    $.github = t2;
-    t2.stargazers$1(new T.RepositorySlug(t1.user_0, t1.repo_1)).then$1(new G.loadOrganization_closure(t1));
+    }
+    t1 = $.GitHub_defaultClient.call$0();
+    $.github = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
+    J.insertAdjacentText$2$x(document.querySelector("#title"), "beforeend", " for " + H.S(user) + "/" + H.S(repo));
+    $.github.stargazersStreamed$1(new T.RepositorySlug(user, repo)).listen$1(new G.loadOrganization_closure()).onDone$1(new G.loadOrganization_closure0());
   },
   main_closure: {
     "^": "Closure:11;",
@@ -8783,38 +9162,37 @@ var $$ = {};
     }
   },
   loadOrganization_closure: {
-    "^": "Closure:13;box_0",
-    call$1: function(stargazers) {
-      var t1, stargazer, h, t2, e;
-      t1 = this.box_0;
-      J.insertAdjacentText$2$x(document.querySelector("#title"), "beforeend", " for " + H.S(t1.user_0) + "/" + H.S(t1.repo_1));
-      t1 = J.getInterceptor$asx(stargazers);
-      J.insertAdjacentText$2$x(document.querySelector("#total"), "beforeend", J.$add$ns(J.toString$0(t1.get$length(stargazers)), " stars"));
-      for (t1 = t1.get$iterator(stargazers); t1.moveNext$0();) {
-        stargazer = t1.get$current();
-        h = document.createElement("div", null);
-        t2 = J.getInterceptor$x(h);
-        t2.get$classes(h).add$1(0, "box");
-        t2.get$classes(h).add$1(0, "user");
-        J.set$textAlign$x(h.style, "center");
-        t2 = stargazer.get$avatarUrl();
-        e = document.createElement("img", null);
-        if (t2 != null)
-          J.set$src$x(e, t2);
-        J.set$width$x(e, 64);
-        J.set$height$x(e, 64);
-        J.get$classes$x(e).add$1(0, "avatar");
-        h.appendChild(e);
-        t2 = stargazer.url;
-        e = document.createElement("a", null);
-        if (t2 != null)
-          J.set$href$x(e, t2);
-        t2 = document.createElement("p", null);
-        t2.textContent = stargazer.login;
-        e.appendChild(t2);
-        h.appendChild(e);
-        $.$$stars.appendChild(h);
-      }
+    "^": "Closure:13;",
+    call$1: function(stargazer) {
+      var h, t1, e;
+      h = document.createElement("div", null);
+      t1 = J.getInterceptor$x(h);
+      t1.get$classes(h).add$1(0, "box");
+      t1.get$classes(h).add$1(0, "user");
+      J.set$textAlign$x(h.style, "center");
+      t1 = stargazer.get$avatarUrl();
+      e = document.createElement("img", null);
+      if (t1 != null)
+        J.set$src$x(e, t1);
+      J.set$width$x(e, 64);
+      J.set$height$x(e, 64);
+      J.get$classes$x(e).add$1(0, "avatar");
+      h.appendChild(e);
+      t1 = stargazer.url;
+      e = document.createElement("a", null);
+      if (t1 != null)
+        J.set$href$x(e, t1);
+      t1 = document.createElement("p", null);
+      t1.textContent = stargazer.login;
+      e.appendChild(t1);
+      h.appendChild(e);
+      $.$$stars.appendChild(h);
+    }
+  },
+  loadOrganization_closure0: {
+    "^": "Closure:11;",
+    call$0: function() {
+      J.insertAdjacentText$2$x(document.querySelector("#total"), "beforeend", C.JSInt_methods.toString$0(W._FrozenElementList$_wrap(document.querySelectorAll(".user"), null)._nodeList.length) + " stars");
     }
   }
 },
@@ -8882,14 +9260,25 @@ $$ = null;
   H.RawReceivePortImpl.$isObject = TRUE;
   H._IsolateEvent.$isObject = TRUE;
   H._IsolateContext.$isObject = TRUE;
-  _ = P.Future;
-  _.$isFuture = TRUE;
-  _.$isObject = TRUE;
   _ = P.Symbol;
   _.$isSymbol = TRUE;
   _.$isObject = TRUE;
+  _ = P.Future;
+  _.$isFuture = TRUE;
+  _.$isObject = TRUE;
   _ = P.StackTrace;
   _.$isStackTrace = TRUE;
+  _.$isObject = TRUE;
+  _ = P._BroadcastSubscription;
+  _.$is_BroadcastSubscription = TRUE;
+  _.$is_BufferingStreamSubscription = TRUE;
+  _.$is_EventSink = TRUE;
+  _.$isStreamSubscription = TRUE;
+  _.$isObject = TRUE;
+  _ = P._BufferingStreamSubscription;
+  _.$is_BufferingStreamSubscription = TRUE;
+  _.$is_EventSink = TRUE;
+  _.$isStreamSubscription = TRUE;
   _.$isObject = TRUE;
   _ = P.$double;
   _.$is$double = TRUE;
@@ -8906,6 +9295,9 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Stream;
+  _.$isStream = TRUE;
   _.$isObject = TRUE;
   _ = P.DateTime;
   _.$isDateTime = TRUE;
@@ -9054,6 +9446,9 @@ J.forEach$1$ax = function(receiver, a0) {
 J.get$body$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$body(receiver);
 };
+J.get$className$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$className(receiver);
+};
 J.get$classes$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$classes(receiver);
 };
@@ -9081,9 +9476,6 @@ J.get$responseText$x = function(receiver) {
 J.insertAdjacentText$2$x = function(receiver, a0, a1) {
   return J.getInterceptor$x(receiver).insertAdjacentText$2(receiver, a0, a1);
 };
-J.map$1$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).map$1(receiver, a0);
-};
 J.postMessage$2$x = function(receiver, a0, a1) {
   return J.getInterceptor$x(receiver).postMessage$2(receiver, a0, a1);
 };
@@ -9104,6 +9496,9 @@ J.round$0$n = function(receiver) {
 };
 J.send$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).send$1(receiver, a0);
+};
+J.set$className$x = function(receiver, value) {
+  return J.getInterceptor$x(receiver).set$className(receiver, value);
 };
 J.set$height$x = function(receiver, value) {
   return J.getInterceptor$x(receiver).set$height(receiver, value);
@@ -9149,6 +9544,7 @@ C.JSArray_methods = J.JSArray.prototype;
 C.JSInt_methods = J.JSInt.prototype;
 C.JSNumber_methods = J.JSNumber.prototype;
 C.JSString_methods = J.JSString.prototype;
+C.NodeList_methods = W.NodeList.prototype;
 C.PlainJavaScriptObject_methods = J.PlainJavaScriptObject.prototype;
 C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
 C.Window_methods = W.Window.prototype;
@@ -9409,6 +9805,11 @@ Isolate.$lazy($, "undefinedLiteralPropertyPattern", "TypeErrorDecoder_undefinedL
 Isolate.$lazy($, "scheduleImmediateClosure", "_AsyncRun_scheduleImmediateClosure", "get$_AsyncRun_scheduleImmediateClosure", function() {
   return P._AsyncRun__initializeScheduleImmediate();
 });
+Isolate.$lazy($, "_nullFuture", "Future__nullFuture", "get$Future__nullFuture", function() {
+  var t1 = H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null, null, null, null, null, null), [null]);
+  t1._async$_Future$immediate$1(null, null);
+  return t1;
+});
 Isolate.$lazy($, "_toStringVisiting", "IterableBase__toStringVisiting", "get$IterableBase__toStringVisiting", function() {
   return [];
 });
@@ -9434,7 +9835,6 @@ init.metadata = [{func: "dynamic__String", args: [P.String]},
 {func: "dynamic__dynamic__dynamic", args: [null], opt: [null]},
 {func: "bool_", ret: P.bool},
 {func: "dynamic__dynamic_StackTrace", args: [null, P.StackTrace]},
-{func: "void__dynamic_StackTrace", void: true, args: [null, P.StackTrace]},
 {func: "int__dynamic_int", ret: P.$int, args: [null, P.$int]},
 {func: "void__int_int", void: true, args: [P.$int, P.$int]},
 {func: "dynamic__Symbol_dynamic", args: [P.Symbol, null]},
@@ -10138,6 +10538,12 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Element.prototype = $desc;
+  Element.prototype.get$className = function(receiver) {
+    return receiver.className;
+  };
+  Element.prototype.set$className = function(receiver, v) {
+    return receiver.className = v;
+  };
   function EmbedElement() {
   }
   EmbedElement.builtin$cls = "EmbedElement";
@@ -13098,17 +13504,28 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   MappedIterator.prototype = $desc;
-  function MappedListIterable(_source, _f) {
-    this._source = _source;
+  function WhereIterable(_iterable, _f) {
+    this._iterable = _iterable;
     this._f = _f;
   }
-  MappedListIterable.builtin$cls = "MappedListIterable";
-  if (!"name" in MappedListIterable)
-    MappedListIterable.name = "MappedListIterable";
-  $desc = $collectedClasses.MappedListIterable;
+  WhereIterable.builtin$cls = "WhereIterable";
+  if (!"name" in WhereIterable)
+    WhereIterable.name = "WhereIterable";
+  $desc = $collectedClasses.WhereIterable;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  MappedListIterable.prototype = $desc;
+  WhereIterable.prototype = $desc;
+  function WhereIterator(_iterator, _f) {
+    this._iterator = _iterator;
+    this._f = _f;
+  }
+  WhereIterator.builtin$cls = "WhereIterator";
+  if (!"name" in WhereIterator)
+    WhereIterator.name = "WhereIterator";
+  $desc = $collectedClasses.WhereIterator;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  WhereIterator.prototype = $desc;
   function IterableMixinWorkaround() {
   }
   IterableMixinWorkaround.builtin$cls = "IterableMixinWorkaround";
@@ -13205,6 +13622,118 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _UncaughtAsyncError.prototype = $desc;
+  function _BroadcastStream(_controller) {
+    this._controller = _controller;
+  }
+  _BroadcastStream.builtin$cls = "_BroadcastStream";
+  if (!"name" in _BroadcastStream)
+    _BroadcastStream.name = "_BroadcastStream";
+  $desc = $collectedClasses._BroadcastStream;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _BroadcastStream.prototype = $desc;
+  function _BroadcastSubscription(_eventState, _next, _previous, _controller, _onData, _onError, _onDone, _zone, _state, _cancelFuture, _pending) {
+    this._eventState = _eventState;
+    this._next = _next;
+    this._previous = _previous;
+    this._controller = _controller;
+    this._onData = _onData;
+    this._onError = _onError;
+    this._onDone = _onDone;
+    this._zone = _zone;
+    this._state = _state;
+    this._cancelFuture = _cancelFuture;
+    this._pending = _pending;
+  }
+  _BroadcastSubscription.builtin$cls = "_BroadcastSubscription";
+  if (!"name" in _BroadcastSubscription)
+    _BroadcastSubscription.name = "_BroadcastSubscription";
+  $desc = $collectedClasses._BroadcastSubscription;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _BroadcastSubscription.prototype = $desc;
+  _BroadcastSubscription.prototype.get$_next = function() {
+    return this._next;
+  };
+  _BroadcastSubscription.prototype.set$_next = function(v) {
+    return this._next = v;
+  };
+  _BroadcastSubscription.prototype.set$_previous = function(v) {
+    return this._previous = v;
+  };
+  function _BroadcastStreamController(_next, _previous) {
+    this._next = _next;
+    this._previous = _previous;
+  }
+  _BroadcastStreamController.builtin$cls = "_BroadcastStreamController";
+  if (!"name" in _BroadcastStreamController)
+    _BroadcastStreamController.name = "_BroadcastStreamController";
+  $desc = $collectedClasses._BroadcastStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _BroadcastStreamController.prototype = $desc;
+  _BroadcastStreamController.prototype.get$_next = function() {
+    return this._next;
+  };
+  _BroadcastStreamController.prototype.set$_next = function(v) {
+    return this._next = v;
+  };
+  _BroadcastStreamController.prototype.set$_previous = function(v) {
+    return this._previous = v;
+  };
+  function _SyncBroadcastStreamController(_onListen, _onCancel, _state, _next, _previous, _addStreamState, _doneFuture) {
+    this._onListen = _onListen;
+    this._onCancel = _onCancel;
+    this._state = _state;
+    this._next = _next;
+    this._previous = _previous;
+    this._addStreamState = _addStreamState;
+    this._doneFuture = _doneFuture;
+  }
+  _SyncBroadcastStreamController.builtin$cls = "_SyncBroadcastStreamController";
+  if (!"name" in _SyncBroadcastStreamController)
+    _SyncBroadcastStreamController.name = "_SyncBroadcastStreamController";
+  $desc = $collectedClasses._SyncBroadcastStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _SyncBroadcastStreamController.prototype = $desc;
+  function _SyncBroadcastStreamController__sendData_closure(this_0, data_1) {
+    this.this_0 = this_0;
+    this.data_1 = data_1;
+  }
+  _SyncBroadcastStreamController__sendData_closure.builtin$cls = "_SyncBroadcastStreamController__sendData_closure";
+  if (!"name" in _SyncBroadcastStreamController__sendData_closure)
+    _SyncBroadcastStreamController__sendData_closure.name = "_SyncBroadcastStreamController__sendData_closure";
+  $desc = $collectedClasses._SyncBroadcastStreamController__sendData_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _SyncBroadcastStreamController__sendData_closure.prototype = $desc;
+  function _SyncBroadcastStreamController__sendDone_closure(this_0) {
+    this.this_0 = this_0;
+  }
+  _SyncBroadcastStreamController__sendDone_closure.builtin$cls = "_SyncBroadcastStreamController__sendDone_closure";
+  if (!"name" in _SyncBroadcastStreamController__sendDone_closure)
+    _SyncBroadcastStreamController__sendDone_closure.name = "_SyncBroadcastStreamController__sendDone_closure";
+  $desc = $collectedClasses._SyncBroadcastStreamController__sendDone_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _SyncBroadcastStreamController__sendDone_closure.prototype = $desc;
+  function _AsyncBroadcastStreamController(_onListen, _onCancel, _state, _next, _previous, _addStreamState, _doneFuture) {
+    this._onListen = _onListen;
+    this._onCancel = _onCancel;
+    this._state = _state;
+    this._next = _next;
+    this._previous = _previous;
+    this._addStreamState = _addStreamState;
+    this._doneFuture = _doneFuture;
+  }
+  _AsyncBroadcastStreamController.builtin$cls = "_AsyncBroadcastStreamController";
+  if (!"name" in _AsyncBroadcastStreamController)
+    _AsyncBroadcastStreamController.name = "_AsyncBroadcastStreamController";
+  $desc = $collectedClasses._AsyncBroadcastStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _AsyncBroadcastStreamController.prototype = $desc;
   function Future() {
   }
   Future.builtin$cls = "Future";
@@ -13497,6 +14026,208 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   StreamSubscription.prototype = $desc;
+  function _StreamController() {
+  }
+  _StreamController.builtin$cls = "_StreamController";
+  if (!"name" in _StreamController)
+    _StreamController.name = "_StreamController";
+  $desc = $collectedClasses._StreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController.prototype = $desc;
+  function _StreamController__subscribe_closure(this_0) {
+    this.this_0 = this_0;
+  }
+  _StreamController__subscribe_closure.builtin$cls = "_StreamController__subscribe_closure";
+  if (!"name" in _StreamController__subscribe_closure)
+    _StreamController__subscribe_closure.name = "_StreamController__subscribe_closure";
+  $desc = $collectedClasses._StreamController__subscribe_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__subscribe_closure.prototype = $desc;
+  function _StreamController__recordCancel_complete(this_0) {
+    this.this_0 = this_0;
+  }
+  _StreamController__recordCancel_complete.builtin$cls = "_StreamController__recordCancel_complete";
+  if (!"name" in _StreamController__recordCancel_complete)
+    _StreamController__recordCancel_complete.name = "_StreamController__recordCancel_complete";
+  $desc = $collectedClasses._StreamController__recordCancel_complete;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__recordCancel_complete.prototype = $desc;
+  function _SyncStreamControllerDispatch() {
+  }
+  _SyncStreamControllerDispatch.builtin$cls = "_SyncStreamControllerDispatch";
+  if (!"name" in _SyncStreamControllerDispatch)
+    _SyncStreamControllerDispatch.name = "_SyncStreamControllerDispatch";
+  $desc = $collectedClasses._SyncStreamControllerDispatch;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _SyncStreamControllerDispatch.prototype = $desc;
+  function _AsyncStreamControllerDispatch() {
+  }
+  _AsyncStreamControllerDispatch.builtin$cls = "_AsyncStreamControllerDispatch";
+  if (!"name" in _AsyncStreamControllerDispatch)
+    _AsyncStreamControllerDispatch.name = "_AsyncStreamControllerDispatch";
+  $desc = $collectedClasses._AsyncStreamControllerDispatch;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _AsyncStreamControllerDispatch.prototype = $desc;
+  function _AsyncStreamController(_onListen, _onPause, _onResume, _onCancel, _varData, _state, _doneFuture) {
+    this._onListen = _onListen;
+    this._onPause = _onPause;
+    this._onResume = _onResume;
+    this._onCancel = _onCancel;
+    this._varData = _varData;
+    this._state = _state;
+    this._doneFuture = _doneFuture;
+  }
+  _AsyncStreamController.builtin$cls = "_AsyncStreamController";
+  if (!"name" in _AsyncStreamController)
+    _AsyncStreamController.name = "_AsyncStreamController";
+  $desc = $collectedClasses._AsyncStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _AsyncStreamController.prototype = $desc;
+  _AsyncStreamController.prototype.get$_onListen = function() {
+    return this._onListen;
+  };
+  _AsyncStreamController.prototype.get$_onPause = function() {
+    return this._onPause;
+  };
+  _AsyncStreamController.prototype.get$_onResume = function() {
+    return this._onResume;
+  };
+  _AsyncStreamController.prototype.get$_onCancel = function() {
+    return this._onCancel;
+  };
+  function _StreamController__AsyncStreamControllerDispatch() {
+  }
+  _StreamController__AsyncStreamControllerDispatch.builtin$cls = "_StreamController__AsyncStreamControllerDispatch";
+  if (!"name" in _StreamController__AsyncStreamControllerDispatch)
+    _StreamController__AsyncStreamControllerDispatch.name = "_StreamController__AsyncStreamControllerDispatch";
+  $desc = $collectedClasses._StreamController__AsyncStreamControllerDispatch;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__AsyncStreamControllerDispatch.prototype = $desc;
+  function _SyncStreamController(_onListen, _onPause, _onResume, _onCancel, _varData, _state, _doneFuture) {
+    this._onListen = _onListen;
+    this._onPause = _onPause;
+    this._onResume = _onResume;
+    this._onCancel = _onCancel;
+    this._varData = _varData;
+    this._state = _state;
+    this._doneFuture = _doneFuture;
+  }
+  _SyncStreamController.builtin$cls = "_SyncStreamController";
+  if (!"name" in _SyncStreamController)
+    _SyncStreamController.name = "_SyncStreamController";
+  $desc = $collectedClasses._SyncStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _SyncStreamController.prototype = $desc;
+  _SyncStreamController.prototype.get$_onListen = function() {
+    return this._onListen;
+  };
+  _SyncStreamController.prototype.get$_onPause = function() {
+    return this._onPause;
+  };
+  _SyncStreamController.prototype.get$_onResume = function() {
+    return this._onResume;
+  };
+  _SyncStreamController.prototype.get$_onCancel = function() {
+    return this._onCancel;
+  };
+  function _StreamController__SyncStreamControllerDispatch() {
+  }
+  _StreamController__SyncStreamControllerDispatch.builtin$cls = "_StreamController__SyncStreamControllerDispatch";
+  if (!"name" in _StreamController__SyncStreamControllerDispatch)
+    _StreamController__SyncStreamControllerDispatch.name = "_StreamController__SyncStreamControllerDispatch";
+  $desc = $collectedClasses._StreamController__SyncStreamControllerDispatch;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__SyncStreamControllerDispatch.prototype = $desc;
+  function _NoCallbacks() {
+  }
+  _NoCallbacks.builtin$cls = "_NoCallbacks";
+  if (!"name" in _NoCallbacks)
+    _NoCallbacks.name = "_NoCallbacks";
+  $desc = $collectedClasses._NoCallbacks;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _NoCallbacks.prototype = $desc;
+  function _NoCallbackAsyncStreamController(_varData, _state, _doneFuture) {
+    this._varData = _varData;
+    this._state = _state;
+    this._doneFuture = _doneFuture;
+  }
+  _NoCallbackAsyncStreamController.builtin$cls = "_NoCallbackAsyncStreamController";
+  if (!"name" in _NoCallbackAsyncStreamController)
+    _NoCallbackAsyncStreamController.name = "_NoCallbackAsyncStreamController";
+  $desc = $collectedClasses._NoCallbackAsyncStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _NoCallbackAsyncStreamController.prototype = $desc;
+  function _StreamController__AsyncStreamControllerDispatch0() {
+  }
+  _StreamController__AsyncStreamControllerDispatch0.builtin$cls = "_StreamController__AsyncStreamControllerDispatch0";
+  if (!"name" in _StreamController__AsyncStreamControllerDispatch0)
+    _StreamController__AsyncStreamControllerDispatch0.name = "_StreamController__AsyncStreamControllerDispatch0";
+  $desc = $collectedClasses._StreamController__AsyncStreamControllerDispatch0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__AsyncStreamControllerDispatch0.prototype = $desc;
+  function _NoCallbackSyncStreamController(_varData, _state, _doneFuture) {
+    this._varData = _varData;
+    this._state = _state;
+    this._doneFuture = _doneFuture;
+  }
+  _NoCallbackSyncStreamController.builtin$cls = "_NoCallbackSyncStreamController";
+  if (!"name" in _NoCallbackSyncStreamController)
+    _NoCallbackSyncStreamController.name = "_NoCallbackSyncStreamController";
+  $desc = $collectedClasses._NoCallbackSyncStreamController;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _NoCallbackSyncStreamController.prototype = $desc;
+  function _StreamController__SyncStreamControllerDispatch0() {
+  }
+  _StreamController__SyncStreamControllerDispatch0.builtin$cls = "_StreamController__SyncStreamControllerDispatch0";
+  if (!"name" in _StreamController__SyncStreamControllerDispatch0)
+    _StreamController__SyncStreamControllerDispatch0.name = "_StreamController__SyncStreamControllerDispatch0";
+  $desc = $collectedClasses._StreamController__SyncStreamControllerDispatch0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamController__SyncStreamControllerDispatch0.prototype = $desc;
+  function _ControllerStream(_controller) {
+    this._controller = _controller;
+  }
+  _ControllerStream.builtin$cls = "_ControllerStream";
+  if (!"name" in _ControllerStream)
+    _ControllerStream.name = "_ControllerStream";
+  $desc = $collectedClasses._ControllerStream;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _ControllerStream.prototype = $desc;
+  function _ControllerSubscription(_controller, _onData, _onError, _onDone, _zone, _state, _cancelFuture, _pending) {
+    this._controller = _controller;
+    this._onData = _onData;
+    this._onError = _onError;
+    this._onDone = _onDone;
+    this._zone = _zone;
+    this._state = _state;
+    this._cancelFuture = _cancelFuture;
+    this._pending = _pending;
+  }
+  _ControllerSubscription.builtin$cls = "_ControllerSubscription";
+  if (!"name" in _ControllerSubscription)
+    _ControllerSubscription.name = "_ControllerSubscription";
+  $desc = $collectedClasses._ControllerSubscription;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _ControllerSubscription.prototype = $desc;
+  _ControllerSubscription.prototype.get$_controller = function() {
+    return this._controller;
+  };
   function _EventSink() {
   }
   _EventSink.builtin$cls = "_EventSink";
@@ -13506,8 +14237,14 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _EventSink.prototype = $desc;
-  function _BufferingStreamSubscription(_zone) {
+  function _BufferingStreamSubscription(_onData, _onError, _onDone, _zone, _state, _cancelFuture, _pending) {
+    this._onData = _onData;
+    this._onError = _onError;
+    this._onDone = _onDone;
     this._zone = _zone;
+    this._state = _state;
+    this._cancelFuture = _cancelFuture;
+    this._pending = _pending;
   }
   _BufferingStreamSubscription.builtin$cls = "_BufferingStreamSubscription";
   if (!"name" in _BufferingStreamSubscription)
@@ -13519,18 +14256,6 @@ function dart_precompiled($collectedClasses) {
   _BufferingStreamSubscription.prototype.get$_zone = function() {
     return this._zone;
   };
-  function _BufferingStreamSubscription__sendError_sendError(this_0, error_1, stackTrace_2) {
-    this.this_0 = this_0;
-    this.error_1 = error_1;
-    this.stackTrace_2 = stackTrace_2;
-  }
-  _BufferingStreamSubscription__sendError_sendError.builtin$cls = "_BufferingStreamSubscription__sendError_sendError";
-  if (!"name" in _BufferingStreamSubscription__sendError_sendError)
-    _BufferingStreamSubscription__sendError_sendError.name = "_BufferingStreamSubscription__sendError_sendError";
-  $desc = $collectedClasses._BufferingStreamSubscription__sendError_sendError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _BufferingStreamSubscription__sendError_sendError.prototype = $desc;
   function _BufferingStreamSubscription__sendDone_sendDone(this_0) {
     this.this_0 = this_0;
   }
@@ -13541,6 +14266,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _BufferingStreamSubscription__sendDone_sendDone.prototype = $desc;
+  function _StreamImpl() {
+  }
+  _StreamImpl.builtin$cls = "_StreamImpl";
+  if (!"name" in _StreamImpl)
+    _StreamImpl.name = "_StreamImpl";
+  $desc = $collectedClasses._StreamImpl;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _StreamImpl.prototype = $desc;
   function _DelayedEvent(next) {
     this.next = next;
   }
@@ -13568,24 +14302,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _DelayedData.prototype = $desc;
-  function _DelayedError(error, stackTrace, next) {
-    this.error = error;
-    this.stackTrace = stackTrace;
-    this.next = next;
-  }
-  _DelayedError.builtin$cls = "_DelayedError";
-  if (!"name" in _DelayedError)
-    _DelayedError.name = "_DelayedError";
-  $desc = $collectedClasses._DelayedError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _DelayedError.prototype = $desc;
-  _DelayedError.prototype.get$error = function(receiver) {
-    return this.error;
-  };
-  _DelayedError.prototype.get$stackTrace = function() {
-    return this.stackTrace;
-  };
   function _DelayedDone() {
   }
   _DelayedDone.builtin$cls = "_DelayedDone";
@@ -13627,6 +14343,21 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _StreamImplEvents.prototype = $desc;
+  function _DoneStreamSubscription(_zone, _state, _onDone) {
+    this._zone = _zone;
+    this._state = _state;
+    this._onDone = _onDone;
+  }
+  _DoneStreamSubscription.builtin$cls = "_DoneStreamSubscription";
+  if (!"name" in _DoneStreamSubscription)
+    _DoneStreamSubscription.name = "_DoneStreamSubscription";
+  $desc = $collectedClasses._DoneStreamSubscription;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _DoneStreamSubscription.prototype = $desc;
+  _DoneStreamSubscription.prototype.get$_zone = function() {
+    return this._zone;
+  };
   function _cancelAndError_closure(future_0, error_1, stackTrace_2) {
     this.future_0 = future_0;
     this.error_1 = error_1;
@@ -13661,44 +14392,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _cancelAndValue_closure.prototype = $desc;
-  function _ForwardingStream() {
-  }
-  _ForwardingStream.builtin$cls = "_ForwardingStream";
-  if (!"name" in _ForwardingStream)
-    _ForwardingStream.name = "_ForwardingStream";
-  $desc = $collectedClasses._ForwardingStream;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ForwardingStream.prototype = $desc;
-  function _ForwardingStreamSubscription(_stream, _subscription, _async$_onData, _onError, _onDone, _zone, _state, _cancelFuture, _pending) {
-    this._stream = _stream;
-    this._subscription = _subscription;
-    this._async$_onData = _async$_onData;
-    this._onError = _onError;
-    this._onDone = _onDone;
-    this._zone = _zone;
-    this._state = _state;
-    this._cancelFuture = _cancelFuture;
-    this._pending = _pending;
-  }
-  _ForwardingStreamSubscription.builtin$cls = "_ForwardingStreamSubscription";
-  if (!"name" in _ForwardingStreamSubscription)
-    _ForwardingStreamSubscription.name = "_ForwardingStreamSubscription";
-  $desc = $collectedClasses._ForwardingStreamSubscription;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ForwardingStreamSubscription.prototype = $desc;
-  function _MapStream(_transform, _async$_source) {
-    this._transform = _transform;
-    this._async$_source = _async$_source;
-  }
-  _MapStream.builtin$cls = "_MapStream";
-  if (!"name" in _MapStream)
-    _MapStream.name = "_MapStream";
-  $desc = $collectedClasses._MapStream;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _MapStream.prototype = $desc;
   function _Zone() {
   }
   _Zone.builtin$cls = "_Zone";
@@ -13845,11 +14538,11 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _LinkedHashMap_values_closure.prototype = $desc;
-  function LinkedHashMapCell(_key, _collection$_value, _next, _previous) {
+  function LinkedHashMapCell(_key, _collection$_value, _collection$_next, _collection$_previous) {
     this._key = _key;
     this._collection$_value = _collection$_value;
-    this._next = _next;
-    this._previous = _previous;
+    this._collection$_next = _collection$_next;
+    this._collection$_previous = _collection$_previous;
   }
   LinkedHashMapCell.builtin$cls = "LinkedHashMapCell";
   if (!"name" in LinkedHashMapCell)
@@ -13867,17 +14560,17 @@ function dart_precompiled($collectedClasses) {
   LinkedHashMapCell.prototype.set$_collection$_value = function(v) {
     return this._collection$_value = v;
   };
-  LinkedHashMapCell.prototype.get$_next = function() {
-    return this._next;
+  LinkedHashMapCell.prototype.get$_collection$_next = function() {
+    return this._collection$_next;
   };
-  LinkedHashMapCell.prototype.set$_next = function(v) {
-    return this._next = v;
+  LinkedHashMapCell.prototype.set$_collection$_next = function(v) {
+    return this._collection$_next = v;
   };
-  LinkedHashMapCell.prototype.get$_previous = function() {
-    return this._previous;
+  LinkedHashMapCell.prototype.get$_collection$_previous = function() {
+    return this._collection$_previous;
   };
-  LinkedHashMapCell.prototype.set$_previous = function(v) {
-    return this._previous = v;
+  LinkedHashMapCell.prototype.set$_collection$_previous = function(v) {
+    return this._collection$_previous = v;
   };
   function LinkedHashMapKeyIterable(_map) {
     this._map = _map;
@@ -13918,10 +14611,10 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _LinkedHashSet.prototype = $desc;
-  function LinkedHashSetCell(_collection$_element, _next, _previous) {
+  function LinkedHashSetCell(_collection$_element, _collection$_next, _collection$_previous) {
     this._collection$_element = _collection$_element;
-    this._next = _next;
-    this._previous = _previous;
+    this._collection$_next = _collection$_next;
+    this._collection$_previous = _collection$_previous;
   }
   LinkedHashSetCell.builtin$cls = "LinkedHashSetCell";
   if (!"name" in LinkedHashSetCell)
@@ -13933,17 +14626,17 @@ function dart_precompiled($collectedClasses) {
   LinkedHashSetCell.prototype.get$_collection$_element = function() {
     return this._collection$_element;
   };
-  LinkedHashSetCell.prototype.get$_next = function() {
-    return this._next;
+  LinkedHashSetCell.prototype.get$_collection$_next = function() {
+    return this._collection$_next;
   };
-  LinkedHashSetCell.prototype.set$_next = function(v) {
-    return this._next = v;
+  LinkedHashSetCell.prototype.set$_collection$_next = function(v) {
+    return this._collection$_next = v;
   };
-  LinkedHashSetCell.prototype.get$_previous = function() {
-    return this._previous;
+  LinkedHashSetCell.prototype.get$_collection$_previous = function() {
+    return this._collection$_previous;
   };
-  LinkedHashSetCell.prototype.set$_previous = function(v) {
-    return this._previous = v;
+  LinkedHashSetCell.prototype.set$_collection$_previous = function(v) {
+    return this._collection$_previous = v;
   };
   function LinkedHashSetIterator(_set, _modifications, _cell, _collection$_current) {
     this._set = _set;
@@ -14585,6 +15278,26 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   CssStyleDeclarationBase.prototype = $desc;
+  function _FrozenElementList(_nodeList, _elementList) {
+    this._nodeList = _nodeList;
+    this._elementList = _elementList;
+  }
+  _FrozenElementList.builtin$cls = "_FrozenElementList";
+  if (!"name" in _FrozenElementList)
+    _FrozenElementList.name = "_FrozenElementList";
+  $desc = $collectedClasses._FrozenElementList;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _FrozenElementList.prototype = $desc;
+  function _FrozenElementList$_wrap_closure() {
+  }
+  _FrozenElementList$_wrap_closure.builtin$cls = "_FrozenElementList$_wrap_closure";
+  if (!"name" in _FrozenElementList$_wrap_closure)
+    _FrozenElementList$_wrap_closure.name = "_FrozenElementList$_wrap_closure";
+  $desc = $collectedClasses._FrozenElementList$_wrap_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _FrozenElementList$_wrap_closure.prototype = $desc;
   function HttpRequest_getString_closure() {
   }
   HttpRequest_getString_closure.builtin$cls = "HttpRequest_getString_closure";
@@ -14685,11 +15398,11 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _ElementEventStreamImpl.prototype = $desc;
-  function _EventStreamSubscription(_pauseCount, _target, _eventType, _onData, _useCapture) {
+  function _EventStreamSubscription(_pauseCount, _target, _eventType, _html$_onData, _useCapture) {
     this._pauseCount = _pauseCount;
     this._target = _target;
     this._eventType = _eventType;
-    this._onData = _onData;
+    this._html$_onData = _html$_onData;
     this._useCapture = _useCapture;
   }
   _EventStreamSubscription.builtin$cls = "_EventStreamSubscription";
@@ -14842,26 +15555,38 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   GitHub.prototype = $desc;
-  function GitHub_stargazers_closure(this_0) {
+  function GitHub_stargazersStreamed_closure(this_0, controller_1) {
     this.this_0 = this_0;
+    this.controller_1 = controller_1;
   }
-  GitHub_stargazers_closure.builtin$cls = "GitHub_stargazers_closure";
-  if (!"name" in GitHub_stargazers_closure)
-    GitHub_stargazers_closure.name = "GitHub_stargazers_closure";
-  $desc = $collectedClasses.GitHub_stargazers_closure;
+  GitHub_stargazersStreamed_closure.builtin$cls = "GitHub_stargazersStreamed_closure";
+  if (!"name" in GitHub_stargazersStreamed_closure)
+    GitHub_stargazersStreamed_closure.name = "GitHub_stargazersStreamed_closure";
+  $desc = $collectedClasses.GitHub_stargazersStreamed_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  GitHub_stargazers_closure.prototype = $desc;
-  function GitHub_stargazers__closure(this_1) {
-    this.this_1 = this_1;
+  GitHub_stargazersStreamed_closure.prototype = $desc;
+  function GitHub_stargazersStreamed__closure(this_2, controller_3) {
+    this.this_2 = this_2;
+    this.controller_3 = controller_3;
   }
-  GitHub_stargazers__closure.builtin$cls = "GitHub_stargazers__closure";
-  if (!"name" in GitHub_stargazers__closure)
-    GitHub_stargazers__closure.name = "GitHub_stargazers__closure";
-  $desc = $collectedClasses.GitHub_stargazers__closure;
+  GitHub_stargazersStreamed__closure.builtin$cls = "GitHub_stargazersStreamed__closure";
+  if (!"name" in GitHub_stargazersStreamed__closure)
+    GitHub_stargazersStreamed__closure.name = "GitHub_stargazersStreamed__closure";
+  $desc = $collectedClasses.GitHub_stargazersStreamed__closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  GitHub_stargazers__closure.prototype = $desc;
+  GitHub_stargazersStreamed__closure.prototype = $desc;
+  function GitHub_stargazersStreamed_closure0(controller_4) {
+    this.controller_4 = controller_4;
+  }
+  GitHub_stargazersStreamed_closure0.builtin$cls = "GitHub_stargazersStreamed_closure0";
+  if (!"name" in GitHub_stargazersStreamed_closure0)
+    GitHub_stargazersStreamed_closure0.name = "GitHub_stargazersStreamed_closure0";
+  $desc = $collectedClasses.GitHub_stargazersStreamed_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  GitHub_stargazersStreamed_closure0.prototype = $desc;
   function GitHub_request_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -14903,44 +15628,33 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   PaginationHelper.prototype = $desc;
-  function PaginationHelper_fetch_actualFetch(this_1, method_2, headers_3, params_4, body_5) {
+  function PaginationHelper_fetchStreamed_actualFetch(this_1, method_2, headers_3, params_4, body_5) {
     this.this_1 = this_1;
     this.method_2 = method_2;
     this.headers_3 = headers_3;
     this.params_4 = params_4;
     this.body_5 = body_5;
   }
-  PaginationHelper_fetch_actualFetch.builtin$cls = "PaginationHelper_fetch_actualFetch";
-  if (!"name" in PaginationHelper_fetch_actualFetch)
-    PaginationHelper_fetch_actualFetch.name = "PaginationHelper_fetch_actualFetch";
-  $desc = $collectedClasses.PaginationHelper_fetch_actualFetch;
+  PaginationHelper_fetchStreamed_actualFetch.builtin$cls = "PaginationHelper_fetchStreamed_actualFetch";
+  if (!"name" in PaginationHelper_fetchStreamed_actualFetch)
+    PaginationHelper_fetchStreamed_actualFetch.name = "PaginationHelper_fetchStreamed_actualFetch";
+  $desc = $collectedClasses.PaginationHelper_fetchStreamed_actualFetch;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  PaginationHelper_fetch_actualFetch.prototype = $desc;
-  function PaginationHelper_fetch_done(this_6) {
-    this.this_6 = this_6;
-  }
-  PaginationHelper_fetch_done.builtin$cls = "PaginationHelper_fetch_done";
-  if (!"name" in PaginationHelper_fetch_done)
-    PaginationHelper_fetch_done.name = "PaginationHelper_fetch_done";
-  $desc = $collectedClasses.PaginationHelper_fetch_done;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PaginationHelper_fetch_done.prototype = $desc;
-  function PaginationHelper_fetch_closure(box_0, this_7, pages_8, actualFetch_9, done_10) {
+  PaginationHelper_fetchStreamed_actualFetch.prototype = $desc;
+  function PaginationHelper_fetchStreamed_closure(box_0, pages_6, controller_7, actualFetch_8) {
     this.box_0 = box_0;
-    this.this_7 = this_7;
-    this.pages_8 = pages_8;
-    this.actualFetch_9 = actualFetch_9;
-    this.done_10 = done_10;
+    this.pages_6 = pages_6;
+    this.controller_7 = controller_7;
+    this.actualFetch_8 = actualFetch_8;
   }
-  PaginationHelper_fetch_closure.builtin$cls = "PaginationHelper_fetch_closure";
-  if (!"name" in PaginationHelper_fetch_closure)
-    PaginationHelper_fetch_closure.name = "PaginationHelper_fetch_closure";
-  $desc = $collectedClasses.PaginationHelper_fetch_closure;
+  PaginationHelper_fetchStreamed_closure.builtin$cls = "PaginationHelper_fetchStreamed_closure";
+  if (!"name" in PaginationHelper_fetchStreamed_closure)
+    PaginationHelper_fetchStreamed_closure.name = "PaginationHelper_fetchStreamed_closure";
+  $desc = $collectedClasses.PaginationHelper_fetchStreamed_closure;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  PaginationHelper_fetch_closure.prototype = $desc;
+  PaginationHelper_fetchStreamed_closure.prototype = $desc;
   function RepositorySlug(owner, name) {
     this.owner = owner;
     this.name = name;
@@ -15121,8 +15835,7 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   main_closure.prototype = $desc;
-  function loadOrganization_closure(box_0) {
-    this.box_0 = box_0;
+  function loadOrganization_closure() {
   }
   loadOrganization_closure.builtin$cls = "loadOrganization_closure";
   if (!"name" in loadOrganization_closure)
@@ -15131,5 +15844,14 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   loadOrganization_closure.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeTypedData, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _MapStream, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri_splitQueryString_closure, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, NativeTypedArray, NativeTypedArrayOfInt, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHub, GitHub_stargazers_closure, GitHub_stargazers__closure, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, PaginationHelper, PaginationHelper_fetch_actualFetch, PaginationHelper_fetch_done, PaginationHelper_fetch_closure, RepositorySlug, User, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, CssClassSetImpl, CssClassSetImpl_add_closure, main_closure, loadOrganization_closure];
+  function loadOrganization_closure0() {
+  }
+  loadOrganization_closure0.builtin$cls = "loadOrganization_closure0";
+  if (!"name" in loadOrganization_closure0)
+    loadOrganization_closure0.name = "loadOrganization_closure0";
+  $desc = $collectedClasses.loadOrganization_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  loadOrganization_closure0.prototype = $desc;
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeTypedData, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init___closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendDone_closure, _AsyncBroadcastStreamController, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _DoneStreamSubscription, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri_splitQueryString_closure, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, _FrozenElementList, _FrozenElementList$_wrap_closure, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ElementCssClassSet, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, NativeTypedArray, NativeTypedArrayOfInt, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHub, GitHub_stargazersStreamed_closure, GitHub_stargazersStreamed__closure, GitHub_stargazersStreamed_closure0, GitHub_request_closure, GitHub_request_closure0, GitHub_request_closure1, PaginationHelper, PaginationHelper_fetchStreamed_actualFetch, PaginationHelper_fetchStreamed_closure, RepositorySlug, User, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, CssClassSetImpl, CssClassSetImpl_add_closure, main_closure, loadOrganization_closure, loadOrganization_closure0];
 }

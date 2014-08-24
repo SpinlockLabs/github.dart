@@ -328,6 +328,22 @@ class GitHub {
   }
   
   /**
+   * Fetches the Stargazers for a Repository in a Streamed Fashion
+   * 
+   * [slug] is a repository slug.
+   */
+  Stream<User> stargazersStreamed(RepositorySlug slug) {
+    var controller = new StreamController();
+    new PaginationHelper(this).fetchStreamed("GET", "/repos/${slug.fullName}/stargazers").listen((response) {
+      var json = JSON.decode(response.body);
+      json.forEach((it) {
+        controller.add(User.fromJSON(this, it));
+      });
+    }).onDone(() => controller.close());
+    return controller.stream;
+  }
+  
+  /**
    * Fetches the repositories that [user] has starred.
    */
   Future<List<Repository>> starred(String user) {
