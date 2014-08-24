@@ -137,7 +137,7 @@ class GitHub {
       organization(names[i]).then((org) {
         controller.add(org);
         if (i == names.length - 1) {
-          controller.close();      
+          controller.close();
         }
       });
     }
