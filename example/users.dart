@@ -17,14 +17,12 @@ void main() {
 }
 
 void loadUsers() {
-  github.users(["kaendfinger", "samrg472", "TrainerGuy22", "logangorence"]).then((List<User> users) {
-    users.forEach((User user) {
-      var element = new DivElement();
-      var out = """
+  github.users(["kaendfinger", "samrg472", "TrainerGuy22", "logangorence"]).listen((User user) {
+    var element = new DivElement();
+    var out = """
         <img width="64" height="64" src="${user.avatarUrl}">&nbsp;&nbsp;<b>${user.login}</b>
       """;
-      element.append(new ParagraphElement()..appendHtml(out));
-      $users.append(element);
-    });
+    element.append(new ParagraphElement()..appendHtml(out));
+    $users.append(element);
   });
 }

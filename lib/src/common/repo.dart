@@ -189,16 +189,16 @@ class Repository {
    * 
    * [limit] is the number of issues to get
    */
-  Future<List<Issue>> issues({int limit: 30}) => github.getJSON("/repos/${fullName}/issues", statusCode: 200, params: {
-    "per_page": limit
-  }).then((json) {
-    return json.map((it) => Issue.fromJSON(github, it));
-  });
+  Stream<Issue> issues() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/issues", Issue.fromJSON);
+  }
 
   /**
    * Gets the Repository Commits
    */
-  Future<List<Commit>> commits() => github.getJSON("/repos/${fullName}/commits", convert: (github, it) => it.map((i) => Commit.fromJSON(github, i)));
+  Stream<Commit> commits() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/commits", Commit.fromJSON);
+  }
 
   /**
    * Gets Repository Contributor Statistics
@@ -228,23 +228,15 @@ class Repository {
   /**
    * Gets the Repository Forks
    */
-  Future<List<Repository>> forks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/forks", statusCode: 200, params: {
-      "per_page": limit
-    }).then((forks) {
-      return copyOf(forks.map((it) => Repository.fromJSON(github, it)));
-    });
+  Stream<Repository> forks() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/forks", Repository.fromJSON);
   }
 
   /**
    * Gets the Repository Pull Requests
    */
-  Future<List<PullRequest>> pullRequests({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/pulls", statusCode: 200, params: {
-      "per_page": limit
-    }).then((List<Map> pulls) {
-      return copyOf(pulls.map((it) => PullRequest.fromJSON(github, it)));
-    });
+  Stream<PullRequest> pullRequests() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequest.fromJSON);
   }
 
   /**
@@ -253,16 +245,16 @@ class Repository {
   Future<RepositoryPages> pages() {
     return github.getJSON("/repos/${fullName}/pages", statusCode: 200, convert: RepositoryPages.fromJSON);
   }
+  
+  Stream<User> collaborators() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/collaborators", User.fromJSON);
+  }
 
   /**
    * Gets the Repository Hooks
    */
-  Future<List<Hook>> hooks({int limit: 30}) {
-    return github.getJSON("/repos/${fullName}/hooks", statusCode: 200, params: {
-      "per_page": limit
-    }).then((hooks) {
-      return copyOf(hooks.map((it) => Hook.fromJSON(github, fullName, it)));
-    });
+  Stream<Hook> hooks({int limit: 30}) {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/hooks", (gh, input) => Hook.fromJSON(gh, fullName, input));
   }
   
   Future<Repository> fork([CreateFork request]) {
@@ -273,7 +265,7 @@ class Repository {
   /**
    * Gets the Repository Releases
    */
-  Future<List<Release>> releases({int limit}) => github.releases(slug(), limit: limit);
+  Stream<Release> releases() => github.releases(slug());
 
   /**
    * Gets a Repository Release by [id].

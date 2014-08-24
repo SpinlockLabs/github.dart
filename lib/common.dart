@@ -7,6 +7,9 @@ import 'package:crypto/crypto.dart' show CryptoUtils;
 import "package:html5lib/parser.dart" as htmlParser;
 import "package:html5lib/dom.dart" as html;
 
+import 'package:quiver/async.dart';
+import 'package:quiver/streams.dart';
+
 import 'http.dart' as http;
 
 import 'src/common/util.dart';

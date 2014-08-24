@@ -135,10 +135,8 @@ class User {
 
   /**
    * Fetches the [User]'s repositories.
-   * 
-   * [limit] is the maximum number of repositories to fetch.
    */
-  Future<List<Repository>> repositories({int limit: 100}) => github.userRepositories(login, limit: limit);
+  Stream<Repository> repositories() => github.userRepositories(login);
 }
 
 /**

@@ -97,7 +97,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
     compare = (a, b) => a.name.compareTo(b.name);
   }
 
-  github.userRepositories(user).then((repos) {
+  github.userRepositories(user).toList().then((repos) {
     repos.sort(compare);
     
     for (var repo in repos) {

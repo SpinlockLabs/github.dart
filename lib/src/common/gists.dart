@@ -62,7 +62,7 @@ class Gist {
     return gist;
   }
   
-  Future<List<GistComment>> comments() => github.gistComments(json['id']);
+  Stream<GistComment> comments() => github.gistComments(json['id']);
   
   Future<GistComment> comment(CreateGistComment request) {
     return github.postJSON("/gists/${json['id']}/comments", body: request.toJSON(), convert: GistComment.fromJSON);

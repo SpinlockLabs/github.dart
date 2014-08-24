@@ -116,7 +116,7 @@ class Organization {
   /**
    * Gets the Organization's Teams
    */
-  Future<List<Team>> teams() => github.teams(login);
+  Stream<Team> teams() => github.teams(login);
 
   /**
    * Creates a Repository on this Organization
@@ -188,7 +188,7 @@ class Team {
   /**
    * Gets the Members of this Team
    */
-  Future<List<TeamMember>> members() => github.teamMembers(id);
+  Stream<TeamMember> members() => github.teamMembers(id);
 }
 
 class TeamMember {

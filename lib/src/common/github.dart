@@ -57,12 +57,19 @@ class GitHub {
   /**
    * Fetches the users specified by [name].
    */
-  Future<List<User>> users(List<String> names) {
-    var group = new FutureGroup<User>();
-    names.forEach((name) {
-      group.add(user(name));
-    });
-    return group.future;
+  Stream<User> users(List<String> names) {
+    var controller = new StreamController();
+    
+    for (var i = 0; i < names.length; i++) {
+      user(names[i]).then((user) {
+        controller.add(user);
+        if (i == names.length - 1) {
+          controller.close();      
+        }
+      });
+    }
+    
+    return controller.stream;
   }
 
   /**
@@ -79,32 +86,19 @@ class GitHub {
   /**
    * Fetches the repositories specified by [slugs].
    */
-  Future<List<Repository>> repositories(List<RepositorySlug> slugs) {
-    var group = new FutureGroup<Repository>();
-    slugs.forEach((repo) {
-      group.add(repository(repo));
-    });
-    return group.future;
-  }
-
-  /**
-   * Fetches the repositories of the user specified by [user].
-   */
-  Future<List<Repository>> userRepositories(String user, {String type: "owner", int limit, String sort: "full_name", String direction: "asc"}) {
-    var params = {
-      "sort": sort,
-      "direction": direction
-    };
+  Stream<Repository> repositories(List<RepositorySlug> slugs) {
+    var controller = new StreamController();
     
-    var pages = limit != null ? (limit / 30).ceil() : null;
+    for (var i = 0; i < slugs.length; i++) {
+      repository(slugs[i]).then((repo) {
+        controller.add(repo);
+        if (i == slugs.length - 1) {
+          controller.close();      
+        }
+      });
+    }
     
-    return new PaginationHelper(this).fetch("GET", "/users/${user}/repos", pages: pages, params: params).then((List<http.Response> responses) {
-      var list = <dynamic>[];
-      for (var response in responses) {
-        list.addAll(JSON.decode(response.body));
-      }
-      return new List.from(list.map((it) => Repository.fromJSON(this, it)));
-    });
+    return controller.stream;
   }
   
   Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) =>
@@ -113,23 +107,13 @@ class GitHub {
   /**
    * Fetches the repositories of the user specified by [user] in a streamed fashion.
    */
-  Stream<Repository> userRepositoriesStreamed(String user, {String type: "owner", int limit, String sort: "full_name", String direction: "asc"}) {
+  Stream<Repository> userRepositories(String user, {String type: "owner", String sort: "full_name", String direction: "asc"}) {
     var params = {
       "sort": sort,
       "direction": direction
     };
     
-    var pages = limit != null ? (limit / 30).ceil() : null;
-    
-    var controller = new StreamController.broadcast();
-    
-    new PaginationHelper(this).fetchStreamed("GET", "/users/${user}/repos", pages: pages, params: params).listen((http.Response response) {
-      var list = JSON.decode(response.body);
-      var repos = new List.from(list.map((it) => Repository.fromJSON(this, it)));
-      for (var repo in repos) controller.add(repo);
-    });
-    
-    return controller.stream;
+    return new PaginationHelper(this).objects("GET", "/users/${user}/repos", Repository.fromJSON, params: params);
   }
 
   /**
@@ -146,12 +130,19 @@ class GitHub {
   /**
    * Fetches the organizations specified by [names].
    */
-  Future<List<Organization>> organizations(List<String> names) {
-    var group = new FutureGroup<Organization>();
-    names.forEach((name) {
-      group.add(organization(name));
-    });
-    return group.future;
+  Stream<Organization> organizations(List<String> names) {
+    var controller = new StreamController();
+    
+    for (var i = 0; i < names.length; i++) {
+      organization(names[i]).then((org) {
+        controller.add(org);
+        if (i == names.length - 1) {
+          controller.close();      
+        }
+      });
+    }
+    
+    return controller.stream;
   }
 
   /**
@@ -160,24 +151,12 @@ class GitHub {
    * [name] is the organization name.
    * [limit] is the maximum number of teams to provide.
    */
-  Future<List<Team>> teams(String name, [int limit]) {
-    var group = new FutureGroup<Team>();
-    getJSON("/orgs/${name}/teams?per_page=${limit}").then((teams) {
-      for (var team in teams) {
-        group.add(getJSON(team['url'], convert: Team.fromJSON, statusCode: 200, fail: (http.Response response) {
-          if (response.statusCode == 404) {
-            throw new TeamNotFound(this, team['id']);
-          }
-        }));
-      }
-    });
-    return group.future;
+  Stream<Team> teams(String name) {    
+    return new PaginationHelper(this).objects("GET", "/orgs/${name}/teams", Team.fromJSON);
   }
   
-  Future<List<GistComment>> gistComments(String id) {
-    return getJSON("/gists/${id}/comments", convert: (github, input) {
-      return input.map((it) => GistComment.fromJSON(github, it));
-    });
+  Stream<GistComment> gistComments(String id) {
+    return new PaginationHelper(this).objects("GET", "/gists/${id}/comments", GistComment.fromJSON);
   }
   
   /**
@@ -246,10 +225,8 @@ class GitHub {
    * 
    * [id] is the team id.
    */
-  Future<List<TeamMember>> teamMembers(int id) {
-    return getJSON("/teams/${id}/members").then((List json) {
-      return new List.from(json.map((it) => TeamMember.fromJSON(this, it)));
-    });
+  Stream<TeamMember> teamMembers(int id) {
+    return new PaginationHelper(this).objects("GET", "/teams/${id}/members", TeamMember.fromJSON);
   }
   
   /**
@@ -258,16 +235,8 @@ class GitHub {
    * [slug] is the repository to fetch releases from.
    * [limit] is the maximum number of releases to show.
    */
-  Future<List<Release>> releases(RepositorySlug slug, {int limit}) {
-    var pages = limit != null ? (limit / 30).ceil() : null;
-    
-    return new PaginationHelper(this).fetch("GET", "/repos/${slug.fullName}/releases", pages: pages, params: {}).then((List<http.Response> responses) {
-      var list = <dynamic>[];
-      for (var response in responses) {
-        list.addAll(JSON.decode(response.body));
-      }
-      return new List.from(list.map((it) => Release.fromJSON(this, it)));
-    });
+  Stream<Release> releases(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/releases", Release.fromJSON);
   }
   
   /**
@@ -307,10 +276,9 @@ class GitHub {
    * 
    * [username] is the user's username.
    */
-  Future<List<Gist>> userGists(String username) {
-    return getJSON("/users/${username}/gists", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
-    });
+  Stream<Gist> userGists(String username) {
+    return new PaginationHelper(this).objects("GET", "/users/${username}/gists", Gist.fromJSON);
+
   }
   
   /**
@@ -318,10 +286,8 @@ class GitHub {
    * 
    * If the user is not authenticated, this returns all public gists.
    */
-  Future<List<Gist>> currentUserGists() {
-    return getJSON("/gists", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
-    });
+  Stream<Gist> currentUserGists() {
+    return new PaginationHelper(this).objects("GET", "/gists", Gist.fromJSON);
   }
   
   /**
@@ -334,60 +300,31 @@ class GitHub {
   /**
    * Fetches the Currently Authenticated User's Public Gists
    */
-  Future<List<Gist>> currentUserPublicGists() {
-    return getJSON("/gists/public", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
-    });
+  Stream<Gist> currentUserPublicGists() {
+    return new PaginationHelper(this).objects("GET", "/gists/public", Gist.fromJSON);
   }
   
   /**
    * Fetches the Currently Authenticated User's Starred Gists
    */
-  Future<List<Gist>> currentUserStarredGists() {
-    return getJSON("/gists/starred", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => Gist.fromJSON(github, it)));
-    });
+  Stream<Gist> currentUserStarredGists() {
+    return new PaginationHelper(this).objects("GET", "/gists/starred", Gist.fromJSON);
   }
   
   /**
-   * Fetches the Stargazers for a Repository
+   * Fetches the Stargazers for a Repository.
    * 
    * [slug] is a repository slug.
    */
-  Future<List<User>> stargazers(RepositorySlug slug) {
-    return new PaginationHelper(this).fetch("GET", "/repos/${slug.fullName}/stargazers").then((responses) {
-      var users = [];
-      for (var response in responses) {
-        var json = JSON.decode(response.body);
-        users.addAll(json.map((it) => User.fromJSON(this, it)));
-      }
-      return users;
-    });
-  }
-  
-  /**
-   * Fetches the Stargazers for a Repository in a Streamed Fashion
-   * 
-   * [slug] is a repository slug.
-   */
-  Stream<User> stargazersStreamed(RepositorySlug slug) {
-    var controller = new StreamController();
-    new PaginationHelper(this).fetchStreamed("GET", "/repos/${slug.fullName}/stargazers").listen((response) {
-      var json = JSON.decode(response.body);
-      json.forEach((it) {
-        controller.add(User.fromJSON(this, it));
-      });
-    }).onDone(() => controller.close());
-    return controller.stream;
+  Stream<User> stargazers(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/stargazers", User.fromJSON);
   }
   
   /**
    * Fetches the repositories that [user] has starred.
    */
-  Future<List<Repository>> starred(String user) {
-    return getJSON("/users/${user}/starred", statusCode: 200, convert: (GitHub github, List<dynamic> input) {
-      return copyOf(input.map((it) => Repository.fromJSON(github, it)));
-    });
+  Stream<Repository> starred(String user) {
+    return new PaginationHelper(this).objects("GET", "/users/${user}/starred", Repository.fromJSON);
   }
   
   /**
@@ -427,9 +364,9 @@ class GitHub {
   /**
    * Fetches notifications for the current user. If [repository] is specified, it fetches notifications for that repository.
    */
-  Future<List<Notification>> notifications({RepositorySlug repository, bool all: false, bool participating: false}) {
+  Stream<Notification> notifications({RepositorySlug repository, bool all: false, bool participating: false}) {
     var url = repository != null ? "/repos/${repository.fullName}/notifications" : "/notifications";
-    return getJSON(url, params: { "all": all, "participating": participating }, convert: (github, input) => copyOf(input.map((it) => Notification.fromJSON(github, it))));
+    return new PaginationHelper(this).objects("GET", url, Notification.fromJSON, params: { "all": all, "participating": participating });
   }
   
   /**
@@ -480,10 +417,8 @@ class GitHub {
   /**
    * Fetches the Watchers of the specified repository.
    */
-  Future<List<User>> watchers(RepositorySlug slug) {
-    return getJSON("/repos/${slug.fullName}/subscribers", statusCode: 200, convert: (GitHub github, input) {
-      return input.map((it) => User.fromJSON(github, it));
-    });
+  Stream<User> watchers(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/subscribers", User.fromJSON);
   }
   
   /**
@@ -498,11 +433,10 @@ class GitHub {
   /**
    * Fetches repositories that the current user is watching. If [user] is specified, it will get the watched repositories for that user.
    */
-  Future<List<Repository>> watching({String user}) {
+  Stream<Repository> watching({String user}) {
     var path = user != null ? "/users/${user}/subscribers" : "/subscribers";
-    return getJSON(path, statusCode: 200, convert: (GitHub github, input) {
-      return input.map((it) => Repository.fromJSON(github, it));
-    });
+    
+    return new PaginationHelper(this).objects("GET", path, Repository.fromJSON);
   }
   
   /**
@@ -681,7 +615,7 @@ class GitHub {
 /**
  * Internal Helper for dealing with GitHub Pagination
  */
-class PaginationHelper {
+class PaginationHelper<T> {
   final GitHub github;
   final List<http.Response> responses;
   final Completer<List<http.Response>> completer;
@@ -767,6 +701,17 @@ class PaginationHelper {
     
     actualFetch(path).then(handleResponse);
     
+    return controller.stream;
+  }
+  
+  Stream<T> objects(String method, String path, JSONConverter converter, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    var controller = new StreamController();
+    fetchStreamed(method, path, pages: pages, headers: headers, params: params, body: body).listen((response) {
+      var json = JSON.decode(response.body);
+      for (var item in json) {
+        controller.add(converter(github, item));
+      }
+    }).onDone(() => controller.close());
     return controller.stream;
   }
 }
