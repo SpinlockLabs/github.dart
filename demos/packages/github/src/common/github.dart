@@ -402,12 +402,59 @@ class GitHub {
   }
   
   /**
+   * Search for Repositories using [query].
+   * 
+   * Since the Search Rate Limit is small, this is a best effort implementation.
+   */
+  Future<List<Repository>> searchRepositories(String query, {String sort, int pages: 2}) {
+    var params = { "q": query };
+    if (sort != null) {
+      params["sort"] = sort;
+    }
+    
+    return new PaginationHelper(this).fetch("GET", "/search/repositories", params: params, pages: pages).then((responses) {
+      List<Repository> repos = [];
+      var isFirst = true;
+      for (var response in responses) {
+        
+        if (response.statusCode == 403 && response.body.contains("rate limit")) {
+          if (isFirst) {
+            throw new RateLimitHit(this);
+          } else {
+            continue;
+          }
+        }
+        
+        isFirst = false;
+        
+        var input = JSON.decode(response.body);
+        List<dynamic> items = input['items'];
+        
+        repos.addAll(items.map((item) => Repository.fromJSON(this, item)));
+      }
+      
+      repos.sort((a, b) => b.json['score'].compareTo(a.json['score']));
+      
+      return repos;
+    });
+  }
+  
+  /**
    * Fetches the Watchers of the specified repository.
    */
   Future<List<User>> watchers(RepositorySlug slug) {
     return getJSON("/repos/${slug.fullName}/subscribers", statusCode: 200, convert: (GitHub github, input) {
       return input.map((it) => User.fromJSON(github, it));
     });
+  }
+  
+  /**
+   * Fetches all emojis available on GitHub
+   * 
+   * Returns a map of the name to a url of the image.
+   */
+  Future<Map<String, String>> emojis() {
+    return getJSON("/emojis", statusCode: 200);
   }
 
   /**
