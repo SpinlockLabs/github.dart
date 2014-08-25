@@ -342,6 +342,8 @@ class GitHub {
     return getJSON("/gist/${id}", statusCode: 200, convert: Gist.fromJSON);
   }
   
+  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(url);
+  
   /**
    * Fetches the Currently Authenticated User's Public Gists
    */

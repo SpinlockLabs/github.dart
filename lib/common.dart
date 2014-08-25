@@ -7,6 +7,8 @@ import 'package:crypto/crypto.dart' show CryptoUtils;
 import "package:html5lib/parser.dart" as htmlParser;
 import "package:html5lib/dom.dart" as html;
 
+import "package:xml/xml.dart" as xml;
+
 import 'http.dart' as http;
 
 import 'src/common/util.dart';
@@ -37,3 +39,4 @@ part 'src/common/pagination.dart';
 part 'src/common/search.dart';
 part 'src/common/events.dart';
 part 'src/common/keys.dart';
+part 'src/common/blog.dart';
