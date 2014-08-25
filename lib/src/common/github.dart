@@ -191,6 +191,10 @@ class GitHub {
     });
   }
   
+  Stream<ShowcaseInfo> showcases() => _showcases();
+  
+  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(info);
+  
   /**
    * Gets .gitignore template names.
    */
