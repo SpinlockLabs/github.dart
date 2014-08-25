@@ -25,3 +25,9 @@ install:
 script:
 - "pub get" # Get Dependencies
 - "./tool/build.dart check" # Run Build System
+
+notifications:
+  webhooks:
+    urls:
+      - "http://n.tkte.ch/h/1825/gZOGuQckPyg_Pg4E2eXOMrlI"
+    on_start: true
