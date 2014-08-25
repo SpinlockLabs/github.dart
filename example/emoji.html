@@ -3,31 +3,12 @@
 
 <head>
   <title>GitHub Emoji</title>
-
-  <style>
-    .line {
-      border-top: 1px;
-      border-style: solid;
-    }
-    
-    .box {
-      border: 2px solid;
-    }
-    
-    .emoji-box {
-      display: inline-block;
-      margin-top: 5px;
-      margin-left: 5px;
-      width: 256px;
-    }
-    
-    .emoji {
-      margin-top: 5px;
-    }
-  </style>
+  
+  <link rel="stylesheet/less" type="text/css" href="style.less" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
 </head>
 
-<body>
+<body class="demo-emoji">
   <div class="header">
     <h1>GitHub Emoji</h1>
     <button id="view-source">View the Source</button>

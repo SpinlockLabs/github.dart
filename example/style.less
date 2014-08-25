@@ -1,0 +1,99 @@
+// Variables
+@box-border-thickness: 2px;
+
+// Property Classes
+.inline-block {
+  display: inline-block;
+}
+
+// Headers
+.header {
+  display: block;
+}
+
+// Layout
+.column {
+  width: 50%;
+  .inline-block;
+}
+
+.center {
+  text-align: center;
+}
+
+.left {
+  float: left;
+}
+
+.right {
+  float: right;
+}
+
+.middle {
+  vertical-align: middle;
+}
+
+// Objects
+.line {
+  border-top: 1px;
+  border-style: solid;
+}
+
+.box {
+  border: @box-border-thickness solid;
+  word-wrap: break-word;
+}
+
+.avatar {
+  margin-top: 5px;
+}
+
+.user-box {
+  .inline-block;
+  margin-top: 30px;
+  width: 512px;
+}
+
+// Users Demo
+.demo-users {
+  .user {
+    .user-box;
+    height: 256px;
+  }
+}
+
+// Emoji Demo
+.demo-emoji {
+  .emoji-box {
+    display: inline-block;
+    margin-top: 5px;
+    margin-left: 5px;
+    width: 256px;
+  }
+    
+  .emoji {
+    margin-top: 5px;
+  }
+}
+
+// Repositories Demo
+.demo-repos {
+  .repo {
+    display: block;
+    text-align: left;
+  }
+}
+
+// Organizations Demo
+.demo-org {
+  .team {
+    margin-bottom: 5px;
+  }
+
+  .user {
+    .user-box;
+    margin-top: 5px;
+    margin-left: 5px;
+    width: 128px;
+  }
+}
