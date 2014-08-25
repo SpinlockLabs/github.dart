@@ -191,6 +191,10 @@ class GitHub {
     });
   }
   
+  Stream<ShowcaseInfo> showcases() => _showcases();
+  
+  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(info);
+  
   /**
    * Gets .gitignore template names.
    */
@@ -337,6 +341,8 @@ class GitHub {
   Future<Gist> gist(String id) {
     return getJSON("/gist/${id}", statusCode: 200, convert: Gist.fromJSON);
   }
+  
+  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(url);
   
   /**
    * Fetches the Currently Authenticated User's Public Gists
