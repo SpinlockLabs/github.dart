@@ -3,6 +3,7 @@ import "dart:async" show Timer;
 
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();
+  
   if (onReady != null) {
     document.onReadyStateChange.listen((event) {
       if (document.readyState == ReadyState.COMPLETE) {
