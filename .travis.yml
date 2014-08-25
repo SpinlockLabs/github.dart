@@ -30,4 +30,4 @@ notifications:
   webhooks:
     urls:
       - "http://n.tkte.ch/h/1825/gZOGuQckPyg_Pg4E2eXOMrlI"
-    on_start: true
+    on_start: always
