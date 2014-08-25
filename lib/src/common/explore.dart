@@ -103,7 +103,9 @@ Future<Showcase> _showcase(ShowcaseInfo info) {
 Stream<ShowcaseInfo> _showcases() {
   var controller = new StreamController();
   
-  GitHub.defaultClient().request(new http.Request("https://github.com/showcases")).then((response) {
+  Function handleResponse;
+  
+  handleResponse = (response) {
     var doc = htmlParser.parse(response.body);
     
     var cards = doc.querySelectorAll(".collection-card");
@@ -124,8 +126,27 @@ Stream<ShowcaseInfo> _showcases() {
       controller.add(showcase);
     }
     
-    controller.close();
-  });
+    var pag = doc.querySelector(".pagination");
+    
+    var links = pag.querySelectorAll("a");
+    
+    var linkNext = null;
+    
+    bool didFetchMore = false;
+    
+    for (var link in links) {
+      if (link.text.contains("Next")) {
+        didFetchMore = true;
+        GitHub.defaultClient().request(new http.Request(link.attributes['href'])).then(handleResponse);
+      }
+    }
+    
+    if (!didFetchMore) {
+      controller.close();
+    }
+  };
+  
+  GitHub.defaultClient().request(new http.Request("https://github.com/showcases")).then(handleResponse);
   
   return controller.stream;
 }
