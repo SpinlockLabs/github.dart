@@ -479,6 +479,47 @@ class GitHub {
   }
   
   /**
+   * Search for Users using [query].
+   * 
+   * Since the Search Rate Limit is small, this is a best effort implementation.
+   */
+  Stream<User> searchUsers(String query, {String sort, int pages: 2, int perPage: 30}) {
+    var params = { "q": query };
+    
+    if (sort != null) {
+      params["sort"] = sort;
+    }
+    
+    params["per_page"] = perPage;
+    
+    var controller = new StreamController();
+    
+    var isFirst = true;
+    
+    new PaginationHelper(this).fetchStreamed("GET", "/search/users", params: params, pages: pages).listen((response) {
+      if (response.statusCode == 403 && response.body.contains("rate limit") && isFirst) {
+        throw new RateLimitHit(this);
+      }
+      
+      isFirst = false;
+      
+      var input = JSON.decode(response.body);
+      
+      if (input['items'] == null) {
+        return;
+      }
+      
+      List<dynamic> items = input['items'];
+      
+      items
+        .map((item) => User.fromJSON(this, item))
+        .forEach(controller.add);
+    }).onDone(controller.close);
+    
+    return controller.stream;
+  }
+  
+  /**
    * Fetches the Watchers of the specified repository.
    */
   Stream<User> watchers(RepositorySlug slug) {
