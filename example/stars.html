@@ -4,34 +4,16 @@
 <head>
   <title>GitHub Stars</title>
 
-  <style>
-    .line {
-      border-top: 1px;
-      border-style: solid;
-    }
-    
-    .box {
-      border: 2px solid;
-    }
-    
-    .user {
-      display: inline-block;
-      margin-top: 5px;
-      margin-left: 5px;
-      width: 256px;
-    }
-    
-    .avatar {
-      margin-top: 5px;
-    }
-  </style>
+  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
 </head>
 
-<body>
+<body class="demo-stars">
   <div class="header">
-    <h1 id="title">GitHub Stars</h1>
+    <h1 class="inline-block" id="title">GitHub Stars</h1>
+    &nbsp;&nbsp;
+    <div class="btn" id="view-source">View the Source</div>
     <h3 id="total"></h3>
-    <button id="view-source">View the Source</button>
     <p></p>
   </div>
 
