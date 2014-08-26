@@ -1,3 +1,48 @@
-@import "../bootstrap/variables.less";
-@import "../bootstrap/mixins.less";
-@import "../bootstrap/buttons.less";
+.btn {
+  display: inline-block;
+  transition-timing-function: ease;
+  transition-duration: 0.2s;
+  transition-property: background-color, color, border-color;
+  background-color: transparent;
+  padding: 8px;
+  border-radius: 3px;
+  border: 1px solid #00AACC;
+  color: #00AACC;
+  font-family:"Helvetica Neue", Helvetica, sans-serif;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.btn:hover {
+  background-color: #00AACC;
+  color: white;
+  border-color: #00AACC;
+  cursor: pointer;
+}
+
+.btn:active {
+  color: white;
+  border-color: #008EAB;
+  background-color: #008EAB;
+}
+
+.btn.red {
+  border-color: red;
+  color: red;
+}
+ 
+.btn.red:hover {
+  background-color: red;
+  border-color: red;
+  color: white;
+}
+ 
+.btn.red:active {
+  background-color: #8b0000;
+  border-color: #8b0000;
+  color: white;
+}

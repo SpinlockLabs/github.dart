@@ -99,14 +99,7 @@ class TestCase {
       _startTime = new DateTime.now();
       _runningTime = null;
       ++_callbackFunctionsOutstanding;
-      var testReturn = _testFunction();
-      // If _testFunction() returned a future, we want to wait for it like we
-      // would a callback, so if a failure occurs while waiting, we can abort.
-      if (testReturn is Future) {
-        ++_callbackFunctionsOutstanding;
-        testReturn.catchError(_errorHandler('Test'))
-            .whenComplete(_markCallbackComplete);
-      }
+      return _testFunction();
     }).catchError(_errorHandler('Test')).then((_) {
       _markCallbackComplete();
       if (result == null) {
