@@ -496,9 +496,6 @@ class GitHub {
   EventPoller pollRepositoryEvents(RepositorySlug slug) =>
       new EventPoller(this, "/repos/${slug.fullName}/events");
   
-  EventPoller pollIssueEvents(RepositorySlug slug) =>
-      new EventPoller(this, "/repos/${slug.fullName}/issues/events");
-  
   /**
    * Search for Users using [query].
    * 
