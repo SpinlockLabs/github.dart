@@ -16,6 +16,9 @@ class Commit {
    * Commit SHA
    */
   String sha;
+  
+  String treeSha;
+  
 
   /**
    * Commit Message
@@ -77,6 +80,8 @@ class Commit {
 
   Commit(this.github);
 
+  Map<String, dynamic> json;
+  
   static Commit fromJSON(GitHub github, input) {
     var commit = new Commit(github)
         ..url = input['html_url']
@@ -86,8 +91,11 @@ class Commit {
         ..authoredAt = parseDateTime(input['commit']['author']['date'])
         ..committedAt = parseDateTime(input['commit']['committer']['date'])
         ..committerEmail = input['commit']['committer']['email']
-        ..authorEmail = input['commit']['author']['email'];
+        ..authorEmail = input['commit']['author']['email']
+        ..treeSha = input['tree']['sha'];
 
+    commit.json = input;
+    
     if (input['stats'] != null) {
       commit
           ..additionsCount = input['stats']['additions']
