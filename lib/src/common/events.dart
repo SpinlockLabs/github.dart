@@ -12,14 +12,12 @@ class EventPoller {
 
   EventPoller(this.github, this.path);
 
-  Stream<Event> start() {
+  Stream<Event> start({bool onlyNew: false, int interval}) {
     if (_timer != null) {
       throw new Exception("Polling already started.");
     }
 
     _controller = new StreamController();
-
-    int interval;
 
     void handleEvent(http.Response response) {
       if (interval == null) {
@@ -32,16 +30,18 @@ class EventPoller {
       
       var json = JSON.decode(response.body);
       
-      for (var item in json) {
-        var event = Event.fromJSON(github, item);
-        
-        if (handledEvents.contains(event.id)) {
-          continue;
+      if (!(onlyNew && _timer == null)) {
+        for (var item in json) {
+          var event = Event.fromJSON(github, item);
+          
+          if (handledEvents.contains(event.id)) {
+            continue;
+          }
+          
+          handledEvents.add(event.id);
+          
+          _controller.add(event);
         }
-        
-        handledEvents.add(event.id);
-        
-        _controller.add(event);
       }
 
       if (_timer == null) {
