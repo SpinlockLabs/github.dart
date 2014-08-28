@@ -496,6 +496,22 @@ class GitHub {
   EventPoller pollRepositoryEvents(RepositorySlug slug) =>
       new EventPoller(this, "/repos/${slug.fullName}/events");
   
+  Stream<Event> publicEvents({int pages: 2}) {
+    return new PaginationHelper(this).objects("GET", "/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> repositoryEvents(RepositorySlug slug, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> userEvents(String username, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/users/${username}/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> organizationEvents(String name, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/orgs/${name}/events", Event.fromJSON, pages: pages);
+  }
+  
   /**
    * Search for Users using [query].
    * 
