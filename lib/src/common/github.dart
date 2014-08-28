@@ -759,7 +759,7 @@ class GitHub {
 
     var url = new StringBuffer();
 
-    if (path.startsWith("http")) {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
       url.write(path);
       url.write(queryString);
     } else {
