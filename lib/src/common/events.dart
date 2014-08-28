@@ -94,6 +94,10 @@ class Event {
   DateTime createdAt;
 
   String id;
+  
+  String type;
+  
+  Map<String, dynamic> json;
 
   Map<String, dynamic> payload;
 
@@ -101,6 +105,10 @@ class Event {
 
   static Event fromJSON(GitHub github, input) {
     var event = new Event(github);
+    
+    event.json = input;
+    
+    event.type = input['type'];
 
     event
         ..repo = Repository.fromJSON(github, input['repo'])
