@@ -478,6 +478,27 @@ class GitHub {
     return controller.stream;
   }
   
+  EventPoller pollUserEvents(String user) =>
+      new EventPoller(this, "/users/${user}/events");
+  
+  EventPoller pollUserOrganizationEvents(String user, String organization) =>
+      new EventPoller(this, "/users/${user}/events/orgs/${organization}");
+  
+  EventPoller pollPublicUserEvents(String user) =>
+      new EventPoller(this, "/repos/${user}/events/public");
+  
+  EventPoller pollPublicEvents() =>
+      new EventPoller(this, "/events");
+  
+  EventPoller pollOrganizationEvents(String name) =>
+      new EventPoller(this, "/orgs/${name}/events");
+  
+  EventPoller pollRepositoryEvents(RepositorySlug slug) =>
+      new EventPoller(this, "/repos/${slug.fullName}/events");
+  
+  EventPoller pollIssueEvents(RepositorySlug slug) =>
+      new EventPoller(this, "/repos/${slug.fullName}/issues/events");
+  
   /**
    * Search for Users using [query].
    * 
