@@ -575,6 +575,7 @@ class GitHub {
         _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }
+      headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
       return convert(this, JSON.decode(response.body));
     });
   }
@@ -597,6 +598,20 @@ class GitHub {
       }
     }, convert: (gh, input) => File.fromJSON(gh, input, slug));
   }
+  
+  Future<String> octocat(String text) {
+    var params = {};
+    
+    if (text != null) {
+      params["s"] = text;
+    }
+    
+    return request("GET", "/octocat", params: params).then((response) {
+      return response.body;
+    });
+  }
+  
+  Future<String> wisdom() => octocat(null);
   
   /**
    * Fetches content in a repository at the specified [path].
@@ -651,6 +666,8 @@ class GitHub {
       convert = (github, input) => input;
     }
 
+    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+    
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
@@ -696,8 +713,6 @@ class GitHub {
       var userAndPass = UTF8.encode("${auth.username}:${auth.password}");
       headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
     }
-    
-    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     var queryString = "";
 
