@@ -3,6 +3,7 @@ part of github.common;
 class EventPoller {
   final GitHub github;
   final String path;
+  final List<String> handledEvents = [];
 
   Timer _timer;
   StreamController _controller;
@@ -33,6 +34,13 @@ class EventPoller {
       
       for (var item in json) {
         var event = Event.fromJSON(github, item);
+        
+        if (handledEvents.contains(event.id)) {
+          continue;
+        }
+        
+        handledEvents.add(event.id);
+        
         _controller.add(event);
       }
 
