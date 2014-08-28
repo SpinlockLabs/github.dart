@@ -599,9 +599,13 @@ class GitHub {
    * The default [convert] function returns the input object.
    */
   Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
+    if (headers == null) headers = {};
+    
     if (convert == null) {
       convert = (github, input) => input;
     }
+    
+    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
@@ -609,7 +613,6 @@ class GitHub {
         _handleStatusCode(response, response.statusCode);
         return new Future.value(null);
       }
-      headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
       return convert(this, JSON.decode(response.body));
     });
   }
@@ -696,6 +699,8 @@ class GitHub {
    * [body] is the data to send to the server.
    */
   Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
+    if (headers == null) headers = {};
+    
     if (convert == null) {
       convert = (github, input) => input;
     }
@@ -737,10 +742,8 @@ class GitHub {
    * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
-    if (headers == null) {
-      headers = {};
-    }
-
+    if (headers == null) headers = {};
+    
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
