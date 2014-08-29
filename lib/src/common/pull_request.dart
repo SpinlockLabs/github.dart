@@ -210,7 +210,31 @@ class PullRequest extends PullRequestInformation {
     return new PaginationHelper(github).objects("GET", "${this.json['url'].replaceFirst("/pulls/", "/issues/")}/comments", IssueComment.fromJSON);
   }
   
+  Stream<Commit> commits() {
+    return new PaginationHelper(github).objects("GET", json['commits_url'], Commit.fromJSON);
+  }
   
+  Future<PullRequest> changeState(String newState) {
+    return github.request("PATCH", json['url'], body: JSON.encode({ "state": newState })).then((response) {
+      return PullRequest.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<PullRequest> close() => changeState("closed");
+  Future<PullRequest> open() => changeState("open");
+  Future<PullRequest> reopen() => changeState("open");
+  
+  Future<PullRequest> changeTitle(String newTitle) {
+    return github.request("PATCH", json['url'], body: JSON.encode({ "title": newTitle })).then((response) {
+      return PullRequest.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<PullRequest> changeBody(String newBody) {
+    return github.request("PATCH", json['url'], body: JSON.encode({ "body": newBody })).then((response) {
+      return PullRequest.fromJSON(github, JSON.decode(response.body));
+    });
+  }
 }
  
 RepositorySlug _slugFromAPIUrl(String url) {
