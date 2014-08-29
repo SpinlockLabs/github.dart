@@ -3,13 +3,13 @@ part of github.common;
 /**
  * A Pull Request
  */
-class PullRequest {
+class PullRequestInformation {
   final GitHub github;
  
   /**
-   * If this is a full pull request
+   * If this is a complete pull request
    */
-  final bool isFullPullRequest;
+  final bool isCompletePullRequest;
  
   /**
    * Url to the Pull Request Page
@@ -90,10 +90,10 @@ class PullRequest {
  
   Map<String, dynamic> json;
  
-  PullRequest(this.github, [this.isFullPullRequest = false]);
+  PullRequestInformation(this.github, [this.isCompletePullRequest = false]);
  
-  static PullRequest fromJSON(GitHub github, input, [PullRequest into]) {
-    var pr = into != null ? into : new PullRequest(github);
+  static PullRequestInformation fromJSON(GitHub github, input, [PullRequestInformation into]) {
+    var pr = into != null ? into : new PullRequestInformation(github);
     pr.head = PullRequestHead.fromJSON(github, input['head']);
     pr.base = PullRequestHead.fromJSON(github, input['head']);
     pr.url = input['html_url'];
@@ -115,18 +115,18 @@ class PullRequest {
   /**
    * Fetches the Full Pull Request
    */
-  Future<FullPullRequest> fetchFullRequest() {
-    if (isFullPullRequest) {
+  Future<PullRequest> fetchPullRequest() {
+    if (isCompletePullRequest) {
       return new Future.value(this);
     }
-    return github.getJSON(json['url'], convert: FullPullRequest.fromJSON);
+    return github.getJSON(json['url'], convert: PullRequest.fromJSON);
   }
 }
  
 /**
  * A Complete Pull Request
  */
-class FullPullRequest extends PullRequest {
+class PullRequest extends PullRequestInformation {
   @ApiName("merge_commit_sha")
   String mergeCommitSha;
  
@@ -171,11 +171,11 @@ class FullPullRequest extends PullRequest {
    */
   int changedFilesCount;
   
-  FullPullRequest(GitHub github) : super(github, true);
+  PullRequest(GitHub github) : super(github, true);
  
-  static FullPullRequest fromJSON(GitHub github, input) {
+  static PullRequest fromJSON(GitHub github, input) {
     if (input == null) return null;
-    FullPullRequest pr = PullRequest.fromJSON(github, input, new FullPullRequest(github));
+    PullRequest pr = PullRequestInformation.fromJSON(github, input, new PullRequest(github));
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
     pr.mergedBy = User.fromJSON(github, input['merged_by']);

@@ -736,8 +736,8 @@ class GitHub {
     }
   }
   
-  Future<FullPullRequest> pullRequest(RepositorySlug slug, int number) {
-    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: FullPullRequest.fromJSON, statusCode: 200);
+  Future<PullRequest> pullRequest(RepositorySlug slug, int number) {
+    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: PullRequest.fromJSON, statusCode: 200);
   }
 
   /**
