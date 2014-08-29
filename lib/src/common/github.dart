@@ -117,6 +117,10 @@ class GitHub {
     return controller.stream;
   }
   
+  Stream<Team> userTeams() {
+    return new PaginationHelper(this).objects("GET", "/user/teams", Team.fromJSON);
+  }
+  
   Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) =>
       _trendingRepos(language: language, since: since);
   
