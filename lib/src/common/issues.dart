@@ -85,6 +85,8 @@ class Issue {
 
   Issue(this.github);
 
+  Map<String, dynamic> json;
+  
   static Issue fromJSON(GitHub github, input) {
     if (input == null) return null;
     return new Issue(github)
@@ -101,7 +103,8 @@ class Issue {
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at'])
         ..closedAt = parseDateTime(input['closed_at'])
-        ..closedBy = User.fromJSON(github, input['closed_by']);
+        ..closedBy = User.fromJSON(github, input['closed_by'])
+        ..json = input;
   }
 }
 

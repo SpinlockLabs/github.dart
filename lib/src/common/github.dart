@@ -731,6 +731,10 @@ class GitHub {
         throw new UnknownError(this);
     }
   }
+  
+  Future<FullPullRequest> pullRequest(RepositorySlug slug, int number) {
+    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: FullPullRequest.fromJSON, statusCode: 200);
+  }
 
   /**
    * Handles Authenticated Requests in an easy to understand way.

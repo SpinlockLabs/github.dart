@@ -185,12 +185,49 @@ class FullPullRequest extends PullRequest {
     pr.additionsCount = input['additions'];
     pr.deletionsCount = input['deletions'];
     pr.changedFilesCount = input['changed_files'];
+    pr.json = input; 
     return pr;
   }
 
   Future<IssueComment> comment(String body) {
     var it = JSON.encode({ "body": body });
-    return github.postJSON(json['_links']['comments']['href'], body: body, convert: IssueComment.fromJSON);
+    return github.postJSON(json['_links']['comments']['href'], body: it, convert: IssueComment.fromJSON, statusCode: 201);
+  }
+  
+  Future<PullRequestMerge> merge({String message}) {
+    var json = {};
+    
+    if (message != null) {
+      json['commit_message'] = message;
+    }
+    
+    return github.request("PUT", "${this.json['url']}/merge", body: JSON.encode(json)).then((response) {
+      return PullRequestMerge.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+}
+
+RepositorySlug _slugFromAPIUrl(String url) {
+  var split = url.split("/");
+  var i = split.indexOf("repos") + 1;
+  var parts = split.sublist(i, i + 1);
+  return new RepositorySlug(parts[0], parts[1]);
+}
+
+class PullRequestMerge {
+  final GitHub github;
+  
+  bool merged;
+  String sha;
+  String message;
+  
+  PullRequestMerge(this.github);
+  
+  static PullRequestMerge fromJSON(GitHub github, input) {
+    return new PullRequestMerge(github)
+    ..merged = input['merged']
+    ..sha = input['sha']
+    ..message = input['message'];
   }
 }
 

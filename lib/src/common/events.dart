@@ -8,14 +8,16 @@ class EventPoller {
   Timer _timer;
   StreamController _controller;
   
-  String _lastFetch;
+  String _lastFetched;
 
   EventPoller(this.github, this.path);
 
-  Stream<Event> start({bool onlyNew: false, int interval}) {
+  Stream<Event> start({bool onlyNew: false, int interval, DateTime after}) {
     if (_timer != null) {
       throw new Exception("Polling already started.");
     }
+    
+    if (after != null) after = after.toUtc();
 
     _controller = new StreamController();
 
@@ -28,11 +30,18 @@ class EventPoller {
         return;
       }
       
+      _lastFetched = response.headers['ETag'];
+      
       var json = JSON.decode(response.body);
       
       if (!(onlyNew && _timer == null)) {
         for (var item in json) {
           var event = Event.fromJSON(github, item);
+          
+          if (event.createdAt.toUtc().isBefore(after)) {
+            print("Skipping Event");
+            continue;
+          }
           
           if (handledEvents.contains(event.id)) {
             continue;
@@ -48,8 +57,8 @@ class EventPoller {
         _timer = new Timer.periodic(new Duration(seconds: interval), (timer) {
           var headers = {};
           
-          if (_lastFetch != null) {
-            headers['If-None-Match'] = _lastFetch;
+          if (_lastFetched != null) {
+            headers['If-None-Match'] = _lastFetched;
           }
           
           github.request("GET", path, headers: headers).then(handleEvent);
@@ -59,8 +68,8 @@ class EventPoller {
     
     var headers = {};
     
-    if (_lastFetch != null) {
-      headers['If-None-Match'] = _lastFetch;
+    if (_lastFetched != null) {
+      headers['If-None-Match'] = _lastFetched;
     }
     
     github.request("GET", path, headers: headers).then(handleEvent);
