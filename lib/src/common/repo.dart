@@ -601,7 +601,7 @@ class CreateStatus {
   
   String toJSON() {
     var map = {};
-    putValue("state", base, map);
+    putValue("state", state, map);
     putValue("target_url", targetUrl, map);
     putValue("description", description, map);
     putValue("context", context, map);
