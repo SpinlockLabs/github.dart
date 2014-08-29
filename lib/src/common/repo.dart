@@ -587,3 +587,24 @@ class RepositoryStatus {
       ..context = input['context'];
   }
 }
+
+class CreateStatus {
+  final String state;
+  
+  @ApiName("target_url")
+  String targetUrl;
+  
+  String description;
+  String context;
+  
+  CreateStatus(this.state);
+  
+  String toJSON() {
+    var map = {};
+    putValue("state", base, map);
+    putValue("target_url", targetUrl, map);
+    putValue("description", description, map);
+    putValue("context", context, map);
+    return JSON.encode(map);
+  }
+}
