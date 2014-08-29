@@ -215,7 +215,7 @@ class PullRequest extends PullRequestInformation {
   }
   
   Future<PullRequest> changeState(String newState) {
-    return github.request("PATCH", json['_links']['self'], body: JSON.encode({ "state": newState })).then((response) {
+    return github.request("POST", json['_links']['self']['href'], body: JSON.encode({ "state": newState })).then((response) {
       return PullRequest.fromJSON(github, JSON.decode(response.body));
     });
   }
@@ -225,13 +225,13 @@ class PullRequest extends PullRequestInformation {
   Future<PullRequest> reopen() => changeState("open");
   
   Future<PullRequest> changeTitle(String newTitle) {
-    return github.request("PATCH", json['_links']['self'], body: JSON.encode({ "title": newTitle })).then((response) {
+    return github.request("POST", json['_links']['self']['href'], body: JSON.encode({ "title": newTitle })).then((response) {
       return PullRequest.fromJSON(github, JSON.decode(response.body));
     });
   }
   
   Future<PullRequest> changeBody(String newBody) {
-    return github.request("PATCH", json['_links']['self'], body: JSON.encode({ "body": newBody })).then((response) {
+    return github.request("POST", json['_links']['self']['href'], body: JSON.encode({ "body": newBody })).then((response) {
       return PullRequest.fromJSON(github, JSON.decode(response.body));
     });
   }
