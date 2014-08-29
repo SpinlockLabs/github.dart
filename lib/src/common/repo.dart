@@ -563,3 +563,27 @@ class CreateMerge {
     return JSON.encode(map);
   }
 }
+
+class RepositoryStatus {
+  final GitHub github;
+  
+  DateTime createdAt;
+  DateTime updatedAt;
+  String state;
+  String targetUrl;
+  String description;
+  String context;
+  
+  RepositoryStatus(this.github);
+  
+  static RepositoryStatus fromJSON(GitHub github, input) {
+    if (input == null) return null;
+    return new RepositoryStatus(github)
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..state = input['state']
+      ..targetUrl = input['target_url']
+      ..description = input['description']
+      ..context = input['context'];
+  }
+}
