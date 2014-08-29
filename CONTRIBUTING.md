@@ -15,6 +15,8 @@ GitHub.dart is of course Open Source! We love it when people contribute!
 - [Commit your code](http://git-scm.com/book/en/Git-Basics-Recording-Changes-to-the-Repository) for each logical change (see [tips for creating better commit messages](http://robots.thoughtbot.com/5-useful-tips-for-a-better-commit-message)).
 - [Push your change](https://help.github.com/articles/pushing-to-a-remote) to your fork.
 - [Create a Pull Request](https://help.github.com/articles/creating-a-pull-request) on GitHub for your change.
+- Wait for Reviewers (usually kaendfinger) to give feedback.
+- When the pull request has been reviewed, a reviewer will comment with 'merge' which instructs our Pull Request Bot to merge the Pull Request.
 
 ## Code Style
 
