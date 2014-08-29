@@ -75,17 +75,21 @@ class GroupedIdMapper {
 }
 
 class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
-  final GroupedIdMapper mapper = new GroupedIdMapper();
-  final Compiler compiler;
+  GroupedIdMapper mapper = new GroupedIdMapper();
+  Compiler compiler;
 
-  final Map<Element, Map<String, dynamic>> jsonCache = {};
+  Map<Element, Map<String, dynamic>> jsonCache = {};
+  Map<Element, jsAst.Expression> codeCache;
 
   int programSize;
+  DateTime compilationMoment;
   String dart2jsVersion;
+  Duration compilationDuration;
+  Duration dumpInfoDuration;
 
-  ElementToJsonVisitor(this.compiler);
+  ElementToJsonVisitor(Compiler compiler) {
+    this.compiler = compiler;
 
-  void run() {
     Backend backend = compiler.backend;
     if (backend is JavaScriptBackend) {
       // Add up the sizes of all output-buffers.
@@ -95,11 +99,16 @@ class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
       programSize = compiler.assembledCode.length;
     }
 
+
+    compilationMoment = new DateTime.now();
     dart2jsVersion = compiler.hasBuildId ? compiler.buildId : null;
+    compilationDuration = compiler.totalCompileTime.elapsed;
 
     for (var library in compiler.libraryLoader.libraries.toList()) {
       library.accept(this);
     }
+
+    dumpInfoDuration = new DateTime.now().difference(compilationMoment);
   }
 
   // If keeping the element is in question (like if a function has a size
@@ -183,9 +192,9 @@ class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
     List<String> children = [];
     StringBuffer emittedCode = compiler.dumpInfoTask.codeOf(element);
 
-    TypeMask inferredType =
-        compiler.typesTask.getGuaranteedTypeOfElement(element);
     // If a field has an empty inferred type it is never used.
+    TypeMask inferredType =
+      compiler.typesTask.getGuaranteedTypeOfElement(element);
     if (inferredType == null || inferredType.isEmpty || element.isConst) {
       return null;
     }
@@ -247,16 +256,6 @@ class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
         if (member is MemberElement) {
           for (Element closure in member.nestedClosures) {
             Map<String, dynamic> child = this.process(closure);
-
-            // Look for the parent element of this closure which should
-            // be a class.  If it exists, set the display name to
-            // the name of the class + the name of the closure function.
-            Element parent = closure.enclosingElement;
-            Map<String, dynamic> processedParent = this.process(parent);
-            if (processedParent != null) {
-              child['name'] = "${processedParent['name']}.${child['name']}";
-            }
-
             if (child != null) {
               size += child['size'];
             }
@@ -326,8 +325,7 @@ class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
         parameters.add({
           'name': parameter.name,
           'type': compiler.typesTask
-            .getGuaranteedTypeOfElement(parameter).toString(),
-          'declaredType': parameter.node.type.toString()
+            .getGuaranteedTypeOfElement(parameter).toString()
         });
       });
       inferredReturnType = compiler.typesTask
@@ -372,11 +370,6 @@ class ElementToJsonVisitor extends ElementVisitor<Map<String, dynamic>> {
   }
 }
 
-class Selection {
-  final Element selectedElement;
-  final Selector selector;
-  Selection(this.selectedElement, this.selector);
-}
 
 class DumpInfoTask extends CompilerTask {
   DumpInfoTask(Compiler compiler)
@@ -414,20 +407,15 @@ class DumpInfoTask extends CompilerTask {
   }
 
   /**
-   * Returns an iterable of [Selection]s that are used by
-   * [element].  Each [Selection] contains an element that is
-   * used and the selector that selected the element.
+   * Returns an iterable of [Element]s that are used by
+   * [element].
    */
-  Iterable<Selection> getRetaining(Element element) {
+  Iterable<Element> getRetaining(Element element) {
     if (!selectorsFromElement.containsKey(element)) {
-      return const <Selection>[];
+      return const <Element>[];
     } else {
       return selectorsFromElement[element].expand(
-        (selector) {
-          return compiler.world.allFunctions.filter(selector).map((element) {
-            return new Selection(element, selector);
-          });
-        });
+          (s) => compiler.world.allFunctions.filter(s));
     }
   }
 
@@ -526,7 +514,7 @@ class DumpInfoTask extends CompilerTask {
   }
 
   void collectInfo() {
-    infoCollector = new ElementToJsonVisitor(compiler)..run();
+    infoCollector = new ElementToJsonVisitor(compiler);
   }
 
   void dumpInfo() {
@@ -550,7 +538,7 @@ class DumpInfoTask extends CompilerTask {
 
     Map<String, List<String>> holding = <String, List<String>>{};
     for (Element fn in infoCollector.mapper.functions) {
-      Iterable<Selection> pulling = getRetaining(fn);
+      Iterable<Element> pulling = getRetaining(fn);
       // Don't bother recording an empty list of dependencies.
       if (pulling.length > 0) {
         String fnId = infoCollector.idOf(fn);
@@ -558,14 +546,9 @@ class DumpInfoTask extends CompilerTask {
         // recorded.  Don't register these.
         if (fnId != null) {
           holding[fnId] = pulling
-            .map((selection) {
-              return <String, String>{
-                "id": infoCollector.idOf(selection.selectedElement),
-                "mask": selection.selector.mask.toString()
-              };
-            })
+            .map((a) => infoCollector.idOf(a))
             // Filter non-null ids for the same reason as above.
-            .where((a) => a['id'] != null)
+            .where((a) => a != null)
             .toList();
         }
       }
@@ -590,7 +573,7 @@ class DumpInfoTask extends CompilerTask {
       'elements': infoCollector.toJson(),
       'holding': holding,
       'outputUnits': outputUnits,
-      'dump_version': 3,
+      'dump_version': 2,
     };
 
     Duration toJsonDuration = new DateTime.now().difference(startToJsonTime);
@@ -598,10 +581,10 @@ class DumpInfoTask extends CompilerTask {
     Map<String, dynamic> generalProgramInfo = <String, dynamic> {
       'size': infoCollector.programSize,
       'dart2jsVersion': infoCollector.dart2jsVersion,
-      'compilationMoment': new DateTime.now().toString(),
-      'compilationDuration': compiler.totalCompileTime.elapsed.toString(),
-      'toJsonDuration': 0,
-      'dumpInfoDuration': this.timing.toString(),
+      'compilationMoment': infoCollector.compilationMoment.toString(),
+      'compilationDuration': infoCollector.compilationDuration.toString(),
+      'toJsonDuration': toJsonDuration.toString(),
+      'dumpInfoDuration': infoCollector.dumpInfoDuration.toString(),
       'noSuchMethodEnabled': compiler.enabledNoSuchMethod
     };
 

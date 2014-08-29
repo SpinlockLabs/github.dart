@@ -634,13 +634,13 @@ class Listener {
     return skipToEof(token);
   }
 
-  Token expectedDeclaration(Token token) {
+  Link<Token> expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       error("expected a declaration, but got '${token.value}'", token);
     }
-    return skipToEof(token);
+    return const Link<Token>();
   }
 
   Token unmatched(Token token) {
@@ -1213,14 +1213,14 @@ class ElementListener extends Listener {
     return unexpected(token);
   }
 
-  Token expectedDeclaration(Token token) {
+  Link<Token> expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       reportFatalError(token,
                        "Expected a declaration, but got '${token.value}'.");
     }
-    return skipToEof(token);
+    return const Link<Token>();
   }
 
   Token unmatched(Token token) {
@@ -1604,7 +1604,6 @@ class NodeListener extends ElementListener {
   Token expectedClassBody(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
-      return skipToEof(token);
     } else {
       reportFatalError(token,
                        "Expected a class body, but got '${token.value}'.");

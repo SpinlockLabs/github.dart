@@ -5,93 +5,93 @@ part of github.common;
  */
 class PullRequest {
   final GitHub github;
-  
+
   /**
    * If this is a full pull request
    */
   final bool isFullPullRequest;
-  
+
   /**
    * Url to the Pull Request Page
    */
   @ApiName("html_url")
   String url;
-  
+
   /**
    * Url to the diff for this Pull Request
    */
   @ApiName("diff_url")
   String diffUrl;
-  
+
   /**
    * Url to the patch for this Pull Request
    */
   @ApiName("patch_url")
   String patchUrl;
-  
+
   /**
    * Pull Request Number
    */
   int number;
-  
+
   /**
    * Pull Request State
    */
   String state;
-  
+
   /**
    * Pull Request Title
    */
   String title;
-  
+
   /**
    * Pull Request Body
    */
   String body;
-  
+
   /**
    * Time the pull request was created
    */
   @ApiName("created_at")
   DateTime createdAt;
-  
+
   /**
    * Time the pull request was updated
    */
   @ApiName("updated_at")
   DateTime updatedAt;
-  
+
   /**
    * Time the pull request was closed
    */
   @ApiName("closed_at")
   DateTime closedAt;
-  
+
   /**
    * Time the pull request was merged
    */
   @ApiName("merged_at")
   DateTime mergedAt;
-  
+
   /**
    * The Pull Request Head
    */
   PullRequestHead head;
-  
+
   /**
    * Pull Request Base
    */
   PullRequestHead base;
-  
+
   /**
    * The User who created the Pull Request
    */
   User user;
-  
+
   Map<String, dynamic> json;
-  
+
   PullRequest(this.github, [this.isFullPullRequest = false]);
-  
+
   static PullRequest fromJSON(GitHub github, input, [PullRequest into]) {
     var pr = into != null ? into : new PullRequest(github);
     pr.head = PullRequestHead.fromJSON(github, input['head']);
@@ -111,7 +111,7 @@ class PullRequest {
     pr.json = input;
     return pr;
   }
-  
+
   /**
    * Fetches the Full Pull Request
    */
@@ -129,50 +129,50 @@ class PullRequest {
 class FullPullRequest extends PullRequest {
   @ApiName("merge_commit_sha")
   String mergeCommitSha;
-  
+
   /**
    * If the pull request was merged
    */
   bool merged;
-  
+
   /**
    * If the pull request is mergable
    */
   bool mergeable;
-  
+
   /**
    * The user who merged the pull request
    */
   @ApiName("merged_by")
   User mergedBy;
-  
+
   /**
    * Number of comments
    */
   int commentsCount;
-  
+
   /**
    * Number of commits
    */
   int commitsCount;
-  
+
   /**
    * Number of additions
    */
   int additionsCount;
-  
+
   /**
    * Number of deletions
    */
   int deletionsCount;
-  
+
   /**
    * Number of changed files
    */
   int changedFilesCount;
   
   FullPullRequest(GitHub github) : super(github, true);
-  
+
   static FullPullRequest fromJSON(GitHub github, input) {
     if (input == null) return null;
     FullPullRequest pr = PullRequest.fromJSON(github, input, new FullPullRequest(github));
@@ -185,7 +185,49 @@ class FullPullRequest extends PullRequest {
     pr.additionsCount = input['additions'];
     pr.deletionsCount = input['deletions'];
     pr.changedFilesCount = input['changed_files'];
+    pr.json = input; 
     return pr;
+  }
+
+  Future<IssueComment> comment(String body) {
+    var it = JSON.encode({ "body": body });
+    return github.postJSON(json['_links']['comments']['href'], body: it, convert: IssueComment.fromJSON, statusCode: 201);
+  }
+  
+  Future<PullRequestMerge> merge({String message}) {
+    var json = {};
+    
+    if (message != null) {
+      json['commit_message'] = message;
+    }
+    
+    return github.request("PUT", "${this.json['url']}/merge", body: JSON.encode(json)).then((response) {
+      return PullRequestMerge.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+}
+
+RepositorySlug _slugFromAPIUrl(String url) {
+  var split = url.split("/");
+  var i = split.indexOf("repos") + 1;
+  var parts = split.sublist(i, i + 1);
+  return new RepositorySlug(parts[0], parts[1]);
+}
+
+class PullRequestMerge {
+  final GitHub github;
+  
+  bool merged;
+  String sha;
+  String message;
+  
+  PullRequestMerge(this.github);
+  
+  static PullRequestMerge fromJSON(GitHub github, input) {
+    return new PullRequestMerge(github)
+    ..merged = input['merged']
+    ..sha = input['sha']
+    ..message = input['message'];
   }
 }
 
@@ -194,34 +236,34 @@ class FullPullRequest extends PullRequest {
  */
 class PullRequestHead {
   final GitHub github;
-  
+
   /**
    * Label
    */
   String label;
-  
+
   /**
    * Ref
    */
   String ref;
-  
+
   /**
    * Commit SHA
    */
   String sha;
-  
+
   /**
    * User
    */
   User user;
-  
+
   /**
    * Repository
    */
   Repository repo;
-  
+
   PullRequestHead(this.github);
-  
+
   static PullRequestHead fromJSON(GitHub github, input) {
     if (input == null) return null;
     var head = new PullRequestHead(github);
@@ -242,24 +284,24 @@ class CreatePullRequest {
    * Pull Request Title
    */
   final String title;
-  
+
   /**
    * Pull Request Head
    */
   final String head;
-  
+
   /**
    * Pull Request Base
    */
   final String base;
-  
+
   /**
    * Pull Request Body
    */
   String body;
-  
+
   CreatePullRequest(this.title, this.head, this.base, {this.body});
-  
+
   String toJSON() {
     var map = {};
     putValue("title", title, map);
@@ -272,59 +314,59 @@ class CreatePullRequest {
 
 class PullRequestComment {
   final GitHub github;
-  
+
   int id;
   @ApiName("diff_hunk")
   String diffHunk;
   String path;
   int position;
-  
+
   @ApiName("original_position")
   int originalPosition;
-  
+
   @ApiName("commit_id")
   String commitID;
-  
+
   @ApiName("original_commit_id")
   String originalCommitID;
-  
+
   User user;
   String body;
-  
+
   @ApiName("created_at")
   DateTime createdAt;
-  
+
   @ApiName("updated_at")
   DateTime updatedAt;
-  
+
   @ApiName("html_url")
   String url;
-  
+
   @ApiName("pull_request_url")
   String pullRequestUrl;
-  
+
   @ApiName("_links")
   Links links;
-  
+
   PullRequestComment(this.github);
-  
+
   static PullRequestComment fromJSON(GitHub github, input) {
     if (input == null) return null;
-    
+
     return new PullRequestComment(github)
-    ..id = input['id']
-    ..diffHunk = input['diff_hunk']
-    ..path = input['path']
-    ..position = input['position']
-    ..originalPosition = input['original_position']
-    ..commitID = input['commit_id']
-    ..originalCommitID = input['original_commit_id']
-    ..user = User.fromJSON(github, input['user'])
-    ..body = input['body']
-    ..createdAt = parseDateTime(input['created_at'])
-    ..updatedAt = parseDateTime(input['updated_at'])
-    ..url = input['html_url']
-    ..pullRequestUrl = input['pull_request_url']
-    ..links = Links.fromJSON(input['_links']);
+        ..id = input['id']
+        ..diffHunk = input['diff_hunk']
+        ..path = input['path']
+        ..position = input['position']
+        ..originalPosition = input['original_position']
+        ..commitID = input['commit_id']
+        ..originalCommitID = input['original_commit_id']
+        ..user = User.fromJSON(github, input['user'])
+        ..body = input['body']
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..url = input['html_url']
+        ..pullRequestUrl = input['pull_request_url']
+        ..links = Links.fromJSON(input['_links']);
   }
 }

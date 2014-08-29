@@ -556,7 +556,7 @@ class DynamicCallSiteTypeInformation extends CallSiteTypeInformation {
     if (selector.mask != receiverType) {
       return receiverType == inferrer.compiler.typesTask.dynamicType
           ? selector.asUntyped
-          : new TypedSelector(receiverType, selector, inferrer.compiler.world);
+          : new TypedSelector(receiverType, selector, inferrer.compiler);
     } else {
       return selector;
     }
@@ -655,6 +655,7 @@ class DynamicCallSiteTypeInformation extends CallSiteTypeInformation {
 
     Compiler compiler = inferrer.compiler;
     Selector selectorToUse = typedSelector.extendIfReachesAll(compiler);
+
     bool canReachAll = compiler.enabledInvokeOn &&
         (selectorToUse != typedSelector);
 
@@ -916,23 +917,8 @@ class NarrowTypeInformation extends TypeInformation {
     addAssignment(narrowedType);
   }
 
-  addAssignment(TypeInformation info) {
-    super.addAssignment(info);
-    assert(assignments.length == 1);
-  }
-
   TypeMask refine(TypeGraphInferrerEngine inferrer) {
-    TypeMask input = assignments[0].type;
-    TypeMask intersection = input.intersection(typeAnnotation,
-        inferrer.compiler);
-    if (_ANOMALY_WARN) {
-      if (!input.containsMask(intersection, inferrer.compiler) ||
-          !typeAnnotation.containsMask(intersection, inferrer.compiler)) {
-        print("ANOMALY WARNING: narrowed $input to $intersection via "
-            "$typeAnnotation");
-      }
-    }
-    return intersection;
+    return assignments[0].type.intersection(typeAnnotation, inferrer.compiler);
   }
 
   String toString() {

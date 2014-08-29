@@ -9,28 +9,27 @@ class UnionTypeMask implements TypeMask {
 
   static const int MAX_UNION_LENGTH = 4;
 
-  UnionTypeMask._internal(this.disjointMasks) {
-    assert(disjointMasks.length > 1);
-    assert(disjointMasks.every((TypeMask mask) => !mask.isUnion));
-  }
+  UnionTypeMask._(this.disjointMasks);
 
   static TypeMask unionOf(Iterable<TypeMask> masks, Compiler compiler) {
-    assert(masks.every((mask) => TypeMask.isNormalized(mask, compiler.world)));
     List<FlatTypeMask> disjoint = <FlatTypeMask>[];
     unionOfHelper(masks, disjoint, compiler);
     if (disjoint.isEmpty) return new TypeMask.nonNullEmpty();
     if (disjoint.length > MAX_UNION_LENGTH) return flatten(disjoint, compiler);
     if (disjoint.length == 1) return disjoint[0];
-    UnionTypeMask union = new UnionTypeMask._internal(disjoint);
-    assert(TypeMask.isNormalized(union, compiler.world));
-    return union;
+    return new UnionTypeMask._(disjoint);
+  }
+
+  static TypeMask nonForwardingMask(mask) {
+    while (mask.isForwarding) mask = mask.forwardTo;
+    return mask;
   }
 
   static void unionOfHelper(Iterable<TypeMask> masks,
                             List<FlatTypeMask> disjoint,
                             Compiler compiler) {
     for (TypeMask mask in masks) {
-      mask = TypeMask.nonForwardingMask(mask);
+      mask = nonForwardingMask(mask);
       if (mask.isUnion) {
         UnionTypeMask union = mask;
         unionOfHelper(union.disjointMasks, disjoint, compiler);
@@ -106,8 +105,7 @@ class UnionTypeMask implements TypeMask {
       // at least one of the two base types is 'unseen'.
       return new TypeMask(compiler.objectClass,
                           FlatTypeMask.SUBCLASS,
-                          isNullable,
-                          compiler.world);
+                          isNullable);
     }
     // Compute the best candidate and its kind.
     ClassElement bestElement;
@@ -140,11 +138,11 @@ class UnionTypeMask implements TypeMask {
       }
     }
     if (bestElement == compiler.objectClass) bestKind = FlatTypeMask.SUBCLASS;
-    return new TypeMask(bestElement, bestKind, isNullable, compiler.world);
+    return new TypeMask(bestElement, bestKind, isNullable);
   }
 
   TypeMask union(var other, Compiler compiler) {
-    other = TypeMask.nonForwardingMask(other);
+    other = nonForwardingMask(other);
     if (!other.isUnion && disjointMasks.contains(other)) return this;
 
     List<FlatTypeMask> newList =
@@ -159,7 +157,7 @@ class UnionTypeMask implements TypeMask {
   }
 
   TypeMask intersection(var other, Compiler compiler) {
-    other = TypeMask.nonForwardingMask(other);
+    other = nonForwardingMask(other);
     if (!other.isUnion && disjointMasks.contains(other)) return other;
 
     List<TypeMask> intersections = <TypeMask>[];
@@ -179,14 +177,14 @@ class UnionTypeMask implements TypeMask {
     if (isNullable) return this;
     List<FlatTypeMask> newList = new List<FlatTypeMask>.from(disjointMasks);
     newList[0] = newList[0].nullable();
-    return new UnionTypeMask._internal(newList);
+    return new UnionTypeMask._(newList);
   }
 
   TypeMask nonNullable() {
     if (!isNullable) return this;
     Iterable<FlatTypeMask> newIterable =
         disjointMasks.map((e) => e.nonNullable());
-    return new UnionTypeMask._internal(newIterable);
+    return new UnionTypeMask._(newIterable);
   }
 
   bool get isEmpty => false;
@@ -199,74 +197,12 @@ class UnionTypeMask implements TypeMask {
   bool get isForwarding => false;
   bool get isValue => false;
 
-  /**
-   * Checks whether [other] is contained in this union.
-   *
-   * Invariants:
-   * - [other] may not be a [UnionTypeMask] itself
-   * - the cheap test matching against individual members of [disjointMasks]
-   *   must have failed.
-   */
-  bool slowContainsCheck(TypeMask other, Compiler compiler) {
-    // Unions should never make it here.
-    assert(!other.isUnion);
-    // Ensure the cheap test fails.
-    assert(!disjointMasks.any((mask) => mask.containsMask(other, compiler)));
-    // If we cover object, we should never get here.
-    assert(!contains(compiler.objectClass, compiler));
-    // Likewise, nullness should be covered.
-    assert(isNullable || !other.isNullable);
-    // The fast test is precise for exact types.
-    if (other.isExact) return false;
-    // We cannot contain object.
-    if (other.contains(compiler.objectClass, compiler)) return false;
-    FlatTypeMask flat = TypeMask.nonForwardingMask(other);
-    // Check we cover the base class.
-    if (!contains(flat.base, compiler)) return false;
-    // Check for other members.
-    Iterable<ClassElement> members;
-    if (flat.isSubclass) {
-      members = compiler.world.subclassesOf(flat.base);
-    } else {
-      assert(flat.isSubtype);
-      members = compiler.world.subtypesOf(flat.base);
-    }
-    if (members == null) return true;
-    return members.every((ClassElement cls) => this.contains(cls, compiler));
-  }
-
   bool isInMask(TypeMask other, Compiler compiler) {
-    other = TypeMask.nonForwardingMask(other);
-    if (isNullable && !other.isNullable) return false;
-    if (other.isUnion) {
-      UnionTypeMask union = other;
-      bool containedInAnyOf(FlatTypeMask mask, Iterable<FlatTypeMask> masks) {
-        // null is not canonicalized for the union but stored only on some
-        // masks in [disjointMask]. It has been checked in the surrounding
-        // context, so we can safely ignore it here.
-        FlatTypeMask maskDisregardNull = mask.nonNullable();
-        return masks.any((FlatTypeMask other) {
-          return other.containsMask(maskDisregardNull, compiler);
-        });
-      }
-      return disjointMasks.every((FlatTypeMask disjointMask) {
-        bool contained = containedInAnyOf(disjointMask, union.disjointMasks);
-        assert(contained || !union.slowContainsCheck(disjointMask, compiler));
-        return contained;
-      });
-    }
     return disjointMasks.every((mask) => mask.isInMask(other, compiler));
   }
 
   bool containsMask(TypeMask other, Compiler compiler) {
-    other = TypeMask.nonForwardingMask(other);
-    if (other.isNullable && !isNullable) return false;
-    if (other.isUnion) return other.isInMask(this, compiler);
-    other = other.nonNullable(); // nullable is not canonicalized, so drop it.
-    bool contained =
-        disjointMasks.any((mask) => mask.containsMask(other, compiler));
-    assert(contained || !slowContainsCheck(other, compiler));
-    return contained;
+    return disjointMasks.any((mask) => mask.containsMask(other, compiler));
   }
 
   bool containsOnlyInt(Compiler compiler) {
@@ -309,13 +245,13 @@ class UnionTypeMask implements TypeMask {
 
   ClassElement singleClass(Compiler compiler) => null;
 
-  bool needsNoSuchMethodHandling(Selector selector, World world) {
+  bool needsNoSuchMethodHandling(Selector selector, Compiler compiler) {
     return disjointMasks.any(
-        (e) => e.needsNoSuchMethodHandling(selector, world));
+        (e) => e.needsNoSuchMethodHandling(selector, compiler));
   }
 
-  bool canHit(Element element, Selector selector, World world) {
-    return disjointMasks.any((e) => e.canHit(element, selector, world));
+  bool canHit(Element element, Selector selector, Compiler compiler) {
+    return disjointMasks.any((e) => e.canHit(element, selector, compiler));
   }
 
   Element locateSingleElement(Selector selector, Compiler compiler) {
@@ -333,11 +269,7 @@ class UnionTypeMask implements TypeMask {
     return candidate;
   }
 
-  String toString() {
-    String masksString = (disjointMasks.map((TypeMask mask) => mask.toString())
-        .toList()..sort()).join(", ");
-    return 'Union of [$masksString]';
-  }
+  String toString() => 'Union of $disjointMasks';
 
   bool operator==(other) {
     if (identical(this, other)) return true;

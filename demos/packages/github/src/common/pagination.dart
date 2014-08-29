@@ -11,6 +11,7 @@ class PaginationHelper<T> {
   PaginationHelper(this.github) : responses = [], completer = new Completer<List<http.Response>>();
   
   Future<List<http.Response>> fetch(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    if (headers == null) headers = {};
     Future<http.Response> actualFetch(String realPath) {
       return github.request(method, realPath, headers: headers, params: params, body: body);
     }
@@ -52,6 +53,7 @@ class PaginationHelper<T> {
   }
   
   Stream<http.Response> fetchStreamed(String method, String path, {int pages, bool reverse: false, int start, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    if (headers == null) headers = {};
     var controller = new StreamController.broadcast();
     
     Future<http.Response> actualFetch(String realPath, [bool first = false]) {
@@ -111,6 +113,8 @@ class PaginationHelper<T> {
   }
   
   Stream<T> objects(String method, String path, JSONConverter converter, {int pages, bool reverse: false, int start, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    if (headers == null) headers = {};
+    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
     var controller = new StreamController();
     fetchStreamed(method, path, pages: pages, start: start, reverse: reverse, headers: headers, params: params, body: body).listen((response) {
       var json = JSON.decode(response.body);

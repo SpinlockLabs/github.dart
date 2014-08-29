@@ -22,7 +22,7 @@ import 'elements/modelx.dart'
          ErroneousElementX,
          LibraryElementX,
          PrefixElementX;
-import 'helpers/helpers.dart';  // Included for debug helpers.
+import 'helpers/helpers.dart';
 import 'native_handler.dart' as native;
 import 'tree/tree.dart';
 import 'util/util.dart' show Link, LinkBuilder;

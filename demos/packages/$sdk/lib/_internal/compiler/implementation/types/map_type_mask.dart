@@ -56,8 +56,7 @@ class MapTypeMask extends ForwardingTypeMask {
 
   bool equalsDisregardNull(other) {
     if (other is! MapTypeMask) return false;
-    return super.equalsDisregardNull(other) &&
-        allocationNode == other.allocationNode &&
+    return allocationNode == other.allocationNode &&
         keyType == other.keyType &&
         valueType == other.valueType;
   }
@@ -96,11 +95,7 @@ class MapTypeMask extends ForwardingTypeMask {
           other.typeMap.values.fold(keyType, (p,n) => p.union(n, compiler));
       TypeMask newForwardTo = forwardTo.union(other.forwardTo, compiler);
       MapTypeMask newMapTypeMask = new MapTypeMask(
-          newForwardTo,
-          allocationNode == other.allocationNode ? allocationNode : null,
-          allocationElement == other.allocationElement ? allocationElement
-                                                       : null,
-          newKeyType, newValueType);
+          newForwardTo, null, null, newKeyType, newValueType);
       return newMapTypeMask;
     } else {
       return forwardTo.union(other, compiler);

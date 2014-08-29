@@ -234,8 +234,7 @@ class SsaTypePropagator extends HBaseVisitor implements OptimizationPhase {
       if (targets.length == 1) {
         Element target = targets.first;
         ClassElement cls = target.enclosingClass;
-        TypeMask type = new TypeMask.nonNullSubclass(cls.declaration,
-                                                     compiler.world);
+        TypeMask type = new TypeMask.nonNullSubclass(cls.declaration);
         // TODO(ngeoffray): We currently only optimize on primitive
         // types.
         if (!type.satisfies(backend.jsIndexableClass, compiler)
@@ -322,8 +321,8 @@ class SsaTypePropagator extends HBaseVisitor implements OptimizationPhase {
 
     HInstruction receiver = instruction.getDartReceiver(compiler);
     TypeMask receiverType = receiver.instructionType;
-    Selector selector =
-        new TypedSelector(receiverType, instruction.selector, compiler.world);
+    Selector selector = new TypedSelector(receiverType, instruction.selector,
+        compiler);
     instruction.selector = selector;
 
     // Try to specialize the receiver after this call.

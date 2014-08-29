@@ -88,29 +88,24 @@ abstract class ForwardingTypeMask implements TypeMask {
     return forwardTo.intersection(other, compiler);
   }
 
-  bool needsNoSuchMethodHandling(Selector selector, World world) {
-    return forwardTo.needsNoSuchMethodHandling(selector, world);
+  bool needsNoSuchMethodHandling(Selector selector, Compiler compiler) {
+    return forwardTo.needsNoSuchMethodHandling(selector, compiler);
   }
 
-  bool canHit(Element element, Selector selector, World world) {
-    return forwardTo.canHit(element, selector, world);
+  bool canHit(Element element, Selector selector, Compiler compiler) {
+    return forwardTo.canHit(element, selector, compiler);
   }
 
   Element locateSingleElement(Selector selector, Compiler compiler) {
     return forwardTo.locateSingleElement(selector, compiler);
   }
 
-  bool equalsDisregardNull(other) {
-    if (other is! ForwardingTypeMask) return false;
-    if (forwardTo.isNullable) {
-      return forwardTo == other.forwardTo.nullable();
-    } else {
-      return forwardTo == other.forwardTo.nonNullable();
-    }
-  }
+  bool equalsDisregardNull(other);
 
   bool operator==(other) {
-    return equalsDisregardNull(other) && isNullable == other.isNullable;
+    return equalsDisregardNull(other) &&
+        isNullable == other.isNullable &&
+        forwardTo == other.forwardTo;
   }
 
   int get hashCode => throw "Subclass should implement hashCode getter";

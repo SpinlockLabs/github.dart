@@ -67,8 +67,6 @@ class SsaSimplifyInterceptors extends HBaseVisitor
   bool canUseSelfForInterceptor(HInstruction receiver,
                                 Set<ClassElement> interceptedClasses) {
     JavaScriptBackend backend = compiler.backend;
-    World world = compiler.world;
-
     if (receiver.canBePrimitive(compiler)) {
       // Primitives always need interceptors.
       return false;
@@ -81,7 +79,7 @@ class SsaSimplifyInterceptors extends HBaseVisitor
 
     // All intercepted classes extend `Interceptor`, so if the receiver can't be
     // a class extending `Interceptor` then it can be called directly.
-    return new TypeMask.nonNullSubclass(backend.jsInterceptorClass, world)
+    return new TypeMask.nonNullSubclass(backend.jsInterceptorClass)
         .intersection(receiver.instructionType, compiler)
         .isEmpty;
   }

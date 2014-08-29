@@ -36,23 +36,6 @@ class World {
 
   final Set<Element> alreadyPopulated;
 
-  bool get isClosed => compiler.phase > Compiler.PHASE_RESOLVING;
-
-  // Used by selectors.
-  bool isAssertMethod(Element element) {
-    return compiler.backend.isAssertMethod(element);
-  }
-
-  // Used by selectors.
-  bool isForeign(Element element) {
-    return element.isForeign(compiler.backend);
-  }
-
-  // Used by typed selectors.
-  ClassElement get nullImplementation {
-    return compiler.backend.nullImplementation;
-  }
-
   Set<ClassElement> subclassesOf(ClassElement cls) {
     return _subclasses[cls.declaration];
   }
@@ -67,6 +50,11 @@ class World {
 
   Set<ClassElement> typesImplementedBySubclassesOf(ClassElement cls) {
     return _typesImplementedBySubclasses[cls.declaration];
+  }
+
+  bool hasSubclasses(ClassElement cls) {
+    Set<ClassElement> subclasses = compiler.world.subclassesOf(cls);
+    return subclasses != null && !subclasses.isEmpty;
   }
 
   World(Compiler compiler)
@@ -160,13 +148,6 @@ class World {
     return classes != null && !classes.isEmpty;
   }
 
-  bool hasOnlySubclasses(ClassElement cls) {
-    Set<ClassElement> subtypes = subtypesOf(cls);
-    if (subtypes == null) return true;
-    Set<ClassElement> subclasses = subclassesOf(cls);
-    return subclasses != null && (subclasses.length == subtypes.length);
-  }
-
   bool hasAnyUserDefinedGetter(Selector selector) {
     return allFunctions.filter(selector).any((each) => each.isGetter);
   }
@@ -219,7 +200,7 @@ class World {
 
   Element locateSingleElement(Selector selector) {
     ti.TypeMask mask = selector.mask == null
-        ? compiler.typesTask.dynamicType
+        ? new ti.TypeMask.subclass(compiler.objectClass)
         : selector.mask;
     return mask.locateSingleElement(selector, compiler);
   }
@@ -245,7 +226,7 @@ class World {
     return element.isFinal
         || element.isConst
         || (element.isInstanceMember
-            && !compiler.resolverWorld.hasInvokedSetter(element, this));
+            && !compiler.resolverWorld.hasInvokedSetter(element, compiler));
   }
 
   SideEffects getSideEffectsOfElement(Element element) {

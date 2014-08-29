@@ -478,6 +478,81 @@ class GitHub {
     return controller.stream;
   }
   
+  EventPoller pollUserEvents(String user) =>
+      new EventPoller(this, "/users/${user}/events");
+  
+  EventPoller pollUserOrganizationEvents(String user, String organization) =>
+      new EventPoller(this, "/users/${user}/events/orgs/${organization}");
+  
+  EventPoller pollPublicUserEvents(String user) =>
+      new EventPoller(this, "/repos/${user}/events/public");
+  
+  EventPoller pollPublicEvents() =>
+      new EventPoller(this, "/events");
+  
+  EventPoller pollOrganizationEvents(String name) =>
+      new EventPoller(this, "/orgs/${name}/events");
+  
+  EventPoller pollRepositoryEvents(RepositorySlug slug) =>
+      new EventPoller(this, "/repos/${slug.fullName}/events");
+  
+  Stream<Event> publicEvents({int pages: 2}) {
+    return new PaginationHelper(this).objects("GET", "/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> repositoryEvents(RepositorySlug slug, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> userEvents(String username, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/users/${username}/events", Event.fromJSON, pages: pages);
+  }
+  
+  Stream<Event> organizationEvents(String name, {int pages}) {
+    return new PaginationHelper(this).objects("GET", "/orgs/${name}/events", Event.fromJSON, pages: pages);
+  }
+  
+  /**
+   * Search for Users using [query].
+   * 
+   * Since the Search Rate Limit is small, this is a best effort implementation.
+   */
+  Stream<User> searchUsers(String query, {String sort, int pages: 2, int perPage: 30}) {
+    var params = { "q": query };
+    
+    if (sort != null) {
+      params["sort"] = sort;
+    }
+    
+    params["per_page"] = perPage;
+    
+    var controller = new StreamController();
+    
+    var isFirst = true;
+    
+    new PaginationHelper(this).fetchStreamed("GET", "/search/users", params: params, pages: pages).listen((response) {
+      if (response.statusCode == 403 && response.body.contains("rate limit") && isFirst) {
+        throw new RateLimitHit(this);
+      }
+      
+      isFirst = false;
+      
+      var input = JSON.decode(response.body);
+      
+      if (input['items'] == null) {
+        return;
+      }
+      
+      List<dynamic> items = input['items'];
+      
+      items
+        .map((item) => User.fromJSON(this, item))
+        .forEach(controller.add);
+    }).onDone(controller.close);
+    
+    return controller.stream;
+  }
+  
   /**
    * Fetches the Watchers of the specified repository.
    */
@@ -524,9 +599,13 @@ class GitHub {
    * The default [convert] function returns the input object.
    */
   Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
+    if (headers == null) headers = {};
+    
     if (convert == null) {
       convert = (github, input) => input;
     }
+    
+    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
@@ -556,6 +635,20 @@ class GitHub {
       }
     }, convert: (gh, input) => File.fromJSON(gh, input, slug));
   }
+  
+  Future<String> octocat(String text) {
+    var params = {};
+    
+    if (text != null) {
+      params["s"] = text;
+    }
+    
+    return request("GET", "/octocat", params: params).then((response) {
+      return response.body;
+    });
+  }
+  
+  Future<String> wisdom() => octocat(null);
   
   /**
    * Fetches content in a repository at the specified [path].
@@ -606,10 +699,14 @@ class GitHub {
    * [body] is the data to send to the server.
    */
   Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
+    if (headers == null) headers = {};
+    
     if (convert == null) {
       convert = (github, input) => input;
     }
 
+    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+    
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
@@ -634,6 +731,10 @@ class GitHub {
         throw new UnknownError(this);
     }
   }
+  
+  Future<FullPullRequest> pullRequest(RepositorySlug slug, int number) {
+    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: FullPullRequest.fromJSON, statusCode: 200);
+  }
 
   /**
    * Handles Authenticated Requests in an easy to understand way.
@@ -645,18 +746,14 @@ class GitHub {
    * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
-    if (headers == null) {
-      headers = {};
-    }
-
+    if (headers == null) headers = {};
+    
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
       var userAndPass = UTF8.encode("${auth.username}:${auth.password}");
       headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
     }
-    
-    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
     var queryString = "";
 
@@ -666,7 +763,7 @@ class GitHub {
 
     var url = new StringBuffer();
 
-    if (path.startsWith("http")) {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
       url.write(path);
       url.write(queryString);
     } else {

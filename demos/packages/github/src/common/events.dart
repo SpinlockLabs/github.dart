@@ -3,22 +3,23 @@ part of github.common;
 class EventPoller {
   final GitHub github;
   final String path;
+  final List<String> handledEvents = [];
 
   Timer _timer;
   StreamController _controller;
   
-  String _lastFetch;
+  String _lastFetched;
 
   EventPoller(this.github, this.path);
 
-  Stream<Event> start() {
+  Stream<Event> start({bool onlyNew: false, int interval, DateTime after}) {
     if (_timer != null) {
       throw new Exception("Polling already started.");
     }
+    
+    if (after != null) after = after.toUtc();
 
     _controller = new StreamController();
-
-    int interval;
 
     void handleEvent(http.Response response) {
       if (interval == null) {
@@ -29,19 +30,35 @@ class EventPoller {
         return;
       }
       
+      _lastFetched = response.headers['ETag'];
+      
       var json = JSON.decode(response.body);
       
-      for (var item in json) {
-        var event = Event.fromJSON(github, item);
-        _controller.add(event);
+      if (!(onlyNew && _timer == null)) {
+        for (var item in json) {
+          var event = Event.fromJSON(github, item);
+          
+          if (event.createdAt.toUtc().isBefore(after)) {
+            print("Skipping Event");
+            continue;
+          }
+          
+          if (handledEvents.contains(event.id)) {
+            continue;
+          }
+          
+          handledEvents.add(event.id);
+          
+          _controller.add(event);
+        }
       }
 
       if (_timer == null) {
         _timer = new Timer.periodic(new Duration(seconds: interval), (timer) {
           var headers = {};
           
-          if (_lastFetch != null) {
-            headers['If-None-Match'] = _lastFetch;
+          if (_lastFetched != null) {
+            headers['If-None-Match'] = _lastFetched;
           }
           
           github.request("GET", path, headers: headers).then(handleEvent);
@@ -51,8 +68,8 @@ class EventPoller {
     
     var headers = {};
     
-    if (_lastFetch != null) {
-      headers['If-None-Match'] = _lastFetch;
+    if (_lastFetched != null) {
+      headers['If-None-Match'] = _lastFetched;
     }
     
     github.request("GET", path, headers: headers).then(handleEvent);
@@ -86,6 +103,10 @@ class Event {
   DateTime createdAt;
 
   String id;
+  
+  String type;
+  
+  Map<String, dynamic> json;
 
   Map<String, dynamic> payload;
 
@@ -93,6 +114,10 @@ class Event {
 
   static Event fromJSON(GitHub github, input) {
     var event = new Event(github);
+    
+    event.json = input;
+    
+    event.type = input['type'];
 
     event
         ..repo = Repository.fromJSON(github, input['repo'])

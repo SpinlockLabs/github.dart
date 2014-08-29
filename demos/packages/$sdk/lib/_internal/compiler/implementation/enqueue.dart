@@ -134,8 +134,8 @@ abstract class Enqueuer {
       if (cls.isNative) {
         compiler.world.registerUsedElement(member);
         nativeEnqueuer.handleFieldAnnotations(member);
-        if (universe.hasInvokedGetter(member, compiler.world) ||
-            universe.hasInvocation(member, compiler.world)) {
+        if (universe.hasInvokedGetter(member, compiler) ||
+            universe.hasInvocation(member, compiler)) {
           nativeEnqueuer.registerFieldLoad(member);
           // In handleUnseenSelector we can't tell if the field is loaded or
           // stored.  We need the basic algorithm to be Church-Rosser, since the
@@ -148,7 +148,7 @@ abstract class Enqueuer {
           addToWorkList(member);
           return;
         }
-        if (universe.hasInvokedSetter(member, compiler.world)) {
+        if (universe.hasInvokedSetter(member, compiler)) {
           nativeEnqueuer.registerFieldStore(member);
           // See comment after registerFieldLoad above.
           nativeEnqueuer.registerFieldLoad(member);
@@ -165,50 +165,43 @@ abstract class Enqueuer {
         return;
       }
     } else if (member.kind == ElementKind.FUNCTION) {
-      FunctionElement function = member;
-      function.computeSignature(compiler);
-      if (function.name == Compiler.NO_SUCH_METHOD) {
-        enableNoSuchMethod(function);
+      if (member.name == Compiler.NO_SUCH_METHOD) {
+        enableNoSuchMethod(member);
       }
-      if (function.name == Compiler.CALL_OPERATOR_NAME &&
+      if (member.name == Compiler.CALL_OPERATOR_NAME &&
           !cls.typeVariables.isEmpty) {
-        registerCallMethodWithFreeTypeVariables(
-            function, compiler.globalDependencies);
+        registerGenericCallMethod(member, compiler.globalDependencies);
       }
       // If there is a property access with the same name as a method we
       // need to emit the method.
-      if (universe.hasInvokedGetter(function, compiler.world)) {
-        registerClosurizedMember(function, compiler.globalDependencies);
-        addToWorkList(function);
+      if (universe.hasInvokedGetter(member, compiler)) {
+        registerClosurizedMember(member, compiler.globalDependencies);
+        addToWorkList(member);
         return;
       }
       // Store the member in [instanceFunctionsByName] to catch
       // getters on the function.
       Link<Element> members = instanceFunctionsByName.putIfAbsent(
           memberName, () => const Link<Element>());
-      instanceFunctionsByName[memberName] = members.prepend(function);
-      if (universe.hasInvocation(function, compiler.world)) {
-        addToWorkList(function);
+      instanceFunctionsByName[memberName] = members.prepend(member);
+      if (universe.hasInvocation(member, compiler)) {
+        addToWorkList(member);
         return;
       }
     } else if (member.kind == ElementKind.GETTER) {
-      FunctionElement getter = member;
-      getter.computeSignature(compiler);
-      if (universe.hasInvokedGetter(getter, compiler.world)) {
-        addToWorkList(getter);
+      if (universe.hasInvokedGetter(member, compiler)) {
+        addToWorkList(member);
         return;
       }
       // We don't know what selectors the returned closure accepts. If
       // the set contains any selector we have to assume that it matches.
-      if (universe.hasInvocation(getter, compiler.world)) {
-        addToWorkList(getter);
+      if (universe.hasInvocation(member, compiler)) {
+        addToWorkList(member);
         return;
       }
     } else if (member.kind == ElementKind.SETTER) {
-      FunctionElement setter = member;
-      setter.computeSignature(compiler);
-      if (universe.hasInvokedSetter(setter, compiler.world)) {
-        addToWorkList(setter);
+      if (universe.hasInvokedSetter(member, compiler)) {
+        addToWorkList(member);
         return;
       }
     }
@@ -333,7 +326,7 @@ abstract class Enqueuer {
         // We need to enqueue all members matching this one in subclasses, as
         // well.
         // TODO(herhut): Use TypedSelector.subtype for enqueueing
-        Selector selector = new Selector.fromElement(element);
+        Selector selector = new Selector.fromElement(element, compiler);
         registerSelectorUse(selector);
         if (element.isField) {
           Selector selector =
@@ -477,7 +470,7 @@ abstract class Enqueuer {
 
   void handleUnseenSelector(String methodName, Selector selector) {
     processInstanceMembers(methodName, (Element member) {
-      if (selector.appliesUnnamed(member, compiler.world)) {
+      if (selector.appliesUnnamed(member, compiler)) {
         if (member.isFunction && selector.isGetter) {
           registerClosurizedMember(member, compiler.globalDependencies);
         }
@@ -506,7 +499,7 @@ abstract class Enqueuer {
     });
     if (selector.isGetter) {
       processInstanceFunctions(methodName, (Element member) {
-        if (selector.appliesUnnamed(member, compiler.world)) {
+        if (selector.appliesUnnamed(member, compiler)) {
           registerClosurizedMember(member, compiler.globalDependencies);
           return true;
         }
@@ -586,32 +579,28 @@ abstract class Enqueuer {
     universe.usingFactoryWithTypeArguments = true;
   }
 
-  void registerCallMethodWithFreeTypeVariables(
-      Element element,
-      Registry registry) {
-    compiler.backend.registerCallMethodWithFreeTypeVariables(
-        element, this, registry);
-    universe.callMethodsWithFreeTypeVariables.add(element);
+  void registerGenericCallMethod(Element element, Registry registry) {
+    compiler.backend.registerGenericCallMethod(element, this, registry);
+    universe.genericCallMethods.add(element);
   }
 
   void registerClosurizedMember(Element element, Registry registry) {
     assert(element.isInstanceMember);
-    registerClosureIfFreeTypeVariables(element, registry);
+    registerIfGeneric(element, registry);
     compiler.backend.registerBoundClosure(this);
     universe.closurizedMembers.add(element);
   }
 
-  void registerClosureIfFreeTypeVariables(Element element, Registry registry) {
+  void registerIfGeneric(Element element, Registry registry) {
     if (element.computeType(compiler).containsTypeVariables) {
-      compiler.backend.registerClosureWithFreeTypeVariables(
-          element, this, registry);
-      universe.closuresWithFreeTypeVariables.add(element);
+      compiler.backend.registerGenericClosure(element, this, registry);
+      universe.genericClosures.add(element);
     }
   }
 
   void registerClosure(LocalFunctionElement element, Registry registry) {
     universe.allClosures.add(element);
-    registerClosureIfFreeTypeVariables(element, registry);
+    registerIfGeneric(element, registry);
   }
 
   void forEach(void f(WorkItem work)) {
@@ -684,11 +673,6 @@ class ResolutionEnqueuer extends Enqueuer {
   /// Registers [element] as resolved for the resolution enqueuer.
   void registerResolvedElement(AstElement element) {
     resolvedElements.add(element);
-  }
-
-  /// Returns `true` if the resolution world considers [cls] to be instantiated.
-  bool isInstantiated(ClassElement cls) {
-    return seenClasses.contains(cls);
   }
 
   /// Returns [:true:] if [element] has actually been used.
@@ -844,7 +828,7 @@ class CodegenEnqueuer extends Enqueuer {
       newlyEnqueuedElements.add(element);
     }
     // Don't generate code for foreign elements.
-    if (element.isForeign(compiler.backend)) return false;
+    if (element.isForeign(compiler)) return false;
 
     // Codegen inlines field initializers. It only needs to generate
     // code for checked setters.

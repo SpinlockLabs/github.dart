@@ -129,7 +129,7 @@ class DeferredLoadTask extends CompilerTask {
   final Set<OutputUnit> allOutputUnits = new Set<OutputUnit>();
 
   /// Will be `true` if the program contains deferred libraries.
-  bool isProgramSplit = false;
+  bool splitProgram = false;
 
   /// A mapping from the name of a defer import to all the output units it
   /// depends on in a list of lists to be loaded in the order they appear.
@@ -171,7 +171,7 @@ class DeferredLoadTask extends CompilerTask {
 
   /// Returns the [OutputUnit] where [element] belongs.
   OutputUnit outputUnitForElement(Element element) {
-    if (!isProgramSplit) return mainOutputUnit;
+    if (!splitProgram) return mainOutputUnit;
 
     element = element.implementation;
     while (!_elementToOutputUnit.containsKey(element)) {
@@ -191,7 +191,7 @@ class DeferredLoadTask extends CompilerTask {
 
   /// Returns the [OutputUnit] where [constant] belongs.
   OutputUnit outputUnitForConstant(Constant constant) {
-    if (!isProgramSplit) return mainOutputUnit;
+    if (!splitProgram) return mainOutputUnit;
 
     return _constantToOutputUnit[constant];
   }
@@ -635,7 +635,7 @@ class DeferredLoadTask extends CompilerTask {
   }
 
   void onResolutionComplete(FunctionElement main) {
-    if (!isProgramSplit) {
+    if (!splitProgram) {
       allOutputUnits.add(mainOutputUnit);
       return;
     }
@@ -740,7 +740,7 @@ class DeferredLoadTask extends CompilerTask {
             } else {
               prefixDeferredImport[prefix] = import;
             }
-            isProgramSplit = true;
+            splitProgram = true;
             lastDeferred = import;
           }
           if (prefix != null) {
@@ -758,15 +758,15 @@ class DeferredLoadTask extends CompilerTask {
       });
     }
     Backend backend = compiler.backend;
-    if (isProgramSplit && backend is JavaScriptBackend) {
+    if (splitProgram && backend is JavaScriptBackend) {
       backend.registerCheckDeferredIsLoaded(compiler.globalDependencies);
     }
-    if (isProgramSplit && backend is DartBackend) {
+    if (splitProgram && backend is DartBackend) {
       // TODO(sigurdm): Implement deferred loading for dart2dart.
       compiler.reportWarning(
           lastDeferred,
           MessageKind.DEFERRED_LIBRARY_DART_2_DART);
-      isProgramSplit = false;
+      splitProgram = false;
     }
   }
 

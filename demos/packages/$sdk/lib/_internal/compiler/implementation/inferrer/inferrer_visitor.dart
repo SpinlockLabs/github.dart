@@ -92,12 +92,6 @@ abstract class TypeSystem<T> {
   T addPhiInput(Local variable, T phiType, T newType);
 
   /**
-   * Returns `true` if `selector` should be updated to reflect the new
-   * `receiverType`.
-   */
-  bool selectorNeedsUpdate(T receiverType, Selector selector);
-
-  /**
    * Returns a new receiver type for this [selector] applied to
    * [receiverType].
    */

@@ -409,12 +409,11 @@ abstract class String implements Comparable<String>, Pattern {
 
   /**
    * Returns a new string in which  the first occurence of [from] in this string
-   * is replaced with [to], starting from [startIndex]:
+   * is replaced with [to]:
    *
    *     '0.0001'.replaceFirst(new RegExp(r'0'), ''); // '.0001'
-   *     '0.0001'.replaceFirst(new RegExp(r'0'), '7', 1); // '0.7001'
    */
-  String replaceFirst(Pattern from, String to, [int startIndex = 0]);
+  String replaceFirst(Pattern from, String to);
 
   /**
    * Replaces all substrings that match [from] with [replace].

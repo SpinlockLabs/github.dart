@@ -62,9 +62,9 @@ class TypeMaskFactory {
     } else if (type.treatAsDynamic) {
       return backend.dynamicType;
     } else if (compiler.world.hasAnySubtype(type.element)) {
-      return new TypeMask.nonNullSubtype(type.element, compiler.world);
+      return new TypeMask.nonNullSubtype(type.element);
     } else if (compiler.world.hasAnySubclass(type.element)) {
-      return new TypeMask.nonNullSubclass(type.element, compiler.world);
+      return new TypeMask.nonNullSubclass(type.element);
     } else {
       return new TypeMask.nonNullExact(type.element);
     }

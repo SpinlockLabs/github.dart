@@ -28,7 +28,6 @@ part 'map_tracer.dart';
 
 bool _VERBOSE = false;
 bool _PRINT_SUMMARY = false;
-final _ANOMALY_WARN = false;
 
 class TypeInformationSystem extends TypeSystem<TypeInformation> {
   final Compiler compiler;
@@ -177,6 +176,7 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
 
   TypeInformation nonNullEmptyType;
 
+
   TypeInformation stringLiteralType(ast.DartString value) {
     return new StringLiteralTypeInformation(
         value, compiler.typesTask.stringType);
@@ -195,11 +195,6 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
         firstType.type.union(secondType.type, compiler));
   }
 
-  bool selectorNeedsUpdate(TypeInformation info, Selector selector)
-  {
-    return info.type != selector.mask;
-  }
-
   TypeInformation refineReceiver(Selector selector, TypeInformation receiver) {
     if (receiver.type.isExact) return receiver;
     TypeMask otherType = compiler.world.allFunctions.receiverType(selector);
@@ -208,7 +203,6 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
     if (otherType.isNullable && otherType.containsAll(compiler)) {
       return receiver;
     }
-    assert(TypeMask.isNormalized(otherType, compiler.world));
     TypeInformation newType = new NarrowTypeInformation(receiver, otherType);
     allocatedTypes.add(newType);
     return newType;
@@ -219,7 +213,7 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
                              {bool isNullable: true}) {
     if (annotation.treatAsDynamic) return type;
     if (annotation.isVoid) return nullType;
-    if (annotation.element == compiler.objectClass && isNullable) return type;
+    if (annotation.element == compiler.objectClass) return type;
     TypeMask otherType;
     if (annotation.isTypedef || annotation.isFunctionType) {
       otherType = functionType.type;
@@ -228,15 +222,12 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
       return type;
     } else {
       assert(annotation.isInterfaceType);
-      otherType = annotation.element == compiler.objectClass
-          ? dynamicType.type.nonNullable()
-          : new TypeMask.nonNullSubtype(annotation.element, compiler.world);
+      otherType = new TypeMask.nonNullSubtype(annotation.element);
     }
     if (isNullable) otherType = otherType.nullable();
     if (type.type.isExact) {
       return type;
     } else {
-      assert(TypeMask.isNormalized(otherType, compiler.world));
       TypeInformation newType = new NarrowTypeInformation(type, otherType);
       allocatedTypes.add(newType);
       return newType;
@@ -271,13 +262,11 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
   }
 
   TypeInformation nonNullSubtype(ClassElement type) {
-    return getConcreteTypeFor(
-        new TypeMask.nonNullSubtype(type.declaration, compiler.world));
+    return getConcreteTypeFor(new TypeMask.nonNullSubtype(type.declaration));
   }
 
   TypeInformation nonNullSubclass(ClassElement type) {
-    return getConcreteTypeFor(
-        new TypeMask.nonNullSubclass(type.declaration, compiler.world));
+    return getConcreteTypeFor(new TypeMask.nonNullSubclass(type.declaration));
   }
 
   TypeInformation nonNullExact(ClassElement type) {
@@ -375,7 +364,7 @@ class TypeInformationSystem extends TypeSystem<TypeInformation> {
     // kinds of [TypeInformation] have the empty type at this point of
     // analysis.
     return info.isConcrete
-        ? new TypedSelector(info.type, selector, compiler.world)
+        ? new TypedSelector(info.type, selector, compiler)
         : selector;
   }
 
@@ -566,11 +555,10 @@ class TypeGraphInferrerEngine
 
   void runOverAllElements() {
     if (compiler.disableTypeInference) return;
-    if (compiler.verbose) {
-      compiler.progress.reset();
-    }
+    compiler.progress.reset();
+
     sortResolvedElements().forEach((Element element) {
-      if (compiler.shouldPrintProgress) {
+      if (compiler.progress.elapsedMilliseconds > 500) {
         compiler.log('Added $addedInGraph elements in inferencing graph.');
         compiler.progress.reset();
       }
@@ -628,7 +616,7 @@ class TypeGraphInferrerEngine
         // of this closure call are not a root to trace but an intermediate
         // for some other function.
         Iterable<FunctionElement> elements = info.callees
-            .where((e) => e.isFunction);
+            .where((e) => e.isFunction).toList();
         trace(elements, new ClosureTracerVisitor(elements, info, this));
       } else {
         assert(info is ElementTypeInformation);
@@ -728,9 +716,8 @@ class TypeGraphInferrerEngine
                 // Although we might find a better type, we have to keep
                 // the old type around to ensure that we get a complete view
                 // of the type graph and do not drop any flow edges.
-                TypeMask refinedType = value.computeMask(compiler);
-                assert(TypeMask.isNormalized(refinedType, compiler.world));
-                type = new NarrowTypeInformation(type, refinedType);
+                type = new NarrowTypeInformation(type,
+                    value.computeMask(compiler));
                 types.allocatedTypes.add(type);
               }
             }
@@ -782,7 +769,7 @@ class TypeGraphInferrerEngine
 
   void refine() {
     while (!workQueue.isEmpty) {
-      if (compiler.shouldPrintProgress) {
+      if (compiler.progress.elapsedMilliseconds > 500) {
         compiler.log('Inferred $overallRefineCount types.');
         compiler.progress.reset();
       }
@@ -796,9 +783,6 @@ class TypeGraphInferrerEngine
         if (info.hasStableType(this)) {
           info.stabilize(this);
         } else if (info.refineCount > MAX_CHANGE_COUNT) {
-          if (_ANOMALY_WARN) {
-            print("ANOMALY WARNING: max refinement reached for $info");
-          }
           info.giveUp(this);
         }
       }

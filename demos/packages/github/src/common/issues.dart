@@ -16,32 +16,32 @@ class Issue {
    * Issue Number
    */
   int number;
-  
+
   /**
    * Issue State
    */
   String state;
-  
+
   /**
    * Issue Title
    */
   String title;
-  
+
   /**
    * User who created the issue.
    */
   User user;
-  
+
   /**
    * Issue Labels
    */
   List<IssueLabel> labels;
-  
+
   /**
    * The User that the issue is assigned to
    */
   User assignee;
-  
+
   /**
    * The Milestone
    */
@@ -85,6 +85,8 @@ class Issue {
 
   Issue(this.github);
 
+  Map<String, dynamic> json;
+  
   static Issue fromJSON(GitHub github, input) {
     if (input == null) return null;
     return new Issue(github)
@@ -101,7 +103,8 @@ class Issue {
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at'])
         ..closedAt = parseDateTime(input['closed_at'])
-        ..closedBy = User.fromJSON(github, input['closed_by']);
+        ..closedBy = User.fromJSON(github, input['closed_by'])
+        ..json = input;
   }
 }
 
@@ -150,7 +153,7 @@ class IssueLabel {
    * Label Name
    */
   String name;
-  
+
   /**
    * Label Color
    */
@@ -176,22 +179,22 @@ class Milestone {
    * Milestone Number
    */
   int number;
-  
+
   /**
    * Milestone State
    */
   String state;
-  
+
   /**
    * Milestone Title
    */
   String title;
-  
+
   /**
    * Milestone Description
    */
   String description;
-  
+
   /**
    * Milestone Creator
    */
@@ -242,5 +245,35 @@ class Milestone {
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at'])
         ..dueOn = parseDateTime(input['due_on']);
+  }
+}
+
+
+class IssueComment {
+  final GitHub github;
+
+  int id;
+
+  @ApiName("html_url")
+  String url;
+
+  String body;
+
+  User user;
+
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  IssueComment(this.github);
+
+  static IssueComment fromJSON(GitHub github, input) {
+    if (input == null) return null;
+
+    return new IssueComment(github)
+        ..id = input['id']
+        ..body = input['body']
+        ..user = User.fromJSON(github, input['user'])
+        ..createdAt = parseDateTime(input['created_at'])
+        ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
