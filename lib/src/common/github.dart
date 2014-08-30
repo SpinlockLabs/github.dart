@@ -188,6 +188,14 @@ class GitHub {
   Future<bool> deleteLabel(RepositorySlug slug, String name) {
     return request("DELETE", "/repos/${slug.fullName}/labels/${name}").then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
+  
+  Stream<User> availableAssignees(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
+  }
+  
+  Future<bool> isAvailableAssignee(RepositorySlug slug, String name) {
+    return request("GET", "/repos/${slug.fullName}/assignees/${name}").then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  }
 
   /**
    * Fetches the teams for the specified organization.
