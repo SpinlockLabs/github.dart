@@ -172,6 +172,22 @@ class GitHub {
   Future<RepositoryStatus> updateStatus(RepositorySlug slug, String sha, CreateStatus request) {
     return postJSON("/repos/${slug.fullName}/commits/${sha}/statuses", body: request.toJSON(), convert: RepositoryStatus.fromJSON);
   }
+  
+  Stream<IssueLabel> listLabels(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
+  }
+  
+  Future<IssueLabel> createLabel(RepositorySlug slug, String name, String color) {
+    return postJSON("/repos/${slug.fullName}/labels", body: JSON.encode({ "name": name, "color": color }), convert: IssueLabel.fromJSON);
+  }
+  
+  Future<IssueLabel> updateLabel(RepositorySlug slug, String name, String color) {
+    return postJSON("/repos/${slug.fullName}/labels/${name}", body: JSON.encode({ "name": name, "color": color }), convert: IssueLabel.fromJSON);
+  }
+  
+  Future<bool> deleteLabel(RepositorySlug slug, String name) {
+    return request("DELETE", "/repos/${slug.fullName}/labels/${name}").then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  }
 
   /**
    * Fetches the teams for the specified organization.
