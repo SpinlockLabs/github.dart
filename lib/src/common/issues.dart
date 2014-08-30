@@ -86,7 +86,7 @@ class Issue {
   Issue(this.github);
 
   Map<String, dynamic> json;
-  
+
   static Issue fromJSON(GitHub github, input) {
     if (input == null) return null;
     return new Issue(github)
@@ -106,37 +106,63 @@ class Issue {
         ..closedBy = User.fromJSON(github, input['closed_by'])
         ..json = input;
   }
-  
+
   Future<IssueComment> comment(String body) {
-    var it = JSON.encode({ "body": body });
+    var it = JSON.encode({
+      "body": body
+    });
     return github.postJSON(json['_links']['comments']['href'], body: it, convert: IssueComment.fromJSON, statusCode: 201);
   }
-  
+
   Stream<IssueComment> comments() {
     return new PaginationHelper(github).objects("GET", "${this.json['url']}/comments", IssueComment.fromJSON);
   }
-  
+
   Future<Issue> changeBody(String newBody) {
-    return github.request("POST", json['url'], body: JSON.encode({ "body": newBody })).then((response) {
+    return github.request("POST", json['url'], body: JSON.encode({
+      "body": newBody
+    })).then((response) {
       return Issue.fromJSON(github, JSON.decode(response.body));
     });
   }
-  
+
   Future<Issue> changeTitle(String title) {
-    return github.request("POST", json['url'], body: JSON.encode({ "title": title })).then((response) {
+    return github.request("POST", json['url'], body: JSON.encode({
+      "title": title
+    })).then((response) {
       return Issue.fromJSON(github, JSON.decode(response.body));
     });
   }
-  
+
   Future<Issue> changeState(String state) {
-    return github.request("POST", json['url'], body: JSON.encode({ "state": state })).then((response) {
+    return github.request("POST", json['url'], body: JSON.encode({
+      "state": state
+    })).then((response) {
       return Issue.fromJSON(github, JSON.decode(response.body));
     });
   }
-  
+
   Future<Issue> close() => changeState("closed");
   Future<Issue> open() => changeState("open");
   Future<Issue> reopen() => changeState("open");
+
+  Future<List<IssueLabel>> addLabels(List<String> labels) {
+    return github.postJSON("${json['url']}/labels", body: JSON.encode(labels), convert: (github, input) => input.map((it) => IssueLabel.fromJSON(github, it)));
+  }
+  
+  Future<List<IssueLabel>> replaceLabels(List<String> labels) {
+    return github.request("PUT", "${json['url']}/labels", body: JSON.encode(labels)).then((response) {
+      return JSON.decode(response.body).map((it) => IssueLabel.fromJSON(github, it));
+    });
+  }
+  
+  Future<bool> removeAllLabels() {
+    return github.request("DELETE", "${json['url']}/labels").then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  }
+  
+  Future<bool> removeLabel(String name) {
+    return github.request("DELETE", "${json['url']}/labels/${name}").then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  }
 }
 
 /**
