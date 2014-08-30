@@ -230,8 +230,8 @@ class Repository {
   /**
    * Gets the Repository Pull Requests
    */
-  Stream<PullRequest> pullRequests() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequest.fromJSON);
+  Stream<PullRequestInformation> pullRequests() {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequestInformation.fromJSON);
   }
 
   /**
@@ -290,8 +290,8 @@ class Repository {
   /**
    * Creates a Pull Request based on the given [request].
    */
-  Future<PullRequest> createPullRequest(CreateReleaseRequest request) {
-    return github.postJSON("/repos/${fullName}/pulls", convert: PullRequest.fromJSON, body: request.toJSON());
+  Future<PullRequestInformation> createPullRequest(CreateReleaseRequest request) {
+    return github.postJSON("/repos/${fullName}/pulls", convert: PullRequestInformation.fromJSON, body: request.toJSON());
   }
   
   Future<Commit> merge(CreateMerge request) {

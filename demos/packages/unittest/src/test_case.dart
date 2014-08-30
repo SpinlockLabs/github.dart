@@ -15,13 +15,13 @@ class TestCase {
   final String description;
 
   /// The setup function to call before the test, if any.
-  final Function _setUp;
+  Function _setUp;
 
   /// The teardown function to call after the test, if any.
-  final Function _tearDown;
+  Function _tearDown;
 
   /// The body of the test case.
-  final TestFunction _testFunction;
+  TestFunction _testFunction;
 
   /// Remaining number of callbacks functions that must reach a 'done' state
   /// to wait for before the test completes.
@@ -99,7 +99,14 @@ class TestCase {
       _startTime = new DateTime.now();
       _runningTime = null;
       ++_callbackFunctionsOutstanding;
-      return _testFunction();
+      var testReturn = _testFunction();
+      // If _testFunction() returned a future, we want to wait for it like we
+      // would a callback, so if a failure occurs while waiting, we can abort.
+      if (testReturn is Future) {
+        ++_callbackFunctionsOutstanding;
+        testReturn.catchError(_errorHandler('Test'))
+            .whenComplete(_markCallbackComplete);
+      }
     }).catchError(_errorHandler('Test')).then((_) {
       _markCallbackComplete();
       if (result == null) {
@@ -113,7 +120,11 @@ class TestCase {
       } else if (_tearDown != null) {
         return _tearDown();
       }
-    }).catchError(_errorHandler('Teardown'));
+    }).catchError(_errorHandler('Teardown')).whenComplete(() {
+      _setUp = null;
+      _tearDown = null;
+      _testFunction = null;
+    });
   }
 
   // Set the results, notify the config, and return true if this

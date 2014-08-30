@@ -191,6 +191,40 @@ class Team {
    * Gets the Members of this Team
    */
   Stream<TeamMember> members() => github.teamMembers(id);
+  
+  Future<bool> addMember(String user) {
+    return github.request("PUT", "/teams/${id}/members/${user}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  Future<bool> removeMember(String user) {
+    return github.request("DELETE", "/teams/${id}/members/${user}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  Stream<Repository> repositories() {
+    return new PaginationHelper(github).objects("GET", "/teams/${id}/repos", Repository.fromJSON);
+  }
+  
+  Future<bool> managesRepository(RepositorySlug slug) {
+    return github.request("GET", "/teams/${id}/repos/${slug.fullName}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  Future<bool> addRepository(RepositorySlug slug) {
+    return github.request("PUT", "/teams/${id}/repos/${slug.fullName}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+  
+  Future<bool> removeRepository(RepositorySlug slug) {
+    return github.request("DELETE", "/teams/${id}/repos/${slug.fullName}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
 }
 
 class TeamMember {

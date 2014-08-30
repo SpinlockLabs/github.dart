@@ -106,6 +106,15 @@ class Issue {
         ..closedBy = User.fromJSON(github, input['closed_by'])
         ..json = input;
   }
+  
+  Future<IssueComment> comment(String body) {
+    var it = JSON.encode({ "body": body });
+    return github.postJSON(json['_links']['comments']['href'], body: it, convert: IssueComment.fromJSON, statusCode: 201);
+  }
+  
+  Stream<IssueComment> comments() {
+    return new PaginationHelper(github).objects("GET", "${this.json['url']}/comments", IssueComment.fromJSON);
+  }
 }
 
 /**
