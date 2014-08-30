@@ -394,6 +394,13 @@ class RepositorySlug {
   String get fullName => "${owner}/${name}";
 
   bool operator ==(Object obj) => obj is RepositorySlug && obj.fullName == fullName;
+  
+  int get hashCode {
+    return fullName.hashCode;
+  }
+  
+  @override
+  String toString() => "${owner}/${name}";
 }
 
 /**
