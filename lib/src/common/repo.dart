@@ -230,8 +230,8 @@ class Repository extends GitHubObject with GitHubUrlProvider implements Provides
   /**
    * Gets the Repository Pull Requests
    */
-  Stream<PullRequestInformation> pullRequests() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequestInformation.fromJSON);
+  Stream<PullRequestInformation> pullRequests({String state: "open"}) {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequestInformation.fromJSON, params: {"state": state});
   }
 
   /**
