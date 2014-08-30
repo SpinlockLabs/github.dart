@@ -3,7 +3,7 @@ part of github.common;
 /**
  * The Repository Model
  */
-class Repository {
+class Repository extends GitHubObject with GitHubUrlProvider implements ProvidesJSON<Map<String, dynamic>> {
   final GitHub github;
 
   /**

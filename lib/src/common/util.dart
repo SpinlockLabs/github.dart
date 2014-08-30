@@ -1,3 +1,5 @@
+import "package:uri/uri.dart";
+
 /**
  * Marks something as not being ready or complete.
  */

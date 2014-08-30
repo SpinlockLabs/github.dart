@@ -11,6 +11,8 @@ import "package:xml/xml.dart" as xml;
 
 import 'http.dart' as http;
 
+import "package:uri/uri.dart";
+
 import 'src/common/util.dart';
 
 part 'src/common/auth.dart';
