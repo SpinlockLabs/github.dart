@@ -23,7 +23,7 @@ install:
 
 # Run the Build
 script:
-- "pub get" # Get Dependencies
+- "./tool/ci/retry.sh pub get" # Get Dependencies
 - "./tool/build.dart check" # Run Build System
 
 notifications:
