@@ -121,6 +121,8 @@ class GitHub {
     return new PaginationHelper(this).objects("GET", "/user/teams", Team.fromJSON);
   }
   
+  Future<String> zen() => request("GET", "/zen").then((response) => response.body);
+  
   Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) =>
       _trendingRepos(language: language, since: since);
   
