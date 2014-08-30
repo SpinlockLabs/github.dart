@@ -76,6 +76,8 @@ class Issue {
    */
   @ApiName("updated_at")
   DateTime updatedAt;
+  
+  String body;
 
   /**
    * The user who closed the issue
@@ -104,14 +106,15 @@ class Issue {
         ..updatedAt = parseDateTime(input['updated_at'])
         ..closedAt = parseDateTime(input['closed_at'])
         ..closedBy = User.fromJSON(github, input['closed_by'])
-        ..json = input;
+        ..json = input
+        ..body = input['body'];
   }
 
   Future<IssueComment> comment(String body) {
     var it = JSON.encode({
       "body": body
     });
-    return github.postJSON(json['_links']['comments']['href'], body: it, convert: IssueComment.fromJSON, statusCode: 201);
+    return github.postJSON("${json['url']}/comments", body: it, convert: IssueComment.fromJSON, statusCode: 201);
   }
 
   Stream<IssueComment> comments() {
