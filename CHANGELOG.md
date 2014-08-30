@@ -2,6 +2,10 @@
 
 The most up-to-date changelog is available [here](https://github.com/DirectMyFile/github.dart/blob/master/CHANGELOG.md).
 
+## v0.6.7
+
+- Hook Server now only handles request at `/hook`
+
 ## v0.6.0
 
 - Custom HTTP System!
