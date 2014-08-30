@@ -43,9 +43,9 @@ Then import the library and use it:
 import 'package:github/server.dart';
 
 void main() {
-  /* Required to setup GitHub */
-  initGitHub();
-  var github = new GitHub();
+  /* Creates a GitHub Client */
+  var github = createGitHubClient();
+  
   github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
     /* Do Something */
   });
@@ -57,10 +57,9 @@ void main() {
 import 'package:github/browser.dart';
 
 void main() {
-  /* Required to setup GitHub */
-  initGitHub();
+  /* Creates a GitHub Client */
+  var github = createGitHubClient();
   
-  var github = new GitHub();
   github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
     /* Do Something */
   });
@@ -72,7 +71,7 @@ void main() {
 To use a GitHub token:
 
 ```dart
-var github = new GitHub(auth: new Authentication.withToken("YourTokenHere"));
+var github = createGitHubClient(auth: new Authentication.withToken("YourTokenHere"));
 ```
 
 ## Contacting Us
