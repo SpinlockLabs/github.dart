@@ -40,3 +40,4 @@ part 'src/common/search.dart';
 part 'src/common/events.dart';
 part 'src/common/keys.dart';
 part 'src/common/blog.dart';
+part 'src/common/authorizations.dart';
