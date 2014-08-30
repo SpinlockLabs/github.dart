@@ -59,16 +59,3 @@ class APIStatus {
 abstract class ProvidesJSON<T> {
   T get json;
 }
-
-abstract class GitHubObject {
-}
-
-abstract class GitHubUrlProvider {
-  UriTemplate _urlTemplate(String name) {
-    if (this is ProvidesJSON<Map>) {
-      return new UriTemplate((this as ProvidesJSON<Map>).json["${name}_url"]);
-    }
-    
-    throw "Not a JSON Provider";
-  }
-}
