@@ -9024,8 +9024,7 @@ var $$ = {};
   GitHub: {
     "^": "Object;auth,endpoint,client",
     users$2$names$pages: function(names, pages) {
-      var t1 = [P.List, T.Response];
-      return new T.PaginationHelper(this, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1])).objects$4$pages("GET", "/users", T.User_fromJSON$closure(), pages);
+      return T.PaginationHelper$(this).objects$4$pages("GET", "/users", T.User_fromJSON$closure(), pages);
     },
     users$1$pages: function(pages) {
       return this.users$2$names$pages(null, pages);
@@ -9135,7 +9134,11 @@ var $$ = {};
     },
     objects$4$pages: function(method, path, converter, pages) {
       return this.objects$9$body$headers$pages$params$reverse$start(method, path, converter, null, null, pages, null, false, null);
-    }
+    },
+    static: {PaginationHelper$: function(github) {
+        var t1 = [P.List, T.Response];
+        return new T.PaginationHelper(github, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]));
+      }}
   },
   PaginationHelper_fetchStreamed_actualFetch: {
     "^": "Closure:28;box_0,this_1,method_2,start_3,params_4,body_5",
@@ -9151,7 +9154,7 @@ var $$ = {};
   PaginationHelper_fetchStreamed_closure: {
     "^": "Closure:29;box_0,pages_6,reverse_7,controller_8,actualFetch_9",
     call$1: function(response) {
-      var t1, t2, t3, info, nextUrl;
+      var t1, t2, t3, info, t4, nextUrl;
       t1 = this.box_0;
       ++t1.count_1;
       t2 = this.controller_8;
@@ -9169,7 +9172,8 @@ var $$ = {};
         t2.close$0(0);
         return;
       }
-      if (t1.count_1 === this.pages_6) {
+      t4 = this.pages_6;
+      if (t4 != null && t1.count_1 === t4) {
         t2.close$0(0);
         return;
       }
@@ -9220,6 +9224,12 @@ var $$ = {};
     call$0: function() {
       return this.controller_3.close$0(0);
     }
+  },
+  RepositorySlug: {
+    "^": "Object;"
+  },
+  RepositoryStatus: {
+    "^": "Object;"
   },
   User: {
     "^": "Object;github,login<,id,avatarUrl<,url,siteAdmin,name,company,blog,location,email,hirable,bio,publicReposCount,publicGistsCount,followersCount,followingCount,createdAt,updatedAt,json",
@@ -9709,6 +9719,15 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Stream;
+  _.$isStream = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositoryStatus;
+  _.$isRepositoryStatus = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositorySlug;
+  _.$isRepositorySlug = TRUE;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;

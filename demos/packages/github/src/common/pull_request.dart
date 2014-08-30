@@ -237,13 +237,6 @@ class PullRequest extends PullRequestInformation {
   }
 }
  
-RepositorySlug _slugFromAPIUrl(String url) {
-  var split = url.split("/");
-  var i = split.indexOf("repos") + 1;
-  var parts = split.sublist(i, i + 1);
-  return new RepositorySlug(parts[0], parts[1]);
-}
- 
 class PullRequestMerge {
   final GitHub github;
   

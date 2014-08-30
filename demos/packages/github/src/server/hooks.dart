@@ -1,23 +1,10 @@
 part of github.server;
 
-class HookServer {
-  final String host;
-  final int port;
+class HookMiddleware {
   final StreamController<HookEvent> _eventController = new StreamController<HookEvent>();
   Stream<HookEvent> get onEvent => _eventController.stream;
   
-  HttpServer _server;
-  
-  HookServer(this.port, [this.host = "0.0.0.0"]);
-  
-  void start() {
-    HttpServer.bind(host, port).then((HttpServer server) {
-      _server = server;
-      server.listen(handleRequest);
-    });
-  }
-  
-  void handleRequest(HttpRequest request) {
+  void handleHookRequest(HttpRequest request) {
     
     if (request.method != "POST") {
       request.response.write("Only POST is Supported");
@@ -37,6 +24,30 @@ class HookServer {
         "handled": true
       }));
       request.response.close();
+    });
+  }
+}
+
+class HookServer extends HookMiddleware {
+  final String host;
+  final int port;
+  
+  HttpServer _server;
+  
+  HookServer(this.port, [this.host = "0.0.0.0"]);
+  
+  void start() {
+    HttpServer.bind(host, port).then((HttpServer server) {
+      _server = server;
+      server.listen((request) {
+        if (request.uri.path == "/hook") {
+          handleHookRequest(request);
+        } else {
+          request.response.statusCode = 404;
+          request.response.write("404 - Not Found");
+          request.response.close();
+        }
+      });
     });
   }
   

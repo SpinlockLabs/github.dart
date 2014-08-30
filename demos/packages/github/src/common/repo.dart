@@ -3,7 +3,7 @@ part of github.common;
 /**
  * The Repository Model
  */
-class Repository {
+class Repository implements ProvidesJSON<Map<String, dynamic>> {
   final GitHub github;
 
   /**
@@ -190,7 +190,7 @@ class Repository {
    * 
    * [limit] is the number of issues to get
    */
-  Stream<Issue> issues() => github.issues(slug());
+  Stream<Issue> issues({String state: "open"}) => github.issues(slug(), state: state);
 
   /**
    * Gets the Repository Commits
@@ -230,8 +230,8 @@ class Repository {
   /**
    * Gets the Repository Pull Requests
    */
-  Stream<PullRequestInformation> pullRequests() {
-    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequestInformation.fromJSON);
+  Stream<PullRequestInformation> pullRequests({String state: "open"}) {
+    return new PaginationHelper(github).objects("GET", "/repos/${fullName}/pulls", PullRequestInformation.fromJSON, params: {"state": state});
   }
 
   /**
@@ -394,6 +394,13 @@ class RepositorySlug {
   String get fullName => "${owner}/${name}";
 
   bool operator ==(Object obj) => obj is RepositorySlug && obj.fullName == fullName;
+  
+  int get hashCode {
+    return fullName.hashCode;
+  }
+  
+  @override
+  String toString() => "${owner}/${name}";
 }
 
 /**
@@ -560,6 +567,51 @@ class CreateMerge {
     putValue("base", base, map);
     putValue("head", head, map);
     putValue("commit_message", commitMessage, map);
+    return JSON.encode(map);
+  }
+}
+
+class RepositoryStatus {
+  final GitHub github;
+  
+  DateTime createdAt;
+  DateTime updatedAt;
+  String state;
+  String targetUrl;
+  String description;
+  String context;
+  
+  RepositoryStatus(this.github);
+  
+  static RepositoryStatus fromJSON(GitHub github, input) {
+    if (input == null) return null;
+    return new RepositoryStatus(github)
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..state = input['state']
+      ..targetUrl = input['target_url']
+      ..description = input['description']
+      ..context = input['context'];
+  }
+}
+
+class CreateStatus {
+  final String state;
+  
+  @ApiName("target_url")
+  String targetUrl;
+  
+  String description;
+  String context;
+  
+  CreateStatus(this.state);
+  
+  String toJSON() {
+    var map = {};
+    putValue("state", state, map);
+    putValue("target_url", targetUrl, map);
+    putValue("description", description, map);
+    putValue("context", context, map);
     return JSON.encode(map);
   }
 }

@@ -9003,7 +9003,11 @@ var $$ = {};
     },
     objects$3: function(method, path, converter) {
       return this.objects$9$body$headers$pages$params$reverse$start(method, path, converter, null, null, null, null, false, null);
-    }
+    },
+    static: {PaginationHelper$: function(github) {
+        var t1 = [P.List, T.Response];
+        return new T.PaginationHelper(github, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]));
+      }}
   },
   PaginationHelper_fetchStreamed_actualFetch: {
     "^": "Closure:28;box_0,this_1,method_2,start_3,params_4,body_5",
@@ -9130,6 +9134,12 @@ var $$ = {};
   },
   ReleaseAsset: {
     "^": "Object;github,url,id>,name>,label,state,contentType,size,downloadCount,createdAt,updatedAt"
+  },
+  RepositorySlug: {
+    "^": "Object;"
+  },
+  RepositoryStatus: {
+    "^": "Object;"
   }
 }],
 ["github.http", "package:github/http.dart", , T, {
@@ -9273,11 +9283,9 @@ var $$ = {};
     R.init("releases.dart", new T.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
   loadReleases: function() {
-    var t1, t2;
-    t1 = $.github;
+    var t1 = $.github;
     t1.toString;
-    t2 = [P.List, T.Response];
-    new T.PaginationHelper(t1, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t2)), [t2])).objects$3("GET", "/repos/twbs/bootstrap/releases", T.Release_fromJSON$closure()).toList$0(0).then$1(new T.loadReleases_closure());
+    T.PaginationHelper$(t1).objects$3("GET", "/repos/twbs/bootstrap/releases", T.Release_fromJSON$closure()).toList$0(0).then$1(new T.loadReleases_closure());
   },
   main_closure: {
     "^": "Closure:13;",
@@ -9442,6 +9450,15 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Stream;
+  _.$isStream = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositoryStatus;
+  _.$isRepositoryStatus = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositorySlug;
+  _.$isRepositorySlug = TRUE;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;

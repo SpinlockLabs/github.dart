@@ -8177,6 +8177,10 @@ var $$ = {};
     $isEfficientLength: true
   },
   "+List": 0,
+  Map: {
+    "^": "Object;",
+    $isMap: true
+  },
   Null: {
     "^": "Object;",
     toString$0: function(_) {
@@ -9606,7 +9610,7 @@ var $$ = {};
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
       }
-      queryString = M.buildQueryString(params);
+      queryString = params != null ? M.buildQueryString(params) : "";
       url = P.StringBuffer$("");
       if (J.getInterceptor$s(path).startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://")) {
         url.write$1(path);
@@ -9658,7 +9662,11 @@ var $$ = {};
     },
     objects$4$params: function(method, path, converter, params) {
       return this.objects$9$body$headers$pages$params$reverse$start(method, path, converter, null, null, null, params, false, null);
-    }
+    },
+    static: {PaginationHelper$: function(github) {
+        var t1 = [P.List, T.Response];
+        return new T.PaginationHelper(github, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]));
+      }}
   },
   PaginationHelper_fetchStreamed_actualFetch: {
     "^": "Closure:30;box_0,this_1,method_2,start_3,params_4,body_5",
@@ -9741,7 +9749,7 @@ var $$ = {};
     }
   },
   Repository: {
-    "^": "Object;github,name>,id,fullName,owner,$private,isFork,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt<,json",
+    "^": "Object;github,name>,id,fullName,owner,$private,isFork,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language>,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt<,json",
     static: {Repository_fromJSON: [function(github, input, instance) {
         var t1, t2;
         if (input == null)
@@ -9800,6 +9808,12 @@ var $$ = {};
         owner.url = t1.$index(input, "html_url");
         return owner;
       }}
+  },
+  RepositorySlug: {
+    "^": "Object;"
+  },
+  RepositoryStatus: {
+    "^": "Object;"
   }
 }],
 ["github.dates", "package:github/dates.dart", , A, {
@@ -10058,7 +10072,7 @@ var $$ = {};
     R.init("repos.dart", null);
   }, "call$0", "main$closure", 0, 0, 3],
   loadRepos: function(compare) {
-    var t1, title, t2, url, queryString, user, sorter, params, t3;
+    var t1, title, t2, url, queryString, user, sorter, params;
     t1 = {};
     t1.compare_0 = compare;
     title = document.querySelector("#title");
@@ -10088,8 +10102,7 @@ var $$ = {};
     t2 = $.github;
     t2.toString;
     params = P.LinkedHashMap_LinkedHashMap$_literal(["sort", "full_name", "direction", "asc"], null, null);
-    t3 = [P.List, T.Response];
-    new T.PaginationHelper(t2, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t3)), [t3])).objects$4$params("GET", "/users/" + H.S(user) + "/repos", T.Repository_fromJSON$closure(), params).toList$0(0).then$1(new D.loadRepos_closure0(t1));
+    T.PaginationHelper$(t2).objects$4$params("GET", "/users/" + H.S(user) + "/repos", T.Repository_fromJSON$closure(), params).toList$0(0).then$1(new D.loadRepos_closure0(t1));
   },
   closure: {
     "^": "Closure:34;",
@@ -10179,92 +10192,91 @@ var $$ = {};
         repo = t1.get$current();
         t2 = $.$$repos;
         t3 = J.getInterceptor$x(repo);
-        t3 = "        <div class=\"repo\" id=\"repo_" + H.S(t3.get$name(repo)) + "\">\n          <div class=\"line\"></div>\n          <h2><a href=\"" + H.S(t3.get$url(repo)) + "\">" + H.S(t3.get$name(repo)) + "</a></h2>\n          ";
-        t3 = t3 + (!J.$eq(repo.get$description(), "") && repo.description != null ? "<b>Description</b>: " + H.S(repo.description) + "<br/>" : "") + "\n          <b>Language</b>: ";
-        t4 = repo.language;
-        t3 = t3 + H.S(t4 != null ? t4 : "Unknown") + "\n          <br/>\n          <b>Default Branch</b>: " + H.S(repo.defaultBranch) + "\n          <br/>\n          <b>Stars</b>: " + H.S(repo.stargazersCount) + "\n          <br/>\n          <b>Forks</b>: " + H.S(repo.forksCount) + "\n          <br/>\n          <b>Created</b>: ";
-        t4 = repo.createdAt;
-        t5 = t4.isUtc;
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getUTCMonth() + 1;
+        t4 = "        <div class=\"repo\" id=\"repo_" + H.S(t3.get$name(repo)) + "\">\n          <div class=\"line\"></div>\n          <h2><a href=\"" + H.S(t3.get$url(repo)) + "\">" + H.S(t3.get$name(repo)) + "</a></h2>\n          ";
+        t4 = t4 + (!J.$eq(repo.get$description(), "") && repo.get$description() != null ? "<b>Description</b>: " + H.S(repo.get$description()) + "<br/>" : "") + "\n          <b>Language</b>: ";
+        t4 = t4 + H.S(t3.get$language(repo) != null ? repo.language : "Unknown") + "\n          <br/>\n          <b>Default Branch</b>: " + H.S(repo.defaultBranch) + "\n          <br/>\n          <b>Stars</b>: " + H.S(repo.stargazersCount) + "\n          <br/>\n          <b>Forks</b>: " + H.S(repo.forksCount) + "\n          <br/>\n          <b>Created</b>: ";
+        t5 = repo.createdAt;
+        t3 = t5.isUtc;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getUTCMonth() + 1;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getMonth() + 1;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getMonth() + 1;
         }
         t6 = A.monthName(t6) + " ";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t7 = t4.date.getUTCDate() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t7 = t5.date.getUTCDate() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t7 = t4.date.getDate() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t7 = t5.date.getDate() + 0;
         }
         t7 = t6 + t7;
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getUTCDate() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getUTCDate() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getDate() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getDate() + 0;
         }
         t6 = t7 + A.friendlyDaySuffix(t6) + ", ";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t7 = t4.date.getUTCFullYear() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t7 = t5.date.getUTCFullYear() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t7 = t4.date.getFullYear() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t7 = t5.date.getFullYear() + 0;
         }
         t7 = t6 + t7 + " at ";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getUTCHours() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getUTCHours() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getHours() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getHours() + 0;
         }
         suffix = t6 >= 12 ? "PM" : "AM";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getUTCHours() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getUTCHours() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t6 = t4.date.getHours() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t6 = t5.date.getHours() + 0;
         }
         t6 = "" + (C.JSInt_methods.$mod(t6 + 11, 12) + 1) + ":";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t8 = t4.date.getUTCMinutes() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t8 = t5.date.getUTCMinutes() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t8 = t4.date.getMinutes() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t8 = t5.date.getMinutes() + 0;
         }
         t8 = t6 + t8 + ":";
-        if (t5) {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t5 = t4.date.getUTCSeconds() + 0;
+        if (t3) {
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t3 = t5.date.getUTCSeconds() + 0;
         } else {
-          if (t4.date === void 0)
-            t4.date = new Date(t4.millisecondsSinceEpoch);
-          t5 = t4.date.getSeconds() + 0;
+          if (t5.date === void 0)
+            t5.date = new Date(t5.millisecondsSinceEpoch);
+          t3 = t5.date.getSeconds() + 0;
         }
-        J.insertAdjacentHtml$2$x(t2, "beforeend", t3 + (t7 + (t8 + A.friendlySecond(t5) + " " + suffix + " (in " + H.S(t4.get$timeZoneName()) + ")")) + "\n        </div>\n      ");
+        J.insertAdjacentHtml$2$x(t2, "beforeend", t4 + (t7 + (t8 + A.friendlySecond(t3) + " " + suffix + " (in " + H.S(t5.get$timeZoneName()) + ")")) + "\n        </div>\n      ");
       }
     }
   }
@@ -10355,6 +10367,7 @@ $$ = null;
   _.$asComparable = [P.Duration];
   _.$isObject = TRUE;
   P.Object.$isObject = TRUE;
+  P.Map.$isObject = TRUE;
   _ = W.Element;
   _.$isElement = TRUE;
   _.$isNode = TRUE;
@@ -10411,6 +10424,15 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Stream;
+  _.$isStream = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositoryStatus;
+  _.$isRepositoryStatus = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositorySlug;
+  _.$isRepositorySlug = TRUE;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;

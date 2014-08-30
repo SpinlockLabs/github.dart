@@ -8592,10 +8592,12 @@ var $$ = {};
       t1 = T.Response;
       completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]);
       C.HttpRequest_methods.open$2(req, request.method, request.url);
-      for (t1 = request.headers, t2 = t1.get$keys(), t2 = t2.get$iterator(t2); t2.moveNext$0();) {
-        header = t2.get$current();
-        req.setRequestHeader(header, t1.$index(0, header));
-      }
+      t1 = request.headers;
+      if (t1 != null)
+        for (t2 = t1.get$keys(), t2 = t2.get$iterator(t2); t2.moveNext$0();) {
+          header = t2.get$current();
+          req.setRequestHeader(header, t1.$index(0, header));
+        }
       t1 = H.setRuntimeTypeInfo(new W._EventStream(req, C.EventStreamProvider_readystatechange0._eventType, false), [null]);
       H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new M._BrowserHttpClient_request_closure(req, completer)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
       req.send(request.body);
@@ -8680,7 +8682,9 @@ var $$ = {};
       }
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
-      var t1, url;
+      var t1, queryString, url;
+      if (headers == null)
+        headers = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
       t1 = this.auth;
       if (t1.isToken)
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure(this));
@@ -8688,14 +8692,15 @@ var $$ = {};
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
       }
+      queryString = params != null ? M.buildQueryString(params) : "";
       url = P.StringBuffer$("");
-      if (C.JSString_methods.startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://")) {
+      if (J.getInterceptor$s(path).startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://")) {
         url.write$1(path);
-        url.write$1("");
+        url.write$1(queryString);
       } else {
         url.write$1(this.endpoint);
         url.write$1(path);
-        url.write$1("");
+        url.write$1(queryString);
       }
       return J.request$1$x(this.client, new T.Request(url._contents, method, body, headers));
     },
@@ -8773,6 +8778,12 @@ var $$ = {};
   },
   ExchangeResponse: {
     "^": "Object;token<,scopes,tokenType"
+  },
+  RepositorySlug: {
+    "^": "Object;"
+  },
+  RepositoryStatus: {
+    "^": "Object;"
   },
   User: {
     "^": "Object;name>"
@@ -9140,6 +9151,15 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Stream;
+  _.$isStream = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositoryStatus;
+  _.$isRepositoryStatus = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositorySlug;
+  _.$isRepositorySlug = TRUE;
   _.$isObject = TRUE;
   _ = P.DateTime;
   _.$isDateTime = TRUE;

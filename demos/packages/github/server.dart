@@ -18,6 +18,14 @@ void initGitHub() {
   GitHub.defaultClient = () => new _IOClient();
 }
 
+/**
+ * Creates a GitHub Client
+ */
+GitHub createGitHubClient({Authentication auth, String endpoint: "https://api.github.com"}) {
+  initGitHub();
+  return new GitHub(auth: auth, endpoint: endpoint);
+}
+
 class _IOClient extends http.Client {
   
   final HttpClient client;

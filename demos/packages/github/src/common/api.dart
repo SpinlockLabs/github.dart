@@ -55,3 +55,7 @@ class APIStatus {
         ..createdOn = parseDateTime(input['created_on']);
   }
 }
+
+abstract class ProvidesJSON<T> {
+  T get json;
+}

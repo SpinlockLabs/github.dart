@@ -8908,7 +8908,11 @@ var $$ = {};
     },
     objects$3: function(method, path, converter) {
       return this.objects$9$body$headers$pages$params$reverse$start(method, path, converter, null, null, null, null, false, null);
-    }
+    },
+    static: {PaginationHelper$: function(github) {
+        var t1 = [P.List, T.Response];
+        return new T.PaginationHelper(github, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t1)), [t1]));
+      }}
   },
   PaginationHelper_fetchStreamed_actualFetch: {
     "^": "Closure:27;box_0,this_1,method_2,start_3,params_4,body_5",
@@ -8989,6 +8993,12 @@ var $$ = {};
     call$0: function() {
       return this.controller_3.close$0(0);
     }
+  },
+  RepositorySlug: {
+    "^": "Object;"
+  },
+  RepositoryStatus: {
+    "^": "Object;"
   },
   User: {
     "^": "Object;github,login,id,avatarUrl<,url,siteAdmin,name,company,blog,location,email,hirable,bio,publicReposCount,publicGistsCount,followersCount,followingCount,createdAt,updatedAt,json",
@@ -9240,7 +9250,7 @@ var $$ = {};
     R.init("stars.dart", new G.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
   loadStars: function() {
-    var url, params, user, repo, token, t1, t2;
+    var url, params, user, repo, token, t1;
     url = window.location.href;
     if (J.getInterceptor$asx(url).contains$1(url, "?")) {
       params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
@@ -9257,8 +9267,7 @@ var $$ = {};
     J.insertAdjacentText$2$x(document.querySelector("#title"), "beforeend", " for " + H.S(user) + "/" + H.S(repo));
     t1 = $.github;
     t1.toString;
-    t2 = [P.List, T.Response];
-    new T.PaginationHelper(t1, [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(t2)), [t2])).objects$3("GET", "/repos/" + (H.S(user) + "/" + H.S(repo)) + "/stargazers", T.User_fromJSON$closure()).listen$1(new G.loadStars_closure()).onDone$1(new G.loadStars_closure0());
+    T.PaginationHelper$(t1).objects$3("GET", "/repos/" + (H.S(user) + "/" + H.S(repo)) + "/stargazers", T.User_fromJSON$closure()).listen$1(new G.loadStars_closure()).onDone$1(new G.loadStars_closure0());
   },
   main_closure: {
     "^": "Closure:12;",
@@ -9437,6 +9446,12 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.Stream;
   _.$isStream = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositoryStatus;
+  _.$isRepositoryStatus = TRUE;
+  _.$isObject = TRUE;
+  _ = T.RepositorySlug;
+  _.$isRepositorySlug = TRUE;
   _.$isObject = TRUE;
   _ = P.DateTime;
   _.$isDateTime = TRUE;
