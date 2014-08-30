@@ -339,6 +339,8 @@ class IssueComment {
 
   IssueComment(this.github);
 
+  Map<String, dynamic> json;
+  
   static IssueComment fromJSON(GitHub github, input) {
     if (input == null) return null;
 
@@ -347,6 +349,11 @@ class IssueComment {
         ..body = input['body']
         ..user = User.fromJSON(github, input['user'])
         ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at']);
+        ..updatedAt = parseDateTime(input['updated_at'])
+        ..json = input;
+  }
+  
+  Future<bool> delete() {
+    return github.request("DELETE", json['url']).then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 }
