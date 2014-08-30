@@ -62,7 +62,7 @@ class GitHub {
    * Checks if a user exists.
    */
   Future<bool> userExists(String name) =>
-      request("GET", "/users/${name}").then((resp) => resp.statusCode == 200);
+      request("GET", "/users/${name}").then((resp) => resp.statusCode == StatusCodes.OK);
 
   /**
    * Fetches the users specified by [names].
@@ -92,7 +92,7 @@ class GitHub {
    * Fetches the repository specified by the [slug].
    */
   Future<Repository> repository(RepositorySlug slug) {
-    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON, statusCode: 200, fail: (http.Response response) {
+    return getJSON("/repos/${slug.owner}/${slug.name}", convert: Repository.fromJSON, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new RepositoryNotFound(this, slug.fullName);
       }
@@ -140,7 +140,7 @@ class GitHub {
    * Fetches the organization specified by [name].
    */
   Future<Organization> organization(String name) {
-    return getJSON("/orgs/${name}", convert: Organization.fromJSON, statusCode: 200, fail: (http.Response response) {
+    return getJSON("/orgs/${name}", convert: Organization.fromJSON, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new OrganizationNotFound(this, name);
       }
@@ -300,8 +300,8 @@ class GitHub {
    * Throws [AccessForbidden] if we are not authenticated.
    */
   Future<CurrentUser> currentUser() {
-    return getJSON("/user", statusCode: 200, fail: (http.Response response) {
-      if (response.statusCode == 403) {
+    return getJSON("/user", statusCode: StatusCodes.OK, fail: (http.Response response) {
+      if (response.statusCode == StatusCodes.FORBIDDEN) {
         throw new AccessForbidden(this);
       }
     }, convert: CurrentUser.fromJSON);
@@ -343,7 +343,7 @@ class GitHub {
    * Fetches a Gist by the specified [id].
    */
   Future<Gist> gist(String id) {
-    return getJSON("/gist/${id}", statusCode: 200, convert: Gist.fromJSON);
+    return getJSON("/gist/${id}", statusCode: StatusCodes.OK, convert: Gist.fromJSON);
   }
   
   Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(url);
@@ -409,7 +409,7 @@ class GitHub {
    * Fetches a Single Notification
    */
   Future<Notification> notification(String id) {
-    return getJSON("/notification/threads/${id}", statusCode: 200, convert: Notification.fromJSON);
+    return getJSON("/notification/threads/${id}", statusCode: StatusCodes.OK, convert: Notification.fromJSON);
   }
   
   /**
@@ -424,7 +424,7 @@ class GitHub {
    * Fetches repository subscription information.
    */
   Future<RepositorySubscription> subscription(RepositorySlug slug) {
-    return getJSON("/repos/${slug.fullName}/subscription", statusCode: 200, convert: RepositorySubscription.fromJSON);
+    return getJSON("/repos/${slug.fullName}/subscription", statusCode: StatusCodes.OK, convert: RepositorySubscription.fromJSON);
   }
   
   Stream<PublicKey> publicKeys([String user]) {
@@ -570,7 +570,7 @@ class GitHub {
    * Returns a map of the name to a url of the image.
    */
   Future<Map<String, String>> emojis() {
-    return getJSON("/emojis", statusCode: 200);
+    return getJSON("/emojis", statusCode: StatusCodes.OK);
   }
 
   /**
@@ -625,7 +625,7 @@ class GitHub {
    * Gets a language breakdown for the specified repository.
    */
   Future<LanguageBreakdown> languages(RepositorySlug slug) =>
-      getJSON("/repos/${slug.fullName}/languages", statusCode: 200, convert: (github, input) => new LanguageBreakdown(input));
+      getJSON("/repos/${slug.fullName}/languages", statusCode: StatusCodes.OK, convert: (github, input) => new LanguageBreakdown(input));
   
   /**
    * Gets the readme file for a repository.
@@ -633,7 +633,7 @@ class GitHub {
   Future<File> readme(RepositorySlug slug) {
     var headers = {};
     
-    return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: 200, fail: (http.Response response) {
+    return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
@@ -677,7 +677,7 @@ class GitHub {
    * Gets the GitHub API Status.
    */
   Future<APIStatus> apiStatus() {
-    return getJSON("https://status.github.com/api/status.json", statusCode: 200, convert: APIStatus.fromJSON);
+    return getJSON("https://status.github.com/api/status.json", statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
   }
   
   /**
@@ -737,7 +737,7 @@ class GitHub {
   }
   
   Future<PullRequest> pullRequest(RepositorySlug slug, int number) {
-    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: PullRequest.fromJSON, statusCode: 200);
+    return getJSON("/repos/${slug.fullName}/pulls/${number}", convert: PullRequest.fromJSON, statusCode: StatusCodes.OK);
   }
 
   /**
