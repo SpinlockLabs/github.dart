@@ -133,6 +133,22 @@ class Issue {
       return Issue.fromJSON(github, JSON.decode(response.body));
     });
   }
+  
+  Future<Issue> changeAssignee(String assignee) {
+    return github.request("POST", json['url'], body: JSON.encode({
+      "assignee": assignee
+    })).then((response) {
+      return Issue.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<Issue> changeMilestone(int id) {
+    return github.request("POST", json['url'], body: JSON.encode({
+      "milestone": milestone
+    })).then((response) {
+      return Issue.fromJSON(github, JSON.decode(response.body));
+    });
+  }
 
   Future<Issue> changeState(String state) {
     return github.request("POST", json['url'], body: JSON.encode({
