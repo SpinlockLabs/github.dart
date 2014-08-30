@@ -164,6 +164,14 @@ class GitHub {
     
     return controller.stream;
   }
+  
+  Stream<RepositoryStatus> status(RepositorySlug slug, String sha) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/commits/${sha}/statuses", RepositoryStatus.fromJSON);
+  }
+  
+  Future<RepositoryStatus> updateStatus(RepositorySlug slug, String sha, CreateStatus request) {
+    return postJSON("/repos/${slug.fullName}/commits/${sha}/statuses", body: request.toJSON(), convert: RepositoryStatus.fromJSON);
+  }
 
   /**
    * Fetches the teams for the specified organization.
