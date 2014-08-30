@@ -115,6 +115,28 @@ class Issue {
   Stream<IssueComment> comments() {
     return new PaginationHelper(github).objects("GET", "${this.json['url']}/comments", IssueComment.fromJSON);
   }
+  
+  Future<Issue> changeBody(String newBody) {
+    return github.request("POST", json['url'], body: JSON.encode({ "body": newBody })).then((response) {
+      return Issue.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<Issue> changeTitle(String title) {
+    return github.request("POST", json['url'], body: JSON.encode({ "title": title })).then((response) {
+      return Issue.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<Issue> changeState(String state) {
+    return github.request("POST", json['url'], body: JSON.encode({ "state": state })).then((response) {
+      return Issue.fromJSON(github, JSON.decode(response.body));
+    });
+  }
+  
+  Future<Issue> close() => changeState("closed");
+  Future<Issue> open() => changeState("open");
+  Future<Issue> reopen() => changeState("open");
 }
 
 /**
