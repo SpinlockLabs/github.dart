@@ -39,7 +39,15 @@ class HookServer extends HookMiddleware {
   void start() {
     HttpServer.bind(host, port).then((HttpServer server) {
       _server = server;
-      server.listen(handleHookRequest);
+      server.listen((request) {
+        if (request.uri.path == "/hook") {
+          handleHookRequest(request);
+        } else {
+          request.response.statusCode = 404;
+          request.response.write("404 - Not Found");
+          request.response.close();
+        }
+      });
     });
   }
   
