@@ -121,6 +121,16 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
   return out;
 }
 
+int parseFancyNumber(String input) {
+  var it = input.endsWith('k') ? input.substring(0, input.length - 1) : input;
+  var isThousand = input.endsWith('k');
+  var number = num.parse(it);
+  if (isThousand) {
+    return (number * 1000).toInt();
+  }
+  return number.toInt();
+}
+
 abstract class StatusCodes {
   static const int OK = 200;
   static const int CREATED = 201;
