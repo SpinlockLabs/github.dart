@@ -117,6 +117,8 @@ class GitHub {
     return controller.stream;
   }
   
+  Stream<Octocat> octocats() => _octocats(this);
+  
   Stream<Team> userTeams() {
     return new PaginationHelper(this).objects("GET", "/user/teams", Team.fromJSON);
   }
