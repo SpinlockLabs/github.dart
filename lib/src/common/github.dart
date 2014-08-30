@@ -319,8 +319,8 @@ class GitHub {
   /**
    * Fetches Issues for a Repository
    */
-  Stream<Issue> issues(RepositorySlug slug) {
-    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/issues", Issue.fromJSON);
+  Stream<Issue> issues(RepositorySlug slug, {String state: "open"}) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/issues", params: {"state": state}, Issue.fromJSON);
   }
   
   /**

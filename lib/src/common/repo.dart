@@ -190,7 +190,7 @@ class Repository extends GitHubObject with GitHubUrlProvider implements Provides
    * 
    * [limit] is the number of issues to get
    */
-  Stream<Issue> issues() => github.issues(slug());
+  Stream<Issue> issues({String state: "open"}) => github.issues(slug(), state: state);
 
   /**
    * Gets the Repository Commits
