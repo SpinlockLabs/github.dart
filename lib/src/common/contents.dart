@@ -9,43 +9,36 @@ class File {
   /**
    * Type of File
    */
-  @ApiName("type")
   String type;
 
   /**
    * File Encoding
    */
-  @ApiName("encoding")
   String encoding;
 
   /**
    * File Size
    */
-  @ApiName("size")
   int size;
 
   /**
    * File Name
    */
-  @ApiName("name")
   String name;
 
   /**
    * File Path
    */
-  @ApiName("path")
   String path;
 
   /**
    * File Content
    */
-  @ApiName("content")
   String content;
 
   /**
    * SHA
    */
-  @ApiName("sha")
   String sha;
 
   /**
