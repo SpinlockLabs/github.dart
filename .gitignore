@@ -9,3 +9,4 @@ dartdoc-viewer/
 .settings
 .buildlog
 .pub
+out/
