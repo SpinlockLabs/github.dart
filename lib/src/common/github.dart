@@ -305,6 +305,10 @@ class GitHub {
     return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/commits", Commit.fromJSON);
   }
   
+  Future<Commit> commit(RepositorySlug slug, String sha) {
+    return getJSON("/repos/${slug.fullName}/commits/${sha}", convert: Commit.fromJSON);
+  }
+  
   /**
    * Gets a Repositories Releases.
    * 
