@@ -139,3 +139,46 @@ class RepositoryContents {
   File file;
   List<File> tree;
 }
+
+class CreateFile {
+  final String path;
+  final String message;
+  final String content;
+  
+  String branch;
+  CommitterInformation committer;
+  
+  CreateFile(this.path, this.content, this.message);
+  
+  String toJSON() {
+    var map = {};
+    putValue("path", path, map);
+    putValue("message", message, map);
+    putValue("content", content, map);
+    putValue("branch", branch, map);
+    putValue("committer", committer != null ? committer.toMap() : null, map);
+    return JSON.encode(map);
+  }
+}
+
+class CommitterInformation {
+  final String name;
+  final String email;
+  
+  CommitterInformation(this.name, this.email);
+  
+  Map<String, String> toMap() => { "name": name, "email": email };
+}
+
+class ContentCreation {
+  final GitHub github;
+  final Commit commit;
+  final File content;
+  
+  ContentCreation(this.github, this.commit, this.content);
+  
+  static ContentCreation fromJSON(GitHub github, input) {
+    if (input == null) return null;
+    return new ContentCreation(github, Commit.fromJSON(github, input['commit']), File.fromJSON(github, input['content']));
+  }
+}

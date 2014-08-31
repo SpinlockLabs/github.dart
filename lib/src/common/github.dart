@@ -721,6 +721,12 @@ class GitHub {
     });
   }
   
+  Future<ContentCreation> createFile(RepositorySlug slug, CreateFile file) {
+    return request("PUT", "/repos/${slug.fullName}/contents/${file.path}", body: file.toJSON()).then((response) {
+      return ContentCreation.fromJSON(this, JSON.decode(response.body));
+    });
+  }
+  
   /**
    * Gets the GitHub API Status.
    */
