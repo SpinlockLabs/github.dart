@@ -181,6 +181,14 @@ class GitHub {
     return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
   }
   
+  Stream<Milestone> listMilestones(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/milestones", Milestone.fromJSON);
+  }
+
+  Future<Milestone> createMilestone(RepositorySlug slug, CreateMilestone request) {
+    return postJSON("/repos/${slug.fullName}/milestones", body: JSON.encode(request.toJSON()), convert: Milestone.fromJSON);
+  }
+  
   Future<IssueLabel> createLabel(RepositorySlug slug, String name, String color) {
     return postJSON("/repos/${slug.fullName}/labels", body: JSON.encode({ "name": name, "color": color }), convert: IssueLabel.fromJSON);
   }
