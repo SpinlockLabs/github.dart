@@ -87,6 +87,10 @@ class GitHub {
     
     return new PaginationHelper(this).objects("GET", "/users", User.fromJSON, pages: pages);
   }
+  
+  Future<String> shortenUrl(String url, {String code}) {
+    return _shortenUrl(this, url, code: code);
+  }
 
   /**
    * Fetches the repository specified by the [slug].
