@@ -1,16 +1,17 @@
 import "dart:html";
-import "dart:js";
 
 import "package:github/browser.dart";
 import "common.dart";
 
 GitHub github;
-DivElement $chart;
+DivElement $table;
+
+LanguageBreakdown breakdown;
 
 void main() {
   initGitHub();
   init("languages.dart", onReady: () {
-    $chart = querySelector("#chart");
+    $table = querySelector("#table");
     loadRepository();
   });
 }
@@ -35,11 +36,54 @@ void loadRepository() {
       reponame = params["repo"];
     }
   }
+  
+  document.getElementById("name").setInnerHtml("${user}/${reponame}");
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.languages(new RepositorySlug(user, reponame)).then((breakdown) {
-    document.getElementById("name").setInnerHtml("${user}/${reponame}");
-    context.callMethod("drawChart", [new JsArray.from(breakdown.toList().map((it) => new JsArray.from(it)))]);
+  github.languages(new RepositorySlug(user, reponame)).then((b) {
+    breakdown = b;
+    reloadTable();
   });
+}
+
+bool isReloadingTable = false;
+
+void reloadTable({int accuracy: 4}) {
+  
+  if (isReloadingTable) {
+    return;
+  }
+  
+  isReloadingTable = true;
+  
+  github.renderMarkdown(generateMarkdown(accuracy)).then((html) {
+    $table.innerHtml = html;
+    isReloadingTable = false;
+  });
+}
+
+int totalBytes(LanguageBreakdown breakdown) {
+  return breakdown.info.values.reduce((a, b) => a + b);
+}
+
+String generateMarkdown(int accuracy) {
+  int total = totalBytes(breakdown);
+  var buff = new StringBuffer();
+  
+  buff.writeln("| Language | Bytes | Percentage |");
+  buff.writeln("|----------|-------|------------|");
+  
+  var data = breakdown.toList();
+  
+  data.sort((a, b) => b[1].compareTo(a[1]));
+  
+  data.forEach((info) {
+    var name = info[0];
+    var bytes = info[1];
+    var percentage = ((bytes / total) * 100);
+    buff.writeln("| ${name} | ${bytes} | ${percentage.toStringAsFixed(accuracy)}%");
+  });
+  print(buff);
+  return buff.toString();
 }
