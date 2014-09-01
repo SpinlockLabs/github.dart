@@ -70,11 +70,6 @@ int totalBytes(LanguageBreakdown breakdown) {
 
 String generateMarkdown(int accuracy) {
   int total = totalBytes(breakdown);
-  var buff = new StringBuffer();
-  
-  buff.writeln("| Language | Bytes | Percentage |");
-  buff.writeln("|----------|-------|------------|");
-  
   var data = breakdown.toList();
   
   var tableData = [];
