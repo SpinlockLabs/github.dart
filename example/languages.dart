@@ -2,6 +2,7 @@ import "dart:html";
 
 import "package:github/browser.dart";
 import "common.dart";
+import "package:quiver/strings.dart";
 
 GitHub github;
 DivElement $table;
@@ -76,14 +77,51 @@ String generateMarkdown(int accuracy) {
   
   var data = breakdown.toList();
   
+  var tableData = [];
+  
   data.sort((a, b) => b[1].compareTo(a[1]));
   
   data.forEach((info) {
-    var name = info[0];
-    var bytes = info[1];
-    var percentage = ((bytes / total) * 100);
-    buff.writeln("| ${name} | ${bytes} | ${percentage.toStringAsFixed(accuracy)}%");
+    String name = info[0];
+    int bytes = info[1];
+    num percentage = ((bytes / total) * 100);
+    tableData.add({
+      "Name": name,
+      "Bytes": bytes,
+      "Percentage": "${percentage.toStringAsFixed(4)}%"
+    });
   });
-  print(buff);
+  return generateTable(tableData);
+}
+
+String generateTable(List<Map<String, dynamic>> data) {
+  var buff = new StringBuffer();
+  var columns = new Set<String>();
+  data.forEach((row) => columns.addAll(row.keys));
+  var p = [];
+  var fm = true;
+  for (var column in columns) {
+    if (fm) {
+      buff.write("|");
+      p.add("|");
+      fm = false;
+    }
+    buff.write(" ${column} |");
+    p.add("${repeat("-", column.length + 2)}|");
+  }
+  buff.writeln();
+  buff.writeln(p.join());
+  data.forEach((row) {
+    var values = row.values;
+    var fa = true;
+    for (var value in values) {
+      if (fa) {
+        buff.write("|");
+        fa = false;
+      }
+      buff.write(" ${value} |");
+    }
+    buff.writeln();
+  });
   return buff.toString();
 }
