@@ -16,14 +16,33 @@ void init(String script, {void onReady()}) {
 
   document.querySelector("#view-source").onClick.listen((_) {
     var popup = window.open("view_source.html", "View Source");
-
-    HttpRequest.getString(script).then((code) {
-      new Timer(new Duration(seconds: 1), () {
+    
+    var fetched = false;
+    var ready = false;
+    
+    String code;
+    
+    window.addEventListener("message", (event) {
+      if (event.data['command'] == "ready") {
+        ready = true;
+        if (fetched) {
+          popup.postMessage({
+            "command": "code",
+            "code": code
+          }, window.location.href);
+        }
+      }
+    });
+    
+    HttpRequest.getString(script).then((c) {
+      code = c;
+      fetched = true;
+      if (ready) {
         popup.postMessage({
           "command": "code",
           "code": code
         }, window.location.href);
-      });
+      }
     });
   });
 }
