@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Publishes a GitHub.dart release
-./tool/build.dart publish
+./tool/build.dart publish ${@}
 VERSION=`grep 'version:' pubspec.yaml | sed 's/version: //'`
 echo Releasing ${VERSION}
 git add .
