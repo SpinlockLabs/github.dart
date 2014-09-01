@@ -54,7 +54,7 @@ void loadUsers() {
       
       m.append(h);
       
-      $users.querySelector("#${column}").append(m);
+      $users.querySelector("#${column}");
       
       if (column == "left") {
         column = "right";
