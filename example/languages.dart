@@ -84,7 +84,7 @@ String generateMarkdown(int accuracy) {
     tableData.add({
       "Name": name,
       "Bytes": bytes,
-      "Percentage": "${percentage.toStringAsFixed(4)}%"
+      "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
     });
   });
   return markdown.table(tableData);
