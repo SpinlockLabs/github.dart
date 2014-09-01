@@ -115,6 +115,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
           <b>Forks</b>: ${repo.forksCount}
           <br/>
           <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
+          <p></p>
         </div>
       """);
     }
