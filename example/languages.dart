@@ -1,8 +1,9 @@
 import "dart:html";
 
+import "package:github/markdown.dart" as markdown;
+
 import "package:github/browser.dart";
 import "common.dart";
-import "package:quiver/strings.dart";
 
 GitHub github;
 DivElement $table;
@@ -86,37 +87,5 @@ String generateMarkdown(int accuracy) {
       "Percentage": "${percentage.toStringAsFixed(4)}%"
     });
   });
-  return generateTable(tableData);
-}
-
-String generateTable(List<Map<String, dynamic>> data) {
-  var buff = new StringBuffer();
-  var columns = new Set<String>();
-  data.forEach((row) => columns.addAll(row.keys));
-  var p = [];
-  var fm = true;
-  for (var column in columns) {
-    if (fm) {
-      buff.write("|");
-      p.add("|");
-      fm = false;
-    }
-    buff.write(" ${column} |");
-    p.add("${repeat("-", column.length + 2)}|");
-  }
-  buff.writeln();
-  buff.writeln(p.join());
-  data.forEach((row) {
-    var values = row.values;
-    var fa = true;
-    for (var value in values) {
-      if (fa) {
-        buff.write("|");
-        fa = false;
-      }
-      buff.write(" ${value} |");
-    }
-    buff.writeln();
-  });
-  return buff.toString();
+  return markdown.table(tableData);
 }
