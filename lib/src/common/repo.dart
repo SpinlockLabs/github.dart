@@ -385,6 +385,16 @@ class RepositorySlug {
   final String name;
 
   RepositorySlug(this.owner, this.name);
+  
+  /**
+   * Creates a Repository Slug from a full name.
+   */
+  factory RepositorySlug.full(String f) {
+    var split = f.split("/");
+    var o = split[0];
+    var n = (split..removeAt(0)).join("/");
+    return new RepositorySlug(o, n);
+  }
 
   /**
    * The Full Name of the Repository
@@ -395,9 +405,7 @@ class RepositorySlug {
 
   bool operator ==(Object obj) => obj is RepositorySlug && obj.fullName == fullName;
   
-  int get hashCode {
-    return fullName.hashCode;
-  }
+  int get hashCode => fullName.hashCode;
   
   @override
   String toString() => "${owner}/${name}";
