@@ -70,3 +70,9 @@ if (window.opener !== null) {
     req.send();
   }
 }
+
+ready(function () {
+  if (window.opener) {
+    window.opener.postMessage({ "command": "ready" }, "*");
+  }
+});

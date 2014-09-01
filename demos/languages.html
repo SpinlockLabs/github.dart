@@ -6,43 +6,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Repository Languages</title>
+  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
+  <link href="http://github.directcode.org/github-markdown.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://www.corsproxy.com/github.directcode.org/octicons/octicons.css">
 </head>
 
-<body>
+<body class="demo-languages">
   <div class="header">
     <h1>Repository Languages</h1>
 
-    <div class="btn" id="view-source">View the Source</div>
-    <p />
+    <div class="btn" id="view-source"><span class="octicon octicon-file-code"></span> View the Source</div>
+    <p/>
   </div>
 
   <div id="info">
     <h3 id="name"></h3>
-    <div id="chart"></div>
+    <div class="markdown-body" id="table"></div>
   </div>
 
-  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-  <script type="text/javascript">
-    google.load('visualization', '1.0', {
-      'packages': ['corechart']
-    });
-
-    function drawChart(info) {
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'name');
-      data.addColumn('number', 'bytes');
-      data.addRows(info);
-
-      var options = {
-        'title': 'Repository Languages',
-        'width': document.body.width,
-        'height': 512
-      };
-
-      var chart = new google.visualization.PieChart(document.getElementById('chart'));
-      chart.draw(data, options);
-    }
-  </script>
   <script type="application/dart" src="languages.dart"></script>
   <script src="packages/browser/dart.js"></script>
 </body>

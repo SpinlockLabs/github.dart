@@ -2355,6 +2355,9 @@ var $$ = {};
       receiver.date = new Date(receiver.millisecondsSinceEpoch);
     return receiver.date;
   },
+  Primitives_getSeconds: function(receiver) {
+    return receiver.isUtc ? H.Primitives_lazyAsJsDate(receiver).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(receiver).getSeconds() + 0;
+  },
   Primitives_getProperty: function(object, key) {
     if (object == null || typeof object === "boolean" || typeof object === "number" || typeof object === "string")
       throw H.wrapException(P.ArgumentError$(object));
@@ -4684,34 +4687,50 @@ var $$ = {};
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
   init_closure: {
-    "^": "Closure:17;onReady_0,stopwatch_1",
+    "^": "Closure:17;onReady_1,stopwatch_2",
     call$1: function($event) {
       var t1;
       if (document.readyState === "complete") {
-        t1 = this.stopwatch_1;
+        t1 = this.stopwatch_2;
         t1.stop$0(0);
         P.print("Document Finished Loading in " + H.S(J.$tdiv$n(J.$mul$ns(t1.get$elapsedTicks(), 1000), $.Stopwatch__frequency)) + "ms");
-        this.onReady_0.call$0();
+        this.onReady_1.call$0();
       }
     }
   },
   init_closure0: {
-    "^": "Closure:17;script_2",
+    "^": "Closure:17;script_3",
     call$1: function(_) {
-      var popup = C.Window_methods.open$2(window, "view_source.html", "View Source");
-      W.HttpRequest_getString(this.script_2, null, null).then$1(new R.init__closure(popup));
+      var t1, popup;
+      t1 = {};
+      popup = C.Window_methods.open$2(window, "view_source.html", "View Source");
+      t1.fetched_0 = false;
+      t1.ready_1 = false;
+      t1.code_2 = null;
+      C.Window_methods.addEventListener$2(window, "message", new R.init__closure(t1, popup));
+      W.HttpRequest_getString(this.script_3, null, null).then$1(new R.init__closure0(t1, popup));
     }
   },
   init__closure: {
-    "^": "Closure:17;popup_3",
-    call$1: function(code) {
-      P.Timer_Timer(P.Duration$(0, 0, 0, 0, 0, 1), new R.init___closure(this.popup_3, code));
+    "^": "Closure:17;box_0,popup_4",
+    call$1: function($event) {
+      var t1;
+      if (J.$eq(J.$index$asx(J.get$data$x($event), "command"), "ready")) {
+        t1 = this.box_0;
+        t1.ready_1 = true;
+        if (t1.fetched_0)
+          J.postMessage$2$x(this.popup_4, P.LinkedHashMap_LinkedHashMap$_literal(["command", "code", "code", t1.code_2], null, null), window.location.href);
+      }
     }
   },
-  init___closure: {
-    "^": "Closure:15;popup_4,code_5",
-    call$0: function() {
-      J.postMessage$2$x(this.popup_4, P.LinkedHashMap_LinkedHashMap$_literal(["command", "code", "code", this.code_5], null, null), window.location.href);
+  init__closure0: {
+    "^": "Closure:17;box_0,popup_5",
+    call$1: function(c) {
+      var t1 = this.box_0;
+      t1.code_2 = c;
+      t1.fetched_0 = true;
+      if (t1.ready_1)
+        J.postMessage$2$x(this.popup_5, P.LinkedHashMap_LinkedHashMap$_literal(["command", "code", "code", c], null, null), window.location.href);
     }
   }
 }],
@@ -12622,7 +12641,7 @@ var $$ = {};
       d = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCDate() + 0 : H.Primitives_lazyAsJsDate(this).getDate() + 0);
       h = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCHours() + 0 : H.Primitives_lazyAsJsDate(this).getHours() + 0);
       min = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCMinutes() + 0 : H.Primitives_lazyAsJsDate(this).getMinutes() + 0);
-      sec = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(this).getSeconds() + 0);
+      sec = P.DateTime__twoDigits(H.Primitives_getSeconds(this));
       ms = P.DateTime__threeDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCMilliseconds() + 0 : H.Primitives_lazyAsJsDate(this).getMilliseconds() + 0);
       if (t1)
         return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec + "." + ms + "Z";
@@ -12638,7 +12657,7 @@ var $$ = {};
       return P.DateTime$fromMillisecondsSinceEpoch(ms + t1, this.isUtc);
     },
     get$second: function() {
-      return this.isUtc ? H.Primitives_lazyAsJsDate(this).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(this).getSeconds() + 0;
+      return H.Primitives_getSeconds(this);
     },
     DateTime$fromMillisecondsSinceEpoch$2$isUtc: function(millisecondsSinceEpoch, isUtc) {
       millisecondsSinceEpoch.toString;
@@ -14609,6 +14628,10 @@ var $$ = {};
     "^": "Interceptor;",
     addEventListener$3: function(receiver, type, listener, useCapture) {
       return receiver.addEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
+    },
+    addEventListener$2: function($receiver, type, listener) {
+      listener = H.convertDartClosureToJS(listener, 1);
+      return $receiver.addEventListener(type, listener);
     },
     removeEventListener$3: function(receiver, type, listener, useCapture) {
       return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
@@ -17849,7 +17872,7 @@ var $$ = {};
           header = t2.get$current();
           req.setRequestHeader(header, t1.$index(0, header));
         }
-      t1 = H.setRuntimeTypeInfo(new W._EventStream(req, C.EventStreamProvider_readystatechange0._eventType, false), [null]);
+      t1 = H.setRuntimeTypeInfo(new W._EventStream(req, C.EventStreamProvider_loadend._eventType, false), [null]);
       H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new M._BrowserHttpClient_request_closure(req, completer)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
       req.send(request.body);
       return completer.future;
@@ -17860,15 +17883,13 @@ var $$ = {};
     call$1: function($event) {
       var t1, t2, t3, t4;
       t1 = this.req_0;
-      if (t1.readyState === 4) {
-        t2 = t1.responseText;
-        t3 = C.HttpRequest_methods.get$responseHeaders(t1);
-        t1 = t1.status;
-        t4 = this.completer_1.future;
-        if (t4._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t4._asyncComplete$1(new T.Response(t2, t3, t1));
-      }
+      t2 = t1.responseText;
+      t3 = C.HttpRequest_methods.get$responseHeaders(t1);
+      t1 = t1.status;
+      t4 = this.completer_1.future;
+      if (t4._state !== 0)
+        H.throwExpression(P.StateError$("Future already completed"));
+      t4._asyncComplete$1(new T.Response(t2, t3, t1));
     }
   },
   initGitHub_closure: {
@@ -26215,13 +26236,13 @@ $$ = null;
   _.$isComparable = TRUE;
   _.$asComparable = [P.num];
   _.$isObject = TRUE;
-  _ = W.Node0;
-  _.$isNode0 = TRUE;
-  _.$isObject = TRUE;
   _ = P.$double;
   _.$isnum = TRUE;
   _.$isComparable = TRUE;
   _.$asComparable = [P.num];
+  _.$isObject = TRUE;
+  _ = W.Node0;
+  _.$isNode0 = TRUE;
   _.$isObject = TRUE;
   W.SpeechRecognitionResult.$isObject = TRUE;
   _ = P.String;
@@ -26313,6 +26334,11 @@ $$ = null;
   _ = P._DelayedEvent;
   _.$is_DelayedEvent = TRUE;
   _.$isObject = TRUE;
+  _ = P.DateTime;
+  _.$isDateTime = TRUE;
+  _.$isComparable = TRUE;
+  _.$asComparable = [null];
+  _.$isObject = TRUE;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
   _.$isObject = TRUE;
@@ -26327,11 +26353,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = P.Function;
   _.$isFunction = TRUE;
-  _.$isObject = TRUE;
-  _ = P.DateTime;
-  _.$isDateTime = TRUE;
-  _.$isComparable = TRUE;
-  _.$asComparable = [null];
   _.$isObject = TRUE;
   _ = G.FileSpan;
   _.$isFileSpan = TRUE;
@@ -26763,8 +26784,8 @@ C.Duration_0 = new P.Duration(0);
 C.EventStreamProvider_click = H.setRuntimeTypeInfo(new W.EventStreamProvider("click"), [W.MouseEvent]);
 C.EventStreamProvider_error = H.setRuntimeTypeInfo(new W.EventStreamProvider("error"), [W.ProgressEvent]);
 C.EventStreamProvider_load = H.setRuntimeTypeInfo(new W.EventStreamProvider("load"), [W.ProgressEvent]);
+C.EventStreamProvider_loadend = H.setRuntimeTypeInfo(new W.EventStreamProvider("loadend"), [W.ProgressEvent]);
 C.EventStreamProvider_readystatechange = H.setRuntimeTypeInfo(new W.EventStreamProvider("readystatechange"), [W.Event]);
-C.EventStreamProvider_readystatechange0 = H.setRuntimeTypeInfo(new W.EventStreamProvider("readystatechange"), [W.ProgressEvent]);
 C.JS_CONST_0 = function(hooks) {
   if (typeof dartExperimentalFixupGetTag != "function") return hooks;
   hooks.getTag = dartExperimentalFixupGetTag(hooks.getTag);

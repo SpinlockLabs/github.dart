@@ -87,6 +87,10 @@ class GitHub {
     
     return new PaginationHelper(this).objects("GET", "/users", User.fromJSON, pages: pages);
   }
+  
+  Future<String> shortenUrl(String url, {String code}) {
+    return _shortenUrl(this, url, code: code);
+  }
 
   /**
    * Fetches the repository specified by the [slug].
@@ -179,6 +183,14 @@ class GitHub {
   
   Stream<IssueLabel> listLabels(RepositorySlug slug) {
     return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
+  }
+  
+  Stream<Milestone> listMilestones(RepositorySlug slug) {
+    return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/milestones", Milestone.fromJSON);
+  }
+
+  Future<Milestone> createMilestone(RepositorySlug slug, CreateMilestone request) {
+    return postJSON("/repos/${slug.fullName}/milestones", body: JSON.encode(request.toJSON()), convert: Milestone.fromJSON);
   }
   
   Future<IssueLabel> createLabel(RepositorySlug slug, String name, String color) {
@@ -291,6 +303,10 @@ class GitHub {
   
   Stream<Commit> commits(RepositorySlug slug) {
     return new PaginationHelper(this).objects("GET", "/repos/${slug.fullName}/commits", Commit.fromJSON);
+  }
+  
+  Future<Commit> commit(RepositorySlug slug, String sha) {
+    return getJSON("/repos/${slug.fullName}/commits/${sha}", convert: Commit.fromJSON);
   }
   
   /**
@@ -706,6 +722,12 @@ class GitHub {
         contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
       }
       return contents;
+    });
+  }
+  
+  Future<ContentCreation> createFile(RepositorySlug slug, CreateFile file) {
+    return request("PUT", "/repos/${slug.fullName}/contents/${file.path}", body: file.toJSON()).then((response) {
+      return ContentCreation.fromJSON(this, JSON.decode(response.body));
     });
   }
   

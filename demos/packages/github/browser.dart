@@ -22,10 +22,8 @@ class _BrowserHttpClient extends http.Client {
       }
     }
     
-    req.onReadyStateChange.listen((event) {
-      if (req.readyState == HttpRequest.DONE) {
-        completer.complete(new http.Response(req.responseText, req.responseHeaders, req.status));
-      }
+    req.onLoadEnd.listen((event) {
+      completer.complete(new http.Response(req.responseText, req.responseHeaders, req.status));
     });
     
     req.send(request.body);

@@ -306,6 +306,8 @@ class Milestone {
   @ApiName("due_on")
   DateTime dueOn;
 
+  Map<String, dynamic> json;
+  
   Milestone(this.github);
 
   static Milestone fromJSON(GitHub github, input) {
@@ -320,10 +322,33 @@ class Milestone {
         ..closedIssuesCount = input['closed_issues']
         ..createdAt = parseDateTime(input['created_at'])
         ..updatedAt = parseDateTime(input['updated_at'])
-        ..dueOn = parseDateTime(input['due_on']);
+        ..dueOn = parseDateTime(input['due_on'])
+        ..json = input;
+  }
+  
+  Future<bool> delete() {
+    return github.request("DELETE", json['url']).then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 }
 
+class CreateMilestone {
+  final String title;
+  
+  String state;
+  String description;
+  DateTime dueOn;
+  
+  CreateMilestone(this.title);
+  
+  String toJSON() {
+    var map = {};
+    putValue("title", title, map);
+    putValue("state", state, map);
+    putValue(description, description, map);
+    putValue("due_on", dueOn, map);
+    return JSON.encode(map);
+  }
+}
 
 class IssueComment {
   final GitHub github;
