@@ -13,7 +13,9 @@ void main() {
     });
     return group.future;
   }).then((mems) {
-    return mems.reduce((List<dynamic> a, List<dynamic> b) => []..addAll(a)..addAll(b));
+    return mems.reduce((value, e) {
+      return new Set()..addAll(value)..addAll(e);
+    });
   }).then((members) {
     for (var member in members) {
       github.publicKeys(member.login).toList().then((keys) {
