@@ -8,7 +8,7 @@ GitHub github;
 DivElement $zen;
 
 void main() {
-  init("readme.dart", onReady: () {
+  init("zen.dart", onReady: () {
     github = createGitHubClient();
     $zen = querySelector("#zen");
     loadZen();
