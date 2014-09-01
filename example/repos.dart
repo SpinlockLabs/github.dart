@@ -13,7 +13,8 @@ Map<String, Comparator<Repository>> sorts = {
   "stars": (Repository a, Repository b) => b.stargazersCount.compareTo(a.stargazersCount),
   "forks": (Repository a, Repository b) => b.forksCount.compareTo(a.forksCount),
   "created": (Repository a, Repository b) => b.createdAt.compareTo(a.createdAt),
-  "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt)
+  "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt),
+  "size": (Repository a, Repository b) => b.size.compareTo(a.size)
 };
 
 void main() {
@@ -36,23 +37,44 @@ void main() {
     loadRepos();
   });
 
-  querySelector("#sort-stars").onClick.listen((event) {
-    loadRepos(sorts['stars']);
-  });
-
-  querySelector("#sort-forks").onClick.listen((event) {
-    loadRepos(sorts['forks']);
-  });
-
-  querySelector("#sort-created").onClick.listen((event) {
-    loadRepos(sorts['created']);
-  });
-  
-  querySelector("#sort-pushed").onClick.listen((event) {
-    loadRepos(sorts['pushed']);
+  sorts.keys.forEach((name) {
+    querySelector("#sort-${name}").onClick.listen((event) {
+      if (_reposCache == null) {
+        loadRepos(sorts[name]);
+      }
+      updateRepos(_reposCache, sorts[name]);
+    });
   });
 
   init("repos.dart");
+}
+
+List<Repository> _reposCache;
+
+void updateRepos(List<Repository> repos, [int compare(Repository a, Repository b)]) {
+  document.querySelector("#repos").children.clear();
+  repos.sort(compare);
+  for (var repo in repos) {
+    $repos.appendHtml("""
+        <div class="repo" id="repo_${repo.name}">
+          <div class="line"></div>
+          <h2><a href="${repo.url}">${repo.name}</a></h2>
+          ${repo.description != "" && repo.description != null ? "<b>Description</b>: ${repo.description}<br/>" : ""}
+          <b>Language</b>: ${repo.language != null ? repo.language : "Unknown"}
+          <br/>
+          <b>Default Branch</b>: ${repo.defaultBranch}
+          <br/>
+          <b>Stars</b>: ${repo.stargazersCount}
+          <br/>
+          <b>Forks</b>: ${repo.forksCount}
+          <br/>
+          <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
+          <br/>
+          <b>Size</b>: ${repo.size} bytes
+          <p></p>
+        </div>
+      """);
+  }
 }
 
 void loadRepos([int compare(Repository a, Repository b)]) {
@@ -63,8 +85,6 @@ void loadRepos([int compare(Repository a, Repository b)]) {
         ..text = "GitHub for Dart - Repositories"
         ..id = "title");
   }
-
-  document.querySelector("#repos").children.clear();
 
   var user = "DirectMyFile";
 
@@ -98,26 +118,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
   }
 
   github.userRepositories(user).toList().then((repos) {
-    repos.sort(compare);
-    
-    for (var repo in repos) {
-      $repos.appendHtml("""
-        <div class="repo" id="repo_${repo.name}">
-          <div class="line"></div>
-          <h2><a href="${repo.url}">${repo.name}</a></h2>
-          ${repo.description != "" && repo.description != null ? "<b>Description</b>: ${repo.description}<br/>" : ""}
-          <b>Language</b>: ${repo.language != null ? repo.language : "Unknown"}
-          <br/>
-          <b>Default Branch</b>: ${repo.defaultBranch}
-          <br/>
-          <b>Stars</b>: ${repo.stargazersCount}
-          <br/>
-          <b>Forks</b>: ${repo.forksCount}
-          <br/>
-          <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
-          <p></p>
-        </div>
-      """);
-    }
+    _reposCache = repos;
+    updateRepos(repos, compare);
   });
 }
