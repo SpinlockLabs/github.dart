@@ -88,7 +88,6 @@ void loadRepos([int compare(Repository a, Repository b)]) {
 
   var user = "DirectMyFile";
 
-  var url = window.location.href;
   var showForks = true;
 
   var params = queryString;
