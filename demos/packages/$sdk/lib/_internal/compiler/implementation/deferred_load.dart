@@ -129,7 +129,7 @@ class DeferredLoadTask extends CompilerTask {
   final Set<OutputUnit> allOutputUnits = new Set<OutputUnit>();
 
   /// Will be `true` if the program contains deferred libraries.
-  bool splitProgram = false;
+  bool isProgramSplit = false;
 
   /// A mapping from the name of a defer import to all the output units it
   /// depends on in a list of lists to be loaded in the order they appear.
@@ -171,7 +171,7 @@ class DeferredLoadTask extends CompilerTask {
 
   /// Returns the [OutputUnit] where [element] belongs.
   OutputUnit outputUnitForElement(Element element) {
-    if (!splitProgram) return mainOutputUnit;
+    if (!isProgramSplit) return mainOutputUnit;
 
     element = element.implementation;
     while (!_elementToOutputUnit.containsKey(element)) {
@@ -191,7 +191,7 @@ class DeferredLoadTask extends CompilerTask {
 
   /// Returns the [OutputUnit] where [constant] belongs.
   OutputUnit outputUnitForConstant(Constant constant) {
-    if (!splitProgram) return mainOutputUnit;
+    if (!isProgramSplit) return mainOutputUnit;
 
     return _constantToOutputUnit[constant];
   }
@@ -568,37 +568,21 @@ class DeferredLoadTask extends CompilerTask {
       importDeferName[import] = makeUnique(result, usedImportNames);;
     }
 
-    Set<String> usedOutputUnitNames = new Set<String>();
-    Map<OutputUnit, String> generatedNames = new Map<OutputUnit, String>();
-
-    void computeOutputUnitName(OutputUnit outputUnit) {
-      if (generatedNames[outputUnit] != null) return;
-      Iterable<String> importNames = outputUnit.imports.map((import) {
-        return importDeferName[import];
-      });
-      String suggestedName = importNames.join('_');
-      // Avoid the name getting too long.
-      // Try to abbreviate the prefix-names
-      if (suggestedName.length > 15) {
-        suggestedName = importNames.map((name) {
-          return name.substring(0, min(2, name.length));
-        }).join('_');
-      }
-      // If this is still too long, truncate the whole name.
-      if (suggestedName.length > 15) {
-        suggestedName = suggestedName.substring(0, 15);
-      }
-      outputUnit.name = makeUnique(suggestedName, usedOutputUnitNames);
-      generatedNames[outputUnit] = outputUnit.name;
-    }
+    int counter = 1;
 
     for (Import import in _allDeferredImports.keys) {
       computeImportDeferName(import);
     }
 
     for (OutputUnit outputUnit in allOutputUnits) {
-      computeOutputUnitName(outputUnit);
+      if (outputUnit == mainOutputUnit) {
+        outputUnit.name = "main";
+      } else {
+        outputUnit.name = "$counter";
+        ++counter;
+      }
     }
+
     List sortedOutputUnits = new List.from(allOutputUnits);
     // Sort the output units in descending order of the number of imports they
     // include.
@@ -635,7 +619,7 @@ class DeferredLoadTask extends CompilerTask {
   }
 
   void onResolutionComplete(FunctionElement main) {
-    if (!splitProgram) {
+    if (!isProgramSplit) {
       allOutputUnits.add(mainOutputUnit);
       return;
     }
@@ -740,7 +724,7 @@ class DeferredLoadTask extends CompilerTask {
             } else {
               prefixDeferredImport[prefix] = import;
             }
-            splitProgram = true;
+            isProgramSplit = true;
             lastDeferred = import;
           }
           if (prefix != null) {
@@ -758,15 +742,15 @@ class DeferredLoadTask extends CompilerTask {
       });
     }
     Backend backend = compiler.backend;
-    if (splitProgram && backend is JavaScriptBackend) {
+    if (isProgramSplit && backend is JavaScriptBackend) {
       backend.registerCheckDeferredIsLoaded(compiler.globalDependencies);
     }
-    if (splitProgram && backend is DartBackend) {
+    if (isProgramSplit && backend is DartBackend) {
       // TODO(sigurdm): Implement deferred loading for dart2dart.
       compiler.reportWarning(
           lastDeferred,
           MessageKind.DEFERRED_LIBRARY_DART_2_DART);
-      splitProgram = false;
+      isProgramSplit = false;
     }
   }
 

@@ -1,5 +1,7 @@
 import "dart:html";
 
+import "package:github/markdown.dart" as markdown;
+
 import "package:github/browser.dart";
 import "common.dart";
 
@@ -69,21 +71,21 @@ int totalBytes(LanguageBreakdown breakdown) {
 
 String generateMarkdown(int accuracy) {
   int total = totalBytes(breakdown);
-  var buff = new StringBuffer();
-  
-  buff.writeln("| Language | Bytes | Percentage |");
-  buff.writeln("|----------|-------|------------|");
-  
   var data = breakdown.toList();
+  
+  var tableData = [];
   
   data.sort((a, b) => b[1].compareTo(a[1]));
   
   data.forEach((info) {
-    var name = info[0];
-    var bytes = info[1];
-    var percentage = ((bytes / total) * 100);
-    buff.writeln("| ${name} | ${bytes} | ${percentage.toStringAsFixed(accuracy)}%");
+    String name = info[0];
+    int bytes = info[1];
+    num percentage = ((bytes / total) * 100);
+    tableData.add({
+      "Name": name,
+      "Bytes": bytes,
+      "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
+    });
   });
-  print(buff);
-  return buff.toString();
+  return markdown.table(tableData);
 }
