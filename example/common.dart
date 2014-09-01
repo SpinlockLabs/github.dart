@@ -45,3 +45,12 @@ void init(String script, {void onReady()}) {
     });
   });
 }
+
+Map<String, String> get queryString {
+  var url = window.location.href;
+  if (url.contains("?")) {
+    return Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
+  } else {
+    return {};
+  }
+}

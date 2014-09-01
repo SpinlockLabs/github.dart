@@ -91,25 +91,24 @@ void loadRepos([int compare(Repository a, Repository b)]) {
   var url = window.location.href;
   var showForks = true;
 
-  if (url.contains("?")) {
-    var queryString = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
-    if (queryString.containsKey("user")) {
-      user = queryString['user'];
-    }
+  var params = queryString;
+  
+  if (params.containsKey("user")) {
+    user = params['user'];
+  }
 
-    if (queryString.containsKey("forks")) {
-      if (["1", "true", "yes", "sure"].contains(queryString['forks'])) {
-        showForks = true;
-      } else {
-        showForks = false;
-      }
+  if (params.containsKey("forks")) {
+    if (["1", "true", "yes", "sure"].contains(params['forks'])) {
+      showForks = true;
+    } else {
+      showForks = false;
     }
+  }
 
-    if (queryString.containsKey("sort") && compare == null) {
-      var sorter = queryString['sort'];
-      if (sorts.containsKey(sorter)) {
-        compare = sorts[sorter];
-      }
+  if (params.containsKey("sort") && compare == null) {
+    var sorter = params['sort'];
+    if (sorts.containsKey(sorter)) {
+      compare = sorts[sorter];
     }
   }
 
