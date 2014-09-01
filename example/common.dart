@@ -1,5 +1,4 @@
 import "dart:html";
-import "dart:async" show Timer;
 
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();
