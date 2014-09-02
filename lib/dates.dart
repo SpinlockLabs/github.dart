@@ -3,8 +3,6 @@
  */
 library github.dates;
 
-import "package:quiver/time.dart";
-
 /**
  * Creates a Friendly Date and Time
  */
@@ -16,8 +14,7 @@ String friendlyDateTime(DateTime time) {
  * Creates a Friendly Date
  */
 String friendlyDate(DateTime time) {
-  return
-      "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
+  return "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
 }
 
 /**
