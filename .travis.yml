@@ -31,3 +31,5 @@ notifications:
     urls:
       - "http://n.tkte.ch/h/1825/gZOGuQckPyg_Pg4E2eXOMrlI"
     on_start: always
+  notifications:
+    slack: directcode:2I5T01PBxls8Yb1v3Jiw1xbh
