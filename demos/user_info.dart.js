@@ -3654,6 +3654,29 @@ var $$ = {};
     },
     $isEfficientLength: true
   },
+  WhereIterable: {
+    "^": "IterableBase;_iterable,_f",
+    get$iterator: function(_) {
+      var t1 = new H.WhereIterator(J.get$iterator$ax(this._iterable), this._f);
+      t1.$builtinTypeInfo = this.$builtinTypeInfo;
+      return t1;
+    }
+  },
+  WhereIterator: {
+    "^": "Iterator;_iterator,_f",
+    _f$1: function(arg0) {
+      return this._f.call$1(arg0);
+    },
+    moveNext$0: function() {
+      for (var t1 = this._iterator; t1.moveNext$0();)
+        if (this._f$1(t1.get$current()) === true)
+          return true;
+      return false;
+    },
+    get$current: function() {
+      return this._iterator.get$current();
+    }
+  },
   IterableMixinWorkaround: {
     "^": "Object;",
     static: {IterableMixinWorkaround_forEach: function(iterable, f) {
@@ -5590,6 +5613,15 @@ var $$ = {};
       return P.IterableBase_iterableToShortString(this, "(", ")");
     }
   },
+  ListBase: {
+    "^": "Object_ListMixin;"
+  },
+  Object_ListMixin: {
+    "^": "Object+ListMixin;",
+    $isList: true,
+    $asList: null,
+    $isEfficientLength: true
+  },
   ListMixin: {
     "^": "Object;",
     get$iterator: function(receiver) {
@@ -5609,6 +5641,9 @@ var $$ = {};
     },
     get$isEmpty: function(receiver) {
       return this.get$length(receiver) === 0;
+    },
+    where$1: function(receiver, test) {
+      return H.setRuntimeTypeInfo(new H.WhereIterable(receiver, test), [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
     },
     toList$1$growable: function(receiver, growable) {
       var result, i, t1;
@@ -5633,7 +5668,8 @@ var $$ = {};
       if (startIndex >= this.get$length(receiver))
         return -1;
       for (i = startIndex; i < this.get$length(receiver); ++i)
-        this.$index(receiver, i);
+        if (J.$eq(this.$index(receiver, i), element))
+          return i;
       return -1;
     },
     indexOf$1: function($receiver, element) {
@@ -6911,6 +6947,9 @@ var $$ = {};
     get$attributes: function(receiver) {
       return new W._ElementAttributeMap(receiver);
     },
+    get$children: function(receiver) {
+      return new W._ChildrenElementList(receiver, receiver.children);
+    },
     toString$0: function(receiver) {
       return receiver.localName;
     },
@@ -7002,6 +7041,7 @@ var $$ = {};
     get$onClick: function(receiver) {
       return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
     },
+    $isElement: true,
     "%": ";Element"
   },
   EmbedElement: {
@@ -7042,6 +7082,33 @@ var $$ = {};
   FormElement: {
     "^": "HtmlElement;length=,name=",
     "%": "HTMLFormElement"
+  },
+  HtmlCollection: {
+    "^": "Interceptor_ListMixin_ImmutableListMixin;",
+    get$length: function(receiver) {
+      return receiver.length;
+    },
+    $index: function(receiver, index) {
+      var t1 = receiver.length;
+      if (index >>> 0 !== index || index >= t1)
+        throw H.wrapException(P.RangeError$range(index, 0, t1));
+      return receiver[index];
+    },
+    $indexSet: function(receiver, index, value) {
+      throw H.wrapException(P.UnsupportedError$("Cannot assign element of immutable List."));
+    },
+    elementAt$1: function(receiver, index) {
+      if (index < 0 || index >= receiver.length)
+        return H.ioore(receiver, index);
+      return receiver[index];
+    },
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true,
+    $isJavaScriptIndexingBehavior: true,
+    "%": "HTMLCollection|HTMLFormControlsCollection|HTMLOptionsCollection"
   },
   HtmlDocument: {
     "^": "Document;body=",
@@ -7098,6 +7165,7 @@ var $$ = {};
   InputElement: {
     "^": "HtmlElement;name=,value=",
     $isInputElement: true,
+    $isElement: true,
     "%": "HTMLInputElement"
   },
   KeygenElement: {
@@ -7171,14 +7239,33 @@ var $$ = {};
       if (t1 != null)
         t1.removeChild(receiver);
     },
+    replaceWith$1: function(receiver, otherNode) {
+      var $parent, exception;
+      try {
+        $parent = receiver.parentNode;
+        J._replaceChild$2$x($parent, otherNode, receiver);
+      } catch (exception) {
+        H.unwrapException(exception);
+      }
+
+      return receiver;
+    },
+    _clearChildren$0: function(receiver) {
+      var t1;
+      for (; t1 = receiver.firstChild, t1 != null;)
+        receiver.removeChild(t1);
+    },
     toString$0: function(receiver) {
       var t1 = receiver.nodeValue;
       return t1 == null ? J.Interceptor.prototype.toString$0.call(this, receiver) : t1;
     },
+    _replaceChild$2: function(receiver, newChild, oldChild) {
+      return receiver.replaceChild(newChild, oldChild);
+    },
     "%": "DocumentFragment|DocumentType|Notation|ShadowRoot;Node"
   },
   NodeList: {
-    "^": "Interceptor_ListMixin_ImmutableListMixin;",
+    "^": "Interceptor_ListMixin_ImmutableListMixin0;",
     get$length: function(receiver) {
       return receiver.length;
     },
@@ -7338,7 +7425,7 @@ var $$ = {};
     "%": "ClientRect|DOMRect"
   },
   _NamedNodeMap: {
-    "^": "Interceptor_ListMixin_ImmutableListMixin0;",
+    "^": "Interceptor_ListMixin_ImmutableListMixin1;",
     get$length: function(receiver) {
       return receiver.length;
     },
@@ -7363,6 +7450,59 @@ var $$ = {};
     $isEfficientLength: true,
     $isJavaScriptIndexingBehavior: true,
     "%": "MozNamedAttrMap|NamedNodeMap"
+  },
+  _ChildrenElementList: {
+    "^": "ListBase;_element,_childElements",
+    get$isEmpty: function(_) {
+      return this._element.firstElementChild == null;
+    },
+    get$length: function(_) {
+      return this._childElements.length;
+    },
+    $index: function(_, index) {
+      var t1 = this._childElements;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    $indexSet: function(_, index, value) {
+      var t1 = this._childElements;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      this._element.replaceChild(value, t1[index]);
+    },
+    get$iterator: function(_) {
+      var t1 = this.toList$0(this);
+      return new H.ListIterator(t1, t1.length, 0, null);
+    },
+    clear$0: function(_) {
+      J._clearChildren$0$x(this._element);
+    },
+    $asListBase: function() {
+      return [W.Element];
+    },
+    $asObject_ListMixin: function() {
+      return [W.Element];
+    },
+    $asList: function() {
+      return [W.Element];
+    }
+  },
+  Interceptor_ListMixin: {
+    "^": "Interceptor+ListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin_ImmutableListMixin: {
+    "^": "Interceptor_ListMixin+ImmutableListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
   },
   HttpRequest_getString_closure: {
     "^": "Closure:12;",
@@ -7395,21 +7535,37 @@ var $$ = {};
         t3.completeError$1(e);
     }
   },
-  Interceptor_ListMixin: {
-    "^": "Interceptor+ListMixin;",
-    $isList: true,
-    $asList: function() {
+  _ChildNodeListLazy: {
+    "^": "ListBase;_this",
+    $indexSet: function(_, index, value) {
+      var t1, t2;
+      t1 = this._this;
+      t2 = t1.childNodes;
+      if (index >>> 0 !== index || index >= t2.length)
+        return H.ioore(t2, index);
+      t1.replaceChild(value, t2[index]);
+    },
+    get$iterator: function(_) {
+      return C.NodeList_methods.get$iterator(this._this.childNodes);
+    },
+    get$length: function(_) {
+      return this._this.childNodes.length;
+    },
+    $index: function(_, index) {
+      var t1 = this._this.childNodes;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    $asListBase: function() {
       return [W.Node];
     },
-    $isEfficientLength: true
-  },
-  Interceptor_ListMixin_ImmutableListMixin: {
-    "^": "Interceptor_ListMixin+ImmutableListMixin;",
-    $isList: true,
-    $asList: function() {
+    $asObject_ListMixin: function() {
       return [W.Node];
     },
-    $isEfficientLength: true
+    $asList: function() {
+      return [W.Node];
+    }
   },
   Interceptor_ListMixin0: {
     "^": "Interceptor+ListMixin;",
@@ -7421,6 +7577,22 @@ var $$ = {};
   },
   Interceptor_ListMixin_ImmutableListMixin0: {
     "^": "Interceptor_ListMixin0+ImmutableListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin1: {
+    "^": "Interceptor+ListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin_ImmutableListMixin1: {
+    "^": "Interceptor_ListMixin1+ImmutableListMixin;",
     $isList: true,
     $asList: function() {
       return [W.Node];
@@ -7786,6 +7958,9 @@ var $$ = {};
   "^": "",
   SvgElement: {
     "^": "Element;",
+    get$children: function(receiver) {
+      return H.setRuntimeTypeInfo(new P.FilteredElementList(receiver, new W._ChildNodeListLazy(receiver)), [W.Element]);
+    },
     insertAdjacentHtml$2: function(receiver, where, text) {
       throw H.wrapException(P.UnsupportedError$("Cannot invoke insertAdjacentHtml on SVG."));
     },
@@ -8117,6 +8292,7 @@ var $$ = {};
   },
   AccessForbidden: {
     "^": "GitHubError;message,apiUrl,github,source",
+    $isAccessForbidden: true,
     static: {AccessForbidden$: function(github) {
         return new T.AccessForbidden("Access Forbbidden", null, github, null);
       }}
@@ -8511,6 +8687,44 @@ var $$ = {};
       }
       return e;
     }
+  },
+  FilteredElementList: {
+    "^": "ListBase;_node,_childNodes",
+    get$_filtered: function() {
+      var t1 = this._childNodes;
+      return P.List_List$from(t1.where$1(t1, new P.FilteredElementList__filtered_closure()), true, W.Element);
+    },
+    forEach$1: function(_, f) {
+      H.IterableMixinWorkaround_forEach(this.get$_filtered(), f);
+    },
+    $indexSet: function(_, index, value) {
+      var t1 = this.get$_filtered();
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      J.replaceWith$1$x(t1[index], value);
+    },
+    clear$0: function(_) {
+      J._clearChildren$0$x(this._childNodes._this);
+    },
+    get$length: function(_) {
+      return this.get$_filtered().length;
+    },
+    $index: function(_, index) {
+      var t1 = this.get$_filtered();
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    get$iterator: function(_) {
+      var t1 = this.get$_filtered();
+      return new H.ListIterator(t1, t1.length, 0, null);
+    }
+  },
+  FilteredElementList__filtered_closure: {
+    "^": "Closure:12;",
+    call$1: function(n) {
+      return !!J.getInterceptor(n).$isElement;
+    }
   }
 }],
 ["", "user_info.dart", , U, {
@@ -8535,20 +8749,26 @@ var $$ = {};
   loadUser_closure: {
     "^": "Closure:12;token_0",
     call$1: function($event) {
-      var t1, t2;
+      var t1, t2, t3;
       t1 = this.token_0.value;
       if (t1 == null || t1.length === 0) {
         window.alert("Please Enter a Token");
         return;
       }
       t2 = $.GitHub_defaultClient.call$0();
-      new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).currentUser$0().then$1(new U.loadUser__closure());
+      t2 = new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).currentUser$0().then$1(new U.loadUser__closure());
+      t1 = $.Zone__current;
+      t3 = P._registerErrorHandler(new U.loadUser__closure0(), t1);
+      t1.toString;
+      t2._addListener$1(H.setRuntimeTypeInfo(new P._Future(0, t1, null, null, null, null, t3, null), [null]));
     }
   },
   loadUser__closure: {
     "^": "Closure:29;",
     call$1: function(user) {
-      var t1 = $.info;
+      var t1;
+      J.get$children$x($.info).clear$0(0);
+      t1 = $.info;
       t1.hidden = false;
       J.insertAdjacentHtml$2$x(t1, "beforeend", "      <b>Name</b>: " + H.S(J.get$name$x(user)) + "\n      ");
       t1 = new U.loadUser___append();
@@ -8569,6 +8789,13 @@ var $$ = {};
     call$2: function($name, value) {
       if (value != null)
         J.insertAdjacentHtml$2$x($.info, "beforeend", "            <br/>\n            <b>" + $name + "</b>: " + H.S(J.toString$0(value)) + "\n          ");
+    }
+  },
+  loadUser__closure0: {
+    "^": "Closure:12;",
+    call$1: function(e) {
+      if (!!J.getInterceptor(e).$isAccessForbidden)
+        window.alert("Invalid Token");
     }
   }
 },
@@ -8634,6 +8861,10 @@ $$ = null;
   _.$isObject = TRUE;
   P.List.$isObject = TRUE;
   P.Object.$isObject = TRUE;
+  _ = W.Element;
+  _.$isElement = TRUE;
+  _.$isNode = TRUE;
+  _.$isObject = TRUE;
   _ = W.NodeValidator;
   _.$isNodeValidator = TRUE;
   _.$isObject = TRUE;
@@ -8658,10 +8889,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = T.GitHub;
   _.$isGitHub = TRUE;
-  _.$isObject = TRUE;
-  _ = W.Element;
-  _.$isElement = TRUE;
-  _.$isNode = TRUE;
   _.$isObject = TRUE;
   _ = W._Html5NodeValidator;
   _.$is_Html5NodeValidator = TRUE;
@@ -8820,6 +9047,12 @@ J.$sub$n = function(receiver, a0) {
 J.$tdiv$n = function(receiver, a0) {
   return J.getInterceptor$n(receiver).$tdiv(receiver, a0);
 };
+J._clearChildren$0$x = function(receiver) {
+  return J.getInterceptor$x(receiver)._clearChildren$0(receiver);
+};
+J._replaceChild$2$x = function(receiver, a0, a1) {
+  return J.getInterceptor$x(receiver)._replaceChild$2(receiver, a0, a1);
+};
 J.addEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).addEventListener$3(receiver, a0, a1, a2);
 };
@@ -8843,6 +9076,9 @@ J.forEach$1$ax = function(receiver, a0) {
 };
 J.get$body$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$body(receiver);
+};
+J.get$children$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$children(receiver);
 };
 J.get$data$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$data(receiver);
@@ -8892,6 +9128,9 @@ J.remove$1$ax = function(receiver, a0) {
 J.removeEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).removeEventListener$3(receiver, a0, a1, a2);
 };
+J.replaceWith$1$x = function(receiver, a0) {
+  return J.getInterceptor$x(receiver).replaceWith$1(receiver, a0);
+};
 J.request$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).request$1(receiver, a0);
 };
@@ -8922,6 +9161,7 @@ C.JSInt_methods = J.JSInt.prototype;
 C.JSNumber_methods = J.JSNumber.prototype;
 C.JSString_methods = J.JSString.prototype;
 C.NativeUint8List_methods = H.NativeUint8List.prototype;
+C.NodeList_methods = W.NodeList.prototype;
 C.PlainJavaScriptObject_methods = J.PlainJavaScriptObject.prototype;
 C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
 C.Window_methods = W.Window.prototype;

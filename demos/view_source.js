@@ -42,6 +42,7 @@ function createEditor(code) {
   editor.setValue(code, 0);
   editor.clearSelection();
   editor.moveCursorTo(0, 0);
+  editor.setReadOnly(true);
 }
 
 function receiveMessage(event) {

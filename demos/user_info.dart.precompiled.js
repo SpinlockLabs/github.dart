@@ -3654,6 +3654,29 @@ var $$ = {};
     },
     $isEfficientLength: true
   },
+  WhereIterable: {
+    "^": "IterableBase;_iterable,_f",
+    get$iterator: function(_) {
+      var t1 = new H.WhereIterator(J.get$iterator$ax(this._iterable), this._f);
+      t1.$builtinTypeInfo = this.$builtinTypeInfo;
+      return t1;
+    }
+  },
+  WhereIterator: {
+    "^": "Iterator;_iterator,_f",
+    _f$1: function(arg0) {
+      return this._f.call$1(arg0);
+    },
+    moveNext$0: function() {
+      for (var t1 = this._iterator; t1.moveNext$0();)
+        if (this._f$1(t1.get$current()) === true)
+          return true;
+      return false;
+    },
+    get$current: function() {
+      return this._iterator.get$current();
+    }
+  },
   IterableMixinWorkaround: {
     "^": "Object;",
     static: {IterableMixinWorkaround_forEach: function(iterable, f) {
@@ -5590,6 +5613,15 @@ var $$ = {};
       return P.IterableBase_iterableToShortString(this, "(", ")");
     }
   },
+  ListBase: {
+    "^": "Object_ListMixin;"
+  },
+  Object_ListMixin: {
+    "^": "Object+ListMixin;",
+    $isList: true,
+    $asList: null,
+    $isEfficientLength: true
+  },
   ListMixin: {
     "^": "Object;",
     get$iterator: function(receiver) {
@@ -5609,6 +5641,9 @@ var $$ = {};
     },
     get$isEmpty: function(receiver) {
       return this.get$length(receiver) === 0;
+    },
+    where$1: function(receiver, test) {
+      return H.setRuntimeTypeInfo(new H.WhereIterable(receiver, test), [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
     },
     toList$1$growable: function(receiver, growable) {
       var result, i, t1;
@@ -5633,7 +5668,8 @@ var $$ = {};
       if (startIndex >= this.get$length(receiver))
         return -1;
       for (i = startIndex; i < this.get$length(receiver); ++i)
-        this.$index(receiver, i);
+        if (J.$eq(this.$index(receiver, i), element))
+          return i;
       return -1;
     },
     indexOf$1: function($receiver, element) {
@@ -6911,6 +6947,9 @@ var $$ = {};
     get$attributes: function(receiver) {
       return new W._ElementAttributeMap(receiver);
     },
+    get$children: function(receiver) {
+      return new W._ChildrenElementList(receiver, receiver.children);
+    },
     toString$0: function(receiver) {
       return receiver.localName;
     },
@@ -7002,6 +7041,7 @@ var $$ = {};
     get$onClick: function(receiver) {
       return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
     },
+    $isElement: true,
     "%": ";Element"
   },
   EmbedElement: {
@@ -7042,6 +7082,33 @@ var $$ = {};
   FormElement: {
     "^": "HtmlElement;length=,name=",
     "%": "HTMLFormElement"
+  },
+  HtmlCollection: {
+    "^": "Interceptor_ListMixin_ImmutableListMixin;",
+    get$length: function(receiver) {
+      return receiver.length;
+    },
+    $index: function(receiver, index) {
+      var t1 = receiver.length;
+      if (index >>> 0 !== index || index >= t1)
+        throw H.wrapException(P.RangeError$range(index, 0, t1));
+      return receiver[index];
+    },
+    $indexSet: function(receiver, index, value) {
+      throw H.wrapException(P.UnsupportedError$("Cannot assign element of immutable List."));
+    },
+    elementAt$1: function(receiver, index) {
+      if (index < 0 || index >= receiver.length)
+        return H.ioore(receiver, index);
+      return receiver[index];
+    },
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true,
+    $isJavaScriptIndexingBehavior: true,
+    "%": "HTMLCollection|HTMLFormControlsCollection|HTMLOptionsCollection"
   },
   HtmlDocument: {
     "^": "Document;body=",
@@ -7098,6 +7165,7 @@ var $$ = {};
   InputElement: {
     "^": "HtmlElement;name=,value=",
     $isInputElement: true,
+    $isElement: true,
     "%": "HTMLInputElement"
   },
   KeygenElement: {
@@ -7171,14 +7239,33 @@ var $$ = {};
       if (t1 != null)
         t1.removeChild(receiver);
     },
+    replaceWith$1: function(receiver, otherNode) {
+      var $parent, exception;
+      try {
+        $parent = receiver.parentNode;
+        J._replaceChild$2$x($parent, otherNode, receiver);
+      } catch (exception) {
+        H.unwrapException(exception);
+      }
+
+      return receiver;
+    },
+    _clearChildren$0: function(receiver) {
+      var t1;
+      for (; t1 = receiver.firstChild, t1 != null;)
+        receiver.removeChild(t1);
+    },
     toString$0: function(receiver) {
       var t1 = receiver.nodeValue;
       return t1 == null ? J.Interceptor.prototype.toString$0.call(this, receiver) : t1;
     },
+    _replaceChild$2: function(receiver, newChild, oldChild) {
+      return receiver.replaceChild(newChild, oldChild);
+    },
     "%": "DocumentFragment|DocumentType|Notation|ShadowRoot;Node"
   },
   NodeList: {
-    "^": "Interceptor_ListMixin_ImmutableListMixin;",
+    "^": "Interceptor_ListMixin_ImmutableListMixin0;",
     get$length: function(receiver) {
       return receiver.length;
     },
@@ -7338,7 +7425,7 @@ var $$ = {};
     "%": "ClientRect|DOMRect"
   },
   _NamedNodeMap: {
-    "^": "Interceptor_ListMixin_ImmutableListMixin0;",
+    "^": "Interceptor_ListMixin_ImmutableListMixin1;",
     get$length: function(receiver) {
       return receiver.length;
     },
@@ -7363,6 +7450,59 @@ var $$ = {};
     $isEfficientLength: true,
     $isJavaScriptIndexingBehavior: true,
     "%": "MozNamedAttrMap|NamedNodeMap"
+  },
+  _ChildrenElementList: {
+    "^": "ListBase;_element,_childElements",
+    get$isEmpty: function(_) {
+      return this._element.firstElementChild == null;
+    },
+    get$length: function(_) {
+      return this._childElements.length;
+    },
+    $index: function(_, index) {
+      var t1 = this._childElements;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    $indexSet: function(_, index, value) {
+      var t1 = this._childElements;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      this._element.replaceChild(value, t1[index]);
+    },
+    get$iterator: function(_) {
+      var t1 = this.toList$0(this);
+      return new H.ListIterator(t1, t1.length, 0, null);
+    },
+    clear$0: function(_) {
+      J._clearChildren$0$x(this._element);
+    },
+    $asListBase: function() {
+      return [W.Element];
+    },
+    $asObject_ListMixin: function() {
+      return [W.Element];
+    },
+    $asList: function() {
+      return [W.Element];
+    }
+  },
+  Interceptor_ListMixin: {
+    "^": "Interceptor+ListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin_ImmutableListMixin: {
+    "^": "Interceptor_ListMixin+ImmutableListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
   },
   HttpRequest_getString_closure: {
     "^": "Closure:12;",
@@ -7395,21 +7535,37 @@ var $$ = {};
         t3.completeError$1(e);
     }
   },
-  Interceptor_ListMixin: {
-    "^": "Interceptor+ListMixin;",
-    $isList: true,
-    $asList: function() {
+  _ChildNodeListLazy: {
+    "^": "ListBase;_this",
+    $indexSet: function(_, index, value) {
+      var t1, t2;
+      t1 = this._this;
+      t2 = t1.childNodes;
+      if (index >>> 0 !== index || index >= t2.length)
+        return H.ioore(t2, index);
+      t1.replaceChild(value, t2[index]);
+    },
+    get$iterator: function(_) {
+      return C.NodeList_methods.get$iterator(this._this.childNodes);
+    },
+    get$length: function(_) {
+      return this._this.childNodes.length;
+    },
+    $index: function(_, index) {
+      var t1 = this._this.childNodes;
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    $asListBase: function() {
       return [W.Node];
     },
-    $isEfficientLength: true
-  },
-  Interceptor_ListMixin_ImmutableListMixin: {
-    "^": "Interceptor_ListMixin+ImmutableListMixin;",
-    $isList: true,
-    $asList: function() {
+    $asObject_ListMixin: function() {
       return [W.Node];
     },
-    $isEfficientLength: true
+    $asList: function() {
+      return [W.Node];
+    }
   },
   Interceptor_ListMixin0: {
     "^": "Interceptor+ListMixin;",
@@ -7421,6 +7577,22 @@ var $$ = {};
   },
   Interceptor_ListMixin_ImmutableListMixin0: {
     "^": "Interceptor_ListMixin0+ImmutableListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin1: {
+    "^": "Interceptor+ListMixin;",
+    $isList: true,
+    $asList: function() {
+      return [W.Node];
+    },
+    $isEfficientLength: true
+  },
+  Interceptor_ListMixin_ImmutableListMixin1: {
+    "^": "Interceptor_ListMixin1+ImmutableListMixin;",
     $isList: true,
     $asList: function() {
       return [W.Node];
@@ -7786,6 +7958,9 @@ var $$ = {};
   "^": "",
   SvgElement: {
     "^": "Element;",
+    get$children: function(receiver) {
+      return H.setRuntimeTypeInfo(new P.FilteredElementList(receiver, new W._ChildNodeListLazy(receiver)), [W.Element]);
+    },
     insertAdjacentHtml$2: function(receiver, where, text) {
       throw H.wrapException(P.UnsupportedError$("Cannot invoke insertAdjacentHtml on SVG."));
     },
@@ -8117,6 +8292,7 @@ var $$ = {};
   },
   AccessForbidden: {
     "^": "GitHubError;message,apiUrl,github,source",
+    $isAccessForbidden: true,
     static: {AccessForbidden$: function(github) {
         return new T.AccessForbidden("Access Forbbidden", null, github, null);
       }}
@@ -8511,6 +8687,44 @@ var $$ = {};
       }
       return e;
     }
+  },
+  FilteredElementList: {
+    "^": "ListBase;_node,_childNodes",
+    get$_filtered: function() {
+      var t1 = this._childNodes;
+      return P.List_List$from(t1.where$1(t1, new P.FilteredElementList__filtered_closure()), true, W.Element);
+    },
+    forEach$1: function(_, f) {
+      H.IterableMixinWorkaround_forEach(this.get$_filtered(), f);
+    },
+    $indexSet: function(_, index, value) {
+      var t1 = this.get$_filtered();
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      J.replaceWith$1$x(t1[index], value);
+    },
+    clear$0: function(_) {
+      J._clearChildren$0$x(this._childNodes._this);
+    },
+    get$length: function(_) {
+      return this.get$_filtered().length;
+    },
+    $index: function(_, index) {
+      var t1 = this.get$_filtered();
+      if (index >>> 0 !== index || index >= t1.length)
+        return H.ioore(t1, index);
+      return t1[index];
+    },
+    get$iterator: function(_) {
+      var t1 = this.get$_filtered();
+      return new H.ListIterator(t1, t1.length, 0, null);
+    }
+  },
+  FilteredElementList__filtered_closure: {
+    "^": "Closure:12;",
+    call$1: function(n) {
+      return !!J.getInterceptor(n).$isElement;
+    }
   }
 }],
 ["", "user_info.dart", , U, {
@@ -8535,20 +8749,26 @@ var $$ = {};
   loadUser_closure: {
     "^": "Closure:12;token_0",
     call$1: function($event) {
-      var t1, t2;
+      var t1, t2, t3;
       t1 = this.token_0.value;
       if (t1 == null || t1.length === 0) {
         window.alert("Please Enter a Token");
         return;
       }
       t2 = $.GitHub_defaultClient.call$0();
-      new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).currentUser$0().then$1(new U.loadUser__closure());
+      t2 = new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2).currentUser$0().then$1(new U.loadUser__closure());
+      t1 = $.Zone__current;
+      t3 = P._registerErrorHandler(new U.loadUser__closure0(), t1);
+      t1.toString;
+      t2._addListener$1(H.setRuntimeTypeInfo(new P._Future(0, t1, null, null, null, null, t3, null), [null]));
     }
   },
   loadUser__closure: {
     "^": "Closure:29;",
     call$1: function(user) {
-      var t1 = $.info;
+      var t1;
+      J.get$children$x($.info).clear$0(0);
+      t1 = $.info;
       t1.hidden = false;
       J.insertAdjacentHtml$2$x(t1, "beforeend", "      <b>Name</b>: " + H.S(J.get$name$x(user)) + "\n      ");
       t1 = new U.loadUser___append();
@@ -8569,6 +8789,13 @@ var $$ = {};
     call$2: function($name, value) {
       if (value != null)
         J.insertAdjacentHtml$2$x($.info, "beforeend", "            <br/>\n            <b>" + $name + "</b>: " + H.S(J.toString$0(value)) + "\n          ");
+    }
+  },
+  loadUser__closure0: {
+    "^": "Closure:12;",
+    call$1: function(e) {
+      if (!!J.getInterceptor(e).$isAccessForbidden)
+        window.alert("Invalid Token");
     }
   }
 },
@@ -8634,6 +8861,10 @@ $$ = null;
   _.$isObject = TRUE;
   P.List.$isObject = TRUE;
   P.Object.$isObject = TRUE;
+  _ = W.Element;
+  _.$isElement = TRUE;
+  _.$isNode = TRUE;
+  _.$isObject = TRUE;
   _ = W.NodeValidator;
   _.$isNodeValidator = TRUE;
   _.$isObject = TRUE;
@@ -8658,10 +8889,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = T.GitHub;
   _.$isGitHub = TRUE;
-  _.$isObject = TRUE;
-  _ = W.Element;
-  _.$isElement = TRUE;
-  _.$isNode = TRUE;
   _.$isObject = TRUE;
   _ = W._Html5NodeValidator;
   _.$is_Html5NodeValidator = TRUE;
@@ -8820,6 +9047,12 @@ J.$sub$n = function(receiver, a0) {
 J.$tdiv$n = function(receiver, a0) {
   return J.getInterceptor$n(receiver).$tdiv(receiver, a0);
 };
+J._clearChildren$0$x = function(receiver) {
+  return J.getInterceptor$x(receiver)._clearChildren$0(receiver);
+};
+J._replaceChild$2$x = function(receiver, a0, a1) {
+  return J.getInterceptor$x(receiver)._replaceChild$2(receiver, a0, a1);
+};
 J.addEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).addEventListener$3(receiver, a0, a1, a2);
 };
@@ -8843,6 +9076,9 @@ J.forEach$1$ax = function(receiver, a0) {
 };
 J.get$body$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$body(receiver);
+};
+J.get$children$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$children(receiver);
 };
 J.get$data$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$data(receiver);
@@ -8892,6 +9128,9 @@ J.remove$1$ax = function(receiver, a0) {
 J.removeEventListener$3$x = function(receiver, a0, a1, a2) {
   return J.getInterceptor$x(receiver).removeEventListener$3(receiver, a0, a1, a2);
 };
+J.replaceWith$1$x = function(receiver, a0) {
+  return J.getInterceptor$x(receiver).replaceWith$1(receiver, a0);
+};
 J.request$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).request$1(receiver, a0);
 };
@@ -8922,6 +9161,7 @@ C.JSInt_methods = J.JSInt.prototype;
 C.JSNumber_methods = J.JSNumber.prototype;
 C.JSString_methods = J.JSString.prototype;
 C.NativeUint8List_methods = H.NativeUint8List.prototype;
+C.NodeList_methods = W.NodeList.prototype;
 C.PlainJavaScriptObject_methods = J.PlainJavaScriptObject.prototype;
 C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
 C.Window_methods = W.Window.prototype;
@@ -10089,6 +10329,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   HeadingElement.prototype = $desc;
+  function HtmlCollection() {
+  }
+  HtmlCollection.builtin$cls = "HtmlCollection";
+  if (!"name" in HtmlCollection)
+    HtmlCollection.name = "HtmlCollection";
+  $desc = $collectedClasses.HtmlCollection;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HtmlCollection.prototype = $desc;
   function HtmlDocument() {
   }
   HtmlDocument.builtin$cls = "HtmlDocument";
@@ -10101,6 +10350,15 @@ function dart_precompiled($collectedClasses) {
   HtmlDocument.prototype.get$body = function(receiver) {
     return receiver.body;
   };
+  function HtmlFormControlsCollection() {
+  }
+  HtmlFormControlsCollection.builtin$cls = "HtmlFormControlsCollection";
+  if (!"name" in HtmlFormControlsCollection)
+    HtmlFormControlsCollection.name = "HtmlFormControlsCollection";
+  $desc = $collectedClasses.HtmlFormControlsCollection;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HtmlFormControlsCollection.prototype = $desc;
   function HtmlHtmlElement() {
   }
   HtmlHtmlElement.builtin$cls = "HtmlHtmlElement";
@@ -10110,6 +10368,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   HtmlHtmlElement.prototype = $desc;
+  function HtmlOptionsCollection() {
+  }
+  HtmlOptionsCollection.builtin$cls = "HtmlOptionsCollection";
+  if (!"name" in HtmlOptionsCollection)
+    HtmlOptionsCollection.name = "HtmlOptionsCollection";
+  $desc = $collectedClasses.HtmlOptionsCollection;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HtmlOptionsCollection.prototype = $desc;
   function HttpRequest() {
   }
   HttpRequest.builtin$cls = "HttpRequest";
@@ -13100,6 +13367,28 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   MappedListIterable.prototype = $desc;
+  function WhereIterable(_iterable, _f) {
+    this._iterable = _iterable;
+    this._f = _f;
+  }
+  WhereIterable.builtin$cls = "WhereIterable";
+  if (!"name" in WhereIterable)
+    WhereIterable.name = "WhereIterable";
+  $desc = $collectedClasses.WhereIterable;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  WhereIterable.prototype = $desc;
+  function WhereIterator(_iterator, _f) {
+    this._iterator = _iterator;
+    this._f = _f;
+  }
+  WhereIterator.builtin$cls = "WhereIterator";
+  if (!"name" in WhereIterator)
+    WhereIterator.name = "WhereIterator";
+  $desc = $collectedClasses.WhereIterator;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  WhereIterator.prototype = $desc;
   function IterableMixinWorkaround() {
   }
   IterableMixinWorkaround.builtin$cls = "IterableMixinWorkaround";
@@ -13799,6 +14088,24 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   IterableBase.prototype = $desc;
+  function ListBase() {
+  }
+  ListBase.builtin$cls = "ListBase";
+  if (!"name" in ListBase)
+    ListBase.name = "ListBase";
+  $desc = $collectedClasses.ListBase;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  ListBase.prototype = $desc;
+  function Object_ListMixin() {
+  }
+  Object_ListMixin.builtin$cls = "Object_ListMixin";
+  if (!"name" in Object_ListMixin)
+    Object_ListMixin.name = "Object_ListMixin";
+  $desc = $collectedClasses.Object_ListMixin;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Object_ListMixin.prototype = $desc;
   function ListMixin() {
   }
   ListMixin.builtin$cls = "ListMixin";
@@ -14326,6 +14633,35 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Uri__uriEncode_byteToHex.prototype = $desc;
+  function _ChildrenElementList(_element, _childElements) {
+    this._element = _element;
+    this._childElements = _childElements;
+  }
+  _ChildrenElementList.builtin$cls = "_ChildrenElementList";
+  if (!"name" in _ChildrenElementList)
+    _ChildrenElementList.name = "_ChildrenElementList";
+  $desc = $collectedClasses._ChildrenElementList;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  _ChildrenElementList.prototype = $desc;
+  function Interceptor_ListMixin() {
+  }
+  Interceptor_ListMixin.builtin$cls = "Interceptor_ListMixin";
+  if (!"name" in Interceptor_ListMixin)
+    Interceptor_ListMixin.name = "Interceptor_ListMixin";
+  $desc = $collectedClasses.Interceptor_ListMixin;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Interceptor_ListMixin.prototype = $desc;
+  function Interceptor_ListMixin_ImmutableListMixin() {
+  }
+  Interceptor_ListMixin_ImmutableListMixin.builtin$cls = "Interceptor_ListMixin_ImmutableListMixin";
+  if (!"name" in Interceptor_ListMixin_ImmutableListMixin)
+    Interceptor_ListMixin_ImmutableListMixin.name = "Interceptor_ListMixin_ImmutableListMixin";
+  $desc = $collectedClasses.Interceptor_ListMixin_ImmutableListMixin;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Interceptor_ListMixin_ImmutableListMixin.prototype = $desc;
   function HttpRequest_getString_closure() {
   }
   HttpRequest_getString_closure.builtin$cls = "HttpRequest_getString_closure";
@@ -14356,24 +14692,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   HttpRequest_request_closure.prototype = $desc;
-  function Interceptor_ListMixin() {
+  function _ChildNodeListLazy(_this) {
+    this._this = _this;
   }
-  Interceptor_ListMixin.builtin$cls = "Interceptor_ListMixin";
-  if (!"name" in Interceptor_ListMixin)
-    Interceptor_ListMixin.name = "Interceptor_ListMixin";
-  $desc = $collectedClasses.Interceptor_ListMixin;
+  _ChildNodeListLazy.builtin$cls = "_ChildNodeListLazy";
+  if (!"name" in _ChildNodeListLazy)
+    _ChildNodeListLazy.name = "_ChildNodeListLazy";
+  $desc = $collectedClasses._ChildNodeListLazy;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  Interceptor_ListMixin.prototype = $desc;
-  function Interceptor_ListMixin_ImmutableListMixin() {
-  }
-  Interceptor_ListMixin_ImmutableListMixin.builtin$cls = "Interceptor_ListMixin_ImmutableListMixin";
-  if (!"name" in Interceptor_ListMixin_ImmutableListMixin)
-    Interceptor_ListMixin_ImmutableListMixin.name = "Interceptor_ListMixin_ImmutableListMixin";
-  $desc = $collectedClasses.Interceptor_ListMixin_ImmutableListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Interceptor_ListMixin_ImmutableListMixin.prototype = $desc;
+  _ChildNodeListLazy.prototype = $desc;
   function Interceptor_ListMixin0() {
   }
   Interceptor_ListMixin0.builtin$cls = "Interceptor_ListMixin0";
@@ -14392,6 +14720,24 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Interceptor_ListMixin_ImmutableListMixin0.prototype = $desc;
+  function Interceptor_ListMixin1() {
+  }
+  Interceptor_ListMixin1.builtin$cls = "Interceptor_ListMixin1";
+  if (!"name" in Interceptor_ListMixin1)
+    Interceptor_ListMixin1.name = "Interceptor_ListMixin1";
+  $desc = $collectedClasses.Interceptor_ListMixin1;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Interceptor_ListMixin1.prototype = $desc;
+  function Interceptor_ListMixin_ImmutableListMixin1() {
+  }
+  Interceptor_ListMixin_ImmutableListMixin1.builtin$cls = "Interceptor_ListMixin_ImmutableListMixin1";
+  if (!"name" in Interceptor_ListMixin_ImmutableListMixin1)
+    Interceptor_ListMixin_ImmutableListMixin1.name = "Interceptor_ListMixin_ImmutableListMixin1";
+  $desc = $collectedClasses.Interceptor_ListMixin_ImmutableListMixin1;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Interceptor_ListMixin_ImmutableListMixin1.prototype = $desc;
   function _AttributeMap() {
   }
   _AttributeMap.builtin$cls = "_AttributeMap";
@@ -15077,6 +15423,26 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   convertNativeToDart_AcceptStructuredClone_walk.prototype = $desc;
+  function FilteredElementList(_node, _childNodes) {
+    this._node = _node;
+    this._childNodes = _childNodes;
+  }
+  FilteredElementList.builtin$cls = "FilteredElementList";
+  if (!"name" in FilteredElementList)
+    FilteredElementList.name = "FilteredElementList";
+  $desc = $collectedClasses.FilteredElementList;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  FilteredElementList.prototype = $desc;
+  function FilteredElementList__filtered_closure() {
+  }
+  FilteredElementList__filtered_closure.builtin$cls = "FilteredElementList__filtered_closure";
+  if (!"name" in FilteredElementList__filtered_closure)
+    FilteredElementList__filtered_closure.name = "FilteredElementList__filtered_closure";
+  $desc = $collectedClasses.FilteredElementList__filtered_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  FilteredElementList__filtered_closure.prototype = $desc;
   function main_closure() {
   }
   main_closure.builtin$cls = "main_closure";
@@ -15114,6 +15480,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   loadUser___append.prototype = $desc;
+  function loadUser__closure0() {
+  }
+  loadUser__closure0.builtin$cls = "loadUser__closure0";
+  if (!"name" in loadUser__closure0)
+    loadUser__closure0.name = "loadUser__closure0";
+  $desc = $collectedClasses.loadUser__closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  loadUser__closure0.prototype = $desc;
   function buildQueryString_closure() {
   }
   buildQueryString_closure.builtin$cls = "buildQueryString_closure";
@@ -15123,5 +15498,5 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   buildQueryString_closure.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, Range, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init__closure0, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, IterableMixinWorkaround, FixedLengthListMixin, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _EventSink, _DelayedEvent, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri__uriEncode_byteToHex, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _AttributeMap, _ElementAttributeMap, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, FixedSizeListIterator, _DOMWindowCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHubError, NotFound, AccessForbidden, UnknownError, GitHub, GitHub_currentUser_closure, GitHub_getJSON_closure1, GitHub_getJSON_closure, GitHub_getJSON_closure0, GitHub_request_closure, GitHub_request_closure0, RepositorySlug, RepositoryStatus, User, UserPlan, CurrentUser, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, main_closure, loadUser_closure, loadUser__closure, loadUser___append, buildQueryString_closure];
+  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlCollection, HtmlDocument, HtmlFormControlsCollection, HtmlHtmlElement, HtmlOptionsCollection, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, Range, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, init_closure, init_closure0, init__closure, init__closure0, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _EventSink, _DelayedEvent, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, NoSuchMethodError_toString_closure, bool, DateTime, DateTime_parse_parseIntOrZero, DateTime_parse_parseDoubleOrZero, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri__uriEncode_byteToHex, _ChildrenElementList, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, _ChildNodeListLazy, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, Interceptor_ListMixin1, Interceptor_ListMixin_ImmutableListMixin1, _AttributeMap, _ElementAttributeMap, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, FixedSizeListIterator, _DOMWindowCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHubError, NotFound, AccessForbidden, UnknownError, GitHub, GitHub_currentUser_closure, GitHub_getJSON_closure1, GitHub_getJSON_closure, GitHub_getJSON_closure0, GitHub_request_closure, GitHub_request_closure0, RepositorySlug, RepositoryStatus, User, UserPlan, CurrentUser, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, FilteredElementList, FilteredElementList__filtered_closure, main_closure, loadUser_closure, loadUser__closure, loadUser___append, loadUser__closure0, buildQueryString_closure];
 }

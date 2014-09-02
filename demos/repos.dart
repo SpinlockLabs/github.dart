@@ -13,7 +13,8 @@ Map<String, Comparator<Repository>> sorts = {
   "stars": (Repository a, Repository b) => b.stargazersCount.compareTo(a.stargazersCount),
   "forks": (Repository a, Repository b) => b.forksCount.compareTo(a.forksCount),
   "created": (Repository a, Repository b) => b.createdAt.compareTo(a.createdAt),
-  "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt)
+  "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt),
+  "size": (Repository a, Repository b) => b.size.compareTo(a.size)
 };
 
 void main() {
@@ -36,72 +37,25 @@ void main() {
     loadRepos();
   });
 
-  querySelector("#sort-stars").onClick.listen((event) {
-    loadRepos(sorts['stars']);
-  });
-
-  querySelector("#sort-forks").onClick.listen((event) {
-    loadRepos(sorts['forks']);
-  });
-
-  querySelector("#sort-created").onClick.listen((event) {
-    loadRepos(sorts['created']);
-  });
-  
-  querySelector("#sort-pushed").onClick.listen((event) {
-    loadRepos(sorts['pushed']);
+  sorts.keys.forEach((name) {
+    querySelector("#sort-${name}").onClick.listen((event) {
+      if (_reposCache == null) {
+        loadRepos(sorts[name]);
+      }
+      updateRepos(_reposCache, sorts[name]);
+    });
   });
 
   init("repos.dart");
 }
 
-void loadRepos([int compare(Repository a, Repository b)]) {
+List<Repository> _reposCache;
 
-  var title = querySelector("#title");
-  if (title.text.contains("(")) {
-    title.replaceWith(new HeadingElement.h2()
-        ..text = "GitHub for Dart - Repositories"
-        ..id = "title");
-  }
-
+void updateRepos(List<Repository> repos, [int compare(Repository a, Repository b)]) {
   document.querySelector("#repos").children.clear();
-
-  var user = "DirectMyFile";
-
-  var url = window.location.href;
-  var showForks = true;
-
-  if (url.contains("?")) {
-    var queryString = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
-    if (queryString.containsKey("user")) {
-      user = queryString['user'];
-    }
-
-    if (queryString.containsKey("forks")) {
-      if (["1", "true", "yes", "sure"].contains(queryString['forks'])) {
-        showForks = true;
-      } else {
-        showForks = false;
-      }
-    }
-
-    if (queryString.containsKey("sort") && compare == null) {
-      var sorter = queryString['sort'];
-      if (sorts.containsKey(sorter)) {
-        compare = sorts[sorter];
-      }
-    }
-  }
-
-  if (compare == null) {
-    compare = (a, b) => a.name.compareTo(b.name);
-  }
-
-  github.userRepositories(user).toList().then((repos) {
-    repos.sort(compare);
-    
-    for (var repo in repos) {
-      $repos.appendHtml("""
+  repos.sort(compare);
+  for (var repo in repos) {
+    $repos.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.url}">${repo.name}</a></h2>
@@ -115,8 +69,54 @@ void loadRepos([int compare(Repository a, Repository b)]) {
           <b>Forks</b>: ${repo.forksCount}
           <br/>
           <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
+          <br/>
+          <b>Size</b>: ${repo.size} bytes
+          <p></p>
         </div>
       """);
+  }
+}
+
+void loadRepos([int compare(Repository a, Repository b)]) {
+
+  var title = querySelector("#title");
+  if (title.text.contains("(")) {
+    title.replaceWith(new HeadingElement.h2()
+        ..text = "GitHub for Dart - Repositories"
+        ..id = "title");
+  }
+
+  var user = "DirectMyFile";
+
+  var showForks = true;
+
+  var params = queryString;
+  
+  if (params.containsKey("user")) {
+    user = params['user'];
+  }
+
+  if (params.containsKey("forks")) {
+    if (["1", "true", "yes", "sure"].contains(params['forks'])) {
+      showForks = true;
+    } else {
+      showForks = false;
     }
+  }
+
+  if (params.containsKey("sort") && compare == null) {
+    var sorter = params['sort'];
+    if (sorts.containsKey(sorter)) {
+      compare = sorts[sorter];
+    }
+  }
+
+  if (compare == null) {
+    compare = (a, b) => a.name.compareTo(b.name);
+  }
+
+  github.userRepositories(user).toList().then((repos) {
+    _reposCache = repos;
+    updateRepos(repos, compare);
   });
 }

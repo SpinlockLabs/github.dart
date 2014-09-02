@@ -3154,6 +3154,13 @@ var $$ = {};
     t1 = J.get$onClick$x(document.querySelector("#view-source"));
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
+  queryString: function() {
+    var url = window.location.href;
+    if (J.getInterceptor$asx(url).contains$1(url, "?"))
+      return P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
+    else
+      return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
+  },
   init_closure: {
     "^": "Closure:9;onReady_1,stopwatch_2",
     call$1: function($event) {
@@ -7760,13 +7767,9 @@ var $$ = {};
     R.init("emoji.dart", new U.main_closure());
   }, "call$0", "main$closure", 0, 0, 2],
   loadEmojis: function() {
-    var url, params, token, t1;
-    url = window.location.href;
-    if (J.getInterceptor$asx(url).contains$1(url, "?")) {
-      params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
-      token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    } else
-      token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
+    var params, token, t1;
+    params = R.queryString();
+    token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
     t1 = $.GitHub_defaultClient.call$0();
     t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
     $.github = t1;

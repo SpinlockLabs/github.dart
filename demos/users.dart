@@ -11,9 +11,8 @@ DivElement $users;
 var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
 
 void main() {
-  initGitHub();
   init("users.dart", onReady: () {
-    github = new GitHub(auth: new Authentication.withToken(token));
+    github = createGitHubClient(auth: new Authentication.withToken(token));
     $users = querySelector("#users");
     loadUsers();
   });
@@ -26,12 +25,16 @@ void loadUsers() {
   github.users(pages: 2).take(12).listen((User baseUser) {
     github.user(baseUser.login).then((user) {
       var m = new DivElement();
-      m.classes.add("box");
-      m.classes.add("user");
-      m.classes.add("middle");
-      m.classes.add("center");
       
-      var h = new DivElement()..classes.add("middle");
+      m.classes.addAll([
+        "box",
+        "user",
+        "middle",
+        "center"
+      ]);
+      
+      var h = new DivElement()
+        ..classes.add("middle");
       
       for (int i = 1; i <= 2; i++) {
         h.append(new BRElement());
@@ -40,9 +43,10 @@ void loadUsers() {
       h.append(new ImageElement(src: user.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
       var buff = new StringBuffer();
       
-      buff.writeln("Username: <a href=\"${baseUser.url}\">${user.login}</a>");
-      buff.writeln("Created: ${friendlyDateTime(user.createdAt)}");
-      buff.writeln("Updated: ${friendlyDateTime(user.updatedAt)}");
+      buff
+          ..writeln("Username: <a href=\"${baseUser.url}\">${user.login}</a>")
+          ..writeln("Created: ${friendlyDateTime(user.createdAt)}")
+          ..writeln("Updated: ${friendlyDateTime(user.updatedAt)}");
       
       if (user.company != null && user.company.isNotEmpty) {
         buff.writeln("Company: ${user.company}");
@@ -54,7 +58,7 @@ void loadUsers() {
       
       m.append(h);
       
-      $users.querySelector("#${column}").append(m);
+      $users.querySelector("#${column}");
       
       if (column == "left") {
         column = "right";

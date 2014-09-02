@@ -3405,6 +3405,13 @@ var $$ = {};
     t1 = J.get$onClick$x(document.querySelector("#view-source"));
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
+  queryString: function() {
+    var url = window.location.href;
+    if (J.getInterceptor$asx(url).contains$1(url, "?"))
+      return P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
+    else
+      return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
+  },
   init_closure0: {
     "^": "Closure:16;onReady_1,stopwatch_2",
     call$1: function($event) {
@@ -8359,7 +8366,7 @@ var $$ = {};
     "%": "HTMLBaseElement"
   },
   Blob: {
-    "^": "Interceptor;",
+    "^": "Interceptor;size=",
     $isBlob: true,
     "%": ";Blob"
   },
@@ -8624,7 +8631,7 @@ var $$ = {};
     "%": "HTMLIFrameElement"
   },
   InputElement: {
-    "^": "HtmlElement;name=,value=",
+    "^": "HtmlElement;name=,size=,value=",
     $isElement: true,
     "%": "HTMLInputElement"
   },
@@ -8787,7 +8794,7 @@ var $$ = {};
     "%": "ResourceProgressEvent"
   },
   SelectElement: {
-    "^": "HtmlElement;length=,name=,value=",
+    "^": "HtmlElement;length=,name=,size=,value=",
     "%": "HTMLSelectElement"
   },
   SpeechRecognitionError: {
@@ -9914,7 +9921,7 @@ var $$ = {};
     }
   },
   Repository: {
-    "^": "Object;github,name>,id,fullName,owner,$private,isFork,url>,description<,cloneUrls,homepage,size,stargazersCount<,watchersCount,language>,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt<,json",
+    "^": "Object;github,name>,id,fullName,owner,$private,isFork,url>,description<,cloneUrls,homepage,size>,stargazersCount<,watchersCount,language>,hasIssues,hasWiki,hasDownloads,forksCount<,openIssuesCount,defaultBranch,subscribersCount,networkCount,createdAt<,pushedAt<,json",
     static: {Repository_fromJSON: [function(github, input, instance) {
         var t1, t2;
         if (input == null)
@@ -10323,18 +10330,107 @@ var $$ = {};
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure(stopwatch)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
     t1 = J.get$onClick$x(document.querySelector("#reload"));
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure0()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
-    t1 = J.get$onClick$x(document.querySelector("#sort-stars"));
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure1()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
-    t1 = J.get$onClick$x(document.querySelector("#sort-forks"));
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure2()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
-    t1 = J.get$onClick$x(document.querySelector("#sort-created"));
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure3()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
-    t1 = J.get$onClick$x(document.querySelector("#sort-pushed"));
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure4()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+    $.get$sorts().get$keys().forEach$1(0, new D.main_closure1());
     R.init("repos.dart", null);
   }, "call$0", "main$closure", 0, 0, 3],
+  updateRepos: function(repos, compare) {
+    var t1, repo, t2, t3, t4, t5, t6, t7, suffix, t8;
+    J.get$children$x(document.querySelector("#repos")).clear$0(0);
+    t1 = J.getInterceptor$ax(repos);
+    t1.sort$1(repos, compare);
+    for (t1 = t1.get$iterator(repos); t1.moveNext$0();) {
+      repo = t1.get$current();
+      t2 = $.$$repos;
+      t3 = J.getInterceptor$x(repo);
+      t4 = "        <div class=\"repo\" id=\"repo_" + H.S(t3.get$name(repo)) + "\">\n          <div class=\"line\"></div>\n          <h2><a href=\"" + H.S(t3.get$url(repo)) + "\">" + H.S(t3.get$name(repo)) + "</a></h2>\n          ";
+      t4 = t4 + (!J.$eq(repo.get$description(), "") && repo.get$description() != null ? "<b>Description</b>: " + H.S(repo.get$description()) + "<br/>" : "") + "\n          <b>Language</b>: ";
+      t4 = t4 + H.S(t3.get$language(repo) != null ? repo.language : "Unknown") + "\n          <br/>\n          <b>Default Branch</b>: " + H.S(repo.defaultBranch) + "\n          <br/>\n          <b>Stars</b>: " + H.S(repo.stargazersCount) + "\n          <br/>\n          <b>Forks</b>: " + H.S(repo.forksCount) + "\n          <br/>\n          <b>Created</b>: ";
+      t5 = repo.createdAt;
+      t3 = t5.isUtc;
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getUTCMonth() + 1;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getMonth() + 1;
+      }
+      t6 = A.monthName(t6) + " ";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t7 = t5.date.getUTCDate() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t7 = t5.date.getDate() + 0;
+      }
+      t7 = t6 + t7;
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getUTCDate() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getDate() + 0;
+      }
+      t6 = t7 + A.friendlyDaySuffix(t6) + ", ";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t7 = t5.date.getUTCFullYear() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t7 = t5.date.getFullYear() + 0;
+      }
+      t7 = t6 + t7 + " at ";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getUTCHours() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getHours() + 0;
+      }
+      suffix = t6 >= 12 ? "PM" : "AM";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getUTCHours() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t6 = t5.date.getHours() + 0;
+      }
+      t6 = "" + (C.JSInt_methods.$mod(t6 + 11, 12) + 1) + ":";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t8 = t5.date.getUTCMinutes() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t8 = t5.date.getMinutes() + 0;
+      }
+      t8 = t6 + t8 + ":";
+      if (t3) {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t3 = t5.date.getUTCSeconds() + 0;
+      } else {
+        if (t5.date === void 0)
+          t5.date = new Date(t5.millisecondsSinceEpoch);
+        t3 = t5.date.getSeconds() + 0;
+      }
+      J.insertAdjacentHtml$2$x(t2, "beforeend", t4 + (t7 + (t8 + A.friendlySecond(t3) + " " + suffix + " (in " + H.S(t5.get$timeZoneName()) + ")")) + "\n          <br/>\n          <b>Size</b>: " + H.S(repo.size) + " bytes\n          <p></p>\n        </div>\n      ");
+    }
+  },
   loadRepos: function(compare) {
-    var t1, title, t2, url, queryString, user, sorter, params;
+    var t1, title, t2, params, user, sorter;
     t1 = {};
     t1.compare_0 = compare;
     title = document.querySelector("#title");
@@ -10344,21 +10440,16 @@ var $$ = {};
       t2.id = "title";
       J.replaceWith$1$x(title, t2);
     }
-    J.get$children$x(document.querySelector("#repos")).clear$0(0);
-    url = window.location.href;
-    if (J.getInterceptor$asx(url).contains$1(url, "?")) {
-      queryString = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
-      user = queryString.containsKey$1("user") === true ? queryString.$index(0, "user") : "DirectMyFile";
-      if (queryString.containsKey$1("forks") === true)
-        if (C.JSArray_methods.contains$1(["1", "true", "yes", "sure"], queryString.$index(0, "forks")))
-          ;
-      if (queryString.containsKey$1("sort") === true && t1.compare_0 == null) {
-        sorter = queryString.$index(0, "sort");
-        if ($.get$sorts().containsKey$1(sorter))
-          t1.compare_0 = $.get$sorts().$index(0, sorter);
-      }
-    } else
-      user = "DirectMyFile";
+    params = R.queryString();
+    user = params.containsKey$1("user") === true ? params.$index(0, "user") : "DirectMyFile";
+    if (params.containsKey$1("forks") === true)
+      if (C.JSArray_methods.contains$1(["1", "true", "yes", "sure"], params.$index(0, "forks")))
+        ;
+    if (params.containsKey$1("sort") === true && t1.compare_0 == null) {
+      sorter = params.$index(0, "sort");
+      if ($.get$sorts().containsKey$1(sorter))
+        t1.compare_0 = $.get$sorts().$index(0, sorter);
+    }
     if (t1.compare_0 == null)
       t1.compare_0 = new D.loadRepos_closure();
     t2 = $.github;
@@ -10396,6 +10487,12 @@ var $$ = {};
       return C.JSNumber_methods.compareTo$1(t1.millisecondsSinceEpoch, t2.millisecondsSinceEpoch);
     }
   },
+  closure3: {
+    "^": "Closure:34;",
+    call$2: function(a, b) {
+      return J.compareTo$1$ns(J.get$size$x(b), J.get$size$x(a));
+    }
+  },
   main_closure: {
     "^": "Closure:16;stopwatch_0",
     call$1: function($event) {
@@ -10416,26 +10513,18 @@ var $$ = {};
   },
   main_closure1: {
     "^": "Closure:16;",
-    call$1: function($event) {
-      D.loadRepos($.get$sorts().$index(0, "stars"));
+    call$1: function($name) {
+      var t1 = "#sort-" + H.S($name);
+      t1 = J.get$onClick$x(document.querySelector(t1));
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main__closure($name)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
     }
   },
-  main_closure2: {
-    "^": "Closure:16;",
+  main__closure: {
+    "^": "Closure:16;name_1",
     call$1: function($event) {
-      D.loadRepos($.get$sorts().$index(0, "forks"));
-    }
-  },
-  main_closure3: {
-    "^": "Closure:16;",
-    call$1: function($event) {
-      D.loadRepos($.get$sorts().$index(0, "created"));
-    }
-  },
-  main_closure4: {
-    "^": "Closure:16;",
-    call$1: function($event) {
-      D.loadRepos($.get$sorts().$index(0, "pushed"));
+      if ($._reposCache == null)
+        D.loadRepos($.get$sorts().$index(0, this.name_1));
+      D.updateRepos($._reposCache, $.get$sorts().$index(0, this.name_1));
     }
   },
   loadRepos_closure: {
@@ -10447,99 +10536,8 @@ var $$ = {};
   loadRepos_closure0: {
     "^": "Closure:16;box_0",
     call$1: function(repos) {
-      var t1, repo, t2, t3, t4, t5, t6, t7, suffix, t8;
-      t1 = J.getInterceptor$ax(repos);
-      t1.sort$1(repos, this.box_0.compare_0);
-      for (t1 = t1.get$iterator(repos); t1.moveNext$0();) {
-        repo = t1.get$current();
-        t2 = $.$$repos;
-        t3 = J.getInterceptor$x(repo);
-        t4 = "        <div class=\"repo\" id=\"repo_" + H.S(t3.get$name(repo)) + "\">\n          <div class=\"line\"></div>\n          <h2><a href=\"" + H.S(t3.get$url(repo)) + "\">" + H.S(t3.get$name(repo)) + "</a></h2>\n          ";
-        t4 = t4 + (!J.$eq(repo.get$description(), "") && repo.get$description() != null ? "<b>Description</b>: " + H.S(repo.get$description()) + "<br/>" : "") + "\n          <b>Language</b>: ";
-        t4 = t4 + H.S(t3.get$language(repo) != null ? repo.language : "Unknown") + "\n          <br/>\n          <b>Default Branch</b>: " + H.S(repo.defaultBranch) + "\n          <br/>\n          <b>Stars</b>: " + H.S(repo.stargazersCount) + "\n          <br/>\n          <b>Forks</b>: " + H.S(repo.forksCount) + "\n          <br/>\n          <b>Created</b>: ";
-        t5 = repo.createdAt;
-        t3 = t5.isUtc;
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getUTCMonth() + 1;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getMonth() + 1;
-        }
-        t6 = A.monthName(t6) + " ";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t7 = t5.date.getUTCDate() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t7 = t5.date.getDate() + 0;
-        }
-        t7 = t6 + t7;
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getUTCDate() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getDate() + 0;
-        }
-        t6 = t7 + A.friendlyDaySuffix(t6) + ", ";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t7 = t5.date.getUTCFullYear() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t7 = t5.date.getFullYear() + 0;
-        }
-        t7 = t6 + t7 + " at ";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getUTCHours() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getHours() + 0;
-        }
-        suffix = t6 >= 12 ? "PM" : "AM";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getUTCHours() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t6 = t5.date.getHours() + 0;
-        }
-        t6 = "" + (C.JSInt_methods.$mod(t6 + 11, 12) + 1) + ":";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t8 = t5.date.getUTCMinutes() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t8 = t5.date.getMinutes() + 0;
-        }
-        t8 = t6 + t8 + ":";
-        if (t3) {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t3 = t5.date.getUTCSeconds() + 0;
-        } else {
-          if (t5.date === void 0)
-            t5.date = new Date(t5.millisecondsSinceEpoch);
-          t3 = t5.date.getSeconds() + 0;
-        }
-        J.insertAdjacentHtml$2$x(t2, "beforeend", t4 + (t7 + (t8 + A.friendlySecond(t3) + " " + suffix + " (in " + H.S(t5.get$timeZoneName()) + ")")) + "\n        </div>\n      ");
-      }
+      $._reposCache = repos;
+      D.updateRepos(repos, this.box_0.compare_0);
     }
   }
 },
@@ -10633,19 +10631,19 @@ $$ = null;
   _.$isComparable = TRUE;
   _.$asComparable = [P.Duration];
   _.$isObject = TRUE;
-  P.List.$isObject = TRUE;
-  P.Object.$isObject = TRUE;
-  P.Map.$isObject = TRUE;
   _ = W.Element;
   _.$isElement = TRUE;
   _.$isNode = TRUE;
   _.$isObject = TRUE;
+  P.List.$isObject = TRUE;
+  P.Object.$isObject = TRUE;
+  P.Map.$isObject = TRUE;
   W.HttpRequest.$isObject = TRUE;
-  _ = T.Response;
-  _.$isResponse = TRUE;
-  _.$isObject = TRUE;
   _ = W.NodeValidator;
   _.$isNodeValidator = TRUE;
+  _.$isObject = TRUE;
+  _ = T.Response;
+  _.$isResponse = TRUE;
   _.$isObject = TRUE;
   _ = P.bool;
   _.$isbool = TRUE;
@@ -10665,15 +10663,15 @@ $$ = null;
   _ = P.Future;
   _.$isFuture = TRUE;
   _.$isObject = TRUE;
-  _ = T.GitHub;
-  _.$isGitHub = TRUE;
-  _.$isObject = TRUE;
   _ = W._Html5NodeValidator;
   _.$is_Html5NodeValidator = TRUE;
   _.$isNodeValidator = TRUE;
   _.$isObject = TRUE;
   _ = P.Comparable;
   _.$isComparable = TRUE;
+  _.$isObject = TRUE;
+  _ = T.GitHub;
+  _.$isGitHub = TRUE;
   _.$isObject = TRUE;
   _ = P._EventSink;
   _.$is_EventSink = TRUE;
@@ -10897,6 +10895,9 @@ J.get$onClick$x = function(receiver) {
 };
 J.get$responseText$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$responseText(receiver);
+};
+J.get$size$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$size(receiver);
 };
 J.get$value$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$value(receiver);
@@ -11157,6 +11158,7 @@ $.Device__isOpera = null;
 $.Device__isWebKit = null;
 $.github = null;
 $.$$repos = null;
+$._reposCache = null;
 Isolate.$lazy($, "thisScript", "IsolateNatives_thisScript", "get$IsolateNatives_thisScript", function() {
   return H.IsolateNatives_computeThisScript();
 });
@@ -11247,7 +11249,7 @@ Isolate.$lazy($, "_attributeValidators", "_Html5NodeValidator__attributeValidato
   return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
 });
 Isolate.$lazy($, "sorts", "sorts", "get$sorts", function() {
-  return P.LinkedHashMap_LinkedHashMap$_literal(["stars", new D.closure(), "forks", new D.closure0(), "created", new D.closure1(), "pushed", new D.closure2()], null, null);
+  return P.LinkedHashMap_LinkedHashMap$_literal(["stars", new D.closure(), "forks", new D.closure0(), "created", new D.closure1(), "pushed", new D.closure2(), "size", new D.closure3()], null, null);
 });
 // Native classes
 

@@ -8,9 +8,8 @@ GitHub github;
 DivElement $readme;
 
 void main() {
-  initGitHub();
   init("readme.dart", onReady: () {
-    github = new GitHub();
+    github = createGitHubClient();
     $readme = querySelector("#readme");
     loadReadme();
   });

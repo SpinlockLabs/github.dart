@@ -18,27 +18,25 @@ void loadStars() {
   var user = "DirectMyFile";
   var repo = "github.dart";
   var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-  var url = window.location.href;
 
-  if (url.contains("?")) {
-    var params = Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
-    if (params.containsKey("user")) {
-      user = params["user"];
-    }
-    
-    if (params.containsKey("repo")) {
-      repo = params["repo"];
-    }
+  var params = queryString;
+  
+  if (params.containsKey("user")) {
+    user = params["user"];
+  }
 
-    if (params.containsKey("token")) {
-      token = params["token"];
-    }
+  if (params.containsKey("repo")) {
+    repo = params["repo"];
+  }
+
+  if (params.containsKey("token")) {
+    token = params["token"];
   }
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
   querySelector("#title").appendText(" for ${user}/${repo}");
-  
+
   github.stargazers(new RepositorySlug(user, repo)).listen((stargazer) {
     var h = new DivElement();
     h.classes.add("box");

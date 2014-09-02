@@ -79,12 +79,14 @@ class OAuth2Flow {
       headers['Origin'] = origin;
     }
     
-    return GitHub.defaultClient().request(new http.Request("${baseUrl}/access_token" + buildQueryString({
+    var body = JSON.encode({
       "client_id": clientId,
       "client_secret": clientSecret,
       "code": code,
       "redirect_uri": redirectUri
-    }), method: "POST", headers: headers)).then((response) {
+    });
+    
+    return GitHub.defaultClient().request(new http.Request("${baseUrl}/access_token", body: body, method: "POST", headers: headers)).then((response) {
       var json = JSON.decode(response.body);
       if (json['error'] != null) {
         throw json;

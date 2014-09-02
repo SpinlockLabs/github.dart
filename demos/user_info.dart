@@ -28,6 +28,7 @@ void loadUser() {
     var github = createClient(token.value);
 
     github.currentUser().then((CurrentUser user) {
+      info.children.clear();
       info.hidden = false;
       info.appendHtml("""
       <b>Name</b>: ${user.name}
@@ -51,6 +52,10 @@ void loadUser() {
       append("Created", user.createdAt);
       document.getElementById("load").hidden = true;
       document.getElementById("token").hidden = true;
+    }).catchError((e) {
+      if (e is AccessForbidden) {
+        window.alert("Invalid Token");
+      }
     });
   });
 }

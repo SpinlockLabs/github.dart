@@ -388,15 +388,6 @@ var $$ = {};
         return H.ioore(receiver, index);
       return receiver[index];
     },
-    sublist$2: function(receiver, start, end) {
-      if (start < 0 || start > receiver.length)
-        throw H.wrapException(P.RangeError$range(start, 0, receiver.length));
-      if (end < start || end > receiver.length)
-        throw H.wrapException(P.RangeError$range(end, start, receiver.length));
-      if (start === end)
-        return H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(receiver, 0)]);
-      return H.setRuntimeTypeInfo(receiver.slice(start, end), [H.getTypeArgumentByIndex(receiver, 0)]);
-    },
     indexOf$2: function(receiver, element, start) {
       return H.Lists_indexOf(receiver, element, start, receiver.length);
     },
@@ -415,19 +406,6 @@ var $$ = {};
     },
     toString$0: function(receiver) {
       return P.IterableBase_iterableToFullString(receiver, "[", "]");
-    },
-    toList$1$growable: function(receiver, growable) {
-      var t1;
-      if (growable)
-        return H.setRuntimeTypeInfo(receiver.slice(), [H.getTypeArgumentByIndex(receiver, 0)]);
-      else {
-        t1 = H.setRuntimeTypeInfo(receiver.slice(), [H.getTypeArgumentByIndex(receiver, 0)]);
-        t1.fixed$length = init;
-        return t1;
-      }
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
     },
     get$iterator: function(receiver) {
       return new H.ListIterator(receiver, receiver.length, 0, null);
@@ -487,11 +465,6 @@ var $$ = {};
       else
         return Math.round(receiver);
     },
-    toRadixString$1: function(receiver, radix) {
-      if (radix < 2 || radix > 36)
-        throw H.wrapException(P.RangeError$(radix));
-      return receiver.toString(radix);
-    },
     toString$0: function(receiver) {
       if (receiver === 0 && 1 / receiver < 0)
         return "-0.0";
@@ -500,9 +473,6 @@ var $$ = {};
     },
     get$hashCode: function(receiver) {
       return receiver & 0x1FFFFFFF;
-    },
-    $negate: function(receiver) {
-      return -receiver;
     },
     $add: function(receiver, other) {
       if (typeof other !== "number")
@@ -619,24 +589,6 @@ var $$ = {};
     substring$1: function($receiver, startIndex) {
       return this.substring$2($receiver, startIndex, null);
     },
-    trim$0: function(receiver) {
-      var result, endIndex, startIndex, t1, endIndex0;
-      result = receiver.trim();
-      endIndex = result.length;
-      if (endIndex === 0)
-        return result;
-      if (this.codeUnitAt$1(result, 0) === 133) {
-        startIndex = J.JSString__skipLeadingWhitespace(result, 1);
-        if (startIndex === endIndex)
-          return "";
-      } else
-        startIndex = 0;
-      t1 = endIndex - 1;
-      endIndex0 = this.codeUnitAt$1(result, t1) === 133 ? J.JSString__skipTrailingWhitespace(result, t1) : endIndex;
-      if (startIndex === 0 && endIndex0 === endIndex)
-        return result;
-      return result.substring(startIndex, endIndex0);
-    },
     $mul: function(receiver, times) {
       var s, result;
       if (0 >= times)
@@ -655,9 +607,6 @@ var $$ = {};
       }
       return result;
     },
-    get$codeUnits: function(receiver) {
-      return new J._CodeUnits(receiver);
-    },
     indexOf$2: function(receiver, pattern, start) {
       if (start < 0 || start > receiver.length)
         throw H.wrapException(P.RangeError$range(start, 0, receiver.length));
@@ -665,14 +614,6 @@ var $$ = {};
     },
     indexOf$1: function($receiver, pattern) {
       return this.indexOf$2($receiver, pattern, 0);
-    },
-    contains$2: function(receiver, other, startIndex) {
-      if (startIndex > receiver.length)
-        throw H.wrapException(P.RangeError$range(startIndex, 0, receiver.length));
-      return H.stringContainsUnchecked(receiver, other, startIndex);
-    },
-    contains$1: function($receiver, other) {
-      return this.contains$2($receiver, other, 0);
     },
     get$isEmpty: function(receiver) {
       return receiver.length === 0;
@@ -701,99 +642,7 @@ var $$ = {};
         throw H.wrapException(P.RangeError$value(index));
       return receiver[index];
     },
-    $isString: true,
-    static: {JSString__isWhitespace: function(codeUnit) {
-        if (codeUnit < 256)
-          switch (codeUnit) {
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 32:
-            case 133:
-            case 160:
-              return true;
-            default:
-              return false;
-          }
-        switch (codeUnit) {
-          case 5760:
-          case 6158:
-          case 8192:
-          case 8193:
-          case 8194:
-          case 8195:
-          case 8196:
-          case 8197:
-          case 8198:
-          case 8199:
-          case 8200:
-          case 8201:
-          case 8202:
-          case 8232:
-          case 8233:
-          case 8239:
-          case 8287:
-          case 12288:
-          case 65279:
-            return true;
-          default:
-            return false;
-        }
-      }, JSString__skipLeadingWhitespace: function(string, index) {
-        var t1, codeUnit;
-        for (t1 = string.length; index < t1;) {
-          if (index >= t1)
-            H.throwExpression(P.RangeError$value(index));
-          codeUnit = string.charCodeAt(index);
-          if (codeUnit !== 32 && codeUnit !== 13 && !J.JSString__isWhitespace(codeUnit))
-            break;
-          ++index;
-        }
-        return index;
-      }, JSString__skipTrailingWhitespace: function(string, index) {
-        var t1, index0, codeUnit;
-        for (t1 = string.length; index > 0; index = index0) {
-          index0 = index - 1;
-          if (index0 >= t1)
-            H.throwExpression(P.RangeError$value(index0));
-          codeUnit = string.charCodeAt(index0);
-          if (codeUnit !== 32 && codeUnit !== 13 && !J.JSString__isWhitespace(codeUnit))
-            break;
-        }
-        return index;
-      }}
-  },
-  _CodeUnits: {
-    "^": "UnmodifiableListBase;_string",
-    get$length: function(_) {
-      return this._string.length;
-    },
-    $index: function(_, i) {
-      var t1 = this._string;
-      if (typeof i !== "number" || Math.floor(i) !== i)
-        H.throwExpression(P.ArgumentError$(i));
-      if (typeof i !== "number")
-        return i.$lt();
-      if (i < 0)
-        H.throwExpression(P.RangeError$value(i));
-      if (i >= t1.length)
-        H.throwExpression(P.RangeError$value(i));
-      return t1.charCodeAt(i);
-    },
-    $asUnmodifiableListBase: function() {
-      return [P.$int];
-    },
-    $asListBase: function() {
-      return [P.$int];
-    },
-    $asObject_ListMixin: function() {
-      return [P.$int];
-    },
-    $asList: function() {
-      return [P.$int];
-    }
+    $isString: true
   }
 }],
 ["_isolate_helper", "dart:_isolate_helper", , H, {
@@ -1231,7 +1080,7 @@ var $$ = {};
       if (t1 != null)
         t1.clear$0(0);
       for (t1 = this.ports, t2 = t1.get$values(t1), t2 = H.setRuntimeTypeInfo(new H.MappedIterator(null, J.get$iterator$ax(t2._iterable), t2._f), [H.getTypeArgumentByIndex(t2, 0), H.getTypeArgumentByIndex(t2, 1)]); t2.moveNext$0();)
-        t2.__internal$_current._close$0();
+        t2._current._close$0();
       t1.clear$0(0);
       this.weakPorts.clear$0(0);
       init.globalState.isolates.remove$1(0, this.id);
@@ -1239,7 +1088,7 @@ var $$ = {};
       t1 = this.doneHandlers;
       if (t1 != null) {
         for (t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();)
-          J.send$1$x(t1.__internal$_current, null);
+          J.send$1$x(t1._current, null);
         this.doneHandlers = null;
       }
     }, "call$0", "get$kill", 0, 0, 2]
@@ -1620,17 +1469,19 @@ var $$ = {};
       return x;
     },
     visitList$1: function(list) {
-      var copy, t1, len, i;
+      var copy, len, i;
       copy = this._visited.$index(0, list);
       if (copy != null)
         return copy;
-      t1 = J.getInterceptor$asx(list);
-      len = t1.get$length(list);
+      len = J.get$length$asx(list);
       copy = Array(len);
       copy.fixed$length = init;
       this._visited.$indexSet(0, list, copy);
-      for (i = 0; i < len; ++i)
-        copy[i] = this._dispatch$1(t1.$index(list, i));
+      for (i = 0; i < len; ++i) {
+        if (i >= list.length)
+          return H.ioore(list, i);
+        copy[i] = this._dispatch$1(list[i]);
+      }
       return copy;
     },
     visitMap$1: function(map) {
@@ -1675,25 +1526,28 @@ var $$ = {};
       return ["list", t1, this._serializeList$1(list)];
     },
     visitMap$1: function(map) {
-      var copyId, t1;
+      var copyId, t1, keys, t2;
       copyId = this._visited.$index(0, map);
       if (copyId != null)
         return ["ref", copyId];
       t1 = this._nextFreeRefId++;
       this._visited.$indexSet(0, map, t1);
-      return ["map", t1, this._serializeList$1(J.toList$0$ax(map.get$keys())), this._serializeList$1(J.toList$0$ax(map.get$values(map)))];
+      keys = this._serializeList$1(map.get$keys().toList$0(0));
+      t2 = map.get$values(map);
+      return ["map", t1, keys, this._serializeList$1(P.List_List$from(t2, true, H.getRuntimeTypeArgument(t2, "IterableBase", 0)))];
     },
     _serializeList$1: function(list) {
-      var t1, len, result, i, t2;
-      t1 = J.getInterceptor$asx(list);
-      len = t1.get$length(list);
+      var len, result, i, t1;
+      len = J.get$length$asx(list);
       result = [];
       C.JSArray_methods.set$length(result, len);
       for (i = 0; i < len; ++i) {
-        t2 = this._dispatch$1(t1.$index(list, i));
+        if (i >= list.length)
+          return H.ioore(list, i);
+        t1 = this._dispatch$1(list[i]);
         if (i >= result.length)
           return H.ioore(result, i);
-        result[i] = t2;
+        result[i] = t1;
       }
       return result;
     },
@@ -1936,7 +1790,7 @@ var $$ = {};
     a = [];
     a.$builtinTypeInfo = [P.$int];
     for (t1 = new H.ListIterator(codePoints, codePoints.length, 0, null); t1.moveNext$0();) {
-      i = t1.__internal$_current;
+      i = t1._current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i <= 65535)
@@ -1952,7 +1806,7 @@ var $$ = {};
   Primitives_stringFromCharCodes: function(charCodes) {
     var t1, i;
     for (t1 = new H.ListIterator(charCodes, charCodes.length, 0, null); t1.moveNext$0();) {
-      i = t1.__internal$_current;
+      i = t1._current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i < 0)
@@ -2761,9 +2615,6 @@ var $$ = {};
   applyHooksTransformer: function(transformer, hooks) {
     return transformer(hooks) || hooks;
   },
-  stringContainsUnchecked: function(receiver, other, startIndex) {
-    return C.JSString_methods.indexOf$2(receiver, other, startIndex) !== -1;
-  },
   ReflectionInfo: {
     "^": "Object;jsFunction,data>,isAccessor,requiredParameterCount,optionalParameterCount,areOptionalParametersNamed,functionType,cachedSortedIndices",
     static: {"^": "ReflectionInfo_REQUIRED_PARAMETERS_INFO,ReflectionInfo_OPTIONAL_PARAMETERS_INFO,ReflectionInfo_FUNCTION_TYPE_INDEX,ReflectionInfo_FIRST_DEFAULT_ARGUMENT", ReflectionInfo_ReflectionInfo: function(jsFunction) {
@@ -3154,13 +3005,6 @@ var $$ = {};
     t1 = J.get$onClick$x(document.querySelector("#view-source"));
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
-  queryString: function() {
-    var url = window.location.href;
-    if (J.getInterceptor$asx(url).contains$1(url, "?"))
-      return P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
-    else
-      return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-  },
   init_closure: {
     "^": "Closure:9;onReady_1,stopwatch_2",
     call$1: function($event) {
@@ -3357,6 +3201,26 @@ var $$ = {};
 }],
 ["dart._internal", "dart:_internal", , H, {
   "^": "",
+  IterableMixinWorkaround_forEach: function(iterable, f) {
+    var t1;
+    for (t1 = new H.ListIterator(iterable, iterable.length, 0, null); t1.moveNext$0();)
+      f.call$1(t1._current);
+  },
+  IterableMixinWorkaround_setRangeList: function(list, start, end, from, skipCount) {
+    var $length;
+    if (start < 0 || start > list.length)
+      H.throwExpression(P.RangeError$range(start, 0, list.length));
+    if (end < start || end > list.length)
+      H.throwExpression(P.RangeError$range(end, start, list.length));
+    $length = end - start;
+    if ($length === 0)
+      return;
+    if (skipCount < 0)
+      throw H.wrapException(P.ArgumentError$(skipCount));
+    if (skipCount + $length > from.length)
+      throw H.wrapException(H.IterableElementError_tooFew());
+    H.Lists_copy(from, skipCount, list, start, $length);
+  },
   IterableElementError_noElement: function() {
     return new P.StateError("No element");
   },
@@ -3393,108 +3257,24 @@ var $$ = {};
   Symbol_getName: function(symbol) {
     return symbol.get$_name();
   },
-  ListIterable: {
-    "^": "IterableBase;",
-    get$iterator: function(_) {
-      return new H.ListIterator(this, this.get$length(this), 0, null);
-    },
-    forEach$1: function(_, action) {
-      var $length, i;
-      $length = this.get$length(this);
-      for (i = 0; i < $length; ++i) {
-        action.call$1(this.elementAt$1(0, i));
-        if ($length !== this.get$length(this))
-          throw H.wrapException(P.ConcurrentModificationError$(this));
-      }
-    },
-    get$isEmpty: function(_) {
-      return this.get$length(this) === 0;
-    },
-    toList$1$growable: function(_, growable) {
-      var result, i, t1;
-      if (growable) {
-        result = H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(this, 0)]);
-        C.JSArray_methods.set$length(result, this.get$length(this));
-      } else
-        result = H.setRuntimeTypeInfo(Array(this.get$length(this)), [H.getTypeArgumentByIndex(this, 0)]);
-      for (i = 0; i < this.get$length(this); ++i) {
-        t1 = this.elementAt$1(0, i);
-        if (i >= result.length)
-          return H.ioore(result, i);
-        result[i] = t1;
-      }
-      return result;
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
-    },
-    $isEfficientLength: true
-  },
-  SubListIterable: {
-    "^": "ListIterable;_iterable,__internal$_start,_endOrLength",
-    get$_endIndex: function() {
-      var $length = J.get$length$asx(this._iterable);
-      return $length;
-    },
-    get$_startIndex: function() {
-      var $length, t1;
-      $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
-      if (t1 > $length)
-        return $length;
-      return t1;
-    },
-    get$length: function(_) {
-      var $length, t1;
-      $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
-      if (t1 >= $length)
-        return 0;
-      return $length - t1;
-    },
-    elementAt$1: function(_, index) {
-      var realIndex, t1;
-      realIndex = this.get$_startIndex() + index;
-      if (index >= 0) {
-        t1 = this.get$_endIndex();
-        if (typeof t1 !== "number")
-          return H.iae(t1);
-        t1 = realIndex >= t1;
-      } else
-        t1 = true;
-      if (t1)
-        throw H.wrapException(P.RangeError$range(index, 0, this.get$length(this)));
-      return J.elementAt$1$ax(this._iterable, realIndex);
-    },
-    SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      var t1 = this.__internal$_start;
-      if (t1 < 0)
-        throw H.wrapException(P.RangeError$value(t1));
-    },
-    static: {SubListIterable$: function(_iterable, _start, _endOrLength, $E) {
-        var t1 = H.setRuntimeTypeInfo(new H.SubListIterable(_iterable, _start, _endOrLength), [$E]);
-        t1.SubListIterable$3(_iterable, _start, _endOrLength, $E);
-        return t1;
-      }}
-  },
   ListIterator: {
-    "^": "Object;_iterable,__internal$_length,_index,__internal$_current",
+    "^": "Object;_iterable,_length,_index,_current",
     get$current: function() {
-      return this.__internal$_current;
+      return this._current;
     },
     moveNext$0: function() {
       var t1, t2, $length, t3;
       t1 = this._iterable;
       t2 = J.getInterceptor$asx(t1);
       $length = t2.get$length(t1);
-      if (this.__internal$_length !== $length)
+      if (this._length !== $length)
         throw H.wrapException(P.ConcurrentModificationError$(t1));
       t3 = this._index;
       if (t3 >= $length) {
-        this.__internal$_current = null;
+        this._current = null;
         return false;
       }
-      this.__internal$_current = t2.elementAt$1(t1, t3);
+      this._current = t2.elementAt$1(t1, t3);
       ++this._index;
       return true;
     }
@@ -3526,67 +3306,25 @@ var $$ = {};
     $isEfficientLength: true
   },
   MappedIterator: {
-    "^": "Iterator;__internal$_current,_iterator,_f",
+    "^": "Iterator;_current,_iterator,_f",
     _f$1: function(arg0) {
       return this._f.call$1(arg0);
     },
     moveNext$0: function() {
       var t1 = this._iterator;
       if (t1.moveNext$0()) {
-        this.__internal$_current = this._f$1(t1.get$current());
+        this._current = this._f$1(t1.get$current());
         return true;
       }
-      this.__internal$_current = null;
+      this._current = null;
       return false;
     },
     get$current: function() {
-      return this.__internal$_current;
+      return this._current;
     }
-  },
-  IterableMixinWorkaround: {
-    "^": "Object;",
-    static: {IterableMixinWorkaround_forEach: function(iterable, f) {
-        var t1;
-        for (t1 = new H.ListIterator(iterable, iterable.length, 0, null); t1.moveNext$0();)
-          f.call$1(t1.__internal$_current);
-      }, IterableMixinWorkaround_fold: function(iterable, initialValue, combine) {
-        var t1;
-        for (t1 = new H.ListIterator(iterable, iterable.length, 0, null); t1.moveNext$0();)
-          initialValue = combine.call$2(initialValue, t1.__internal$_current);
-        return initialValue;
-      }, IterableMixinWorkaround_setRangeList: function(list, start, end, from, skipCount) {
-        var $length;
-        if (start < 0 || start > list.length)
-          H.throwExpression(P.RangeError$range(start, 0, list.length));
-        if (end < start || end > list.length)
-          H.throwExpression(P.RangeError$range(end, start, list.length));
-        $length = end - start;
-        if ($length === 0)
-          return;
-        if (skipCount < 0)
-          throw H.wrapException(P.ArgumentError$(skipCount));
-        if (skipCount + $length > from.length)
-          throw H.wrapException(H.IterableElementError_tooFew());
-        H.Lists_copy(from, skipCount, list, start, $length);
-      }}
   },
   FixedLengthListMixin: {
     "^": "Object;"
-  },
-  UnmodifiableListMixin: {
-    "^": "Object;",
-    $indexSet: function(_, index, value) {
-      throw H.wrapException(P.UnsupportedError$("Cannot modify an unmodifiable list"));
-    },
-    $isList: true,
-    $asList: null,
-    $isEfficientLength: true
-  },
-  UnmodifiableListBase: {
-    "^": "ListBase+UnmodifiableListMixin;",
-    $isList: true,
-    $asList: null,
-    $isEfficientLength: true
   }
 }],
 ["dart._js_names", "dart:_js_names", , H, {
@@ -4712,20 +4450,6 @@ var $$ = {};
     get$values: function(_) {
       return H.MappedIterable_MappedIterable(H.setRuntimeTypeInfo(new P.HashMapKeyIterable(this), [H.getTypeArgumentByIndex(this, 0)]), new P._HashMap_values_closure(this), H.getTypeArgumentByIndex(this, 0), H.getTypeArgumentByIndex(this, 1));
     },
-    containsKey$1: function(key) {
-      var strings;
-      if (key !== "__proto__") {
-        strings = this._strings;
-        return strings == null ? false : strings[key] != null;
-      } else
-        return this._containsKey$1(key);
-    },
-    _containsKey$1: function(key) {
-      var rest = this._rest;
-      if (rest == null)
-        return false;
-      return this._findBucketIndex$2(rest[this._computeHashCode$1(key)], key) >= 0;
-    },
     $index: function(_, key) {
       var strings, t1, entry, nums;
       if (typeof key === "string" && key !== "__proto__") {
@@ -4803,7 +4527,7 @@ var $$ = {};
     },
     forEach$1: function(_, action) {
       var keys, $length, i, key;
-      keys = this._collection$_computeKeys$0();
+      keys = this._computeKeys$0();
       for ($length = keys.length, i = 0; i < $length; ++i) {
         key = keys[i];
         action.call$2(key, this.$index(0, key));
@@ -4811,7 +4535,7 @@ var $$ = {};
           throw H.wrapException(P.ConcurrentModificationError$(this));
       }
     },
-    _collection$_computeKeys$0: function() {
+    _computeKeys$0: function() {
       var t1, result, strings, names, entries, index, i, nums, rest, bucket, $length, i0;
       t1 = this._keys;
       if (t1 != null)
@@ -4902,12 +4626,12 @@ var $$ = {};
     },
     get$iterator: function(_) {
       var t1 = this._map;
-      return new P.HashMapKeyIterator(t1, t1._collection$_computeKeys$0(), 0, null);
+      return new P.HashMapKeyIterator(t1, t1._computeKeys$0(), 0, null);
     },
     forEach$1: function(_, f) {
       var t1, keys, $length, i;
       t1 = this._map;
-      keys = t1._collection$_computeKeys$0();
+      keys = t1._computeKeys$0();
       for ($length = keys.length, i = 0; i < $length; ++i) {
         f.call$1(keys[i]);
         if (keys !== t1._keys)
@@ -5277,14 +5001,14 @@ var $$ = {};
       index = this._findBucketIndex$2(bucket, object);
       if (index < 0)
         return;
-      return J.$index$asx(bucket, index).get$_collection$_element();
+      return J.$index$asx(bucket, index).get$_element();
     },
     forEach$1: function(_, action) {
       var cell, modifications;
       cell = this._first;
       modifications = this._modifications;
       for (; cell != null;) {
-        action.call$1(cell.get$_collection$_element());
+        action.call$1(cell.get$_element());
         if (modifications !== this._modifications)
           throw H.wrapException(P.ConcurrentModificationError$(this));
         cell = cell._next;
@@ -5421,7 +5145,7 @@ var $$ = {};
         return -1;
       $length = bucket.length;
       for (i = 0; i < $length; ++i)
-        if (J.$eq(bucket[i].get$_collection$_element(), element))
+        if (J.$eq(bucket[i].get$_element(), element))
           return i;
       return -1;
     },
@@ -5434,7 +5158,7 @@ var $$ = {};
       }}
   },
   LinkedHashSetCell: {
-    "^": "Object;_collection$_element<,_next@,_previous@"
+    "^": "Object;_element<,_next@,_previous@"
   },
   LinkedHashSetIterator: {
     "^": "Object;_set,_modifications,_cell,_collection$_current",
@@ -5451,7 +5175,7 @@ var $$ = {};
           this._collection$_current = null;
           return false;
         } else {
-          this._collection$_current = t1.get$_collection$_element();
+          this._collection$_current = t1.get$_element();
           this._cell = this._cell.get$_next();
           return true;
         }
@@ -5507,15 +5231,6 @@ var $$ = {};
       return P.IterableBase_iterableToShortString(this, "(", ")");
     }
   },
-  ListBase: {
-    "^": "Object_ListMixin;"
-  },
-  Object_ListMixin: {
-    "^": "Object+ListMixin;",
-    $isList: true,
-    $asList: null,
-    $isEfficientLength: true
-  },
   ListMixin: {
     "^": "Object;",
     get$iterator: function(receiver) {
@@ -5525,61 +5240,25 @@ var $$ = {};
       return this.$index(receiver, index);
     },
     forEach$1: function(receiver, action) {
-      var $length, i;
+      var $length, t1, i;
       $length = this.get$length(receiver);
-      for (i = 0; i < $length; ++i) {
-        action.call$1(this.$index(receiver, i));
-        if ($length !== this.get$length(receiver))
+      for (t1 = receiver.length, i = 0; i < $length; ++i) {
+        if (i >= t1)
+          return H.ioore(receiver, i);
+        action.call$1(receiver[i]);
+        if ($length !== t1)
           throw H.wrapException(P.ConcurrentModificationError$(receiver));
       }
     },
     get$isEmpty: function(receiver) {
       return this.get$length(receiver) === 0;
     },
-    toList$1$growable: function(receiver, growable) {
-      var result, i, t1;
-      if (growable) {
-        result = H.setRuntimeTypeInfo([], [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-        C.JSArray_methods.set$length(result, this.get$length(receiver));
-      } else
-        result = H.setRuntimeTypeInfo(Array(this.get$length(receiver)), [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-      for (i = 0; i < this.get$length(receiver); ++i) {
-        t1 = this.$index(receiver, i);
-        if (i >= result.length)
-          return H.ioore(result, i);
-        result[i] = t1;
-      }
-      return result;
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
-    },
-    _rangeCheck$2: function(receiver, start, end) {
-      if (start < 0 || start > this.get$length(receiver))
-        throw H.wrapException(P.RangeError$range(start, 0, this.get$length(receiver)));
-      if (end < start || end > this.get$length(receiver))
-        throw H.wrapException(P.RangeError$range(end, start, this.get$length(receiver)));
-    },
-    sublist$2: function(receiver, start, end) {
-      var $length, result, i, t1;
-      this._rangeCheck$2(receiver, start, end);
-      $length = end - start;
-      result = H.setRuntimeTypeInfo([], [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-      C.JSArray_methods.set$length(result, $length);
-      for (i = 0; i < $length; ++i) {
-        t1 = this.$index(receiver, start + i);
-        if (i >= result.length)
-          return H.ioore(result, i);
-        result[i] = t1;
-      }
-      return result;
-    },
     indexOf$2: function(receiver, element, startIndex) {
-      var i;
+      var t1, i;
       if (startIndex >= this.get$length(receiver))
         return -1;
-      for (i = startIndex; i < this.get$length(receiver); ++i)
-        this.$index(receiver, i);
+      for (t1 = receiver.length, i = startIndex; i < t1; ++i)
+        ;
       return -1;
     },
     indexOf$1: function($receiver, element) {
@@ -5627,22 +5306,6 @@ var $$ = {};
     },
     get$length: function(_) {
       return (this._tail - this._head & this._table.length - 1) >>> 0;
-    },
-    toList$1$growable: function(_, growable) {
-      var list, t1;
-      if (growable) {
-        list = H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(this, 0)]);
-        C.JSArray_methods.set$length(list, this.get$length(this));
-      } else {
-        t1 = Array(this.get$length(this));
-        t1.fixed$length = init;
-        list = H.setRuntimeTypeInfo(t1, [H.getTypeArgumentByIndex(this, 0)]);
-      }
-      this._writeToList$1(list);
-      return list;
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
     },
     clear$0: function(_) {
       var i, t1, t2, t3, t4;
@@ -5707,24 +5370,6 @@ var $$ = {};
       this._tail = this._table.length;
       this._table = newTable;
     },
-    _writeToList$1: function(target) {
-      var t1, t2, t3, $length, firstPartSize;
-      t1 = this._head;
-      t2 = this._tail;
-      t3 = this._table;
-      if (t1 <= t2) {
-        $length = t2 - t1;
-        H.IterableMixinWorkaround_setRangeList(target, 0, $length, t3, t1);
-        return $length;
-      } else {
-        firstPartSize = t3.length - t1;
-        H.IterableMixinWorkaround_setRangeList(target, 0, firstPartSize, t3, t1);
-        t1 = this._tail;
-        t2 = this._table;
-        H.IterableMixinWorkaround_setRangeList(target, firstPartSize, firstPartSize + t1, t2, 0);
-        return this._tail + firstPartSize;
-      }
-    },
     ListQueue$1: function(initialCapacity, $E) {
       var t1 = Array(8);
       t1.fixed$length = init;
@@ -5734,7 +5379,7 @@ var $$ = {};
     static: {"^": "ListQueue__INITIAL_CAPACITY"}
   },
   _ListQueueIterator: {
-    "^": "Object;_queue,_end,_modificationCount,_collection$_position,_collection$_current",
+    "^": "Object;_queue,_end,_modificationCount,_position,_collection$_current",
     get$current: function() {
       return this._collection$_current;
     },
@@ -5743,7 +5388,7 @@ var $$ = {};
       t1 = this._queue;
       if (this._modificationCount !== t1._modificationCount)
         H.throwExpression(P.ConcurrentModificationError$(t1));
-      t2 = this._collection$_position;
+      t2 = this._position;
       if (t2 === this._end) {
         this._collection$_current = null;
         return false;
@@ -5753,7 +5398,7 @@ var $$ = {};
       if (t2 >= t3)
         return H.ioore(t1, t2);
       this._collection$_current = t1[t2];
-      this._collection$_position = (t2 + 1 & t3 - 1) >>> 0;
+      this._position = (t2 + 1 & t3 - 1) >>> 0;
       return true;
     }
   },
@@ -5761,25 +5406,6 @@ var $$ = {};
     "^": "Object;",
     get$isEmpty: function(_) {
       return this.get$length(this) === 0;
-    },
-    toList$1$growable: function(_, growable) {
-      var result, t1, i, element, i0;
-      if (growable) {
-        result = H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(this, 0)]);
-        C.JSArray_methods.set$length(result, this.get$length(this));
-      } else
-        result = H.setRuntimeTypeInfo(Array(this.get$length(this)), [H.getTypeArgumentByIndex(this, 0)]);
-      for (t1 = this.get$iterator(this), i = 0; t1.moveNext$0(); i = i0) {
-        element = t1._collection$_current;
-        i0 = i + 1;
-        if (i >= result.length)
-          return H.ioore(result, i);
-        result[i] = element;
-      }
-      return result;
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
     },
     toString$0: function(_) {
       return P.IterableBase_iterableToFullString(this, "{", "}");
@@ -5789,27 +5415,6 @@ var $$ = {};
       for (t1 = this.get$iterator(this); t1.moveNext$0();)
         f.call$1(t1._collection$_current);
     },
-    join$1: function(_, separator) {
-      var iterator, buffer, t1;
-      iterator = this.get$iterator(this);
-      if (!iterator.moveNext$0())
-        return "";
-      buffer = P.StringBuffer$("");
-      if (separator === "") {
-        do {
-          t1 = H.S(iterator._collection$_current);
-          buffer._contents += t1;
-        } while (iterator.moveNext$0());
-      } else {
-        buffer.write$1(H.S(iterator._collection$_current));
-        for (; iterator.moveNext$0();) {
-          buffer._contents += separator;
-          t1 = H.S(iterator._collection$_current);
-          buffer._contents += t1;
-        }
-      }
-      return buffer._contents;
-    },
     $isEfficientLength: true
   },
   SetBase: {
@@ -5818,173 +5423,6 @@ var $$ = {};
 }],
 ["dart.convert", "dart:convert", , P, {
   "^": "",
-  _convertJsonToDartLazy: function(object) {
-    var i;
-    if (object == null)
-      return;
-    if (typeof object != "object")
-      return object;
-    if (Object.getPrototypeOf(object) !== Array.prototype)
-      return new P._JsonMap(object, Object.create(null), null);
-    for (i = 0; i < object.length; ++i)
-      object[i] = P._convertJsonToDartLazy(object[i]);
-    return object;
-  },
-  _parseJson: function(source, reviver) {
-    var parsed, e, t1, exception;
-    t1 = source;
-    if (typeof t1 !== "string")
-      throw H.wrapException(P.ArgumentError$(source));
-    parsed = null;
-    try {
-      parsed = JSON.parse(source);
-    } catch (exception) {
-      t1 = H.unwrapException(exception);
-      e = t1;
-      throw H.wrapException(P.FormatException$(String(e), null, null));
-    }
-
-    return P._convertJsonToDartLazy(parsed);
-  },
-  _JsonMap: {
-    "^": "Object;_original,_processed,_data",
-    $index: function(_, key) {
-      var t1, result;
-      t1 = this._processed;
-      if (t1 == null)
-        return this._data.$index(0, key);
-      else if (typeof key !== "string")
-        return;
-      else {
-        result = t1[key];
-        return typeof result == "undefined" ? this._process$1(key) : result;
-      }
-    },
-    get$length: function(_) {
-      var t1;
-      if (this._processed == null) {
-        t1 = this._data;
-        t1 = t1.get$length(t1);
-      } else
-        t1 = this._computeKeys$0().length;
-      return t1;
-    },
-    get$isEmpty: function(_) {
-      var t1;
-      if (this._processed == null) {
-        t1 = this._data;
-        t1 = t1.get$length(t1);
-      } else
-        t1 = this._computeKeys$0().length;
-      return t1 === 0;
-    },
-    get$keys: function() {
-      if (this._processed == null)
-        return this._data.get$keys();
-      var t1 = this._computeKeys$0();
-      return H.SubListIterable$(t1, 0, null, H.getTypeArgumentByIndex(H.setRuntimeTypeInfo(new H.IterableMixinWorkaround(), [H.getTypeArgumentByIndex(t1, 0)]), 0));
-    },
-    get$values: function(_) {
-      var t1;
-      if (this._processed == null) {
-        t1 = this._data;
-        return t1.get$values(t1);
-      }
-      return H.MappedIterable_MappedIterable(this._computeKeys$0(), new P._JsonMap_values_closure(this), null, null);
-    },
-    $indexSet: function(_, key, value) {
-      var processed, original;
-      if (this._processed == null)
-        this._data.$indexSet(0, key, value);
-      else if (this.containsKey$1(key)) {
-        processed = this._processed;
-        processed[key] = value;
-        original = this._original;
-        if (original == null ? processed != null : original !== processed)
-          original[key] = null;
-      } else
-        this._upgrade$0().$indexSet(0, key, value);
-    },
-    containsKey$1: function(key) {
-      if (this._processed == null)
-        return this._data.containsKey$1(key);
-      if (typeof key !== "string")
-        return false;
-      return Object.prototype.hasOwnProperty.call(this._original, key);
-    },
-    putIfAbsent$2: function(key, ifAbsent) {
-      var value;
-      if (this.containsKey$1(key))
-        return this.$index(0, key);
-      value = ifAbsent.call$0();
-      this.$indexSet(0, key, value);
-      return value;
-    },
-    forEach$1: function(_, f) {
-      var keys, i, key, value;
-      if (this._processed == null)
-        return this._data.forEach$1(0, f);
-      keys = this._computeKeys$0();
-      for (i = 0; i < keys.length; ++i) {
-        key = keys[i];
-        value = this._processed[key];
-        if (typeof value == "undefined") {
-          value = P._convertJsonToDartLazy(this._original[key]);
-          this._processed[key] = value;
-        }
-        f.call$2(key, value);
-        if (keys !== this._data)
-          throw H.wrapException(P.ConcurrentModificationError$(this));
-      }
-    },
-    toString$0: function(_) {
-      return P.Maps_mapToString(this);
-    },
-    _computeKeys$0: function() {
-      var keys = this._data;
-      if (keys == null) {
-        keys = Object.keys(this._original);
-        this._data = keys;
-      }
-      return keys;
-    },
-    _upgrade$0: function() {
-      var result, keys, i, t1, key;
-      if (this._processed == null)
-        return this._data;
-      result = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-      keys = this._computeKeys$0();
-      for (i = 0; t1 = keys.length, i < t1; ++i) {
-        key = keys[i];
-        result.$indexSet(0, key, this.$index(0, key));
-      }
-      if (t1 === 0)
-        keys.push(null);
-      else
-        C.JSArray_methods.set$length(keys, 0);
-      this._processed = null;
-      this._original = null;
-      this._data = result;
-      return result;
-    },
-    _process$1: function(key) {
-      var result;
-      if (!Object.prototype.hasOwnProperty.call(this._original, key))
-        return;
-      result = P._convertJsonToDartLazy(this._original[key]);
-      return this._processed[key] = result;
-    },
-    $isMap: true,
-    $asMap: function() {
-      return [null, null];
-    }
-  },
-  _JsonMap_values_closure: {
-    "^": "Closure:9;this_0",
-    call$1: function(each) {
-      return this.this_0.$index(0, each);
-    }
-  },
   Codec: {
     "^": "Object;"
   },
@@ -5993,21 +5431,6 @@ var $$ = {};
   },
   Encoding: {
     "^": "Codec;"
-  },
-  JsonCodec: {
-    "^": "Codec;_reviver,_toEncodable",
-    decode$2$reviver: function(source, reviver) {
-      return P._parseJson(source, this.get$decoder()._reviver);
-    },
-    decode$1: function(source) {
-      return this.decode$2$reviver(source, null);
-    },
-    get$decoder: function() {
-      return C.JsonDecoder_null;
-    }
-  },
-  JsonDecoder: {
-    "^": "Converter;_reviver"
   },
   Utf8Codec: {
     "^": "Encoding;_allowMalformed",
@@ -6138,172 +5561,6 @@ var $$ = {};
       return stringIndex;
     },
     static: {"^": "_Utf8Encoder__DEFAULT_BYTE_BUFFER_SIZE"}
-  },
-  Utf8Decoder: {
-    "^": "Converter;_allowMalformed",
-    convert$1: function(codeUnits) {
-      var buffer, t1, decoder;
-      buffer = P.StringBuffer$("");
-      t1 = this._allowMalformed;
-      decoder = new P._Utf8Decoder(t1, buffer, true, 0, 0, 0);
-      decoder.convert$3(codeUnits, 0, J.get$length$asx(codeUnits));
-      if (decoder._expectedUnits > 0) {
-        if (!t1)
-          H.throwExpression(P.FormatException$("Unfinished UTF-8 octet sequence", null, null));
-        buffer.write$1(H.Primitives_stringFromCharCode(65533));
-        decoder._convert$_value = 0;
-        decoder._expectedUnits = 0;
-        decoder._extraUnits = 0;
-      }
-      return buffer._contents;
-    }
-  },
-  _Utf8Decoder: {
-    "^": "Object;_allowMalformed,_stringSink,_isFirstCharacter,_convert$_value,_expectedUnits,_extraUnits",
-    convert$3: function(codeUnits, startIndex, endIndex) {
-      var value, expectedUnits, extraUnits, t1, t2, t3, t4, t5, i, unit, t6, oneBytes, i0;
-      value = this._convert$_value;
-      expectedUnits = this._expectedUnits;
-      extraUnits = this._extraUnits;
-      this._convert$_value = 0;
-      this._expectedUnits = 0;
-      this._extraUnits = 0;
-      t1 = new P._Utf8Decoder_convert_scanOneByteCharacters(endIndex);
-      t2 = new P._Utf8Decoder_convert_addSingleBytes(this, codeUnits, startIndex, endIndex);
-      $loop$0:
-        for (t3 = this._stringSink, t4 = !this._allowMalformed, t5 = J.getInterceptor$asx(codeUnits), i = startIndex; true; i = i0) {
-          $multibyte$2: {
-            if (expectedUnits > 0) {
-              do {
-                if (i === endIndex)
-                  break $loop$0;
-                unit = t5.$index(codeUnits, i);
-                if (typeof unit !== "number")
-                  return unit.$and();
-                if ((unit & 192) !== 128) {
-                  if (t4)
-                    throw H.wrapException(P.FormatException$("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
-                  this._isFirstCharacter = false;
-                  t6 = H.Primitives_stringFromCharCode(65533);
-                  t3._contents += t6;
-                  expectedUnits = 0;
-                  break $multibyte$2;
-                } else {
-                  value = (value << 6 | unit & 63) >>> 0;
-                  --expectedUnits;
-                  ++i;
-                }
-              } while (expectedUnits > 0);
-              t6 = extraUnits - 1;
-              if (t6 < 0 || t6 >= 4)
-                return H.ioore(C.List_127_2047_65535_1114111, t6);
-              if (value <= C.List_127_2047_65535_1114111[t6]) {
-                if (t4)
-                  throw H.wrapException(P.FormatException$("Overlong encoding of 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
-                value = 65533;
-                expectedUnits = 0;
-                extraUnits = 0;
-              }
-              if (value > 1114111) {
-                if (t4)
-                  throw H.wrapException(P.FormatException$("Character outside valid Unicode range: 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
-                value = 65533;
-              }
-              if (!this._isFirstCharacter || value !== 65279) {
-                t6 = H.Primitives_stringFromCharCode(value);
-                t3._contents += t6;
-              }
-              this._isFirstCharacter = false;
-            }
-          }
-          for (; i < endIndex; i = i0) {
-            oneBytes = t1.call$2(codeUnits, i);
-            if (J.$gt$n(oneBytes, 0)) {
-              this._isFirstCharacter = false;
-              if (typeof oneBytes !== "number")
-                return H.iae(oneBytes);
-              i0 = i + oneBytes;
-              t2.call$2(i, i0);
-              if (i0 === endIndex)
-                break;
-              i = i0;
-            }
-            i0 = i + 1;
-            unit = t5.$index(codeUnits, i);
-            t6 = J.getInterceptor$n(unit);
-            if (t6.$lt(unit, 0)) {
-              if (t4)
-                throw H.wrapException(P.FormatException$("Negative UTF-8 code unit: -0x" + J.toRadixString$1$n(t6.$negate(unit), 16), null, null));
-              t6 = H.Primitives_stringFromCharCode(65533);
-              t3._contents += t6;
-            } else {
-              if (typeof unit !== "number")
-                return unit.$and();
-              if ((unit & 224) === 192) {
-                value = unit & 31;
-                expectedUnits = 1;
-                extraUnits = 1;
-                continue $loop$0;
-              }
-              if ((unit & 240) === 224) {
-                value = unit & 15;
-                expectedUnits = 2;
-                extraUnits = 2;
-                continue $loop$0;
-              }
-              if ((unit & 248) === 240 && unit < 245) {
-                value = unit & 7;
-                expectedUnits = 3;
-                extraUnits = 3;
-                continue $loop$0;
-              }
-              if (t4)
-                throw H.wrapException(P.FormatException$("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
-              this._isFirstCharacter = false;
-              t6 = H.Primitives_stringFromCharCode(65533);
-              t3._contents += t6;
-              value = 65533;
-              expectedUnits = 0;
-              extraUnits = 0;
-            }
-          }
-          break $loop$0;
-        }
-      if (expectedUnits > 0) {
-        this._convert$_value = value;
-        this._expectedUnits = expectedUnits;
-        this._extraUnits = extraUnits;
-      }
-    },
-    static: {"^": "_Utf8Decoder__LIMITS"}
-  },
-  _Utf8Decoder_convert_scanOneByteCharacters: {
-    "^": "Closure:19;endIndex_0",
-    call$2: function(units, from) {
-      var to, t1, i, unit;
-      to = this.endIndex_0;
-      for (t1 = J.getInterceptor$asx(units), i = from; i < to; ++i) {
-        unit = t1.$index(units, i);
-        if (typeof unit !== "number")
-          return unit.$and();
-        if ((unit & 127) !== unit)
-          return i - from;
-      }
-      return to - from;
-    }
-  },
-  _Utf8Decoder_convert_addSingleBytes: {
-    "^": "Closure:20;this_1,codeUnits_2,startIndex_3,endIndex_4",
-    call$2: function(from, to) {
-      var t1, t2, t3;
-      t1 = from === 0 && to === J.get$length$asx(this.codeUnits_2);
-      t2 = this.this_1;
-      t3 = this.codeUnits_2;
-      if (t1)
-        t2._stringSink.write$1(P.String_String$fromCharCodes(t3));
-      else
-        t2._stringSink.write$1(P.String_String$fromCharCodes(J.sublist$2$ax(t3, from, to)));
-    }
   }
 }],
 ["dart.core", "dart:core", , P, {
@@ -6377,10 +5634,7 @@ var $$ = {};
     H.printString(line);
   },
   String_String$fromCharCodes: function(charCodes) {
-    return H.Primitives_stringFromCharCodes(charCodes.constructor !== Array ? P.List_List$from(charCodes, true, null) : charCodes);
-  },
-  Uri_splitQueryString: function(query, encoding) {
-    return H.IterableMixinWorkaround_fold(query.split("&"), P.LinkedHashMap_LinkedHashMap$_empty(null, null), new P.Uri_splitQueryString_closure(encoding));
+    return H.Primitives_stringFromCharCodes(charCodes);
   },
   Uri__uriEncode: function(canonicalTable, text, encoding, spaceToPlus) {
     var t1, result, bytes, t2, i, $byte, t3;
@@ -6410,64 +5664,8 @@ var $$ = {};
     }
     return result._contents;
   },
-  Uri__hexCharPairToByte: function(s, pos) {
-    var t1, $byte, i, t2, charCode;
-    for (t1 = s.length, $byte = 0, i = 0; i < 2; ++i) {
-      t2 = pos + i;
-      if (t2 >= t1)
-        H.throwExpression(P.RangeError$value(t2));
-      charCode = s.charCodeAt(t2);
-      if (48 <= charCode && charCode <= 57)
-        $byte = $byte * 16 + charCode - 48;
-      else {
-        charCode |= 32;
-        if (97 <= charCode && charCode <= 102)
-          $byte = $byte * 16 + charCode - 87;
-        else
-          throw H.wrapException(P.ArgumentError$("Invalid URL encoding"));
-      }
-    }
-    return $byte;
-  },
-  Uri__uriDecode: function(text, encoding, plusToSpace) {
-    var t1, simple, i, codeUnit, bytes, allowMalformed;
-    t1 = J.getInterceptor$asx(text);
-    simple = true;
-    i = 0;
-    while (true) {
-      if (!(i < t1.get$length(text) && simple))
-        break;
-      codeUnit = t1.codeUnitAt$1(text, i);
-      simple = codeUnit !== 37 && codeUnit !== 43;
-      ++i;
-    }
-    if (simple)
-      if (encoding === C.Utf8Codec_false || false)
-        return text;
-      else
-        bytes = t1.get$codeUnits(text);
-    else {
-      bytes = [];
-      for (i = 0; i < t1.get$length(text); ++i) {
-        codeUnit = t1.codeUnitAt$1(text, i);
-        if (codeUnit > 127)
-          throw H.wrapException(P.ArgumentError$("Illegal percent encoding in URI"));
-        if (codeUnit === 37) {
-          if (i + 3 > text.length)
-            throw H.wrapException(P.ArgumentError$("Truncated URI"));
-          bytes.push(P.Uri__hexCharPairToByte(text, i + 1));
-          i += 2;
-        } else if (plusToSpace && codeUnit === 43)
-          bytes.push(32);
-        else
-          bytes.push(codeUnit);
-      }
-    }
-    allowMalformed = encoding._allowMalformed;
-    return new P.Utf8Decoder(allowMalformed).convert$1(bytes);
-  },
   NoSuchMethodError_toString_closure: {
-    "^": "Closure:21;box_0",
+    "^": "Closure:19;box_0",
     call$2: function(key, value) {
       var t1 = this.box_0;
       if (t1.i_1 > 0)
@@ -6591,16 +5789,13 @@ var $$ = {};
       sixDigitUs = new P.Duration_toString_sixDigits().call$1(C.JSInt_methods.remainder$1(t2, 1000000));
       return "" + C.JSInt_methods._tdivFast$1(t2, 3600000000) + ":" + H.S(twoDigitMinutes) + ":" + H.S(twoDigitSeconds) + "." + H.S(sixDigitUs);
     },
-    $negate: function(_) {
-      return P.Duration$(0, 0, -this._duration, 0, 0, 0);
-    },
     $isDuration: true,
     static: {"^": "Duration_MICROSECONDS_PER_MILLISECOND,Duration_MILLISECONDS_PER_SECOND,Duration_SECONDS_PER_MINUTE,Duration_MINUTES_PER_HOUR,Duration_HOURS_PER_DAY,Duration_MICROSECONDS_PER_SECOND,Duration_MICROSECONDS_PER_MINUTE,Duration_MICROSECONDS_PER_HOUR,Duration_MICROSECONDS_PER_DAY,Duration_MILLISECONDS_PER_MINUTE,Duration_MILLISECONDS_PER_HOUR,Duration_MILLISECONDS_PER_DAY,Duration_SECONDS_PER_HOUR,Duration_SECONDS_PER_DAY,Duration_MINUTES_PER_DAY,Duration_ZERO", Duration$: function(days, hours, microseconds, milliseconds, minutes, seconds) {
         return new P.Duration(days * 86400000000 + hours * 3600000000 + minutes * 60000000 + seconds * 1000000 + milliseconds * 1000 + microseconds);
       }}
   },
   Duration_toString_sixDigits: {
-    "^": "Closure:22;",
+    "^": "Closure:20;",
     call$1: function(n) {
       if (n >= 100000)
         return "" + n;
@@ -6616,7 +5811,7 @@ var $$ = {};
     }
   },
   Duration_toString_twoDigits: {
-    "^": "Closure:22;",
+    "^": "Closure:20;",
     call$1: function(n) {
       if (n >= 10)
         return "" + n;
@@ -6653,9 +5848,7 @@ var $$ = {};
     toString$0: function(_) {
       return "RangeError: " + H.S(this.message);
     },
-    static: {RangeError$: function(message) {
-        return new P.RangeError(message);
-      }, RangeError$value: function(value) {
+    static: {RangeError$value: function(value) {
         return new P.RangeError("value " + H.S(value));
       }, RangeError$range: function(value, start, end) {
         return new P.RangeError("value " + H.S(value) + " not in range " + start + ".." + H.S(end));
@@ -6739,24 +5932,6 @@ var $$ = {};
         return "Exception";
       return "Exception: " + H.S(t1);
     }
-  },
-  FormatException: {
-    "^": "Object;message,source,offset",
-    toString$0: function(_) {
-      var t1, report, source;
-      t1 = this.message;
-      report = t1 != null && "" !== t1 ? "FormatException: " + H.S(t1) : "FormatException";
-      source = this.source;
-      if (typeof source !== "string")
-        return report;
-      t1 = J.getInterceptor$asx(source);
-      if (J.$gt$n(t1.get$length(source), 78))
-        source = t1.substring$2(source, 0, 75) + "...";
-      return report + "\n" + H.S(source);
-    },
-    static: {FormatException$: function(message, source, offset) {
-        return new P.FormatException(message, source, offset);
-      }}
   },
   IntegerDivisionByZeroException: {
     "^": "Object;",
@@ -6909,24 +6084,6 @@ var $$ = {};
   Symbol: {
     "^": "Object;"
   },
-  Uri_splitQueryString_closure: {
-    "^": "Closure:8;encoding_0",
-    call$2: function(map, element) {
-      var t1, index, key, value;
-      t1 = J.getInterceptor$asx(element);
-      index = t1.indexOf$1(element, "=");
-      if (index === -1) {
-        if (element !== "")
-          J.$indexSet$ax(map, P.Uri__uriDecode(element, this.encoding_0, true), "");
-      } else if (index !== 0) {
-        key = t1.substring$2(element, 0, index);
-        value = C.JSString_methods.substring$1(element, index + 1);
-        t1 = this.encoding_0;
-        J.$indexSet$ax(map, P.Uri__uriDecode(key, t1, true), P.Uri__uriDecode(value, t1, true));
-      }
-      return map;
-    }
-  },
   Uri__uriEncode_byteToHex: {
     "^": "Closure:8;",
     call$2: function($byte, buffer) {
@@ -6937,9 +6094,6 @@ var $$ = {};
 }],
 ["dart.dom.html", "dart:html", , W, {
   "^": "",
-  CssStyleDeclaration__camelCase: function(hyphenated) {
-    return hyphenated.replace(/^-ms-/, "ms-").replace(/-([\da-z])/ig, C.JS_CONST_s8I);
-  },
   HttpRequest_getString: function(url, onProgress, withCredentials) {
     return W.HttpRequest_request(url, null, null, onProgress, null, null, null, withCredentials).then$1(new W.HttpRequest_getString_closure());
   },
@@ -6969,7 +6123,7 @@ var $$ = {};
   },
   HtmlElement: {
     "^": "Element;",
-    "%": "HTMLAppletElement|HTMLBRElement|HTMLBaseElement|HTMLBodyElement|HTMLButtonElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLDivElement|HTMLFieldSetElement|HTMLFontElement|HTMLFrameElement|HTMLFrameSetElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLKeygenElement|HTMLLIElement|HTMLLabelElement|HTMLLegendElement|HTMLLinkElement|HTMLMapElement|HTMLMarqueeElement|HTMLMenuElement|HTMLMetaElement|HTMLMeterElement|HTMLModElement|HTMLOListElement|HTMLOptGroupElement|HTMLOptionElement|HTMLOutputElement|HTMLParagraphElement|HTMLParamElement|HTMLPreElement|HTMLProgressElement|HTMLQuoteElement|HTMLShadowElement|HTMLSpanElement|HTMLStyleElement|HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableDataCellElement|HTMLTableElement|HTMLTableHeaderCellElement|HTMLTableRowElement|HTMLTableSectionElement|HTMLTemplateElement|HTMLTextAreaElement|HTMLTitleElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
+    "%": "HTMLAppletElement|HTMLBRElement|HTMLBaseElement|HTMLBodyElement|HTMLButtonElement|HTMLCanvasElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLDivElement|HTMLEmbedElement|HTMLFieldSetElement|HTMLFontElement|HTMLFrameElement|HTMLFrameSetElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLIFrameElement|HTMLImageElement|HTMLInputElement|HTMLKeygenElement|HTMLLIElement|HTMLLabelElement|HTMLLegendElement|HTMLLinkElement|HTMLMapElement|HTMLMarqueeElement|HTMLMenuElement|HTMLMetaElement|HTMLMeterElement|HTMLModElement|HTMLOListElement|HTMLOptGroupElement|HTMLOptionElement|HTMLOutputElement|HTMLParagraphElement|HTMLParamElement|HTMLPreElement|HTMLProgressElement|HTMLQuoteElement|HTMLScriptElement|HTMLShadowElement|HTMLSourceElement|HTMLSpanElement|HTMLStyleElement|HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableColElement|HTMLTableDataCellElement|HTMLTableElement|HTMLTableHeaderCellElement|HTMLTableRowElement|HTMLTableSectionElement|HTMLTemplateElement|HTMLTextAreaElement|HTMLTitleElement|HTMLTrackElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
   },
   AnchorElement: {
     "^": "HtmlElement;",
@@ -6990,10 +6144,6 @@ var $$ = {};
     $isBlob: true,
     "%": ";Blob"
   },
-  CanvasElement: {
-    "^": "HtmlElement;height},width}",
-    "%": "HTMLCanvasElement"
-  },
   CharacterData: {
     "^": "Node;data=,length=",
     "%": "CDATASection|CharacterData|Comment|ProcessingInstruction|Text"
@@ -7001,36 +6151,6 @@ var $$ = {};
   CompositionEvent: {
     "^": "UIEvent;data=",
     "%": "CompositionEvent"
-  },
-  CssStyleDeclaration: {
-    "^": "Interceptor_CssStyleDeclarationBase;length=",
-    setProperty$3: function(receiver, propertyName, value, priority) {
-      var t1;
-      if (W.CssStyleDeclaration__camelCase(propertyName) in receiver)
-        return this._setPropertyHelper$3(receiver, propertyName, value, priority);
-      else {
-        t1 = P.Device_cssPrefix();
-        if (t1 == null)
-          return t1.$add();
-        return this._setPropertyHelper$3(receiver, t1 + propertyName, value, priority);
-      }
-    },
-    _setPropertyHelper$3: function(receiver, propertyName, value, priority) {
-      var exception;
-      try {
-        if (value == null)
-          value = "";
-        if (priority == null)
-          priority = "";
-        receiver.setProperty(propertyName, value, priority);
-        if (!!receiver.setAttribute)
-          receiver.setAttribute(propertyName, value);
-      } catch (exception) {
-        H.unwrapException(exception);
-      }
-
-    },
-    "%": "CSS2Properties|CSSStyleDeclaration|MSStyleCSSProperties"
   },
   Document: {
     "^": "Node;",
@@ -7045,9 +6165,6 @@ var $$ = {};
   },
   Element: {
     "^": "Node;",
-    get$classes: function(receiver) {
-      return new W._ElementCssClassSet(receiver);
-    },
     toString$0: function(receiver) {
       return receiver.localName;
     },
@@ -7056,17 +6173,13 @@ var $$ = {};
     },
     "%": ";Element"
   },
-  EmbedElement: {
-    "^": "HtmlElement;height},src},width}",
-    "%": "HTMLEmbedElement"
-  },
   ErrorEvent: {
     "^": "Event;error=",
     "%": "ErrorEvent"
   },
   Event: {
     "^": "Interceptor;",
-    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MediaKeyEvent|MediaKeyMessageEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|ProgressEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|ResourceProgressEvent|SpeechInputEvent|SpeechRecognitionEvent|SpeechSynthesisEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent|XMLHttpRequestProgressEvent;ClipboardEvent|Event|InputEvent"
+    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MediaKeyEvent|MediaKeyMessageEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|ProgressEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|ResourceProgressEvent|SecurityPolicyViolationEvent|SpeechInputEvent|SpeechRecognitionEvent|SpeechSynthesisEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent|XMLHttpRequestProgressEvent;ClipboardEvent|Event|InputEvent"
   },
   EventTarget: {
     "^": "Interceptor;",
@@ -7105,7 +6218,7 @@ var $$ = {};
         return headers;
       headersList = headersString.split("\r\n");
       for (t1 = new H.ListIterator(headersList, headersList.length, 0, null); t1.moveNext$0();) {
-        header = t1.__internal$_current;
+        header = t1._current;
         t2 = J.getInterceptor$asx(header);
         if (t2.get$isEmpty(header) === true)
           continue;
@@ -7124,11 +6237,11 @@ var $$ = {};
     open$5$async$password$user: function(receiver, method, url, async, password, user) {
       return receiver.open(method, url, async, user, password);
     },
-    open$3$async: function($receiver, method, url, async) {
-      return $receiver.open(method, url, async);
-    },
     open$2: function($receiver, method, url) {
       return $receiver.open(method, url);
+    },
+    open$3$async: function($receiver, method, url, async) {
+      return $receiver.open(method, url, async);
     },
     send$1: function(receiver, data) {
       return receiver.send(data);
@@ -7139,18 +6252,6 @@ var $$ = {};
     "^": "EventTarget;",
     "%": ";XMLHttpRequestEventTarget"
   },
-  IFrameElement: {
-    "^": "HtmlElement;height},src},width}",
-    "%": "HTMLIFrameElement"
-  },
-  ImageElement: {
-    "^": "HtmlElement;height},src},width}",
-    "%": "HTMLImageElement"
-  },
-  InputElement: {
-    "^": "HtmlElement;height},src},width}",
-    "%": "HTMLInputElement"
-  },
   Location: {
     "^": "Interceptor;",
     toString$0: function(receiver) {
@@ -7159,8 +6260,8 @@ var $$ = {};
     "%": "Location"
   },
   MediaElement: {
-    "^": "HtmlElement;error=,src}",
-    "%": "HTMLAudioElement;HTMLMediaElement"
+    "^": "HtmlElement;error=",
+    "%": "HTMLAudioElement|HTMLMediaElement|HTMLVideoElement"
   },
   MessageEvent: {
     "^": "Event;",
@@ -7182,24 +6283,12 @@ var $$ = {};
     "%": "Attr|DocumentFragment|DocumentType|Notation|ShadowRoot;Node"
   },
   ObjectElement: {
-    "^": "HtmlElement;data=,height},width}",
+    "^": "HtmlElement;data=",
     "%": "HTMLObjectElement"
-  },
-  ScriptElement: {
-    "^": "HtmlElement;src}",
-    "%": "HTMLScriptElement"
-  },
-  SecurityPolicyViolationEvent: {
-    "^": "Event;statusCode=",
-    "%": "SecurityPolicyViolationEvent"
   },
   SelectElement: {
     "^": "HtmlElement;length=",
     "%": "HTMLSelectElement"
-  },
-  SourceElement: {
-    "^": "HtmlElement;src}",
-    "%": "HTMLSourceElement"
   },
   SpeechRecognitionError: {
     "^": "Event;error=",
@@ -7209,17 +6298,9 @@ var $$ = {};
     "^": "UIEvent;data=",
     "%": "TextEvent"
   },
-  TrackElement: {
-    "^": "HtmlElement;src}",
-    "%": "HTMLTrackElement"
-  },
   UIEvent: {
     "^": "Event;",
     "%": "DragEvent|FocusEvent|KeyboardEvent|MSPointerEvent|MouseEvent|MouseScrollEvent|MouseWheelEvent|PointerEvent|SVGZoomEvent|TouchEvent|WheelEvent;UIEvent"
-  },
-  VideoElement: {
-    "^": "MediaElement;height},width}",
-    "%": "HTMLVideoElement"
   },
   Window: {
     "^": "EventTarget;",
@@ -7290,42 +6371,6 @@ var $$ = {};
     },
     "%": "ClientRect|DOMRect"
   },
-  _NamedNodeMap: {
-    "^": "Interceptor_ListMixin_ImmutableListMixin;",
-    get$length: function(receiver) {
-      return receiver.length;
-    },
-    $index: function(receiver, index) {
-      var t1 = receiver.length;
-      if (index >>> 0 !== index || index >= t1)
-        throw H.wrapException(P.RangeError$range(index, 0, t1));
-      return receiver[index];
-    },
-    $indexSet: function(receiver, index, value) {
-      throw H.wrapException(P.UnsupportedError$("Cannot assign element of immutable List."));
-    },
-    elementAt$1: function(receiver, index) {
-      if (index < 0 || index >= receiver.length)
-        return H.ioore(receiver, index);
-      return receiver[index];
-    },
-    $isList: true,
-    $asList: function() {
-      return [W.Node];
-    },
-    $isEfficientLength: true,
-    $isJavaScriptIndexingBehavior: true,
-    "%": "MozNamedAttrMap|NamedNodeMap"
-  },
-  Interceptor_CssStyleDeclarationBase: {
-    "^": "Interceptor+CssStyleDeclarationBase;"
-  },
-  CssStyleDeclarationBase: {
-    "^": "Object;",
-    set$textAlign: function(receiver, value) {
-      this.setProperty$3(receiver, "text-align", value, "");
-    }
-  },
   HttpRequest_getString_closure: {
     "^": "Closure:9;",
     call$1: function(xhr) {
@@ -7355,39 +6400,6 @@ var $$ = {};
         t2._asyncComplete$1(t1);
       } else
         t3.completeError$1(e);
-    }
-  },
-  Interceptor_ListMixin: {
-    "^": "Interceptor+ListMixin;",
-    $isList: true,
-    $asList: function() {
-      return [W.Node];
-    },
-    $isEfficientLength: true
-  },
-  Interceptor_ListMixin_ImmutableListMixin: {
-    "^": "Interceptor_ListMixin+ImmutableListMixin;",
-    $isList: true,
-    $asList: function() {
-      return [W.Node];
-    },
-    $isEfficientLength: true
-  },
-  _ElementCssClassSet: {
-    "^": "CssClassSetImpl;_html$_element",
-    readClasses$0: function() {
-      var s, t1, trimmed;
-      s = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-      for (t1 = this._html$_element.className.split(" "), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        trimmed = J.trim$0$s(t1.__internal$_current);
-        if (trimmed.length !== 0)
-          s.add$1(0, trimmed);
-      }
-      return s;
-    },
-    writeClasses$1: function(s) {
-      P.List_List$from(s, true, null);
-      this._html$_element.className = s.join$1(0, " ");
     }
   },
   _EventStream: {
@@ -7423,34 +6435,6 @@ var $$ = {};
         J.removeEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
     }
   },
-  ImmutableListMixin: {
-    "^": "Object;",
-    get$iterator: function(receiver) {
-      return new W.FixedSizeListIterator(receiver, this.get$length(receiver), -1, null);
-    },
-    $isList: true,
-    $asList: null,
-    $isEfficientLength: true
-  },
-  FixedSizeListIterator: {
-    "^": "Object;_array,_length,_position,_current",
-    moveNext$0: function() {
-      var nextPosition, t1;
-      nextPosition = this._position + 1;
-      t1 = this._length;
-      if (nextPosition < t1) {
-        this._current = J.$index$asx(this._array, nextPosition);
-        this._position = nextPosition;
-        return true;
-      }
-      this._current = null;
-      this._position = t1;
-      return false;
-    },
-    get$current: function() {
-      return this._current;
-    }
-  },
   _DOMWindowCrossFrame: {
     "^": "Object;_window",
     postMessage$3: function(_, message, targetOrigin, messagePorts) {
@@ -7471,34 +6455,10 @@ var $$ = {};
   "^": "",
   SvgElement: {
     "^": "Element;",
-    get$classes: function(receiver) {
-      if (receiver._cssClassSet == null)
-        receiver._cssClassSet = new P._AttributeClassSet(receiver);
-      return receiver._cssClassSet;
-    },
     get$onClick: function(receiver) {
       return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
     },
     "%": "SVGAElement|SVGAltGlyphDefElement|SVGAltGlyphElement|SVGAltGlyphItemElement|SVGAnimateElement|SVGAnimateMotionElement|SVGAnimateTransformElement|SVGAnimationElement|SVGCircleElement|SVGClipPathElement|SVGComponentTransferFunctionElement|SVGCursorElement|SVGDefsElement|SVGDescElement|SVGDiscardElement|SVGElement|SVGEllipseElement|SVGFEBlendElement|SVGFEColorMatrixElement|SVGFEComponentTransferElement|SVGFECompositeElement|SVGFEConvolveMatrixElement|SVGFEDiffuseLightingElement|SVGFEDisplacementMapElement|SVGFEDistantLightElement|SVGFEDropShadowElement|SVGFEFloodElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEGaussianBlurElement|SVGFEImageElement|SVGFEMergeElement|SVGFEMergeNodeElement|SVGFEMorphologyElement|SVGFEOffsetElement|SVGFEPointLightElement|SVGFESpecularLightingElement|SVGFESpotLightElement|SVGFETileElement|SVGFETurbulenceElement|SVGFilterElement|SVGFontElement|SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement|SVGForeignObjectElement|SVGGElement|SVGGeometryElement|SVGGlyphElement|SVGGlyphRefElement|SVGGradientElement|SVGGraphicsElement|SVGHKernElement|SVGImageElement|SVGLineElement|SVGLinearGradientElement|SVGMPathElement|SVGMarkerElement|SVGMaskElement|SVGMetadataElement|SVGMissingGlyphElement|SVGPathElement|SVGPatternElement|SVGPolygonElement|SVGPolylineElement|SVGRadialGradientElement|SVGRectElement|SVGSVGElement|SVGScriptElement|SVGSetElement|SVGStopElement|SVGStyleElement|SVGSwitchElement|SVGSymbolElement|SVGTSpanElement|SVGTextContentElement|SVGTextElement|SVGTextPathElement|SVGTextPositioningElement|SVGTitleElement|SVGUseElement|SVGVKernElement|SVGViewElement"
-  },
-  _AttributeClassSet: {
-    "^": "CssClassSetImpl;_element",
-    readClasses$0: function() {
-      var classname, s, t1, trimmed;
-      classname = this._element.getAttribute("class");
-      s = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-      if (classname == null)
-        return s;
-      for (t1 = classname.split(" "), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        trimmed = J.trim$0$s(t1.__internal$_current);
-        if (trimmed.length !== 0)
-          s.add$1(0, trimmed);
-      }
-      return s;
-    },
-    writeClasses$1: function(s) {
-      this._element.setAttribute("class", s.join$1(0, " "));
-    }
   }
 }],
 ["dart.isolate", "dart:isolate", , P, {
@@ -7760,58 +6720,6 @@ var $$ = {};
     throw "Unable to print message: " + String(string);
   }
 }],
-["", "emoji.dart", , U, {
-  "^": "",
-  main: [function() {
-    M.initGitHub();
-    R.init("emoji.dart", new U.main_closure());
-  }, "call$0", "main$closure", 0, 0, 2],
-  loadEmojis: function() {
-    var params, token, t1;
-    params = R.queryString();
-    token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    t1 = $.GitHub_defaultClient.call$0();
-    t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
-    $.github = t1;
-    t1.getJSON$2$statusCode("/emojis", 200).then$1(new U.loadEmojis_closure());
-  },
-  main_closure: {
-    "^": "Closure:7;",
-    call$0: function() {
-      $.$$emoji = document.querySelector("#emojis");
-      U.loadEmojis();
-    }
-  },
-  loadEmojis_closure: {
-    "^": "Closure:9;",
-    call$1: function(info) {
-      J.forEach$1$ax(info, new U.loadEmojis__closure());
-    }
-  },
-  loadEmojis__closure: {
-    "^": "Closure:8;",
-    call$2: function($name, url) {
-      var h, t1, e;
-      h = document.createElement("div", null);
-      t1 = J.getInterceptor$x(h);
-      t1.get$classes(h).add$1(0, "box");
-      t1.get$classes(h).add$1(0, "emoji-box");
-      J.set$textAlign$x(h.style, "center");
-      e = document.createElement("img", null);
-      if (url != null)
-        J.set$src$x(e, url);
-      J.set$width$x(e, 64);
-      J.set$height$x(e, 64);
-      J.get$classes$x(e).add$1(0, "emoji");
-      h.appendChild(e);
-      t1 = document.createElement("p", null);
-      t1.textContent = $name;
-      h.appendChild(t1);
-      $.$$emoji.appendChild(h);
-    }
-  }
-},
-1],
 ["github.browser", "package:github/browser.dart", , M, {
   "^": "",
   initGitHub: function() {
@@ -7861,52 +6769,10 @@ var $$ = {};
   Authentication: {
     "^": "Object;token,username,password,isAnonymous,isBasic,isToken"
   },
-  GitHubError: {
-    "^": "Object;",
-    toString$0: function(_) {
-      return "GitHub Error: " + this.message;
-    }
-  },
-  NotFound: {
-    "^": "GitHubError;message,apiUrl,github,source",
-    static: {NotFound$: function(github, msg) {
-        return new T.NotFound(msg, null, github, null);
-      }}
-  },
-  AccessForbidden: {
-    "^": "GitHubError;message,apiUrl,github,source",
-    static: {AccessForbidden$: function(github) {
-        return new T.AccessForbidden("Access Forbbidden", null, github, null);
-      }}
-  },
-  UnknownError: {
-    "^": "GitHubError;message,apiUrl,github,source",
-    static: {UnknownError$: function(github) {
-        return new T.UnknownError("Unknown Error", null, github, null);
-      }}
-  },
   GitHub: {
     "^": "Object;auth,endpoint,client",
-    getJSON$6$convert$fail$headers$params$statusCode: function(path, convert, fail, headers, params, statusCode) {
-      var t1 = {};
-      t1.convert_0 = convert;
-      headers = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-      t1.convert_0 = new T.GitHub_getJSON_closure();
-      headers.putIfAbsent$2("Accept", new T.GitHub_getJSON_closure0());
-      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure1(t1, this, statusCode, fail));
-    },
-    getJSON$2$statusCode: function(path, statusCode) {
-      return this.getJSON$6$convert$fail$headers$params$statusCode(path, null, null, null, null, statusCode);
-    },
-    _handleStatusCode$2: function(response, code) {
-      switch (code) {
-        case 404:
-          throw H.wrapException(T.NotFound$(this, "Requested Resource was Not Found"));
-        case 401:
-          throw H.wrapException(T.AccessForbidden$(this));
-        default:
-          throw H.wrapException(T.UnknownError$(this));
-      }
+    zen$0: function() {
+      return this.request$2(0, "GET", "/zen").then$1(new T.GitHub_zen_closure());
     },
     request$5$body$headers$params: function(_, method, path, body, headers, params) {
       var t1, queryString, url;
@@ -7931,29 +6797,15 @@ var $$ = {};
       }
       return J.request$1$x(this.client, new T.Request(url._contents, method, body, headers));
     },
-    request$4$headers$params: function($receiver, method, path, headers, params) {
-      return this.request$5$body$headers$params($receiver, method, path, null, headers, params);
+    request$2: function($receiver, method, path) {
+      return this.request$5$body$headers$params($receiver, method, path, null, null, null);
     },
     static: {"^": "GitHub_defaultClient"}
   },
-  GitHub_getJSON_closure: {
-    "^": "Closure:8;",
-    call$2: function(github, input) {
-      return input;
-    }
-  },
-  GitHub_getJSON_closure0: {
-    "^": "Closure:7;",
-    call$0: function() {
-      return "application/vnd.github.v3+json";
-    }
-  },
-  GitHub_getJSON_closure1: {
-    "^": "Closure:9;box_0,this_1,statusCode_2,fail_3",
+  GitHub_zen_closure: {
+    "^": "Closure:9;",
     call$1: function(response) {
-      if (this.statusCode_2 !== J.get$statusCode$x(response))
-        this.this_1._handleStatusCode$2(response, J.get$statusCode$x(response));
-      return this.box_0.convert_0.call$2(this.this_1, C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
+      return J.get$body$x(response);
     }
   },
   GitHub_request_closure: {
@@ -7984,7 +6836,7 @@ var $$ = {};
     "^": "Object;url,method,body>,headers"
   },
   Response: {
-    "^": "Object;body>,headers,statusCode>"
+    "^": "Object;body>,headers,statusCode"
   }
 }],
 ["html_common", "dart:html_common", , P, {
@@ -7999,45 +6851,6 @@ var $$ = {};
   convertNativeToDart_AcceptStructuredClone: function(object, mustCopy) {
     var copies = [];
     return new P.convertNativeToDart_AcceptStructuredClone_walk(mustCopy, new P.convertNativeToDart_AcceptStructuredClone_findSlot([], copies), new P.convertNativeToDart_AcceptStructuredClone_readSlot(copies), new P.convertNativeToDart_AcceptStructuredClone_writeSlot(copies)).call$1(object);
-  },
-  Device_isOpera: function() {
-    var t1 = $.Device__isOpera;
-    if (t1 == null) {
-      t1 = J.contains$2$asx(window.navigator.userAgent, "Opera", 0);
-      $.Device__isOpera = t1;
-    }
-    return t1;
-  },
-  Device_cssPrefix: function() {
-    var t1 = $.Device__cachedCssPrefix;
-    if (t1 == null) {
-      t1 = $.Device__isFirefox;
-      if (t1 == null) {
-        t1 = J.contains$2$asx(window.navigator.userAgent, "Firefox", 0);
-        $.Device__isFirefox = t1;
-      }
-      if (t1 === true) {
-        $.Device__cachedCssPrefix = "-moz-";
-        t1 = "-moz-";
-      } else {
-        t1 = $.Device__isIE;
-        if (t1 == null) {
-          t1 = P.Device_isOpera() !== true && J.contains$2$asx(window.navigator.userAgent, "Trident/", 0);
-          $.Device__isIE = t1;
-        }
-        if (t1 === true) {
-          $.Device__cachedCssPrefix = "-ms-";
-          t1 = "-ms-";
-        } else if (P.Device_isOpera() === true) {
-          $.Device__cachedCssPrefix = "-o-";
-          t1 = "-o-";
-        } else {
-          $.Device__cachedCssPrefix = "-webkit-";
-          t1 = "-webkit-";
-        }
-      }
-    }
-    return t1;
   },
   _convertDartToNative_PrepareForStructuredClone_findSlot: {
     "^": "Closure:4;values_1,copies_2",
@@ -8054,7 +6867,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_readSlot: {
-    "^": "Closure:23;copies_3",
+    "^": "Closure:21;copies_3",
     call$1: function(i) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -8063,7 +6876,7 @@ var $$ = {};
     }
   },
   _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-    "^": "Closure:24;copies_4",
+    "^": "Closure:22;copies_4",
     call$2: function(i, x) {
       var t1 = this.copies_4;
       if (i >= t1.length)
@@ -8132,7 +6945,9 @@ var $$ = {};
         copy = new Array($length);
         this.writeSlot_7.call$2(slot, copy);
         for (i = 0; i < $length; ++i) {
-          t1 = this.call$1(t2.$index(e, i));
+          if (i >= e.length)
+            return H.ioore(e, i);
+          t1 = this.call$1(e[i]);
           if (i >= copy.length)
             return H.ioore(copy, i);
           copy[i] = t1;
@@ -8165,7 +6980,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_readSlot: {
-    "^": "Closure:23;copies_2",
+    "^": "Closure:21;copies_2",
     call$1: function(i) {
       var t1 = this.copies_2;
       if (i >= t1.length)
@@ -8174,7 +6989,7 @@ var $$ = {};
     }
   },
   convertNativeToDart_AcceptStructuredClone_writeSlot: {
-    "^": "Closure:24;copies_3",
+    "^": "Closure:22;copies_3",
     call$2: function(i, x) {
       var t1 = this.copies_3;
       if (i >= t1.length)
@@ -8206,7 +7021,7 @@ var $$ = {};
         copy = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
         this.writeSlot_7.call$2(slot, copy);
         for (t1 = Object.keys(e), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-          key = t1.__internal$_current;
+          key = t1._current;
           copy.$indexSet(0, key, this.call$1(e[key]));
         }
         return copy;
@@ -8229,54 +7044,6 @@ var $$ = {};
         return copy;
       }
       return e;
-    }
-  },
-  CssClassSetImpl: {
-    "^": "Object;",
-    toString$0: function(_) {
-      return this.readClasses$0().join$1(0, " ");
-    },
-    get$iterator: function(_) {
-      var t1, t2;
-      t1 = this.readClasses$0();
-      t2 = new P.LinkedHashSetIterator(t1, t1._modifications, null, null);
-      t2._cell = t1._first;
-      return t2;
-    },
-    forEach$1: function(_, f) {
-      this.readClasses$0().forEach$1(0, f);
-    },
-    get$isEmpty: function(_) {
-      return this.readClasses$0()._collection$_length === 0;
-    },
-    get$length: function(_) {
-      return this.readClasses$0()._collection$_length;
-    },
-    lookup$1: function(value) {
-      return this.readClasses$0().contains$1(0, value) ? value : null;
-    },
-    add$1: function(_, value) {
-      return this.modify$1(new P.CssClassSetImpl_add_closure(value));
-    },
-    toList$1$growable: function(_, growable) {
-      return this.readClasses$0().toList$1$growable(0, growable);
-    },
-    toList$0: function($receiver) {
-      return this.toList$1$growable($receiver, true);
-    },
-    modify$1: function(f) {
-      var s, ret;
-      s = this.readClasses$0();
-      ret = f.call$1(s);
-      this.writeClasses$1(s);
-      return ret;
-    },
-    $isEfficientLength: true
-  },
-  CssClassSetImpl_add_closure: {
-    "^": "Closure:9;value_0",
-    call$1: function(s) {
-      return s.add$1(0, this.value_0);
     }
   }
 }],
@@ -8307,6 +7074,37 @@ var $$ = {};
     }
   }
 }],
+["", "zen.dart", , V, {
+  "^": "",
+  main: [function() {
+    R.init("zen.dart", new V.main_closure());
+  }, "call$0", "main$closure", 0, 0, 2],
+  loadZen: function() {
+    $.github.zen$0().then$1(new V.loadZen_closure());
+  },
+  main_closure: {
+    "^": "Closure:7;",
+    call$0: function() {
+      var t1, t2;
+      M.initGitHub();
+      t1 = new T.Authentication(null, null, null, true, false, false);
+      t2 = $.GitHub_defaultClient.call$0();
+      $.github = new T.GitHub(t1, "https://api.github.com", t2);
+      $.$$zen = document.querySelector("#zen");
+      V.loadZen();
+    }
+  },
+  loadZen_closure: {
+    "^": "Closure:9;",
+    call$1: function(zen) {
+      var t1 = $.$$zen;
+      t1.toString;
+      t1.appendChild(document.createTextNode(zen));
+      return;
+    }
+  }
+},
+1],
 ]);
 Isolate.$finishClasses($$, $, null);
 $$ = null;
@@ -8321,7 +7119,6 @@ $$ = null;
   _ = P.$double;
   _.$isnum = TRUE;
   _.$isObject = TRUE;
-  W.Node.$isObject = TRUE;
   _ = P.String;
   _.$isString = TRUE;
   _.$isObject = TRUE;
@@ -8332,12 +7129,11 @@ $$ = null;
   _.$isDuration = TRUE;
   _.$isObject = TRUE;
   P.List.$isObject = TRUE;
-  P.Object.$isObject = TRUE;
-  W.HttpRequest.$isObject = TRUE;
   T.Response.$isObject = TRUE;
   _ = P.bool;
   _.$isbool = TRUE;
   _.$isObject = TRUE;
+  W.HttpRequest.$isObject = TRUE;
   H.RawReceivePortImpl.$isObject = TRUE;
   H._IsolateEvent.$isObject = TRUE;
   H._IsolateContext.$isObject = TRUE;
@@ -8347,6 +7143,7 @@ $$ = null;
   _ = P.StackTrace;
   _.$isStackTrace = TRUE;
   _.$isObject = TRUE;
+  P.Object.$isObject = TRUE;
   _ = P._EventSink;
   _.$is_EventSink = TRUE;
   _.$isObject = TRUE;
@@ -8509,20 +7306,11 @@ J.codeUnitAt$1$s = function(receiver, a0) {
 J.contains$1$asx = function(receiver, a0) {
   return J.getInterceptor$asx(receiver).contains$1(receiver, a0);
 };
-J.contains$2$asx = function(receiver, a0, a1) {
-  return J.getInterceptor$asx(receiver).contains$2(receiver, a0, a1);
-};
-J.elementAt$1$ax = function(receiver, a0) {
-  return J.getInterceptor$ax(receiver).elementAt$1(receiver, a0);
-};
 J.forEach$1$ax = function(receiver, a0) {
   return J.getInterceptor$ax(receiver).forEach$1(receiver, a0);
 };
 J.get$body$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$body(receiver);
-};
-J.get$classes$x = function(receiver) {
-  return J.getInterceptor$x(receiver).get$classes(receiver);
 };
 J.get$data$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$data(receiver);
@@ -8548,9 +7336,6 @@ J.get$onClick$x = function(receiver) {
 J.get$responseText$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$responseText(receiver);
 };
-J.get$statusCode$x = function(receiver) {
-  return J.getInterceptor$x(receiver).get$statusCode(receiver);
-};
 J.postMessage$2$x = function(receiver, a0, a1) {
   return J.getInterceptor$x(receiver).postMessage$2(receiver, a0, a1);
 };
@@ -8566,32 +7351,8 @@ J.request$1$x = function(receiver, a0) {
 J.send$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).send$1(receiver, a0);
 };
-J.set$height$x = function(receiver, value) {
-  return J.getInterceptor$x(receiver).set$height(receiver, value);
-};
-J.set$src$x = function(receiver, value) {
-  return J.getInterceptor$x(receiver).set$src(receiver, value);
-};
-J.set$textAlign$x = function(receiver, value) {
-  return J.getInterceptor$x(receiver).set$textAlign(receiver, value);
-};
-J.set$width$x = function(receiver, value) {
-  return J.getInterceptor$x(receiver).set$width(receiver, value);
-};
-J.sublist$2$ax = function(receiver, a0, a1) {
-  return J.getInterceptor$ax(receiver).sublist$2(receiver, a0, a1);
-};
-J.toList$0$ax = function(receiver) {
-  return J.getInterceptor$ax(receiver).toList$0(receiver);
-};
-J.toRadixString$1$n = function(receiver, a0) {
-  return J.getInterceptor$n(receiver).toRadixString$1(receiver, a0);
-};
 J.toString$0 = function(receiver) {
   return J.getInterceptor(receiver).toString$0(receiver);
-};
-J.trim$0$s = function(receiver) {
-  return J.getInterceptor$s(receiver).trim$0(receiver);
 };
 C.HttpRequest_methods = W.HttpRequest.prototype;
 C.JSArray_methods = J.JSArray.prototype;
@@ -8737,16 +7498,12 @@ C.JS_CONST_rr7 = function(hooks) {
   hooks.getTag = getTagFixed;
   hooks.prototypeForTag = prototypeForTagFixed;
 };
-C.JS_CONST_s8I = function(_, letter) { return letter.toUpperCase(); };
-C.JsonCodec_null_null = new P.JsonCodec(null, null);
-C.JsonDecoder_null = new P.JsonDecoder(null);
 Isolate.makeConstantList = function(list) {
   list.immutable$list = init;
   list.fixed$length = init;
   return list;
 };
 ;
-C.List_127_2047_65535_1114111 = H.setRuntimeTypeInfo(Isolate.makeConstantList([127, 2047, 65535, 1114111]), [P.$int]);
 C.List_KIf = Isolate.makeConstantList([0, 0, 26498, 1023, 65534, 34815, 65534, 18431]);
 C.Type_AHF = H.createRuntimeType('NativeTypedArray');
 C.Type_EQs = H.createRuntimeType('GlobalEventHandlers');
@@ -8779,14 +7536,11 @@ $._isInCallbackLoop = false;
 $.Zone__current = C.C__RootZone;
 $.Expando__keyCount = 0;
 $.Stopwatch__frequency = null;
-$.github = null;
-$.$$emoji = null;
 $.GitHub_defaultClient = null;
 $.Device__isOpera = null;
-$.Device__isIE = null;
-$.Device__isFirefox = null;
 $.Device__isWebKit = null;
-$.Device__cachedCssPrefix = null;
+$.github = null;
+$.$$zen = null;
 Isolate.$lazy($, "thisScript", "IsolateNatives_thisScript", "get$IsolateNatives_thisScript", function() {
   return H.IsolateNatives_computeThisScript();
 });
@@ -8884,8 +7638,6 @@ init.metadata = [{func: "num_", ret: P.num},
 {func: "dynamic__dynamic__dynamic", args: [null], opt: [null]},
 {func: "bool_", ret: P.bool},
 {func: "dynamic__dynamic_StackTrace", args: [null, P.StackTrace]},
-{func: "int__dynamic_int", ret: P.$int, args: [null, P.$int]},
-{func: "void__int_int", void: true, args: [P.$int, P.$int]},
 {func: "dynamic__Symbol_dynamic", args: [P.Symbol, null]},
 {func: "String__int", ret: P.String, args: [P.$int]},
 {func: "dynamic__int", args: [P.$int]},
@@ -9228,11 +7980,11 @@ init.dispatchPropertyName = init.getIsolateTag("dispatch_record");
   init.currentScript = currentScript;
   if (typeof dartMainRunner === "function") {
     dartMainRunner(function(a) {
-      H.startRootIsolate(U.main$closure(), a);
+      H.startRootIsolate(V.main$closure(), a);
     }, []);
   } else {
     (function(a) {
-      H.startRootIsolate(U.main$closure(), a);
+      H.startRootIsolate(V.main$closure(), a);
     })([]);
   }
 });
@@ -9240,5295 +7992,4 @@ init.dispatchPropertyName = init.getIsolateTag("dispatch_record");
 // END invoke [main].
 })()
 
-//# sourceMappingURL=emoji.dart.js.map
-{
-  var message =
-      'Deprecation: Automatic generation of output for Content Security\n' +
-      'Policy is deprecated and will be removed with the next development\n' +
-      'release. Use the --csp option to generate CSP restricted output.';
-  if (typeof dartPrint == "function") {
-    dartPrint(message);
-  } else if (typeof console == "object" && typeof console.log == "function") {
-    console.log(message);
-  } else if (typeof print == "function") {
-    print(message);
-  }
-}
-function dart_precompiled($collectedClasses) {
-  var $desc;
-  function HtmlElement() {
-  }
-  HtmlElement.builtin$cls = "HtmlElement";
-  if (!"name" in HtmlElement)
-    HtmlElement.name = "HtmlElement";
-  $desc = $collectedClasses.HtmlElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HtmlElement.prototype = $desc;
-  function AnchorElement() {
-  }
-  AnchorElement.builtin$cls = "AnchorElement";
-  if (!"name" in AnchorElement)
-    AnchorElement.name = "AnchorElement";
-  $desc = $collectedClasses.AnchorElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnchorElement.prototype = $desc;
-  function AnimationEvent() {
-  }
-  AnimationEvent.builtin$cls = "AnimationEvent";
-  if (!"name" in AnimationEvent)
-    AnimationEvent.name = "AnimationEvent";
-  $desc = $collectedClasses.AnimationEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimationEvent.prototype = $desc;
-  function AreaElement() {
-  }
-  AreaElement.builtin$cls = "AreaElement";
-  if (!"name" in AreaElement)
-    AreaElement.name = "AreaElement";
-  $desc = $collectedClasses.AreaElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AreaElement.prototype = $desc;
-  function AudioElement() {
-  }
-  AudioElement.builtin$cls = "AudioElement";
-  if (!"name" in AudioElement)
-    AudioElement.name = "AudioElement";
-  $desc = $collectedClasses.AudioElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioElement.prototype = $desc;
-  function AutocompleteErrorEvent() {
-  }
-  AutocompleteErrorEvent.builtin$cls = "AutocompleteErrorEvent";
-  if (!"name" in AutocompleteErrorEvent)
-    AutocompleteErrorEvent.name = "AutocompleteErrorEvent";
-  $desc = $collectedClasses.AutocompleteErrorEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AutocompleteErrorEvent.prototype = $desc;
-  function BRElement() {
-  }
-  BRElement.builtin$cls = "BRElement";
-  if (!"name" in BRElement)
-    BRElement.name = "BRElement";
-  $desc = $collectedClasses.BRElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BRElement.prototype = $desc;
-  function BaseElement() {
-  }
-  BaseElement.builtin$cls = "BaseElement";
-  if (!"name" in BaseElement)
-    BaseElement.name = "BaseElement";
-  $desc = $collectedClasses.BaseElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BaseElement.prototype = $desc;
-  function BeforeLoadEvent() {
-  }
-  BeforeLoadEvent.builtin$cls = "BeforeLoadEvent";
-  if (!"name" in BeforeLoadEvent)
-    BeforeLoadEvent.name = "BeforeLoadEvent";
-  $desc = $collectedClasses.BeforeLoadEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BeforeLoadEvent.prototype = $desc;
-  function BeforeUnloadEvent() {
-  }
-  BeforeUnloadEvent.builtin$cls = "BeforeUnloadEvent";
-  if (!"name" in BeforeUnloadEvent)
-    BeforeUnloadEvent.name = "BeforeUnloadEvent";
-  $desc = $collectedClasses.BeforeUnloadEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BeforeUnloadEvent.prototype = $desc;
-  function Blob() {
-  }
-  Blob.builtin$cls = "Blob";
-  if (!"name" in Blob)
-    Blob.name = "Blob";
-  $desc = $collectedClasses.Blob;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Blob.prototype = $desc;
-  function BodyElement() {
-  }
-  BodyElement.builtin$cls = "BodyElement";
-  if (!"name" in BodyElement)
-    BodyElement.name = "BodyElement";
-  $desc = $collectedClasses.BodyElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BodyElement.prototype = $desc;
-  function ButtonElement() {
-  }
-  ButtonElement.builtin$cls = "ButtonElement";
-  if (!"name" in ButtonElement)
-    ButtonElement.name = "ButtonElement";
-  $desc = $collectedClasses.ButtonElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ButtonElement.prototype = $desc;
-  function CDataSection() {
-  }
-  CDataSection.builtin$cls = "CDataSection";
-  if (!"name" in CDataSection)
-    CDataSection.name = "CDataSection";
-  $desc = $collectedClasses.CDataSection;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CDataSection.prototype = $desc;
-  function CanvasElement() {
-  }
-  CanvasElement.builtin$cls = "CanvasElement";
-  if (!"name" in CanvasElement)
-    CanvasElement.name = "CanvasElement";
-  $desc = $collectedClasses.CanvasElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CanvasElement.prototype = $desc;
-  CanvasElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  CanvasElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function CharacterData() {
-  }
-  CharacterData.builtin$cls = "CharacterData";
-  if (!"name" in CharacterData)
-    CharacterData.name = "CharacterData";
-  $desc = $collectedClasses.CharacterData;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CharacterData.prototype = $desc;
-  CharacterData.prototype.get$data = function(receiver) {
-    return receiver.data;
-  };
-  CharacterData.prototype.get$length = function(receiver) {
-    return receiver.length;
-  };
-  function CloseEvent() {
-  }
-  CloseEvent.builtin$cls = "CloseEvent";
-  if (!"name" in CloseEvent)
-    CloseEvent.name = "CloseEvent";
-  $desc = $collectedClasses.CloseEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CloseEvent.prototype = $desc;
-  function Comment() {
-  }
-  Comment.builtin$cls = "Comment";
-  if (!"name" in Comment)
-    Comment.name = "Comment";
-  $desc = $collectedClasses.Comment;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Comment.prototype = $desc;
-  function CompositionEvent() {
-  }
-  CompositionEvent.builtin$cls = "CompositionEvent";
-  if (!"name" in CompositionEvent)
-    CompositionEvent.name = "CompositionEvent";
-  $desc = $collectedClasses.CompositionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CompositionEvent.prototype = $desc;
-  CompositionEvent.prototype.get$data = function(receiver) {
-    return receiver.data;
-  };
-  function ContentElement() {
-  }
-  ContentElement.builtin$cls = "ContentElement";
-  if (!"name" in ContentElement)
-    ContentElement.name = "ContentElement";
-  $desc = $collectedClasses.ContentElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ContentElement.prototype = $desc;
-  function CssFontFaceLoadEvent() {
-  }
-  CssFontFaceLoadEvent.builtin$cls = "CssFontFaceLoadEvent";
-  if (!"name" in CssFontFaceLoadEvent)
-    CssFontFaceLoadEvent.name = "CssFontFaceLoadEvent";
-  $desc = $collectedClasses.CssFontFaceLoadEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CssFontFaceLoadEvent.prototype = $desc;
-  function CssStyleDeclaration() {
-  }
-  CssStyleDeclaration.builtin$cls = "CssStyleDeclaration";
-  if (!"name" in CssStyleDeclaration)
-    CssStyleDeclaration.name = "CssStyleDeclaration";
-  $desc = $collectedClasses.CssStyleDeclaration;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CssStyleDeclaration.prototype = $desc;
-  CssStyleDeclaration.prototype.get$length = function(receiver) {
-    return receiver.length;
-  };
-  function CustomEvent() {
-  }
-  CustomEvent.builtin$cls = "CustomEvent";
-  if (!"name" in CustomEvent)
-    CustomEvent.name = "CustomEvent";
-  $desc = $collectedClasses.CustomEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CustomEvent.prototype = $desc;
-  function DListElement() {
-  }
-  DListElement.builtin$cls = "DListElement";
-  if (!"name" in DListElement)
-    DListElement.name = "DListElement";
-  $desc = $collectedClasses.DListElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DListElement.prototype = $desc;
-  function DataListElement() {
-  }
-  DataListElement.builtin$cls = "DataListElement";
-  if (!"name" in DataListElement)
-    DataListElement.name = "DataListElement";
-  $desc = $collectedClasses.DataListElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DataListElement.prototype = $desc;
-  function DetailsElement() {
-  }
-  DetailsElement.builtin$cls = "DetailsElement";
-  if (!"name" in DetailsElement)
-    DetailsElement.name = "DetailsElement";
-  $desc = $collectedClasses.DetailsElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DetailsElement.prototype = $desc;
-  function DeviceMotionEvent() {
-  }
-  DeviceMotionEvent.builtin$cls = "DeviceMotionEvent";
-  if (!"name" in DeviceMotionEvent)
-    DeviceMotionEvent.name = "DeviceMotionEvent";
-  $desc = $collectedClasses.DeviceMotionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DeviceMotionEvent.prototype = $desc;
-  function DeviceOrientationEvent() {
-  }
-  DeviceOrientationEvent.builtin$cls = "DeviceOrientationEvent";
-  if (!"name" in DeviceOrientationEvent)
-    DeviceOrientationEvent.name = "DeviceOrientationEvent";
-  $desc = $collectedClasses.DeviceOrientationEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DeviceOrientationEvent.prototype = $desc;
-  function DialogElement() {
-  }
-  DialogElement.builtin$cls = "DialogElement";
-  if (!"name" in DialogElement)
-    DialogElement.name = "DialogElement";
-  $desc = $collectedClasses.DialogElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DialogElement.prototype = $desc;
-  function DivElement() {
-  }
-  DivElement.builtin$cls = "DivElement";
-  if (!"name" in DivElement)
-    DivElement.name = "DivElement";
-  $desc = $collectedClasses.DivElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DivElement.prototype = $desc;
-  function Document() {
-  }
-  Document.builtin$cls = "Document";
-  if (!"name" in Document)
-    Document.name = "Document";
-  $desc = $collectedClasses.Document;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Document.prototype = $desc;
-  function DocumentFragment() {
-  }
-  DocumentFragment.builtin$cls = "DocumentFragment";
-  if (!"name" in DocumentFragment)
-    DocumentFragment.name = "DocumentFragment";
-  $desc = $collectedClasses.DocumentFragment;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DocumentFragment.prototype = $desc;
-  function DomError() {
-  }
-  DomError.builtin$cls = "DomError";
-  if (!"name" in DomError)
-    DomError.name = "DomError";
-  $desc = $collectedClasses.DomError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DomError.prototype = $desc;
-  function DomException() {
-  }
-  DomException.builtin$cls = "DomException";
-  if (!"name" in DomException)
-    DomException.name = "DomException";
-  $desc = $collectedClasses.DomException;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DomException.prototype = $desc;
-  function Element() {
-  }
-  Element.builtin$cls = "Element";
-  if (!"name" in Element)
-    Element.name = "Element";
-  $desc = $collectedClasses.Element;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Element.prototype = $desc;
-  function EmbedElement() {
-  }
-  EmbedElement.builtin$cls = "EmbedElement";
-  if (!"name" in EmbedElement)
-    EmbedElement.name = "EmbedElement";
-  $desc = $collectedClasses.EmbedElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EmbedElement.prototype = $desc;
-  EmbedElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  EmbedElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  EmbedElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function ErrorEvent() {
-  }
-  ErrorEvent.builtin$cls = "ErrorEvent";
-  if (!"name" in ErrorEvent)
-    ErrorEvent.name = "ErrorEvent";
-  $desc = $collectedClasses.ErrorEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ErrorEvent.prototype = $desc;
-  ErrorEvent.prototype.get$error = function(receiver) {
-    return receiver.error;
-  };
-  function Event() {
-  }
-  Event.builtin$cls = "Event";
-  if (!"name" in Event)
-    Event.name = "Event";
-  $desc = $collectedClasses.Event;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Event.prototype = $desc;
-  function EventTarget() {
-  }
-  EventTarget.builtin$cls = "EventTarget";
-  if (!"name" in EventTarget)
-    EventTarget.name = "EventTarget";
-  $desc = $collectedClasses.EventTarget;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EventTarget.prototype = $desc;
-  function FieldSetElement() {
-  }
-  FieldSetElement.builtin$cls = "FieldSetElement";
-  if (!"name" in FieldSetElement)
-    FieldSetElement.name = "FieldSetElement";
-  $desc = $collectedClasses.FieldSetElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FieldSetElement.prototype = $desc;
-  function File() {
-  }
-  File.builtin$cls = "File";
-  if (!"name" in File)
-    File.name = "File";
-  $desc = $collectedClasses.File;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  File.prototype = $desc;
-  function FileError() {
-  }
-  FileError.builtin$cls = "FileError";
-  if (!"name" in FileError)
-    FileError.name = "FileError";
-  $desc = $collectedClasses.FileError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FileError.prototype = $desc;
-  function FocusEvent() {
-  }
-  FocusEvent.builtin$cls = "FocusEvent";
-  if (!"name" in FocusEvent)
-    FocusEvent.name = "FocusEvent";
-  $desc = $collectedClasses.FocusEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FocusEvent.prototype = $desc;
-  function FormElement() {
-  }
-  FormElement.builtin$cls = "FormElement";
-  if (!"name" in FormElement)
-    FormElement.name = "FormElement";
-  $desc = $collectedClasses.FormElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FormElement.prototype = $desc;
-  FormElement.prototype.get$length = function(receiver) {
-    return receiver.length;
-  };
-  function HRElement() {
-  }
-  HRElement.builtin$cls = "HRElement";
-  if (!"name" in HRElement)
-    HRElement.name = "HRElement";
-  $desc = $collectedClasses.HRElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HRElement.prototype = $desc;
-  function HashChangeEvent() {
-  }
-  HashChangeEvent.builtin$cls = "HashChangeEvent";
-  if (!"name" in HashChangeEvent)
-    HashChangeEvent.name = "HashChangeEvent";
-  $desc = $collectedClasses.HashChangeEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HashChangeEvent.prototype = $desc;
-  function HeadElement() {
-  }
-  HeadElement.builtin$cls = "HeadElement";
-  if (!"name" in HeadElement)
-    HeadElement.name = "HeadElement";
-  $desc = $collectedClasses.HeadElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HeadElement.prototype = $desc;
-  function HeadingElement() {
-  }
-  HeadingElement.builtin$cls = "HeadingElement";
-  if (!"name" in HeadingElement)
-    HeadingElement.name = "HeadingElement";
-  $desc = $collectedClasses.HeadingElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HeadingElement.prototype = $desc;
-  function HtmlDocument() {
-  }
-  HtmlDocument.builtin$cls = "HtmlDocument";
-  if (!"name" in HtmlDocument)
-    HtmlDocument.name = "HtmlDocument";
-  $desc = $collectedClasses.HtmlDocument;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HtmlDocument.prototype = $desc;
-  HtmlDocument.prototype.get$body = function(receiver) {
-    return receiver.body;
-  };
-  function HtmlHtmlElement() {
-  }
-  HtmlHtmlElement.builtin$cls = "HtmlHtmlElement";
-  if (!"name" in HtmlHtmlElement)
-    HtmlHtmlElement.name = "HtmlHtmlElement";
-  $desc = $collectedClasses.HtmlHtmlElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HtmlHtmlElement.prototype = $desc;
-  function HttpRequest() {
-  }
-  HttpRequest.builtin$cls = "HttpRequest";
-  if (!"name" in HttpRequest)
-    HttpRequest.name = "HttpRequest";
-  $desc = $collectedClasses.HttpRequest;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequest.prototype = $desc;
-  HttpRequest.prototype.get$responseText = function(receiver) {
-    return receiver.responseText;
-  };
-  function HttpRequestEventTarget() {
-  }
-  HttpRequestEventTarget.builtin$cls = "HttpRequestEventTarget";
-  if (!"name" in HttpRequestEventTarget)
-    HttpRequestEventTarget.name = "HttpRequestEventTarget";
-  $desc = $collectedClasses.HttpRequestEventTarget;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequestEventTarget.prototype = $desc;
-  function IFrameElement() {
-  }
-  IFrameElement.builtin$cls = "IFrameElement";
-  if (!"name" in IFrameElement)
-    IFrameElement.name = "IFrameElement";
-  $desc = $collectedClasses.IFrameElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IFrameElement.prototype = $desc;
-  IFrameElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  IFrameElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  IFrameElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function ImageElement() {
-  }
-  ImageElement.builtin$cls = "ImageElement";
-  if (!"name" in ImageElement)
-    ImageElement.name = "ImageElement";
-  $desc = $collectedClasses.ImageElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ImageElement.prototype = $desc;
-  ImageElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  ImageElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  ImageElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function InputElement() {
-  }
-  InputElement.builtin$cls = "InputElement";
-  if (!"name" in InputElement)
-    InputElement.name = "InputElement";
-  $desc = $collectedClasses.InputElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  InputElement.prototype = $desc;
-  InputElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  InputElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  InputElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function InstallEvent() {
-  }
-  InstallEvent.builtin$cls = "InstallEvent";
-  if (!"name" in InstallEvent)
-    InstallEvent.name = "InstallEvent";
-  $desc = $collectedClasses.InstallEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  InstallEvent.prototype = $desc;
-  function InstallPhaseEvent() {
-  }
-  InstallPhaseEvent.builtin$cls = "InstallPhaseEvent";
-  if (!"name" in InstallPhaseEvent)
-    InstallPhaseEvent.name = "InstallPhaseEvent";
-  $desc = $collectedClasses.InstallPhaseEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  InstallPhaseEvent.prototype = $desc;
-  function KeyboardEvent() {
-  }
-  KeyboardEvent.builtin$cls = "KeyboardEvent";
-  if (!"name" in KeyboardEvent)
-    KeyboardEvent.name = "KeyboardEvent";
-  $desc = $collectedClasses.KeyboardEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  KeyboardEvent.prototype = $desc;
-  function KeygenElement() {
-  }
-  KeygenElement.builtin$cls = "KeygenElement";
-  if (!"name" in KeygenElement)
-    KeygenElement.name = "KeygenElement";
-  $desc = $collectedClasses.KeygenElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  KeygenElement.prototype = $desc;
-  function LIElement() {
-  }
-  LIElement.builtin$cls = "LIElement";
-  if (!"name" in LIElement)
-    LIElement.name = "LIElement";
-  $desc = $collectedClasses.LIElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LIElement.prototype = $desc;
-  function LabelElement() {
-  }
-  LabelElement.builtin$cls = "LabelElement";
-  if (!"name" in LabelElement)
-    LabelElement.name = "LabelElement";
-  $desc = $collectedClasses.LabelElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LabelElement.prototype = $desc;
-  function LegendElement() {
-  }
-  LegendElement.builtin$cls = "LegendElement";
-  if (!"name" in LegendElement)
-    LegendElement.name = "LegendElement";
-  $desc = $collectedClasses.LegendElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LegendElement.prototype = $desc;
-  function LinkElement() {
-  }
-  LinkElement.builtin$cls = "LinkElement";
-  if (!"name" in LinkElement)
-    LinkElement.name = "LinkElement";
-  $desc = $collectedClasses.LinkElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkElement.prototype = $desc;
-  function Location() {
-  }
-  Location.builtin$cls = "Location";
-  if (!"name" in Location)
-    Location.name = "Location";
-  $desc = $collectedClasses.Location;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Location.prototype = $desc;
-  function MapElement() {
-  }
-  MapElement.builtin$cls = "MapElement";
-  if (!"name" in MapElement)
-    MapElement.name = "MapElement";
-  $desc = $collectedClasses.MapElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MapElement.prototype = $desc;
-  function MediaElement() {
-  }
-  MediaElement.builtin$cls = "MediaElement";
-  if (!"name" in MediaElement)
-    MediaElement.name = "MediaElement";
-  $desc = $collectedClasses.MediaElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaElement.prototype = $desc;
-  MediaElement.prototype.get$error = function(receiver) {
-    return receiver.error;
-  };
-  MediaElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  function MediaError() {
-  }
-  MediaError.builtin$cls = "MediaError";
-  if (!"name" in MediaError)
-    MediaError.name = "MediaError";
-  $desc = $collectedClasses.MediaError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaError.prototype = $desc;
-  function MediaKeyError() {
-  }
-  MediaKeyError.builtin$cls = "MediaKeyError";
-  if (!"name" in MediaKeyError)
-    MediaKeyError.name = "MediaKeyError";
-  $desc = $collectedClasses.MediaKeyError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaKeyError.prototype = $desc;
-  function MediaKeyEvent() {
-  }
-  MediaKeyEvent.builtin$cls = "MediaKeyEvent";
-  if (!"name" in MediaKeyEvent)
-    MediaKeyEvent.name = "MediaKeyEvent";
-  $desc = $collectedClasses.MediaKeyEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaKeyEvent.prototype = $desc;
-  function MediaKeyMessageEvent() {
-  }
-  MediaKeyMessageEvent.builtin$cls = "MediaKeyMessageEvent";
-  if (!"name" in MediaKeyMessageEvent)
-    MediaKeyMessageEvent.name = "MediaKeyMessageEvent";
-  $desc = $collectedClasses.MediaKeyMessageEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaKeyMessageEvent.prototype = $desc;
-  function MediaKeyNeededEvent() {
-  }
-  MediaKeyNeededEvent.builtin$cls = "MediaKeyNeededEvent";
-  if (!"name" in MediaKeyNeededEvent)
-    MediaKeyNeededEvent.name = "MediaKeyNeededEvent";
-  $desc = $collectedClasses.MediaKeyNeededEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaKeyNeededEvent.prototype = $desc;
-  function MediaStream() {
-  }
-  MediaStream.builtin$cls = "MediaStream";
-  if (!"name" in MediaStream)
-    MediaStream.name = "MediaStream";
-  $desc = $collectedClasses.MediaStream;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaStream.prototype = $desc;
-  function MediaStreamEvent() {
-  }
-  MediaStreamEvent.builtin$cls = "MediaStreamEvent";
-  if (!"name" in MediaStreamEvent)
-    MediaStreamEvent.name = "MediaStreamEvent";
-  $desc = $collectedClasses.MediaStreamEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaStreamEvent.prototype = $desc;
-  function MediaStreamTrackEvent() {
-  }
-  MediaStreamTrackEvent.builtin$cls = "MediaStreamTrackEvent";
-  if (!"name" in MediaStreamTrackEvent)
-    MediaStreamTrackEvent.name = "MediaStreamTrackEvent";
-  $desc = $collectedClasses.MediaStreamTrackEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MediaStreamTrackEvent.prototype = $desc;
-  function MenuElement() {
-  }
-  MenuElement.builtin$cls = "MenuElement";
-  if (!"name" in MenuElement)
-    MenuElement.name = "MenuElement";
-  $desc = $collectedClasses.MenuElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MenuElement.prototype = $desc;
-  function MessageEvent() {
-  }
-  MessageEvent.builtin$cls = "MessageEvent";
-  if (!"name" in MessageEvent)
-    MessageEvent.name = "MessageEvent";
-  $desc = $collectedClasses.MessageEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MessageEvent.prototype = $desc;
-  function MetaElement() {
-  }
-  MetaElement.builtin$cls = "MetaElement";
-  if (!"name" in MetaElement)
-    MetaElement.name = "MetaElement";
-  $desc = $collectedClasses.MetaElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MetaElement.prototype = $desc;
-  function MeterElement() {
-  }
-  MeterElement.builtin$cls = "MeterElement";
-  if (!"name" in MeterElement)
-    MeterElement.name = "MeterElement";
-  $desc = $collectedClasses.MeterElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MeterElement.prototype = $desc;
-  function MidiConnectionEvent() {
-  }
-  MidiConnectionEvent.builtin$cls = "MidiConnectionEvent";
-  if (!"name" in MidiConnectionEvent)
-    MidiConnectionEvent.name = "MidiConnectionEvent";
-  $desc = $collectedClasses.MidiConnectionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MidiConnectionEvent.prototype = $desc;
-  function MidiMessageEvent() {
-  }
-  MidiMessageEvent.builtin$cls = "MidiMessageEvent";
-  if (!"name" in MidiMessageEvent)
-    MidiMessageEvent.name = "MidiMessageEvent";
-  $desc = $collectedClasses.MidiMessageEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MidiMessageEvent.prototype = $desc;
-  MidiMessageEvent.prototype.get$data = function(receiver) {
-    return receiver.data;
-  };
-  function ModElement() {
-  }
-  ModElement.builtin$cls = "ModElement";
-  if (!"name" in ModElement)
-    ModElement.name = "ModElement";
-  $desc = $collectedClasses.ModElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ModElement.prototype = $desc;
-  function MouseEvent() {
-  }
-  MouseEvent.builtin$cls = "MouseEvent";
-  if (!"name" in MouseEvent)
-    MouseEvent.name = "MouseEvent";
-  $desc = $collectedClasses.MouseEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MouseEvent.prototype = $desc;
-  function Navigator() {
-  }
-  Navigator.builtin$cls = "Navigator";
-  if (!"name" in Navigator)
-    Navigator.name = "Navigator";
-  $desc = $collectedClasses.Navigator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Navigator.prototype = $desc;
-  function NavigatorUserMediaError() {
-  }
-  NavigatorUserMediaError.builtin$cls = "NavigatorUserMediaError";
-  if (!"name" in NavigatorUserMediaError)
-    NavigatorUserMediaError.name = "NavigatorUserMediaError";
-  $desc = $collectedClasses.NavigatorUserMediaError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NavigatorUserMediaError.prototype = $desc;
-  function Node() {
-  }
-  Node.builtin$cls = "Node";
-  if (!"name" in Node)
-    Node.name = "Node";
-  $desc = $collectedClasses.Node;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Node.prototype = $desc;
-  function OListElement() {
-  }
-  OListElement.builtin$cls = "OListElement";
-  if (!"name" in OListElement)
-    OListElement.name = "OListElement";
-  $desc = $collectedClasses.OListElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OListElement.prototype = $desc;
-  function ObjectElement() {
-  }
-  ObjectElement.builtin$cls = "ObjectElement";
-  if (!"name" in ObjectElement)
-    ObjectElement.name = "ObjectElement";
-  $desc = $collectedClasses.ObjectElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ObjectElement.prototype = $desc;
-  ObjectElement.prototype.get$data = function(receiver) {
-    return receiver.data;
-  };
-  ObjectElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  ObjectElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function OptGroupElement() {
-  }
-  OptGroupElement.builtin$cls = "OptGroupElement";
-  if (!"name" in OptGroupElement)
-    OptGroupElement.name = "OptGroupElement";
-  $desc = $collectedClasses.OptGroupElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OptGroupElement.prototype = $desc;
-  function OptionElement() {
-  }
-  OptionElement.builtin$cls = "OptionElement";
-  if (!"name" in OptionElement)
-    OptionElement.name = "OptionElement";
-  $desc = $collectedClasses.OptionElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OptionElement.prototype = $desc;
-  function OutputElement() {
-  }
-  OutputElement.builtin$cls = "OutputElement";
-  if (!"name" in OutputElement)
-    OutputElement.name = "OutputElement";
-  $desc = $collectedClasses.OutputElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OutputElement.prototype = $desc;
-  function OverflowEvent() {
-  }
-  OverflowEvent.builtin$cls = "OverflowEvent";
-  if (!"name" in OverflowEvent)
-    OverflowEvent.name = "OverflowEvent";
-  $desc = $collectedClasses.OverflowEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OverflowEvent.prototype = $desc;
-  function PageTransitionEvent() {
-  }
-  PageTransitionEvent.builtin$cls = "PageTransitionEvent";
-  if (!"name" in PageTransitionEvent)
-    PageTransitionEvent.name = "PageTransitionEvent";
-  $desc = $collectedClasses.PageTransitionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PageTransitionEvent.prototype = $desc;
-  function ParagraphElement() {
-  }
-  ParagraphElement.builtin$cls = "ParagraphElement";
-  if (!"name" in ParagraphElement)
-    ParagraphElement.name = "ParagraphElement";
-  $desc = $collectedClasses.ParagraphElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ParagraphElement.prototype = $desc;
-  function ParamElement() {
-  }
-  ParamElement.builtin$cls = "ParamElement";
-  if (!"name" in ParamElement)
-    ParamElement.name = "ParamElement";
-  $desc = $collectedClasses.ParamElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ParamElement.prototype = $desc;
-  function PopStateEvent() {
-  }
-  PopStateEvent.builtin$cls = "PopStateEvent";
-  if (!"name" in PopStateEvent)
-    PopStateEvent.name = "PopStateEvent";
-  $desc = $collectedClasses.PopStateEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PopStateEvent.prototype = $desc;
-  function PositionError() {
-  }
-  PositionError.builtin$cls = "PositionError";
-  if (!"name" in PositionError)
-    PositionError.name = "PositionError";
-  $desc = $collectedClasses.PositionError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PositionError.prototype = $desc;
-  function PreElement() {
-  }
-  PreElement.builtin$cls = "PreElement";
-  if (!"name" in PreElement)
-    PreElement.name = "PreElement";
-  $desc = $collectedClasses.PreElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PreElement.prototype = $desc;
-  function ProcessingInstruction() {
-  }
-  ProcessingInstruction.builtin$cls = "ProcessingInstruction";
-  if (!"name" in ProcessingInstruction)
-    ProcessingInstruction.name = "ProcessingInstruction";
-  $desc = $collectedClasses.ProcessingInstruction;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ProcessingInstruction.prototype = $desc;
-  function ProgressElement() {
-  }
-  ProgressElement.builtin$cls = "ProgressElement";
-  if (!"name" in ProgressElement)
-    ProgressElement.name = "ProgressElement";
-  $desc = $collectedClasses.ProgressElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ProgressElement.prototype = $desc;
-  function ProgressEvent() {
-  }
-  ProgressEvent.builtin$cls = "ProgressEvent";
-  if (!"name" in ProgressEvent)
-    ProgressEvent.name = "ProgressEvent";
-  $desc = $collectedClasses.ProgressEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ProgressEvent.prototype = $desc;
-  function QuoteElement() {
-  }
-  QuoteElement.builtin$cls = "QuoteElement";
-  if (!"name" in QuoteElement)
-    QuoteElement.name = "QuoteElement";
-  $desc = $collectedClasses.QuoteElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  QuoteElement.prototype = $desc;
-  function ResourceProgressEvent() {
-  }
-  ResourceProgressEvent.builtin$cls = "ResourceProgressEvent";
-  if (!"name" in ResourceProgressEvent)
-    ResourceProgressEvent.name = "ResourceProgressEvent";
-  $desc = $collectedClasses.ResourceProgressEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ResourceProgressEvent.prototype = $desc;
-  function RtcDataChannelEvent() {
-  }
-  RtcDataChannelEvent.builtin$cls = "RtcDataChannelEvent";
-  if (!"name" in RtcDataChannelEvent)
-    RtcDataChannelEvent.name = "RtcDataChannelEvent";
-  $desc = $collectedClasses.RtcDataChannelEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RtcDataChannelEvent.prototype = $desc;
-  function RtcDtmfToneChangeEvent() {
-  }
-  RtcDtmfToneChangeEvent.builtin$cls = "RtcDtmfToneChangeEvent";
-  if (!"name" in RtcDtmfToneChangeEvent)
-    RtcDtmfToneChangeEvent.name = "RtcDtmfToneChangeEvent";
-  $desc = $collectedClasses.RtcDtmfToneChangeEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RtcDtmfToneChangeEvent.prototype = $desc;
-  function RtcIceCandidateEvent() {
-  }
-  RtcIceCandidateEvent.builtin$cls = "RtcIceCandidateEvent";
-  if (!"name" in RtcIceCandidateEvent)
-    RtcIceCandidateEvent.name = "RtcIceCandidateEvent";
-  $desc = $collectedClasses.RtcIceCandidateEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RtcIceCandidateEvent.prototype = $desc;
-  function ScriptElement() {
-  }
-  ScriptElement.builtin$cls = "ScriptElement";
-  if (!"name" in ScriptElement)
-    ScriptElement.name = "ScriptElement";
-  $desc = $collectedClasses.ScriptElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ScriptElement.prototype = $desc;
-  ScriptElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  function SecurityPolicyViolationEvent() {
-  }
-  SecurityPolicyViolationEvent.builtin$cls = "SecurityPolicyViolationEvent";
-  if (!"name" in SecurityPolicyViolationEvent)
-    SecurityPolicyViolationEvent.name = "SecurityPolicyViolationEvent";
-  $desc = $collectedClasses.SecurityPolicyViolationEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SecurityPolicyViolationEvent.prototype = $desc;
-  SecurityPolicyViolationEvent.prototype.get$statusCode = function(receiver) {
-    return receiver.statusCode;
-  };
-  function SelectElement() {
-  }
-  SelectElement.builtin$cls = "SelectElement";
-  if (!"name" in SelectElement)
-    SelectElement.name = "SelectElement";
-  $desc = $collectedClasses.SelectElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SelectElement.prototype = $desc;
-  SelectElement.prototype.get$length = function(receiver) {
-    return receiver.length;
-  };
-  function ShadowElement() {
-  }
-  ShadowElement.builtin$cls = "ShadowElement";
-  if (!"name" in ShadowElement)
-    ShadowElement.name = "ShadowElement";
-  $desc = $collectedClasses.ShadowElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ShadowElement.prototype = $desc;
-  function ShadowRoot() {
-  }
-  ShadowRoot.builtin$cls = "ShadowRoot";
-  if (!"name" in ShadowRoot)
-    ShadowRoot.name = "ShadowRoot";
-  $desc = $collectedClasses.ShadowRoot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ShadowRoot.prototype = $desc;
-  function SourceElement() {
-  }
-  SourceElement.builtin$cls = "SourceElement";
-  if (!"name" in SourceElement)
-    SourceElement.name = "SourceElement";
-  $desc = $collectedClasses.SourceElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SourceElement.prototype = $desc;
-  SourceElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  function SpanElement() {
-  }
-  SpanElement.builtin$cls = "SpanElement";
-  if (!"name" in SpanElement)
-    SpanElement.name = "SpanElement";
-  $desc = $collectedClasses.SpanElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpanElement.prototype = $desc;
-  function SpeechInputEvent() {
-  }
-  SpeechInputEvent.builtin$cls = "SpeechInputEvent";
-  if (!"name" in SpeechInputEvent)
-    SpeechInputEvent.name = "SpeechInputEvent";
-  $desc = $collectedClasses.SpeechInputEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpeechInputEvent.prototype = $desc;
-  function SpeechRecognitionError() {
-  }
-  SpeechRecognitionError.builtin$cls = "SpeechRecognitionError";
-  if (!"name" in SpeechRecognitionError)
-    SpeechRecognitionError.name = "SpeechRecognitionError";
-  $desc = $collectedClasses.SpeechRecognitionError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpeechRecognitionError.prototype = $desc;
-  SpeechRecognitionError.prototype.get$error = function(receiver) {
-    return receiver.error;
-  };
-  function SpeechRecognitionEvent() {
-  }
-  SpeechRecognitionEvent.builtin$cls = "SpeechRecognitionEvent";
-  if (!"name" in SpeechRecognitionEvent)
-    SpeechRecognitionEvent.name = "SpeechRecognitionEvent";
-  $desc = $collectedClasses.SpeechRecognitionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpeechRecognitionEvent.prototype = $desc;
-  function SpeechSynthesisEvent() {
-  }
-  SpeechSynthesisEvent.builtin$cls = "SpeechSynthesisEvent";
-  if (!"name" in SpeechSynthesisEvent)
-    SpeechSynthesisEvent.name = "SpeechSynthesisEvent";
-  $desc = $collectedClasses.SpeechSynthesisEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpeechSynthesisEvent.prototype = $desc;
-  function StorageEvent() {
-  }
-  StorageEvent.builtin$cls = "StorageEvent";
-  if (!"name" in StorageEvent)
-    StorageEvent.name = "StorageEvent";
-  $desc = $collectedClasses.StorageEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StorageEvent.prototype = $desc;
-  function StyleElement() {
-  }
-  StyleElement.builtin$cls = "StyleElement";
-  if (!"name" in StyleElement)
-    StyleElement.name = "StyleElement";
-  $desc = $collectedClasses.StyleElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StyleElement.prototype = $desc;
-  function TableCaptionElement() {
-  }
-  TableCaptionElement.builtin$cls = "TableCaptionElement";
-  if (!"name" in TableCaptionElement)
-    TableCaptionElement.name = "TableCaptionElement";
-  $desc = $collectedClasses.TableCaptionElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableCaptionElement.prototype = $desc;
-  function TableCellElement() {
-  }
-  TableCellElement.builtin$cls = "TableCellElement";
-  if (!"name" in TableCellElement)
-    TableCellElement.name = "TableCellElement";
-  $desc = $collectedClasses.TableCellElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableCellElement.prototype = $desc;
-  function TableColElement() {
-  }
-  TableColElement.builtin$cls = "TableColElement";
-  if (!"name" in TableColElement)
-    TableColElement.name = "TableColElement";
-  $desc = $collectedClasses.TableColElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableColElement.prototype = $desc;
-  function TableElement() {
-  }
-  TableElement.builtin$cls = "TableElement";
-  if (!"name" in TableElement)
-    TableElement.name = "TableElement";
-  $desc = $collectedClasses.TableElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableElement.prototype = $desc;
-  function TableRowElement() {
-  }
-  TableRowElement.builtin$cls = "TableRowElement";
-  if (!"name" in TableRowElement)
-    TableRowElement.name = "TableRowElement";
-  $desc = $collectedClasses.TableRowElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableRowElement.prototype = $desc;
-  function TableSectionElement() {
-  }
-  TableSectionElement.builtin$cls = "TableSectionElement";
-  if (!"name" in TableSectionElement)
-    TableSectionElement.name = "TableSectionElement";
-  $desc = $collectedClasses.TableSectionElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TableSectionElement.prototype = $desc;
-  function TemplateElement() {
-  }
-  TemplateElement.builtin$cls = "TemplateElement";
-  if (!"name" in TemplateElement)
-    TemplateElement.name = "TemplateElement";
-  $desc = $collectedClasses.TemplateElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TemplateElement.prototype = $desc;
-  function Text() {
-  }
-  Text.builtin$cls = "Text";
-  if (!"name" in Text)
-    Text.name = "Text";
-  $desc = $collectedClasses.Text;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Text.prototype = $desc;
-  function TextAreaElement() {
-  }
-  TextAreaElement.builtin$cls = "TextAreaElement";
-  if (!"name" in TextAreaElement)
-    TextAreaElement.name = "TextAreaElement";
-  $desc = $collectedClasses.TextAreaElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextAreaElement.prototype = $desc;
-  function TextEvent() {
-  }
-  TextEvent.builtin$cls = "TextEvent";
-  if (!"name" in TextEvent)
-    TextEvent.name = "TextEvent";
-  $desc = $collectedClasses.TextEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextEvent.prototype = $desc;
-  TextEvent.prototype.get$data = function(receiver) {
-    return receiver.data;
-  };
-  function TitleElement() {
-  }
-  TitleElement.builtin$cls = "TitleElement";
-  if (!"name" in TitleElement)
-    TitleElement.name = "TitleElement";
-  $desc = $collectedClasses.TitleElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TitleElement.prototype = $desc;
-  function TouchEvent() {
-  }
-  TouchEvent.builtin$cls = "TouchEvent";
-  if (!"name" in TouchEvent)
-    TouchEvent.name = "TouchEvent";
-  $desc = $collectedClasses.TouchEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TouchEvent.prototype = $desc;
-  function TrackElement() {
-  }
-  TrackElement.builtin$cls = "TrackElement";
-  if (!"name" in TrackElement)
-    TrackElement.name = "TrackElement";
-  $desc = $collectedClasses.TrackElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TrackElement.prototype = $desc;
-  TrackElement.prototype.set$src = function(receiver, v) {
-    return receiver.src = v;
-  };
-  function TrackEvent() {
-  }
-  TrackEvent.builtin$cls = "TrackEvent";
-  if (!"name" in TrackEvent)
-    TrackEvent.name = "TrackEvent";
-  $desc = $collectedClasses.TrackEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TrackEvent.prototype = $desc;
-  function TransitionEvent() {
-  }
-  TransitionEvent.builtin$cls = "TransitionEvent";
-  if (!"name" in TransitionEvent)
-    TransitionEvent.name = "TransitionEvent";
-  $desc = $collectedClasses.TransitionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TransitionEvent.prototype = $desc;
-  function UIEvent() {
-  }
-  UIEvent.builtin$cls = "UIEvent";
-  if (!"name" in UIEvent)
-    UIEvent.name = "UIEvent";
-  $desc = $collectedClasses.UIEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UIEvent.prototype = $desc;
-  function UListElement() {
-  }
-  UListElement.builtin$cls = "UListElement";
-  if (!"name" in UListElement)
-    UListElement.name = "UListElement";
-  $desc = $collectedClasses.UListElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UListElement.prototype = $desc;
-  function UnknownElement() {
-  }
-  UnknownElement.builtin$cls = "UnknownElement";
-  if (!"name" in UnknownElement)
-    UnknownElement.name = "UnknownElement";
-  $desc = $collectedClasses.UnknownElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnknownElement.prototype = $desc;
-  function VideoElement() {
-  }
-  VideoElement.builtin$cls = "VideoElement";
-  if (!"name" in VideoElement)
-    VideoElement.name = "VideoElement";
-  $desc = $collectedClasses.VideoElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  VideoElement.prototype = $desc;
-  VideoElement.prototype.set$height = function(receiver, v) {
-    return receiver.height = v;
-  };
-  VideoElement.prototype.set$width = function(receiver, v) {
-    return receiver.width = v;
-  };
-  function WheelEvent() {
-  }
-  WheelEvent.builtin$cls = "WheelEvent";
-  if (!"name" in WheelEvent)
-    WheelEvent.name = "WheelEvent";
-  $desc = $collectedClasses.WheelEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  WheelEvent.prototype = $desc;
-  function Window() {
-  }
-  Window.builtin$cls = "Window";
-  if (!"name" in Window)
-    Window.name = "Window";
-  $desc = $collectedClasses.Window;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Window.prototype = $desc;
-  function XmlDocument() {
-  }
-  XmlDocument.builtin$cls = "XmlDocument";
-  if (!"name" in XmlDocument)
-    XmlDocument.name = "XmlDocument";
-  $desc = $collectedClasses.XmlDocument;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  XmlDocument.prototype = $desc;
-  function _Attr() {
-  }
-  _Attr.builtin$cls = "_Attr";
-  if (!"name" in _Attr)
-    _Attr.name = "_Attr";
-  $desc = $collectedClasses._Attr;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Attr.prototype = $desc;
-  function _ClientRect() {
-  }
-  _ClientRect.builtin$cls = "_ClientRect";
-  if (!"name" in _ClientRect)
-    _ClientRect.name = "_ClientRect";
-  $desc = $collectedClasses._ClientRect;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ClientRect.prototype = $desc;
-  _ClientRect.prototype.get$bottom = function(receiver) {
-    return receiver.bottom;
-  };
-  _ClientRect.prototype.get$height = function(receiver) {
-    return receiver.height;
-  };
-  _ClientRect.prototype.get$left = function(receiver) {
-    return receiver.left;
-  };
-  _ClientRect.prototype.get$right = function(receiver) {
-    return receiver.right;
-  };
-  _ClientRect.prototype.get$top = function(receiver) {
-    return receiver.top;
-  };
-  _ClientRect.prototype.get$width = function(receiver) {
-    return receiver.width;
-  };
-  function _DocumentType() {
-  }
-  _DocumentType.builtin$cls = "_DocumentType";
-  if (!"name" in _DocumentType)
-    _DocumentType.name = "_DocumentType";
-  $desc = $collectedClasses._DocumentType;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _DocumentType.prototype = $desc;
-  function _HTMLAppletElement() {
-  }
-  _HTMLAppletElement.builtin$cls = "_HTMLAppletElement";
-  if (!"name" in _HTMLAppletElement)
-    _HTMLAppletElement.name = "_HTMLAppletElement";
-  $desc = $collectedClasses._HTMLAppletElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLAppletElement.prototype = $desc;
-  function _HTMLDirectoryElement() {
-  }
-  _HTMLDirectoryElement.builtin$cls = "_HTMLDirectoryElement";
-  if (!"name" in _HTMLDirectoryElement)
-    _HTMLDirectoryElement.name = "_HTMLDirectoryElement";
-  $desc = $collectedClasses._HTMLDirectoryElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLDirectoryElement.prototype = $desc;
-  function _HTMLFontElement() {
-  }
-  _HTMLFontElement.builtin$cls = "_HTMLFontElement";
-  if (!"name" in _HTMLFontElement)
-    _HTMLFontElement.name = "_HTMLFontElement";
-  $desc = $collectedClasses._HTMLFontElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLFontElement.prototype = $desc;
-  function _HTMLFrameElement() {
-  }
-  _HTMLFrameElement.builtin$cls = "_HTMLFrameElement";
-  if (!"name" in _HTMLFrameElement)
-    _HTMLFrameElement.name = "_HTMLFrameElement";
-  $desc = $collectedClasses._HTMLFrameElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLFrameElement.prototype = $desc;
-  function _HTMLFrameSetElement() {
-  }
-  _HTMLFrameSetElement.builtin$cls = "_HTMLFrameSetElement";
-  if (!"name" in _HTMLFrameSetElement)
-    _HTMLFrameSetElement.name = "_HTMLFrameSetElement";
-  $desc = $collectedClasses._HTMLFrameSetElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLFrameSetElement.prototype = $desc;
-  function _HTMLMarqueeElement() {
-  }
-  _HTMLMarqueeElement.builtin$cls = "_HTMLMarqueeElement";
-  if (!"name" in _HTMLMarqueeElement)
-    _HTMLMarqueeElement.name = "_HTMLMarqueeElement";
-  $desc = $collectedClasses._HTMLMarqueeElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HTMLMarqueeElement.prototype = $desc;
-  function _MutationEvent() {
-  }
-  _MutationEvent.builtin$cls = "_MutationEvent";
-  if (!"name" in _MutationEvent)
-    _MutationEvent.name = "_MutationEvent";
-  $desc = $collectedClasses._MutationEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _MutationEvent.prototype = $desc;
-  function _NamedNodeMap() {
-  }
-  _NamedNodeMap.builtin$cls = "_NamedNodeMap";
-  if (!"name" in _NamedNodeMap)
-    _NamedNodeMap.name = "_NamedNodeMap";
-  $desc = $collectedClasses._NamedNodeMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _NamedNodeMap.prototype = $desc;
-  function _Notation() {
-  }
-  _Notation.builtin$cls = "_Notation";
-  if (!"name" in _Notation)
-    _Notation.name = "_Notation";
-  $desc = $collectedClasses._Notation;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Notation.prototype = $desc;
-  function _XMLHttpRequestProgressEvent() {
-  }
-  _XMLHttpRequestProgressEvent.builtin$cls = "_XMLHttpRequestProgressEvent";
-  if (!"name" in _XMLHttpRequestProgressEvent)
-    _XMLHttpRequestProgressEvent.name = "_XMLHttpRequestProgressEvent";
-  $desc = $collectedClasses._XMLHttpRequestProgressEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _XMLHttpRequestProgressEvent.prototype = $desc;
-  function VersionChangeEvent() {
-  }
-  VersionChangeEvent.builtin$cls = "VersionChangeEvent";
-  if (!"name" in VersionChangeEvent)
-    VersionChangeEvent.name = "VersionChangeEvent";
-  $desc = $collectedClasses.VersionChangeEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  VersionChangeEvent.prototype = $desc;
-  function AElement() {
-  }
-  AElement.builtin$cls = "AElement";
-  if (!"name" in AElement)
-    AElement.name = "AElement";
-  $desc = $collectedClasses.AElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AElement.prototype = $desc;
-  function AltGlyphElement() {
-  }
-  AltGlyphElement.builtin$cls = "AltGlyphElement";
-  if (!"name" in AltGlyphElement)
-    AltGlyphElement.name = "AltGlyphElement";
-  $desc = $collectedClasses.AltGlyphElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AltGlyphElement.prototype = $desc;
-  function AnimateElement() {
-  }
-  AnimateElement.builtin$cls = "AnimateElement";
-  if (!"name" in AnimateElement)
-    AnimateElement.name = "AnimateElement";
-  $desc = $collectedClasses.AnimateElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimateElement.prototype = $desc;
-  function AnimateMotionElement() {
-  }
-  AnimateMotionElement.builtin$cls = "AnimateMotionElement";
-  if (!"name" in AnimateMotionElement)
-    AnimateMotionElement.name = "AnimateMotionElement";
-  $desc = $collectedClasses.AnimateMotionElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimateMotionElement.prototype = $desc;
-  function AnimateTransformElement() {
-  }
-  AnimateTransformElement.builtin$cls = "AnimateTransformElement";
-  if (!"name" in AnimateTransformElement)
-    AnimateTransformElement.name = "AnimateTransformElement";
-  $desc = $collectedClasses.AnimateTransformElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimateTransformElement.prototype = $desc;
-  function AnimatedEnumeration() {
-  }
-  AnimatedEnumeration.builtin$cls = "AnimatedEnumeration";
-  if (!"name" in AnimatedEnumeration)
-    AnimatedEnumeration.name = "AnimatedEnumeration";
-  $desc = $collectedClasses.AnimatedEnumeration;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedEnumeration.prototype = $desc;
-  function AnimatedLength() {
-  }
-  AnimatedLength.builtin$cls = "AnimatedLength";
-  if (!"name" in AnimatedLength)
-    AnimatedLength.name = "AnimatedLength";
-  $desc = $collectedClasses.AnimatedLength;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedLength.prototype = $desc;
-  function AnimatedLengthList() {
-  }
-  AnimatedLengthList.builtin$cls = "AnimatedLengthList";
-  if (!"name" in AnimatedLengthList)
-    AnimatedLengthList.name = "AnimatedLengthList";
-  $desc = $collectedClasses.AnimatedLengthList;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedLengthList.prototype = $desc;
-  function AnimatedNumber() {
-  }
-  AnimatedNumber.builtin$cls = "AnimatedNumber";
-  if (!"name" in AnimatedNumber)
-    AnimatedNumber.name = "AnimatedNumber";
-  $desc = $collectedClasses.AnimatedNumber;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedNumber.prototype = $desc;
-  function AnimatedNumberList() {
-  }
-  AnimatedNumberList.builtin$cls = "AnimatedNumberList";
-  if (!"name" in AnimatedNumberList)
-    AnimatedNumberList.name = "AnimatedNumberList";
-  $desc = $collectedClasses.AnimatedNumberList;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedNumberList.prototype = $desc;
-  function AnimatedString() {
-  }
-  AnimatedString.builtin$cls = "AnimatedString";
-  if (!"name" in AnimatedString)
-    AnimatedString.name = "AnimatedString";
-  $desc = $collectedClasses.AnimatedString;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimatedString.prototype = $desc;
-  function AnimationElement() {
-  }
-  AnimationElement.builtin$cls = "AnimationElement";
-  if (!"name" in AnimationElement)
-    AnimationElement.name = "AnimationElement";
-  $desc = $collectedClasses.AnimationElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AnimationElement.prototype = $desc;
-  function CircleElement() {
-  }
-  CircleElement.builtin$cls = "CircleElement";
-  if (!"name" in CircleElement)
-    CircleElement.name = "CircleElement";
-  $desc = $collectedClasses.CircleElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CircleElement.prototype = $desc;
-  function ClipPathElement() {
-  }
-  ClipPathElement.builtin$cls = "ClipPathElement";
-  if (!"name" in ClipPathElement)
-    ClipPathElement.name = "ClipPathElement";
-  $desc = $collectedClasses.ClipPathElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ClipPathElement.prototype = $desc;
-  function DefsElement() {
-  }
-  DefsElement.builtin$cls = "DefsElement";
-  if (!"name" in DefsElement)
-    DefsElement.name = "DefsElement";
-  $desc = $collectedClasses.DefsElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DefsElement.prototype = $desc;
-  function DescElement() {
-  }
-  DescElement.builtin$cls = "DescElement";
-  if (!"name" in DescElement)
-    DescElement.name = "DescElement";
-  $desc = $collectedClasses.DescElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DescElement.prototype = $desc;
-  function DiscardElement() {
-  }
-  DiscardElement.builtin$cls = "DiscardElement";
-  if (!"name" in DiscardElement)
-    DiscardElement.name = "DiscardElement";
-  $desc = $collectedClasses.DiscardElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DiscardElement.prototype = $desc;
-  function EllipseElement() {
-  }
-  EllipseElement.builtin$cls = "EllipseElement";
-  if (!"name" in EllipseElement)
-    EllipseElement.name = "EllipseElement";
-  $desc = $collectedClasses.EllipseElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EllipseElement.prototype = $desc;
-  function FEBlendElement() {
-  }
-  FEBlendElement.builtin$cls = "FEBlendElement";
-  if (!"name" in FEBlendElement)
-    FEBlendElement.name = "FEBlendElement";
-  $desc = $collectedClasses.FEBlendElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEBlendElement.prototype = $desc;
-  function FEColorMatrixElement() {
-  }
-  FEColorMatrixElement.builtin$cls = "FEColorMatrixElement";
-  if (!"name" in FEColorMatrixElement)
-    FEColorMatrixElement.name = "FEColorMatrixElement";
-  $desc = $collectedClasses.FEColorMatrixElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEColorMatrixElement.prototype = $desc;
-  function FEComponentTransferElement() {
-  }
-  FEComponentTransferElement.builtin$cls = "FEComponentTransferElement";
-  if (!"name" in FEComponentTransferElement)
-    FEComponentTransferElement.name = "FEComponentTransferElement";
-  $desc = $collectedClasses.FEComponentTransferElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEComponentTransferElement.prototype = $desc;
-  function FECompositeElement() {
-  }
-  FECompositeElement.builtin$cls = "FECompositeElement";
-  if (!"name" in FECompositeElement)
-    FECompositeElement.name = "FECompositeElement";
-  $desc = $collectedClasses.FECompositeElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FECompositeElement.prototype = $desc;
-  function FEConvolveMatrixElement() {
-  }
-  FEConvolveMatrixElement.builtin$cls = "FEConvolveMatrixElement";
-  if (!"name" in FEConvolveMatrixElement)
-    FEConvolveMatrixElement.name = "FEConvolveMatrixElement";
-  $desc = $collectedClasses.FEConvolveMatrixElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEConvolveMatrixElement.prototype = $desc;
-  function FEDiffuseLightingElement() {
-  }
-  FEDiffuseLightingElement.builtin$cls = "FEDiffuseLightingElement";
-  if (!"name" in FEDiffuseLightingElement)
-    FEDiffuseLightingElement.name = "FEDiffuseLightingElement";
-  $desc = $collectedClasses.FEDiffuseLightingElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEDiffuseLightingElement.prototype = $desc;
-  function FEDisplacementMapElement() {
-  }
-  FEDisplacementMapElement.builtin$cls = "FEDisplacementMapElement";
-  if (!"name" in FEDisplacementMapElement)
-    FEDisplacementMapElement.name = "FEDisplacementMapElement";
-  $desc = $collectedClasses.FEDisplacementMapElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEDisplacementMapElement.prototype = $desc;
-  function FEDistantLightElement() {
-  }
-  FEDistantLightElement.builtin$cls = "FEDistantLightElement";
-  if (!"name" in FEDistantLightElement)
-    FEDistantLightElement.name = "FEDistantLightElement";
-  $desc = $collectedClasses.FEDistantLightElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEDistantLightElement.prototype = $desc;
-  function FEFloodElement() {
-  }
-  FEFloodElement.builtin$cls = "FEFloodElement";
-  if (!"name" in FEFloodElement)
-    FEFloodElement.name = "FEFloodElement";
-  $desc = $collectedClasses.FEFloodElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEFloodElement.prototype = $desc;
-  function FEFuncAElement() {
-  }
-  FEFuncAElement.builtin$cls = "FEFuncAElement";
-  if (!"name" in FEFuncAElement)
-    FEFuncAElement.name = "FEFuncAElement";
-  $desc = $collectedClasses.FEFuncAElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEFuncAElement.prototype = $desc;
-  function FEFuncBElement() {
-  }
-  FEFuncBElement.builtin$cls = "FEFuncBElement";
-  if (!"name" in FEFuncBElement)
-    FEFuncBElement.name = "FEFuncBElement";
-  $desc = $collectedClasses.FEFuncBElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEFuncBElement.prototype = $desc;
-  function FEFuncGElement() {
-  }
-  FEFuncGElement.builtin$cls = "FEFuncGElement";
-  if (!"name" in FEFuncGElement)
-    FEFuncGElement.name = "FEFuncGElement";
-  $desc = $collectedClasses.FEFuncGElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEFuncGElement.prototype = $desc;
-  function FEFuncRElement() {
-  }
-  FEFuncRElement.builtin$cls = "FEFuncRElement";
-  if (!"name" in FEFuncRElement)
-    FEFuncRElement.name = "FEFuncRElement";
-  $desc = $collectedClasses.FEFuncRElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEFuncRElement.prototype = $desc;
-  function FEGaussianBlurElement() {
-  }
-  FEGaussianBlurElement.builtin$cls = "FEGaussianBlurElement";
-  if (!"name" in FEGaussianBlurElement)
-    FEGaussianBlurElement.name = "FEGaussianBlurElement";
-  $desc = $collectedClasses.FEGaussianBlurElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEGaussianBlurElement.prototype = $desc;
-  function FEImageElement() {
-  }
-  FEImageElement.builtin$cls = "FEImageElement";
-  if (!"name" in FEImageElement)
-    FEImageElement.name = "FEImageElement";
-  $desc = $collectedClasses.FEImageElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEImageElement.prototype = $desc;
-  function FEMergeElement() {
-  }
-  FEMergeElement.builtin$cls = "FEMergeElement";
-  if (!"name" in FEMergeElement)
-    FEMergeElement.name = "FEMergeElement";
-  $desc = $collectedClasses.FEMergeElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEMergeElement.prototype = $desc;
-  function FEMergeNodeElement() {
-  }
-  FEMergeNodeElement.builtin$cls = "FEMergeNodeElement";
-  if (!"name" in FEMergeNodeElement)
-    FEMergeNodeElement.name = "FEMergeNodeElement";
-  $desc = $collectedClasses.FEMergeNodeElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEMergeNodeElement.prototype = $desc;
-  function FEMorphologyElement() {
-  }
-  FEMorphologyElement.builtin$cls = "FEMorphologyElement";
-  if (!"name" in FEMorphologyElement)
-    FEMorphologyElement.name = "FEMorphologyElement";
-  $desc = $collectedClasses.FEMorphologyElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEMorphologyElement.prototype = $desc;
-  function FEOffsetElement() {
-  }
-  FEOffsetElement.builtin$cls = "FEOffsetElement";
-  if (!"name" in FEOffsetElement)
-    FEOffsetElement.name = "FEOffsetElement";
-  $desc = $collectedClasses.FEOffsetElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEOffsetElement.prototype = $desc;
-  function FEPointLightElement() {
-  }
-  FEPointLightElement.builtin$cls = "FEPointLightElement";
-  if (!"name" in FEPointLightElement)
-    FEPointLightElement.name = "FEPointLightElement";
-  $desc = $collectedClasses.FEPointLightElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FEPointLightElement.prototype = $desc;
-  function FESpecularLightingElement() {
-  }
-  FESpecularLightingElement.builtin$cls = "FESpecularLightingElement";
-  if (!"name" in FESpecularLightingElement)
-    FESpecularLightingElement.name = "FESpecularLightingElement";
-  $desc = $collectedClasses.FESpecularLightingElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FESpecularLightingElement.prototype = $desc;
-  function FESpotLightElement() {
-  }
-  FESpotLightElement.builtin$cls = "FESpotLightElement";
-  if (!"name" in FESpotLightElement)
-    FESpotLightElement.name = "FESpotLightElement";
-  $desc = $collectedClasses.FESpotLightElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FESpotLightElement.prototype = $desc;
-  function FETileElement() {
-  }
-  FETileElement.builtin$cls = "FETileElement";
-  if (!"name" in FETileElement)
-    FETileElement.name = "FETileElement";
-  $desc = $collectedClasses.FETileElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FETileElement.prototype = $desc;
-  function FETurbulenceElement() {
-  }
-  FETurbulenceElement.builtin$cls = "FETurbulenceElement";
-  if (!"name" in FETurbulenceElement)
-    FETurbulenceElement.name = "FETurbulenceElement";
-  $desc = $collectedClasses.FETurbulenceElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FETurbulenceElement.prototype = $desc;
-  function FilterElement() {
-  }
-  FilterElement.builtin$cls = "FilterElement";
-  if (!"name" in FilterElement)
-    FilterElement.name = "FilterElement";
-  $desc = $collectedClasses.FilterElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FilterElement.prototype = $desc;
-  function ForeignObjectElement() {
-  }
-  ForeignObjectElement.builtin$cls = "ForeignObjectElement";
-  if (!"name" in ForeignObjectElement)
-    ForeignObjectElement.name = "ForeignObjectElement";
-  $desc = $collectedClasses.ForeignObjectElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ForeignObjectElement.prototype = $desc;
-  function GElement() {
-  }
-  GElement.builtin$cls = "GElement";
-  if (!"name" in GElement)
-    GElement.name = "GElement";
-  $desc = $collectedClasses.GElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GElement.prototype = $desc;
-  function GeometryElement() {
-  }
-  GeometryElement.builtin$cls = "GeometryElement";
-  if (!"name" in GeometryElement)
-    GeometryElement.name = "GeometryElement";
-  $desc = $collectedClasses.GeometryElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GeometryElement.prototype = $desc;
-  function GraphicsElement() {
-  }
-  GraphicsElement.builtin$cls = "GraphicsElement";
-  if (!"name" in GraphicsElement)
-    GraphicsElement.name = "GraphicsElement";
-  $desc = $collectedClasses.GraphicsElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GraphicsElement.prototype = $desc;
-  function ImageElement0() {
-  }
-  ImageElement0.builtin$cls = "ImageElement0";
-  if (!"name" in ImageElement0)
-    ImageElement0.name = "ImageElement0";
-  $desc = $collectedClasses.ImageElement0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ImageElement0.prototype = $desc;
-  function LineElement() {
-  }
-  LineElement.builtin$cls = "LineElement";
-  if (!"name" in LineElement)
-    LineElement.name = "LineElement";
-  $desc = $collectedClasses.LineElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LineElement.prototype = $desc;
-  function LinearGradientElement() {
-  }
-  LinearGradientElement.builtin$cls = "LinearGradientElement";
-  if (!"name" in LinearGradientElement)
-    LinearGradientElement.name = "LinearGradientElement";
-  $desc = $collectedClasses.LinearGradientElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinearGradientElement.prototype = $desc;
-  function MarkerElement() {
-  }
-  MarkerElement.builtin$cls = "MarkerElement";
-  if (!"name" in MarkerElement)
-    MarkerElement.name = "MarkerElement";
-  $desc = $collectedClasses.MarkerElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MarkerElement.prototype = $desc;
-  function MaskElement() {
-  }
-  MaskElement.builtin$cls = "MaskElement";
-  if (!"name" in MaskElement)
-    MaskElement.name = "MaskElement";
-  $desc = $collectedClasses.MaskElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MaskElement.prototype = $desc;
-  function MetadataElement() {
-  }
-  MetadataElement.builtin$cls = "MetadataElement";
-  if (!"name" in MetadataElement)
-    MetadataElement.name = "MetadataElement";
-  $desc = $collectedClasses.MetadataElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MetadataElement.prototype = $desc;
-  function PathElement() {
-  }
-  PathElement.builtin$cls = "PathElement";
-  if (!"name" in PathElement)
-    PathElement.name = "PathElement";
-  $desc = $collectedClasses.PathElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PathElement.prototype = $desc;
-  function PatternElement() {
-  }
-  PatternElement.builtin$cls = "PatternElement";
-  if (!"name" in PatternElement)
-    PatternElement.name = "PatternElement";
-  $desc = $collectedClasses.PatternElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PatternElement.prototype = $desc;
-  function PolygonElement() {
-  }
-  PolygonElement.builtin$cls = "PolygonElement";
-  if (!"name" in PolygonElement)
-    PolygonElement.name = "PolygonElement";
-  $desc = $collectedClasses.PolygonElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PolygonElement.prototype = $desc;
-  function PolylineElement() {
-  }
-  PolylineElement.builtin$cls = "PolylineElement";
-  if (!"name" in PolylineElement)
-    PolylineElement.name = "PolylineElement";
-  $desc = $collectedClasses.PolylineElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PolylineElement.prototype = $desc;
-  function RadialGradientElement() {
-  }
-  RadialGradientElement.builtin$cls = "RadialGradientElement";
-  if (!"name" in RadialGradientElement)
-    RadialGradientElement.name = "RadialGradientElement";
-  $desc = $collectedClasses.RadialGradientElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RadialGradientElement.prototype = $desc;
-  function RectElement() {
-  }
-  RectElement.builtin$cls = "RectElement";
-  if (!"name" in RectElement)
-    RectElement.name = "RectElement";
-  $desc = $collectedClasses.RectElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RectElement.prototype = $desc;
-  function ScriptElement0() {
-  }
-  ScriptElement0.builtin$cls = "ScriptElement0";
-  if (!"name" in ScriptElement0)
-    ScriptElement0.name = "ScriptElement0";
-  $desc = $collectedClasses.ScriptElement0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ScriptElement0.prototype = $desc;
-  function SetElement() {
-  }
-  SetElement.builtin$cls = "SetElement";
-  if (!"name" in SetElement)
-    SetElement.name = "SetElement";
-  $desc = $collectedClasses.SetElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SetElement.prototype = $desc;
-  function StopElement() {
-  }
-  StopElement.builtin$cls = "StopElement";
-  if (!"name" in StopElement)
-    StopElement.name = "StopElement";
-  $desc = $collectedClasses.StopElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StopElement.prototype = $desc;
-  function StyleElement0() {
-  }
-  StyleElement0.builtin$cls = "StyleElement0";
-  if (!"name" in StyleElement0)
-    StyleElement0.name = "StyleElement0";
-  $desc = $collectedClasses.StyleElement0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StyleElement0.prototype = $desc;
-  function SvgElement() {
-  }
-  SvgElement.builtin$cls = "SvgElement";
-  if (!"name" in SvgElement)
-    SvgElement.name = "SvgElement";
-  $desc = $collectedClasses.SvgElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SvgElement.prototype = $desc;
-  function SvgSvgElement() {
-  }
-  SvgSvgElement.builtin$cls = "SvgSvgElement";
-  if (!"name" in SvgSvgElement)
-    SvgSvgElement.name = "SvgSvgElement";
-  $desc = $collectedClasses.SvgSvgElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SvgSvgElement.prototype = $desc;
-  function SwitchElement() {
-  }
-  SwitchElement.builtin$cls = "SwitchElement";
-  if (!"name" in SwitchElement)
-    SwitchElement.name = "SwitchElement";
-  $desc = $collectedClasses.SwitchElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SwitchElement.prototype = $desc;
-  function SymbolElement() {
-  }
-  SymbolElement.builtin$cls = "SymbolElement";
-  if (!"name" in SymbolElement)
-    SymbolElement.name = "SymbolElement";
-  $desc = $collectedClasses.SymbolElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SymbolElement.prototype = $desc;
-  function TSpanElement() {
-  }
-  TSpanElement.builtin$cls = "TSpanElement";
-  if (!"name" in TSpanElement)
-    TSpanElement.name = "TSpanElement";
-  $desc = $collectedClasses.TSpanElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TSpanElement.prototype = $desc;
-  function TextContentElement() {
-  }
-  TextContentElement.builtin$cls = "TextContentElement";
-  if (!"name" in TextContentElement)
-    TextContentElement.name = "TextContentElement";
-  $desc = $collectedClasses.TextContentElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextContentElement.prototype = $desc;
-  function TextElement() {
-  }
-  TextElement.builtin$cls = "TextElement";
-  if (!"name" in TextElement)
-    TextElement.name = "TextElement";
-  $desc = $collectedClasses.TextElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextElement.prototype = $desc;
-  function TextPathElement() {
-  }
-  TextPathElement.builtin$cls = "TextPathElement";
-  if (!"name" in TextPathElement)
-    TextPathElement.name = "TextPathElement";
-  $desc = $collectedClasses.TextPathElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextPathElement.prototype = $desc;
-  function TextPositioningElement() {
-  }
-  TextPositioningElement.builtin$cls = "TextPositioningElement";
-  if (!"name" in TextPositioningElement)
-    TextPositioningElement.name = "TextPositioningElement";
-  $desc = $collectedClasses.TextPositioningElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TextPositioningElement.prototype = $desc;
-  function TitleElement0() {
-  }
-  TitleElement0.builtin$cls = "TitleElement0";
-  if (!"name" in TitleElement0)
-    TitleElement0.name = "TitleElement0";
-  $desc = $collectedClasses.TitleElement0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TitleElement0.prototype = $desc;
-  function UseElement() {
-  }
-  UseElement.builtin$cls = "UseElement";
-  if (!"name" in UseElement)
-    UseElement.name = "UseElement";
-  $desc = $collectedClasses.UseElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UseElement.prototype = $desc;
-  function ViewElement() {
-  }
-  ViewElement.builtin$cls = "ViewElement";
-  if (!"name" in ViewElement)
-    ViewElement.name = "ViewElement";
-  $desc = $collectedClasses.ViewElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ViewElement.prototype = $desc;
-  function ZoomEvent() {
-  }
-  ZoomEvent.builtin$cls = "ZoomEvent";
-  if (!"name" in ZoomEvent)
-    ZoomEvent.name = "ZoomEvent";
-  $desc = $collectedClasses.ZoomEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ZoomEvent.prototype = $desc;
-  function _GradientElement() {
-  }
-  _GradientElement.builtin$cls = "_GradientElement";
-  if (!"name" in _GradientElement)
-    _GradientElement.name = "_GradientElement";
-  $desc = $collectedClasses._GradientElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _GradientElement.prototype = $desc;
-  function _SVGAltGlyphDefElement() {
-  }
-  _SVGAltGlyphDefElement.builtin$cls = "_SVGAltGlyphDefElement";
-  if (!"name" in _SVGAltGlyphDefElement)
-    _SVGAltGlyphDefElement.name = "_SVGAltGlyphDefElement";
-  $desc = $collectedClasses._SVGAltGlyphDefElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGAltGlyphDefElement.prototype = $desc;
-  function _SVGAltGlyphItemElement() {
-  }
-  _SVGAltGlyphItemElement.builtin$cls = "_SVGAltGlyphItemElement";
-  if (!"name" in _SVGAltGlyphItemElement)
-    _SVGAltGlyphItemElement.name = "_SVGAltGlyphItemElement";
-  $desc = $collectedClasses._SVGAltGlyphItemElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGAltGlyphItemElement.prototype = $desc;
-  function _SVGComponentTransferFunctionElement() {
-  }
-  _SVGComponentTransferFunctionElement.builtin$cls = "_SVGComponentTransferFunctionElement";
-  if (!"name" in _SVGComponentTransferFunctionElement)
-    _SVGComponentTransferFunctionElement.name = "_SVGComponentTransferFunctionElement";
-  $desc = $collectedClasses._SVGComponentTransferFunctionElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGComponentTransferFunctionElement.prototype = $desc;
-  function _SVGCursorElement() {
-  }
-  _SVGCursorElement.builtin$cls = "_SVGCursorElement";
-  if (!"name" in _SVGCursorElement)
-    _SVGCursorElement.name = "_SVGCursorElement";
-  $desc = $collectedClasses._SVGCursorElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGCursorElement.prototype = $desc;
-  function _SVGFEDropShadowElement() {
-  }
-  _SVGFEDropShadowElement.builtin$cls = "_SVGFEDropShadowElement";
-  if (!"name" in _SVGFEDropShadowElement)
-    _SVGFEDropShadowElement.name = "_SVGFEDropShadowElement";
-  $desc = $collectedClasses._SVGFEDropShadowElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFEDropShadowElement.prototype = $desc;
-  function _SVGFontElement() {
-  }
-  _SVGFontElement.builtin$cls = "_SVGFontElement";
-  if (!"name" in _SVGFontElement)
-    _SVGFontElement.name = "_SVGFontElement";
-  $desc = $collectedClasses._SVGFontElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontElement.prototype = $desc;
-  function _SVGFontFaceElement() {
-  }
-  _SVGFontFaceElement.builtin$cls = "_SVGFontFaceElement";
-  if (!"name" in _SVGFontFaceElement)
-    _SVGFontFaceElement.name = "_SVGFontFaceElement";
-  $desc = $collectedClasses._SVGFontFaceElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontFaceElement.prototype = $desc;
-  function _SVGFontFaceFormatElement() {
-  }
-  _SVGFontFaceFormatElement.builtin$cls = "_SVGFontFaceFormatElement";
-  if (!"name" in _SVGFontFaceFormatElement)
-    _SVGFontFaceFormatElement.name = "_SVGFontFaceFormatElement";
-  $desc = $collectedClasses._SVGFontFaceFormatElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontFaceFormatElement.prototype = $desc;
-  function _SVGFontFaceNameElement() {
-  }
-  _SVGFontFaceNameElement.builtin$cls = "_SVGFontFaceNameElement";
-  if (!"name" in _SVGFontFaceNameElement)
-    _SVGFontFaceNameElement.name = "_SVGFontFaceNameElement";
-  $desc = $collectedClasses._SVGFontFaceNameElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontFaceNameElement.prototype = $desc;
-  function _SVGFontFaceSrcElement() {
-  }
-  _SVGFontFaceSrcElement.builtin$cls = "_SVGFontFaceSrcElement";
-  if (!"name" in _SVGFontFaceSrcElement)
-    _SVGFontFaceSrcElement.name = "_SVGFontFaceSrcElement";
-  $desc = $collectedClasses._SVGFontFaceSrcElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontFaceSrcElement.prototype = $desc;
-  function _SVGFontFaceUriElement() {
-  }
-  _SVGFontFaceUriElement.builtin$cls = "_SVGFontFaceUriElement";
-  if (!"name" in _SVGFontFaceUriElement)
-    _SVGFontFaceUriElement.name = "_SVGFontFaceUriElement";
-  $desc = $collectedClasses._SVGFontFaceUriElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGFontFaceUriElement.prototype = $desc;
-  function _SVGGlyphElement() {
-  }
-  _SVGGlyphElement.builtin$cls = "_SVGGlyphElement";
-  if (!"name" in _SVGGlyphElement)
-    _SVGGlyphElement.name = "_SVGGlyphElement";
-  $desc = $collectedClasses._SVGGlyphElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGGlyphElement.prototype = $desc;
-  function _SVGGlyphRefElement() {
-  }
-  _SVGGlyphRefElement.builtin$cls = "_SVGGlyphRefElement";
-  if (!"name" in _SVGGlyphRefElement)
-    _SVGGlyphRefElement.name = "_SVGGlyphRefElement";
-  $desc = $collectedClasses._SVGGlyphRefElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGGlyphRefElement.prototype = $desc;
-  function _SVGHKernElement() {
-  }
-  _SVGHKernElement.builtin$cls = "_SVGHKernElement";
-  if (!"name" in _SVGHKernElement)
-    _SVGHKernElement.name = "_SVGHKernElement";
-  $desc = $collectedClasses._SVGHKernElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGHKernElement.prototype = $desc;
-  function _SVGMPathElement() {
-  }
-  _SVGMPathElement.builtin$cls = "_SVGMPathElement";
-  if (!"name" in _SVGMPathElement)
-    _SVGMPathElement.name = "_SVGMPathElement";
-  $desc = $collectedClasses._SVGMPathElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGMPathElement.prototype = $desc;
-  function _SVGMissingGlyphElement() {
-  }
-  _SVGMissingGlyphElement.builtin$cls = "_SVGMissingGlyphElement";
-  if (!"name" in _SVGMissingGlyphElement)
-    _SVGMissingGlyphElement.name = "_SVGMissingGlyphElement";
-  $desc = $collectedClasses._SVGMissingGlyphElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGMissingGlyphElement.prototype = $desc;
-  function _SVGVKernElement() {
-  }
-  _SVGVKernElement.builtin$cls = "_SVGVKernElement";
-  if (!"name" in _SVGVKernElement)
-    _SVGVKernElement.name = "_SVGVKernElement";
-  $desc = $collectedClasses._SVGVKernElement;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SVGVKernElement.prototype = $desc;
-  function AudioProcessingEvent() {
-  }
-  AudioProcessingEvent.builtin$cls = "AudioProcessingEvent";
-  if (!"name" in AudioProcessingEvent)
-    AudioProcessingEvent.name = "AudioProcessingEvent";
-  $desc = $collectedClasses.AudioProcessingEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AudioProcessingEvent.prototype = $desc;
-  function OfflineAudioCompletionEvent() {
-  }
-  OfflineAudioCompletionEvent.builtin$cls = "OfflineAudioCompletionEvent";
-  if (!"name" in OfflineAudioCompletionEvent)
-    OfflineAudioCompletionEvent.name = "OfflineAudioCompletionEvent";
-  $desc = $collectedClasses.OfflineAudioCompletionEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OfflineAudioCompletionEvent.prototype = $desc;
-  function ContextEvent() {
-  }
-  ContextEvent.builtin$cls = "ContextEvent";
-  if (!"name" in ContextEvent)
-    ContextEvent.name = "ContextEvent";
-  $desc = $collectedClasses.ContextEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ContextEvent.prototype = $desc;
-  function SqlError() {
-  }
-  SqlError.builtin$cls = "SqlError";
-  if (!"name" in SqlError)
-    SqlError.name = "SqlError";
-  $desc = $collectedClasses.SqlError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SqlError.prototype = $desc;
-  function NativeByteBuffer() {
-  }
-  NativeByteBuffer.builtin$cls = "NativeByteBuffer";
-  if (!"name" in NativeByteBuffer)
-    NativeByteBuffer.name = "NativeByteBuffer";
-  $desc = $collectedClasses.NativeByteBuffer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeByteBuffer.prototype = $desc;
-  function NativeTypedData() {
-  }
-  NativeTypedData.builtin$cls = "NativeTypedData";
-  if (!"name" in NativeTypedData)
-    NativeTypedData.name = "NativeTypedData";
-  $desc = $collectedClasses.NativeTypedData;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedData.prototype = $desc;
-  function NativeByteData() {
-  }
-  NativeByteData.builtin$cls = "NativeByteData";
-  if (!"name" in NativeByteData)
-    NativeByteData.name = "NativeByteData";
-  $desc = $collectedClasses.NativeByteData;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeByteData.prototype = $desc;
-  function NativeFloat32List() {
-  }
-  NativeFloat32List.builtin$cls = "NativeFloat32List";
-  if (!"name" in NativeFloat32List)
-    NativeFloat32List.name = "NativeFloat32List";
-  $desc = $collectedClasses.NativeFloat32List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeFloat32List.prototype = $desc;
-  function NativeFloat64List() {
-  }
-  NativeFloat64List.builtin$cls = "NativeFloat64List";
-  if (!"name" in NativeFloat64List)
-    NativeFloat64List.name = "NativeFloat64List";
-  $desc = $collectedClasses.NativeFloat64List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeFloat64List.prototype = $desc;
-  function NativeInt16List() {
-  }
-  NativeInt16List.builtin$cls = "NativeInt16List";
-  if (!"name" in NativeInt16List)
-    NativeInt16List.name = "NativeInt16List";
-  $desc = $collectedClasses.NativeInt16List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeInt16List.prototype = $desc;
-  function NativeInt32List() {
-  }
-  NativeInt32List.builtin$cls = "NativeInt32List";
-  if (!"name" in NativeInt32List)
-    NativeInt32List.name = "NativeInt32List";
-  $desc = $collectedClasses.NativeInt32List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeInt32List.prototype = $desc;
-  function NativeInt8List() {
-  }
-  NativeInt8List.builtin$cls = "NativeInt8List";
-  if (!"name" in NativeInt8List)
-    NativeInt8List.name = "NativeInt8List";
-  $desc = $collectedClasses.NativeInt8List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeInt8List.prototype = $desc;
-  function NativeUint16List() {
-  }
-  NativeUint16List.builtin$cls = "NativeUint16List";
-  if (!"name" in NativeUint16List)
-    NativeUint16List.name = "NativeUint16List";
-  $desc = $collectedClasses.NativeUint16List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeUint16List.prototype = $desc;
-  function NativeUint32List() {
-  }
-  NativeUint32List.builtin$cls = "NativeUint32List";
-  if (!"name" in NativeUint32List)
-    NativeUint32List.name = "NativeUint32List";
-  $desc = $collectedClasses.NativeUint32List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeUint32List.prototype = $desc;
-  function NativeUint8ClampedList() {
-  }
-  NativeUint8ClampedList.builtin$cls = "NativeUint8ClampedList";
-  if (!"name" in NativeUint8ClampedList)
-    NativeUint8ClampedList.name = "NativeUint8ClampedList";
-  $desc = $collectedClasses.NativeUint8ClampedList;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeUint8ClampedList.prototype = $desc;
-  function NativeUint8List() {
-  }
-  NativeUint8List.builtin$cls = "NativeUint8List";
-  if (!"name" in NativeUint8List)
-    NativeUint8List.name = "NativeUint8List";
-  $desc = $collectedClasses.NativeUint8List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeUint8List.prototype = $desc;
-  function JS_CONST(code) {
-    this.code = code;
-  }
-  JS_CONST.builtin$cls = "JS_CONST";
-  if (!"name" in JS_CONST)
-    JS_CONST.name = "JS_CONST";
-  $desc = $collectedClasses.JS_CONST;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JS_CONST.prototype = $desc;
-  function Interceptor() {
-  }
-  Interceptor.builtin$cls = "Interceptor";
-  if (!"name" in Interceptor)
-    Interceptor.name = "Interceptor";
-  $desc = $collectedClasses.Interceptor;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Interceptor.prototype = $desc;
-  function JSBool() {
-  }
-  JSBool.builtin$cls = "JSBool";
-  if (!"name" in JSBool)
-    JSBool.name = "JSBool";
-  $desc = $collectedClasses.JSBool;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSBool.prototype = $desc;
-  function JSNull() {
-  }
-  JSNull.builtin$cls = "JSNull";
-  if (!"name" in JSNull)
-    JSNull.name = "JSNull";
-  $desc = $collectedClasses.JSNull;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSNull.prototype = $desc;
-  function JavaScriptObject() {
-  }
-  JavaScriptObject.builtin$cls = "JavaScriptObject";
-  if (!"name" in JavaScriptObject)
-    JavaScriptObject.name = "JavaScriptObject";
-  $desc = $collectedClasses.JavaScriptObject;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JavaScriptObject.prototype = $desc;
-  function PlainJavaScriptObject() {
-  }
-  PlainJavaScriptObject.builtin$cls = "PlainJavaScriptObject";
-  if (!"name" in PlainJavaScriptObject)
-    PlainJavaScriptObject.name = "PlainJavaScriptObject";
-  $desc = $collectedClasses.PlainJavaScriptObject;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  PlainJavaScriptObject.prototype = $desc;
-  function UnknownJavaScriptObject() {
-  }
-  UnknownJavaScriptObject.builtin$cls = "UnknownJavaScriptObject";
-  if (!"name" in UnknownJavaScriptObject)
-    UnknownJavaScriptObject.name = "UnknownJavaScriptObject";
-  $desc = $collectedClasses.UnknownJavaScriptObject;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnknownJavaScriptObject.prototype = $desc;
-  function JSArray() {
-  }
-  JSArray.builtin$cls = "JSArray";
-  if (!"name" in JSArray)
-    JSArray.name = "JSArray";
-  $desc = $collectedClasses.JSArray;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSArray.prototype = $desc;
-  function JSNumber() {
-  }
-  JSNumber.builtin$cls = "JSNumber";
-  if (!"name" in JSNumber)
-    JSNumber.name = "JSNumber";
-  $desc = $collectedClasses.JSNumber;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSNumber.prototype = $desc;
-  function JSInt() {
-  }
-  JSInt.builtin$cls = "JSInt";
-  if (!"name" in JSInt)
-    JSInt.name = "JSInt";
-  $desc = $collectedClasses.JSInt;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSInt.prototype = $desc;
-  function JSDouble() {
-  }
-  JSDouble.builtin$cls = "JSDouble";
-  if (!"name" in JSDouble)
-    JSDouble.name = "JSDouble";
-  $desc = $collectedClasses.JSDouble;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSDouble.prototype = $desc;
-  function JSString() {
-  }
-  JSString.builtin$cls = "JSString";
-  if (!"name" in JSString)
-    JSString.name = "JSString";
-  $desc = $collectedClasses.JSString;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JSString.prototype = $desc;
-  function _CodeUnits(_string) {
-    this._string = _string;
-  }
-  _CodeUnits.builtin$cls = "_CodeUnits";
-  if (!"name" in _CodeUnits)
-    _CodeUnits.name = "_CodeUnits";
-  $desc = $collectedClasses._CodeUnits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _CodeUnits.prototype = $desc;
-  function startRootIsolate_closure(box_0, entry_1) {
-    this.box_0 = box_0;
-    this.entry_1 = entry_1;
-  }
-  startRootIsolate_closure.builtin$cls = "startRootIsolate_closure";
-  if (!"name" in startRootIsolate_closure)
-    startRootIsolate_closure.name = "startRootIsolate_closure";
-  $desc = $collectedClasses.startRootIsolate_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  startRootIsolate_closure.prototype = $desc;
-  function startRootIsolate_closure0(box_0, entry_2) {
-    this.box_0 = box_0;
-    this.entry_2 = entry_2;
-  }
-  startRootIsolate_closure0.builtin$cls = "startRootIsolate_closure0";
-  if (!"name" in startRootIsolate_closure0)
-    startRootIsolate_closure0.name = "startRootIsolate_closure0";
-  $desc = $collectedClasses.startRootIsolate_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  startRootIsolate_closure0.prototype = $desc;
-  function _Manager(nextIsolateId, currentManagerId, nextManagerId, currentContext, rootContext, topEventLoop, fromCommandLine, isWorker, supportsWorkers, isolates, mainManager, managers, entry) {
-    this.nextIsolateId = nextIsolateId;
-    this.currentManagerId = currentManagerId;
-    this.nextManagerId = nextManagerId;
-    this.currentContext = currentContext;
-    this.rootContext = rootContext;
-    this.topEventLoop = topEventLoop;
-    this.fromCommandLine = fromCommandLine;
-    this.isWorker = isWorker;
-    this.supportsWorkers = supportsWorkers;
-    this.isolates = isolates;
-    this.mainManager = mainManager;
-    this.managers = managers;
-    this.entry = entry;
-  }
-  _Manager.builtin$cls = "_Manager";
-  if (!"name" in _Manager)
-    _Manager.name = "_Manager";
-  $desc = $collectedClasses._Manager;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Manager.prototype = $desc;
-  function _IsolateContext(id, ports, weakPorts, isolateStatics, controlPort, pauseCapability, terminateCapability, initialized, isPaused, delayedEvents, pauseTokens, doneHandlers, _scheduledControlEvents, _isExecutingEvent, errorsAreFatal, errorPorts) {
-    this.id = id;
-    this.ports = ports;
-    this.weakPorts = weakPorts;
-    this.isolateStatics = isolateStatics;
-    this.controlPort = controlPort;
-    this.pauseCapability = pauseCapability;
-    this.terminateCapability = terminateCapability;
-    this.initialized = initialized;
-    this.isPaused = isPaused;
-    this.delayedEvents = delayedEvents;
-    this.pauseTokens = pauseTokens;
-    this.doneHandlers = doneHandlers;
-    this._scheduledControlEvents = _scheduledControlEvents;
-    this._isExecutingEvent = _isExecutingEvent;
-    this.errorsAreFatal = errorsAreFatal;
-    this.errorPorts = errorPorts;
-  }
-  _IsolateContext.builtin$cls = "_IsolateContext";
-  if (!"name" in _IsolateContext)
-    _IsolateContext.name = "_IsolateContext";
-  $desc = $collectedClasses._IsolateContext;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _IsolateContext.prototype = $desc;
-  _IsolateContext.prototype.get$isolateStatics = function() {
-    return this.isolateStatics;
-  };
-  _IsolateContext.prototype.get$controlPort = function() {
-    return this.controlPort;
-  };
-  function _IsolateContext_handlePing_respond(responsePort_0) {
-    this.responsePort_0 = responsePort_0;
-  }
-  _IsolateContext_handlePing_respond.builtin$cls = "_IsolateContext_handlePing_respond";
-  if (!"name" in _IsolateContext_handlePing_respond)
-    _IsolateContext_handlePing_respond.name = "_IsolateContext_handlePing_respond";
-  $desc = $collectedClasses._IsolateContext_handlePing_respond;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _IsolateContext_handlePing_respond.prototype = $desc;
-  function _EventLoop(events, _activeJsAsyncCount) {
-    this.events = events;
-    this._activeJsAsyncCount = _activeJsAsyncCount;
-  }
-  _EventLoop.builtin$cls = "_EventLoop";
-  if (!"name" in _EventLoop)
-    _EventLoop.name = "_EventLoop";
-  $desc = $collectedClasses._EventLoop;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _EventLoop.prototype = $desc;
-  function _EventLoop__runHelper_next(this_0) {
-    this.this_0 = this_0;
-  }
-  _EventLoop__runHelper_next.builtin$cls = "_EventLoop__runHelper_next";
-  if (!"name" in _EventLoop__runHelper_next)
-    _EventLoop__runHelper_next.name = "_EventLoop__runHelper_next";
-  $desc = $collectedClasses._EventLoop__runHelper_next;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _EventLoop__runHelper_next.prototype = $desc;
-  function _IsolateEvent(isolate, fn, message) {
-    this.isolate = isolate;
-    this.fn = fn;
-    this.message = message;
-  }
-  _IsolateEvent.builtin$cls = "_IsolateEvent";
-  if (!"name" in _IsolateEvent)
-    _IsolateEvent.name = "_IsolateEvent";
-  $desc = $collectedClasses._IsolateEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _IsolateEvent.prototype = $desc;
-  function _MainManagerStub() {
-  }
-  _MainManagerStub.builtin$cls = "_MainManagerStub";
-  if (!"name" in _MainManagerStub)
-    _MainManagerStub.name = "_MainManagerStub";
-  $desc = $collectedClasses._MainManagerStub;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _MainManagerStub.prototype = $desc;
-  function IsolateNatives__processWorkerMessage_closure(entryPoint_0, args_1, message_2, isSpawnUri_3, startPaused_4, replyTo_5) {
-    this.entryPoint_0 = entryPoint_0;
-    this.args_1 = args_1;
-    this.message_2 = message_2;
-    this.isSpawnUri_3 = isSpawnUri_3;
-    this.startPaused_4 = startPaused_4;
-    this.replyTo_5 = replyTo_5;
-  }
-  IsolateNatives__processWorkerMessage_closure.builtin$cls = "IsolateNatives__processWorkerMessage_closure";
-  if (!"name" in IsolateNatives__processWorkerMessage_closure)
-    IsolateNatives__processWorkerMessage_closure.name = "IsolateNatives__processWorkerMessage_closure";
-  $desc = $collectedClasses.IsolateNatives__processWorkerMessage_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IsolateNatives__processWorkerMessage_closure.prototype = $desc;
-  function IsolateNatives__startIsolate_runStartFunction(topLevel_0, args_1, message_2, isSpawnUri_3, context_4) {
-    this.topLevel_0 = topLevel_0;
-    this.args_1 = args_1;
-    this.message_2 = message_2;
-    this.isSpawnUri_3 = isSpawnUri_3;
-    this.context_4 = context_4;
-  }
-  IsolateNatives__startIsolate_runStartFunction.builtin$cls = "IsolateNatives__startIsolate_runStartFunction";
-  if (!"name" in IsolateNatives__startIsolate_runStartFunction)
-    IsolateNatives__startIsolate_runStartFunction.name = "IsolateNatives__startIsolate_runStartFunction";
-  $desc = $collectedClasses.IsolateNatives__startIsolate_runStartFunction;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IsolateNatives__startIsolate_runStartFunction.prototype = $desc;
-  function _BaseSendPort() {
-  }
-  _BaseSendPort.builtin$cls = "_BaseSendPort";
-  if (!"name" in _BaseSendPort)
-    _BaseSendPort.name = "_BaseSendPort";
-  $desc = $collectedClasses._BaseSendPort;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _BaseSendPort.prototype = $desc;
-  function _NativeJsSendPort(_receivePort, _isolateId) {
-    this._receivePort = _receivePort;
-    this._isolateId = _isolateId;
-  }
-  _NativeJsSendPort.builtin$cls = "_NativeJsSendPort";
-  if (!"name" in _NativeJsSendPort)
-    _NativeJsSendPort.name = "_NativeJsSendPort";
-  $desc = $collectedClasses._NativeJsSendPort;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _NativeJsSendPort.prototype = $desc;
-  function _NativeJsSendPort_send_closure(box_0, this_1, shouldSerialize_2) {
-    this.box_0 = box_0;
-    this.this_1 = this_1;
-    this.shouldSerialize_2 = shouldSerialize_2;
-  }
-  _NativeJsSendPort_send_closure.builtin$cls = "_NativeJsSendPort_send_closure";
-  if (!"name" in _NativeJsSendPort_send_closure)
-    _NativeJsSendPort_send_closure.name = "_NativeJsSendPort_send_closure";
-  $desc = $collectedClasses._NativeJsSendPort_send_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _NativeJsSendPort_send_closure.prototype = $desc;
-  function _WorkerSendPort(_workerId, _receivePortId, _isolateId) {
-    this._workerId = _workerId;
-    this._receivePortId = _receivePortId;
-    this._isolateId = _isolateId;
-  }
-  _WorkerSendPort.builtin$cls = "_WorkerSendPort";
-  if (!"name" in _WorkerSendPort)
-    _WorkerSendPort.name = "_WorkerSendPort";
-  $desc = $collectedClasses._WorkerSendPort;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _WorkerSendPort.prototype = $desc;
-  function RawReceivePortImpl(_id, _handler, _isClosed) {
-    this._id = _id;
-    this._handler = _handler;
-    this._isClosed = _isClosed;
-  }
-  RawReceivePortImpl.builtin$cls = "RawReceivePortImpl";
-  if (!"name" in RawReceivePortImpl)
-    RawReceivePortImpl.name = "RawReceivePortImpl";
-  $desc = $collectedClasses.RawReceivePortImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RawReceivePortImpl.prototype = $desc;
-  RawReceivePortImpl.prototype.get$_id = function() {
-    return this._id;
-  };
-  RawReceivePortImpl.prototype.get$_isClosed = function() {
-    return this._isClosed;
-  };
-  function _JsSerializer(_nextFreeRefId, _visited) {
-    this._nextFreeRefId = _nextFreeRefId;
-    this._visited = _visited;
-  }
-  _JsSerializer.builtin$cls = "_JsSerializer";
-  if (!"name" in _JsSerializer)
-    _JsSerializer.name = "_JsSerializer";
-  $desc = $collectedClasses._JsSerializer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsSerializer.prototype = $desc;
-  function _JsCopier(_visited) {
-    this._visited = _visited;
-  }
-  _JsCopier.builtin$cls = "_JsCopier";
-  if (!"name" in _JsCopier)
-    _JsCopier.name = "_JsCopier";
-  $desc = $collectedClasses._JsCopier;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsCopier.prototype = $desc;
-  function _JsDeserializer(_deserialized) {
-    this._deserialized = _deserialized;
-  }
-  _JsDeserializer.builtin$cls = "_JsDeserializer";
-  if (!"name" in _JsDeserializer)
-    _JsDeserializer.name = "_JsDeserializer";
-  $desc = $collectedClasses._JsDeserializer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsDeserializer.prototype = $desc;
-  function _JsVisitedMap(tagged) {
-    this.tagged = tagged;
-  }
-  _JsVisitedMap.builtin$cls = "_JsVisitedMap";
-  if (!"name" in _JsVisitedMap)
-    _JsVisitedMap.name = "_JsVisitedMap";
-  $desc = $collectedClasses._JsVisitedMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsVisitedMap.prototype = $desc;
-  function _MessageTraverserVisitedMap() {
-  }
-  _MessageTraverserVisitedMap.builtin$cls = "_MessageTraverserVisitedMap";
-  if (!"name" in _MessageTraverserVisitedMap)
-    _MessageTraverserVisitedMap.name = "_MessageTraverserVisitedMap";
-  $desc = $collectedClasses._MessageTraverserVisitedMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _MessageTraverserVisitedMap.prototype = $desc;
-  function _MessageTraverser() {
-  }
-  _MessageTraverser.builtin$cls = "_MessageTraverser";
-  if (!"name" in _MessageTraverser)
-    _MessageTraverser.name = "_MessageTraverser";
-  $desc = $collectedClasses._MessageTraverser;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _MessageTraverser.prototype = $desc;
-  function _Copier() {
-  }
-  _Copier.builtin$cls = "_Copier";
-  if (!"name" in _Copier)
-    _Copier.name = "_Copier";
-  $desc = $collectedClasses._Copier;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Copier.prototype = $desc;
-  function _Copier_visitMap_closure(box_0, this_1) {
-    this.box_0 = box_0;
-    this.this_1 = this_1;
-  }
-  _Copier_visitMap_closure.builtin$cls = "_Copier_visitMap_closure";
-  if (!"name" in _Copier_visitMap_closure)
-    _Copier_visitMap_closure.name = "_Copier_visitMap_closure";
-  $desc = $collectedClasses._Copier_visitMap_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Copier_visitMap_closure.prototype = $desc;
-  function _Serializer() {
-  }
-  _Serializer.builtin$cls = "_Serializer";
-  if (!"name" in _Serializer)
-    _Serializer.name = "_Serializer";
-  $desc = $collectedClasses._Serializer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Serializer.prototype = $desc;
-  function _Deserializer() {
-  }
-  _Deserializer.builtin$cls = "_Deserializer";
-  if (!"name" in _Deserializer)
-    _Deserializer.name = "_Deserializer";
-  $desc = $collectedClasses._Deserializer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Deserializer.prototype = $desc;
-  function TimerImpl(_once, _inEventLoop, _handle) {
-    this._once = _once;
-    this._inEventLoop = _inEventLoop;
-    this._handle = _handle;
-  }
-  TimerImpl.builtin$cls = "TimerImpl";
-  if (!"name" in TimerImpl)
-    TimerImpl.name = "TimerImpl";
-  $desc = $collectedClasses.TimerImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TimerImpl.prototype = $desc;
-  function TimerImpl_internalCallback(this_0, callback_1) {
-    this.this_0 = this_0;
-    this.callback_1 = callback_1;
-  }
-  TimerImpl_internalCallback.builtin$cls = "TimerImpl_internalCallback";
-  if (!"name" in TimerImpl_internalCallback)
-    TimerImpl_internalCallback.name = "TimerImpl_internalCallback";
-  $desc = $collectedClasses.TimerImpl_internalCallback;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TimerImpl_internalCallback.prototype = $desc;
-  function TimerImpl_internalCallback0(this_2, callback_3) {
-    this.this_2 = this_2;
-    this.callback_3 = callback_3;
-  }
-  TimerImpl_internalCallback0.builtin$cls = "TimerImpl_internalCallback0";
-  if (!"name" in TimerImpl_internalCallback0)
-    TimerImpl_internalCallback0.name = "TimerImpl_internalCallback0";
-  $desc = $collectedClasses.TimerImpl_internalCallback0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TimerImpl_internalCallback0.prototype = $desc;
-  function CapabilityImpl(_id) {
-    this._id = _id;
-  }
-  CapabilityImpl.builtin$cls = "CapabilityImpl";
-  if (!"name" in CapabilityImpl)
-    CapabilityImpl.name = "CapabilityImpl";
-  $desc = $collectedClasses.CapabilityImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CapabilityImpl.prototype = $desc;
-  CapabilityImpl.prototype.get$_id = function() {
-    return this._id;
-  };
-  function ReflectionInfo(jsFunction, data, isAccessor, requiredParameterCount, optionalParameterCount, areOptionalParametersNamed, functionType, cachedSortedIndices) {
-    this.jsFunction = jsFunction;
-    this.data = data;
-    this.isAccessor = isAccessor;
-    this.requiredParameterCount = requiredParameterCount;
-    this.optionalParameterCount = optionalParameterCount;
-    this.areOptionalParametersNamed = areOptionalParametersNamed;
-    this.functionType = functionType;
-    this.cachedSortedIndices = cachedSortedIndices;
-  }
-  ReflectionInfo.builtin$cls = "ReflectionInfo";
-  if (!"name" in ReflectionInfo)
-    ReflectionInfo.name = "ReflectionInfo";
-  $desc = $collectedClasses.ReflectionInfo;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ReflectionInfo.prototype = $desc;
-  ReflectionInfo.prototype.get$data = function(receiver) {
-    return this.data;
-  };
-  function Primitives_initTicker_closure(performance_0) {
-    this.performance_0 = performance_0;
-  }
-  Primitives_initTicker_closure.builtin$cls = "Primitives_initTicker_closure";
-  if (!"name" in Primitives_initTicker_closure)
-    Primitives_initTicker_closure.name = "Primitives_initTicker_closure";
-  $desc = $collectedClasses.Primitives_initTicker_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Primitives_initTicker_closure.prototype = $desc;
-  function TypeErrorDecoder(_pattern, _arguments, _argumentsExpr, _expr, _method, _receiver) {
-    this._pattern = _pattern;
-    this._arguments = _arguments;
-    this._argumentsExpr = _argumentsExpr;
-    this._expr = _expr;
-    this._method = _method;
-    this._receiver = _receiver;
-  }
-  TypeErrorDecoder.builtin$cls = "TypeErrorDecoder";
-  if (!"name" in TypeErrorDecoder)
-    TypeErrorDecoder.name = "TypeErrorDecoder";
-  $desc = $collectedClasses.TypeErrorDecoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TypeErrorDecoder.prototype = $desc;
-  function NullError(_message, _method) {
-    this._message = _message;
-    this._method = _method;
-  }
-  NullError.builtin$cls = "NullError";
-  if (!"name" in NullError)
-    NullError.name = "NullError";
-  $desc = $collectedClasses.NullError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NullError.prototype = $desc;
-  function JsNoSuchMethodError(_message, _method, _receiver) {
-    this._message = _message;
-    this._method = _method;
-    this._receiver = _receiver;
-  }
-  JsNoSuchMethodError.builtin$cls = "JsNoSuchMethodError";
-  if (!"name" in JsNoSuchMethodError)
-    JsNoSuchMethodError.name = "JsNoSuchMethodError";
-  $desc = $collectedClasses.JsNoSuchMethodError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JsNoSuchMethodError.prototype = $desc;
-  function UnknownJsTypeError(_message) {
-    this._message = _message;
-  }
-  UnknownJsTypeError.builtin$cls = "UnknownJsTypeError";
-  if (!"name" in UnknownJsTypeError)
-    UnknownJsTypeError.name = "UnknownJsTypeError";
-  $desc = $collectedClasses.UnknownJsTypeError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnknownJsTypeError.prototype = $desc;
-  function unwrapException_saveStackTrace(ex_0) {
-    this.ex_0 = ex_0;
-  }
-  unwrapException_saveStackTrace.builtin$cls = "unwrapException_saveStackTrace";
-  if (!"name" in unwrapException_saveStackTrace)
-    unwrapException_saveStackTrace.name = "unwrapException_saveStackTrace";
-  $desc = $collectedClasses.unwrapException_saveStackTrace;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  unwrapException_saveStackTrace.prototype = $desc;
-  function _StackTrace(_exception, _trace) {
-    this._exception = _exception;
-    this._trace = _trace;
-  }
-  _StackTrace.builtin$cls = "_StackTrace";
-  if (!"name" in _StackTrace)
-    _StackTrace.name = "_StackTrace";
-  $desc = $collectedClasses._StackTrace;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _StackTrace.prototype = $desc;
-  function invokeClosure_closure(closure_0) {
-    this.closure_0 = closure_0;
-  }
-  invokeClosure_closure.builtin$cls = "invokeClosure_closure";
-  if (!"name" in invokeClosure_closure)
-    invokeClosure_closure.name = "invokeClosure_closure";
-  $desc = $collectedClasses.invokeClosure_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  invokeClosure_closure.prototype = $desc;
-  function invokeClosure_closure0(closure_1, arg1_2) {
-    this.closure_1 = closure_1;
-    this.arg1_2 = arg1_2;
-  }
-  invokeClosure_closure0.builtin$cls = "invokeClosure_closure0";
-  if (!"name" in invokeClosure_closure0)
-    invokeClosure_closure0.name = "invokeClosure_closure0";
-  $desc = $collectedClasses.invokeClosure_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  invokeClosure_closure0.prototype = $desc;
-  function invokeClosure_closure1(closure_3, arg1_4, arg2_5) {
-    this.closure_3 = closure_3;
-    this.arg1_4 = arg1_4;
-    this.arg2_5 = arg2_5;
-  }
-  invokeClosure_closure1.builtin$cls = "invokeClosure_closure1";
-  if (!"name" in invokeClosure_closure1)
-    invokeClosure_closure1.name = "invokeClosure_closure1";
-  $desc = $collectedClasses.invokeClosure_closure1;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  invokeClosure_closure1.prototype = $desc;
-  function invokeClosure_closure2(closure_6, arg1_7, arg2_8, arg3_9) {
-    this.closure_6 = closure_6;
-    this.arg1_7 = arg1_7;
-    this.arg2_8 = arg2_8;
-    this.arg3_9 = arg3_9;
-  }
-  invokeClosure_closure2.builtin$cls = "invokeClosure_closure2";
-  if (!"name" in invokeClosure_closure2)
-    invokeClosure_closure2.name = "invokeClosure_closure2";
-  $desc = $collectedClasses.invokeClosure_closure2;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  invokeClosure_closure2.prototype = $desc;
-  function invokeClosure_closure3(closure_10, arg1_11, arg2_12, arg3_13, arg4_14) {
-    this.closure_10 = closure_10;
-    this.arg1_11 = arg1_11;
-    this.arg2_12 = arg2_12;
-    this.arg3_13 = arg3_13;
-    this.arg4_14 = arg4_14;
-  }
-  invokeClosure_closure3.builtin$cls = "invokeClosure_closure3";
-  if (!"name" in invokeClosure_closure3)
-    invokeClosure_closure3.name = "invokeClosure_closure3";
-  $desc = $collectedClasses.invokeClosure_closure3;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  invokeClosure_closure3.prototype = $desc;
-  function Closure() {
-  }
-  Closure.builtin$cls = "Closure";
-  if (!"name" in Closure)
-    Closure.name = "Closure";
-  $desc = $collectedClasses.Closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Closure.prototype = $desc;
-  function TearOffClosure() {
-  }
-  TearOffClosure.builtin$cls = "TearOffClosure";
-  if (!"name" in TearOffClosure)
-    TearOffClosure.name = "TearOffClosure";
-  $desc = $collectedClasses.TearOffClosure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TearOffClosure.prototype = $desc;
-  function BoundClosure(_self, __js_helper$_target, _receiver, __js_helper$_name) {
-    this._self = _self;
-    this.__js_helper$_target = __js_helper$_target;
-    this._receiver = _receiver;
-    this.__js_helper$_name = __js_helper$_name;
-  }
-  BoundClosure.builtin$cls = "BoundClosure";
-  if (!"name" in BoundClosure)
-    BoundClosure.name = "BoundClosure";
-  $desc = $collectedClasses.BoundClosure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BoundClosure.prototype = $desc;
-  function RuntimeError(message) {
-    this.message = message;
-  }
-  RuntimeError.builtin$cls = "RuntimeError";
-  if (!"name" in RuntimeError)
-    RuntimeError.name = "RuntimeError";
-  $desc = $collectedClasses.RuntimeError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RuntimeError.prototype = $desc;
-  function RuntimeType() {
-  }
-  RuntimeType.builtin$cls = "RuntimeType";
-  if (!"name" in RuntimeType)
-    RuntimeType.name = "RuntimeType";
-  $desc = $collectedClasses.RuntimeType;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RuntimeType.prototype = $desc;
-  function RuntimeFunctionType(returnType, parameterTypes, optionalParameterTypes, namedParameters) {
-    this.returnType = returnType;
-    this.parameterTypes = parameterTypes;
-    this.optionalParameterTypes = optionalParameterTypes;
-    this.namedParameters = namedParameters;
-  }
-  RuntimeFunctionType.builtin$cls = "RuntimeFunctionType";
-  if (!"name" in RuntimeFunctionType)
-    RuntimeFunctionType.name = "RuntimeFunctionType";
-  $desc = $collectedClasses.RuntimeFunctionType;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RuntimeFunctionType.prototype = $desc;
-  function DynamicRuntimeType() {
-  }
-  DynamicRuntimeType.builtin$cls = "DynamicRuntimeType";
-  if (!"name" in DynamicRuntimeType)
-    DynamicRuntimeType.name = "DynamicRuntimeType";
-  $desc = $collectedClasses.DynamicRuntimeType;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DynamicRuntimeType.prototype = $desc;
-  function TypeImpl(_typeName, _unmangledName) {
-    this._typeName = _typeName;
-    this._unmangledName = _unmangledName;
-  }
-  TypeImpl.builtin$cls = "TypeImpl";
-  if (!"name" in TypeImpl)
-    TypeImpl.name = "TypeImpl";
-  $desc = $collectedClasses.TypeImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TypeImpl.prototype = $desc;
-  function initHooks_closure(getTag_0) {
-    this.getTag_0 = getTag_0;
-  }
-  initHooks_closure.builtin$cls = "initHooks_closure";
-  if (!"name" in initHooks_closure)
-    initHooks_closure.name = "initHooks_closure";
-  $desc = $collectedClasses.initHooks_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  initHooks_closure.prototype = $desc;
-  function initHooks_closure0(getUnknownTag_1) {
-    this.getUnknownTag_1 = getUnknownTag_1;
-  }
-  initHooks_closure0.builtin$cls = "initHooks_closure0";
-  if (!"name" in initHooks_closure0)
-    initHooks_closure0.name = "initHooks_closure0";
-  $desc = $collectedClasses.initHooks_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  initHooks_closure0.prototype = $desc;
-  function initHooks_closure1(prototypeForTag_2) {
-    this.prototypeForTag_2 = prototypeForTag_2;
-  }
-  initHooks_closure1.builtin$cls = "initHooks_closure1";
-  if (!"name" in initHooks_closure1)
-    initHooks_closure1.name = "initHooks_closure1";
-  $desc = $collectedClasses.initHooks_closure1;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  initHooks_closure1.prototype = $desc;
-  function init_closure(onReady_1, stopwatch_2) {
-    this.onReady_1 = onReady_1;
-    this.stopwatch_2 = stopwatch_2;
-  }
-  init_closure.builtin$cls = "init_closure";
-  if (!"name" in init_closure)
-    init_closure.name = "init_closure";
-  $desc = $collectedClasses.init_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  init_closure.prototype = $desc;
-  function init_closure0(script_3) {
-    this.script_3 = script_3;
-  }
-  init_closure0.builtin$cls = "init_closure0";
-  if (!"name" in init_closure0)
-    init_closure0.name = "init_closure0";
-  $desc = $collectedClasses.init_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  init_closure0.prototype = $desc;
-  function init__closure(box_0, popup_4) {
-    this.box_0 = box_0;
-    this.popup_4 = popup_4;
-  }
-  init__closure.builtin$cls = "init__closure";
-  if (!"name" in init__closure)
-    init__closure.name = "init__closure";
-  $desc = $collectedClasses.init__closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  init__closure.prototype = $desc;
-  function init__closure0(box_0, popup_5) {
-    this.box_0 = box_0;
-    this.popup_5 = popup_5;
-  }
-  init__closure0.builtin$cls = "init__closure0";
-  if (!"name" in init__closure0)
-    init__closure0.name = "init__closure0";
-  $desc = $collectedClasses.init__closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  init__closure0.prototype = $desc;
-  function ListIterable() {
-  }
-  ListIterable.builtin$cls = "ListIterable";
-  if (!"name" in ListIterable)
-    ListIterable.name = "ListIterable";
-  $desc = $collectedClasses.ListIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ListIterable.prototype = $desc;
-  function SubListIterable(_iterable, __internal$_start, _endOrLength) {
-    this._iterable = _iterable;
-    this.__internal$_start = __internal$_start;
-    this._endOrLength = _endOrLength;
-  }
-  SubListIterable.builtin$cls = "SubListIterable";
-  if (!"name" in SubListIterable)
-    SubListIterable.name = "SubListIterable";
-  $desc = $collectedClasses.SubListIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SubListIterable.prototype = $desc;
-  function ListIterator(_iterable, __internal$_length, _index, __internal$_current) {
-    this._iterable = _iterable;
-    this.__internal$_length = __internal$_length;
-    this._index = _index;
-    this.__internal$_current = __internal$_current;
-  }
-  ListIterator.builtin$cls = "ListIterator";
-  if (!"name" in ListIterator)
-    ListIterator.name = "ListIterator";
-  $desc = $collectedClasses.ListIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ListIterator.prototype = $desc;
-  function MappedIterable(_iterable, _f) {
-    this._iterable = _iterable;
-    this._f = _f;
-  }
-  MappedIterable.builtin$cls = "MappedIterable";
-  if (!"name" in MappedIterable)
-    MappedIterable.name = "MappedIterable";
-  $desc = $collectedClasses.MappedIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MappedIterable.prototype = $desc;
-  function EfficientLengthMappedIterable(_iterable, _f) {
-    this._iterable = _iterable;
-    this._f = _f;
-  }
-  EfficientLengthMappedIterable.builtin$cls = "EfficientLengthMappedIterable";
-  if (!"name" in EfficientLengthMappedIterable)
-    EfficientLengthMappedIterable.name = "EfficientLengthMappedIterable";
-  $desc = $collectedClasses.EfficientLengthMappedIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EfficientLengthMappedIterable.prototype = $desc;
-  function MappedIterator(__internal$_current, _iterator, _f) {
-    this.__internal$_current = __internal$_current;
-    this._iterator = _iterator;
-    this._f = _f;
-  }
-  MappedIterator.builtin$cls = "MappedIterator";
-  if (!"name" in MappedIterator)
-    MappedIterator.name = "MappedIterator";
-  $desc = $collectedClasses.MappedIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  MappedIterator.prototype = $desc;
-  function IterableMixinWorkaround() {
-  }
-  IterableMixinWorkaround.builtin$cls = "IterableMixinWorkaround";
-  if (!"name" in IterableMixinWorkaround)
-    IterableMixinWorkaround.name = "IterableMixinWorkaround";
-  $desc = $collectedClasses.IterableMixinWorkaround;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IterableMixinWorkaround.prototype = $desc;
-  function FixedLengthListMixin() {
-  }
-  FixedLengthListMixin.builtin$cls = "FixedLengthListMixin";
-  if (!"name" in FixedLengthListMixin)
-    FixedLengthListMixin.name = "FixedLengthListMixin";
-  $desc = $collectedClasses.FixedLengthListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FixedLengthListMixin.prototype = $desc;
-  function UnmodifiableListMixin() {
-  }
-  UnmodifiableListMixin.builtin$cls = "UnmodifiableListMixin";
-  if (!"name" in UnmodifiableListMixin)
-    UnmodifiableListMixin.name = "UnmodifiableListMixin";
-  $desc = $collectedClasses.UnmodifiableListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnmodifiableListMixin.prototype = $desc;
-  function UnmodifiableListBase() {
-  }
-  UnmodifiableListBase.builtin$cls = "UnmodifiableListBase";
-  if (!"name" in UnmodifiableListBase)
-    UnmodifiableListBase.name = "UnmodifiableListBase";
-  $desc = $collectedClasses.UnmodifiableListBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnmodifiableListBase.prototype = $desc;
-  function _AsyncRun__initializeScheduleImmediate_internalCallback(box_0) {
-    this.box_0 = box_0;
-  }
-  _AsyncRun__initializeScheduleImmediate_internalCallback.builtin$cls = "_AsyncRun__initializeScheduleImmediate_internalCallback";
-  if (!"name" in _AsyncRun__initializeScheduleImmediate_internalCallback)
-    _AsyncRun__initializeScheduleImmediate_internalCallback.name = "_AsyncRun__initializeScheduleImmediate_internalCallback";
-  $desc = $collectedClasses._AsyncRun__initializeScheduleImmediate_internalCallback;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncRun__initializeScheduleImmediate_internalCallback.prototype = $desc;
-  function _AsyncRun__initializeScheduleImmediate_closure(box_0, div_1, span_2) {
-    this.box_0 = box_0;
-    this.div_1 = div_1;
-    this.span_2 = span_2;
-  }
-  _AsyncRun__initializeScheduleImmediate_closure.builtin$cls = "_AsyncRun__initializeScheduleImmediate_closure";
-  if (!"name" in _AsyncRun__initializeScheduleImmediate_closure)
-    _AsyncRun__initializeScheduleImmediate_closure.name = "_AsyncRun__initializeScheduleImmediate_closure";
-  $desc = $collectedClasses._AsyncRun__initializeScheduleImmediate_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncRun__initializeScheduleImmediate_closure.prototype = $desc;
-  function _AsyncRun__scheduleImmediateJsOverride_internalCallback(callback_0) {
-    this.callback_0 = callback_0;
-  }
-  _AsyncRun__scheduleImmediateJsOverride_internalCallback.builtin$cls = "_AsyncRun__scheduleImmediateJsOverride_internalCallback";
-  if (!"name" in _AsyncRun__scheduleImmediateJsOverride_internalCallback)
-    _AsyncRun__scheduleImmediateJsOverride_internalCallback.name = "_AsyncRun__scheduleImmediateJsOverride_internalCallback";
-  $desc = $collectedClasses._AsyncRun__scheduleImmediateJsOverride_internalCallback;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncRun__scheduleImmediateJsOverride_internalCallback.prototype = $desc;
-  function _AsyncError(error, stackTrace) {
-    this.error = error;
-    this.stackTrace = stackTrace;
-  }
-  _AsyncError.builtin$cls = "_AsyncError";
-  if (!"name" in _AsyncError)
-    _AsyncError.name = "_AsyncError";
-  $desc = $collectedClasses._AsyncError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncError.prototype = $desc;
-  _AsyncError.prototype.get$error = function(receiver) {
-    return this.error;
-  };
-  _AsyncError.prototype.get$stackTrace = function() {
-    return this.stackTrace;
-  };
-  function _UncaughtAsyncError(error, stackTrace) {
-    this.error = error;
-    this.stackTrace = stackTrace;
-  }
-  _UncaughtAsyncError.builtin$cls = "_UncaughtAsyncError";
-  if (!"name" in _UncaughtAsyncError)
-    _UncaughtAsyncError.name = "_UncaughtAsyncError";
-  $desc = $collectedClasses._UncaughtAsyncError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _UncaughtAsyncError.prototype = $desc;
-  function Future() {
-  }
-  Future.builtin$cls = "Future";
-  if (!"name" in Future)
-    Future.name = "Future";
-  $desc = $collectedClasses.Future;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Future.prototype = $desc;
-  function _Completer() {
-  }
-  _Completer.builtin$cls = "_Completer";
-  if (!"name" in _Completer)
-    _Completer.name = "_Completer";
-  $desc = $collectedClasses._Completer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Completer.prototype = $desc;
-  function _AsyncCompleter(future) {
-    this.future = future;
-  }
-  _AsyncCompleter.builtin$cls = "_AsyncCompleter";
-  if (!"name" in _AsyncCompleter)
-    _AsyncCompleter.name = "_AsyncCompleter";
-  $desc = $collectedClasses._AsyncCompleter;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncCompleter.prototype = $desc;
-  function _Future(_state, _zone, _resultOrListeners, _nextListener, _onValueCallback, _errorTestCallback, _onErrorCallback, _whenCompleteActionCallback) {
-    this._state = _state;
-    this._zone = _zone;
-    this._resultOrListeners = _resultOrListeners;
-    this._nextListener = _nextListener;
-    this._onValueCallback = _onValueCallback;
-    this._errorTestCallback = _errorTestCallback;
-    this._onErrorCallback = _onErrorCallback;
-    this._whenCompleteActionCallback = _whenCompleteActionCallback;
-  }
-  _Future.builtin$cls = "_Future";
-  if (!"name" in _Future)
-    _Future.name = "_Future";
-  $desc = $collectedClasses._Future;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future.prototype = $desc;
-  _Future.prototype.get$_zone = function() {
-    return this._zone;
-  };
-  _Future.prototype.get$_nextListener = function() {
-    return this._nextListener;
-  };
-  function _Future__addListener_closure(this_0, listener_1) {
-    this.this_0 = this_0;
-    this.listener_1 = listener_1;
-  }
-  _Future__addListener_closure.builtin$cls = "_Future__addListener_closure";
-  if (!"name" in _Future__addListener_closure)
-    _Future__addListener_closure.name = "_Future__addListener_closure";
-  $desc = $collectedClasses._Future__addListener_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__addListener_closure.prototype = $desc;
-  function _Future__chainForeignFuture_closure(target_0) {
-    this.target_0 = target_0;
-  }
-  _Future__chainForeignFuture_closure.builtin$cls = "_Future__chainForeignFuture_closure";
-  if (!"name" in _Future__chainForeignFuture_closure)
-    _Future__chainForeignFuture_closure.name = "_Future__chainForeignFuture_closure";
-  $desc = $collectedClasses._Future__chainForeignFuture_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__chainForeignFuture_closure.prototype = $desc;
-  function _Future__chainForeignFuture_closure0(target_1) {
-    this.target_1 = target_1;
-  }
-  _Future__chainForeignFuture_closure0.builtin$cls = "_Future__chainForeignFuture_closure0";
-  if (!"name" in _Future__chainForeignFuture_closure0)
-    _Future__chainForeignFuture_closure0.name = "_Future__chainForeignFuture_closure0";
-  $desc = $collectedClasses._Future__chainForeignFuture_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__chainForeignFuture_closure0.prototype = $desc;
-  function _Future__asyncComplete_closure(this_0, coreFuture_1) {
-    this.this_0 = this_0;
-    this.coreFuture_1 = coreFuture_1;
-  }
-  _Future__asyncComplete_closure.builtin$cls = "_Future__asyncComplete_closure";
-  if (!"name" in _Future__asyncComplete_closure)
-    _Future__asyncComplete_closure.name = "_Future__asyncComplete_closure";
-  $desc = $collectedClasses._Future__asyncComplete_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__asyncComplete_closure.prototype = $desc;
-  function _Future__asyncComplete_closure0(this_2, value_3) {
-    this.this_2 = this_2;
-    this.value_3 = value_3;
-  }
-  _Future__asyncComplete_closure0.builtin$cls = "_Future__asyncComplete_closure0";
-  if (!"name" in _Future__asyncComplete_closure0)
-    _Future__asyncComplete_closure0.name = "_Future__asyncComplete_closure0";
-  $desc = $collectedClasses._Future__asyncComplete_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__asyncComplete_closure0.prototype = $desc;
-  function _Future__asyncCompleteError_closure(this_0, error_1, stackTrace_2) {
-    this.this_0 = this_0;
-    this.error_1 = error_1;
-    this.stackTrace_2 = stackTrace_2;
-  }
-  _Future__asyncCompleteError_closure.builtin$cls = "_Future__asyncCompleteError_closure";
-  if (!"name" in _Future__asyncCompleteError_closure)
-    _Future__asyncCompleteError_closure.name = "_Future__asyncCompleteError_closure";
-  $desc = $collectedClasses._Future__asyncCompleteError_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__asyncCompleteError_closure.prototype = $desc;
-  function _Future__propagateToListeners_handleValueCallback(box_1, listener_3, sourceValue_4, zone_5) {
-    this.box_1 = box_1;
-    this.listener_3 = listener_3;
-    this.sourceValue_4 = sourceValue_4;
-    this.zone_5 = zone_5;
-  }
-  _Future__propagateToListeners_handleValueCallback.builtin$cls = "_Future__propagateToListeners_handleValueCallback";
-  if (!"name" in _Future__propagateToListeners_handleValueCallback)
-    _Future__propagateToListeners_handleValueCallback.name = "_Future__propagateToListeners_handleValueCallback";
-  $desc = $collectedClasses._Future__propagateToListeners_handleValueCallback;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__propagateToListeners_handleValueCallback.prototype = $desc;
-  function _Future__propagateToListeners_handleError(box_2, box_1, listener_6, zone_7) {
-    this.box_2 = box_2;
-    this.box_1 = box_1;
-    this.listener_6 = listener_6;
-    this.zone_7 = zone_7;
-  }
-  _Future__propagateToListeners_handleError.builtin$cls = "_Future__propagateToListeners_handleError";
-  if (!"name" in _Future__propagateToListeners_handleError)
-    _Future__propagateToListeners_handleError.name = "_Future__propagateToListeners_handleError";
-  $desc = $collectedClasses._Future__propagateToListeners_handleError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__propagateToListeners_handleError.prototype = $desc;
-  function _Future__propagateToListeners_handleWhenCompleteCallback(box_2, box_1, hasError_8, listener_9, zone_10) {
-    this.box_2 = box_2;
-    this.box_1 = box_1;
-    this.hasError_8 = hasError_8;
-    this.listener_9 = listener_9;
-    this.zone_10 = zone_10;
-  }
-  _Future__propagateToListeners_handleWhenCompleteCallback.builtin$cls = "_Future__propagateToListeners_handleWhenCompleteCallback";
-  if (!"name" in _Future__propagateToListeners_handleWhenCompleteCallback)
-    _Future__propagateToListeners_handleWhenCompleteCallback.name = "_Future__propagateToListeners_handleWhenCompleteCallback";
-  $desc = $collectedClasses._Future__propagateToListeners_handleWhenCompleteCallback;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__propagateToListeners_handleWhenCompleteCallback.prototype = $desc;
-  function _Future__propagateToListeners_handleWhenCompleteCallback_closure(box_2, listener_11) {
-    this.box_2 = box_2;
-    this.listener_11 = listener_11;
-  }
-  _Future__propagateToListeners_handleWhenCompleteCallback_closure.builtin$cls = "_Future__propagateToListeners_handleWhenCompleteCallback_closure";
-  if (!"name" in _Future__propagateToListeners_handleWhenCompleteCallback_closure)
-    _Future__propagateToListeners_handleWhenCompleteCallback_closure.name = "_Future__propagateToListeners_handleWhenCompleteCallback_closure";
-  $desc = $collectedClasses._Future__propagateToListeners_handleWhenCompleteCallback_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__propagateToListeners_handleWhenCompleteCallback_closure.prototype = $desc;
-  function _Future__propagateToListeners_handleWhenCompleteCallback_closure0(box_0, listener_12) {
-    this.box_0 = box_0;
-    this.listener_12 = listener_12;
-  }
-  _Future__propagateToListeners_handleWhenCompleteCallback_closure0.builtin$cls = "_Future__propagateToListeners_handleWhenCompleteCallback_closure0";
-  if (!"name" in _Future__propagateToListeners_handleWhenCompleteCallback_closure0)
-    _Future__propagateToListeners_handleWhenCompleteCallback_closure0.name = "_Future__propagateToListeners_handleWhenCompleteCallback_closure0";
-  $desc = $collectedClasses._Future__propagateToListeners_handleWhenCompleteCallback_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Future__propagateToListeners_handleWhenCompleteCallback_closure0.prototype = $desc;
-  function _AsyncCallbackEntry(callback, next) {
-    this.callback = callback;
-    this.next = next;
-  }
-  _AsyncCallbackEntry.builtin$cls = "_AsyncCallbackEntry";
-  if (!"name" in _AsyncCallbackEntry)
-    _AsyncCallbackEntry.name = "_AsyncCallbackEntry";
-  $desc = $collectedClasses._AsyncCallbackEntry;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AsyncCallbackEntry.prototype = $desc;
-  function Stream() {
-  }
-  Stream.builtin$cls = "Stream";
-  if (!"name" in Stream)
-    Stream.name = "Stream";
-  $desc = $collectedClasses.Stream;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream.prototype = $desc;
-  function Stream_forEach_closure(box_0, this_1, action_2, future_3) {
-    this.box_0 = box_0;
-    this.this_1 = this_1;
-    this.action_2 = action_2;
-    this.future_3 = future_3;
-  }
-  Stream_forEach_closure.builtin$cls = "Stream_forEach_closure";
-  if (!"name" in Stream_forEach_closure)
-    Stream_forEach_closure.name = "Stream_forEach_closure";
-  $desc = $collectedClasses.Stream_forEach_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_forEach_closure.prototype = $desc;
-  function Stream_forEach__closure(action_4, element_5) {
-    this.action_4 = action_4;
-    this.element_5 = element_5;
-  }
-  Stream_forEach__closure.builtin$cls = "Stream_forEach__closure";
-  if (!"name" in Stream_forEach__closure)
-    Stream_forEach__closure.name = "Stream_forEach__closure";
-  $desc = $collectedClasses.Stream_forEach__closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_forEach__closure.prototype = $desc;
-  function Stream_forEach__closure0() {
-  }
-  Stream_forEach__closure0.builtin$cls = "Stream_forEach__closure0";
-  if (!"name" in Stream_forEach__closure0)
-    Stream_forEach__closure0.name = "Stream_forEach__closure0";
-  $desc = $collectedClasses.Stream_forEach__closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_forEach__closure0.prototype = $desc;
-  function Stream_forEach_closure0(future_6) {
-    this.future_6 = future_6;
-  }
-  Stream_forEach_closure0.builtin$cls = "Stream_forEach_closure0";
-  if (!"name" in Stream_forEach_closure0)
-    Stream_forEach_closure0.name = "Stream_forEach_closure0";
-  $desc = $collectedClasses.Stream_forEach_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_forEach_closure0.prototype = $desc;
-  function Stream_length_closure(box_0) {
-    this.box_0 = box_0;
-  }
-  Stream_length_closure.builtin$cls = "Stream_length_closure";
-  if (!"name" in Stream_length_closure)
-    Stream_length_closure.name = "Stream_length_closure";
-  $desc = $collectedClasses.Stream_length_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_length_closure.prototype = $desc;
-  function Stream_length_closure0(box_0, future_1) {
-    this.box_0 = box_0;
-    this.future_1 = future_1;
-  }
-  Stream_length_closure0.builtin$cls = "Stream_length_closure0";
-  if (!"name" in Stream_length_closure0)
-    Stream_length_closure0.name = "Stream_length_closure0";
-  $desc = $collectedClasses.Stream_length_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_length_closure0.prototype = $desc;
-  function Stream_isEmpty_closure(box_0, future_1) {
-    this.box_0 = box_0;
-    this.future_1 = future_1;
-  }
-  Stream_isEmpty_closure.builtin$cls = "Stream_isEmpty_closure";
-  if (!"name" in Stream_isEmpty_closure)
-    Stream_isEmpty_closure.name = "Stream_isEmpty_closure";
-  $desc = $collectedClasses.Stream_isEmpty_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_isEmpty_closure.prototype = $desc;
-  function Stream_isEmpty_closure0(future_2) {
-    this.future_2 = future_2;
-  }
-  Stream_isEmpty_closure0.builtin$cls = "Stream_isEmpty_closure0";
-  if (!"name" in Stream_isEmpty_closure0)
-    Stream_isEmpty_closure0.name = "Stream_isEmpty_closure0";
-  $desc = $collectedClasses.Stream_isEmpty_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stream_isEmpty_closure0.prototype = $desc;
-  function StreamSubscription() {
-  }
-  StreamSubscription.builtin$cls = "StreamSubscription";
-  if (!"name" in StreamSubscription)
-    StreamSubscription.name = "StreamSubscription";
-  $desc = $collectedClasses.StreamSubscription;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StreamSubscription.prototype = $desc;
-  function _EventSink() {
-  }
-  _EventSink.builtin$cls = "_EventSink";
-  if (!"name" in _EventSink)
-    _EventSink.name = "_EventSink";
-  $desc = $collectedClasses._EventSink;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _EventSink.prototype = $desc;
-  function _DelayedEvent() {
-  }
-  _DelayedEvent.builtin$cls = "_DelayedEvent";
-  if (!"name" in _DelayedEvent)
-    _DelayedEvent.name = "_DelayedEvent";
-  $desc = $collectedClasses._DelayedEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _DelayedEvent.prototype = $desc;
-  function _cancelAndError_closure(future_0, error_1, stackTrace_2) {
-    this.future_0 = future_0;
-    this.error_1 = error_1;
-    this.stackTrace_2 = stackTrace_2;
-  }
-  _cancelAndError_closure.builtin$cls = "_cancelAndError_closure";
-  if (!"name" in _cancelAndError_closure)
-    _cancelAndError_closure.name = "_cancelAndError_closure";
-  $desc = $collectedClasses._cancelAndError_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _cancelAndError_closure.prototype = $desc;
-  function _cancelAndErrorClosure_closure(subscription_0, future_1) {
-    this.subscription_0 = subscription_0;
-    this.future_1 = future_1;
-  }
-  _cancelAndErrorClosure_closure.builtin$cls = "_cancelAndErrorClosure_closure";
-  if (!"name" in _cancelAndErrorClosure_closure)
-    _cancelAndErrorClosure_closure.name = "_cancelAndErrorClosure_closure";
-  $desc = $collectedClasses._cancelAndErrorClosure_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _cancelAndErrorClosure_closure.prototype = $desc;
-  function _cancelAndValue_closure(future_0, value_1) {
-    this.future_0 = future_0;
-    this.value_1 = value_1;
-  }
-  _cancelAndValue_closure.builtin$cls = "_cancelAndValue_closure";
-  if (!"name" in _cancelAndValue_closure)
-    _cancelAndValue_closure.name = "_cancelAndValue_closure";
-  $desc = $collectedClasses._cancelAndValue_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _cancelAndValue_closure.prototype = $desc;
-  function _Zone() {
-  }
-  _Zone.builtin$cls = "_Zone";
-  if (!"name" in _Zone)
-    _Zone.name = "_Zone";
-  $desc = $collectedClasses._Zone;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Zone.prototype = $desc;
-  function _rootHandleUncaughtError_closure(error_0, stackTrace_1) {
-    this.error_0 = error_0;
-    this.stackTrace_1 = stackTrace_1;
-  }
-  _rootHandleUncaughtError_closure.builtin$cls = "_rootHandleUncaughtError_closure";
-  if (!"name" in _rootHandleUncaughtError_closure)
-    _rootHandleUncaughtError_closure.name = "_rootHandleUncaughtError_closure";
-  $desc = $collectedClasses._rootHandleUncaughtError_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _rootHandleUncaughtError_closure.prototype = $desc;
-  function _RootZone() {
-  }
-  _RootZone.builtin$cls = "_RootZone";
-  if (!"name" in _RootZone)
-    _RootZone.name = "_RootZone";
-  $desc = $collectedClasses._RootZone;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _RootZone.prototype = $desc;
-  function _RootZone_bindCallback_closure(this_0, f_1) {
-    this.this_0 = this_0;
-    this.f_1 = f_1;
-  }
-  _RootZone_bindCallback_closure.builtin$cls = "_RootZone_bindCallback_closure";
-  if (!"name" in _RootZone_bindCallback_closure)
-    _RootZone_bindCallback_closure.name = "_RootZone_bindCallback_closure";
-  $desc = $collectedClasses._RootZone_bindCallback_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _RootZone_bindCallback_closure.prototype = $desc;
-  function _RootZone_bindCallback_closure0(this_2, f_3) {
-    this.this_2 = this_2;
-    this.f_3 = f_3;
-  }
-  _RootZone_bindCallback_closure0.builtin$cls = "_RootZone_bindCallback_closure0";
-  if (!"name" in _RootZone_bindCallback_closure0)
-    _RootZone_bindCallback_closure0.name = "_RootZone_bindCallback_closure0";
-  $desc = $collectedClasses._RootZone_bindCallback_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _RootZone_bindCallback_closure0.prototype = $desc;
-  function _RootZone_bindUnaryCallback_closure(this_0, f_1) {
-    this.this_0 = this_0;
-    this.f_1 = f_1;
-  }
-  _RootZone_bindUnaryCallback_closure.builtin$cls = "_RootZone_bindUnaryCallback_closure";
-  if (!"name" in _RootZone_bindUnaryCallback_closure)
-    _RootZone_bindUnaryCallback_closure.name = "_RootZone_bindUnaryCallback_closure";
-  $desc = $collectedClasses._RootZone_bindUnaryCallback_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _RootZone_bindUnaryCallback_closure.prototype = $desc;
-  function _RootZone_bindUnaryCallback_closure0(this_2, f_3) {
-    this.this_2 = this_2;
-    this.f_3 = f_3;
-  }
-  _RootZone_bindUnaryCallback_closure0.builtin$cls = "_RootZone_bindUnaryCallback_closure0";
-  if (!"name" in _RootZone_bindUnaryCallback_closure0)
-    _RootZone_bindUnaryCallback_closure0.name = "_RootZone_bindUnaryCallback_closure0";
-  $desc = $collectedClasses._RootZone_bindUnaryCallback_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _RootZone_bindUnaryCallback_closure0.prototype = $desc;
-  function _HashMap(_collection$_length, _strings, _nums, _rest, _keys) {
-    this._collection$_length = _collection$_length;
-    this._strings = _strings;
-    this._nums = _nums;
-    this._rest = _rest;
-    this._keys = _keys;
-  }
-  _HashMap.builtin$cls = "_HashMap";
-  if (!"name" in _HashMap)
-    _HashMap.name = "_HashMap";
-  $desc = $collectedClasses._HashMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HashMap.prototype = $desc;
-  function _HashMap_values_closure(this_0) {
-    this.this_0 = this_0;
-  }
-  _HashMap_values_closure.builtin$cls = "_HashMap_values_closure";
-  if (!"name" in _HashMap_values_closure)
-    _HashMap_values_closure.name = "_HashMap_values_closure";
-  $desc = $collectedClasses._HashMap_values_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HashMap_values_closure.prototype = $desc;
-  function HashMapKeyIterable(_map) {
-    this._map = _map;
-  }
-  HashMapKeyIterable.builtin$cls = "HashMapKeyIterable";
-  if (!"name" in HashMapKeyIterable)
-    HashMapKeyIterable.name = "HashMapKeyIterable";
-  $desc = $collectedClasses.HashMapKeyIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HashMapKeyIterable.prototype = $desc;
-  function HashMapKeyIterator(_map, _keys, _offset, _collection$_current) {
-    this._map = _map;
-    this._keys = _keys;
-    this._offset = _offset;
-    this._collection$_current = _collection$_current;
-  }
-  HashMapKeyIterator.builtin$cls = "HashMapKeyIterator";
-  if (!"name" in HashMapKeyIterator)
-    HashMapKeyIterator.name = "HashMapKeyIterator";
-  $desc = $collectedClasses.HashMapKeyIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HashMapKeyIterator.prototype = $desc;
-  function _LinkedHashMap(_collection$_length, _strings, _nums, _rest, _first, _last, _modifications) {
-    this._collection$_length = _collection$_length;
-    this._strings = _strings;
-    this._nums = _nums;
-    this._rest = _rest;
-    this._first = _first;
-    this._last = _last;
-    this._modifications = _modifications;
-  }
-  _LinkedHashMap.builtin$cls = "_LinkedHashMap";
-  if (!"name" in _LinkedHashMap)
-    _LinkedHashMap.name = "_LinkedHashMap";
-  $desc = $collectedClasses._LinkedHashMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _LinkedHashMap.prototype = $desc;
-  function _LinkedHashMap_values_closure(this_0) {
-    this.this_0 = this_0;
-  }
-  _LinkedHashMap_values_closure.builtin$cls = "_LinkedHashMap_values_closure";
-  if (!"name" in _LinkedHashMap_values_closure)
-    _LinkedHashMap_values_closure.name = "_LinkedHashMap_values_closure";
-  $desc = $collectedClasses._LinkedHashMap_values_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _LinkedHashMap_values_closure.prototype = $desc;
-  function LinkedHashMapCell(_key, _collection$_value, _next, _previous) {
-    this._key = _key;
-    this._collection$_value = _collection$_value;
-    this._next = _next;
-    this._previous = _previous;
-  }
-  LinkedHashMapCell.builtin$cls = "LinkedHashMapCell";
-  if (!"name" in LinkedHashMapCell)
-    LinkedHashMapCell.name = "LinkedHashMapCell";
-  $desc = $collectedClasses.LinkedHashMapCell;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkedHashMapCell.prototype = $desc;
-  LinkedHashMapCell.prototype.get$_key = function() {
-    return this._key;
-  };
-  LinkedHashMapCell.prototype.get$_collection$_value = function() {
-    return this._collection$_value;
-  };
-  LinkedHashMapCell.prototype.set$_collection$_value = function(v) {
-    return this._collection$_value = v;
-  };
-  LinkedHashMapCell.prototype.get$_next = function() {
-    return this._next;
-  };
-  LinkedHashMapCell.prototype.set$_next = function(v) {
-    return this._next = v;
-  };
-  LinkedHashMapCell.prototype.get$_previous = function() {
-    return this._previous;
-  };
-  LinkedHashMapCell.prototype.set$_previous = function(v) {
-    return this._previous = v;
-  };
-  function LinkedHashMapKeyIterable(_map) {
-    this._map = _map;
-  }
-  LinkedHashMapKeyIterable.builtin$cls = "LinkedHashMapKeyIterable";
-  if (!"name" in LinkedHashMapKeyIterable)
-    LinkedHashMapKeyIterable.name = "LinkedHashMapKeyIterable";
-  $desc = $collectedClasses.LinkedHashMapKeyIterable;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkedHashMapKeyIterable.prototype = $desc;
-  function LinkedHashMapKeyIterator(_map, _modifications, _cell, _collection$_current) {
-    this._map = _map;
-    this._modifications = _modifications;
-    this._cell = _cell;
-    this._collection$_current = _collection$_current;
-  }
-  LinkedHashMapKeyIterator.builtin$cls = "LinkedHashMapKeyIterator";
-  if (!"name" in LinkedHashMapKeyIterator)
-    LinkedHashMapKeyIterator.name = "LinkedHashMapKeyIterator";
-  $desc = $collectedClasses.LinkedHashMapKeyIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkedHashMapKeyIterator.prototype = $desc;
-  function _LinkedHashSet(_collection$_length, _strings, _nums, _rest, _first, _last, _modifications) {
-    this._collection$_length = _collection$_length;
-    this._strings = _strings;
-    this._nums = _nums;
-    this._rest = _rest;
-    this._first = _first;
-    this._last = _last;
-    this._modifications = _modifications;
-  }
-  _LinkedHashSet.builtin$cls = "_LinkedHashSet";
-  if (!"name" in _LinkedHashSet)
-    _LinkedHashSet.name = "_LinkedHashSet";
-  $desc = $collectedClasses._LinkedHashSet;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _LinkedHashSet.prototype = $desc;
-  function LinkedHashSetCell(_collection$_element, _next, _previous) {
-    this._collection$_element = _collection$_element;
-    this._next = _next;
-    this._previous = _previous;
-  }
-  LinkedHashSetCell.builtin$cls = "LinkedHashSetCell";
-  if (!"name" in LinkedHashSetCell)
-    LinkedHashSetCell.name = "LinkedHashSetCell";
-  $desc = $collectedClasses.LinkedHashSetCell;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkedHashSetCell.prototype = $desc;
-  LinkedHashSetCell.prototype.get$_collection$_element = function() {
-    return this._collection$_element;
-  };
-  LinkedHashSetCell.prototype.get$_next = function() {
-    return this._next;
-  };
-  LinkedHashSetCell.prototype.set$_next = function(v) {
-    return this._next = v;
-  };
-  LinkedHashSetCell.prototype.get$_previous = function() {
-    return this._previous;
-  };
-  LinkedHashSetCell.prototype.set$_previous = function(v) {
-    return this._previous = v;
-  };
-  function LinkedHashSetIterator(_set, _modifications, _cell, _collection$_current) {
-    this._set = _set;
-    this._modifications = _modifications;
-    this._cell = _cell;
-    this._collection$_current = _collection$_current;
-  }
-  LinkedHashSetIterator.builtin$cls = "LinkedHashSetIterator";
-  if (!"name" in LinkedHashSetIterator)
-    LinkedHashSetIterator.name = "LinkedHashSetIterator";
-  $desc = $collectedClasses.LinkedHashSetIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  LinkedHashSetIterator.prototype = $desc;
-  function _HashSetBase() {
-  }
-  _HashSetBase.builtin$cls = "_HashSetBase";
-  if (!"name" in _HashSetBase)
-    _HashSetBase.name = "_HashSetBase";
-  $desc = $collectedClasses._HashSetBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _HashSetBase.prototype = $desc;
-  function IterableBase() {
-  }
-  IterableBase.builtin$cls = "IterableBase";
-  if (!"name" in IterableBase)
-    IterableBase.name = "IterableBase";
-  $desc = $collectedClasses.IterableBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IterableBase.prototype = $desc;
-  function ListBase() {
-  }
-  ListBase.builtin$cls = "ListBase";
-  if (!"name" in ListBase)
-    ListBase.name = "ListBase";
-  $desc = $collectedClasses.ListBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ListBase.prototype = $desc;
-  function Object_ListMixin() {
-  }
-  Object_ListMixin.builtin$cls = "Object_ListMixin";
-  if (!"name" in Object_ListMixin)
-    Object_ListMixin.name = "Object_ListMixin";
-  $desc = $collectedClasses.Object_ListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Object_ListMixin.prototype = $desc;
-  function ListMixin() {
-  }
-  ListMixin.builtin$cls = "ListMixin";
-  if (!"name" in ListMixin)
-    ListMixin.name = "ListMixin";
-  $desc = $collectedClasses.ListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ListMixin.prototype = $desc;
-  function Maps_mapToString_closure(box_0, result_1) {
-    this.box_0 = box_0;
-    this.result_1 = result_1;
-  }
-  Maps_mapToString_closure.builtin$cls = "Maps_mapToString_closure";
-  if (!"name" in Maps_mapToString_closure)
-    Maps_mapToString_closure.name = "Maps_mapToString_closure";
-  $desc = $collectedClasses.Maps_mapToString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Maps_mapToString_closure.prototype = $desc;
-  function ListQueue(_table, _head, _tail, _modificationCount) {
-    this._table = _table;
-    this._head = _head;
-    this._tail = _tail;
-    this._modificationCount = _modificationCount;
-  }
-  ListQueue.builtin$cls = "ListQueue";
-  if (!"name" in ListQueue)
-    ListQueue.name = "ListQueue";
-  $desc = $collectedClasses.ListQueue;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ListQueue.prototype = $desc;
-  function _ListQueueIterator(_queue, _end, _modificationCount, _collection$_position, _collection$_current) {
-    this._queue = _queue;
-    this._end = _end;
-    this._modificationCount = _modificationCount;
-    this._collection$_position = _collection$_position;
-    this._collection$_current = _collection$_current;
-  }
-  _ListQueueIterator.builtin$cls = "_ListQueueIterator";
-  if (!"name" in _ListQueueIterator)
-    _ListQueueIterator.name = "_ListQueueIterator";
-  $desc = $collectedClasses._ListQueueIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ListQueueIterator.prototype = $desc;
-  function SetMixin() {
-  }
-  SetMixin.builtin$cls = "SetMixin";
-  if (!"name" in SetMixin)
-    SetMixin.name = "SetMixin";
-  $desc = $collectedClasses.SetMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SetMixin.prototype = $desc;
-  function SetBase() {
-  }
-  SetBase.builtin$cls = "SetBase";
-  if (!"name" in SetBase)
-    SetBase.name = "SetBase";
-  $desc = $collectedClasses.SetBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SetBase.prototype = $desc;
-  function _JsonMap(_original, _processed, _data) {
-    this._original = _original;
-    this._processed = _processed;
-    this._data = _data;
-  }
-  _JsonMap.builtin$cls = "_JsonMap";
-  if (!"name" in _JsonMap)
-    _JsonMap.name = "_JsonMap";
-  $desc = $collectedClasses._JsonMap;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsonMap.prototype = $desc;
-  function _JsonMap_values_closure(this_0) {
-    this.this_0 = this_0;
-  }
-  _JsonMap_values_closure.builtin$cls = "_JsonMap_values_closure";
-  if (!"name" in _JsonMap_values_closure)
-    _JsonMap_values_closure.name = "_JsonMap_values_closure";
-  $desc = $collectedClasses._JsonMap_values_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _JsonMap_values_closure.prototype = $desc;
-  function Codec() {
-  }
-  Codec.builtin$cls = "Codec";
-  if (!"name" in Codec)
-    Codec.name = "Codec";
-  $desc = $collectedClasses.Codec;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Codec.prototype = $desc;
-  function Converter() {
-  }
-  Converter.builtin$cls = "Converter";
-  if (!"name" in Converter)
-    Converter.name = "Converter";
-  $desc = $collectedClasses.Converter;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Converter.prototype = $desc;
-  function Encoding() {
-  }
-  Encoding.builtin$cls = "Encoding";
-  if (!"name" in Encoding)
-    Encoding.name = "Encoding";
-  $desc = $collectedClasses.Encoding;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Encoding.prototype = $desc;
-  function JsonCodec(_reviver, _toEncodable) {
-    this._reviver = _reviver;
-    this._toEncodable = _toEncodable;
-  }
-  JsonCodec.builtin$cls = "JsonCodec";
-  if (!"name" in JsonCodec)
-    JsonCodec.name = "JsonCodec";
-  $desc = $collectedClasses.JsonCodec;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JsonCodec.prototype = $desc;
-  function JsonDecoder(_reviver) {
-    this._reviver = _reviver;
-  }
-  JsonDecoder.builtin$cls = "JsonDecoder";
-  if (!"name" in JsonDecoder)
-    JsonDecoder.name = "JsonDecoder";
-  $desc = $collectedClasses.JsonDecoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  JsonDecoder.prototype = $desc;
-  function Utf8Codec(_allowMalformed) {
-    this._allowMalformed = _allowMalformed;
-  }
-  Utf8Codec.builtin$cls = "Utf8Codec";
-  if (!"name" in Utf8Codec)
-    Utf8Codec.name = "Utf8Codec";
-  $desc = $collectedClasses.Utf8Codec;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Utf8Codec.prototype = $desc;
-  function Utf8Encoder() {
-  }
-  Utf8Encoder.builtin$cls = "Utf8Encoder";
-  if (!"name" in Utf8Encoder)
-    Utf8Encoder.name = "Utf8Encoder";
-  $desc = $collectedClasses.Utf8Encoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Utf8Encoder.prototype = $desc;
-  function _Utf8Encoder(_carry, _bufferIndex, _buffer) {
-    this._carry = _carry;
-    this._bufferIndex = _bufferIndex;
-    this._buffer = _buffer;
-  }
-  _Utf8Encoder.builtin$cls = "_Utf8Encoder";
-  if (!"name" in _Utf8Encoder)
-    _Utf8Encoder.name = "_Utf8Encoder";
-  $desc = $collectedClasses._Utf8Encoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Utf8Encoder.prototype = $desc;
-  function Utf8Decoder(_allowMalformed) {
-    this._allowMalformed = _allowMalformed;
-  }
-  Utf8Decoder.builtin$cls = "Utf8Decoder";
-  if (!"name" in Utf8Decoder)
-    Utf8Decoder.name = "Utf8Decoder";
-  $desc = $collectedClasses.Utf8Decoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Utf8Decoder.prototype = $desc;
-  function _Utf8Decoder(_allowMalformed, _stringSink, _isFirstCharacter, _convert$_value, _expectedUnits, _extraUnits) {
-    this._allowMalformed = _allowMalformed;
-    this._stringSink = _stringSink;
-    this._isFirstCharacter = _isFirstCharacter;
-    this._convert$_value = _convert$_value;
-    this._expectedUnits = _expectedUnits;
-    this._extraUnits = _extraUnits;
-  }
-  _Utf8Decoder.builtin$cls = "_Utf8Decoder";
-  if (!"name" in _Utf8Decoder)
-    _Utf8Decoder.name = "_Utf8Decoder";
-  $desc = $collectedClasses._Utf8Decoder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Utf8Decoder.prototype = $desc;
-  function _Utf8Decoder_convert_scanOneByteCharacters(endIndex_0) {
-    this.endIndex_0 = endIndex_0;
-  }
-  _Utf8Decoder_convert_scanOneByteCharacters.builtin$cls = "_Utf8Decoder_convert_scanOneByteCharacters";
-  if (!"name" in _Utf8Decoder_convert_scanOneByteCharacters)
-    _Utf8Decoder_convert_scanOneByteCharacters.name = "_Utf8Decoder_convert_scanOneByteCharacters";
-  $desc = $collectedClasses._Utf8Decoder_convert_scanOneByteCharacters;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Utf8Decoder_convert_scanOneByteCharacters.prototype = $desc;
-  function _Utf8Decoder_convert_addSingleBytes(this_1, codeUnits_2, startIndex_3, endIndex_4) {
-    this.this_1 = this_1;
-    this.codeUnits_2 = codeUnits_2;
-    this.startIndex_3 = startIndex_3;
-    this.endIndex_4 = endIndex_4;
-  }
-  _Utf8Decoder_convert_addSingleBytes.builtin$cls = "_Utf8Decoder_convert_addSingleBytes";
-  if (!"name" in _Utf8Decoder_convert_addSingleBytes)
-    _Utf8Decoder_convert_addSingleBytes.name = "_Utf8Decoder_convert_addSingleBytes";
-  $desc = $collectedClasses._Utf8Decoder_convert_addSingleBytes;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _Utf8Decoder_convert_addSingleBytes.prototype = $desc;
-  function NoSuchMethodError_toString_closure(box_0) {
-    this.box_0 = box_0;
-  }
-  NoSuchMethodError_toString_closure.builtin$cls = "NoSuchMethodError_toString_closure";
-  if (!"name" in NoSuchMethodError_toString_closure)
-    NoSuchMethodError_toString_closure.name = "NoSuchMethodError_toString_closure";
-  $desc = $collectedClasses.NoSuchMethodError_toString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NoSuchMethodError_toString_closure.prototype = $desc;
-  function bool() {
-  }
-  bool.builtin$cls = "bool";
-  if (!"name" in bool)
-    bool.name = "bool";
-  $desc = $collectedClasses.bool;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  bool.prototype = $desc;
-  function DateTime(millisecondsSinceEpoch, isUtc) {
-    this.millisecondsSinceEpoch = millisecondsSinceEpoch;
-    this.isUtc = isUtc;
-  }
-  DateTime.builtin$cls = "DateTime";
-  if (!"name" in DateTime)
-    DateTime.name = "DateTime";
-  $desc = $collectedClasses.DateTime;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  DateTime.prototype = $desc;
-  function $double() {
-  }
-  $double.builtin$cls = "$double";
-  if (!"name" in $double)
-    $double.name = "$double";
-  $desc = $collectedClasses.$double;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  $double.prototype = $desc;
-  function Duration(_duration) {
-    this._duration = _duration;
-  }
-  Duration.builtin$cls = "Duration";
-  if (!"name" in Duration)
-    Duration.name = "Duration";
-  $desc = $collectedClasses.Duration;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Duration.prototype = $desc;
-  Duration.prototype.get$_duration = function() {
-    return this._duration;
-  };
-  function Duration_toString_sixDigits() {
-  }
-  Duration_toString_sixDigits.builtin$cls = "Duration_toString_sixDigits";
-  if (!"name" in Duration_toString_sixDigits)
-    Duration_toString_sixDigits.name = "Duration_toString_sixDigits";
-  $desc = $collectedClasses.Duration_toString_sixDigits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Duration_toString_sixDigits.prototype = $desc;
-  function Duration_toString_twoDigits() {
-  }
-  Duration_toString_twoDigits.builtin$cls = "Duration_toString_twoDigits";
-  if (!"name" in Duration_toString_twoDigits)
-    Duration_toString_twoDigits.name = "Duration_toString_twoDigits";
-  $desc = $collectedClasses.Duration_toString_twoDigits;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Duration_toString_twoDigits.prototype = $desc;
-  function Error() {
-  }
-  Error.builtin$cls = "Error";
-  if (!"name" in Error)
-    Error.name = "Error";
-  $desc = $collectedClasses.Error;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Error.prototype = $desc;
-  function NullThrownError() {
-  }
-  NullThrownError.builtin$cls = "NullThrownError";
-  if (!"name" in NullThrownError)
-    NullThrownError.name = "NullThrownError";
-  $desc = $collectedClasses.NullThrownError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NullThrownError.prototype = $desc;
-  function ArgumentError(message) {
-    this.message = message;
-  }
-  ArgumentError.builtin$cls = "ArgumentError";
-  if (!"name" in ArgumentError)
-    ArgumentError.name = "ArgumentError";
-  $desc = $collectedClasses.ArgumentError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ArgumentError.prototype = $desc;
-  function RangeError(message) {
-    this.message = message;
-  }
-  RangeError.builtin$cls = "RangeError";
-  if (!"name" in RangeError)
-    RangeError.name = "RangeError";
-  $desc = $collectedClasses.RangeError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RangeError.prototype = $desc;
-  function UnsupportedError(message) {
-    this.message = message;
-  }
-  UnsupportedError.builtin$cls = "UnsupportedError";
-  if (!"name" in UnsupportedError)
-    UnsupportedError.name = "UnsupportedError";
-  $desc = $collectedClasses.UnsupportedError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnsupportedError.prototype = $desc;
-  function UnimplementedError(message) {
-    this.message = message;
-  }
-  UnimplementedError.builtin$cls = "UnimplementedError";
-  if (!"name" in UnimplementedError)
-    UnimplementedError.name = "UnimplementedError";
-  $desc = $collectedClasses.UnimplementedError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnimplementedError.prototype = $desc;
-  function StateError(message) {
-    this.message = message;
-  }
-  StateError.builtin$cls = "StateError";
-  if (!"name" in StateError)
-    StateError.name = "StateError";
-  $desc = $collectedClasses.StateError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StateError.prototype = $desc;
-  function ConcurrentModificationError(modifiedObject) {
-    this.modifiedObject = modifiedObject;
-  }
-  ConcurrentModificationError.builtin$cls = "ConcurrentModificationError";
-  if (!"name" in ConcurrentModificationError)
-    ConcurrentModificationError.name = "ConcurrentModificationError";
-  $desc = $collectedClasses.ConcurrentModificationError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ConcurrentModificationError.prototype = $desc;
-  function OutOfMemoryError() {
-  }
-  OutOfMemoryError.builtin$cls = "OutOfMemoryError";
-  if (!"name" in OutOfMemoryError)
-    OutOfMemoryError.name = "OutOfMemoryError";
-  $desc = $collectedClasses.OutOfMemoryError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  OutOfMemoryError.prototype = $desc;
-  function StackOverflowError() {
-  }
-  StackOverflowError.builtin$cls = "StackOverflowError";
-  if (!"name" in StackOverflowError)
-    StackOverflowError.name = "StackOverflowError";
-  $desc = $collectedClasses.StackOverflowError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StackOverflowError.prototype = $desc;
-  function CyclicInitializationError(variableName) {
-    this.variableName = variableName;
-  }
-  CyclicInitializationError.builtin$cls = "CyclicInitializationError";
-  if (!"name" in CyclicInitializationError)
-    CyclicInitializationError.name = "CyclicInitializationError";
-  $desc = $collectedClasses.CyclicInitializationError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CyclicInitializationError.prototype = $desc;
-  function _ExceptionImplementation(message) {
-    this.message = message;
-  }
-  _ExceptionImplementation.builtin$cls = "_ExceptionImplementation";
-  if (!"name" in _ExceptionImplementation)
-    _ExceptionImplementation.name = "_ExceptionImplementation";
-  $desc = $collectedClasses._ExceptionImplementation;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ExceptionImplementation.prototype = $desc;
-  function FormatException(message, source, offset) {
-    this.message = message;
-    this.source = source;
-    this.offset = offset;
-  }
-  FormatException.builtin$cls = "FormatException";
-  if (!"name" in FormatException)
-    FormatException.name = "FormatException";
-  $desc = $collectedClasses.FormatException;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FormatException.prototype = $desc;
-  function IntegerDivisionByZeroException() {
-  }
-  IntegerDivisionByZeroException.builtin$cls = "IntegerDivisionByZeroException";
-  if (!"name" in IntegerDivisionByZeroException)
-    IntegerDivisionByZeroException.name = "IntegerDivisionByZeroException";
-  $desc = $collectedClasses.IntegerDivisionByZeroException;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  IntegerDivisionByZeroException.prototype = $desc;
-  function Expando(name) {
-    this.name = name;
-  }
-  Expando.builtin$cls = "Expando";
-  if (!"name" in Expando)
-    Expando.name = "Expando";
-  $desc = $collectedClasses.Expando;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Expando.prototype = $desc;
-  function Function() {
-  }
-  Function.builtin$cls = "Function";
-  if (!"name" in Function)
-    Function.name = "Function";
-  $desc = $collectedClasses.Function;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Function.prototype = $desc;
-  function $int() {
-  }
-  $int.builtin$cls = "$int";
-  if (!"name" in $int)
-    $int.name = "$int";
-  $desc = $collectedClasses.$int;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  $int.prototype = $desc;
-  function Iterator() {
-  }
-  Iterator.builtin$cls = "Iterator";
-  if (!"name" in Iterator)
-    Iterator.name = "Iterator";
-  $desc = $collectedClasses.Iterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Iterator.prototype = $desc;
-  function List() {
-  }
-  List.builtin$cls = "List";
-  if (!"name" in List)
-    List.name = "List";
-  $desc = $collectedClasses.List;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  List.prototype = $desc;
-  function Null() {
-  }
-  Null.builtin$cls = "Null";
-  if (!"name" in Null)
-    Null.name = "Null";
-  $desc = $collectedClasses.Null;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Null.prototype = $desc;
-  function num() {
-  }
-  num.builtin$cls = "num";
-  if (!"name" in num)
-    num.name = "num";
-  $desc = $collectedClasses.num;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  num.prototype = $desc;
-  function Object() {
-  }
-  Object.builtin$cls = "Object";
-  if (!"name" in Object)
-    Object.name = "Object";
-  $desc = $collectedClasses.Object;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Object.prototype = $desc;
-  function StackTrace() {
-  }
-  StackTrace.builtin$cls = "StackTrace";
-  if (!"name" in StackTrace)
-    StackTrace.name = "StackTrace";
-  $desc = $collectedClasses.StackTrace;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StackTrace.prototype = $desc;
-  function Stopwatch(_start, _stop) {
-    this._start = _start;
-    this._stop = _stop;
-  }
-  Stopwatch.builtin$cls = "Stopwatch";
-  if (!"name" in Stopwatch)
-    Stopwatch.name = "Stopwatch";
-  $desc = $collectedClasses.Stopwatch;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Stopwatch.prototype = $desc;
-  function String() {
-  }
-  String.builtin$cls = "String";
-  if (!"name" in String)
-    String.name = "String";
-  $desc = $collectedClasses.String;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  String.prototype = $desc;
-  function StringBuffer(_contents) {
-    this._contents = _contents;
-  }
-  StringBuffer.builtin$cls = "StringBuffer";
-  if (!"name" in StringBuffer)
-    StringBuffer.name = "StringBuffer";
-  $desc = $collectedClasses.StringBuffer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  StringBuffer.prototype = $desc;
-  StringBuffer.prototype.get$_contents = function() {
-    return this._contents;
-  };
-  function Symbol() {
-  }
-  Symbol.builtin$cls = "Symbol";
-  if (!"name" in Symbol)
-    Symbol.name = "Symbol";
-  $desc = $collectedClasses.Symbol;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Symbol.prototype = $desc;
-  function Uri_splitQueryString_closure(encoding_0) {
-    this.encoding_0 = encoding_0;
-  }
-  Uri_splitQueryString_closure.builtin$cls = "Uri_splitQueryString_closure";
-  if (!"name" in Uri_splitQueryString_closure)
-    Uri_splitQueryString_closure.name = "Uri_splitQueryString_closure";
-  $desc = $collectedClasses.Uri_splitQueryString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Uri_splitQueryString_closure.prototype = $desc;
-  function Uri__uriEncode_byteToHex() {
-  }
-  Uri__uriEncode_byteToHex.builtin$cls = "Uri__uriEncode_byteToHex";
-  if (!"name" in Uri__uriEncode_byteToHex)
-    Uri__uriEncode_byteToHex.name = "Uri__uriEncode_byteToHex";
-  $desc = $collectedClasses.Uri__uriEncode_byteToHex;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Uri__uriEncode_byteToHex.prototype = $desc;
-  function Interceptor_CssStyleDeclarationBase() {
-  }
-  Interceptor_CssStyleDeclarationBase.builtin$cls = "Interceptor_CssStyleDeclarationBase";
-  if (!"name" in Interceptor_CssStyleDeclarationBase)
-    Interceptor_CssStyleDeclarationBase.name = "Interceptor_CssStyleDeclarationBase";
-  $desc = $collectedClasses.Interceptor_CssStyleDeclarationBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Interceptor_CssStyleDeclarationBase.prototype = $desc;
-  function CssStyleDeclarationBase() {
-  }
-  CssStyleDeclarationBase.builtin$cls = "CssStyleDeclarationBase";
-  if (!"name" in CssStyleDeclarationBase)
-    CssStyleDeclarationBase.name = "CssStyleDeclarationBase";
-  $desc = $collectedClasses.CssStyleDeclarationBase;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CssStyleDeclarationBase.prototype = $desc;
-  function HttpRequest_getString_closure() {
-  }
-  HttpRequest_getString_closure.builtin$cls = "HttpRequest_getString_closure";
-  if (!"name" in HttpRequest_getString_closure)
-    HttpRequest_getString_closure.name = "HttpRequest_getString_closure";
-  $desc = $collectedClasses.HttpRequest_getString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequest_getString_closure.prototype = $desc;
-  function HttpRequest_request_closure0(xhr_0) {
-    this.xhr_0 = xhr_0;
-  }
-  HttpRequest_request_closure0.builtin$cls = "HttpRequest_request_closure0";
-  if (!"name" in HttpRequest_request_closure0)
-    HttpRequest_request_closure0.name = "HttpRequest_request_closure0";
-  $desc = $collectedClasses.HttpRequest_request_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequest_request_closure0.prototype = $desc;
-  function HttpRequest_request_closure(completer_1, xhr_2) {
-    this.completer_1 = completer_1;
-    this.xhr_2 = xhr_2;
-  }
-  HttpRequest_request_closure.builtin$cls = "HttpRequest_request_closure";
-  if (!"name" in HttpRequest_request_closure)
-    HttpRequest_request_closure.name = "HttpRequest_request_closure";
-  $desc = $collectedClasses.HttpRequest_request_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HttpRequest_request_closure.prototype = $desc;
-  function Interceptor_ListMixin() {
-  }
-  Interceptor_ListMixin.builtin$cls = "Interceptor_ListMixin";
-  if (!"name" in Interceptor_ListMixin)
-    Interceptor_ListMixin.name = "Interceptor_ListMixin";
-  $desc = $collectedClasses.Interceptor_ListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Interceptor_ListMixin.prototype = $desc;
-  function Interceptor_ListMixin_ImmutableListMixin() {
-  }
-  Interceptor_ListMixin_ImmutableListMixin.builtin$cls = "Interceptor_ListMixin_ImmutableListMixin";
-  if (!"name" in Interceptor_ListMixin_ImmutableListMixin)
-    Interceptor_ListMixin_ImmutableListMixin.name = "Interceptor_ListMixin_ImmutableListMixin";
-  $desc = $collectedClasses.Interceptor_ListMixin_ImmutableListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Interceptor_ListMixin_ImmutableListMixin.prototype = $desc;
-  function _ElementCssClassSet(_html$_element) {
-    this._html$_element = _html$_element;
-  }
-  _ElementCssClassSet.builtin$cls = "_ElementCssClassSet";
-  if (!"name" in _ElementCssClassSet)
-    _ElementCssClassSet.name = "_ElementCssClassSet";
-  $desc = $collectedClasses._ElementCssClassSet;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ElementCssClassSet.prototype = $desc;
-  function _EventStream(_target, _eventType, _useCapture) {
-    this._target = _target;
-    this._eventType = _eventType;
-    this._useCapture = _useCapture;
-  }
-  _EventStream.builtin$cls = "_EventStream";
-  if (!"name" in _EventStream)
-    _EventStream.name = "_EventStream";
-  $desc = $collectedClasses._EventStream;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _EventStream.prototype = $desc;
-  function _ElementEventStreamImpl(_target, _eventType, _useCapture) {
-    this._target = _target;
-    this._eventType = _eventType;
-    this._useCapture = _useCapture;
-  }
-  _ElementEventStreamImpl.builtin$cls = "_ElementEventStreamImpl";
-  if (!"name" in _ElementEventStreamImpl)
-    _ElementEventStreamImpl.name = "_ElementEventStreamImpl";
-  $desc = $collectedClasses._ElementEventStreamImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _ElementEventStreamImpl.prototype = $desc;
-  function _EventStreamSubscription(_pauseCount, _target, _eventType, _onData, _useCapture) {
-    this._pauseCount = _pauseCount;
-    this._target = _target;
-    this._eventType = _eventType;
-    this._onData = _onData;
-    this._useCapture = _useCapture;
-  }
-  _EventStreamSubscription.builtin$cls = "_EventStreamSubscription";
-  if (!"name" in _EventStreamSubscription)
-    _EventStreamSubscription.name = "_EventStreamSubscription";
-  $desc = $collectedClasses._EventStreamSubscription;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _EventStreamSubscription.prototype = $desc;
-  function ImmutableListMixin() {
-  }
-  ImmutableListMixin.builtin$cls = "ImmutableListMixin";
-  if (!"name" in ImmutableListMixin)
-    ImmutableListMixin.name = "ImmutableListMixin";
-  $desc = $collectedClasses.ImmutableListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ImmutableListMixin.prototype = $desc;
-  function FixedSizeListIterator(_array, _length, _position, _current) {
-    this._array = _array;
-    this._length = _length;
-    this._position = _position;
-    this._current = _current;
-  }
-  FixedSizeListIterator.builtin$cls = "FixedSizeListIterator";
-  if (!"name" in FixedSizeListIterator)
-    FixedSizeListIterator.name = "FixedSizeListIterator";
-  $desc = $collectedClasses.FixedSizeListIterator;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  FixedSizeListIterator.prototype = $desc;
-  function _DOMWindowCrossFrame(_window) {
-    this._window = _window;
-  }
-  _DOMWindowCrossFrame.builtin$cls = "_DOMWindowCrossFrame";
-  if (!"name" in _DOMWindowCrossFrame)
-    _DOMWindowCrossFrame.name = "_DOMWindowCrossFrame";
-  $desc = $collectedClasses._DOMWindowCrossFrame;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _DOMWindowCrossFrame.prototype = $desc;
-  function _AttributeClassSet(_element) {
-    this._element = _element;
-  }
-  _AttributeClassSet.builtin$cls = "_AttributeClassSet";
-  if (!"name" in _AttributeClassSet)
-    _AttributeClassSet.name = "_AttributeClassSet";
-  $desc = $collectedClasses._AttributeClassSet;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _AttributeClassSet.prototype = $desc;
-  function Capability() {
-  }
-  Capability.builtin$cls = "Capability";
-  if (!"name" in Capability)
-    Capability.name = "Capability";
-  $desc = $collectedClasses.Capability;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Capability.prototype = $desc;
-  function NativeTypedArray() {
-  }
-  NativeTypedArray.builtin$cls = "NativeTypedArray";
-  if (!"name" in NativeTypedArray)
-    NativeTypedArray.name = "NativeTypedArray";
-  $desc = $collectedClasses.NativeTypedArray;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArray.prototype = $desc;
-  function NativeTypedArrayOfDouble() {
-  }
-  NativeTypedArrayOfDouble.builtin$cls = "NativeTypedArrayOfDouble";
-  if (!"name" in NativeTypedArrayOfDouble)
-    NativeTypedArrayOfDouble.name = "NativeTypedArrayOfDouble";
-  $desc = $collectedClasses.NativeTypedArrayOfDouble;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArrayOfDouble.prototype = $desc;
-  function NativeTypedArray_ListMixin() {
-  }
-  NativeTypedArray_ListMixin.builtin$cls = "NativeTypedArray_ListMixin";
-  if (!"name" in NativeTypedArray_ListMixin)
-    NativeTypedArray_ListMixin.name = "NativeTypedArray_ListMixin";
-  $desc = $collectedClasses.NativeTypedArray_ListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArray_ListMixin.prototype = $desc;
-  function NativeTypedArray_ListMixin_FixedLengthListMixin() {
-  }
-  NativeTypedArray_ListMixin_FixedLengthListMixin.builtin$cls = "NativeTypedArray_ListMixin_FixedLengthListMixin";
-  if (!"name" in NativeTypedArray_ListMixin_FixedLengthListMixin)
-    NativeTypedArray_ListMixin_FixedLengthListMixin.name = "NativeTypedArray_ListMixin_FixedLengthListMixin";
-  $desc = $collectedClasses.NativeTypedArray_ListMixin_FixedLengthListMixin;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArray_ListMixin_FixedLengthListMixin.prototype = $desc;
-  function NativeTypedArrayOfInt() {
-  }
-  NativeTypedArrayOfInt.builtin$cls = "NativeTypedArrayOfInt";
-  if (!"name" in NativeTypedArrayOfInt)
-    NativeTypedArrayOfInt.name = "NativeTypedArrayOfInt";
-  $desc = $collectedClasses.NativeTypedArrayOfInt;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArrayOfInt.prototype = $desc;
-  function NativeTypedArray_ListMixin0() {
-  }
-  NativeTypedArray_ListMixin0.builtin$cls = "NativeTypedArray_ListMixin0";
-  if (!"name" in NativeTypedArray_ListMixin0)
-    NativeTypedArray_ListMixin0.name = "NativeTypedArray_ListMixin0";
-  $desc = $collectedClasses.NativeTypedArray_ListMixin0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArray_ListMixin0.prototype = $desc;
-  function NativeTypedArray_ListMixin_FixedLengthListMixin0() {
-  }
-  NativeTypedArray_ListMixin_FixedLengthListMixin0.builtin$cls = "NativeTypedArray_ListMixin_FixedLengthListMixin0";
-  if (!"name" in NativeTypedArray_ListMixin_FixedLengthListMixin0)
-    NativeTypedArray_ListMixin_FixedLengthListMixin0.name = "NativeTypedArray_ListMixin_FixedLengthListMixin0";
-  $desc = $collectedClasses.NativeTypedArray_ListMixin_FixedLengthListMixin0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NativeTypedArray_ListMixin_FixedLengthListMixin0.prototype = $desc;
-  function main_closure() {
-  }
-  main_closure.builtin$cls = "main_closure";
-  if (!"name" in main_closure)
-    main_closure.name = "main_closure";
-  $desc = $collectedClasses.main_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  main_closure.prototype = $desc;
-  function loadEmojis_closure() {
-  }
-  loadEmojis_closure.builtin$cls = "loadEmojis_closure";
-  if (!"name" in loadEmojis_closure)
-    loadEmojis_closure.name = "loadEmojis_closure";
-  $desc = $collectedClasses.loadEmojis_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  loadEmojis_closure.prototype = $desc;
-  function loadEmojis__closure() {
-  }
-  loadEmojis__closure.builtin$cls = "loadEmojis__closure";
-  if (!"name" in loadEmojis__closure)
-    loadEmojis__closure.name = "loadEmojis__closure";
-  $desc = $collectedClasses.loadEmojis__closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  loadEmojis__closure.prototype = $desc;
-  function _BrowserHttpClient() {
-  }
-  _BrowserHttpClient.builtin$cls = "_BrowserHttpClient";
-  if (!"name" in _BrowserHttpClient)
-    _BrowserHttpClient.name = "_BrowserHttpClient";
-  $desc = $collectedClasses._BrowserHttpClient;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _BrowserHttpClient.prototype = $desc;
-  function _BrowserHttpClient_request_closure(req_0, completer_1) {
-    this.req_0 = req_0;
-    this.completer_1 = completer_1;
-  }
-  _BrowserHttpClient_request_closure.builtin$cls = "_BrowserHttpClient_request_closure";
-  if (!"name" in _BrowserHttpClient_request_closure)
-    _BrowserHttpClient_request_closure.name = "_BrowserHttpClient_request_closure";
-  $desc = $collectedClasses._BrowserHttpClient_request_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _BrowserHttpClient_request_closure.prototype = $desc;
-  function initGitHub_closure() {
-  }
-  initGitHub_closure.builtin$cls = "initGitHub_closure";
-  if (!"name" in initGitHub_closure)
-    initGitHub_closure.name = "initGitHub_closure";
-  $desc = $collectedClasses.initGitHub_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  initGitHub_closure.prototype = $desc;
-  function Authentication(token, username, password, isAnonymous, isBasic, isToken) {
-    this.token = token;
-    this.username = username;
-    this.password = password;
-    this.isAnonymous = isAnonymous;
-    this.isBasic = isBasic;
-    this.isToken = isToken;
-  }
-  Authentication.builtin$cls = "Authentication";
-  if (!"name" in Authentication)
-    Authentication.name = "Authentication";
-  $desc = $collectedClasses.Authentication;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Authentication.prototype = $desc;
-  function GitHubError() {
-  }
-  GitHubError.builtin$cls = "GitHubError";
-  if (!"name" in GitHubError)
-    GitHubError.name = "GitHubError";
-  $desc = $collectedClasses.GitHubError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHubError.prototype = $desc;
-  function NotFound(message, apiUrl, github, source) {
-    this.message = message;
-    this.apiUrl = apiUrl;
-    this.github = github;
-    this.source = source;
-  }
-  NotFound.builtin$cls = "NotFound";
-  if (!"name" in NotFound)
-    NotFound.name = "NotFound";
-  $desc = $collectedClasses.NotFound;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  NotFound.prototype = $desc;
-  function AccessForbidden(message, apiUrl, github, source) {
-    this.message = message;
-    this.apiUrl = apiUrl;
-    this.github = github;
-    this.source = source;
-  }
-  AccessForbidden.builtin$cls = "AccessForbidden";
-  if (!"name" in AccessForbidden)
-    AccessForbidden.name = "AccessForbidden";
-  $desc = $collectedClasses.AccessForbidden;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  AccessForbidden.prototype = $desc;
-  function UnknownError(message, apiUrl, github, source) {
-    this.message = message;
-    this.apiUrl = apiUrl;
-    this.github = github;
-    this.source = source;
-  }
-  UnknownError.builtin$cls = "UnknownError";
-  if (!"name" in UnknownError)
-    UnknownError.name = "UnknownError";
-  $desc = $collectedClasses.UnknownError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  UnknownError.prototype = $desc;
-  function GitHub(auth, endpoint, client) {
-    this.auth = auth;
-    this.endpoint = endpoint;
-    this.client = client;
-  }
-  GitHub.builtin$cls = "GitHub";
-  if (!"name" in GitHub)
-    GitHub.name = "GitHub";
-  $desc = $collectedClasses.GitHub;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub.prototype = $desc;
-  function GitHub_getJSON_closure() {
-  }
-  GitHub_getJSON_closure.builtin$cls = "GitHub_getJSON_closure";
-  if (!"name" in GitHub_getJSON_closure)
-    GitHub_getJSON_closure.name = "GitHub_getJSON_closure";
-  $desc = $collectedClasses.GitHub_getJSON_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_getJSON_closure.prototype = $desc;
-  function GitHub_getJSON_closure0() {
-  }
-  GitHub_getJSON_closure0.builtin$cls = "GitHub_getJSON_closure0";
-  if (!"name" in GitHub_getJSON_closure0)
-    GitHub_getJSON_closure0.name = "GitHub_getJSON_closure0";
-  $desc = $collectedClasses.GitHub_getJSON_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_getJSON_closure0.prototype = $desc;
-  function GitHub_getJSON_closure1(box_0, this_1, statusCode_2, fail_3) {
-    this.box_0 = box_0;
-    this.this_1 = this_1;
-    this.statusCode_2 = statusCode_2;
-    this.fail_3 = fail_3;
-  }
-  GitHub_getJSON_closure1.builtin$cls = "GitHub_getJSON_closure1";
-  if (!"name" in GitHub_getJSON_closure1)
-    GitHub_getJSON_closure1.name = "GitHub_getJSON_closure1";
-  $desc = $collectedClasses.GitHub_getJSON_closure1;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_getJSON_closure1.prototype = $desc;
-  function GitHub_request_closure(this_0) {
-    this.this_0 = this_0;
-  }
-  GitHub_request_closure.builtin$cls = "GitHub_request_closure";
-  if (!"name" in GitHub_request_closure)
-    GitHub_request_closure.name = "GitHub_request_closure";
-  $desc = $collectedClasses.GitHub_request_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_request_closure.prototype = $desc;
-  function GitHub_request_closure0(userAndPass_1) {
-    this.userAndPass_1 = userAndPass_1;
-  }
-  GitHub_request_closure0.builtin$cls = "GitHub_request_closure0";
-  if (!"name" in GitHub_request_closure0)
-    GitHub_request_closure0.name = "GitHub_request_closure0";
-  $desc = $collectedClasses.GitHub_request_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GitHub_request_closure0.prototype = $desc;
-  function RepositorySlug() {
-  }
-  RepositorySlug.builtin$cls = "RepositorySlug";
-  if (!"name" in RepositorySlug)
-    RepositorySlug.name = "RepositorySlug";
-  $desc = $collectedClasses.RepositorySlug;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RepositorySlug.prototype = $desc;
-  function RepositoryStatus() {
-  }
-  RepositoryStatus.builtin$cls = "RepositoryStatus";
-  if (!"name" in RepositoryStatus)
-    RepositoryStatus.name = "RepositoryStatus";
-  $desc = $collectedClasses.RepositoryStatus;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  RepositoryStatus.prototype = $desc;
-  function Client() {
-  }
-  Client.builtin$cls = "Client";
-  if (!"name" in Client)
-    Client.name = "Client";
-  $desc = $collectedClasses.Client;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Client.prototype = $desc;
-  function Request(url, method, body, headers) {
-    this.url = url;
-    this.method = method;
-    this.body = body;
-    this.headers = headers;
-  }
-  Request.builtin$cls = "Request";
-  if (!"name" in Request)
-    Request.name = "Request";
-  $desc = $collectedClasses.Request;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Request.prototype = $desc;
-  Request.prototype.get$body = function(receiver) {
-    return this.body;
-  };
-  function Response(body, headers, statusCode) {
-    this.body = body;
-    this.headers = headers;
-    this.statusCode = statusCode;
-  }
-  Response.builtin$cls = "Response";
-  if (!"name" in Response)
-    Response.name = "Response";
-  $desc = $collectedClasses.Response;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  Response.prototype = $desc;
-  Response.prototype.get$body = function(receiver) {
-    return this.body;
-  };
-  Response.prototype.get$statusCode = function(receiver) {
-    return this.statusCode;
-  };
-  function _convertDartToNative_PrepareForStructuredClone_findSlot(values_1, copies_2) {
-    this.values_1 = values_1;
-    this.copies_2 = copies_2;
-  }
-  _convertDartToNative_PrepareForStructuredClone_findSlot.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_findSlot";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_findSlot)
-    _convertDartToNative_PrepareForStructuredClone_findSlot.name = "_convertDartToNative_PrepareForStructuredClone_findSlot";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_findSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_findSlot.prototype = $desc;
-  function _convertDartToNative_PrepareForStructuredClone_readSlot(copies_3) {
-    this.copies_3 = copies_3;
-  }
-  _convertDartToNative_PrepareForStructuredClone_readSlot.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_readSlot";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_readSlot)
-    _convertDartToNative_PrepareForStructuredClone_readSlot.name = "_convertDartToNative_PrepareForStructuredClone_readSlot";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_readSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_readSlot.prototype = $desc;
-  function _convertDartToNative_PrepareForStructuredClone_writeSlot(copies_4) {
-    this.copies_4 = copies_4;
-  }
-  _convertDartToNative_PrepareForStructuredClone_writeSlot.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_writeSlot";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_writeSlot)
-    _convertDartToNative_PrepareForStructuredClone_writeSlot.name = "_convertDartToNative_PrepareForStructuredClone_writeSlot";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_writeSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_writeSlot.prototype = $desc;
-  function _convertDartToNative_PrepareForStructuredClone_cleanupSlots() {
-  }
-  _convertDartToNative_PrepareForStructuredClone_cleanupSlots.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_cleanupSlots";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_cleanupSlots)
-    _convertDartToNative_PrepareForStructuredClone_cleanupSlots.name = "_convertDartToNative_PrepareForStructuredClone_cleanupSlots";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_cleanupSlots;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_cleanupSlots.prototype = $desc;
-  function _convertDartToNative_PrepareForStructuredClone_walk(findSlot_5, readSlot_6, writeSlot_7) {
-    this.findSlot_5 = findSlot_5;
-    this.readSlot_6 = readSlot_6;
-    this.writeSlot_7 = writeSlot_7;
-  }
-  _convertDartToNative_PrepareForStructuredClone_walk.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_walk";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_walk)
-    _convertDartToNative_PrepareForStructuredClone_walk.name = "_convertDartToNative_PrepareForStructuredClone_walk";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_walk;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_walk.prototype = $desc;
-  function _convertDartToNative_PrepareForStructuredClone_walk_closure(box_0, walk_8) {
-    this.box_0 = box_0;
-    this.walk_8 = walk_8;
-  }
-  _convertDartToNative_PrepareForStructuredClone_walk_closure.builtin$cls = "_convertDartToNative_PrepareForStructuredClone_walk_closure";
-  if (!"name" in _convertDartToNative_PrepareForStructuredClone_walk_closure)
-    _convertDartToNative_PrepareForStructuredClone_walk_closure.name = "_convertDartToNative_PrepareForStructuredClone_walk_closure";
-  $desc = $collectedClasses._convertDartToNative_PrepareForStructuredClone_walk_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _convertDartToNative_PrepareForStructuredClone_walk_closure.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_findSlot(values_0, copies_1) {
-    this.values_0 = values_0;
-    this.copies_1 = copies_1;
-  }
-  convertNativeToDart_AcceptStructuredClone_findSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_findSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_findSlot)
-    convertNativeToDart_AcceptStructuredClone_findSlot.name = "convertNativeToDart_AcceptStructuredClone_findSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_findSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_findSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_readSlot(copies_2) {
-    this.copies_2 = copies_2;
-  }
-  convertNativeToDart_AcceptStructuredClone_readSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_readSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_readSlot)
-    convertNativeToDart_AcceptStructuredClone_readSlot.name = "convertNativeToDart_AcceptStructuredClone_readSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_readSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_readSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_writeSlot(copies_3) {
-    this.copies_3 = copies_3;
-  }
-  convertNativeToDart_AcceptStructuredClone_writeSlot.builtin$cls = "convertNativeToDart_AcceptStructuredClone_writeSlot";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_writeSlot)
-    convertNativeToDart_AcceptStructuredClone_writeSlot.name = "convertNativeToDart_AcceptStructuredClone_writeSlot";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_writeSlot;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_writeSlot.prototype = $desc;
-  function convertNativeToDart_AcceptStructuredClone_walk(mustCopy_4, findSlot_5, readSlot_6, writeSlot_7) {
-    this.mustCopy_4 = mustCopy_4;
-    this.findSlot_5 = findSlot_5;
-    this.readSlot_6 = readSlot_6;
-    this.writeSlot_7 = writeSlot_7;
-  }
-  convertNativeToDart_AcceptStructuredClone_walk.builtin$cls = "convertNativeToDart_AcceptStructuredClone_walk";
-  if (!"name" in convertNativeToDart_AcceptStructuredClone_walk)
-    convertNativeToDart_AcceptStructuredClone_walk.name = "convertNativeToDart_AcceptStructuredClone_walk";
-  $desc = $collectedClasses.convertNativeToDart_AcceptStructuredClone_walk;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  convertNativeToDart_AcceptStructuredClone_walk.prototype = $desc;
-  function CssClassSetImpl() {
-  }
-  CssClassSetImpl.builtin$cls = "CssClassSetImpl";
-  if (!"name" in CssClassSetImpl)
-    CssClassSetImpl.name = "CssClassSetImpl";
-  $desc = $collectedClasses.CssClassSetImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CssClassSetImpl.prototype = $desc;
-  function CssClassSetImpl_add_closure(value_0) {
-    this.value_0 = value_0;
-  }
-  CssClassSetImpl_add_closure.builtin$cls = "CssClassSetImpl_add_closure";
-  if (!"name" in CssClassSetImpl_add_closure)
-    CssClassSetImpl_add_closure.name = "CssClassSetImpl_add_closure";
-  $desc = $collectedClasses.CssClassSetImpl_add_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  CssClassSetImpl_add_closure.prototype = $desc;
-  function buildQueryString_closure() {
-  }
-  buildQueryString_closure.builtin$cls = "buildQueryString_closure";
-  if (!"name" in buildQueryString_closure)
-    buildQueryString_closure.name = "buildQueryString_closure";
-  $desc = $collectedClasses.buildQueryString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  buildQueryString_closure.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlDocument, HtmlHtmlElement, HttpRequest, HttpRequestEventTarget, IFrameElement, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiMessageEvent, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement0, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, _CodeUnits, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ReflectionInfo, Primitives_initTicker_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, init_closure, init_closure0, init__closure, init__closure0, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, IterableMixinWorkaround, FixedLengthListMixin, UnmodifiableListMixin, UnmodifiableListBase, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, Future, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, StreamSubscription, _EventSink, _DelayedEvent, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, _JsonMap, _JsonMap_values_closure, Codec, Converter, Encoding, JsonCodec, JsonDecoder, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, NoSuchMethodError_toString_closure, bool, DateTime, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterator, List, Null, num, Object, StackTrace, Stopwatch, String, StringBuffer, Symbol, Uri_splitQueryString_closure, Uri__uriEncode_byteToHex, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, HttpRequest_getString_closure, HttpRequest_request_closure0, HttpRequest_request_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, _ElementCssClassSet, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, ImmutableListMixin, FixedSizeListIterator, _DOMWindowCrossFrame, _AttributeClassSet, Capability, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, main_closure, loadEmojis_closure, loadEmojis__closure, _BrowserHttpClient, _BrowserHttpClient_request_closure, initGitHub_closure, Authentication, GitHubError, NotFound, AccessForbidden, UnknownError, GitHub, GitHub_getJSON_closure, GitHub_getJSON_closure0, GitHub_getJSON_closure1, GitHub_request_closure, GitHub_request_closure0, RepositorySlug, RepositoryStatus, Client, Request, Response, _convertDartToNative_PrepareForStructuredClone_findSlot, _convertDartToNative_PrepareForStructuredClone_readSlot, _convertDartToNative_PrepareForStructuredClone_writeSlot, _convertDartToNative_PrepareForStructuredClone_cleanupSlots, _convertDartToNative_PrepareForStructuredClone_walk, _convertDartToNative_PrepareForStructuredClone_walk_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, CssClassSetImpl, CssClassSetImpl_add_closure, buildQueryString_closure];
-}
+//# sourceMappingURL=zen.dart.js.map

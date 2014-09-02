@@ -3286,7 +3286,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   SubListIterable: {
-    "^": "ListIterable;_iterable,__internal$_start,_endOrLength",
+    "^": "ListIterable;_iterable,_start,_endOrLength",
     get$_endIndex: function() {
       var $length = J.get$length$asx(this._iterable);
       return $length;
@@ -3294,7 +3294,7 @@ var $$ = {};
     get$_startIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
+      t1 = this._start;
       if (t1 > $length)
         return $length;
       return t1;
@@ -3302,7 +3302,7 @@ var $$ = {};
     get$length: function(_) {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
+      t1 = this._start;
       if (t1 >= $length)
         return 0;
       return $length - t1;
@@ -3322,7 +3322,7 @@ var $$ = {};
       return J.elementAt$1$ax(this._iterable, realIndex);
     },
     SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      var t1 = this.__internal$_start;
+      var t1 = this._start;
       if (t1 < 0)
         throw H.wrapException(P.RangeError$value(t1));
     },
@@ -6414,19 +6414,19 @@ var $$ = {};
     "^": "Object;"
   },
   Stopwatch: {
-    "^": "Object;_start,_stop",
+    "^": "Object;_core$_start,_stop",
     stop$0: function(_) {
-      if (!(this._start != null && this._stop == null))
+      if (!(this._core$_start != null && this._stop == null))
         return;
       this._stop = $.Primitives_timerTicks.call$0();
     },
     get$elapsedTicks: function() {
       var t1, t2;
-      t1 = this._start;
+      t1 = this._core$_start;
       if (t1 == null)
         return 0;
       t2 = this._stop;
-      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._start) : J.$sub$n(t2, t1);
+      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._core$_start) : J.$sub$n(t2, t1);
     },
     static: {"^": "Stopwatch__frequency"}
   },
@@ -6742,11 +6742,11 @@ var $$ = {};
     open$5$async$password$user: function(receiver, method, url, async, password, user) {
       return receiver.open(method, url, async, user, password);
     },
-    open$3$async: function($receiver, method, url, async) {
-      return $receiver.open(method, url, async);
-    },
     open$2: function($receiver, method, url) {
       return $receiver.open(method, url);
+    },
+    open$3$async: function($receiver, method, url, async) {
+      return $receiver.open(method, url, async);
     },
     send$1: function(receiver, data) {
       return receiver.send(data);
@@ -8177,7 +8177,6 @@ var $$ = {};
 ["", "readme.dart", , K, {
   "^": "",
   main: [function() {
-    M.initGitHub();
     R.init("readme.dart", new K.main_closure());
   }, "call$0", "main$closure", 0, 0, 2],
   loadReadme: function() {
@@ -8187,6 +8186,7 @@ var $$ = {};
     "^": "Closure:8;",
     call$0: function() {
       var t1, t2;
+      M.initGitHub();
       t1 = new T.Authentication(null, null, null, true, false, false);
       t2 = $.GitHub_defaultClient.call$0();
       $.github = new T.GitHub(t1, "https://api.github.com", t2);
@@ -8267,13 +8267,13 @@ $$ = null;
   _ = W.NodeValidator;
   _.$isNodeValidator = TRUE;
   _.$isObject = TRUE;
-  W.HttpRequest.$isObject = TRUE;
   _ = T.Response;
   _.$isResponse = TRUE;
   _.$isObject = TRUE;
   _ = P.bool;
   _.$isbool = TRUE;
   _.$isObject = TRUE;
+  W.HttpRequest.$isObject = TRUE;
   H.RawReceivePortImpl.$isObject = TRUE;
   H._IsolateEvent.$isObject = TRUE;
   H._IsolateContext.$isObject = TRUE;
@@ -8306,6 +8306,9 @@ $$ = null;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
   _.$isObject = TRUE;
+  _ = P.Function;
+  _.$isFunction = TRUE;
+  _.$isObject = TRUE;
   _ = P.Stream;
   _.$isStream = TRUE;
   _.$isObject = TRUE;
@@ -8314,9 +8317,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = T.RepositorySlug;
   _.$isRepositorySlug = TRUE;
-  _.$isObject = TRUE;
-  _ = P.Function;
-  _.$isFunction = TRUE;
   _.$isObject = TRUE;
 })();
 ;

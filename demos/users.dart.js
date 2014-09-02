@@ -3574,7 +3574,7 @@ var $$ = {};
     $isEfficientLength: true
   },
   SubListIterable: {
-    "^": "ListIterable;_iterable,__internal$_start,_endOrLength",
+    "^": "ListIterable;_iterable,_start,_endOrLength",
     get$_endIndex: function() {
       var $length = J.get$length$asx(this._iterable);
       return $length;
@@ -3582,7 +3582,7 @@ var $$ = {};
     get$_startIndex: function() {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
+      t1 = this._start;
       if (t1 > $length)
         return $length;
       return t1;
@@ -3590,7 +3590,7 @@ var $$ = {};
     get$length: function(_) {
       var $length, t1;
       $length = J.get$length$asx(this._iterable);
-      t1 = this.__internal$_start;
+      t1 = this._start;
       if (t1 >= $length)
         return 0;
       return $length - t1;
@@ -3610,7 +3610,7 @@ var $$ = {};
       return J.elementAt$1$ax(this._iterable, realIndex);
     },
     SubListIterable$3: function(_iterable, _start, _endOrLength, $E) {
-      var t1 = this.__internal$_start;
+      var t1 = this._start;
       if (t1 < 0)
         throw H.wrapException(P.RangeError$value(t1));
     },
@@ -7745,19 +7745,19 @@ var $$ = {};
     "^": "Object;"
   },
   Stopwatch: {
-    "^": "Object;_start,_stop",
+    "^": "Object;_core$_start,_stop",
     stop$0: function(_) {
-      if (!(this._start != null && this._stop == null))
+      if (!(this._core$_start != null && this._stop == null))
         return;
       this._stop = $.Primitives_timerTicks.call$0();
     },
     get$elapsedTicks: function() {
       var t1, t2;
-      t1 = this._start;
+      t1 = this._core$_start;
       if (t1 == null)
         return 0;
       t2 = this._stop;
-      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._start) : J.$sub$n(t2, t1);
+      return t2 == null ? J.$sub$n($.Primitives_timerTicks.call$0(), this._core$_start) : J.$sub$n(t2, t1);
     },
     static: {"^": "Stopwatch__frequency"}
   },
@@ -8083,11 +8083,11 @@ var $$ = {};
     open$5$async$password$user: function(receiver, method, url, async, password, user) {
       return receiver.open(method, url, async, user, password);
     },
-    open$3$async: function($receiver, method, url, async) {
-      return $receiver.open(method, url, async);
-    },
     open$2: function($receiver, method, url) {
       return $receiver.open(method, url);
+    },
+    open$3$async: function($receiver, method, url, async) {
+      return $receiver.open(method, url, async);
     },
     send$1: function(receiver, data) {
       return receiver.send(data);
@@ -9739,6 +9739,9 @@ var $$ = {};
     add$1: function(_, value) {
       return this.modify$1(new P.CssClassSetImpl_add_closure(value));
     },
+    addAll$1: function(_, iterable) {
+      this.modify$1(new P.CssClassSetImpl_addAll_closure(iterable));
+    },
     toList$1$growable: function(_, growable) {
       return this.readClasses$0().toList$1$growable(0, growable);
     },
@@ -9759,12 +9762,17 @@ var $$ = {};
     call$1: function(s) {
       return s.add$1(0, this.value_0);
     }
+  },
+  CssClassSetImpl_addAll_closure: {
+    "^": "Closure:15;iterable_0",
+    call$1: function(s) {
+      return s.addAll$1(0, this.iterable_0);
+    }
   }
 }],
 ["", "users.dart", , L, {
   "^": "",
   main: [function() {
-    M.initGitHub();
     R.init("users.dart", new L.main_closure());
   }, "call$0", "main$closure", 0, 0, 3],
   loadUsers: function() {
@@ -9781,6 +9789,7 @@ var $$ = {};
     call$0: function() {
       var t1, t2;
       t1 = $.token;
+      M.initGitHub();
       t2 = $.GitHub_defaultClient.call$0();
       $.github = new T.GitHub(new T.Authentication(t1, null, null, false, false, true), "https://api.github.com", t2);
       $.$$users = document.querySelector("#users");
@@ -9800,13 +9809,9 @@ var $$ = {};
   loadUsers__closure: {
     "^": "Closure:15;box_0,baseUser_1",
     call$1: function(user) {
-      var m, t1, h, i, e, buff, t2;
+      var m, h, i, t1, e, buff, t2;
       m = document.createElement("div", null);
-      t1 = J.getInterceptor$x(m);
-      t1.get$classes(m).add$1(0, "box");
-      t1.get$classes(m).add$1(0, "user");
-      t1.get$classes(m).add$1(0, "middle");
-      t1.get$classes(m).add$1(0, "center");
+      J.get$classes$x(m).addAll$1(0, ["box", "user", "middle", "center"]);
       h = document.createElement("div", null);
       J.get$classes$x(h).add$1(0, "middle");
       for (i = 1; i <= 2; ++i)
@@ -9841,7 +9846,7 @@ var $$ = {};
       h.appendChild(t1);
       m.appendChild(h);
       t1 = this.box_0;
-      $.$$users.querySelector("#" + t1.column_0).appendChild(m);
+      $.$$users.querySelector("#" + t1.column_0);
       if (t1.column_0 === "left")
         t1.column_0 = "right";
       else
@@ -9979,6 +9984,9 @@ $$ = null;
   _ = P.StreamSubscription;
   _.$isStreamSubscription = TRUE;
   _.$isObject = TRUE;
+  _ = P.Function;
+  _.$isFunction = TRUE;
+  _.$isObject = TRUE;
   _ = P.Stream;
   _.$isStream = TRUE;
   _.$isObject = TRUE;
@@ -9987,9 +9995,6 @@ $$ = null;
   _.$isObject = TRUE;
   _ = T.RepositorySlug;
   _.$isRepositorySlug = TRUE;
-  _.$isObject = TRUE;
-  _ = P.Function;
-  _.$isFunction = TRUE;
   _.$isObject = TRUE;
 })();
 ;

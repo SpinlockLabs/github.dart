@@ -3156,6 +3156,13 @@ var $$ = {};
     t1 = J.get$onClick$x(document.querySelector("#view-source"));
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
   },
+  queryString: function() {
+    var url = window.location.href;
+    if (J.getInterceptor$asx(url).contains$1(url, "?"))
+      return P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
+    else
+      return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
+  },
   init_closure: {
     "^": "Closure:12;onReady_1,stopwatch_2",
     call$1: function($event) {
@@ -9403,18 +9410,11 @@ var $$ = {};
     R.init("languages.dart", new M.main_closure());
   }, "call$0", "main$closure", 0, 0, 2],
   loadRepository: function() {
-    var url, params, user, token, reponame, t1;
-    url = window.location.href;
-    if (J.getInterceptor$asx(url).contains$1(url, "?")) {
-      params = P.Uri_splitQueryString(C.JSString_methods.substring$1(url, C.JSString_methods.indexOf$1(url, "?") + 1), C.Utf8Codec_false);
-      user = params.containsKey$1("user") === true ? params.$index(0, "user") : "dart-lang";
-      token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-      reponame = params.containsKey$1("repo") === true ? params.$index(0, "repo") : "bleeding_edge";
-    } else {
-      user = "dart-lang";
-      reponame = "bleeding_edge";
-      token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    }
+    var params, user, token, reponame, t1;
+    params = R.queryString();
+    user = params.containsKey$1("user") === true ? params.$index(0, "user") : "dart-lang";
+    token = params.containsKey$1("token") === true ? params.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
+    reponame = params.containsKey$1("repo") === true ? params.$index(0, "repo") : "bleeding_edge";
     J.setInnerHtml$1$x(document.getElementById("name"), H.S(user) + "/" + H.S(reponame));
     t1 = $.GitHub_defaultClient.call$0();
     t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1);
