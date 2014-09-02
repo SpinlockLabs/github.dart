@@ -35,9 +35,9 @@ class ContributorWeekStatistics {
   final GitHub github;
 
   /**
-   * Beginning of the Week
+   * Beginning of the Week (As a Unix Timestamp)
    */
-  DateTime start;
+  String start;
   
   /**
    * Number of Additions
@@ -61,7 +61,7 @@ class ContributorWeekStatistics {
         ..additions = input['a']
         ..deletions = input['d']
         ..commits = input['c']
-        ..start = new DateTime.fromMillisecondsSinceEpoch(int.parse(input['w']));
+        ..start = input['w'];
   }
 }
 
