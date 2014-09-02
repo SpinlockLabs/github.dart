@@ -29,6 +29,7 @@ void loadEmojis() {
     info.forEach((name, url) {
       var h = new DivElement();
       h.classes.add("box");
+      h.classes.add("item");
       h.classes.add("emoji-box");
       h.style.textAlign = "center";
       h.append(new ImageElement(src: url, width: 64, height: 64)..classes.add("emoji"));
