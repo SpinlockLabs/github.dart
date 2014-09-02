@@ -5,12 +5,17 @@ import "common.dart";
 
 GitHub github;
 DivElement $emoji;
+Map<String, String> emojis;
 
 void main() {
   initGitHub();
   init("emoji.dart", onReady: () {
     $emoji = querySelector("#emojis");
     loadEmojis();
+    var searchBox = querySelector("#search-box");
+    searchBox.onKeyUp.listen((event) {
+      filter(searchBox.value);
+    });
   });
 }
 
@@ -26,6 +31,7 @@ void loadEmojis() {
   github = new GitHub(auth: new Authentication.withToken(token));
 
   github.emojis().then((info) {
+    emojis = info;
     info.forEach((name, url) {
       var h = new DivElement();
       h.classes.add("box");
@@ -37,4 +43,24 @@ void loadEmojis() {
       $emoji.append(h);
     });
   });
+}
+
+String lastQuery;
+
+void filter(String query) {
+  if (lastQuery != null && lastQuery == query) {
+    return;
+  }
+  lastQuery = query;
+  var boxes = $emoji.children;
+  for (var box in boxes) {
+    var boxName = box.querySelector("p");
+    var t = boxName.text;
+    var name = t.substring(1, t.length - 1);
+    if (name.contains(query)) {
+      box.style.display = "inline";
+    } else {
+      box.style.display = "none";
+    }
+  }
 }
