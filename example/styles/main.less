@@ -1,11 +1,9 @@
+@import "variables.less";
 @import "http://fonts.googleapis.com/css?family=Open+Sans:400,700";
 
 body {
   font-family: 'Open Sans', sans-serif;
 }
-
-// Variables
-@box-border-thickness: 2px;
 
 // Organizations Demo
 .demo-org {
@@ -15,9 +13,9 @@ body {
 
   .user {
     .user-box;
+    width: 128px;
     margin-top: 5px;
     margin-left: 5px;
-    width: 128px;
   }
 }
 
@@ -135,7 +133,7 @@ body {
   }
 }
 
-.btn {
+.btn-base(@color) {
   display: inline-block;
   transition-timing-function: ease;
   transition-duration: 0.2s;
@@ -143,8 +141,8 @@ body {
   background-color: transparent;
   padding: 8px;
   border-radius: 3px;
-  border: 1px solid #00AACC;
-  color: #00AACC;
+  border: 1px solid @color;
+  color: @color;
   font-family:"Helvetica Neue", Helvetica, sans-serif;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -152,36 +150,31 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+
+  &:active {
+    color: white;
+    border-color: #008EAB;
+    background-color: #008EAB;
+  }
+
+  &:hover {
+    background-color: @color;
+    color: white;
+    border-color: @color;
+    cursor: pointer;
+  }
 }
 
-.btn:hover {
-  background-color: #00AACC;
-  color: white;
-  border-color: #00AACC;
-  cursor: pointer;
+.btn {
+  .btn-base(#00AACC);
 }
 
-.btn:active {
-  color: white;
-  border-color: #008EAB;
-  background-color: #008EAB;
+.btn-danger {
+  .btn-base(#d9534f);
 }
 
-.btn.red {
-  border-color: red;
-  color: red;
-}
- 
-.btn.red:hover {
-  background-color: red;
-  border-color: red;
-  color: white;
-}
- 
-.btn.red:active {
-  background-color: #8b0000;
-  border-color: #8b0000;
-  color: white;
+.btn-warning {
+  .btn-base(#f0ad4e);
 }
 
 .input-box {
@@ -201,4 +194,18 @@ body {
   -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
   -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
   transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  color: #333333;
+  background-color: #f5f5f5;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
 }
