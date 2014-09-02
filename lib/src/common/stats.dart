@@ -61,7 +61,7 @@ class ContributorWeekStatistics {
         ..additions = input['a']
         ..deletions = input['d']
         ..commits = input['c']
-        ..start = parseDateTime(input['w']);
+        ..start = new DateTime.fromMillisecondsSinceEpoch(int.parse(input['w']));
   }
 }
 
