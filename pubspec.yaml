@@ -1,5 +1,5 @@
 name: github
-version: 1.0.1
+version: 1.3.0
 author: Kenneth Endfinger <kaendfinger@gmail.com>
 description: GitHub API Client Library
 homepage: https://github.com/DirectMyFile/github.dart
