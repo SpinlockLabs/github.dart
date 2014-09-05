@@ -127,10 +127,12 @@ class RuntimeTypes {
       classesNeedingRti.add(cls);
 
       // TODO(ngeoffray): This should use subclasses, not subtypes.
-      Iterable<ClassElement> classes = compiler.world.subtypesOf(cls);
-      classes.forEach((ClassElement sub) {
-        potentiallyAddForRti(sub);
-      });
+      Set<ClassElement> classes = compiler.world.subtypesOf(cls);
+      if (classes != null) {
+        classes.forEach((ClassElement sub) {
+          potentiallyAddForRti(sub);
+        });
+      }
 
       Set<ClassElement> dependencies = rtiDependencies[cls];
       if (dependencies != null) {
@@ -184,10 +186,8 @@ class RuntimeTypes {
               methodsNeedingRti.add(method);
             }
           }
-          compiler.resolverWorld.closuresWithFreeTypeVariables.forEach(
-              analyzeMethod);
-          compiler.resolverWorld.callMethodsWithFreeTypeVariables.forEach(
-              analyzeMethod);
+          compiler.resolverWorld.genericClosures.forEach(analyzeMethod);
+          compiler.resolverWorld.genericCallMethods.forEach(analyzeMethod);
         }
       }
     });
@@ -200,10 +200,8 @@ class RuntimeTypes {
           methodsNeedingRti.add(method);
         }
       }
-      compiler.resolverWorld.closuresWithFreeTypeVariables.forEach(
-          analyzeMethod);
-      compiler.resolverWorld.callMethodsWithFreeTypeVariables.forEach(
-          analyzeMethod);
+      compiler.resolverWorld.genericClosures.forEach(analyzeMethod);
+      compiler.resolverWorld.genericCallMethods.forEach(analyzeMethod);
     }
     // Add the classes that need RTI because they use a type variable as
     // expression.

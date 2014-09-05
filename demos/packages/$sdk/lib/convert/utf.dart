@@ -134,10 +134,11 @@ class _Utf8Encoder {
   _Utf8Encoder.withBufferSize(int bufferSize)
       : _buffer = _createBuffer(bufferSize);
 
+  // TODO(11971): Always use Uint8List.
   /**
    * Allow an implementation to pick the most efficient way of storing bytes.
    */
-  static List<int> _createBuffer(int size) => new Uint8List(size);
+  external static List<int> _createBuffer(int size);
 
   /**
    * Tries to combine the given [leadingSurrogate] with the [nextCodeUnit] and

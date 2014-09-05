@@ -4,7 +4,6 @@
 
 library dart2js.util;
 
-import 'dart:collection';
 import 'util_implementation.dart';
 import 'characters.dart';
 
@@ -13,10 +12,6 @@ export 'maplet.dart';
 
 part 'indentation.dart';
 part 'link.dart';
-
-/// If an integer is masked by this constant, the result is guaranteed to be in
-/// Smi range.
-const int SMI_MASK = 0x3fffffff;
 
 /**
  * Tagging interface for classes from which source spans can be generated.
@@ -169,32 +164,4 @@ String modifiersToString({bool isStatic: false,
   StringBuffer buffer = new StringBuffer();
   builder.toLink().printOn(buffer, ', ');
   return buffer.toString();
-}
-
-class Pair<A, B> {
-  final A a;
-  final B b;
-
-  Pair(this.a, this.b);
-
-  int get hashCode => 13 * a.hashCode + 17 * b.hashCode;
-
-  bool operator ==(var other) {
-    if (identical(this, other)) return true;
-    if (other is! Pair) return false;
-    return a == other.a && b == other.b;
-  }
-
-  String toString() => '($a,$b)';
-}
-
-
-int longestCommonPrefixLength(List a, List b) {
-  int index = 0;
-  for ( ; index < a.length && index < b.length; index++) {
-    if (a[index] != b[index]) {
-      break;
-    }
-  }
-  return index;
 }

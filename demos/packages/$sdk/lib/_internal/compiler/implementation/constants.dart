@@ -190,7 +190,7 @@ class IntConstant extends NumConstant {
     return value == otherInt.value;
   }
 
-  int get hashCode => value & SMI_MASK;
+  int get hashCode => value.hashCode;
   DartString toDartString() => new DartString.literal(value.toString());
 
   accept(ConstantVisitor visitor) => visitor.visitInt(this);

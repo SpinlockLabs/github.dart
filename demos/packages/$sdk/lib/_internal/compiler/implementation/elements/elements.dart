@@ -21,7 +21,6 @@ import '../dart2jslib.dart' show InterfaceType,
                                  Selector,
                                  Constant,
                                  Compiler,
-                                 Backend,
                                  isPrivateName;
 
 import '../dart_types.dart';
@@ -402,7 +401,7 @@ abstract class Element implements Entity {
   String get fixedBackendName;
 
   bool get isAbstract;
-  bool isForeign(Backend backend);
+  bool isForeign(Compiler compiler);
 
   void addMetadata(MetadataAnnotation annotation);
   void setNative(String name);
@@ -739,8 +738,8 @@ class Elements {
     ClassElement cls = constructor.enclosingClass;
     return cls.library == compiler.typedDataLibrary
         && cls.isNative
-        && compiler.world.isSubtypeOf(cls, compiler.typedDataClass)
-        && compiler.world.isSubtypeOf(cls, compiler.listClass)
+        && compiler.world.isSubtype(compiler.typedDataClass, cls)
+        && compiler.world.isSubtype(compiler.listClass, cls)
         && constructor.name == '';
   }
 
@@ -1077,7 +1076,6 @@ abstract class FunctionSignature {
   int get optionalParameterCount;
   bool get optionalParametersAreNamed;
   FormalElement get firstOptionalParameter;
-  bool get hasOptionalParameters;
 
   int get parameterCount;
   List<FormalElement> get orderedOptionalParameters;
@@ -1112,7 +1110,6 @@ abstract class FunctionElement extends Element
   /// Trying to access a function signature that has not been computed in
   /// resolution is an error and calling [computeSignature] covers that error.
   /// This method will go away!
-  // TODO(johnniwinther): Rename to `ensureFunctionSignature`.
   @deprecated FunctionSignature computeSignature(Compiler compiler);
 }
 
@@ -1301,8 +1298,8 @@ abstract class ClassElement extends TypeDeclarationElement
   void reverseBackendMembers();
 
   Element lookupMember(String memberName);
-  Element lookupSelector(Selector selector);
-  Element lookupSuperSelector(Selector selector);
+  Element lookupSelector(Selector selector, Compiler compiler);
+  Element lookupSuperSelector(Selector selector, Compiler compiler);
 
   Element lookupLocalMember(String memberName);
   Element lookupBackendMember(String memberName);

@@ -256,10 +256,9 @@ class InterceptorEmitter extends CodeEmitterHelper {
       //    }
       bool containsArray = classes.contains(backend.jsArrayClass);
       bool containsString = classes.contains(backend.jsStringClass);
-      bool containsJsIndexable =
-          backend.jsIndexingBehaviorInterface.isResolved && classes.any((cls) {
-        return compiler.world.isSubtypeOf(cls,
-            backend.jsIndexingBehaviorInterface);
+      bool containsJsIndexable = classes.any((cls) {
+        return compiler.world.isSubtype(
+            backend.jsIndexingBehaviorInterface, cls);
       });
       // The index set operator requires a check on its set value in
       // checked mode, so we don't optimize the interceptor if the

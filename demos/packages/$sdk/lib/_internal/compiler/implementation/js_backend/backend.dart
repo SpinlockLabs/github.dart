@@ -173,59 +173,12 @@ class JavaScriptBackend extends Backend {
   TypeMask get dynamicType => compiler.typesTask.dynamicType;
   TypeMask get nullType => compiler.typesTask.nullType;
   TypeMask get emptyType => const TypeMask.nonNullEmpty();
-
-  TypeMask _indexablePrimitiveTypeCache;
-  TypeMask get indexablePrimitiveType {
-    if (_indexablePrimitiveTypeCache == null) {
-      _indexablePrimitiveTypeCache =
-          new TypeMask.nonNullSubtype(jsIndexableClass, compiler.world);
-    }
-    return _indexablePrimitiveTypeCache;
-  }
-
-  TypeMask _readableArrayTypeCache;
-  TypeMask get readableArrayType {
-    if (_readableArrayTypeCache == null) {
-      _readableArrayTypeCache = new TypeMask.nonNullSubclass(jsArrayClass,
-          compiler.world);
-    }
-    return _readableArrayTypeCache;
-  }
-
-  TypeMask _mutableArrayTypeCache;
-  TypeMask get mutableArrayType {
-    if (_mutableArrayTypeCache == null) {
-      _mutableArrayTypeCache = new TypeMask.nonNullSubclass(jsMutableArrayClass,
-          compiler.world);
-    }
-    return _mutableArrayTypeCache;
-  }
-
-  TypeMask _fixedArrayTypeCache;
-  TypeMask get fixedArrayType {
-    if (_fixedArrayTypeCache == null) {
-      _fixedArrayTypeCache = new TypeMask.nonNullExact(jsFixedArrayClass);
-    }
-    return _fixedArrayTypeCache;
-  }
-
-  TypeMask _extendableArrayTypeCache;
-  TypeMask get extendableArrayType {
-    if (_extendableArrayTypeCache == null) {
-      _extendableArrayTypeCache =
-          new TypeMask.nonNullExact(jsExtendableArrayClass);
-    }
-    return _extendableArrayTypeCache;
-  }
-
-  TypeMask _nonNullTypeCache;
-  TypeMask get nonNullType {
-    if (_nonNullTypeCache == null) {
-      _nonNullTypeCache =
-          compiler.typesTask.dynamicType.nonNullable();
-    }
-    return _nonNullTypeCache;
-  }
+  TypeMask indexablePrimitiveType;
+  TypeMask readableArrayType;
+  TypeMask mutableArrayType;
+  TypeMask fixedArrayType;
+  TypeMask extendableArrayType;
+  TypeMask nonNullType;
 
   /// Maps special classes to their implementation (JSXxx) class.
   Map<ClassElement, ClassElement> implementationClasses;
@@ -552,7 +505,7 @@ class JavaScriptBackend extends Backend {
 
     if (elements == null) return false;
     if (elements.isEmpty) return false;
-    return elements.any((element) => selector.applies(element, compiler.world));
+    return elements.any((element) => selector.applies(element, compiler));
   }
 
   final Map<String, Set<ClassElement>> interceptedClassesCache =
@@ -586,14 +539,17 @@ class JavaScriptBackend extends Backend {
   }
 
   Set<ClassElement> nativeSubclassesOfMixin(ClassElement mixin) {
-    Iterable<MixinApplicationElement> uses = compiler.world.mixinUsesOf(mixin);
+    Set<MixinApplicationElement> uses = compiler.world.mixinUses[mixin];
+    if (uses == null) return null;
     Set<ClassElement> result = null;
     for (MixinApplicationElement use in uses) {
       Iterable<ClassElement> subclasses = compiler.world.subclassesOf(use);
-      for (ClassElement subclass in subclasses) {
-        if (Elements.isNativeOrExtendsNative(subclass)) {
-          if (result == null) result = new Set<ClassElement>();
-          result.add(subclass);
+      if (subclasses != null) {
+        for (ClassElement subclass in subclasses) {
+          if (Elements.isNativeOrExtendsNative(subclass)) {
+            if (result == null) result = new Set<ClassElement>();
+            result.add(subclass);
+          }
         }
       }
     }
@@ -892,19 +848,15 @@ class JavaScriptBackend extends Backend {
     enqueueInResolution(getCopyTypeArguments(), registry);
   }
 
-  void registerCallMethodWithFreeTypeVariables(
-      Element callMethod,
-      Enqueuer enqueuer,
-      Registry registry) {
+  void registerGenericCallMethod(Element callMethod,
+                                 Enqueuer enqueuer, Registry registry) {
     if (enqueuer.isResolutionQueue || methodNeedsRti(callMethod)) {
       registerComputeSignature(enqueuer, registry);
     }
   }
 
-  void registerClosureWithFreeTypeVariables(
-      Element closure,
-      Enqueuer enqueuer,
-      Registry registry) {
+  void registerGenericClosure(Element closure,
+                              Enqueuer enqueuer, Registry registry) {
     if (enqueuer.isResolutionQueue || methodNeedsRti(closure)) {
       registerComputeSignature(enqueuer, registry);
     }
@@ -987,11 +939,9 @@ class JavaScriptBackend extends Backend {
     enqueueClass(compiler.enqueuer.resolution, compiler.stringClass, registry);
   }
 
-  void enableNoSuchMethod(Element context, Enqueuer world) {
+  void enableNoSuchMethod(context, Enqueuer world) {
     enqueue(world, getCreateInvocationMirror(), compiler.globalDependencies);
     world.registerInvocation(compiler.noSuchMethodSelector);
-    // TODO(tyoverby): Send the context element to DumpInfoTask to be
-    // blamed.
   }
 
   void enableIsolateSupport(Enqueuer enqueuer) {
@@ -1753,6 +1703,13 @@ class JavaScriptBackend extends Backend {
         ..add(jsInterceptorClass)
         ..add(jsNullClass);
 
+    indexablePrimitiveType = new TypeMask.nonNullSubtype(jsIndexableClass);
+    readableArrayType = new TypeMask.nonNullSubclass(jsArrayClass);
+    mutableArrayType = new TypeMask.nonNullSubclass(jsMutableArrayClass);
+    fixedArrayType = new TypeMask.nonNullExact(jsFixedArrayClass);
+    extendableArrayType = new TypeMask.nonNullExact(jsExtendableArrayClass);
+    nonNullType = compiler.typesTask.dynamicType.nonNullable();
+
     validateInterceptorImplementsAllObjectMethods(jsInterceptorClass);
     // The null-interceptor must also implement *all* methods.
     validateInterceptorImplementsAllObjectMethods(jsNullClass);
@@ -2010,20 +1967,17 @@ class JavaScriptBackend extends Backend {
     // abstract class any user-defined class can implement. So we also
     // check for the interface [JavaScriptIndexingBehavior].
     return compiler.typedDataClass != null
-        && mask.satisfies(compiler.typedDataClass, compiler.world)
-        && mask.satisfies(jsIndexingBehaviorInterface, compiler.world);
+        && mask.satisfies(compiler.typedDataClass, compiler)
+        && mask.satisfies(jsIndexingBehaviorInterface, compiler);
   }
 
   bool couldBeTypedArray(TypeMask mask) {
     bool intersects(TypeMask type1, TypeMask type2) =>
-        !type1.intersection(type2, compiler.world).isEmpty;
-    // TODO(herhut): Maybe cache the TypeMask for typedDataClass and
-    //               jsIndexingBehaviourInterface.
-    return compiler.typedDataClass != null &&
-           intersects(mask, new TypeMask.subtype(compiler.typedDataClass,
-                                                 compiler.world)) &&
-           intersects(mask, new TypeMask.subtype(jsIndexingBehaviorInterface,
-                                                 compiler.world));
+        !type1.intersection(type2, compiler).isEmpty;
+
+    return compiler.typedDataClass != null
+        && intersects(mask, new TypeMask.subtype(compiler.typedDataClass))
+        && intersects(mask, new TypeMask.subtype(jsIndexingBehaviorInterface));
   }
 
   /// Returns all static fields that are referenced through [targetsUsed].

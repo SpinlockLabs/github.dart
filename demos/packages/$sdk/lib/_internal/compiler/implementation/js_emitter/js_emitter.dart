@@ -8,8 +8,6 @@ import '../common.dart';
 
 import '../js/js.dart' as jsAst;
 
-import '../new_js_emitter/emitter.dart' as new_js_emitter;
-
 import '../closure.dart' show
     ClosureClassElement,
     ClosureClassMap,
@@ -41,7 +39,7 @@ import '../js_backend/js_backend.dart' show
     TypeChecks,
     TypeVariableHandler;
 
-import '../helpers/helpers.dart';  // Included for debug helpers.
+import '../helpers/helpers.dart';
 
 import '../source_file.dart' show
     SourceFile,

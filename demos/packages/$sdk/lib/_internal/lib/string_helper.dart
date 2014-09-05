@@ -77,14 +77,6 @@ stringReplaceJS(receiver, replacer, to) {
   return JS('String', r'#.replace(#, #)', receiver, replacer, to);
 }
 
-stringReplaceFirstRE(receiver, regexp, to, startIndex) {
-  var match = regexp._execGlobal(receiver, startIndex);
-  if (match == null) return receiver;
-  var start = match.start;
-  var end = match.end;
-  return "${receiver.substring(0,start)}$to${receiver.substring(end)}";
-}
-
 const String ESCAPE_REGEXP = r'[[\]{}()*+?.\\^$|]';
 
 stringReplaceAllUnchecked(receiver, from, to) {
@@ -193,16 +185,12 @@ stringReplaceAllStringFuncUnchecked(receiver, pattern, onMatch, onNonMatch) {
 }
 
 
-stringReplaceFirstUnchecked(receiver, from, to, [int startIndex = 0]) {
+stringReplaceFirstUnchecked(receiver, from, to) {
   if (from is String) {
-    var index = receiver.indexOf(from, startIndex);
-    if (index < 0) return receiver;
-    return '${receiver.substring(0, index)}$to'
-           '${receiver.substring(index + from.length)}';
+    return stringReplaceJS(receiver, from, to);
   } else if (from is JSSyntaxRegExp) {
-    return startIndex == 0 ?
-        stringReplaceJS(receiver, regExpGetNative(from), to) :
-        stringReplaceFirstRE(receiver, from, to, startIndex);
+    var re = regExpGetNative(from);
+    return stringReplaceJS(receiver, re, to);
   } else {
     checkNull(from);
     // TODO(floitsch): implement generic String.replace (with patterns).

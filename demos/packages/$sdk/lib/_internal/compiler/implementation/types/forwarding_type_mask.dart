@@ -25,55 +25,55 @@ abstract class ForwardingTypeMask implements TypeMask {
   bool get isValue => false;
   bool get isForwarding => true;
 
-  bool isInMask(TypeMask other, ClassWorld classWorld) {
-    return forwardTo.isInMask(other, classWorld);
+  bool isInMask(TypeMask other, Compiler compiler) {
+    return forwardTo.isInMask(other, compiler);
   }
 
-  bool containsMask(TypeMask other, ClassWorld classWorld) {
-    return forwardTo.containsMask(other, classWorld);
+  bool containsMask(TypeMask other, Compiler compiler) {
+    return forwardTo.containsMask(other, compiler);
   }
 
-  bool containsOnlyInt(ClassWorld classWorld) {
-    return forwardTo.containsOnlyInt(classWorld);
+  bool containsOnlyInt(Compiler compiler) {
+    return forwardTo.containsOnlyInt(compiler);
   }
 
-  bool containsOnlyDouble(ClassWorld classWorld) {
-    return forwardTo.containsOnlyDouble(classWorld);
+  bool containsOnlyDouble(Compiler compiler) {
+    return forwardTo.containsOnlyDouble(compiler);
   }
 
-  bool containsOnlyNum(ClassWorld classWorld) {
-    return forwardTo.containsOnlyNum(classWorld);
+  bool containsOnlyNum(Compiler compiler) {
+    return forwardTo.containsOnlyNum(compiler);
   }
 
-  bool containsOnlyBool(ClassWorld classWorld) {
-    return forwardTo.containsOnlyBool(classWorld);
+  bool containsOnlyBool(Compiler compiler) {
+    return forwardTo.containsOnlyBool(compiler);
   }
 
-  bool containsOnlyString(ClassWorld classWorld) {
-    return forwardTo.containsOnlyString(classWorld);
+  bool containsOnlyString(Compiler compiler) {
+    return forwardTo.containsOnlyString(compiler);
   }
 
   bool containsOnly(ClassElement element) {
     return forwardTo.containsOnly(element);
   }
 
-  bool satisfies(ClassElement cls, ClassWorld classWorld) {
-    return forwardTo.satisfies(cls, classWorld);
+  bool satisfies(ClassElement cls, Compiler compiler) {
+    return forwardTo.satisfies(cls, compiler);
   }
 
-  bool contains(ClassElement type, ClassWorld classWorld) {
-    return forwardTo.contains(type, classWorld);
+  bool contains(ClassElement type, Compiler compiler) {
+    return forwardTo.contains(type, compiler);
   }
 
-  bool containsAll(ClassWorld classWorld) {
-    return forwardTo.containsAll(classWorld);
+  bool containsAll(Compiler compiler) {
+    return forwardTo.containsAll(compiler);
   }
 
-  ClassElement singleClass(ClassWorld classWorld) {
-    return forwardTo.singleClass(classWorld);
+  ClassElement singleClass(Compiler compiler) {
+    return forwardTo.singleClass(compiler);
   }
 
-  TypeMask union(other, ClassWorld classWorld) {
+  TypeMask union(other, Compiler compiler) {
     if (this == other) {
       return this;
     } else if (equalsDisregardNull(other)) {
@@ -81,36 +81,31 @@ abstract class ForwardingTypeMask implements TypeMask {
     } else if (other.isEmpty) {
       return other.isNullable ? this.nullable() : this;
     }
-    return forwardTo.union(other, classWorld);
+    return forwardTo.union(other, compiler);
   }
 
-  TypeMask intersection(TypeMask other, ClassWorld classWorld) {
-    return forwardTo.intersection(other, classWorld);
+  TypeMask intersection(TypeMask other, Compiler compiler) {
+    return forwardTo.intersection(other, compiler);
   }
 
-  bool needsNoSuchMethodHandling(Selector selector, ClassWorld classWorld) {
-    return forwardTo.needsNoSuchMethodHandling(selector, classWorld);
+  bool needsNoSuchMethodHandling(Selector selector, Compiler compiler) {
+    return forwardTo.needsNoSuchMethodHandling(selector, compiler);
   }
 
-  bool canHit(Element element, Selector selector, ClassWorld classWorld) {
-    return forwardTo.canHit(element, selector, classWorld);
+  bool canHit(Element element, Selector selector, Compiler compiler) {
+    return forwardTo.canHit(element, selector, compiler);
   }
 
   Element locateSingleElement(Selector selector, Compiler compiler) {
     return forwardTo.locateSingleElement(selector, compiler);
   }
 
-  bool equalsDisregardNull(other) {
-    if (other is! ForwardingTypeMask) return false;
-    if (forwardTo.isNullable) {
-      return forwardTo == other.forwardTo.nullable();
-    } else {
-      return forwardTo == other.forwardTo.nonNullable();
-    }
-  }
+  bool equalsDisregardNull(other);
 
   bool operator==(other) {
-    return equalsDisregardNull(other) && isNullable == other.isNullable;
+    return equalsDisregardNull(other) &&
+        isNullable == other.isNullable &&
+        forwardTo == other.forwardTo;
   }
 
   int get hashCode => throw "Subclass should implement hashCode getter";

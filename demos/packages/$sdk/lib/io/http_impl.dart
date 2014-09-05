@@ -1585,12 +1585,12 @@ class _ConnectionTarget {
   }
 
   Future<_ConnectionInfo> connect(String uriHost,
-                                  int uriPort,
-                                  _Proxy proxy,
-                                  _HttpClient client) {
+                                   int uriPort,
+                                   _Proxy proxy,
+                                   _HttpClient client) {
     if (hasIdle) {
       var connection = takeIdle();
-      client._connectionsChanged();
+      client._updateTimers();
       return new Future.value(new _ConnectionInfo(connection, proxy));
     }
     if (client.maxConnectionsPerHost != null &&
@@ -1640,7 +1640,6 @@ class _ConnectionTarget {
 
 class _HttpClient implements HttpClient {
   bool _closing = false;
-  bool _closingForcefully = false;
   final Map<String, _ConnectionTarget> _connectionTargets
       = new HashMap<String, _ConnectionTarget>();
   final List<_Credentials> _credentials = [];
@@ -1650,6 +1649,8 @@ class _HttpClient implements HttpClient {
   Function _findProxy = HttpClient.findProxyFromEnvironment;
   Duration _idleTimeout = const Duration(seconds: 15);
   Function _badCertificateCallback;
+
+  Timer _noActiveTimer;
 
   Duration get idleTimeout => _idleTimeout;
 
@@ -1662,7 +1663,7 @@ class _HttpClient implements HttpClient {
   void set idleTimeout(Duration timeout) {
     _idleTimeout = timeout;
     for (var c in _connectionTargets.values) {
-      for (var idle in c._idle) {
+      for (var idle in c.idle) {
         // Reset timer. This is fine, as it's not happening often.
         idle.stopTimer();
         idle.startTimer();
@@ -1723,8 +1724,7 @@ class _HttpClient implements HttpClient {
 
   void close({bool force: false}) {
     _closing = true;
-    _closingForcefully = force;
-    _closeConnections(_closingForcefully);
+    _connectionTargets.values.toList().forEach((c) => c.close(force));
     assert(!_connectionTargets.values.any((s) => s.hasIdle));
     assert(!force ||
         !_connectionTargets.values.any((s) => s._active.isNotEmpty));
@@ -1827,7 +1827,7 @@ class _HttpClient implements HttpClient {
   // Return a live connection to the idle pool.
   void _returnConnection(_HttpClientConnection connection) {
     _connectionTargets[connection.key].returnConnection(connection);
-    _connectionsChanged();
+    _updateTimers();
   }
 
   // Remove a closed connnection from the active set.
@@ -1839,19 +1839,28 @@ class _HttpClient implements HttpClient {
       if (connectionTarget.isEmpty) {
         _connectionTargets.remove(connection.key);
       }
-      _connectionsChanged();
+      _updateTimers();
     }
   }
 
-  void _connectionsChanged() {
-    if (_closing) {
-      _closeConnections(_closingForcefully);
-    }
-  }
-
-  void _closeConnections(bool force) {
-    for (var connectionTarget in _connectionTargets.values.toList()) {
-      connectionTarget.close(force);
+  void _updateTimers() {
+    bool hasActive = _connectionTargets.values.any((t) => t.hasActive);
+    if (!hasActive) {
+      bool hasIdle = _connectionTargets.values.any((t) => t.hasIdle);
+      if (hasIdle && _noActiveTimer == null) {
+        _noActiveTimer = new Timer(const Duration(milliseconds: 100), () {
+          _noActiveTimer = null;
+          bool hasActive =
+              _connectionTargets.values.any((t) => t.hasActive);
+          if (!hasActive) {
+            close();
+            _closing = false;
+          }
+        });
+      }
+    } else if (_noActiveTimer != null) {
+      _noActiveTimer.cancel();
+      _noActiveTimer = null;
     }
   }
 
@@ -2007,6 +2016,7 @@ class _HttpConnection
   final _HttpParser _httpParser;
   int _state = _IDLE;
   StreamSubscription _subscription;
+  Timer _idleTimer;
   bool _idleMark = false;
   Future _streamFuture;
 

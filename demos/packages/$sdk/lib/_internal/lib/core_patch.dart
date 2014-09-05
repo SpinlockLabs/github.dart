@@ -254,16 +254,6 @@ class List<E> {
     }
     return result;
   }
-
-  @patch
-  factory List.from(Iterable other, { bool growable: true }) {
-    List<E> list = new List<E>();
-    for (E e in other) {
-      list.add(e);
-    }
-    if (growable) return list;
-    return makeListFixedLength(list);
-  }
 }
 
 

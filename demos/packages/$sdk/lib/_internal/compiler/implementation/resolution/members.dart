@@ -712,11 +712,13 @@ class ResolverTask extends CompilerTask {
         ClassElement enclosingClass = element.enclosingClass;
         if (enclosingClass != null) {
           // TODO(johnniwinther): Find another way to obtain mixin uses.
-          Iterable<MixinApplicationElement> mixinUses =
-              compiler.world.mixinUsesOf(enclosingClass);
-          ClassElement mixin = enclosingClass;
-          for (MixinApplicationElement mixinApplication in mixinUses) {
-            checkMixinSuperUses(resolutionTree, mixinApplication, mixin);
+          Set<MixinApplicationElement> mixinUses =
+              compiler.world.mixinUses[enclosingClass];
+          if (mixinUses != null) {
+            ClassElement mixin = enclosingClass;
+            for (MixinApplicationElement mixinApplication in mixinUses) {
+              checkMixinSuperUses(resolutionTree, mixinApplication, mixin);
+            }
           }
         }
         return resolutionTree;
@@ -744,9 +746,6 @@ class ResolverTask extends CompilerTask {
     }
     ResolverVisitor visitor = visitorFor(element);
     ResolutionRegistry registry = visitor.registry;
-    // TODO(johnniwinther): Maybe remove this when placeholderCollector migrates
-    // to the backend ast.
-    registry.defineElement(tree.definitions.nodes.head, element);
     // TODO(johnniwinther): Share the resolved type between all variables
     // declared in the same declaration.
     if (tree.type != null) {
@@ -1613,8 +1612,7 @@ class InitializerResolver {
       visitor.compiler.reportError(
           diagnosticNode, kind, {'constructorName': fullConstructorName});
     } else {
-      lookedupConstructor.computeSignature(visitor.compiler);
-      if (!call.applies(lookedupConstructor, visitor.compiler.world)) {
+      if (!call.applies(lookedupConstructor, visitor.compiler)) {
         MessageKind kind = isImplicitSuperCall
                            ? MessageKind.NO_MATCHING_CONSTRUCTOR_FOR_IMPLICIT
                            : MessageKind.NO_MATCHING_CONSTRUCTOR;
@@ -2389,10 +2387,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     Link<Node> parameterNodes = (node.parameters == null)
         ? const Link<Node>() : node.parameters.nodes;
     functionParameters.forEachParameter((ParameterElement element) {
-      // TODO(karlklose): should be a list of [FormalElement]s, but the actual
-      // implementation uses [Element].
-      Link<Element> optionals = functionParameters.optionalParameters;
-      if (!optionals.isEmpty && element == optionals.head) {
+      if (element == functionParameters.optionalParameters.head) {
         NodeList nodes = parameterNodes.head;
         parameterNodes = nodes.nodes;
       }
@@ -2601,7 +2596,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       }
       // TODO(johnniwinther): Ensure correct behavior if currentClass is a
       // patch.
-      target = currentClass.lookupSuperSelector(selector);
+      target = currentClass.lookupSuperSelector(selector, compiler);
       // [target] may be null which means invoking noSuchMethod on
       // super.
       if (target == null) {
@@ -2901,25 +2896,19 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
         // We call 'call()' on a Type instance returned from the reference to a
         // class or typedef literal. We do not need to register this call as a
         // dynamic invocation, because we statically know what the target is.
-      } else {
-        if (target is FunctionElement) {
-          FunctionElement function = target;
-          function.computeSignature(compiler);
-        }
-        if (!selector.applies(target, compiler.world)) {
-          registry.registerThrowNoSuchMethod();
-          if (node.isSuperCall) {
-            // Similar to what we do when we can't find super via selector
-            // in [resolveSend] above, we still need to register the invocation,
-            // because we might call [:super.noSuchMethod:] which calls
-            // [JSInvocationMirror._invokeOn].
-            registry.registerDynamicInvocation(selector);
-            registry.registerSuperNoSuchMethod();
-          }
+      } else if (!selector.applies(target, compiler)) {
+        registry.registerThrowNoSuchMethod();
+        if (node.isSuperCall) {
+          // Similar to what we do when we can't find super via selector
+          // in [resolveSend] above, we still need to register the invocation,
+          // because we might call [:super.noSuchMethod:] which calls
+          // [JSInvocationMirror._invokeOn].
+          registry.registerDynamicInvocation(selector);
+          registry.registerSuperNoSuchMethod();
         }
       }
 
-      if (target != null && target.isForeign(compiler.backend)) {
+      if (target != null && target.isForeign(compiler)) {
         if (selector.name == 'JS') {
           registry.registerJsCall(node, this);
         } else if (selector.name == 'JS_INTERCEPTOR_CONSTANT') {
@@ -3022,7 +3011,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       registerSend(getterSelector, getter);
       registry.setGetterSelectorInComplexSendSet(node, getterSelector);
       if (node.isSuperCall) {
-        getter = currentClass.lookupSuperSelector(getterSelector);
+        getter = currentClass.lookupSuperSelector(getterSelector, compiler);
         if (getter == null) {
           target = warnAndCreateErroneousElement(
               node, selector.name, MessageKind.NO_SUCH_SUPER_MEMBER,
@@ -3280,8 +3269,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     if (Elements.isUnresolved(constructor)) {
       return new ElementResult(constructor);
     }
-    constructor.computeSignature(compiler);
-    if (!callSelector.applies(constructor, compiler.world)) {
+    if (!callSelector.applies(constructor, compiler)) {
       registry.registerThrowNoSuchMethod();
     }
 
@@ -3729,6 +3717,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     Map<String, LabelDefinition> continueLabels = <String, LabelDefinition>{};
 
     Link<Node> cases = node.cases.nodes;
+    SwitchCase switchCase = cases.head;
     CaseMatch firstCase = null;
     DartType firstCaseType = null;
     bool hasReportedProblem = false;
@@ -4231,10 +4220,8 @@ class ClassResolverVisitor extends TypeDefinitionVisitor {
             kind, arguments, '', element);
         registry.registerThrowNoSuchMethod();
       } else {
-        ConstructorElement superConstructor = superMember;
         Selector callToMatch = new Selector.call("", element.library, 0);
-        superConstructor.computeSignature(compiler);
-        if (!callToMatch.applies(superConstructor, compiler.world)) {
+        if (!callToMatch.applies(superMember, compiler)) {
           MessageKind kind = MessageKind.NO_MATCHING_CONSTRUCTOR_FOR_IMPLICIT;
           compiler.reportError(node, kind);
           superMember = new ErroneousElementX(kind, {}, '', element);

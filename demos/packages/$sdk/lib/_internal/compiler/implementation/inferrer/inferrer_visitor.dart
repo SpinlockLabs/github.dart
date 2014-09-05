@@ -92,12 +92,6 @@ abstract class TypeSystem<T> {
   T addPhiInput(Local variable, T phiType, T newType);
 
   /**
-   * Returns `true` if `selector` should be updated to reflect the new
-   * `receiverType`.
-   */
-  bool selectorNeedsUpdate(T receiverType, Selector selector);
-
-  /**
    * Returns a new receiver type for this [selector] applied to
    * [receiverType].
    */
@@ -767,8 +761,10 @@ abstract class InferrerVisitor
     ClassElement cls = outermostElement.enclosingClass;
     if (compiler.world.isUsedAsMixin(cls)) {
       return _thisType = types.nonNullSubtype(cls);
-    } else {
+    } else if (compiler.world.hasAnySubclass(cls)) {
       return _thisType = types.nonNullSubclass(cls);
+    } else {
+      return _thisType = types.nonNullExact(cls);
     }
   }
 

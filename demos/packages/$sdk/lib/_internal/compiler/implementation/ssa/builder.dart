@@ -1118,7 +1118,7 @@ class SsaBuilder extends ResolvedVisitor {
       Selector selector,
       FunctionElement function,
       List<HInstruction> providedArguments) {
-    assert(selector.applies(function, compiler.world));
+    assert(selector.applies(function, compiler));
     FunctionSignature signature = function.functionSignature;
     List<HInstruction> compiledArguments = new List<HInstruction>(
         signature.parameterCount + 1); // Plus one for receiver.
@@ -1205,7 +1205,7 @@ class SsaBuilder extends ResolvedVisitor {
       assert(selector != null
              || Elements.isStaticOrTopLevel(element)
              || element.isGenerativeConstructorBody);
-      if (selector != null && !selector.applies(function, compiler.world)) {
+      if (selector != null && !selector.applies(function, compiler)) {
         return false;
       }
 
@@ -1400,9 +1400,9 @@ class SsaBuilder extends ResolvedVisitor {
         // of the class that mixins the enclosing class. These two
         // classes do not have a subclass relationship, so, for
         // simplicity, we mark the type as an interface type.
-        result = new TypeMask.nonNullSubtype(cls.declaration, compiler.world);
+        result = new TypeMask.nonNullSubtype(cls.declaration);
       } else {
-        result = new TypeMask.nonNullSubclass(cls.declaration, compiler.world);
+        result = new TypeMask.nonNullSubclass(cls.declaration);
       }
       cachedTypeOfThis = result;
     }
@@ -1768,7 +1768,7 @@ class SsaBuilder extends ResolvedVisitor {
           target,
           compileArgument,
           handleConstantForOptionalParameter,
-          compiler.world);
+          compiler);
       if (!match) {
         // If this fails, the selector we constructed for the call to a
         // forwarding constructor in a mixin application did not match the
@@ -1848,7 +1848,7 @@ class SsaBuilder extends ResolvedVisitor {
                                     target.implementation,
                                     null,
                                     handleConstantForOptionalParameter,
-                                    compiler.world);
+                                    compiler);
         inlineSuperOrRedirect(target,
                               arguments,
                               constructors,
@@ -2252,7 +2252,7 @@ class SsaBuilder extends ResolvedVisitor {
     type = type.unalias(compiler);
     assert(assertTypeInContext(type, original));
     if (type.isInterfaceType && !type.treatAsRaw) {
-      TypeMask subtype = new TypeMask.subtype(type.element, compiler.world);
+      TypeMask subtype = new TypeMask.subtype(type.element);
       HInstruction representations = buildTypeArgumentRepresentations(type);
       add(representations);
       return new HTypeConversion.withTypeRepresentation(type, kind, subtype,
@@ -2912,7 +2912,7 @@ class SsaBuilder extends ResolvedVisitor {
 
     Element methodElement = nestedClosureData.closureElement;
     if (compiler.backend.methodNeedsRti(methodElement)) {
-      registry.registerClosureWithFreeTypeVariables(methodElement);
+      registry.registerGenericClosure(methodElement);
     }
   }
 
@@ -3052,7 +3052,7 @@ class SsaBuilder extends ResolvedVisitor {
   }
 
   void generateGetter(ast.Send send, Element element) {
-    if (element != null && element.isForeign(backend)) {
+    if (element != null && element.isForeign(compiler)) {
       visitForeignGetter(send);
     } else if (Elements.isStaticOrTopLevelField(element)) {
       Constant value;
@@ -3078,8 +3078,7 @@ class SsaBuilder extends ResolvedVisitor {
         // does not look at elements in the list.
         TypeMask type =
             TypeMaskFactory.inferredTypeForElement(element, compiler);
-        if (!type.containsAll(compiler.world) &&
-            !instruction.isConstantNull()) {
+        if (!type.containsAll(compiler) && !instruction.isConstantNull()) {
           // TODO(13429): The inferrer should know that an element
           // cannot be null.
           instruction.instructionType = type.nonNullable();
@@ -3306,7 +3305,7 @@ class SsaBuilder extends ResolvedVisitor {
       add(representations);
       String operator = backend.namer.operatorIs(element);
       HInstruction isFieldName = addConstantString(operator);
-      HInstruction asFieldName = compiler.world.hasAnyStrictSubtype(element)
+      HInstruction asFieldName = compiler.world.hasAnySubtype(element)
           ? addConstantString(backend.namer.substitutionName(element))
           : graph.addConstantNull(compiler);
       List<HInstruction> inputs = <HInstruction>[expression,
@@ -3332,7 +3331,7 @@ class SsaBuilder extends ResolvedVisitor {
   }
 
   HInstruction buildFunctionType(FunctionType type) {
-    type.accept(new TypeBuilder(compiler.world), this);
+    type.accept(new TypeBuilder(), this);
     return pop();
   }
 
@@ -3392,7 +3391,7 @@ class SsaBuilder extends ResolvedVisitor {
                                        element,
                                        compileArgument,
                                        handleConstantForOptionalParameter,
-                                       compiler.world);
+                                       compiler);
   }
 
   void addGenericSendArgumentsToList(Link<ast.Node> link, List<HInstruction> list) {
@@ -3856,7 +3855,7 @@ class SsaBuilder extends ResolvedVisitor {
     if (node.isPropertyAccess) {
       push(buildInvokeSuper(selector, element, inputs));
     } else if (element.isFunction || element.isGenerativeConstructor) {
-      if (selector.applies(element, compiler.world)) {
+      if (selector.applies(element, compiler)) {
         // TODO(5347): Try to avoid the need for calling [implementation] before
         // calling [addStaticSendArgumentsToList].
         FunctionElement function = element.implementation;
@@ -3883,8 +3882,8 @@ class SsaBuilder extends ResolvedVisitor {
   bool needsSubstitutionForTypeVariableAccess(ClassElement cls) {
     if (compiler.world.isUsedAsMixin(cls)) return true;
 
-    Iterable<ClassElement> subclasses = compiler.world.strictSubclassesOf(cls);
-    return subclasses.any((ClassElement subclass) {
+    Set<ClassElement> subclasses = compiler.world.subclassesOf(cls);
+    return subclasses != null && subclasses.any((ClassElement subclass) {
       return !rti.isTrivialSubstitution(subclass, cls);
     });
   }
@@ -4076,13 +4075,13 @@ class SsaBuilder extends ResolvedVisitor {
         isFixedList = true;
         TypeMask inferred =
             TypeMaskFactory.inferredForNode(sourceElement, send, compiler);
-        return inferred.containsAll(compiler.world)
+        return inferred.containsAll(compiler)
             ? backend.fixedArrayType
             : inferred;
       } else if (isGrowableListConstructorCall) {
         TypeMask inferred =
             TypeMaskFactory.inferredForNode(sourceElement, send, compiler);
-        return inferred.containsAll(compiler.world)
+        return inferred.containsAll(compiler)
             ? backend.extendableArrayType
             : inferred;
       } else if (Elements.isConstructorOfTypedArraySubclass(
@@ -4092,7 +4091,7 @@ class SsaBuilder extends ResolvedVisitor {
             TypeMaskFactory.inferredForNode(sourceElement, send, compiler);
         ClassElement cls = element.enclosingClass;
         assert(cls.thisType.element.isNative);
-        return inferred.containsAll(compiler.world)
+        return inferred.containsAll(compiler)
             ? new TypeMask.nonNullExact(cls.thisType.element)
             : inferred;
       } else if (element.isGenerativeConstructor) {
@@ -4313,7 +4312,7 @@ class SsaBuilder extends ResolvedVisitor {
     if (elements.isAssert(node)) {
       element = backend.assertMethod;
     }
-    if (element.isForeign(backend) && element.isFunction) {
+    if (element.isForeign(compiler) && element.isFunction) {
       visitForeignSend(node);
       return;
     }
@@ -4540,11 +4539,11 @@ class SsaBuilder extends ResolvedVisitor {
       if (isLength || selector.isIndex) {
         TypeMask type = new TypeMask.nonNullExact(
             element.enclosingClass.declaration);
-        return type.satisfies(backend.jsIndexableClass, compiler.world);
+        return type.satisfies(backend.jsIndexableClass, compiler);
       } else if (selector.isIndexSet) {
         TypeMask type = new TypeMask.nonNullExact(
             element.enclosingClass.declaration);
-        return type.satisfies(backend.jsMutableIndexableClass, compiler.world);
+        return type.satisfies(backend.jsMutableIndexableClass, compiler);
       } else {
         return false;
       }
@@ -4731,7 +4730,7 @@ class SsaBuilder extends ResolvedVisitor {
       }
       Selector setterSelector = elements.getSelector(node);
       if (Elements.isUnresolved(element)
-          || !setterSelector.applies(element, compiler.world)) {
+          || !setterSelector.applies(element, compiler)) {
         generateSuperNoSuchMethodSend(
             node, setterSelector, setterInputs);
         pop();
@@ -5032,7 +5031,7 @@ class SsaBuilder extends ResolvedVisitor {
 
     TypeMask type =
         TypeMaskFactory.inferredForNode(sourceElement, node, compiler);
-    if (!type.containsAll(compiler.world)) instruction.instructionType = type;
+    if (!type.containsAll(compiler)) instruction.instructionType = type;
     stack.add(instruction);
   }
 
@@ -5265,12 +5264,10 @@ class SsaBuilder extends ResolvedVisitor {
     // The instruction type will always be a subtype of the mapLiteralClass, but
     // type inference might discover a more specific type, or find nothing (in
     // dart2js unit tests).
-    TypeMask mapType =
-        new TypeMask.nonNullSubtype(backend.mapLiteralClass, compiler.world);
+    TypeMask mapType = new TypeMask.nonNullSubtype(backend.mapLiteralClass);
     TypeMask returnTypeMask = TypeMaskFactory.inferredReturnTypeForElement(
         constructor, compiler);
-    TypeMask instructionType =
-        mapType.intersection(returnTypeMask, compiler.world);
+    TypeMask instructionType = mapType.intersection(returnTypeMask, compiler);
 
     addInlinedInstantiation(expectedType);
     pushInvokeStatic(node, constructor, inputs, instructionType);
@@ -5938,9 +5935,9 @@ class StringBuilderVisitor extends ast.Visitor {
     // directly.
     Selector selector =
         new TypedSelector(expression.instructionType,
-            new Selector.call('toString', null, 0), compiler.world);
+            new Selector.call('toString', null, 0), compiler);
     TypeMask type = TypeMaskFactory.inferredTypeForSelector(selector, compiler);
-    if (type.containsOnlyString(compiler.world)) {
+    if (type.containsOnlyString(compiler)) {
       builder.pushInvokeDynamic(node, selector, <HInstruction>[expression]);
       append(builder.pop());
       return;
@@ -6361,10 +6358,6 @@ class SsaBranchBuilder {
 }
 
 class TypeBuilder implements DartTypeVisitor<dynamic, SsaBuilder> {
-  final World world;
-
-  TypeBuilder(this.world);
-
   void visitType(DartType type, _) {
     throw 'Internal error $type';
   }
@@ -6377,7 +6370,7 @@ class TypeBuilder implements DartTypeVisitor<dynamic, SsaBuilder> {
   void visitTypeVariableType(TypeVariableType type,
                              SsaBuilder builder) {
     ClassElement cls = builder.backend.findHelper('RuntimeType');
-    TypeMask instructionType = new TypeMask.subclass(cls, world);
+    TypeMask instructionType = new TypeMask.subclass(cls);
     if (!builder.sourceElement.enclosingElement.isClosure &&
         builder.sourceElement.isInstanceMember) {
       HInstruction receiver = builder.localsHandler.readThis();

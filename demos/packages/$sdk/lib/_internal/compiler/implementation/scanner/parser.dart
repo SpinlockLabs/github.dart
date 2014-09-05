@@ -656,7 +656,7 @@ class Parser {
 
     Link<Token> identifiers = findMemberName(token);
     if (identifiers.isEmpty) {
-      return listener.expectedDeclaration(start);
+      return listener.unexpected(start);
     }
     Token name = identifiers.head;
     identifiers = identifiers.tail;
@@ -905,7 +905,7 @@ class Parser {
       }
       token = token.next;
     }
-    return const Link<Token>();
+    return listener.expectedDeclaration(start);
   }
 
   Token parseVariableInitializerOpt(Token token) {
@@ -1076,7 +1076,7 @@ class Parser {
 
     Link<Token> identifiers = findMemberName(token);
     if (identifiers.isEmpty) {
-      return listener.expectedDeclaration(start);
+      return listener.unexpected(start);
     }
     Token name = identifiers.head;
     Token afterName = name.next;
