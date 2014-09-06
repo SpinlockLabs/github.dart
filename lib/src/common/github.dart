@@ -131,7 +131,7 @@ class GitHub {
   
   
   
-  Stream<Octocat> octocats() => _octocats(this);
+  Stream<Octocat> octocats({bool cors: false}) => _octocats(this, cors);
   
   Stream<Team> userTeams() {
     return new PaginationHelper(this).objects("GET", "/user/teams", Team.fromJSON);
