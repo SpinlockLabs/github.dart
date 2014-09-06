@@ -11,7 +11,7 @@ String friendlyDateTime(DateTime time) {
 }
 
 /**
- * Creates a Friendly Date
+ * Creates a Friendly Date String
  */
 String friendlyDate(DateTime time) {
   
@@ -19,7 +19,7 @@ String friendlyDate(DateTime time) {
 }
 
 /**
- * Creates a Friendly Time
+ * Creates a Friendly Time String
  */
 String friendlyTime(DateTime time) {
   var suffix = time.hour >= 12 ? "PM" : "AM";
@@ -29,7 +29,7 @@ String friendlyTime(DateTime time) {
 }
 
 /**
- * Creates a friendly second
+ * Creates a friendly second string
  */
 String friendlySecond(int second) {
   if (second > 9) {
@@ -59,8 +59,11 @@ String friendlyDaySuffix(int day) {
   }
 }
 
-String dayName(DateTime time) {
-  switch (time.weekday) {
+/**
+ * Gets the Day Name
+ */
+String dayName(int number) {
+  switch (number) {
     case DateTime.SUNDAY:
       return "Sunday";
     case DateTime.MONDAY:
