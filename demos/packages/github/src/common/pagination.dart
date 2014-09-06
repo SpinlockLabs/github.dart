@@ -5,12 +5,12 @@ part of github.common;
  */
 class PaginationHelper<T> {
   final GitHub github;
-  final List<http.Response> responses;
-  final Completer<List<http.Response>> completer;
   
-  PaginationHelper(this.github) : responses = [], completer = new Completer<List<http.Response>>();
+  PaginationHelper(this.github);
   
   Future<List<http.Response>> fetch(String method, String path, {int pages, Map<String, String> headers, Map<String, dynamic> params, String body}) {
+    var completer = new Completer();
+    var responses = [];
     if (headers == null) headers = {};
     Future<http.Response> actualFetch(String realPath) {
       return github.request(method, realPath, headers: headers, params: params, body: body);

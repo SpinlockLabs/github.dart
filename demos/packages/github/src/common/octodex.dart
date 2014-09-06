@@ -6,12 +6,12 @@ class Octocat {
   String url;
 }
 
-Stream<Octocat> _octocats(GitHub github) {
+Stream<Octocat> _octocats(GitHub github, bool cors) {
   var controller = new StreamController();
 
   var u = "feeds.feedburner.com/Octocats.xml";
   
-  github.client.request(new http.Request("http://www.corsproxy.com/${u}")).then((response) {
+  github.client.request(new http.Request("${cors ? "http://www.corsproxy.com/" : "http://"}${u}")).then((response) {
     var document = htmlParser.parse(response.body);
     document.querySelectorAll("entry").forEach((entry) {
       var name = entry.querySelector("title").text;

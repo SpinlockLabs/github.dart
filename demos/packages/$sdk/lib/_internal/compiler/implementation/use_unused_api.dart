@@ -55,6 +55,7 @@ void main(List<String> arguments) {
   useNode(null);
   useUtil(null);
   useSetlet(null);
+  useImmutableEmptySet(null);
   useElementVisitor(new ElementVisitor());
   useJs(new js.Program(null));
   useJs(new js.Blob(null));
@@ -124,10 +125,17 @@ void useNode(tree.Node node) {
 
 void useUtil(util.Link link) {
   link.reversePrependAll(link);
+  util.longestCommonPrefixLength(null, null);
+  new util.Pair(null, null);
 }
 
 void useSetlet(util.Setlet setlet) {
   setlet.difference(setlet);
+  setlet.retainWhere(null);
+}
+
+void useImmutableEmptySet(util.ImmutableEmptySet set) {
+  set.retainWhere(null);
 }
 
 void useElementVisitor(ElementVisitor visitor) {
@@ -197,9 +205,9 @@ usedByTests() {
   typeGraphInferrer.getCallersOf(null);
   dart_types.Types.sorted(null);
   new dart_types.Types(compiler).copy(compiler);
-  new universe.TypedSelector.subclass(null, null, compiler);
-  new universe.TypedSelector.subtype(null, null, compiler);
-  new universe.TypedSelector.exact(null, null, compiler);
+  new universe.TypedSelector.subclass(null, null, compiler.world);
+  new universe.TypedSelector.subtype(null, null, compiler.world);
+  new universe.TypedSelector.exact(null, null, compiler.world);
   sourceFileProvider.readStringFromUri(null);
 }
 

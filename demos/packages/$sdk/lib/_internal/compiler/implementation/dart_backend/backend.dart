@@ -19,34 +19,21 @@ class ElementAst {
 
 class DartBackend extends Backend {
   final List<CompilerTask> tasks;
-  final bool forceStripTypes;
   final bool stripAsserts;
-  // TODO(antonm): make available from command-line options.
-  final bool outputAst = false;
-  final Map<Node, String> renames;
-  final Map<LibraryElement, String> imports;
-  final Map<ClassNode, List<Node>> memberNodes;
-  Map<Element, LibraryElement> reexportingLibraries;
 
   // TODO(zarah) Maybe change this to a command-line option.
   // Right now, it is set by the tests.
   bool useMirrorHelperLibrary = false;
 
-  /// Initialized if the useMirrorHelperLibrary field is set.
-  MirrorRenamer mirrorRenamer;
+  /// Updated to a [MirrorRenamerImpl] instance if the [useMirrorHelperLibrary]
+  /// field is set and mirror are needed.
+  MirrorRenamer mirrorRenamer = const MirrorRenamer();
 
-  /// Initialized when dart:mirrors is loaded if the useMirrorHelperLibrary
-  /// field is set.
-  LibraryElement mirrorHelperLibrary;
-  /// Initialized when dart:mirrors is loaded if the useMirrorHelperLibrary
-  /// field is set.
-  FunctionElement mirrorHelperGetNameFunction;
-  /// Initialized when dart:mirrors is loaded if the useMirrorHelperLibrary
-  /// field is set.
-  Element mirrorHelperSymbolsMap;
+  final DartOutputter outputter;
 
-  Iterable<Element> get resolvedElements =>
-      compiler.enqueuer.resolution.resolvedElements;
+  // Used in test.
+  PlaceholderRenamer get placeholderRenamer => outputter.renamer;
+  Map<ClassNode, List<Node>> get memberNodes => outputter.output.memberNodes;
 
   ConstantSystem get constantSystem {
     return constantCompilerTask.constantCompiler.constantSystem;
@@ -70,7 +57,7 @@ class DartBackend extends Backend {
    * These restrictions can be less strict.
    */
   bool isSafeToRemoveTypeDeclarations(
-      Map<ClassElement, Set<Element>> classMembers) {
+      Map<ClassElement, Iterable<Element>> classMembers) {
     ClassElement typeErrorElement = compiler.coreLibrary.find('TypeError');
     if (classMembers.containsKey(typeErrorElement) ||
         compiler.resolverWorld.isChecks.any(
@@ -103,15 +90,15 @@ class DartBackend extends Backend {
     return true;
   }
 
-  DartBackend(Compiler compiler, List<String> strips)
+  DartBackend(Compiler compiler, List<String> strips, {bool multiFile})
       : tasks = <CompilerTask>[],
-        renames = new Map<Node, String>(),
-        imports = new Map<LibraryElement, String>(),
-        memberNodes = new Map<ClassNode, List<Node>>(),
-        reexportingLibraries = <Element, LibraryElement>{},
-        forceStripTypes = strips.indexOf('types') != -1,
         stripAsserts = strips.indexOf('asserts') != -1,
-        constantCompilerTask  = new DartConstantTask(compiler),
+        constantCompilerTask = new DartConstantTask(compiler),
+        outputter = new DartOutputter(
+            compiler, compiler.outputProvider,
+            forceStripTypes: strips.indexOf('types') != -1,
+            multiFile: multiFile,
+            enableMinification: compiler.enableMinification),
         super(compiler) {
     resolutionCallbacks = new DartResolutionCallbacks(this);
   }
@@ -140,137 +127,77 @@ class DartBackend extends Backend {
 
   void codegen(CodegenWorkItem work) { }
 
-  bool isUserLibrary(LibraryElement lib) => !lib.isPlatformLibrary;
+  /// Create an [ElementAst] from the CPS IR.
+  static ElementAst createElementAst(Compiler compiler,
+                                     Tracer tracer,
+                                     ConstantSystem constantSystem,
+                                     Element element,
+                                     cps_ir.FunctionDefinition function) {
+    // Transformations on the CPS IR.
+    if (tracer != null) {
+      tracer.traceCompilation(element.name, null);
+    }
 
-  /**
-   * Tells whether we should output given element. Corelib classes like
-   * Object should not be in the resulting code.
-   */
-  bool shouldOutput(Element element) {
-    return (isUserLibrary(element.library) &&
-            !element.isSynthesized &&
-            element is !AbstractFieldElement)
-        || element.library == mirrorHelperLibrary;
+    void traceGraph(String title, var irObject) {
+      if (tracer != null) {
+        tracer.traceGraph(title, irObject);
+      }
+    }
+
+    new ConstantPropagator(compiler, constantSystem).rewrite(function);
+    traceGraph("Sparse constant propagation", function);
+    new RedundantPhiEliminator().rewrite(function);
+    traceGraph("Redundant phi elimination", function);
+    new ShrinkingReducer().rewrite(function);
+    traceGraph("Shrinking reductions", function);
+
+    // Do not rewrite the IR after variable allocation.  Allocation
+    // makes decisions based on an approximation of IR variable live
+    // ranges that can be invalidated by transforming the IR.
+    new cps_ir.RegisterAllocator().visit(function);
+
+    tree_builder.Builder builder = new tree_builder.Builder(compiler);
+    tree_ir.FunctionDefinition definition = builder.build(function);
+    assert(definition != null);
+    traceGraph('Tree builder', definition);
+
+    // Transformations on the Tree IR.
+    new StatementRewriter().rewrite(definition);
+    traceGraph('Statement rewriter', definition);
+    new CopyPropagator().rewrite(definition);
+    traceGraph('Copy propagation', definition);
+    new LoopRewriter().rewrite(definition);
+    traceGraph('Loop rewriter', definition);
+    new LogicalRewriter().rewrite(definition);
+    traceGraph('Logical rewriter', definition);
+    new backend_ast_emitter.UnshadowParameters().unshadow(definition);
+    traceGraph('Unshadow parameters', definition);
+
+    TreeElementMapping treeElements = new TreeElementMapping(element);
+    backend_ast.Node backendAst =
+        backend_ast_emitter.emit(definition);
+    Node frontend_ast = backend2frontend.emit(treeElements, backendAst);
+    return new ElementAst.internal(frontend_ast, treeElements);
+
   }
 
   void assembleProgram() {
-    // Conservatively traverse all platform libraries and collect member names.
-    // TODO(antonm): ideally we should only collect names of used members,
-    // however as of today there are problems with names of some core library
-    // interfaces, most probably for interfaces of literals.
-    final fixedMemberNames = new Set<String>();
-    for (final library in compiler.libraryLoader.libraries) {
-      if (!library.isPlatformLibrary) continue;
-      library.forEachLocalMember((Element element) {
-        if (element.isClass) {
-          ClassElement classElement = element;
-          assert(invariant(classElement, classElement.isResolved,
-              message: "Unresolved platform class."));
-          classElement.forEachLocalMember((member) {
-            final name = member.name;
-            // Skip operator names.
-            if (!name.startsWith(r'operator$')) {
-              // Fetch name of named constructors and factories if any,
-              // otherwise store regular name.
-              // TODO(antonm): better way to analyze the name.
-              fixedMemberNames.add(name.split(r'$').last);
-            }
-          });
-        }
-        // Even class names are added due to a delicate problem we have:
-        // if one imports dart:core with a prefix, we cannot tell prefix.name
-        // from dynamic invocation (alas!).  So we'd better err on preserving
-        // those names.
-        fixedMemberNames.add(element.name);
-      });
-      for (Element export in library.exports) {
-        if (!library.isInternalLibrary &&
-            export.library.isInternalLibrary) {
-          // If an element of an internal library is reexported by a platform
-          // library, we have to import the reexporting library instead of the
-          // internal library, because the internal library is an
-          // implementation detail of dart2js.
-          reexportingLibraries[export] = library;
-        }
-      }
-    }
-    // As of now names of named optionals are not renamed. Therefore add all
-    // field names used as named optionals into [fixedMemberNames].
-    for (final element in resolvedElements) {
-      if (!element.isConstructor) continue;
-      Link<Element> optionalParameters =
-          element.functionSignature.optionalParameters;
-      for (final optional in optionalParameters) {
-        if (!optional.isInitializingFormal) continue;
-        fixedMemberNames.add(optional.name);
-      }
-    }
-    // The VM will automatically invoke the call method of objects
-    // that are invoked as functions. Make sure to not rename that.
-    fixedMemberNames.add('call');
-    // TODO(antonm): TypeError.srcType and TypeError.dstType are defined in
-    // runtime/lib/error.dart. Overall, all DartVM specific libs should be
-    // accounted for.
-    fixedMemberNames.add('srcType');
-    fixedMemberNames.add('dstType');
 
-    if (useMirrorHelperLibrary && compiler.mirrorsLibrary != null) {
-        mirrorRenamer = new MirrorRenamer(compiler, this);
-    } else {
-      useMirrorHelperLibrary = false;
-    }
-
-    final elementAsts = new Map<Element, ElementAst>();
-
-    ElementAst parse(AstElement element) {
+    ElementAst computeElementAst(AstElement element) {
       if (!compiler.irBuilder.hasIr(element)) {
         return new ElementAst(element);
       } else {
         cps_ir.FunctionDefinition function = compiler.irBuilder.getIr(element);
-        // Transformations on the CPS IR.
-        new RedundantPhiEliminator().rewrite(function);
-        compiler.tracer.traceCompilation(element.name, null, compiler);
-        compiler.tracer.traceGraph("Redundant phi elimination", function);
-        new ShrinkingReducer().rewrite(function);
-        compiler.tracer.traceGraph("Shrinking reductions", function);
-        // Do not rewrite the IR after variable allocation.  Allocation
-        // makes decisions based on an approximation of IR variable live
-        // ranges that can be invalidated by transforming the IR.
-        new cps_ir.RegisterAllocator().visit(function);
-
-        tree_builder.Builder builder = new tree_builder.Builder(compiler);
-        tree_ir.FunctionDefinition definition = builder.build(function);
-        assert(definition != null);
-        compiler.tracer.traceGraph('Tree builder', definition);
-
-        // Transformations on the Tree IR.
-        new StatementRewriter().rewrite(definition);
-        compiler.tracer.traceGraph('Statement rewriter', definition);
-        new CopyPropagator().rewrite(definition);
-        compiler.tracer.traceGraph('Copy propagation', definition);
-        new LoopRewriter().rewrite(definition);
-        compiler.tracer.traceGraph('Loop rewriter', definition);
-        new LogicalRewriter().rewrite(definition);
-        compiler.tracer.traceGraph('Logical rewriter', definition);
-        new backend_ast_emitter.UnshadowParameters().unshadow(definition);
-        compiler.tracer.traceGraph('Unshadow parameters', definition);
-
-        TreeElementMapping treeElements = new TreeElementMapping(element);
-        backend_ast.Node backendAst =
-            backend_ast_emitter.emit(definition);
-        Node frontend_ast = backend2frontend.emit(treeElements, backendAst);
-        return new ElementAst.internal(frontend_ast, treeElements);
+        return createElementAst(compiler,
+            compiler.tracer, constantSystem, element, function);
       }
     }
 
-    Set<Element> topLevelElements = new Set<Element>();
-    Map<ClassElement, Set<Element>> classMembers =
-        new Map<ClassElement, Set<Element>>();
-
-    // Build all top level elements to emit and necessary class members.
-    var newTypedefElementCallback, newClassElementCallback;
-
-    void processElement(Element element, ElementAst elementAst) {
+    // TODO(johnniwinther): Remove the need for this method.
+    void postProcessElementAst(
+        AstElement element, ElementAst elementAst,
+        newTypedefElementCallback,
+        newClassElementCallback) {
       ReferencedElementCollector collector =
           new ReferencedElementCollector(compiler,
                                          element,
@@ -278,203 +205,57 @@ class DartBackend extends Backend {
                                          newTypedefElementCallback,
                                          newClassElementCallback);
       collector.collect();
-      elementAsts[element] = elementAst;
     }
 
-    addTopLevel(AstElement element, ElementAst elementAst) {
-      if (topLevelElements.contains(element)) return;
-      topLevelElements.add(element);
-      processElement(element, elementAst);
+    /**
+     * Tells whether we should output given element. Corelib classes like
+     * Object should not be in the resulting code.
+     */
+    bool shouldOutput(Element element) {
+      return (!element.library.isPlatformLibrary &&
+              !element.isSynthesized &&
+              element is! AbstractFieldElement)
+          || mirrorRenamer.isMirrorHelperLibrary(element.library);
     }
 
-    addClass(ClassElement classElement) {
-      addTopLevel(classElement, new ElementAst(classElement));
-      classMembers.putIfAbsent(classElement, () => new Set());
-    }
-
-    newTypedefElementCallback = (TypedefElement element) {
-      if (!shouldOutput(element)) return;
-      addTopLevel(element, new ElementAst(element));
-    };
-    newClassElementCallback = (ClassElement classElement) {
-      if (!shouldOutput(classElement)) return;
-      addClass(classElement);
-    };
-
-    compiler.resolverWorld.instantiatedClasses.forEach(
-        (ClassElement classElement) {
-      if (shouldOutput(classElement)) addClass(classElement);
-    });
-    resolvedElements.forEach((element) {
-      if (!shouldOutput(element) ||
-          !compiler.enqueuer.resolution.hasBeenResolved(element)) {
-        return;
-      }
-      ElementAst elementAst = parse(element);
-
-      if (element.isClassMember) {
-        ClassElement enclosingClass = element.enclosingClass;
-        assert(enclosingClass.isClass);
-        assert(enclosingClass.isTopLevel);
-        assert(shouldOutput(enclosingClass));
-        addClass(enclosingClass);
-        classMembers[enclosingClass].add(element);
-        processElement(element, elementAst);
-      } else {
-        if (element.isTopLevel) {
-          addTopLevel(element, elementAst);
-        }
-      }
-    });
-    Set<ClassElement> emitNoMembersFor = new Set<ClassElement>();
-    usedTypeLiterals.forEach((ClassElement element) {
-      if (shouldOutput(element)) {
-        if (!topLevelElements.contains(element)) {
-          // The class is only referenced by type literals.
-          emitNoMembersFor.add(element);
-        }
-        addClass(element);
-      }
-    });
-
-    // Add synthesized constructors to classes with no resolved constructors,
-    // but which originally had any constructor.  That should prevent
-    // those classes from being instantiable with default constructor.
-    Identifier synthesizedIdentifier = new Identifier(
-        new StringToken.fromString(IDENTIFIER_INFO, '', -1));
-
-    NextClassElement:
-    for (ClassElement classElement in classMembers.keys) {
-      if (emitNoMembersFor.contains(classElement)) continue;
-      for (Element member in classMembers[classElement]) {
-        if (member.isConstructor) continue NextClassElement;
-      }
-      if (classElement.constructors.isEmpty) continue NextClassElement;
-
-      // TODO(antonm): check with AAR team if there is better approach.
-      // As an idea: provide template as a Dart code---class C { C.name(); }---
-      // and then overwrite necessary parts.
-      var classNode = classElement.node;
-      SynthesizedConstructorElementX constructor =
-          new SynthesizedConstructorElementX(
-              classElement.name, null, classElement, false);
-      constructor.typeCache =
-          new FunctionType(constructor, const VoidType());
-      if (!constructor.isSynthesized) {
-        classMembers[classElement].add(constructor);
-      }
-      FunctionExpression node = new FunctionExpression(
-          new Send(classNode.name, synthesizedIdentifier),
-          new NodeList(new StringToken.fromString(OPEN_PAREN_INFO, '(', -1),
-                       const Link<Node>(),
-                       new StringToken.fromString(CLOSE_PAREN_INFO, ')', -1)),
-          new EmptyStatement(
-              new StringToken.fromString(SEMICOLON_INFO, ';', -1)),
-          null, Modifiers.EMPTY, null, null);
-
-      elementAsts[constructor] =
-          new ElementAst.internal(node, new TreeElementMapping(null));
-    }
-
-    // Create all necessary placeholders.
-    PlaceholderCollector collector =
-        new PlaceholderCollector(compiler, fixedMemberNames, elementAsts);
-    // Add synthesizedIdentifier to set of unresolved names to rename it to
-    // some unused identifier.
-    collector.unresolvedNodes.add(synthesizedIdentifier);
-    makePlaceholders(element) {
-      bool oldUseHelper = useMirrorHelperLibrary;
-      useMirrorHelperLibrary = (useMirrorHelperLibrary
-                               && element.library != mirrorHelperLibrary);
-      collector.collect(element);
-      useMirrorHelperLibrary = oldUseHelper;
-
-      if (element.isClass) {
-        classMembers[element].forEach(makePlaceholders);
-      }
-    }
-    topLevelElements.forEach(makePlaceholders);
-    // Create renames.
-    bool shouldCutDeclarationTypes = forceStripTypes
-        || (compiler.enableMinification
-            && isSafeToRemoveTypeDeclarations(classMembers));
-    renamePlaceholders(
-        compiler, collector, renames, imports,
-        fixedMemberNames, reexportingLibraries,
-        shouldCutDeclarationTypes,
-        uniqueGlobalNaming: useMirrorHelperLibrary);
-
-    // Sort elements.
-    final sortedTopLevels = sortElements(topLevelElements);
-    final sortedClassMembers = new Map<ClassElement, List<Element>>();
-    classMembers.forEach((classElement, members) {
-      sortedClassMembers[classElement] = sortElements(members);
-    });
-
-    if (outputAst) {
-      // TODO(antonm): Ideally XML should be a separate backend.
-      // TODO(antonm): obey renames and minification, at least as an option.
-      StringBuffer sb = new StringBuffer();
-      outputElement(element) {
-        sb.write(element.parseNode(compiler).toDebugString());
-      }
-
-      // Emit XML for AST instead of the program.
-      for (final topLevel in sortedTopLevels) {
-        if (topLevel.isClass && !emitNoMembersFor.contains(topLevel)) {
-          // TODO(antonm): add some class info.
-          sortedClassMembers[topLevel].forEach(outputElement);
-        } else {
-          outputElement(topLevel);
-        }
-      }
-      compiler.assembledCode = '<Program>\n$sb</Program>\n';
-      return;
-    }
-
-    final topLevelNodes = <Node>[];
-    for (final element in sortedTopLevels) {
-      topLevelNodes.add(elementAsts[element].ast);
-      if (element.isClass && !element.isMixinApplication) {
-        final members = <Node>[];
-        for (final member in sortedClassMembers[element]) {
-          members.add(elementAsts[member].ast);
-        }
-        memberNodes[elementAsts[element].ast] = members;
-      }
-    }
-
-    if (useMirrorHelperLibrary) {
-      mirrorRenamer.addRenames(renames, topLevelNodes, collector);
-    }
-
-    final unparser = new EmitterUnparser(renames, stripTypes: forceStripTypes,
-        minify: compiler.enableMinification);
-    emitCode(unparser, imports, topLevelNodes, memberNodes);
-    String assembledCode = unparser.result;
-    compiler.outputProvider('', 'dart')
-        ..add(assembledCode)
-        ..close();
+    String assembledCode = outputter.assembleProgram(
+        libraries: compiler.libraryLoader.libraries,
+        instantiatedClasses: compiler.resolverWorld.instantiatedClasses,
+        resolvedElements: compiler.enqueuer.resolution.resolvedElements,
+        usedTypeLiterals: usedTypeLiterals,
+        postProcessElementAst: postProcessElementAst,
+        computeElementAst: computeElementAst,
+        shouldOutput: shouldOutput,
+        isSafeToRemoveTypeDeclarations: isSafeToRemoveTypeDeclarations,
+        mirrorRenamer: mirrorRenamer,
+        mainLibrary: compiler.mainApp,
+        mainFunction: compiler.mainFunction,
+        outputUri: compiler.outputUri);
     compiler.assembledCode = assembledCode;
+
+    int totalSize = assembledCode.length;
 
     // Output verbose info about size ratio of resulting bundle to all
     // referenced non-platform sources.
-    logResultBundleSizeInfo(topLevelElements);
+    logResultBundleSizeInfo(
+        outputter.libraryInfo.userLibraries,
+        outputter.elementInfo.topLevelElements,
+        assembledCode.length);
   }
 
-  void logResultBundleSizeInfo(Set<Element> topLevelElements) {
-    Iterable<LibraryElement> referencedLibraries =
-        compiler.libraryLoader.libraries.where(isUserLibrary);
+  void logResultBundleSizeInfo(Iterable<LibraryElement> userLibraries,
+                               Iterable<Element> topLevelElements,
+                               int totalOutputSize) {
     // Sum total size of scripts in each referenced library.
     int nonPlatformSize = 0;
-    for (LibraryElement lib in referencedLibraries) {
+    for (LibraryElement lib in userLibraries) {
       for (CompilationUnitElement compilationUnit in lib.compilationUnits) {
         nonPlatformSize += compilationUnit.script.file.length;
       }
     }
-    int percentage = compiler.assembledCode.length * 100 ~/ nonPlatformSize;
+    int percentage = totalOutputSize * 100 ~/ nonPlatformSize;
     log('Total used non-platform files size: ${nonPlatformSize} bytes, '
-        'bundle size: ${compiler.assembledCode.length} bytes (${percentage}%)');
+        'Output total size: $totalOutputSize bytes (${percentage}%)');
   }
 
   log(String message) => compiler.log('[DartBackend] $message');
@@ -497,35 +278,20 @@ class DartBackend extends Backend {
       return compiler.libraryLoader.loadLibrary(
           compiler.translateResolvedUri(
               loadedLibraries[Compiler.DART_MIRRORS],
-              MirrorRenamer.DART_MIRROR_HELPER, null)).
-          then((LibraryElement element) {
-        mirrorHelperLibrary = element;
-        mirrorHelperGetNameFunction = mirrorHelperLibrary.find(
-            MirrorRenamer.MIRROR_HELPER_GET_NAME_FUNCTION);
-        mirrorHelperSymbolsMap = mirrorHelperLibrary.find(
-            MirrorRenamer.MIRROR_HELPER_SYMBOLS_MAP_NAME);
+              MirrorRenamerImpl.DART_MIRROR_HELPER, null)).
+          then((LibraryElement library) {
+        mirrorRenamer = new MirrorRenamerImpl(compiler, this, library);
       });
     }
     return new Future.value();
   }
 
-  void registerStaticSend(Element element, Node node) {
-    if (useMirrorHelperLibrary) {
-      mirrorRenamer.registerStaticSend(element, node);
-    }
-  }
-
-  void registerMirrorHelperElement(Element element, Node node) {
-    if (mirrorHelperLibrary != null
-        && element.library == mirrorHelperLibrary) {
-      mirrorRenamer.registerHelperElement(element, node);
-    }
-  }
-
   void registerStaticUse(Element element, Enqueuer enqueuer) {
-    if (useMirrorHelperLibrary &&
-        element == compiler.mirrorSystemGetNameFunction) {
-      enqueuer.addToWorkList(mirrorHelperGetNameFunction);
+    if (element == compiler.mirrorSystemGetNameFunction) {
+      FunctionElement getNameFunction = mirrorRenamer.getNameFunction;
+      if (getNameFunction != null) {
+        enqueuer.addToWorkList(getNameFunction);
+      }
     }
   }
 }

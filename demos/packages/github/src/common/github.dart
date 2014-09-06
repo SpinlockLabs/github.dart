@@ -91,6 +91,14 @@ class GitHub {
   Future<String> shortenUrl(String url, {String code}) {
     return _shortenUrl(this, url, code: code);
   }
+  
+  Stream<Authorization> authorizations() {
+    return new PaginationHelper(this).objects("GET", "/authorizations", Authorization.fromJSON);
+  }
+  
+  Future<Authorization> authorization(int id) {
+    return getJSON("/authorizations/${id}", statusCode: 200, convert: Authorization.fromJSON);
+  }
 
   /**
    * Fetches the repository specified by the [slug].
@@ -123,7 +131,7 @@ class GitHub {
   
   
   
-  Stream<Octocat> octocats() => _octocats(this);
+  Stream<Octocat> octocats({bool cors: false}) => _octocats(this, cors);
   
   Stream<Team> userTeams() {
     return new PaginationHelper(this).objects("GET", "/user/teams", Team.fromJSON);

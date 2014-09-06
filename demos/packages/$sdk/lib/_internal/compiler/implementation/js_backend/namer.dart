@@ -260,6 +260,10 @@ class Namer implements ClosureNamer {
   final Map<Constant, String> constantLongNames;
   ConstantCanonicalHasher constantHasher;
 
+  // All alphanumeric characters.
+  static const String _alphaNumeric =
+      'abcdefghijklmnopqrstuvwxyzABZDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
   Namer(Compiler compiler)
       : compiler = compiler,
         globals = new Map<Element, String>(),
@@ -502,7 +506,8 @@ class Namer implements ClosureNamer {
     // If a class is used anywhere as a mixin, we must make the name unique so
     // that it does not accidentally shadow.  Also, the mixin name must be
     // constant over all mixins.
-    if (compiler.world.isUsedAsMixin(element.enclosingClass) ||
+    ClassWorld classWorld = compiler.world;
+    if (classWorld.isUsedAsMixin(element.enclosingClass) ||
         shadowingAnotherField(element)) {
       // Construct a new name for the element based on the library and class it
       // is in.  The name here is not important, we just need to make sure it is
@@ -604,6 +609,28 @@ class Namer implements ClosureNamer {
     }
     usedNames.add(candidate);
     return candidate;
+  }
+
+  /// Returns a random alphanumeric string of length 14 prefixed with [prefix].
+  /// There are more than 2^80 such strings, so the chance that the same string
+  /// will be chosen twice is negligible.
+  /// To further decrease the chance of collision in case of bad PRG we also
+  /// incorporate a time-stamp.
+  static String computeRandomIdentifier(String prefix) {
+    math.Random random = new math.Random();
+    String randomPart = new String.fromCharCodes(new List.generate(14, (_) {
+          return _alphaNumeric.codeUnitAt(random.nextInt(_alphaNumeric.length));
+        }));
+    int time = new DateTime.now().millisecondsSinceEpoch;
+
+    List<int> digits = new List<int>();
+    while (time > 0) {
+      digits.add(time % _alphaNumeric.length);
+      time = time ~/ _alphaNumeric.length;
+    }
+    String timePart = new String.fromCharCodes(digits.reversed.map(
+         (int index) => _alphaNumeric.codeUnitAt(index)));
+    return "$prefix$randomPart$timePart";
   }
 
   String getClosureVariableName(String name, int id) {
@@ -821,6 +848,7 @@ class Namer implements ClosureNamer {
         // other elements, such as bound closures also live in [currentIsolate].
         !element.isAccessor &&
         !element.isClass &&
+        !element.isTypedef &&
         !element.isConstructor &&
         !element.isFunction &&
         !element.isLibrary;
@@ -881,6 +909,8 @@ class Namer implements ClosureNamer {
   String operatorAsPrefix() => r'$as';
 
   String operatorSignature() => r'$signature';
+
+  String typedefTag() => r'typedef';
 
   String functionTypeTag() => r'func';
 

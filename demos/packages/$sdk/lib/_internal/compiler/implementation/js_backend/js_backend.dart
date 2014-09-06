@@ -4,6 +4,7 @@
 
 library js_backend;
 
+import 'dart:math' as math;
 import 'dart:async' show EventSink, Future;
 import 'dart:collection' show Queue, LinkedHashMap, LinkedHashSet;
 
@@ -24,8 +25,6 @@ import '../types/types.dart';
 import '../universe/universe.dart';
 import '../util/characters.dart';
 import '../util/util.dart';
-
-import '../dump_info.dart';
 
 part 'backend.dart';
 part 'checked_mode_helpers.dart';

@@ -808,6 +808,10 @@ class Primitives {
     return JS_STRING_CONCAT(string1, string2);
   }
 
+  static String flattenString(String str) {
+    return JS('', "#.charCodeAt(0) == 0 ? # : #", str, str, str);
+  }
+
   static String getTimeZoneName(receiver) {
     // Firefox and Chrome emit the timezone in parenthesis.
     // Example: "Wed May 16 2012 21:13:00 GMT+0200 (CEST)".
@@ -3231,19 +3235,22 @@ LoadLibraryFunctionType _loadLibraryWrapper(String loadId) {
 final Map<String, Future<Null>> _loadingLibraries = <String, Future<Null>>{};
 final Set<String> _loadedLibraries = new Set<String>();
 
-Future<Null> loadDeferredLibrary(String loadId, [String uri]) {
-  List<List<String>> hunkLists = JS('JSExtendableArray|Null',
-      '\$.libraries_to_load[#]', loadId);
-  if (hunkLists == null) return new Future.value(null);
-
-  return Future.forEach(hunkLists, (hunkNames) {
-    Iterable<Future<Null>> allLoads =
-        hunkNames.map((hunkName) => _loadHunk(hunkName, uri));
-    return Future.wait(allLoads).then((_) => null);
-  }).then((_) => _loadedLibraries.add(loadId));
+Future<Null> loadDeferredLibrary(String loadId) {
+  List<String> librariesToLoad = JS('JSExtendableArray|Null',
+      'init.librariesToLoad[#]',
+      loadId);
+  if (librariesToLoad == null) return new Future.value(null);
+  return Future.wait(librariesToLoad.map(
+      (String hunkName) => _loadHunk(hunkName))).then((_) {
+    for (String hunkName in librariesToLoad) {
+      // TODO(floitsch): Replace unsafe access to embedded global.
+      JS('void', 'init.initializeLoadedHunk(#)', hunkName);
+    }
+    _loadedLibraries.add(loadId);
+  });
 }
 
-Future<Null> _loadHunk(String hunkName, String uri) {
+Future<Null> _loadHunk(String hunkName) {
   // TODO(ahe): Validate libraryName.  Kasper points out that you want
   // to be able to experiment with the effect of toggling @DeferLoad,
   // so perhaps we should silently ignore "bad" library names.
@@ -3252,9 +3259,8 @@ Future<Null> _loadHunk(String hunkName, String uri) {
     return future.then((_) => null);
   }
 
-  if (uri == null) {
-    uri = IsolateNatives.thisScript;
-  }
+  String uri = IsolateNatives.thisScript;
+
   int index = uri.lastIndexOf('/');
   uri = '${uri.substring(0, index + 1)}$hunkName';
 

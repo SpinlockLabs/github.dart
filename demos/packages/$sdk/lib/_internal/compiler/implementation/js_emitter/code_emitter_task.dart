@@ -4,6 +4,8 @@
 
 part of dart2js.js_emitter;
 
+const USE_NEW_EMITTER = const bool.fromEnvironment("dart2js.use.new.emitter");
+
 /**
  * Generates the code for all used classes in the program. Static fields (even
  * in classes) are ignored, since they can be treated as non-class elements.
@@ -158,6 +160,12 @@ class CodeEmitterTask extends CompilerTask {
   String get initName => 'init';
   String get makeConstListProperty
       => namer.getMappedInstanceName('makeConstantList');
+
+  /// For deferred loading we communicate the initializers via this global var.
+  final String deferredInitializers = Namer.computeRandomIdentifier("G");
+
+  /// All the global state can be passed around with this variable.
+  String get globalsHolder => namer.getMappedGlobalName("globalsHolder");
 
   jsAst.FunctionDeclaration get generateAccessorFunction {
     const RANGE1_SIZE = RANGE1_LAST - RANGE1_FIRST + 1;
@@ -597,8 +605,7 @@ class CodeEmitterTask extends CompilerTask {
                 // Use try-finally, not try-catch/throw as it destroys the
                 // stack trace.
                 if (result === sentinelUndefined)
-                  if ($isolate[fieldName] === sentinelInProgress)
-                    $isolate[fieldName] = null;
+                  $isolate[fieldName] = null;
               }
             } else {
               if (result === sentinelInProgress)
@@ -1207,7 +1214,7 @@ class CodeEmitterTask extends CompilerTask {
         if (!element.isNative) continue;
         Element member = element.lookupLocalMember(noSuchMethodName);
         if (member == null) continue;
-        if (noSuchMethodSelector.applies(member, compiler)) {
+        if (noSuchMethodSelector.applies(member, compiler.world)) {
           nativeEmitter.handleNoSuchMethod = true;
           break;
         }
@@ -1336,7 +1343,7 @@ class CodeEmitterTask extends CompilerTask {
 
     for (OutputUnit outputUnit in compiler.deferredLoadTask.allOutputUnits) {
       if (!descriptors.containsKey(outputUnit)) continue;
- 
+
       ClassBuilder descriptor = descriptors[outputUnit];
 
       jsAst.Fun metadata = metadataEmitter.buildMetadataFunction(library);
@@ -1400,30 +1407,55 @@ class CodeEmitterTask extends CompilerTask {
 
       computeNeededDeclarations();
 
+      if (USE_NEW_EMITTER) {
+        new new_js_emitter.Emitter(compiler, this).emitProgram();
+        return;
+      }
+
       OutputUnit mainOutputUnit = compiler.deferredLoadTask.mainOutputUnit;
 
       mainBuffer.add(buildGeneratedBy());
       addComment(HOOKS_API_USAGE, mainBuffer);
-
-      if (!compiler.deferredLoadTask.splitProgram) {
-        mainBuffer.add('(function(${namer.currentIsolate})$_{$n');
+      if (compiler.deferredLoadTask.isProgramSplit) {
+        /// For deferred loading we communicate the initializers via this global
+        /// var. The deferred hunks will add their initialization to this.
+        /// The semicolon is important in minified mode, without it the
+        /// following parenthesis looks like a call to the object literal.
+        mainBuffer.add('var ${deferredInitializers} = {};$n');
       }
 
       // Using a named function here produces easier to read stack traces in
       // Chrome/V8.
-      mainBuffer.add('function dart(){${_}this.x$_=${_}0$_}');
+      mainBuffer.add('(function(${namer.currentIsolate})$_{\n');
+      if (compiler.deferredLoadTask.isProgramSplit) {
+        /// We collect all the global state of the, so it can be passed to the
+        /// initializer of deferred files.
+        mainBuffer.add('var ${globalsHolder}$_=$_{}$N');
+      }
+      mainBuffer.add('function dart()$_{$n'
+          '${_}${_}this.x$_=${_}0$N'
+          '${_}${_}delete this.x$N'
+          '}$n');
       for (String globalObject in Namer.reservedGlobalObjectNames) {
         // The global objects start as so-called "slow objects". For V8, this
         // means that it won't try to make map transitions as we add properties
         // to these objects. Later on, we attempt to turn these objects into
         // fast objects by calling "convertToFastObject" (see
         // [emitConvertToFastObjectFunction]).
-        mainBuffer
-            ..write('var ${globalObject}$_=${_}new dart$N')
-            ..write('delete ${globalObject}.x$N');
+        mainBuffer.write('var ${globalObject}$_=${_}');
+        if(compiler.deferredLoadTask.isProgramSplit) {
+          mainBuffer.add('${globalsHolder}.$globalObject$_=${_}');
+        }
+        mainBuffer.write('new dart$N');
       }
 
       mainBuffer.add('function ${namer.isolateName}()$_{}\n');
+      if (compiler.deferredLoadTask.isProgramSplit) {
+        mainBuffer
+          .write('${globalsHolder}.${namer.isolateName}$_=$_'
+                 '${namer.isolateName}$N'
+                 '${globalsHolder}.init$_=${_}init$N');
+      }
       mainBuffer.add('init()$N$n');
       // Shorten the code by using [namer.currentIsolate] as temporary.
       isolateProperties = namer.currentIsolate;
@@ -1616,26 +1648,28 @@ class CodeEmitterTask extends CompilerTask {
       computeNeededConstants();
       emitCompileTimeConstants(mainBuffer, mainOutputUnit);
 
-      // Write a javascript mapping from Deferred import load ids (derrived from
-      // the import prefix.) to a list of lists of js hunks to load.
-      // TODO(sigurdm): Create a syntax tree for this.
-      // TODO(sigurdm): Also find out where to place it.
-      mainBuffer.write("\$.libraries_to_load = {");
-      for (String loadId in compiler.deferredLoadTask.hunksToLoad.keys) {
-        // TODO(sigurdm): Escape these strings.
-        mainBuffer.write('"$loadId":[');
-        for (List<OutputUnit> outputUnits in
-            compiler.deferredLoadTask.hunksToLoad[loadId]) {
+      if (compiler.deferredLoadTask.isProgramSplit) {
+        mainBuffer.write('init.initializeLoadedHunk$_=${_}'
+            'function(hunkName)$_{$_'
+              '$deferredInitializers[hunkName]($globalsHolder)'
+            '$_}$N');
+        // Write a javascript mapping from Deferred import load ids (derrived
+        // from the import prefix.) to a list of lists of js hunks to load.
+        // TODO(sigurdm): Create a syntax tree for this.
+        // TODO(sigurdm): Also find out where to place it.
+        mainBuffer.write("$initName.librariesToLoad = {");
+        compiler.deferredLoadTask.hunksToLoad.forEach(
+            (String loadId, List<OutputUnit>outputUnits) {
+          mainBuffer.write('"$loadId": ');
           mainBuffer.write("[");
           for (OutputUnit outputUnit in outputUnits) {
             mainBuffer
-              .write('"${outputUnit.partFileName(compiler)}.part.js", ');
+                .write('"${outputUnit.partFileName(compiler)}.part.js", ');
           }
           mainBuffer.write("],");
-        }
-        mainBuffer.write("],\n");
+        });
+        mainBuffer.write("}$N");
       }
-      mainBuffer.write("}$N");
       // Static field initializations require the classes and compile-time
       // constants to be set up.
       emitStaticNonFinalFieldInitializations(mainBuffer);
@@ -1704,11 +1738,7 @@ class CodeEmitterTask extends CompilerTask {
           buildPrecompiledFunction();
       emitInitFunction(mainBuffer);
       emitMain(mainBuffer);
-      if (!compiler.deferredLoadTask.splitProgram) {
-        mainBuffer.add('})()\n');
-      } else {
-        mainBuffer.add('\n');
-      }
+      mainBuffer.add('})()\n');
 
       if (compiler.useContentSecurityPolicy) {
         mainBuffer.write(
@@ -1820,20 +1850,31 @@ class CodeEmitterTask extends CompilerTask {
       var oldClassesCollector = classesCollector;
       classesCollector = r"$$";
 
+      String hunkName = "${outputUnit.partFileName(compiler)}.part.js";
+
       outputBuffer
-        ..write(buildGeneratedBy());
-      if (libraryDescriptorBuffer != null) {
+        ..write(buildGeneratedBy())
+        ..write('${deferredInitializers}'
+                '["$hunkName"]$_=$_'
+                'function$_(${globalsHolder}) {$N');
+      for (String globalObject in Namer.reservedGlobalObjectNames) {
         outputBuffer
-          ..write('var old${namer.currentIsolate}$_='
-                  '$_${namer.currentIsolate}$N'
+            .write('var $globalObject$_=$_'
+                   '${globalsHolder}.$globalObject$N');
+      }
+      outputBuffer
+          .write('var init$_=$_${globalsHolder}.init$N');
+      if (libraryDescriptorBuffer != null) {
       // TODO(ahe): This defines a lot of properties on the
       // Isolate.prototype object.  We know this will turn it into a
       // slow object in V8, so instead we should do something similar
       // to Isolate.$finishIsolateConstructor.
-                  '${namer.currentIsolate}$_='
-                  '$_${namer.isolateName}.prototype$N$n'
-                  // The classesCollector object ($$).
-                  '$classesCollector$_=$_{};$n')
+         outputBuffer
+             ..write('var ${namer.isolateName}$_=$_'
+                     '${globalsHolder}.${namer.isolateName}$N')
+            ..write('var ${namer.currentIsolate}$_=$_$isolatePropertiesName$N')
+            // The classesCollector object ($$).
+            ..write('$classesCollector$_=$_{};$n')
           ..write('(')
           ..write(
               jsAst.prettyPrint(
@@ -1850,10 +1891,6 @@ class CodeEmitterTask extends CompilerTask {
               '$_$isolatePropertiesName)$N');
         }
 
-        outputBuffer.write(
-          // Reset the classesCollector ($$).
-          '$classesCollector$_=${_}null$N$n'
-          '${namer.currentIsolate}$_=${_}old${namer.currentIsolate}$N');
       }
 
       classesCollector = oldClassesCollector;
@@ -1861,7 +1898,7 @@ class CodeEmitterTask extends CompilerTask {
       typeTestEmitter.emitRuntimeTypeSupport(outputBuffer, outputUnit);
 
       emitCompileTimeConstants(outputBuffer, outputUnit);
-
+      outputBuffer.write('}$N');
       String code = outputBuffer.getText();
       outputBuffers[outputUnit] = outputBuffer;
       compiler.outputProvider(outputUnit.partFileName(compiler), 'part.js')

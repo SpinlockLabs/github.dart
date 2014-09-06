@@ -31,6 +31,10 @@ class ResolutionRegistry extends Registry {
 
   /// Register [node] as the declaration of [element].
   void defineFunction(FunctionExpression node, FunctionElement element) {
+    // TODO(sigurdm): Remove when not needed by the dart2dart backend.
+    if (node.name != null) {
+      mapping[node.name] = element;
+    }
     mapping[node] = element;
   }
 
@@ -201,8 +205,9 @@ class ResolutionRegistry extends Registry {
     backend.resolutionCallbacks.onLazyField(this);
   }
 
-  void registerMetadataConstant(Constant constant, Element annotatedElement) {
-    backend.registerMetadataConstant(constant, annotatedElement, this);
+  void registerMetadataConstant(MetadataAnnotation metadata,
+                                Element annotatedElement) {
+    backend.registerMetadataConstant(metadata, annotatedElement, this);
   }
 
   void registerThrowRuntimeError() {

@@ -394,16 +394,28 @@ class TypeTestEmitter extends CodeEmitterHelper {
         return false;
       } else if (function.isInstanceMember) {
         if (!function.enclosingClass.isClosure) {
-          return compiler.codegenWorld.hasInvokedGetter(function, compiler);
+          return compiler.codegenWorld.hasInvokedGetter(
+              function, compiler.world);
         }
       }
       return false;
     }
 
+    bool canBeReflectedAsFunction(Element element) {
+      return element.kind == ElementKind.FUNCTION ||
+          element.kind == ElementKind.GETTER ||
+          element.kind == ElementKind.SETTER ||
+          element.kind == ElementKind.GENERATIVE_CONSTRUCTOR;
+    }
+
+    bool canBeReified(Element element) {
+      return (canTearOff(element) || backend.isAccessibleByReflection(element));
+    }
+
+    // Find all types referenced from the types of elements that can be
+    // reflected on 'as functions'.
     backend.generatedCode.keys.where((element) {
-      return element is FunctionElement &&
-          element is! ConstructorBodyElement &&
-          (canTearOff(element) || backend.isAccessibleByReflection(element));
+      return canBeReflectedAsFunction(element) && canBeReified(element);
     }).forEach((FunctionElement function) {
       DartType type = function.computeType(compiler);
       for (ClassElement cls in backend.rti.getReferencedClasses(type)) {

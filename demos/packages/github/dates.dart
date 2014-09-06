@@ -11,14 +11,15 @@ String friendlyDateTime(DateTime time) {
 }
 
 /**
- * Creates a Friendly Date
+ * Creates a Friendly Date String
  */
 String friendlyDate(DateTime time) {
+  
   return "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
 }
 
 /**
- * Creates a Friendly Time
+ * Creates a Friendly Time String
  */
 String friendlyTime(DateTime time) {
   var suffix = time.hour >= 12 ? "PM" : "AM";
@@ -28,7 +29,7 @@ String friendlyTime(DateTime time) {
 }
 
 /**
- * Creates a friendly second
+ * Creates a friendly second string
  */
 String friendlySecond(int second) {
   if (second > 9) {
@@ -55,6 +56,30 @@ String friendlyDaySuffix(int day) {
       return "rd";
     default:
       return "th";
+  }
+}
+
+/**
+ * Gets the Day Name
+ */
+String dayName(int number) {
+  switch (number) {
+    case DateTime.SUNDAY:
+      return "Sunday";
+    case DateTime.MONDAY:
+      return "Monday";
+    case DateTime.TUESDAY:
+      return "Tuesday";
+    case DateTime.WEDNESDAY:
+      return "Wednesday";
+    case DateTime.THURSDAY:
+      return "Thursday";
+    case DateTime.FRIDAY:
+      return "Friday";
+    case DateTime.SATURDAY:
+      return "Saturday";
+    default:
+      throw "Should never happen.";
   }
 }
 
