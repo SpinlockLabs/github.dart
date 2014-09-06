@@ -60,39 +60,24 @@ String friendlyDaySuffix(int day) {
 }
 
 String dayName(DateTime time) {
-  var millennium = new DateTime(2000); // Millennium was a Saturday
-  var current = millennium;
-  String DAY = "Saturday";
-  while (!(current.year == time.year && current.month == time.month && current.day == time.day)) {
-    switch (DAY) {
-      case "Sunday":
-        DAY = "Monday";
-        break;
-      case "Monday":
-        DAY = "Tuesday";
-        break;
-      case "Tuesday":
-        DAY = "Wednesday";
-        break;
-      case "Wednesday":
-        DAY = "Thursday";
-        break;
-      case "Thursday":
-        DAY = "Friday";
-        break;
-      case "Friday":
-        DAY = "Saturday";
-        break;
-      case "Saturday":
-        DAY = "Sunday";
-        break;
-      default:
-        throw "Shouldn't Happen";
-    }
-    current = current.add(new Duration(days: 1));
+  switch (time.weekday) {
+    case DateTime.SUNDAY:
+      return "Sunday";
+    case DateTime.MONDAY:
+      return "Monday";
+    case DateTime.TUESDAY:
+      return "Tuesday";
+    case DateTime.WEDNESDAY:
+      return "Wednesday";
+    case DateTime.THURSDAY:
+      return "Thursday";
+    case DateTime.FRIDAY:
+      return "Friday";
+    case DateTime.SATURDAY:
+      return "Saturday";
+    default:
+      throw "Should never happen.";
   }
-  
-  return DAY;
 }
 
 /**
