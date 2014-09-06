@@ -14,6 +14,7 @@ String friendlyDateTime(DateTime time) {
  * Creates a Friendly Date
  */
 String friendlyDate(DateTime time) {
+  
   return "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
 }
 
@@ -56,6 +57,42 @@ String friendlyDaySuffix(int day) {
     default:
       return "th";
   }
+}
+
+String dayName(DateTime time) {
+  var millennium = new DateTime(2000); // Millennium was a Saturday
+  var current = millennium;
+  String DAY = "Saturday";
+  while (!(current.year == time.year && current.month == time.month && current.day == time.day)) {
+    switch (DAY) {
+      case "Sunday":
+        DAY = "Monday";
+        break;
+      case "Monday":
+        DAY = "Tuesday";
+        break;
+      case "Tuesday":
+        DAY = "Wednesday";
+        break;
+      case "Wednesday":
+        DAY = "Thursday";
+        break;
+      case "Thursday":
+        DAY = "Friday";
+        break;
+      case "Friday":
+        DAY = "Saturday";
+        break;
+      case "Saturday":
+        DAY = "Sunday";
+        break;
+      default:
+        throw "Shouldn't Happen";
+    }
+    current = current.add(new Duration(days: 1));
+  }
+  
+  return DAY;
 }
 
 /**
