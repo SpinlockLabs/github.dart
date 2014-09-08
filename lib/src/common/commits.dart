@@ -32,7 +32,7 @@ class Commit {
   User author;
 
   /**
-   * Commit Commiter
+   * Commit Committer
    */
   User committer;
 
@@ -67,7 +67,7 @@ class Commit {
   DateTime committedAt;
 
   /**
-   * Commiter Email
+   * Committer Email
    */
   @ApiName("commit/commiter/email")
   String committerEmail;

@@ -136,7 +136,7 @@ class PullRequest extends PullRequestInformation {
   bool merged;
  
   /**
-   * If the pull request is mergable
+   * If the pull request is mergeable
    */
   bool mergeable;
  

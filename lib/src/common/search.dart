@@ -18,11 +18,11 @@ class SearchResults<T> {
       ..totalCount = input['total_count']
       ..incompleteResults = input['incomplete_results'];
     
-    var itemz = input['items'];
+    var itemList = input['items'];
     
     results.items = [];
     
-    for (var item in itemz) {
+    for (var item in itemList) {
       results.items.add(resultConverter(github, item));
     }
     
