@@ -35,6 +35,6 @@ Pull Request rejections are not a bad thing. It just means you need to fix somet
 - IRC: `#directcode on irc.esper.net`
 - Email: `kaendfinger@gmail.com`
 
-## Becoming a Commiter
+## Becoming a Committer
 
-If you get on IRC and ask us, we can review your work and add you as a commiter if we think you should have it.
+If you get on IRC and ask us, we can review your work and add you as a committer if we think you should have it.
