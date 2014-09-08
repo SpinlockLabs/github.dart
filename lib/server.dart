@@ -54,4 +54,7 @@ class _IOClient extends http.Client {
     
     return completer.future;
   }
+
+  @override
+  void close() => client.close();
 }

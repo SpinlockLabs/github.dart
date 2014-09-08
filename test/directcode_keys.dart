@@ -17,13 +17,15 @@ void main() {
       return new Set()..addAll(value)..addAll(e);
     });
   }).then((members) {
+    var group = new FutureGroup();
     for (var member in members) {
-      github.publicKeys(member.login).toList().then((keys) {
+      group.add(github.publicKeys(member.login).toList().then((keys) {
         print("${member.login}:");
         keys.forEach((key) {
           print("- ${key.key}");
         });
-      });
+      }));
     }
-  });
+    return group.future;
+  }).then((_) => github.dispose());
 }

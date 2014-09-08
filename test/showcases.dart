@@ -7,5 +7,5 @@ void main() {
 
   github.showcases().listen((info) {
     print("- ${info.title}");
-  });
+  }).onDone(() => github.dispose());
 }

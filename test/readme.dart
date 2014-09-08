@@ -7,5 +7,6 @@ void main() {
   
   github.readme(new RepositorySlug("DirectMyFile", "github.dart"))
     .then((file) => file.renderMarkdown())
-    .then((html) => print(html));
+    .then((html) => print(html))
+    .then((_) => github.dispose());
 }

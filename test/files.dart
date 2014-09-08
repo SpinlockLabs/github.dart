@@ -7,5 +7,6 @@ void main() {
   
   github.contents(new RepositorySlug("DirectMyFile", "github.dart"), "pubspec.yaml")
     .then((contents) => contents.file)
-    .then((file) => print(file.text));
+    .then((file) => print(file.text))
+    .then((_) => github.dispose());
 }

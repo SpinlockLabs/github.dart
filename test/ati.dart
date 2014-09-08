@@ -18,5 +18,5 @@ void main() {
     print("Default Branch: ${repository.defaultBranch}");
     print("Created At: ${friendlyDateTime(repository.createdAt)}");
     print("Last Pushed At: ${friendlyDateTime(repository.pushedAt)}");
-  });
+  }).then((_) => github.dispose());
 }

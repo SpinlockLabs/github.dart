@@ -7,5 +7,5 @@ void main() {
   
   github.publicRepositories(limit: 10).listen((repo) {
     print("-> ${repo.fullName}");
-  });
+  }).onDone(() => github.dispose());
 }

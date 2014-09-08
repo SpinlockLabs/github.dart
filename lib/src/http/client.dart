@@ -22,4 +22,6 @@ abstract class Client {
   Future<Response> head(String url, {Map<String, String> headers}) {
     return request(new Request(url, method: "HEAD", headers: headers));
   }
+
+  void close() => null;
 }

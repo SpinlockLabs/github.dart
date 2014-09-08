@@ -7,5 +7,5 @@ void main() {
 
   github.blogPosts().listen((post) {
     print(post.title);
-  });
+  }).onDone(() => github.dispose());
 }

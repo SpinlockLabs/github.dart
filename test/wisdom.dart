@@ -7,5 +7,5 @@ void main() {
   
   github.wisdom().then((value) {
     print(value);
-  });
+  }).then((_) => github.dispose());
 }
