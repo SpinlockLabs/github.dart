@@ -1,5 +1,3 @@
-import "dart:math";
-
 void main() {
   print(solve(500));
   print(solve(20));
