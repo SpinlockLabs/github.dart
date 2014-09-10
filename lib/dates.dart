@@ -14,7 +14,6 @@ String friendlyDateTime(DateTime time) {
  * Creates a Friendly Date String
  */
 String friendlyDate(DateTime time) {
-  
   return "${monthName(time.month)} ${time.day}${friendlyDaySuffix(time.day)}, ${time.year}";
 }
 
