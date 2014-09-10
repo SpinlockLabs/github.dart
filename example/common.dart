@@ -15,20 +15,23 @@ void init(String script, {void onReady()}) {
 
   document.querySelector("#view-source").onClick.listen((_) {
     var popup = window.open("view_source.html", "View Source");
+    String code;
     
     var fetched = false;
     var ready = false;
     
-    String code;
+    void sendCode() {
+      popup.postMessage({
+        "command": "code",
+        "code": code
+      }, window.location.href);
+    }
     
     window.addEventListener("message", (event) {
       if (event.data['command'] == "ready") {
         ready = true;
         if (fetched) {
-          popup.postMessage({
-            "command": "code",
-            "code": code
-          }, window.location.href);
+          sendCode();
         }
       }
     });
@@ -37,20 +40,10 @@ void init(String script, {void onReady()}) {
       code = c;
       fetched = true;
       if (ready) {
-        popup.postMessage({
-          "command": "code",
-          "code": code
-        }, window.location.href);
+        sendCode();
       }
     });
   });
 }
 
-Map<String, String> get queryString {
-  var url = window.location.href;
-  if (url.contains("?")) {
-    return Uri.splitQueryString(url.substring(url.indexOf('?') + 1));
-  } else {
-    return {};
-  }
-}
+Map<String, String> get queryString => Uri.parse(window.location.href).queryParameters;
