@@ -32,7 +32,7 @@ Pull Request rejections are not a bad thing. It just means you need to fix somet
 
 ## Contacting Us
 
-- IRC: `#directcode on irc.esper.net`
+- IRC: `#directcode on irc.esper.net and irc.freenode.net`
 - Email: `kaendfinger@gmail.com`
 
 ## Becoming a Committer

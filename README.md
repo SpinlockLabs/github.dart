@@ -76,4 +76,4 @@ var github = createGitHubClient(auth: new Authentication.withToken("YourTokenHer
 
 ## Contacting Us
 
-You can find us on `irc.esper.net` at `#directcode`.
+You can find us on `irc.esper.net and irc.freenode.net` at `#directcode`.
