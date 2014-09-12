@@ -12,12 +12,6 @@ class Hook {
   List<String> events;
   
   /**
-   * Url for the Hook
-   */
-  @ApiName("config/url")
-  String url;
-  
-  /**
    * Content Type
    */
   @ApiName("config/content_type")
@@ -55,19 +49,21 @@ class Hook {
    */
   String repoName;
   
+  Map<String, dynamic> config;
+  
   Hook(this.github);
   
   static Hook fromJSON(GitHub github, repoName, input) {
     return new Hook(github)
       ..events = input['events']
-      ..url = input['config']['url']
       ..active = input['active']
       ..name = input['name']
       ..id = input['id']
       ..repoName = repoName
       ..updatedAt = parseDateTime(input['updated_at'])
       ..createdAt = parseDateTime(input['created_at'])
-      ..contentType = input['config']['content_type'];
+      ..contentType = input['config']['content_type']
+      ..config = input['config'];
   }
   
   /**
