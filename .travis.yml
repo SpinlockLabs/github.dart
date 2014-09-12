@@ -37,3 +37,6 @@ notifications:
     on_start: always
   notifications:
     slack: directcode:2I5T01PBxls8Yb1v3Jiw1xbh
+
+matrix:
+  fast_finish: true
