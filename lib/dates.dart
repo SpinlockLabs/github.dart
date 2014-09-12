@@ -114,3 +114,31 @@ String monthName(int number) {
   }
   return "(not a month?)";
 }
+
+DateTime now() => new DateTime.now();
+
+DateTime offsetDay(DateTime original, int days) {
+  if (days.isNegative) {
+    return original.subtract(new Duration(days: days.abs()));
+  } else {
+    return original.add(new Duration(days: days));
+  }
+}
+
+DateTime yesterday() => offsetDay(now(), -1);
+DateTime tomorrow() => offsetDay(now(), 1);
+
+DateTime offsetTimezone(DateTime other) {
+  var offset = now().timeZoneOffset;
+  return offsetDay(other, offset.inDays);
+}
+
+String _timezoneName;
+
+String get timezoneName {
+  if (_timezoneName == null) {
+    _timezoneName = new DateTime.now().timeZoneName;
+  }
+
+  return _timezoneName;
+}
