@@ -1,11 +1,6 @@
-library utils_tests;
+part of github.tests;
 
-import 'package:unittest/unittest.dart';
-
-import 'package:github/src/common/util.dart';
-import 'test_helper.dart';
-
-void main() {
+void utilsTests() {
   test("https://api.github.com/repos/DirectMyFile/irc.dart slug is correct", () {
     expectSlug(slugFromAPIUrl("https://api.github.com/repos/DirectMyFile/irc.dart"), "DirectMyFile", "irc.dart");
   });

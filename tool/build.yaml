@@ -1,4 +1,4 @@
-analyzer.files: 
+analyzer.files:
   - lib/common.dart
   - lib/server.dart
   - lib/browser.dart
@@ -10,8 +10,8 @@ analyzer.files:
   - example/oauth2.dart
   - example/releases.dart
   - example/common.dart
-check.tasks: 
+check.tasks:
   - analyze
   - test
 docs.output: out/docs
-test.file: test/all_tests.dart
+test.file: test/tests.dart
