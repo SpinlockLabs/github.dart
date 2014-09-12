@@ -50,8 +50,8 @@ String friendlyDaySuffix(int day) {
     case 2:
     case 22:
       return "nd";
-    case 23:
     case 3:
+    case 23:
       return "rd";
     default:
       return "th";
