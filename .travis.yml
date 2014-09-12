@@ -4,6 +4,10 @@
 # we use this as a placeholder. Not really a big deal.
 language: node_js
 
+branches:
+  except:
+    - "gh-pages"
+
 # Build Matrix Configurations
 env:
 - DART_CHANNEL=stable DART_VERSION=latest # Latest Dart Release
