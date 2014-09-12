@@ -7,8 +7,8 @@ language: node_js
 # Build Matrix Configurations
 env:
 - DART_CHANNEL=stable DART_VERSION=latest # Latest Dart Release
-- DART_CHANNEL=dev DART_VERSION=latest # Dart Development Channel
-- DART_CHANNEL=be DART_VERSION=latest # Dart Bleeding Edge Channel
+# - DART_CHANNEL=dev DART_VERSION=latest # Dart Development Channel
+# - DART_CHANNEL=be DART_VERSION=latest # Dart Bleeding Edge Channel
 
 # Setup Dart
 install:
