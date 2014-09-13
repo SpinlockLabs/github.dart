@@ -62,7 +62,6 @@ class Hook {
       ..repoName = repoName
       ..updatedAt = parseDateTime(input['updated_at'])
       ..createdAt = parseDateTime(input['created_at'])
-      ..contentType = input['config']['content_type']
       ..config = input['config'];
   }
   
