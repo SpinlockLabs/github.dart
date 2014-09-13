@@ -51,6 +51,8 @@ class Hook {
   
   Map<String, dynamic> config;
   
+  Map<String, dynamic> json;
+  
   Hook(this.github);
   
   static Hook fromJSON(GitHub github, repoName, input) {
@@ -62,7 +64,8 @@ class Hook {
       ..repoName = repoName
       ..updatedAt = parseDateTime(input['updated_at'])
       ..createdAt = parseDateTime(input['created_at'])
-      ..config = input['config'];
+      ..config = input['config']
+      ..json = input;
   }
   
   /**
