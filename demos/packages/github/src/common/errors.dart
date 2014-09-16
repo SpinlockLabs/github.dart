@@ -51,7 +51,7 @@ class TeamNotFound extends NotFound {
 }
 
 /**
- * Access was forbbiden to a resource
+ * Access was forbidden to a resource
  */
 class AccessForbidden extends GitHubError {
   AccessForbidden(GitHub github) : super(github, "Access Forbbidden");

@@ -4,6 +4,8 @@
 
 library dart2js.js_emitter;
 
+import '../hash/sha1.dart' show hashOfString;
+
 import '../common.dart';
 
 import '../js/js.dart' as jsAst;
@@ -72,7 +74,10 @@ import '../util/util.dart' show
 import '../deferred_load.dart' show
     OutputUnit;
 
-import '../runtime_data.dart' as encoding;
+import '../../js_lib/shared/runtime_data.dart' as encoding;
+import '../../js_lib/shared/embedded_names.dart' as embeddedNames;
+
+import '../hash/sha1.dart';
 
 part 'class_builder.dart';
 part 'class_emitter.dart';

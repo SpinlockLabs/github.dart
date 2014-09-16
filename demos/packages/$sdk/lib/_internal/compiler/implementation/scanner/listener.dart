@@ -934,8 +934,9 @@ class ElementListener extends Listener {
     NodeList typeVariables = popNode(); // TOOD(karlklose): do not throw away.
     Identifier name = popNode();
     TypeAnnotation returnType = popNode();
-    pushElement(new PartialTypedefElement(name.source, compilationUnitElement,
-                                          typedefKeyword));
+    pushElement(
+        new PartialTypedefElement(
+            name.source, compilationUnitElement, typedefKeyword, endToken));
     rejectBuiltInIdentifier(name);
   }
 
@@ -2169,13 +2170,15 @@ class NodeListener extends ElementListener {
   }
 }
 
-abstract class PartialElement {
-  Token get beginToken;
-  Token get endToken;
+abstract class PartialElement implements DeclarationSite {
+  Token beginToken;
+  Token endToken;
 
   bool hasParseError = false;
 
   bool get isErroneous => hasParseError;
+
+  DeclarationSite get declarationSite => this;
 }
 
 abstract class PartialFunctionMixin implements FunctionElement {
@@ -2255,14 +2258,13 @@ class PartialConstructorElement extends ConstructorElementX
 }
 
 class PartialFieldList extends VariableList with PartialElement {
-  final Token beginToken;
-  final Token endToken;
-
-  PartialFieldList(this.beginToken,
-                   this.endToken,
+  PartialFieldList(Token beginToken,
+                   Token endToken,
                    Modifiers modifiers,
                    bool hasParseError)
       : super(modifiers) {
+    super.beginToken = beginToken;
+    super.endToken = endToken;
     super.hasParseError = hasParseError;
   }
 
@@ -2310,11 +2312,19 @@ class PartialFieldList extends VariableList with PartialElement {
   }
 }
 
-class PartialTypedefElement extends TypedefElementX {
-  final Token token;
+class PartialTypedefElement extends TypedefElementX with PartialElement {
 
-  PartialTypedefElement(String name, Element enclosing, this.token)
-      : super(name, enclosing);
+  PartialTypedefElement(
+      String name,
+      Element enclosing,
+      Token beginToken,
+      Token endToken)
+      : super(name, enclosing) {
+    this.beginToken = beginToken;
+    this.endToken = endToken;
+  }
+
+  Token get token => beginToken;
 
   Node parseNode(DiagnosticListener listener) {
     if (cachedNode != null) return cachedNode;

@@ -38,6 +38,9 @@ import '../ordered_typeset.dart' show OrderedTypeSet;
 
 import 'visitor.dart' show ElementVisitor;
 
+abstract class DeclarationSite {
+}
+
 abstract class ElementX extends Element {
   static int elementHashCode = 0;
 
@@ -117,6 +120,8 @@ abstract class ElementX extends Element {
   bool get isForwardingConstructor => false;
 
   bool get isMixinApplication => false;
+
+  bool get isLocal => false;
 
   // TODO(johnniwinther): This breaks for libraries (for which enclosing
   // elements are null) and is invalid for top level variable declarations for
@@ -259,6 +264,8 @@ abstract class ElementX extends Element {
     if (element.isAbstractField || element.isPrefix) return element.library;
     return element;
   }
+
+  DeclarationSite get declarationSite => null;
 }
 
 class ErroneousElementX extends ElementX implements ErroneousElement {
@@ -268,6 +275,8 @@ class ErroneousElementX extends ElementX implements ErroneousElement {
   ErroneousElementX(this.messageKind, this.messageArguments,
                     String name, Element enclosing)
       : super(name, ElementKind.ERROR, enclosing);
+
+  bool get isTopLevel => false;
 
   bool get isSynthesized => true;
 
@@ -426,6 +435,8 @@ class AmbiguousElementX extends ElementX implements AmbiguousElement {
   }
 
   accept(ElementVisitor visitor) => visitor.visitAmbiguousElement(this);
+
+  bool get isTopLevel => false;
 }
 
 class ScopeX {
@@ -736,6 +747,8 @@ class LibraryElementX
     }
   }
 
+  bool get isDartCore => canonicalUri == Compiler.DART_CORE;
+
   Link<MetadataAnnotation> get metadata {
     return (libraryTag == null) ? super.metadata : libraryTag.metadata;
   }
@@ -977,6 +990,8 @@ class PrefixElementX extends ElementX implements PrefixElement {
   PrefixElementX(String prefix, Element enclosing, this.firstPosition)
       : super(prefix, ElementKind.PREFIX, enclosing);
 
+  bool get isTopLevel => false;
+
   Element lookupLocalMember(String memberName) => importScope[memberName];
 
   DartType computeType(Compiler compiler) => const DynamicType();
@@ -1070,7 +1085,7 @@ class TypedefElementX extends ElementX
 // This class holds common information for a list of variable or field
 // declarations. It contains the node, and the type. A [VariableElementX]
 // forwards its [computeType] and [parseNode] methods to this class.
-class VariableList {
+class VariableList implements DeclarationSite {
   VariableDefinitions definitions;
   DartType type;
   final Modifiers modifiers;
@@ -1199,6 +1214,8 @@ abstract class VariableElementX extends ElementX with AstElementMixin
   Token get position => token;
 
   accept(ElementVisitor visitor) => visitor.visitVariableElement(this);
+
+  DeclarationSite get declarationSite => variables;
 }
 
 class LocalVariableElementX extends VariableElementX
@@ -1221,6 +1238,8 @@ class LocalVariableElementX extends VariableElementX
   ExecutableElement get executableContext => enclosingElement;
 
   ExecutableElement get memberContext => executableContext.memberContext;
+
+  bool get isLocal => true;
 }
 
 class FieldElementX extends VariableElementX
@@ -1236,6 +1255,11 @@ class FieldElementX extends VariableElementX
   accept(ElementVisitor visitor) => visitor.visitFieldElement(this);
 
   MemberElement get memberContext => this;
+
+  void reuseElement() {
+    super.reuseElement();
+    nestedClosures.clear();
+  }
 }
 
 /// [Element] for a parameter-like element.
@@ -1322,6 +1346,8 @@ abstract class ParameterElementX extends FormalElementX
   MemberElement get memberContext => executableContext.memberContext;
 
   accept(ElementVisitor visitor) => visitor.visitParameterElement(this);
+
+  bool get isLocal => true;
 }
 
 class LocalParameterElementX extends ParameterElementX
@@ -1351,6 +1377,8 @@ class InitializingFormalElementX extends ParameterElementX
   accept(ElementVisitor visitor) => visitor.visitFieldParameterElement(this);
 
   MemberElement get memberContext => enclosingElement;
+
+  bool get isLocal => false;
 }
 
 
@@ -1592,6 +1620,11 @@ abstract class FunctionElementX extends BaseFunctionElementX
       : super(name, kind, modifiers, enclosing, hasNoBody);
 
   MemberElement get memberContext => this;
+
+  void reuseElement() {
+    super.reuseElement();
+    nestedClosures.clear();
+  }
 }
 
 class LocalFunctionElementX extends BaseFunctionElementX
@@ -1621,6 +1654,8 @@ class LocalFunctionElementX extends BaseFunctionElementX
       return node.getBeginToken();
     }
   }
+
+  bool get isLocal => true;
 }
 
 abstract class ConstructorElementX extends FunctionElementX
@@ -1698,6 +1733,7 @@ class DeferredLoaderGetterElementX extends FunctionElementX {
 
   bool get isGetter => true;
 
+  bool get isTopLevel => true;
   // By having position null, the enclosing elements location is printed in
   // error messages.
   Token get position => null;

@@ -1,5 +1,5 @@
 /**
- * Pluggable HTTP Client
+ * Cross-Platform HTTP Client Abstraction
  */
 library github.http;
 

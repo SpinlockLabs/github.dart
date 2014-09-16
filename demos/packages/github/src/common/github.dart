@@ -2,16 +2,6 @@ part of github.common;
 
 typedef http.Client ClientCreator();
 
-String __timezoneName;
-
-String get _timezoneName {
-  if (__timezoneName == null) {
-    __timezoneName = new DateTime.now().timeZoneName;
-  }
-  
-  return __timezoneName;
-}
-
 /**
  * The Main GitHub Client
  * 
@@ -21,6 +11,8 @@ String get _timezoneName {
  *      // Use the Client
  */
 class GitHub {
+  
+  
   /**
    * Default Client Creator
    */
@@ -845,6 +837,20 @@ class GitHub {
     }
 
     return client.request(new http.Request(url.toString(), method: method, headers: headers, body: body));
+  }
+
+  /**
+   * Disposes of this GitHub Instance.
+   *
+   * No other methods on this instance should be called after this method is called.
+   */
+  void dispose() {
+    // Destroy the Authentication Information
+    // This is needed for security reasons.
+    auth = null;
+
+    // Closes the HTTP Client
+    client.close();
   }
   
   Stream<Issue> currentUserIssues() {

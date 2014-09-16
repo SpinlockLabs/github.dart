@@ -12,6 +12,8 @@ export 'common.dart';
 
 import 'http.dart' as http;
 
+import 'dates.dart';
+
 part "src/server/hooks.dart";
 
 void initGitHub() {
@@ -37,6 +39,7 @@ class _IOClient extends http.Client {
     var completer = new Completer<http.Response>();
     client.openUrl(request.method, Uri.parse(request.url)).then((req) {
       request.headers.forEach(req.headers.set);
+      req.headers.set("TimeZone", timezoneName);
       if (request.body != null) {
         req.write(request.body);
       }
@@ -54,4 +57,7 @@ class _IOClient extends http.Client {
     
     return completer.future;
   }
+
+  @override
+  void close() => client.close();
 }

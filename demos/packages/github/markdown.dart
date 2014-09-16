@@ -1,7 +1,7 @@
 /**
- * Helper for Creating Markdown Programmatically
+ * Helper for Creating Markdown in a programmatic way.
  * 
- * For rendering markdown, see the GitHub class
+ * For rendering Markdown, see the GitHub class.
  */
 library github.markdown;
 

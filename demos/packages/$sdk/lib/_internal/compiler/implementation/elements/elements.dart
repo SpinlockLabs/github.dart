@@ -25,6 +25,7 @@ import '../dart2jslib.dart' show InterfaceType,
                                  isPrivateName;
 
 import '../dart_types.dart';
+import '../helpers/helpers.dart';
 
 import '../scanner/scannerlib.dart' show Token,
                                          isUserDefinableOperator,
@@ -332,6 +333,10 @@ abstract class Element implements Entity {
   /// is declared `static`.
   bool get isStatic;
 
+  /// `true` if this element is local element, that is, a local variable,
+  /// local function or parameter.
+  bool get isLocal;
+
   bool get impliesType;
 
   Token get position;
@@ -442,13 +447,7 @@ class Elements {
   }
 
   static bool isLocal(Element element) {
-    return !Elements.isUnresolved(element)
-            && !element.isInstanceMember
-            && !isStaticOrTopLevelField(element)
-            && !isStaticOrTopLevelFunction(element)
-            && (identical(element.kind, ElementKind.VARIABLE) ||
-                identical(element.kind, ElementKind.PARAMETER) ||
-                identical(element.kind, ElementKind.FUNCTION));
+    return !Elements.isUnresolved(element) && element.isLocal;
   }
 
   static bool isInstanceField(Element element) {
@@ -460,14 +459,13 @@ class Elements {
   }
 
   static bool isStaticOrTopLevel(Element element) {
-    // TODO(ager): This should not be necessary when patch support has
-    // been reworked.
-    if (!Elements.isUnresolved(element)
-        && element.isStatic) {
-      return true;
-    }
-    return !Elements.isUnresolved(element)
-           && !element.isAmbiguous
+    // TODO(johnniwinther): Clean this up. This currently returns true for a
+    // PartialConstructorElement, SynthesizedConstructorElementX, and
+    // TypeVariableElementX though neither `element.isStatic` nor
+    // `element.isTopLevel` is true.
+    if (Elements.isUnresolved(element)) return false;
+    if (element.isStatic || element.isTopLevel) return true;
+    return !element.isAmbiguous
            && !element.isInstanceMember
            && !element.isPrefix
            && element.enclosingElement != null
@@ -855,6 +853,10 @@ abstract class LibraryElement extends Element
    * libraries the canonical uri is of the form [:dart:x:].
    */
   Uri get canonicalUri;
+
+  /// Returns `true` if this library is 'dart:core'.
+  bool get isDartCore;
+
   CompilationUnitElement get entryCompilationUnit;
   Link<CompilationUnitElement> get compilationUnits;
   Iterable<LibraryTag> get tags;
@@ -971,7 +973,7 @@ abstract class ExecutableElement extends Element
   MemberElement get memberContext;
 }
 
-/// A top-level or static field or method, or a constructor.
+/// A top-level, static or instance field or method, or a constructor.
 ///
 /// A [MemberElement] is the outermost executable element for any executable
 /// context.
@@ -1046,6 +1048,10 @@ abstract class FormalElement extends Element
 /// the form `this.x`, are modeled by [InitializingFormalParameter].
 abstract class ParameterElement extends Element
     implements VariableElement, FormalElement, LocalElement {
+  /// Use [functionDeclaration] instead.
+  @deprecated
+  get enclosingElement;
+
   /// The function on which this parameter is declared.
   FunctionElement get functionDeclaration;
 }

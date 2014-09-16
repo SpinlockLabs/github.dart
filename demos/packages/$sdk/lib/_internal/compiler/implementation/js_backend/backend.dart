@@ -224,7 +224,8 @@ class JavaScriptBackend extends Backend {
   TypeMask _fixedArrayTypeCache;
   TypeMask get fixedArrayType {
     if (_fixedArrayTypeCache == null) {
-      _fixedArrayTypeCache = new TypeMask.nonNullExact(jsFixedArrayClass);
+      _fixedArrayTypeCache = new TypeMask.nonNullExact(jsFixedArrayClass,
+          compiler.world);
     }
     return _fixedArrayTypeCache;
   }
@@ -233,7 +234,7 @@ class JavaScriptBackend extends Backend {
   TypeMask get extendableArrayType {
     if (_extendableArrayTypeCache == null) {
       _extendableArrayTypeCache =
-          new TypeMask.nonNullExact(jsExtendableArrayClass);
+          new TypeMask.nonNullExact(jsExtendableArrayClass, compiler.world);
     }
     return _extendableArrayTypeCache;
   }
@@ -427,7 +428,7 @@ class JavaScriptBackend extends Backend {
 
   JavaScriptConstantTask constantCompilerTask;
 
-  JavaScriptionResolutionCallbacks resolutionCallbacks;
+  JavaScriptResolutionCallbacks resolutionCallbacks;
 
   JavaScriptBackend(Compiler compiler, bool generateSourceMap)
       : namer = determineNamer(compiler),
@@ -443,7 +444,7 @@ class JavaScriptBackend extends Backend {
     typeVariableHandler = new TypeVariableHandler(this);
     customElementsAnalysis = new CustomElementsAnalysis(this);
     constantCompilerTask = new JavaScriptConstantTask(compiler);
-    resolutionCallbacks = new JavaScriptionResolutionCallbacks(this);
+    resolutionCallbacks = new JavaScriptResolutionCallbacks(this);
   }
 
   ConstantSystem get constantSystem => constants.constantSystem;
@@ -1605,8 +1606,6 @@ class JavaScriptBackend extends Backend {
     return symbolsUsed.contains(name);
   }
 
-  bool get rememberLazies => isTreeShakingDisabled;
-
   bool retainMetadataOf(Element element) {
     if (mustRetainMetadata) hasRetainedMetadata = true;
     if (mustRetainMetadata && referencedFromMirrorSystem(element)) {
@@ -2038,13 +2037,15 @@ class JavaScriptBackend extends Backend {
 
   jsAst.Call generateIsJsIndexableCall(jsAst.Expression use1,
                                        jsAst.Expression use2) {
-    String dispatchPropertyName = 'init.dispatchPropertyName';
+    String dispatchPropertyName = embeddedNames.DISPATCH_PROPERTY_NAME;
+    jsAst.Expression dispatchProperty =
+        emitter.generateEmbeddedGlobalAccess(dispatchPropertyName);
 
     // We pass the dispatch property record to the isJsIndexable
     // helper rather than reading it inside the helper to increase the
     // chance of making the dispatch record access monomorphic.
-    jsAst.PropertyAccess record = new jsAst.PropertyAccess(
-        use2, js(dispatchPropertyName));
+    jsAst.PropertyAccess record =
+        new jsAst.PropertyAccess(use2, dispatchProperty);
 
     List<jsAst.Expression> arguments = <jsAst.Expression>[use1, record];
     FunctionElement helper = findHelper('isJsIndexable');
@@ -2209,10 +2210,10 @@ class JavaScriptBackend extends Backend {
   }
 }
 
-class JavaScriptionResolutionCallbacks extends ResolutionCallbacks {
+class JavaScriptResolutionCallbacks extends ResolutionCallbacks {
   final JavaScriptBackend backend;
 
-  JavaScriptionResolutionCallbacks(this.backend);
+  JavaScriptResolutionCallbacks(this.backend);
 
   void registerBackendStaticInvocation(Element element, Registry registry) {
     registry.registerStaticInvocation(backend.registerBackendUse(element));

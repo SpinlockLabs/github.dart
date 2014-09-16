@@ -32,7 +32,7 @@ class Commit {
   User author;
 
   /**
-   * Commit Commiter
+   * Commit Committer
    */
   User committer;
 
@@ -67,7 +67,7 @@ class Commit {
   DateTime committedAt;
 
   /**
-   * Commiter Email
+   * Committer Email
    */
   @ApiName("commit/commiter/email")
   String committerEmail;
@@ -89,11 +89,6 @@ class Commit {
         ..url = input['html_url']
         ..author = User.fromJSON(github, input['author'])
         ..committer = User.fromJSON(github, input['committer'])
-        ..message = input['commit']['message']
-        ..authoredAt = parseDateTime(input['commit']['author']['date'])
-        ..committedAt = parseDateTime(input['commit']['committer']['date'])
-        ..committerEmail = input['commit']['committer']['email']
-        ..authorEmail = input['commit']['author']['email']
         ..treeSha = input['tree']['sha'];
 
     commit.json = input;
@@ -101,8 +96,17 @@ class Commit {
     if (input['stats'] != null) {
       commit
           ..additionsCount = input['stats']['additions']
-          ..deletionsCount = input['stats']['deletions']
-          ..commentsCount = input['commit']['comments_count'];
+          ..deletionsCount = input['stats']['deletions'];
+    }
+
+    if (input['commit'] != null) {
+      commit
+        ..commentsCount = input['commit']['comments_count']
+        ..message = input['commit']['message']
+        ..authoredAt = parseDateTime(input['commit']['author']['date'])
+        ..committedAt = parseDateTime(input['commit']['committer']['date'])
+        ..committerEmail = input['commit']['committer']['email']
+        ..authorEmail = input['commit']['author']['email'];
     }
 
     if (input['files'] != null) {

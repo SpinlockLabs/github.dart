@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
+import 'package:quiver/cache.dart';
+
 import "package:html5lib/parser.dart" as htmlParser;
 import "package:html5lib/dom.dart" as html;
 
@@ -44,3 +46,4 @@ part 'src/common/authorizations.dart';
 part 'src/common/git.dart';
 part 'src/common/octodex.dart';
 part 'src/common/shortener.dart';
+part 'src/common/cache.dart';

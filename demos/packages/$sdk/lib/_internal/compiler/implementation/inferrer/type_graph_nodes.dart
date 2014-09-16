@@ -28,6 +28,12 @@ abstract class TypeInformation {
   /// Initially empty.
   TypeMask type = const TypeMask.nonNullEmpty();
 
+  /// The graph node of the member this [TypeInformation] node belongs to
+  final MemberTypeInformation context;
+
+  /// The element this
+  MemberElement get contextMember => context == null ? null : context.element;
+
   /// We abandon inference in certain cases (complex cyclic flow, native
   /// behaviours, etc.). In some case, we might resume inference in the
   /// closure tracer, which is handled by checking whether [assignments] has
@@ -60,16 +66,19 @@ abstract class TypeInformation {
 
   bool get isConcrete => false;
 
-  TypeInformation() : assignments = <TypeInformation>[],
-                      users = new Setlet<TypeInformation>();
+  TypeInformation(this.context) : assignments = <TypeInformation>[],
+                                  users = new Setlet<TypeInformation>();
 
-  TypeInformation.noAssignments() : assignments = const <TypeInformation>[],
-                                    users = new Setlet<TypeInformation>();
+  TypeInformation.noAssignments(this.context)
+      : assignments = const <TypeInformation>[],
+        users = new Setlet<TypeInformation>();
 
-  TypeInformation.untracked () : assignments = const <TypeInformation>[],
-                                 users = const ImmutableEmptySet();
+  TypeInformation.untracked()
+      : assignments = const <TypeInformation>[],
+        users = const ImmutableEmptySet(),
+        context = null;
 
-  TypeInformation.withAssignments(this.assignments)
+  TypeInformation.withAssignments(this.context, this.assignments)
       : users = new Setlet<TypeInformation>();
 
   void addUser(TypeInformation user) {
@@ -198,6 +207,7 @@ abstract class ApplyableTypeInformation implements TypeInformation {
  * [getDefaultTypeOfParameter] and [setDefaultTypeOfParameter] for details.
  */
 class PlaceholderTypeInformation extends TypeInformation {
+  PlaceholderTypeInformation(MemberTypeInformation context) : super(context);
 
   void accept(TypeInformationVisitor visitor) {
     throw new UnsupportedError("Cannot visit placeholder");
@@ -291,20 +301,22 @@ abstract class ElementTypeInformation extends TypeInformation {
   /// Marker to disable inference for closures in [handleSpecialCases].
   bool disableInferenceForClosures = true;
 
-  factory ElementTypeInformation(Element element) {
+  factory ElementTypeInformation(Element element, TypeInformationSystem types) {
     if (element.isParameter || element.isInitializingFormal) {
       ParameterElement parameter = element;
       if (parameter.functionDeclaration.isInstanceMember) {
-        return new ParameterTypeInformation._instanceMember(element);
+        return new ParameterTypeInformation._instanceMember(element, types);
       }
-      return new ParameterTypeInformation._internal(element);
+      return new ParameterTypeInformation._internal(element, types);
     }
     return new MemberTypeInformation._internal(element);
   }
 
-  ElementTypeInformation._internal(this.element);
-  ElementTypeInformation._withAssignments(this.element, assignments)
-      : super.withAssignments(assignments);
+  ElementTypeInformation._internal(MemberTypeInformation context, this.element)
+      : super(context);
+  ElementTypeInformation._withAssignments(MemberTypeInformation context,
+      this.element, assignments)
+      : super.withAssignments(context, assignments);
 }
 
 /**
@@ -335,7 +347,8 @@ class MemberTypeInformation extends ElementTypeInformation
    */
   final Map<Element, Setlet<Spannable>> _callers = new Map<Element, Setlet>();
 
-  MemberTypeInformation._internal(Element element) : super._internal(element);
+  MemberTypeInformation._internal(Element element)
+      : super._internal(null, element);
 
   void addCall(Element caller, Spannable node) {
     assert(node is ast.Node || node is cps_ir.Node || node is Element);
@@ -468,12 +481,21 @@ class MemberTypeInformation extends ElementTypeInformation
  * the [ElementTypeInformation] factory.
  */
 class ParameterTypeInformation extends ElementTypeInformation {
-  ParameterTypeInformation._internal(ParameterElement element)
-      : super._internal(element) {
+  ParameterElement get element => super.element;
+
+  ParameterTypeInformation._internal(ParameterElement element,
+                                     TypeInformationSystem types)
+      : super._internal(types.getInferredTypeOf(element.functionDeclaration),
+                        element) {
     assert(!element.functionDeclaration.isInstanceMember);
   }
-  ParameterTypeInformation._instanceMember(ParameterElement element)
-      : super._withAssignments(element, new ParameterAssignments()) {
+
+  ParameterTypeInformation._instanceMember(ParameterElement element,
+                                           TypeInformationSystem types)
+      : super._withAssignments(
+          types.getInferredTypeOf(element.functionDeclaration),
+          element,
+          new ParameterAssignments()) {
     assert(element.functionDeclaration.isInstanceMember);
   }
 
@@ -497,8 +519,8 @@ class ParameterTypeInformation extends ElementTypeInformation {
     // initializing formals.
     if (element.isInitializingFormal) return null;
 
-    Element enclosing = element.enclosingElement;
-    if ((isTearOffClosureParameter || Elements.isLocal(enclosing)) &&
+    FunctionElement function = element.functionDeclaration;
+    if ((isTearOffClosureParameter || function.isLocal) &&
         disableInferenceForClosures) {
       // Do not infer types for parameters of closures. We do not
       // clear the assignments in case the closure is successfully
@@ -506,16 +528,16 @@ class ParameterTypeInformation extends ElementTypeInformation {
       giveUp(inferrer, clearAssignments: false);
       return safeType(inferrer);
     }
-    if (enclosing.isInstanceMember &&
-        (enclosing.name == Compiler.NO_SUCH_METHOD ||
-        (enclosing.name == Compiler.CALL_OPERATOR_NAME &&
+    if (function.isInstanceMember &&
+        (function.name == Compiler.NO_SUCH_METHOD ||
+        (function.name == Compiler.CALL_OPERATOR_NAME &&
          disableInferenceForClosures))) {
       // Do not infer types for parameters of [noSuchMethod] and
       // [call] instance methods.
       giveUp(inferrer);
       return safeType(inferrer);
     }
-    if (enclosing == inferrer.mainElement) {
+    if (function == inferrer.mainElement) {
       // The implicit call to main is not seen by the inferrer,
       // therefore we explicitly set the type of its parameters as
       // dynamic.
@@ -537,7 +559,7 @@ class ParameterTypeInformation extends ElementTypeInformation {
   bool hasStableType(TypeGraphInferrerEngine inferrer) {
     // The number of assignments of parameters of instance methods is
     // not stable. Therefore such a parameter cannot be stable.
-    if (element.enclosingElement.isInstanceMember) {
+    if (element.functionDeclaration.isInstanceMember) {
       return false;
     }
     return super.hasStableType(inferrer);
@@ -567,11 +589,12 @@ abstract class CallSiteTypeInformation extends TypeInformation
   final bool inLoop;
 
   CallSiteTypeInformation(
+      MemberTypeInformation context,
       this.call,
       this.caller,
       this.selector,
       this.arguments,
-      this.inLoop) : super.noAssignments();
+      this.inLoop) : super.noAssignments(context);
 
   String toString() => 'Call site $call $type';
 
@@ -588,12 +611,14 @@ class StaticCallSiteTypeInformation extends CallSiteTypeInformation {
   final Element calledElement;
 
   StaticCallSiteTypeInformation(
+      MemberTypeInformation context,
       Spannable call,
       Element enclosing,
       this.calledElement,
       Selector selector,
       ArgumentsTypes arguments,
-      bool inLoop) : super(call, enclosing, selector, arguments, inLoop);
+      bool inLoop)
+      : super(context, call, enclosing, selector, arguments, inLoop);
 
   void addToGraph(TypeGraphInferrerEngine inferrer) {
     MemberTypeInformation callee =
@@ -654,12 +679,14 @@ class DynamicCallSiteTypeInformation extends CallSiteTypeInformation {
   Iterable<Element> targets;
 
   DynamicCallSiteTypeInformation(
+      MemberTypeInformation context,
       Spannable call,
       Element enclosing,
       Selector selector,
       this.receiver,
       ArgumentsTypes arguments,
-      bool inLoop) : super(call, enclosing, selector, arguments, inLoop);
+      bool inLoop)
+      : super(context, call, enclosing, selector, arguments, inLoop);
 
   void addToGraph(TypeGraphInferrerEngine inferrer) {
     assert(receiver != null);
@@ -922,12 +949,14 @@ class ClosureCallSiteTypeInformation extends CallSiteTypeInformation {
   final TypeInformation closure;
 
   ClosureCallSiteTypeInformation(
+      MemberTypeInformation context,
       Spannable call,
       Element enclosing,
       Selector selector,
       this.closure,
       ArgumentsTypes arguments,
-      bool inLoop) : super(call, enclosing, selector, arguments, inLoop);
+      bool inLoop)
+      : super(context, call, enclosing, selector, arguments, inLoop);
 
   void addToGraph(TypeGraphInferrerEngine inferrer) {
     arguments.forEach((info) => info.addUser(this));
@@ -968,8 +997,7 @@ class ClosureCallSiteTypeInformation extends CallSiteTypeInformation {
  * type.
  */
 class ConcreteTypeInformation extends TypeInformation {
-  ConcreteTypeInformation(TypeMask type)
-      : super.untracked() {
+  ConcreteTypeInformation(TypeMask type) : super.untracked() {
     this.type = type;
     this.isStable = true;
   }
@@ -1043,8 +1071,8 @@ class StringLiteralTypeInformation extends ConcreteTypeInformation {
 class NarrowTypeInformation extends TypeInformation {
   final TypeMask typeAnnotation;
 
-  NarrowTypeInformation(narrowedType, this.typeAnnotation)
-      : super() {
+  NarrowTypeInformation(TypeInformation narrowedType, this.typeAnnotation)
+      : super(narrowedType.context) {
     addAssignment(narrowedType);
   }
 
@@ -1086,7 +1114,9 @@ abstract class InferredTypeInformation extends TypeInformation {
   /** Whether the element type in that container has been inferred. */
   bool inferred = false;
 
-  InferredTypeInformation(parentType) {
+  InferredTypeInformation(MemberTypeInformation context,
+                          TypeInformation parentType)
+      : super(context) {
     if (parentType != null) addAssignment(parentType);
   }
 
@@ -1129,9 +1159,11 @@ class ListTypeInformation extends TypeInformation {
   bool bailedOut = true;
   bool analyzed = false;
 
-  ListTypeInformation(this.originalType,
+  ListTypeInformation(MemberTypeInformation context,
+                      this.originalType,
                       this.elementType,
-                      this.originalLength) {
+                      this.originalLength)
+      : super(context) {
     type = originalType;
     inferredLength = originalType.length;
     elementType.addUser(this);
@@ -1169,7 +1201,9 @@ class ListTypeInformation extends TypeInformation {
  * elements in a [ListTypeInformation].
  */
 class ElementInContainerTypeInformation extends InferredTypeInformation {
-  ElementInContainerTypeInformation(elementType) : super(elementType);
+  ElementInContainerTypeInformation(MemberTypeInformation context,
+      elementType)
+      : super(context, elementType);
 
   String toString() => 'Element in container $type';
 
@@ -1204,7 +1238,11 @@ class MapTypeInformation extends TypeInformation {
 
   bool get inDictionaryMode => !bailedOut && _allKeysAreStrings;
 
-  MapTypeInformation(this.originalType, this.keyType, this.valueType) {
+  MapTypeInformation(MemberTypeInformation context,
+                     this.originalType,
+                     this.keyType,
+                     this.valueType)
+      : super(context) {
     keyType.addUser(this);
     valueType.addUser(this);
     type = originalType;
@@ -1216,8 +1254,10 @@ class MapTypeInformation extends TypeInformation {
     TypeInformation newInfo = null;
     if (_allKeysAreStrings && key is StringLiteralTypeInformation) {
       String keyString = key.asString();
-      typeInfoMap.putIfAbsent(keyString,
-          () => newInfo = new ValueInMapTypeInformation(null, nonNull));
+      typeInfoMap.putIfAbsent(keyString, () {
+          newInfo = new ValueInMapTypeInformation(context, null, nonNull);
+          return newInfo;
+      });
       typeInfoMap[keyString].addAssignment(value);
     } else {
       _allKeysAreStrings = false;
@@ -1235,7 +1275,8 @@ class MapTypeInformation extends TypeInformation {
     if (_allKeysAreStrings && other.inDictionaryMode) {
       other.typeInfoMap.forEach((keyString, value) {
         typeInfoMap.putIfAbsent(keyString, () {
-          TypeInformation newInfo = new ValueInMapTypeInformation(null, false);
+          TypeInformation newInfo =
+              new ValueInMapTypeInformation(context, null, false);
           newInfos.add(newInfo);
           return newInfo;
         });
@@ -1333,7 +1374,9 @@ class MapTypeInformation extends TypeInformation {
  * for the keys in a [MapTypeInformation]
  */
 class KeyInMapTypeInformation extends InferredTypeInformation {
-  KeyInMapTypeInformation(TypeInformation keyType) : super(keyType);
+  KeyInMapTypeInformation(MemberTypeInformation context,
+      TypeInformation keyType)
+      : super(context, keyType);
 
   accept(TypeInformationVisitor visitor) {
     return visitor.visitKeyInMapTypeInformation(this);
@@ -1352,8 +1395,9 @@ class ValueInMapTypeInformation extends InferredTypeInformation {
   // mode can ever be marked as [nonNull].
   final bool nonNull;
 
-  ValueInMapTypeInformation(TypeInformation valueType, [this.nonNull = false])
-      : super(valueType);
+  ValueInMapTypeInformation(MemberTypeInformation context,
+      TypeInformation valueType, [this.nonNull = false])
+      : super(context, valueType);
 
   accept(TypeInformationVisitor visitor) {
     return visitor.visitValueInMapTypeInformation(this);
@@ -1376,7 +1420,9 @@ class PhiElementTypeInformation extends TypeInformation {
   final bool isLoopPhi;
   final Local variable;
 
-  PhiElementTypeInformation(this.branchNode, this.isLoopPhi, this.variable);
+  PhiElementTypeInformation(MemberTypeInformation context, this.branchNode,
+                            this.isLoopPhi, this.variable)
+      : super(context);
 
   TypeMask computeType(TypeGraphInferrerEngine inferrer) {
     return inferrer.types.computeTypeMask(assignments);
@@ -1394,7 +1440,9 @@ class ClosureTypeInformation extends TypeInformation
   final ast.Node node;
   final Element element;
 
-  ClosureTypeInformation(this.node, this.element);
+  ClosureTypeInformation(MemberTypeInformation context, this.node,
+                         this.element)
+      : super(context);
 
   TypeMask computeType(TypeGraphInferrerEngine inferrer) => safeType(inferrer);
 

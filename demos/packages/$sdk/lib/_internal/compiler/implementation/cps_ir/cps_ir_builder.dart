@@ -243,7 +243,7 @@ class JumpCollector {
     builder.add(invoke);
     _invocations.add(invoke);
     _environments.add(builder.environment);
-    builder.current = null;
+    builder._current = null;
     // TODO(kmillikin): Can we set builder.environment to null to make it
     // less likely to mutate it?
   }
@@ -256,6 +256,11 @@ class IrBuilder {
   ConstantSystem constantSystem = DART_CONSTANT_SYSTEM;
 
   ir.Continuation returnContinuation = new ir.Continuation.retrn();
+
+  List<ir.Parameter> _parameters = <ir.Parameter>[];
+
+  /// A map from variable indexes to their values.
+  Environment environment = new Environment.empty();
 
   // The IR builder maintains a context, which is an expression with a hole in
   // it.  The hole represents the focus where new expressions can be added.
@@ -281,10 +286,24 @@ class IrBuilder {
   // Visiting a statement returns null; visiting an expression returns the
   // primitive denoting its value.
 
-  ir.Expression root = null;
-  ir.Expression current = null;
+  ir.Expression _root = null;
+  ir.Expression _current = null;
 
-  bool get isOpen => root == null || current != null;
+  bool get isOpen => _root == null || _current != null;
+
+  /// Create a parameter for [parameterElement] and add it to the current
+  /// environment. If [isClosureVariable] marks whether [parameterElement] is
+  /// accessed from an inner function.
+  void createParameter(LocalElement parameterElement,
+                       {bool isClosureVariable: false}) {
+    ir.Parameter parameter = new ir.Parameter(parameterElement);
+    _parameters.add(parameter);
+    if (isClosureVariable) {
+      add(new ir.SetClosureVariable(parameterElement, parameter));
+    } else {
+      environment.extend(parameterElement, parameter);
+    }
+  }
 
   // Plug an expression into the 'hole' in the context being accumulated.  The
   // empty context (just a hole) is represented by root (and current) being
@@ -293,10 +312,10 @@ class IrBuilder {
   // new value of current.
   void add(ir.Expression expr) {
     assert(isOpen);
-    if (root == null) {
-      root = current = expr;
+    if (_root == null) {
+      _root = _current = expr;
     } else {
-      current = current.plug(expr);
+      _current = _current.plug(expr);
     }
   }
 
@@ -316,6 +335,47 @@ class IrBuilder {
     return makeConst(new PrimitiveConstExp(value), value);
   }
 
+  // TODO(johnniwinther): Build constants directly through [ConstExp] when these
+  // are created from analyzer2dart.
+  ir.Node buildPrimConst(PrimitiveConstant constant) {
+    assert(isOpen);
+    ir.Node prim = makePrimConst(constant);
+    add(new ir.LetPrim(prim));
+    return prim;
+  }
+
+  /// Create an integer literal.
+  ir.Constant buildIntegerLiteral(int value) {
+    return buildPrimConst(constantSystem.createInt(value));
+  }
+
+  /// Create an double literal.
+  ir.Constant buildDoubleLiteral(double value) {
+    return buildPrimConst(constantSystem.createDouble(value));
+  }
+
+  /// Create an bool literal.
+  ir.Constant buildBooleanLiteral(bool value) {
+    return buildPrimConst(constantSystem.createBool(value));
+  }
+
+  /// Create an null literal.
+  ir.Constant buildNullLiteral() {
+    return buildPrimConst(constantSystem.createNull());
+  }
+
+  /// Create a string literal.
+  ir.Constant buildStringLiteral(String value) {
+    return buildPrimConst(
+        constantSystem.createString(new ast.DartString.literal(value)));
+  }
+
+  /// Create a get access of [local].
+  ir.Primitive buildGetLocal(Element local) {
+    assert(isOpen);
+    return environment.lookup(local);
+  }
+
   /**
    * Add an explicit `return null` for functions that don't have a return
    * statement on each branch. This includes functions with an empty body,
@@ -326,26 +386,28 @@ class IrBuilder {
     ir.Constant constant = makePrimConst(constantSystem.createNull());
     add(new ir.LetPrim(constant));
     add(new ir.InvokeContinuation(returnContinuation, [constant]));
-    current = null;
+    _current = null;
   }
 
-  /// Create a [ir.FunctionDefinition] for [element] using [root] as the body.
+  /// Create a [ir.FunctionDefinition] for [element] using [_root] as the body.
+  ///
+  /// Parameters must be created before the construction of the body using
+  /// [createParameter].
   ir.FunctionDefinition buildFunctionDefinition(
       FunctionElement element,
-      List<ir.Parameter> parameters,
       List<ConstDeclaration> constants,
       List<ConstExp> defaults) {
     if (!element.isAbstract) {
       ensureReturn();
       return new ir.FunctionDefinition(
-          element, returnContinuation, parameters, root, constants, defaults);
+          element, returnContinuation, _parameters, _root, constants, defaults);
     } else {
-      assert(invariant(element, root == null,
-          message: "Non-empty body for abstract method $element: $root"));
+      assert(invariant(element, _root == null,
+          message: "Non-empty body for abstract method $element: $_root"));
       assert(invariant(element, constants.isEmpty,
           message: "Local constants for abstract method $element: $constants"));
       return new ir.FunctionDefinition.abstract(
-                element, parameters, defaults);
+                element, _parameters, defaults);
     }
   }
 
@@ -358,6 +420,22 @@ class IrBuilder {
         (k) => new ir.InvokeStatic(element, selector, k, arguments));
   }
 
+  /// Create a return statement `return value;` or `return;` if [value] is
+  /// null.
+  void buildReturn([ir.Primitive value]) {
+    // Build(Return(e), C) = C'[InvokeContinuation(return, x)]
+    //   where (C', x) = Build(e, C)
+    //
+    // Return without a subexpression is translated as if it were return null.
+    assert(isOpen);
+    if (value == null) {
+      value = makePrimConst(constantSystem.createNull());
+      add(new ir.LetPrim(value));
+    }
+    add(new ir.InvokeContinuation(returnContinuation, [value]));
+    _current = null;
+  }
+
 }
 
 /**
@@ -368,7 +446,6 @@ class IrBuilder {
 class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
   final Compiler compiler;
   final SourceFile sourceFile;
-  final List<ir.Parameter> parameters;
 
   // In SSA terms, join-point continuation parameters are the phis and the
   // continuation invocation arguments are the corresponding phi inputs.  To
@@ -388,9 +465,6 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
   // used to determine if a join-point continuation needs to be passed
   // arguments, and what the arguments are.
 
-  /// A map from variable indexes to their values.
-  Environment environment;
-
   /// A stack of collectors for breaks.
   final List<JumpCollector> breakCollectors;
   /// A stack of collectors for continues.
@@ -405,9 +479,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
 
   /// Construct a top-level visitor.
   IrBuilderVisitor(TreeElements elements, this.compiler, this.sourceFile)
-      : parameters = <ir.Parameter>[],
-        environment = new Environment.empty(),
-        breakCollectors = <JumpCollector>[],
+      : breakCollectors = <JumpCollector>[],
         continueCollectors = <JumpCollector>[],
         localConstants = <ConstDeclaration>[],
         closureLocals = new DetectClosureVariables(elements),
@@ -425,8 +497,6 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
   IrBuilderVisitor.delimited(IrBuilderVisitor parent)
       : compiler = parent.compiler,
         sourceFile = parent.sourceFile,
-        parameters = <ir.Parameter>[],
-        environment = new Environment.from(parent.environment),
         breakCollectors = parent.breakCollectors,
         continueCollectors = parent.continueCollectors,
         constantBuilder = parent.constantBuilder,
@@ -436,6 +506,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
         super(parent.elements) {
     constantSystem = parent.constantSystem;
     returnContinuation = parent.returnContinuation;
+    environment = new Environment.from(parent.environment);
   }
 
   /// Construct a visitor for a recursive continuation.
@@ -449,8 +520,6 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
   IrBuilderVisitor.recursive(IrBuilderVisitor parent)
       : compiler = parent.compiler,
         sourceFile = parent.sourceFile,
-        parameters = <ir.Parameter>[],
-        environment = new Environment.empty(),
         breakCollectors = parent.breakCollectors,
         continueCollectors = parent.continueCollectors,
         constantBuilder = parent.constantBuilder,
@@ -460,11 +529,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
         super(parent.elements) {
     constantSystem = parent.constantSystem;
     returnContinuation = parent.returnContinuation;
-    for (Element element in parent.environment.index2variable) {
-      ir.Parameter parameter = new ir.Parameter(element);
-      parameters.add(parameter);
-      environment.extend(element, parameter);
-    }
+    parent.environment.index2variable.forEach(createParameter);
   }
 
   /**
@@ -486,17 +551,12 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
 
     closureLocals.visit(function);
 
-    root = current = null;
+    _root = _current = null;
 
     FunctionSignature signature = element.functionSignature;
     signature.orderedForEachParameter((ParameterElement parameterElement) {
-      ir.Parameter parameter = new ir.Parameter(parameterElement);
-      parameters.add(parameter);
-      if (isClosureVariable(parameterElement)) {
-        add(new ir.SetClosureVariable(parameterElement, parameter));
-      } else {
-        environment.extend(parameterElement, parameter);
-      }
+      createParameter(parameterElement,
+                      isClosureVariable: isClosureVariable(parameterElement));
     });
 
     List<ConstExp> defaults = new List<ConstExp>();
@@ -509,8 +569,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     });
 
     visit(function.body);
-    return buildFunctionDefinition(
-        element, parameters, localConstants, defaults);
+    return buildFunctionDefinition(element, localConstants, defaults);
   }
 
   ir.Primitive visit(ast.Node node) => node.accept(this);
@@ -790,7 +849,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     if (hasBreaks) {
       letJoin = new ir.LetCont(null, branch);
       condBuilder.add(letJoin);
-      condBuilder.current = branch;
+      condBuilder._current = branch;
     } else {
       condBuilder.add(branch);
     }
@@ -798,12 +857,12 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     if (hasContinues) {
       // If there are continues in the body, we need a named continue
       // continuation as a join point.
-      continueContinuation = new ir.Continuation(updateBuilder.parameters);
+      continueContinuation = new ir.Continuation(updateBuilder._parameters);
       if (bodyBuilder.isOpen) continueCollector.addJump(bodyBuilder);
       invokeFullJoin(continueContinuation, continueCollector);
     }
     ir.Continuation loopContinuation =
-        new ir.Continuation(condBuilder.parameters);
+        new ir.Continuation(condBuilder._parameters);
     if (updateBuilder.isOpen) {
       JumpCollector backEdges = new JumpCollector(null);
       backEdges.addJump(updateBuilder);
@@ -813,25 +872,25 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     // Fill in the body and possible continue continuation bodies.  Do this
     // only after it is guaranteed that they are not empty.
     if (hasContinues) {
-      continueContinuation.body = updateBuilder.root;
+      continueContinuation.body = updateBuilder._root;
       bodyContinuation.body =
-          new ir.LetCont(continueContinuation, bodyBuilder.root);
+          new ir.LetCont(continueContinuation, bodyBuilder._root);
     } else {
-      bodyContinuation.body = bodyBuilder.root;
+      bodyContinuation.body = bodyBuilder._root;
     }
 
-    loopContinuation.body = condBuilder.root;
+    loopContinuation.body = condBuilder._root;
     add(new ir.LetCont(loopContinuation,
             new ir.InvokeContinuation(loopContinuation,
                                       environment.index2value)));
     if (hasBreaks) {
-      current = branch;
+      _current = branch;
       environment = condBuilder.environment;
       breakCollector.addJump(this);
       letJoin.continuation = createJoin(environment.length, breakCollector);
-      current = letJoin;
+      _current = letJoin;
     } else {
-      current = condBuilder.current;
+      _current = condBuilder._current;
       environment = condBuilder.environment;
     }
     return null;
@@ -880,20 +939,20 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     // case that one of them is null, it must be the only one that is open
     // and thus contains the new hole in the context.  This case is handled
     // after the branch is plugged into the current hole.
-    thenContinuation.body = thenBuilder.root;
-    elseContinuation.body = elseBuilder.root;
+    thenContinuation.body = thenBuilder._root;
+    elseContinuation.body = elseBuilder._root;
 
     add(result);
     if (joinContinuation == null) {
       // At least one subexpression is closed.
       if (thenBuilder.isOpen) {
-        current = (thenBuilder.root == null) ? letThen : thenBuilder.current;
+        _current = (thenBuilder._root == null) ? letThen : thenBuilder._current;
         environment = thenBuilder.environment;
       } else if (elseBuilder.isOpen) {
-        current = (elseBuilder.root == null) ? letElse : elseBuilder.current;
+        _current = (elseBuilder._root == null) ? letElse : elseBuilder._current;
         environment = elseBuilder.environment;
       } else {
-        current = null;
+        _current = null;
       }
     }
     return null;
@@ -957,28 +1016,144 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     if (hasBreaks) {
       letJoin = new ir.LetCont(null, branch);
       condBuilder.add(letJoin);
-      condBuilder.current = branch;
+      condBuilder._current = branch;
     } else {
       condBuilder.add(branch);
     }
     ir.Continuation loopContinuation =
-        new ir.Continuation(condBuilder.parameters);
+        new ir.Continuation(condBuilder._parameters);
     if (bodyBuilder.isOpen) continueCollector.addJump(bodyBuilder);
     invokeFullJoin(loopContinuation, continueCollector, recursive: true);
-    bodyContinuation.body = bodyBuilder.root;
+    bodyContinuation.body = bodyBuilder._root;
 
-    loopContinuation.body = condBuilder.root;
+    loopContinuation.body = condBuilder._root;
     add(new ir.LetCont(loopContinuation,
             new ir.InvokeContinuation(loopContinuation,
                                       environment.index2value)));
     if (hasBreaks) {
-      current = branch;
+      _current = branch;
       environment = condBuilder.environment;
       breakCollector.addJump(this);
       letJoin.continuation = createJoin(environment.length, breakCollector);
-      current = letJoin;
+      _current = letJoin;
     } else {
-      current = condBuilder.current;
+      _current = condBuilder._current;
+      environment = condBuilder.environment;
+    }
+    return null;
+  }
+
+  ir.Primitive visitForIn(ast.ForIn node) {
+    // The for-in loop
+    //
+    // for (a in e) s;
+    //
+    // Is compiled analogously to:
+    //
+    // a = e.iterator;
+    // while (a.moveNext()) {
+    //   var n0 = a.current;
+    //   s;
+    // }
+
+    // The condition and body are delimited.
+    IrBuilderVisitor condBuilder = new IrBuilderVisitor.recursive(this);
+
+    ir.Primitive expressionReceiver = visit(node.expression);
+    List<ir.Primitive> emptyArguments = new List<ir.Primitive>();
+
+    ir.Parameter iterator = new ir.Parameter(null);
+    ir.Continuation iteratorInvoked = new ir.Continuation([iterator]);
+    add(new ir.LetCont(iteratorInvoked,
+        new ir.InvokeMethod(expressionReceiver,
+            new Selector.getter("iterator", null), iteratorInvoked,
+            emptyArguments)));
+
+    ir.Parameter condition = new ir.Parameter(null);
+    ir.Continuation moveNextInvoked = new ir.Continuation([condition]);
+    condBuilder.add(new ir.LetCont(moveNextInvoked,
+        new ir.InvokeMethod(iterator,
+            new Selector.call("moveNext", null, 0),
+            moveNextInvoked, emptyArguments)));
+
+    JumpTarget target = elements.getTargetDefinition(node);
+    JumpCollector breakCollector = new JumpCollector(target);
+    JumpCollector continueCollector = new JumpCollector(target);
+    breakCollectors.add(breakCollector);
+    continueCollectors.add(continueCollector);
+
+    IrBuilderVisitor bodyBuilder = new IrBuilderVisitor.delimited(condBuilder);
+    ast.Node identifier = node.declaredIdentifier;
+    Element variableElement = elements.getForInVariable(node);
+    Selector selector = elements.getSelector(identifier);
+
+    // node.declaredIdentifier can be either an ast.VariableDefinitions
+    // (defining a new local variable) or a send designating some existing
+    // variable.
+    ast.Node declaredIdentifier = node.declaredIdentifier;
+
+    if (declaredIdentifier is ast.VariableDefinitions) {
+      bodyBuilder.visit(declaredIdentifier);
+    }
+
+    ir.Parameter currentValue = new ir.Parameter(null);
+    ir.Continuation currentInvoked = new ir.Continuation([currentValue]);
+    bodyBuilder.add(new ir.LetCont(currentInvoked,
+        new ir.InvokeMethod(iterator, new Selector.getter("current", null),
+            currentInvoked, emptyArguments)));
+    if (Elements.isLocal(variableElement)) {
+      bodyBuilder.setLocal(variableElement, currentValue);
+    } else if (Elements.isStaticOrTopLevel(variableElement)) {
+      bodyBuilder.setStatic(variableElement, selector, currentValue);
+    } else {
+      ir.Primitive receiver = bodyBuilder.lookupThis();
+      bodyBuilder.setDynamic(null, receiver, selector, currentValue);
+    }
+
+    bodyBuilder.visit(node.body);
+    assert(breakCollectors.last == breakCollector);
+    assert(continueCollectors.last == continueCollector);
+    breakCollectors.removeLast();
+    continueCollectors.removeLast();
+
+    // Create body entry and loop exit continuations and a branch to them.
+    ir.Continuation bodyContinuation = new ir.Continuation([]);
+    ir.Continuation exitContinuation = new ir.Continuation([]);
+    ir.LetCont branch =
+        new ir.LetCont(exitContinuation,
+            new ir.LetCont(bodyContinuation,
+                new ir.Branch(new ir.IsTrue(condition),
+                              bodyContinuation,
+                              exitContinuation)));
+    // If there are breaks in the body, then there must be a join-point
+    // continuation for the normal exit and the breaks.
+    bool hasBreaks = !breakCollector.isEmpty;
+    ir.LetCont letJoin;
+    if (hasBreaks) {
+      letJoin = new ir.LetCont(null, branch);
+      condBuilder.add(letJoin);
+      condBuilder._current = branch;
+    } else {
+      condBuilder.add(branch);
+    }
+    ir.Continuation loopContinuation =
+        new ir.Continuation(condBuilder._parameters);
+    if (bodyBuilder.isOpen) continueCollector.addJump(bodyBuilder);
+    invokeFullJoin(loopContinuation, continueCollector, recursive: true);
+    bodyContinuation.body = bodyBuilder._root;
+
+    loopContinuation.body = condBuilder._root;
+    add(new ir.LetCont(loopContinuation,
+            new ir.InvokeContinuation(loopContinuation,
+                                      environment.index2value)));
+    if (hasBreaks) {
+      _current = branch;
+      environment = condBuilder.environment;
+      breakCollector.addJump(this);
+      letJoin.continuation = createJoin(environment.length, breakCollector);
+      _current = letJoin;
+    } else {
+      _current = condBuilder._current;
       environment = condBuilder.environment;
     }
     return null;
@@ -1031,18 +1206,13 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
   //
   // Return without a subexpression is translated as if it were return null.
   ir.Primitive visitReturn(ast.Return node) {
-    assert(isOpen);
     // TODO(lry): support native returns.
     if (node.beginToken.value == 'native') return giveup(node, 'Native return');
-    ir.Primitive value;
     if (node.expression == null) {
-      value = makePrimConst(constantSystem.createNull());
-      add(new ir.LetPrim(value));
+      buildReturn();
     } else {
-      value = visit(node.expression);
+      buildReturn(visit(node.expression));
     }
-    add(new ir.InvokeContinuation(returnContinuation, [value]));
-    current = null;
     return null;
   }
 
@@ -1077,8 +1247,8 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     //     if condition (then, else)
     ir.Continuation thenContinuation = new ir.Continuation([]);
     ir.Continuation elseContinuation = new ir.Continuation([]);
-    thenContinuation.body = thenBuilder.root;
-    elseContinuation.body = elseBuilder.root;
+    thenContinuation.body = thenBuilder._root;
+    elseContinuation.body = elseBuilder._root;
     add(new ir.LetCont(joinContinuation,
             new ir.LetCont(thenContinuation,
                 new ir.LetCont(elseContinuation,
@@ -1257,7 +1427,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
                              ir.Definition receiver,
                              ir.Continuation k,
                              List<ir.Definition> arguments) {
-    return node.receiver != null && node.receiver.isSuper()
+    return node != null && node.receiver != null && node.receiver.isSuper()
         ? new ir.InvokeSuperMethod(selector, k, arguments)
         : new ir.InvokeMethod(receiver, selector, k, arguments);
   }
@@ -1289,7 +1459,7 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
       add(new ir.LetPrim(result));
     } else if (Elements.isLocal(element)) {
       // Reference to local variable
-      result = environment.lookup(element);
+      result = buildGetLocal(element);
     } else if (element == null ||
                Elements.isInstanceField(element) ||
                Elements.isInstanceMethod(element) ||
@@ -1421,8 +1591,8 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     ir.Continuation leftFalseContinuation = new ir.Continuation([]);
     ir.Continuation rightTrueContinuation = new ir.Continuation([]);
     ir.Continuation rightFalseContinuation = new ir.Continuation([]);
-    rightTrueContinuation.body = rightTrueBuilder.root;
-    rightFalseContinuation.body = rightFalseBuilder.root;
+    rightTrueContinuation.body = rightTrueBuilder._root;
+    rightFalseContinuation.body = rightFalseBuilder._root;
     // The right subexpression has two continuations.
     rightBuilder.add(
         new ir.LetCont(rightTrueContinuation,
@@ -1434,11 +1604,11 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     // either the right subexpression or an invocation of the join-point
     // continuation.
     if (op.source == '&&') {
-      leftTrueContinuation.body = rightBuilder.root;
-      leftFalseContinuation.body = emptyBuilder.root;
+      leftTrueContinuation.body = rightBuilder._root;
+      leftFalseContinuation.body = emptyBuilder._root;
     } else {
-      leftTrueContinuation.body = emptyBuilder.root;
-      leftFalseContinuation.body = rightBuilder.root;
+      leftTrueContinuation.body = emptyBuilder._root;
+      leftFalseContinuation.body = rightBuilder._root;
     }
 
     add(new ir.LetCont(joinContinuation,
@@ -1545,6 +1715,42 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
     return closureLocals.isClosureVariable(element);
   }
 
+  void setLocal(Element element, ir.Primitive valueToStore) {
+    if (isClosureVariable(element)) {
+      LocalElement local = element;
+      add(new ir.SetClosureVariable(local, valueToStore));
+    } else {
+      valueToStore.useElementAsHint(element);
+      environment.update(element, valueToStore);
+    }
+  }
+
+  void setStatic(Element element,
+                 Selector selector,
+                 ir.Primitive valueToStore) {
+    assert(element.isErroneous || element.isField || element.isSetter);
+    continueWithExpression(
+        (k) => new ir.InvokeStatic(element, selector, k, [valueToStore]));
+  }
+
+  void setDynamic(ast.Node node,
+                  ir.Primitive receiver, Selector selector,
+                  ir.Primitive valueToStore) {
+    List<ir.Definition> arguments = [valueToStore];
+    continueWithExpression(
+        (k) => createDynamicInvoke(node, selector, receiver, k, arguments));
+  }
+
+  void setIndex(ast.Node node,
+                ir.Primitive receiver,
+                Selector selector,
+                ir.Primitive index,
+                ir.Primitive valueToStore) {
+    List<ir.Definition> arguments = [index, valueToStore];
+    continueWithExpression(
+        (k) => createDynamicInvoke(node, selector, receiver, k, arguments));
+  }
+
   ir.Primitive visitSendSet(ast.SendSet node) {
     assert(isOpen);
     Element element = elements[node];
@@ -1609,29 +1815,21 @@ class IrBuilderVisitor extends ResolvedVisitor<ir.Primitive> with IrBuilder {
       add(new ir.LetCont(k, invoke));
     }
 
-    // Set the value
-    if (isClosureVariable(element)) {
-      LocalElement local = element;
-      add(new ir.SetClosureVariable(local, valueToStore));
-    } else if (Elements.isLocal(element)) {
-      valueToStore.useElementAsHint(element);
-      environment.update(element, valueToStore);
+    if (Elements.isLocal(element)) {
+      setLocal(element, valueToStore);
     } else if ((!node.isSuperCall && Elements.isErroneousElement(element)) ||
                 Elements.isStaticOrTopLevel(element)) {
-      assert(element.isErroneous || element.isField || element.isSetter);
-      Selector selector = elements.getSelector(node);
-      continueWithExpression(
-          (k) => new ir.InvokeStatic(element, selector, k, [valueToStore]));
+      setStatic(element, elements.getSelector(node), valueToStore);
     } else {
       // Setter or index-setter invocation
       Selector selector = elements.getSelector(node);
       assert(selector.kind == SelectorKind.SETTER ||
           selector.kind == SelectorKind.INDEX);
-      List<ir.Definition> arguments = selector.isIndexSet
-          ? [index, valueToStore]
-          : [valueToStore];
-      continueWithExpression(
-          (k) => createDynamicInvoke(node, selector, receiver, k, arguments));
+      if (selector.isIndexSet) {
+        setIndex(node, receiver, selector, index, valueToStore);
+      } else {
+        setDynamic(node, receiver, selector, valueToStore);
+      }
     }
 
     if (node.isPostfix) {
@@ -1801,9 +1999,10 @@ class ConstExpBuilder extends ast.Visitor<ConstExp> {
 
   ConstExp visitNewExpression(ast.NewExpression node) {
     FunctionElement element = elements[node.send];
-    if (Elements.isUnresolved(element)) {
-      throw parent.giveup(node, 'const NewExpression: unresolved constructor');
-    }
+    // The resolver will already have thrown an error if the constructor was
+    // unresolved.
+    assert(invariant(node, !Elements.isUnresolved(element)));
+
     Selector selector = elements.getSelector(node.send);
     ast.Node selectorNode = node.send.selector;
     GenericType type = elements.getType(node);

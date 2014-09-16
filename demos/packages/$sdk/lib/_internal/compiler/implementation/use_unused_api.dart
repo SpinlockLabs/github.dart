@@ -20,6 +20,8 @@ import 'util/util.dart' as util;
 
 import 'elements/elements.dart' as elements;
 
+import 'elements/modelx.dart' as modelx;
+
 import 'elements/visitor.dart' as elements_visitor;
 
 import 'js/js.dart' as js;
@@ -66,9 +68,10 @@ void main(List<String> arguments) {
   useSsa(null);
   useCodeBuffer(null);
   usedByTests();
-  useElements(null, null);
-  useIr(null, null);
+  useElements(null, null, null);
+  useIr(null, null, null);
   useCompiler(null);
+  useTypes();
 }
 
 useApi() {
@@ -211,14 +214,16 @@ usedByTests() {
   sourceFileProvider.readStringFromUri(null);
 }
 
-useElements(elements.ClassElement e, elements.Name n) {
+useElements(elements.ClassElement e, elements.Name n, modelx.FieldElementX f) {
   e.lookupClassMember(null);
   e.lookupInterfaceMember(null);
   n.isAccessibleFrom(null);
+  f.reuseElement();
 }
 
 useIr(cps_ir_nodes_sexpr.SExpressionStringifier stringifier,
-      ir_builder.IrBuilderTask task) {
+      ir_builder.IrBuilderTask task,
+      ir_builder.IrBuilder builder) {
   new cps_ir_nodes_sexpr.SExpressionStringifier();
   stringifier
     ..newContinuationName()
@@ -235,9 +240,21 @@ useIr(cps_ir_nodes_sexpr.SExpressionStringifier stringifier,
   task
     ..hasIr(null)
     ..getIr(null);
+  builder
+    ..buildIntegerLiteral(null)
+    ..buildDoubleLiteral(null)
+    ..buildBooleanLiteral(null)
+    ..buildNullLiteral()
+    ..buildStringLiteral(null);
 }
 
 useCompiler(dart2jslib.Compiler compiler) {
-  compiler.libraryLoader.reset();
-  compiler.libraryLoader.lookupLibrary(null);
+  compiler.libraryLoader
+      ..reset()
+      ..resetAsync(null)
+      ..lookupLibrary(null);
+}
+
+useTypes() {
+  new dart_types.ResolvedTypedefType(null, null, null).unalias(null);
 }

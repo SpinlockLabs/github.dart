@@ -4,6 +4,18 @@
 
 library _js_helper;
 
+import 'shared/embedded_names.dart' show
+    ALL_CLASSES,
+    GET_ISOLATE_TAG,
+    INTERCEPTED_NAMES,
+    INTERCEPTORS_BY_TAG,
+    LEAF_TAGS,
+    METADATA,
+    DEFERRED_LIBRARY_URIS,
+    DEFERRED_LIBRARY_HASHES,
+    INITIALIZE_LOADED_HUNK,
+    IS_HUNK_LOADED;
+
 import 'dart:collection';
 import 'dart:_isolate_helper' show
     IsolateNatives,
@@ -22,6 +34,7 @@ import 'dart:_foreign_helper' show
     JS_CURRENT_ISOLATE_CONTEXT,
     JS_DART_OBJECT_CONSTRUCTOR,
     JS_EFFECT,
+    JS_EMBEDDED_GLOBAL,
     JS_FUNCTION_CLASS_NAME,
     JS_FUNCTION_TYPE_NAMED_PARAMETERS_TAG,
     JS_FUNCTION_TYPE_OPTIONAL_PARAMETERS_TAG,
@@ -204,18 +217,18 @@ class JSInvocationMirror implements Invocation {
     var receiver = object;
     var name = _internalName;
     var arguments = _arguments;
+    var embeddedInterceptedNames = JS_EMBEDDED_GLOBAL('', INTERCEPTED_NAMES);
     // TODO(ngeoffray): If this functionality ever become performance
     // critical, we might want to dynamically change [interceptedNames]
     // to be a JavaScript object with intercepted names as property
     // instead of a JavaScript array.
     // TODO(floitsch): we already add stubs (tear-off getters) as properties
-    // in init.interceptedNames.
+    // in the embedded global interceptedNames.
     // Finish the transition and always use the object as hashtable.
     bool isIntercepted =
         JS("bool",
-            'Object.prototype.hasOwnProperty.call(init.interceptedNames, #) ||'
-            '#.indexOf(#) !== -1',
-            name, interceptedNames, name);
+            'Object.prototype.hasOwnProperty.call(#, #) || #.indexOf(#) !== -1',
+            embeddedInterceptedNames, name, interceptedNames, name);
     if (isIntercepted) {
       receiver = interceptor;
       if (JS('bool', '# === #', object, interceptor)) {
@@ -402,9 +415,9 @@ class ReflectionInfo {
   /// Are optional parameters named.
   final bool areOptionalParametersNamed;
 
-  /// Either an index to the function type in [:init.metadata:] or a JavaScript
-  /// function object which can compute such a type (presumably due to free
-  /// type variables).
+  /// Either an index to the function type in the embedded `metadata` global or
+  /// a JavaScript function object which can compute such a type (presumably
+  /// due to free type variables).
   final functionType;
 
   List cachedSortedIndices;
@@ -447,7 +460,8 @@ class ReflectionInfo {
       metadataIndex = JS('int', '#[# + # + #]', data,
           parameter, optionalParameterCount, FIRST_DEFAULT_ARGUMENT);
     }
-    return JS('String', 'init.metadata[#]', metadataIndex);
+    var metadata = JS_EMBEDDED_GLOBAL('', METADATA);
+    return JS('String', '#[#]', metadata, metadataIndex);
   }
 
   List<int> parameterMetadataAnnotations(int parameter) {
@@ -530,7 +544,10 @@ class ReflectionInfo {
   String get reflectionName => JS('String', r'#.$reflectionName', jsFunction);
 }
 
-getMetadata(int index) => JS('', 'init.metadata[#]', index);
+getMetadata(int index) {
+  var metadata = JS_EMBEDDED_GLOBAL('', METADATA);
+  return JS('', '#[#]', metadata, index);
+}
 
 class Primitives {
   /// Isolate-unique ID for caching [JsClosureMirror.function].
@@ -1356,7 +1373,7 @@ class TypeErrorDecoder {
     var match = JS('JSExtendableArray|Null',
         'new RegExp(#).exec(#)', _pattern, message);
     if (match == null) return null;
-    var result = JS('', '{}');
+    var result = JS('', 'Object.create(null)');
     if (_arguments != -1) {
       JS('', '#.arguments = #[# + 1]', result, match, _arguments);
     }
@@ -1990,9 +2007,14 @@ abstract class Closure implements Function {
 
     var signatureFunction;
     if (JS('bool', 'typeof # == "number"', functionType)) {
+      var metadata = JS_EMBEDDED_GLOBAL('', METADATA);
+      // It is ok, if the access is inlined into the JS. The access is safe in
+      // and outside the function. In fact we prefer if there is a textual
+      // inlining.
       signatureFunction =
-          JS('', '(function(s){return function(){return init.metadata[s]}})(#)',
-             functionType);
+          JS('', '(function(s){return function(){return #[s]}})(#)',
+              metadata,
+              functionType);
     } else if (!isStatic
                && JS('bool', 'typeof # == "function"', functionType)) {
       var getReceiver = isIntercepted
@@ -2916,7 +2938,7 @@ class RuntimeFunctionType extends RuntimeType {
     }
 
     if (namedParameters != null) {
-      var namedRti = JS('=Object', '{}');
+      var namedRti = JS('=Object', 'Object.create(null)');
       var keys = extractKeys(namedParameters);
       for (var i = 0; i < keys.length; i++) {
         var name = keys[i];
@@ -3083,7 +3105,8 @@ class RuntimeTypePlain extends RuntimeType {
   RuntimeTypePlain(this.name);
 
   toRti() {
-    var rti = JS('', 'init.allClasses[#]', name);
+    var allClasses = JS_EMBEDDED_GLOBAL('', ALL_CLASSES);
+    var rti = JS('', '#[#]', allClasses, name);
     if (rti == null) throw "no type for '$name'";
     return rti;
   }
@@ -3100,7 +3123,8 @@ class RuntimeTypeGeneric extends RuntimeType {
 
   toRti() {
     if (rti != null) return rti;
-    var result = JS('JSExtendableArray', '[init.allClasses[#]]', name);
+    var allClasses = JS_EMBEDDED_GLOBAL('', ALL_CLASSES);
+    var result = JS('JSExtendableArray', '[#[#]]', allClasses, name);
     if (result[0] == null) {
       throw "no type for '$name<...>'";
     }
@@ -3223,7 +3247,9 @@ int random64() {
  * The form of the name is '___dart_$name_$id'.
  */
 String getIsolateAffinityTag(String name) {
-  return JS('String', 'init.getIsolateTag(#)', name);
+  var isolateTagGetter =
+      JS_EMBEDDED_GLOBAL('', GET_ISOLATE_TAG);
+  return JS('String', '#(#)', isolateTagGetter, name);
 }
 
 typedef Future<Null> LoadLibraryFunctionType();
@@ -3235,18 +3261,36 @@ LoadLibraryFunctionType _loadLibraryWrapper(String loadId) {
 final Map<String, Future<Null>> _loadingLibraries = <String, Future<Null>>{};
 final Set<String> _loadedLibraries = new Set<String>();
 
+typedef void DeferredLoadCallback();
+
+// Function that will be called every time a new deferred import is loaded.
+DeferredLoadCallback deferredLoadHook;
+
 Future<Null> loadDeferredLibrary(String loadId) {
-  List<String> librariesToLoad = JS('JSExtendableArray|Null',
-      'init.librariesToLoad[#]',
-      loadId);
-  if (librariesToLoad == null) return new Future.value(null);
-  return Future.wait(librariesToLoad.map(
-      (String hunkName) => _loadHunk(hunkName))).then((_) {
-    for (String hunkName in librariesToLoad) {
-      // TODO(floitsch): Replace unsafe access to embedded global.
-      JS('void', 'init.initializeLoadedHunk(#)', hunkName);
+  // For each loadId there is a list of hunk-uris to load, and a corresponding
+  // list of hashes. These are stored in the app-global scope.
+  var urisMap = JS_EMBEDDED_GLOBAL('', DEFERRED_LIBRARY_URIS);
+  List<String> uris = JS('JSExtendableArray|Null', '#[#]', urisMap, loadId);
+  var hashesMap = JS_EMBEDDED_GLOBAL('', DEFERRED_LIBRARY_HASHES);
+  List<String> hashes = JS('JSExtendableArray|Null', '#[#]', hashesMap, loadId);
+  if (uris == null) return new Future.value(null);
+  // The indices into `uris` and `hashes` that we want to load.
+  List<int> indices = new List.generate(uris.length, (i) => i);
+  var isHunkLoaded = JS_EMBEDDED_GLOBAL('', IS_HUNK_LOADED);
+  return Future.wait(indices
+      // Filter away indices for hunks that have already been loaded.
+      .where((int i) => !JS('bool','#(#)', isHunkLoaded, hashes[i]))
+      // Load the rest.
+      .map((int i) => _loadHunk(uris[i]))).then((_) {
+    // Now all hunks have been loaded, we call all their initializers
+    for (String hash in hashes) {
+      var initializer = JS_EMBEDDED_GLOBAL('', INITIALIZE_LOADED_HUNK);
+      JS('void', '#(#)', initializer, hash);
     }
-    _loadedLibraries.add(loadId);
+    bool updated = _loadedLibraries.add(loadId);
+    if (updated && deferredLoadHook != null) {
+      deferredLoadHook();
+    }
   });
 }
 

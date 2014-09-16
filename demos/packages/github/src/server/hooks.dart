@@ -7,23 +7,26 @@ class HookMiddleware {
   void handleHookRequest(HttpRequest request) {
     
     if (request.method != "POST") {
-      request.response.write("Only POST is Supported");
-      request.response.close();
+      request.response
+          ..write("Only POST is Supported")
+          ..close();
       return;
     }
     
     if (request.headers['x-github-event'] == null) {
-      request.response.write("X-GitHub-Event must be specified.");
-      request.response.close();
+      request.response
+          ..write("X-GitHub-Event must be specified.")
+          ..close();
       return;
     }
     
-    request.transform(new Utf8Decoder()).join().then((content) {
+    request.transform(UTF8.decoder).join().then((content) {
       _eventController.add(new HookEvent(request.headers['x-github-event'].first, JSON.decode(content)));
-      request.response.write(JSON.encode({
-        "handled": true
-      }));
-      request.response.close();
+      request.response
+          ..write(JSON.encode({
+            "handled": _eventController.hasListener
+          }))
+          ..close();
     });
   }
 }
@@ -43,9 +46,10 @@ class HookServer extends HookMiddleware {
         if (request.uri.path == "/hook") {
           handleHookRequest(request);
         } else {
-          request.response.statusCode = 404;
-          request.response.write("404 - Not Found");
-          request.response.close();
+          request.response
+              ..statusCode = 404
+              ..write("404 - Not Found")
+              ..close();
         }
       });
     });
