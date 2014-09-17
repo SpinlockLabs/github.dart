@@ -363,3 +363,18 @@ class TeamRepositoryPermissions {
         ..pull = input['pull'];
   }
 }
+
+class OrganizationMembership {
+  final GitHub github;
+  String state;
+  Organization organization;
+  
+  OrganizationMembership(this.github);
+
+  static OrganizationMembership fromJSON(GitHub github, input) {
+    if (input == null) return null;
+    return new OrganizationMembership(github)
+        ..organization = Organization.fromJSON(github, input['organization'])
+        ..state = input['state'];
+  }
+}
