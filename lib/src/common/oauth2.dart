@@ -46,7 +46,9 @@ class OAuth2Flow {
    */
   final String baseUrl;
   
-  OAuth2Flow(this.clientId, this.clientSecret, {String redirectUri, this.scopes: const [], this.state, this.baseUrl: "https://github.com/login/oauth"})
+  GitHub github;
+  
+  OAuth2Flow(this.clientId, this.clientSecret, {String redirectUri, this.scopes: const [], this.state, this.github, this.baseUrl: "https://github.com/login/oauth"})
       : this.redirectUri = redirectUri == null ? null : _checkRedirectUri(redirectUri);
   
   static String _checkRedirectUri(String uri) {
@@ -86,7 +88,7 @@ class OAuth2Flow {
       "redirect_uri": redirectUri
     });
     
-    return GitHub.defaultClient().request(new http.Request("${baseUrl}/access_token", body: body, method: "POST", headers: headers)).then((response) {
+    return (github == null ? GitHub.defaultClient() : github.client).request(new http.Request("${baseUrl}/access_token", body: body, method: "POST", headers: headers)).then((response) {
       var json = JSON.decode(response.body);
       if (json['error'] != null) {
         throw json;
