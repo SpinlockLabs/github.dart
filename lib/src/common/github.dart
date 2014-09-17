@@ -11,6 +11,8 @@ typedef http.Client ClientCreator();
  *      // Use the Client
  */
 class GitHub {
+  
+  
   /**
    * Default Client Creator
    */
@@ -130,7 +132,7 @@ class GitHub {
   Future<String> zen() => request("GET", "/zen").then((response) => response.body);
   
   Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) =>
-      _trendingRepos(language: language, since: since);
+      _trendingRepos(this, language: language, since: since);
   
   /**
    * Fetches the repositories of the user specified by [user] in a streamed fashion.
@@ -243,9 +245,9 @@ class GitHub {
     });
   }
   
-  Stream<ShowcaseInfo> showcases() => _showcases();
+  Stream<ShowcaseInfo> showcases() => _showcases(this);
   
-  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(info);
+  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(this, info);
   
   /**
    * Gets .gitignore template names.
@@ -398,7 +400,7 @@ class GitHub {
     return getJSON("/gist/${id}", statusCode: StatusCodes.OK, convert: Gist.fromJSON);
   }
   
-  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(url);
+  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(this, url);
   
   /**
    * Fetches the Currently Authenticated User's Public Gists

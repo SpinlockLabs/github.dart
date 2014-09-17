@@ -9,7 +9,7 @@ class TrendingRepository {
   String description;
 }
 
-Stream<TrendingRepository> _trendingRepos({String language, String since: "daily"}) {
+Stream<TrendingRepository> _trendingRepos(GitHub github, {String language, String since: "daily"}) {
   var url = "https://github.com/trending";
   
   if (language != null) url += "?l=${language}";
@@ -18,7 +18,7 @@ Stream<TrendingRepository> _trendingRepos({String language, String since: "daily
   
   var controller = new StreamController();
   
-  GitHub.defaultClient().request(new http.Request(url)).then((response) {
+  github.client.request(new http.Request(url)).then((response) {
     var doc = htmlParser.parse(response.body);
     var items = doc.querySelectorAll("li.repo-leaderboard-list-item.leaderboard-list-item");
     
@@ -59,10 +59,10 @@ class ShowcaseItem {
   String url;
 }
 
-Future<Showcase> _showcase(ShowcaseInfo info) {
+Future<Showcase> _showcase(GitHub github, ShowcaseInfo info) {
   var completer = new Completer();
   
-  GitHub.defaultClient().request(new http.Request(info.url)).then((response) {
+  github.client.request(new http.Request(info.url)).then((response) {
     var doc = htmlParser.parse(response.body);
     var showcase = new Showcase();
     
@@ -100,7 +100,7 @@ Future<Showcase> _showcase(ShowcaseInfo info) {
   return completer.future;
 }
 
-Stream<ShowcaseInfo> _showcases() {
+Stream<ShowcaseInfo> _showcases(GitHub github) {
   var controller = new StreamController();
   
   Function handleResponse;
@@ -146,7 +146,7 @@ Stream<ShowcaseInfo> _showcases() {
     }
   };
   
-  GitHub.defaultClient().request(new http.Request("https://github.com/showcases")).then(handleResponse);
+  github.client.request(new http.Request("https://github.com/showcases")).then(handleResponse);
   
   return controller.stream;
 }

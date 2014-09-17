@@ -34,9 +34,9 @@ class BlogPost {
   }
 }
 
-Stream<BlogPost> _blogPosts(String url) {
+Stream<BlogPost> _blogPosts(GitHub github, String url) {
   var controller = new StreamController();
-  GitHub.defaultClient().request(new http.Request(url)).then((response) {
+  github.client.request(new http.Request(url)).then((response) {
     var document = xml.parse(response.body);
     
     var entries = document.rootElement.findElements("entry");
