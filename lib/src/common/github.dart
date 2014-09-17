@@ -139,6 +139,7 @@ class GitHub {
    */
   Stream<Repository> userRepositories(String user, {String type: "owner", String sort: "full_name", String direction: "asc"}) {
     var params = {
+      "type": type,
       "sort": sort,
       "direction": direction
     };
