@@ -1,6 +1,6 @@
 import 'package:github/server.dart';
 
-import '../test_helper.dart';
+import '../helper.dart';
 
 import 'dart:io';
 import 'dart:convert';

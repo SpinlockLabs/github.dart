@@ -685,14 +685,14 @@ class GitHub {
   /**
    * Gets the readme file for a repository.
    */
-  Future<File> readme(RepositorySlug slug) {
+  Future<GitHubFile> readme(RepositorySlug slug) {
     var headers = {};
     
     return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
-    }, convert: (gh, input) => File.fromJSON(gh, input, slug));
+    }, convert: (gh, input) => GitHubFile.fromJSON(gh, input, slug));
   }
   
   Future<String> octocat(String text) {
@@ -718,11 +718,11 @@ class GitHub {
       if (input is Map) {
         contents.isFile = true;
         contents.isDirectory = false;
-        contents.file = File.fromJSON(github, input);
+        contents.file = GitHubFile.fromJSON(github, input);
       } else {
         contents.isFile = false;
         contents.isDirectory = true;
-        contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
+        contents.tree = copyOf(input.map((it) => GitHubFile.fromJSON(github, it)));
       }
       return contents;
     });

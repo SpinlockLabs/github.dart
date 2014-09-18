@@ -3,7 +3,7 @@ part of github.common;
 /**
  * The File Model
  */
-class File {
+class GitHubFile {
   final GitHub github;
 
   /**
@@ -71,11 +71,11 @@ class File {
   
   Map<String, dynamic> json;
   
-  File(this.github);
+  GitHubFile(this.github);
 
-  static File fromJSON(GitHub github, input, [RepositorySlug slug]) {
+  static GitHubFile fromJSON(GitHub github, input, [RepositorySlug slug]) {
     if (input == null) return null;
-    return new File(github)
+    return new GitHubFile(github)
         ..type = input['type']
         ..encoding = input['encoding']
         ..size = input['size']
@@ -136,8 +136,8 @@ class RepositoryContents {
   bool isFile;
   bool isDirectory;
   
-  File file;
-  List<File> tree;
+  GitHubFile file;
+  List<GitHubFile> tree;
 }
 
 class CreateFile {
@@ -173,12 +173,12 @@ class CommitterInformation {
 class ContentCreation {
   final GitHub github;
   final Commit commit;
-  final File content;
+  final GitHubFile content;
   
   ContentCreation(this.github, this.commit, this.content);
   
   static ContentCreation fromJSON(GitHub github, input) {
     if (input == null) return null;
-    return new ContentCreation(github, Commit.fromJSON(github, input['commit']), File.fromJSON(github, input['content']));
+    return new ContentCreation(github, Commit.fromJSON(github, input['commit']), GitHubFile.fromJSON(github, input['content']));
   }
 }
