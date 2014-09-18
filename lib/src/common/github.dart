@@ -669,7 +669,7 @@ class GitHub {
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -775,7 +775,7 @@ class GitHub {
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -785,8 +785,8 @@ class GitHub {
   /**
    * Internal method to handle status codes
    */
-  void _handleStatusCode(http.Response response, int code) {
-    switch (code) {
+  void handleStatusCode(http.Response response) {
+    switch (response.statusCode) {
       case 404:
         throw new NotFound(this, "Requested Resource was Not Found");
         break;
@@ -807,16 +807,17 @@ class GitHub {
         var errors = json['errors'];
         
         var buff = new StringBuffer();
-        buff.writeln("Message: ${msg}");
-        buff.writeln("Errors:");
+        buff.writeln();
+        buff.writeln("  Message: ${msg}");
+        buff.writeln("  Errors:");
         for (Map<String, String> error in errors) {
           var resource = error['resource'];
           var field = error['field'];
           var code = error['code'];
           buff
-          ..writeln("Resource: ${resource}")
-          ..writeln("Field ${field}")
-          ..writeln("Code: ${code}");
+          ..writeln("    Resource: ${resource}")
+          ..writeln("    Field ${field}")
+          ..write("    Code: ${code}");
         }
         throw new ValidationFailed(this, buff.toString());
     }
