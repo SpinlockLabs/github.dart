@@ -78,3 +78,11 @@ class UnknownError extends GitHubError {
 class NotAuthenticated extends GitHubError {
   NotAuthenticated(GitHub github) : super(github, "Client not Authenticated");
 }
+
+class InvalidJSON extends GitHubError {
+  InvalidJSON(GitHub github, [String message = "Invalid JSON"]) : super(github, message);
+}
+
+class ValidationFailed extends GitHubError {
+  ValidationFailed(GitHub github, [String message = "Validation Failed"]) : super(github, message);  
+}

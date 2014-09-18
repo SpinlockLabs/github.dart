@@ -792,9 +792,35 @@ class GitHub {
         break;
       case 401:
         throw new AccessForbidden(this);
-      default:
-        throw new UnknownError(this);
+      case 400:
+        var json = response.asJSON();
+        String msg = json['message'];
+        if (msg == "Problems parsing JSON") {
+          throw new InvalidJSON(this, msg);
+        } else if (msg == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, msg);
+        }
+        break;
+      case 422:
+        var json = response.asJSON();
+        String msg = json['message'];
+        var errors = json['errors'];
+        
+        var buff = new StringBuffer();
+        buff.writeln("Message: ${msg}");
+        buff.writeln("Errors:");
+        for (Map<String, String> error in errors) {
+          var resource = error['resource'];
+          var field = error['field'];
+          var code = error['code'];
+          buff
+          ..writeln("Resource: ${resource}")
+          ..writeln("Field ${field}")
+          ..writeln("Code: ${code}");
+        }
+        throw new ValidationFailed(this, buff.toString());
     }
+    throw new UnknownError(this);
   }
   
   Future<PullRequest> pullRequest(RepositorySlug slug, int number) {
