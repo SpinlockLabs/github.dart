@@ -326,8 +326,8 @@ class TeamRepository extends Repository {
         ..createdAt = parseDateTime(input['created_at'])
         ..pushedAt = parseDateTime(input['pushed_at'])
         ..json = input
-        ..owner = RepositoryOwner.fromJSON(input['owner'])
-        ..private = input['private']
+        ..owner = UserInformation.fromJSON(github, input['owner'])
+        ..isPrivate = input['private']
         ..permissions = TeamRepositoryPermissions.fromJSON(github, input['permissions']);
   }
 }
