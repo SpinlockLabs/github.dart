@@ -89,7 +89,7 @@ class OAuth2Flow {
     });
     
     return (github == null ? GitHub.defaultClient() : github.client).request(new http.Request("${baseUrl}/access_token", body: body, method: "POST", headers: headers)).then((response) {
-      var json = JSON.decode(response.body);
+      var json = response.asJSON();
       if (json['error'] != null) {
         throw json;
       }

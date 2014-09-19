@@ -117,7 +117,7 @@ class PaginationHelper<T> {
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
     var controller = new StreamController();
     fetchStreamed(method, path, pages: pages, start: start, reverse: reverse, headers: headers, params: params, body: body).listen((response) {
-      var json = JSON.decode(response.body);
+      var json = response.asJSON();
       for (var item in json) {
         controller.add(converter(github, item));
       }

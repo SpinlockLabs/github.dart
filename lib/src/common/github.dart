@@ -137,6 +137,7 @@ class GitHub {
    */
   Stream<Repository> userRepositories(String user, {String type: "owner", String sort: "full_name", String direction: "asc"}) {
     var params = {
+      "type": type,
       "sort": sort,
       "direction": direction
     };
@@ -666,7 +667,7 @@ class GitHub {
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -682,14 +683,14 @@ class GitHub {
   /**
    * Gets the readme file for a repository.
    */
-  Future<File> readme(RepositorySlug slug) {
+  Future<GitHubFile> readme(RepositorySlug slug) {
     var headers = {};
     
     return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
-    }, convert: (gh, input) => File.fromJSON(gh, input, slug));
+    }, convert: (gh, input) => GitHubFile.fromJSON(gh, input, slug));
   }
   
   Future<String> octocat(String text) {
@@ -715,11 +716,11 @@ class GitHub {
       if (input is Map) {
         contents.isFile = true;
         contents.isDirectory = false;
-        contents.file = File.fromJSON(github, input);
+        contents.file = GitHubFile.fromJSON(github, input);
       } else {
         contents.isFile = false;
         contents.isDirectory = true;
-        contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
+        contents.tree = copyOf(input.map((it) => GitHubFile.fromJSON(github, it)));
       }
       return contents;
     });
@@ -772,7 +773,7 @@ class GitHub {
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -782,16 +783,43 @@ class GitHub {
   /**
    * Internal method to handle status codes
    */
-  void _handleStatusCode(http.Response response, int code) {
-    switch (code) {
+  void handleStatusCode(http.Response response) {
+    switch (response.statusCode) {
       case 404:
         throw new NotFound(this, "Requested Resource was Not Found");
         break;
       case 401:
         throw new AccessForbidden(this);
-      default:
-        throw new UnknownError(this);
+      case 400:
+        var json = response.asJSON();
+        String msg = json['message'];
+        if (msg == "Problems parsing JSON") {
+          throw new InvalidJSON(this, msg);
+        } else if (msg == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, msg);
+        }
+        break;
+      case 422:
+        var json = response.asJSON();
+        String msg = json['message'];
+        var errors = json['errors'];
+        
+        var buff = new StringBuffer();
+        buff.writeln();
+        buff.writeln("  Message: ${msg}");
+        buff.writeln("  Errors:");
+        for (Map<String, String> error in errors) {
+          var resource = error['resource'];
+          var field = error['field'];
+          var code = error['code'];
+          buff
+          ..writeln("    Resource: ${resource}")
+          ..writeln("    Field ${field}")
+          ..write("    Code: ${code}");
+        }
+        throw new ValidationFailed(this, buff.toString());
     }
+    throw new UnknownError(this);
   }
   
   Future<PullRequest> pullRequest(RepositorySlug slug, int number) {

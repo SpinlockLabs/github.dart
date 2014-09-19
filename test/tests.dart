@@ -3,7 +3,7 @@ library github.tests;
 import "package:unittest/unittest.dart";
 
 import "package:github/src/common/util.dart";
-import "test_helper.dart";
+import "helper.dart";
 
 part "tests/utils.dart";
 

@@ -25,12 +25,13 @@ class Repository implements ProvidesJSON<Map<String, dynamic>> {
   /**
    * Repository Owner
    */
-  RepositoryOwner owner;
+  UserInformation owner;
   
   /**
    * If the Repository is Private
    */
-  bool private;
+  @ApiName("private")
+  bool isPrivate;
   
   /**
    * If the Repository is a fork
@@ -175,9 +176,9 @@ class Repository implements ProvidesJSON<Map<String, dynamic>> {
         ..forksCount = input['forks_count']
         ..createdAt = parseDateTime(input['created_at'])
         ..pushedAt = parseDateTime(input['pushed_at'])
-        ..private = input['private']
+        ..isPrivate = input['private']
         ..json = input
-        ..owner = RepositoryOwner.fromJSON(input['owner']);
+        ..owner = UserInformation.fromJSON(github, input['owner']);
   }
 
   /**
@@ -335,9 +336,11 @@ class CloneUrls {
 }
 
 /**
- * Repository Owner Information
+ * User Information
  */
-class RepositoryOwner {
+class UserInformation {
+  final GitHub github;
+  
   /**
    * Owner Username
    */
@@ -359,16 +362,22 @@ class RepositoryOwner {
    */
   @ApiName("html_url")
   String url;
+  
+  UserInformation(this.github);
 
-  static RepositoryOwner fromJSON(input) {
+  static UserInformation fromJSON(GitHub github, input) {
     if (input == null) return null;
-    var owner = new RepositoryOwner();
+    var owner = new UserInformation(github);
     owner
         ..login = input['login']
         ..id = input['id']
         ..avatarUrl = input['avatar_url']
         ..url = input['html_url'];
     return owner;
+  }
+  
+  Future<User> fetchUser() {
+    return github.user(login);
   }
 }
 
