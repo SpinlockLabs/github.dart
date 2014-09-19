@@ -121,8 +121,6 @@ class GitHub {
     return controller.stream;
   }
   
-  
-  
   Stream<Octocat> octocats({bool cors: false}) => _octocats(this, cors);
   
   Stream<Team> userTeams() {

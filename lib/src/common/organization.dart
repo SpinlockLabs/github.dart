@@ -204,6 +204,20 @@ class Team {
     });
   }
   
+  Future<TeamMembershipState> checkMembershipState(String user) {
+    var completer = new Completer();
+    
+    github.getJSON("/teams/${id}/memberships/${user}", statusCode: 200, fail: (http.Response response) {
+      if (response.statusCode == 404) {
+        completer.complete(new TeamMembershipState(null));
+      } else {
+        github._handleStatusCode(response, response.statusCode);
+      }
+    }, convert: (github, json) => new TeamMembershipState(json['state'])).then(completer.complete);
+    
+    return completer.future;
+  }
+  
   Stream<Repository> repositories() {
     return new PaginationHelper(github).objects("GET", "/teams/${id}/repos", Repository.fromJSON);
   }
@@ -225,6 +239,16 @@ class Team {
       return response.statusCode == 204;
     });
   }
+}
+
+class TeamMembershipState {
+  final String name;
+  
+  TeamMembershipState(this.name);
+  
+  bool get isPending => name == "pending";
+  bool get isActive => name == "active";
+  bool get isInactive => name == null;
 }
 
 class TeamMember {
