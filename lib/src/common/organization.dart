@@ -211,7 +211,7 @@ class Team {
       if (response.statusCode == 404) {
         completer.complete(new TeamMembershipState(null));
       } else {
-        github._handleStatusCode(response, response.statusCode);
+        github.handleStatusCode(response);
       }
     }, convert: (github, json) => new TeamMembershipState(json['state'])).then(completer.complete);
     

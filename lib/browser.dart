@@ -7,6 +7,8 @@ import 'common.dart';
 import 'http.dart' as http;
 export 'common.dart';
 
+part 'src/browser/helper.dart';
+
 class _BrowserHttpClient extends http.Client {
   
   @override
