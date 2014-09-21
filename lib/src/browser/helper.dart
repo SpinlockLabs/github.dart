@@ -21,4 +21,8 @@ class GitHubBrowserHelper {
       });
     }
   }
+  
+  static ImageElement createAvatarImage(User user, {int width: 128, int height: 128}) {
+    return new ImageElement(src: user.avatarUrl, width: width, height: height);
+  }
 }
