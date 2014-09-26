@@ -1,3 +1,9 @@
+/**
+ * GitHub for the Browser
+ * 
+ * This contains a few utilities that are browser specific.
+ * See [GitHubBrowserHelper] for more information.
+ */
 library github.browser;
 
 import 'dart:async';

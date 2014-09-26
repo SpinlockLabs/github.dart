@@ -1,5 +1,5 @@
 /**
- * GitHub for the Dart VM
+ * GitHub for the Server
  */
 library github.server;
 

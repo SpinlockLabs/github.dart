@@ -1,3 +1,8 @@
+/**
+ * The Core of GitHub for Dart.
+ * 
+ * Contains the Models and other GitHub stuff.
+ */
 library github.common;
 
 import 'dart:async';
