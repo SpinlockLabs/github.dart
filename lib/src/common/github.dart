@@ -64,16 +64,19 @@ class GitHub {
   Stream<User> users({List<String> names, int pages}) {
     if (names != null) {
       var controller = new StreamController();
-      
-      for (var i = 0; i < names.length; i++) {
-        user(names[i]).then((user) {
+
+      var group = new FutureGroup();
+
+      for (var name in names) {
+        group.add(user(name).then((user) {
           controller.add(user);
-          if (i == names.length - 1) {
-            controller.close();
-          }
-        });
+        }));
       }
-      
+
+      group.future.then((_) {
+        controller.close();
+      });
+
       return controller.stream;
     }
     
@@ -108,16 +111,19 @@ class GitHub {
    */
   Stream<Repository> repositories(List<RepositorySlug> slugs) {
     var controller = new StreamController();
-    
-    for (var i = 0; i < slugs.length; i++) {
-      repository(slugs[i]).then((repo) {
+
+    var group = new FutureGroup();
+
+    for (var slug in slugs) {
+      group.add(repository(slug).then((repo) {
         controller.add(repo);
-        if (i == slugs.length - 1) {
-          controller.close();      
-        }
-      });
+      }));
     }
-    
+
+    group.future.then((_) {
+      controller.close();
+    });
+
     return controller.stream;
   }
   
@@ -161,15 +167,18 @@ class GitHub {
    */
   Stream<Organization> organizations(List<String> names) {
     var controller = new StreamController();
-    
-    for (var i = 0; i < names.length; i++) {
-      organization(names[i]).then((org) {
+
+    var group = new FutureGroup();
+
+    for (var name in names) {
+      group.add(organization(name).then((org) {
         controller.add(org);
-        if (i == names.length - 1) {
-          controller.close();
-        }
-      });
+      }));
     }
+
+    group.future.then((_) {
+      controller.close();
+    });
     
     return controller.stream;
   }

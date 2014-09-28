@@ -12,6 +12,8 @@ import 'package:crypto/crypto.dart' show CryptoUtils;
 import "package:html5lib/parser.dart" as htmlParser;
 import "package:html5lib/dom.dart" as html;
 
+import "package:quiver/async.dart" show FutureGroup;
+
 import "package:xml/xml.dart" as xml;
 
 import 'http.dart' as http;
