@@ -39,7 +39,11 @@ class _IOClient extends http.Client {
     var completer = new Completer<http.Response>();
     client.openUrl(request.method, Uri.parse(request.url)).then((req) {
       request.headers.forEach(req.headers.set);
-      req.headers.set("TimeZone", timezoneName);
+      // TODO (marcojakob): The DateTime.timeZoneName is currently not correctly
+      // implemented: https://code.google.com/p/dart/issues/detail?id=17085
+      // Once this issue is resolved, we can reenable setting this header.
+      // req.headers.set("Time-Zone", timezoneName);
+      
       if (request.body != null) {
         req.write(request.body);
       }

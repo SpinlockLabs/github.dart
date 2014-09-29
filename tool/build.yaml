@@ -14,4 +14,4 @@ check.tasks:
   - analyze
   - test
 docs.output: out/docs
-test.file: test/tests.dart
+test.file: test/all_tests.dart
