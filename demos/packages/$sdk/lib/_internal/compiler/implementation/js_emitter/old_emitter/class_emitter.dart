@@ -5,6 +5,10 @@
 part of dart2js.js_emitter;
 
 class ClassEmitter extends CodeEmitterHelper {
+
+  ClassStubGenerator get _stubGenerator =>
+      new ClassStubGenerator(compiler, namer, backend);
+
   /**
    * Documentation wanted -- johnniwinther
    *
@@ -14,12 +18,12 @@ class ClassEmitter extends CodeEmitterHelper {
                      ClassBuilder properties,
                      Map<String, jsAst.Expression> additionalProperties) {
     final onlyForRti =
-        task.typeTestEmitter.rtiNeededClasses.contains(classElement);
+        emitter.typeTestEmitter.rtiNeededClasses.contains(classElement);
 
     assert(invariant(classElement, classElement.isDeclaration));
     assert(invariant(classElement, !classElement.isNative || onlyForRti));
 
-    task.needsDefineClass = true;
+    emitter.needsDefineClass = true;
     String className = namer.getNameOfClass(classElement);
 
     ClassElement superclass = classElement.superclass;
@@ -31,7 +35,7 @@ class ClassEmitter extends CodeEmitterHelper {
     if (classElement.isMixinApplication) {
       String mixinName = namer.getNameOfClass(computeMixinClass(classElement));
       superName = '$superName+$mixinName';
-      task.needsMixinSupport = true;
+      emitter.needsMixinSupport = true;
     }
 
     ClassBuilder builder = new ClassBuilder(classElement, namer);
@@ -39,7 +43,7 @@ class ClassEmitter extends CodeEmitterHelper {
     emitFields(classElement, builder, superName, onlyForRti: onlyForRti);
     emitClassGettersSetters(classElement, builder, onlyForRti: onlyForRti);
     emitInstanceMembers(classElement, builder, onlyForRti: onlyForRti);
-    task.typeTestEmitter.emitIsTests(classElement, builder);
+    emitter.typeTestEmitter.emitIsTests(classElement, builder);
     if (additionalProperties != null) {
       additionalProperties.forEach(builder.addProperty);
     }
@@ -73,17 +77,15 @@ class ClassEmitter extends CodeEmitterHelper {
         fields.add(name);
       });
     }
-    String constructorName = namer.getNameOfClass(classElement);
 
-    // TODO(sra): Implement placeholders in VariableDeclaration position:
-    //     task.precompiledFunction.add(js.statement('function #(#) { #; }',
-    //        [ constructorName, fields,
-    //            fields.map(
-    //                (name) => js('this.# = #', [name, name]))]));
-    jsAst.Expression constructorAst = js('function(#) { #; }',
-        [fields,
-         fields.map((name) => js('this.# = #', [name, name]))]);
-    task.emitPrecompiledConstructor(constructorName, constructorAst);
+    jsAst.Expression constructorAst =
+        _stubGenerator.generateClassConstructor(classElement, fields);
+
+    String constructorName = namer.getNameOfClass(classElement);
+    OutputUnit outputUnit =
+        compiler.deferredLoadTask.outputUnitForElement(classElement);
+    emitter.emitPrecompiledConstructor(
+        outputUnit, constructorName, constructorAst);
   }
 
   /// Returns `true` if fields added.
@@ -125,7 +127,7 @@ class ClassEmitter extends CodeEmitterHelper {
         // constructors, so we don't need the fields unless we are generating
         // accessors at runtime.
         if (!classIsNative || needsAccessor) {
-          var metadata = task.metadataEmitter.buildMetadataFunction(field);
+          var metadata = emitter.metadataEmitter.buildMetadataFunction(field);
           if (metadata != null) {
             hasMetadata = true;
           } else {
@@ -149,11 +151,11 @@ class ClassEmitter extends CodeEmitterHelper {
 
             int getterCode = 0;
             if (needsAccessor && backend.fieldHasInterceptedGetter(field)) {
-              task.interceptorEmitter.interceptorInvocationNames.add(
+              emitter.interceptorEmitter.interceptorInvocationNames.add(
                   namer.getterName(field));
             }
             if (needsAccessor && backend.fieldHasInterceptedGetter(field)) {
-              task.interceptorEmitter.interceptorInvocationNames.add(
+              emitter.interceptorEmitter.interceptorInvocationNames.add(
                   namer.setterName(field));
             }
             if (needsGetter) {
@@ -169,7 +171,7 @@ class ClassEmitter extends CodeEmitterHelper {
                 // the method's class was elsewhere mixed-in to an interceptor.
                 assert(!field.isInstanceMember || getterCode != 0);
                 if (isIntercepted) {
-                  task.interceptorEmitter.interceptorInvocationNames.add(
+                  emitter.interceptorEmitter.interceptorInvocationNames.add(
                       namer.getterName(field));
                 }
               } else {
@@ -187,7 +189,7 @@ class ClassEmitter extends CodeEmitterHelper {
                 setterCode += backend.isInterceptorClass(element) ? 0 : 1;
                 assert(!field.isInstanceMember || setterCode != 0);
                 if (isIntercepted) {
-                  task.interceptorEmitter.interceptorInvocationNames.add(
+                  emitter.interceptorEmitter.interceptorInvocationNames.add(
                       namer.setterName(field));
                 }
               } else {
@@ -204,7 +206,7 @@ class ClassEmitter extends CodeEmitterHelper {
           }
           if (backend.isAccessibleByReflection(field)) {
             DartType type = field.type;
-            reflectionMarker = '-${task.metadataEmitter.reifyType(type)}';
+            reflectionMarker = '-${emitter.metadataEmitter.reifyType(type)}';
           }
           String builtFieldname = '$fieldName$fieldCode$reflectionMarker';
           builder.addField(builtFieldname);
@@ -264,7 +266,7 @@ class ClassEmitter extends CodeEmitterHelper {
     void visitMember(ClassElement enclosing, Element member) {
       assert(invariant(classElement, member.isDeclaration));
       if (member.isInstanceMember) {
-        task.containerBuilder.addMember(member, builder);
+        emitter.containerBuilder.addMember(member, builder);
       }
     }
 
@@ -278,8 +280,8 @@ class ClassEmitter extends CodeEmitterHelper {
       // so that the code in the dynamicFunction helper can find
       // them. Note that this helper is invoked before analyzing the
       // full JS script.
-      if (!task.nativeEmitter.handleNoSuchMethod) {
-        task.nsmEmitter.emitNoSuchMethodHandlers(builder.addProperty);
+      if (!emitter.nativeEmitter.handleNoSuchMethod) {
+        emitter.nsmEmitter.emitNoSuchMethodHandlers(builder.addProperty);
       }
     }
   }
@@ -288,14 +290,14 @@ class ClassEmitter extends CodeEmitterHelper {
                                           ClassElement classElement,
                                           ClassBuilder classBuilder,
                                           ClassBuilder enclosingBuilder) {
-    var metadata = task.metadataEmitter.buildMetadataFunction(classElement);
+    var metadata = emitter.metadataEmitter.buildMetadataFunction(classElement);
     if (metadata != null) {
       classBuilder.addProperty("@", metadata);
     }
 
     if (backend.isAccessibleByReflection(classElement)) {
       List<DartType> typeVars = classElement.typeVariables;
-      Iterable typeVariableProperties = task.typeVariableHandler
+      Iterable typeVariableProperties = emitter.typeVariableHandler
           .typeVariablesOf(classElement).map(js.number);
 
       ClassElement superclass = classElement.superclass;
@@ -320,7 +322,7 @@ class ClassEmitter extends CodeEmitterHelper {
     }
 
     Map<OutputUnit, ClassBuilder> classPropertyLists =
-        task.elementDescriptors.remove(classElement);
+        emitter.elementDescriptors.remove(classElement);
     if (classPropertyLists != null) {
       for (ClassBuilder classProperties in classPropertyLists.values) {
         // TODO(sigurdm): What about deferred?
@@ -339,17 +341,17 @@ class ClassEmitter extends CodeEmitterHelper {
     compiler.dumpInfoTask.registerElementAst(classBuilder.element, propertyValue);
     enclosingBuilder.addProperty(className, propertyValue);
 
-    String reflectionName = task.getReflectionName(classElement, className);
+    String reflectionName = emitter.getReflectionName(classElement, className);
     if (reflectionName != null) {
       if (!backend.isAccessibleByReflection(classElement)) {
         enclosingBuilder.addProperty("+$reflectionName", js.number(0));
       } else {
         List<int> types = <int>[];
         if (classElement.supertype != null) {
-          types.add(task.metadataEmitter.reifyType(classElement.supertype));
+          types.add(emitter.metadataEmitter.reifyType(classElement.supertype));
         }
         for (DartType interface in classElement.interfaces) {
-          types.add(task.metadataEmitter.reifyType(interface));
+          types.add(emitter.metadataEmitter.reifyType(interface));
         }
         enclosingBuilder.addProperty("+$reflectionName",
             new jsAst.ArrayInitializer.from(types.map(js.number)));
@@ -358,7 +360,7 @@ class ClassEmitter extends CodeEmitterHelper {
   }
 
   /**
-   * Calls [addField] for each of the fields of [element].
+   * Invokes [f] for each of the fields of [element].
    *
    * [element] must be a [ClassElement] or a [LibraryElement].
    *
@@ -461,11 +463,11 @@ class ClassEmitter extends CodeEmitterHelper {
     if (!backend.shouldRetainGetter(member)) return;
     String previousName;
     if (member.isInstanceMember) {
-      previousName = task.mangledFieldNames.putIfAbsent(
+      previousName = emitter.mangledFieldNames.putIfAbsent(
           '${namer.getterPrefix}$accessorName',
           () => memberName);
     } else {
-      previousName = task.mangledGlobalFieldNames.putIfAbsent(
+      previousName = emitter.mangledGlobalFieldNames.putIfAbsent(
           accessorName,
           () => memberName);
     }
@@ -517,16 +519,18 @@ class ClassEmitter extends CodeEmitterHelper {
 
   void generateGetter(Element member, String fieldName, String accessorName,
                       ClassBuilder builder) {
+    jsAst.Expression function =
+        _stubGenerator.generateGetter(member, fieldName);
+
     String getterName = namer.getterNameFromAccessorName(accessorName);
     ClassElement cls = member.enclosingClass;
     String className = namer.getNameOfClass(cls);
-    String receiver = backend.isInterceptorClass(cls) ? 'receiver' : 'this';
-    List<String> args = backend.isInterceptedMethod(member) ? ['receiver'] : [];
-    task.precompiledFunction.add(
-        js('#.prototype.# = function(#) { return #.# }',
-           [className, getterName, args, receiver, fieldName]));
+    OutputUnit outputUnit =
+        compiler.deferredLoadTask.outputUnitForElement(member);
+    emitter.cspPrecompiledFunctionFor(outputUnit).add(
+        js('#.prototype.# = #', [className, getterName, function]));
     if (backend.isAccessibleByReflection(member)) {
-      task.precompiledFunction.add(
+      emitter.cspPrecompiledFunctionFor(outputUnit).add(
           js('#.prototype.#.${namer.reflectableField} = 1',
               [className, getterName]));
     }
@@ -534,17 +538,18 @@ class ClassEmitter extends CodeEmitterHelper {
 
   void generateSetter(Element member, String fieldName, String accessorName,
                       ClassBuilder builder) {
+    jsAst.Expression function =
+        _stubGenerator.generateSetter(member, fieldName);
+
     String setterName = namer.setterNameFromAccessorName(accessorName);
     ClassElement cls = member.enclosingClass;
     String className = namer.getNameOfClass(cls);
-    String receiver = backend.isInterceptorClass(cls) ? 'receiver' : 'this';
-    List<String> args = backend.isInterceptedMethod(member) ? ['receiver'] : [];
-    task.precompiledFunction.add(
-        // TODO: remove 'return'?
-        js('#.prototype.# = function(#, v) { return #.# = v; }',
-            [className, setterName, args, receiver, fieldName]));
+    OutputUnit outputUnit =
+        compiler.deferredLoadTask.outputUnitForElement(member);
+    emitter.cspPrecompiledFunctionFor(outputUnit).add(
+        js('#.prototype.# = #', [className, setterName, function]));
     if (backend.isAccessibleByReflection(member)) {
-      task.precompiledFunction.add(
+      emitter.cspPrecompiledFunctionFor(outputUnit).add(
           js('#.prototype.#.${namer.reflectableField} = 1',
               [className, setterName]));
     }
@@ -557,7 +562,7 @@ class ClassEmitter extends CodeEmitterHelper {
     Selector selector = isGetter
         ? new Selector.getter(member.name, member.library)
         : new Selector.setter(member.name, member.library);
-    String reflectionName = task.getReflectionName(selector, name);
+    String reflectionName = emitter.getReflectionName(selector, name);
     if (reflectionName != null) {
       var reflectable =
           js(backend.isAccessibleByReflection(member) ? '1' : '0');
@@ -570,7 +575,7 @@ class ClassEmitter extends CodeEmitterHelper {
     ClassElement superclass = cls;
     while (superclass != null) {
       for (TypeVariableType parameter in superclass.typeVariables) {
-        if (task.readTypeVariables.contains(parameter.element)) {
+        if (backend.emitter.readTypeVariables.contains(parameter.element)) {
           emitTypeVariableReader(cls, builder, parameter.element);
         }
       }

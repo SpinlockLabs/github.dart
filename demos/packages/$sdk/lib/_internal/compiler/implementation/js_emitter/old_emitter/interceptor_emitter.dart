@@ -13,19 +13,6 @@ class InterceptorEmitter extends CodeEmitterHelper {
     }
   }
 
-  Set<ClassElement> interceptorsReferencedFromConstants() {
-    Set<ClassElement> classes = new Set<ClassElement>();
-    JavaScriptConstantCompiler handler = backend.constants;
-    List<Constant> constants = handler.getConstantsForEmission();
-    for (Constant constant in constants) {
-      if (constant is InterceptorConstant) {
-        InterceptorConstant interceptorConstant = constant;
-        classes.add(interceptorConstant.dispatchedType.element);
-      }
-    }
-    return classes;
-  }
-
   void emitGetInterceptorMethod(CodeBuffer buffer,
                                 String key,
                                 Set<ClassElement> classes) {
@@ -186,7 +173,7 @@ class InterceptorEmitter extends CodeEmitterHelper {
    * Emit all versions of the [:getInterceptor:] method.
    */
   void emitGetInterceptorMethods(CodeBuffer buffer) {
-    task.addComment('getInterceptor methods', buffer);
+    emitter.addComment('getInterceptor methods', buffer);
     Map<String, Set<ClassElement>> specializedGetInterceptors =
         backend.specializedGetInterceptors;
     for (String name in specializedGetInterceptors.keys.toList()..sort()) {
@@ -386,7 +373,7 @@ class InterceptorEmitter extends CodeEmitterHelper {
         new jsAst.ArrayInitializer(invocationNames.length, elements);
 
     jsAst.Expression assignment =
-        js('${task.isolateProperties}.# = #', [name, array]);
+        js('${emitter.isolateProperties}.# = #', [name, array]);
 
     buffer.write(jsAst.prettyPrint(assignment, compiler));
     buffer.write(N);
@@ -405,7 +392,7 @@ class InterceptorEmitter extends CodeEmitterHelper {
     List<jsAst.Expression> elements = <jsAst.Expression>[];
     JavaScriptConstantCompiler handler = backend.constants;
     List<Constant> constants =
-        handler.getConstantsForEmission(task.compareConstants);
+        handler.getConstantsForEmission(emitter.compareConstants);
     for (Constant constant in constants) {
       if (constant is TypeConstant) {
         TypeConstant typeConstant = constant;
@@ -414,7 +401,7 @@ class InterceptorEmitter extends CodeEmitterHelper {
           ClassElement classElement = element;
           if (!analysis.needsClass(classElement)) continue;
 
-          elements.add(backend.emitter.constantReference(constant));
+          elements.add(emitter.constantReference(constant));
           elements.add(namer.elementAccess(classElement));
 
           // Create JavaScript Object map for by-name lookup of generative
@@ -450,7 +437,7 @@ class InterceptorEmitter extends CodeEmitterHelper {
     String name =
         backend.namer.getNameOfGlobalField(backend.mapTypeToInterceptor);
     jsAst.Expression assignment =
-        js('${task.isolateProperties}.# = #', [name, array]);
+        js('${emitter.isolateProperties}.# = #', [name, array]);
 
     buffer.write(jsAst.prettyPrint(assignment, compiler));
     buffer.write(N);

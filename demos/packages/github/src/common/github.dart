@@ -32,6 +32,18 @@ class GitHub {
    * HTTP Client
    */
   final http.Client client;
+  
+  GitService _git;
+  
+  /**
+   * Service for git data methods.
+   */
+  GitService get git {
+    if (_git == null) {
+      _git = new GitService(this);
+    }
+    return _git;
+  }
 
   /**
    * Creates a new [GitHub] instance.
@@ -43,7 +55,7 @@ class GitHub {
   GitHub({Authentication auth, this.endpoint: "https://api.github.com", http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
         this.client = client == null ? defaultClient() : client;
-
+        
   /**
    * Fetches the user specified by [name].
    */
@@ -64,16 +76,19 @@ class GitHub {
   Stream<User> users({List<String> names, int pages}) {
     if (names != null) {
       var controller = new StreamController();
-      
-      for (var i = 0; i < names.length; i++) {
-        user(names[i]).then((user) {
+
+      var group = new FutureGroup();
+
+      for (var name in names) {
+        group.add(user(name).then((user) {
           controller.add(user);
-          if (i == names.length - 1) {
-            controller.close();
-          }
-        });
+        }));
       }
-      
+
+      group.future.then((_) {
+        controller.close();
+      });
+
       return controller.stream;
     }
     
@@ -108,20 +123,21 @@ class GitHub {
    */
   Stream<Repository> repositories(List<RepositorySlug> slugs) {
     var controller = new StreamController();
-    
-    for (var i = 0; i < slugs.length; i++) {
-      repository(slugs[i]).then((repo) {
+
+    var group = new FutureGroup();
+
+    for (var slug in slugs) {
+      group.add(repository(slug).then((repo) {
         controller.add(repo);
-        if (i == slugs.length - 1) {
-          controller.close();      
-        }
-      });
+      }));
     }
-    
+
+    group.future.then((_) {
+      controller.close();
+    });
+
     return controller.stream;
   }
-  
-  
   
   Stream<Octocat> octocats({bool cors: false}) => _octocats(this, cors);
   
@@ -132,13 +148,14 @@ class GitHub {
   Future<String> zen() => request("GET", "/zen").then((response) => response.body);
   
   Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) =>
-      _trendingRepos(language: language, since: since);
+      _trendingRepos(this, language: language, since: since);
   
   /**
    * Fetches the repositories of the user specified by [user] in a streamed fashion.
    */
   Stream<Repository> userRepositories(String user, {String type: "owner", String sort: "full_name", String direction: "asc"}) {
     var params = {
+      "type": type,
       "sort": sort,
       "direction": direction
     };
@@ -162,15 +179,18 @@ class GitHub {
    */
   Stream<Organization> organizations(List<String> names) {
     var controller = new StreamController();
-    
-    for (var i = 0; i < names.length; i++) {
-      organization(names[i]).then((org) {
+
+    var group = new FutureGroup();
+
+    for (var name in names) {
+      group.add(organization(name).then((org) {
         controller.add(org);
-        if (i == names.length - 1) {
-          controller.close();
-        }
-      });
+      }));
     }
+
+    group.future.then((_) {
+      controller.close();
+    });
     
     return controller.stream;
   }
@@ -245,9 +265,9 @@ class GitHub {
     });
   }
   
-  Stream<ShowcaseInfo> showcases() => _showcases();
+  Stream<ShowcaseInfo> showcases() => _showcases(this);
   
-  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(info);
+  Future<Showcase> showcase(ShowcaseInfo info) => _showcase(this, info);
   
   /**
    * Gets .gitignore template names.
@@ -400,7 +420,7 @@ class GitHub {
     return getJSON("/gist/${id}", statusCode: StatusCodes.OK, convert: Gist.fromJSON);
   }
   
-  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(url);
+  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) => _blogPosts(this, url);
   
   /**
    * Fetches the Currently Authenticated User's Public Gists
@@ -668,7 +688,7 @@ class GitHub {
     return request("GET", path, headers: headers, params: params).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -684,14 +704,14 @@ class GitHub {
   /**
    * Gets the readme file for a repository.
    */
-  Future<File> readme(RepositorySlug slug) {
+  Future<GitHubFile> readme(RepositorySlug slug) {
     var headers = {};
     
     return getJSON("/repos/${slug.fullName}/readme", headers: headers, statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(this, response.body);
       }
-    }, convert: (gh, input) => File.fromJSON(gh, input, slug));
+    }, convert: (gh, input) => GitHubFile.fromJSON(gh, input, slug));
   }
   
   Future<String> octocat(String text) {
@@ -717,11 +737,11 @@ class GitHub {
       if (input is Map) {
         contents.isFile = true;
         contents.isDirectory = false;
-        contents.file = File.fromJSON(github, input);
+        contents.file = GitHubFile.fromJSON(github, input);
       } else {
         contents.isFile = false;
         contents.isDirectory = true;
-        contents.tree = copyOf(input.map((it) => File.fromJSON(github, it)));
+        contents.tree = copyOf(input.map((it) => GitHubFile.fromJSON(github, it)));
       }
       return contents;
     });
@@ -774,7 +794,7 @@ class GitHub {
     return request("POST", path, headers: headers, params: params, body: body).then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
-        _handleStatusCode(response, response.statusCode);
+        handleStatusCode(response);
         return new Future.value(null);
       }
       return convert(this, JSON.decode(response.body));
@@ -784,16 +804,43 @@ class GitHub {
   /**
    * Internal method to handle status codes
    */
-  void _handleStatusCode(http.Response response, int code) {
-    switch (code) {
+  void handleStatusCode(http.Response response) {
+    switch (response.statusCode) {
       case 404:
         throw new NotFound(this, "Requested Resource was Not Found");
         break;
       case 401:
         throw new AccessForbidden(this);
-      default:
-        throw new UnknownError(this);
+      case 400:
+        var json = response.asJSON();
+        String msg = json['message'];
+        if (msg == "Problems parsing JSON") {
+          throw new InvalidJSON(this, msg);
+        } else if (msg == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, msg);
+        }
+        break;
+      case 422:
+        var json = response.asJSON();
+        String msg = json['message'];
+        var errors = json['errors'];
+        
+        var buff = new StringBuffer();
+        buff.writeln();
+        buff.writeln("  Message: ${msg}");
+        buff.writeln("  Errors:");
+        for (Map<String, String> error in errors) {
+          var resource = error['resource'];
+          var field = error['field'];
+          var code = error['code'];
+          buff
+          ..writeln("    Resource: ${resource}")
+          ..writeln("    Field ${field}")
+          ..write("    Code: ${code}");
+        }
+        throw new ValidationFailed(this, buff.toString());
     }
+    throw new UnknownError(this);
   }
   
   Future<PullRequest> pullRequest(RepositorySlug slug, int number) {

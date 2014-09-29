@@ -164,6 +164,10 @@ class Issue {
   Future<Issue> close() => changeState("closed");
   Future<Issue> open() => changeState("open");
   Future<Issue> reopen() => changeState("open");
+  Future<Issue> toggleState() => isOpen ? close() : open();
+
+  bool get isOpen => state == "open";
+  bool get isClosed => state == "closed";
 
   Future<List<IssueLabel>> addLabels(List<String> labels) {
     return github.postJSON("${json['url']}/labels", body: JSON.encode(labels), convert: (github, input) => input.map((it) => IssueLabel.fromJSON(github, it)));

@@ -1,3 +1,9 @@
+/**
+ * GitHub for the Browser
+ * 
+ * This contains a few utilities that are browser specific.
+ * See [GitHubBrowserHelper] for more information.
+ */
 library github.browser;
 
 import 'dart:async';
@@ -6,6 +12,8 @@ import 'dart:html';
 import 'common.dart';
 import 'http.dart' as http;
 export 'common.dart';
+
+part 'src/browser/helper.dart';
 
 class _BrowserHttpClient extends http.Client {
   

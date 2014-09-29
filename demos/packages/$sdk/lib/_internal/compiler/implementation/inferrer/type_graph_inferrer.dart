@@ -5,7 +5,8 @@
 library type_graph_inferrer;
 
 import 'dart:collection' show Queue, IterableBase;
-import '../dart_types.dart' show DartType, InterfaceType, TypeKind;
+import '../dart_types.dart' show DartType, FunctionType, InterfaceType,
+    TypeKind;
 import '../elements/elements.dart';
 import '../tree/tree.dart' as ast show DartString, Node;
 import '../cps_ir/cps_ir_nodes.dart' as cps_ir show Node;
@@ -21,7 +22,7 @@ import '../dart2jslib.dart'
          invariant,
          TreeElementMapping;
 import 'inferrer_visitor.dart' show TypeSystem, ArgumentsTypes;
-import '../native_handler.dart' as native;
+import '../native/native.dart' as native;
 import '../util/util.dart' show Spannable, Setlet, ImmutableEmptySet;
 import 'simple_types_inferrer.dart';
 
@@ -619,6 +620,8 @@ class TypeGraphInferrerEngine
       analyzeMapAndEnqueue(info);
     });
 
+    Set<FunctionElement> bailedOutOn = new Set<FunctionElement>();
+
     // Trace closures to potentially infer argument types.
     types.allocatedClosures.forEach((info) {
       void trace(Iterable<FunctionElement> elements,
@@ -628,12 +631,22 @@ class TypeGraphInferrerEngine
           elements.forEach((FunctionElement e) {
             compiler.world.registerMightBePassedToApply(e);
             if (_VERBOSE) print("traced closure $e as ${true} (bail)");
+            e.functionSignature.forEachParameter((parameter) {
+              types.getInferredTypeOf(parameter).giveUp(
+                  this,
+                  clearAssignments: false);
+            });
           });
+          bailedOutOn.addAll(elements);
           return;
         }
-        elements.forEach((FunctionElement e) {
+        elements
+            .where((e) => !bailedOutOn.contains(e))
+            .forEach((FunctionElement e) {
           e.functionSignature.forEachParameter((parameter) {
-            workQueue.add(types.getInferredTypeOf(parameter));
+            var info = types.getInferredTypeOf(parameter);
+            info.maybeResume();
+            workQueue.add(info);
           });
           if (tracer.tracedType.mightBePassedToFunctionApply) {
             compiler.world.registerMightBePassedToApply(e);
@@ -668,7 +681,8 @@ class TypeGraphInferrerEngine
     while (!workQueue.isEmpty) {
       TypeInformation info = workQueue.remove();
       if (seenTypes.contains(info)) continue;
-      info.reset(this);
+      // If the node cannot be reset, we do not need to update its users either.
+      if (!info.reset(this)) continue;
       seenTypes.add(info);
       workQueue.addAll(info.users);
     }

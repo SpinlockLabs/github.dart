@@ -8,13 +8,20 @@ part of dart2js.new_js_emitter.emitter;
 ///
 /// Fundamentally, this class is a `Map<LibraryElement, List<Element>>`.
 class Fragment {
-  final Map<LibraryElement, List<Element>> _mapping = <LibraryElement,
-      List<Element>>{};
+  final Map<LibraryElement, List<Element>> _mapping =
+      <LibraryElement, List<Element>>{};
 
   // It is very common to access the same library multiple times in a row, so
   // we cache the last access.
   LibraryElement _lastLibrary;
   List<Element> _lastElements;
+
+  /// A unique name representing this fragment.
+  final String name;
+  final OutputUnit outputUnit;
+
+  Fragment.main(this.outputUnit) : name = "";
+  Fragment.deferred(this.outputUnit, this.name);
 
   void add(LibraryElement library, Element element) {
     if (_lastLibrary != library) {
@@ -31,31 +38,41 @@ class Fragment {
   }
 }
 
+/// Keeps track of all elements and holders.
+///
+/// This class assigns each registered element to its [Fragment] (which are in
+/// bijection with [OutputUnit]s).
+///
+/// Registered holders are assigned a name.
 class Registry {
-  final DeferredLoadTask _deferredLoadTask;
+  final Compiler _compiler;
   final Map<String, Holder> _holdersMap = <String, Holder>{};
-  final Map<OutputUnit, Fragment> _fragmentsMap = <OutputUnit, Fragment>{};
+  final Map<OutputUnit, Fragment> _deferredFragmentsMap =
+      <OutputUnit, Fragment>{};
 
+  DeferredLoadTask get _deferredLoadTask => _compiler.deferredLoadTask;
   Iterable<Holder> get holders => _holdersMap.values;
-  Iterable<Fragment> get deferredFragments => _fragmentsMap.values.skip(1);
-  int get fragmentCount => _fragmentsMap.length;
+  Iterable<Fragment> get deferredFragments => _deferredFragmentsMap.values;
+  // Add one for the main fragment.
+  int get fragmentCount => _deferredFragmentsMap.length + 1;
 
-  /// A fastpath for `_libraryElements[_mainOutputUnit]`.
-  final Fragment mainFragment = new Fragment();
+  Fragment mainFragment;
 
-  Registry(this._deferredLoadTask) {
-    _fragmentsMap[_mainOutputUnit] = mainFragment;
-  }
+  Registry(this._compiler);
 
   bool get _isProgramSplit => _deferredLoadTask.isProgramSplit;
   OutputUnit get _mainOutputUnit => _deferredLoadTask.mainOutputUnit;
 
   Fragment _computeTargetFragment(Element element) {
+    if (mainFragment == null) {
+      mainFragment = new Fragment.main(_deferredLoadTask.mainOutputUnit);
+    }
     if (!_isProgramSplit) return mainFragment;
     OutputUnit targetUnit = _deferredLoadTask.outputUnitForElement(element);
-    return (targetUnit == _mainOutputUnit)
-        ? mainFragment
-        : _fragmentsMap.putIfAbsent(targetUnit, () => new Fragment());
+    if (targetUnit == _mainOutputUnit) return mainFragment;
+    String name = targetUnit.name;
+    return _deferredFragmentsMap.putIfAbsent(
+        targetUnit, () => new Fragment.deferred(targetUnit, name));
   }
 
   /// Adds the element to the list of elements of the library in the right

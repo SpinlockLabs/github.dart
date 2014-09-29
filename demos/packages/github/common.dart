@@ -1,13 +1,18 @@
+/**
+ * The Core of GitHub for Dart.
+ * 
+ * Contains the Models and other GitHub stuff.
+ */
 library github.common;
 
 import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
-import 'package:quiver/cache.dart';
-
 import "package:html5lib/parser.dart" as htmlParser;
 import "package:html5lib/dom.dart" as html;
+
+import "package:quiver/async.dart" show FutureGroup;
 
 import "package:xml/xml.dart" as xml;
 
@@ -44,6 +49,8 @@ part 'src/common/keys.dart';
 part 'src/common/blog.dart';
 part 'src/common/authorizations.dart';
 part 'src/common/git.dart';
+part 'src/common/git_blob.dart';
+part 'src/common/git_commit.dart';
+part 'src/common/git_tree.dart';
 part 'src/common/octodex.dart';
 part 'src/common/shortener.dart';
-part 'src/common/cache.dart';

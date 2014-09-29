@@ -1903,7 +1903,7 @@ class JavaScriptBackend extends Backend {
   computeMembersNeededForReflection() {
     if (_membersNeededForReflection != null) return;
     if (compiler.mirrorsLibrary == null) {
-      _membersNeededForReflection = new Set<Element>();
+      _membersNeededForReflection = const ImmutableEmptySet<Element>();
       return;
     }
     // Compute a mapping from class to the closures it contains, so we
@@ -1942,9 +1942,12 @@ class JavaScriptBackend extends Backend {
           for (ClassElement subcls in compiler.world.subtypesOf(cls)) {
             subcls.forEachClassMember((Member member) {
               if (memberNames.contains(member.name)) {
-                assert(invariant(member.element,
-                    resolution.isLive(member.element)));
-                reflectableMembers.add(member.element);
+                // TODO(20993): find out why this assertion fails.
+                // assert(invariant(member.element,
+                //    resolution.isLive(member.element)));
+                if (resolution.isLive(member.element)) {
+                  reflectableMembers.add(member.element);
+                }
               }
             });
           }
