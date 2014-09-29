@@ -1,6 +1,7 @@
-library github.tests.helper;
+library github.test.helper;
 
 import 'package:unittest/unittest.dart';
+import 'package:mock/mock.dart';
 
 import 'package:github/server.dart';
 

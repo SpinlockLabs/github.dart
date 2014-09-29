@@ -1,4 +1,4 @@
-part of github.tests.helper;
+part of github.test.helper;
 
 final MockHTTPClient httpClient = new MockHTTPClient();
 
