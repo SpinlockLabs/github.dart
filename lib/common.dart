@@ -49,5 +49,8 @@ part 'src/common/keys.dart';
 part 'src/common/blog.dart';
 part 'src/common/authorizations.dart';
 part 'src/common/git.dart';
+part 'src/common/git_blob.dart';
+part 'src/common/git_commit.dart';
+part 'src/common/git_tree.dart';
 part 'src/common/octodex.dart';
 part 'src/common/shortener.dart';

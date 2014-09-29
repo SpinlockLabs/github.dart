@@ -32,6 +32,18 @@ class GitHub {
    * HTTP Client
    */
   final http.Client client;
+  
+  GitService _git;
+  
+  /**
+   * Service for git data methods.
+   */
+  GitService get git {
+    if (_git == null) {
+      _git = new GitService(this);
+    }
+    return _git;
+  }
 
   /**
    * Creates a new [GitHub] instance.
@@ -43,7 +55,7 @@ class GitHub {
   GitHub({Authentication auth, this.endpoint: "https://api.github.com", http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
         this.client = client == null ? defaultClient() : client;
-
+        
   /**
    * Fetches the user specified by [name].
    */

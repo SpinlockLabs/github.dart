@@ -1,80 +1,36 @@
 part of github.common;
 
-class GitBlob {
+/// The [GitService] handles communication with GitHub API methods related 
+/// to git data.
+///  
+/// API docs: https://developer.github.com/v3/git/
+class GitService {
   final GitHub github;
-
-  String content;
-  String sha;
-  String encoding;
-  int size;
-
-  GitBlob(this.github);
-
-  static GitBlob fromJSON(GitHub github, input) {
-    if (input == null) return null;
-    return new GitBlob(github)
-        ..content = input['content']
-        ..sha = input['sha']
-        ..encoding = input['encoding']
-        ..size = input['size'];
+  
+  GitService(this.github);
+  
+  /// Fetches a blob from [slug] for a given [sha].
+  /// 
+  /// API docs: https://developer.github.com/v3/git/blobs/#get-a-blob
+  Future<GitBlob> getBlob(RepositorySlug slug, String sha) {
+    return github.getJSON('/repos/${slug.fullName}/git/blobs/${sha}', 
+        convert: GitBlob.fromJSON, statusCode: StatusCodes.OK); 
   }
-}
 
-class CreateGitBlob {
-  final String content;
-  final String encoding;
-
-  CreateGitBlob(this.content, this.encoding);
-
-  String toJSON() {
-    return JSON.encode({
-      "content": content,
-      "encoding": encoding
-    });
+  /// Creates a blob with specified [blob] content.
+  /// 
+  /// API docs: https://developer.github.com/v3/git/blobs/#create-a-blob
+  Future<GitBlob> createBlob(RepositorySlug slug, CreateGitBlob blob) {
+    return github.postJSON('/repos/${slug.fullName}/git/blobs', 
+        convert: GitBlob.fromJSON, statusCode: StatusCodes.CREATED,
+        body: blob.toJSON());
   }
-}
 
-class GitTree {
-  final GitHub github;
-
-  String sha;
-
-  @ApiName("tree")
-  List<GitTreeEntry> entries;
-
-  Map<String, dynamic> json;
-
-  GitTree(this.github);
-
-  static GitTree fromJSON(GitHub github, input) {
-    return new GitTree(github)
-        ..sha = input['sha']
-        ..entries = input['tree'].map((Map<String, dynamic> it) => GitTreeEntry.fromJSON(github, it))
-        ..json = input;
-  }
-}
-
-class GitTreeEntry {
-  final GitHub github;
-
-  String path;
-  String mode;
-  String type;
-  int size;
-  String sha;
-
-  GitTreeEntry(this.github);
-
-  Map<String, dynamic> json;
-
-  static GitTreeEntry fromJSON(GitHub github, input) {
-    if (input == null) return null;
-    return new GitTreeEntry(github)
-        ..path = input['path']
-        ..mode = input['mode']
-        ..type = input['type']
-        ..size = input['size']
-        ..sha = input['sha']
-        ..json = input;
+  /// Fetches a commit from [slug] for a given [sha].
+  /// 
+  /// API docs: https://developer.github.com/v3/git/commits/#get-a-commit
+  Future<GitCommit> getCommit(RepositorySlug slug, String sha) {
+    return github.getJSON('/repos/${slug.fullName}/git/commits/${sha}', 
+        convert: GitCommit.fromJSON, statusCode: StatusCodes.OK); 
   }
 }
