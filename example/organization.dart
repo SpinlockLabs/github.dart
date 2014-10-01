@@ -32,15 +32,15 @@ void loadOrganization() {
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.organization(org).then((Organization org) {
-    return org.teams().toList();
+  github.organizations.get(org).then((Organization org) {
+    return github.organizations.listTeams(org.name).toList();
   }).then((List<Team> teams) {
     for (var team in teams) {
       var e = new DivElement()..id = "team-${team.name}";
       e.classes.add("team");
       $org.append(e);
       e.append(new HeadingElement.h3()..text = team.name);
-      team.members().toList().then((List<TeamMember> members) {
+      github.organizations.listTeamMembers(team.id).toList().then((List<TeamMember> members) {
         var divs = members.map((member) {
           var h = new DivElement();
           h.classes.add("box");

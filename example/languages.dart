@@ -41,7 +41,7 @@ void loadRepository() {
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.languages(new RepositorySlug(user, reponame)).then((b) {
+  github.repositories.listLanguages(new RepositorySlug(user, reponame)).then((b) {
     breakdown = b;
     reloadTable();
   });
@@ -57,7 +57,7 @@ void reloadTable({int accuracy: 4}) {
   
   isReloadingTable = true;
   
-  github.renderMarkdown(generateMarkdown(accuracy)).then((html) {
+  github.misc.renderMarkdown(generateMarkdown(accuracy)).then((html) {
     $table.innerHtml = html;
     isReloadingTable = false;
   });

@@ -22,8 +22,8 @@ void loadUsers() {
   
   String column = "left";
   
-  github.users(pages: 2).take(12).listen((User baseUser) {
-    github.user(baseUser.login).then((user) {
+  github.users.listUsers(pages: 2).take(12).listen((User baseUser) {
+    github.users.getUser(baseUser.login).then((user) {
       var m = new DivElement();
       
       m.classes.addAll([
@@ -44,7 +44,7 @@ void loadUsers() {
       var buff = new StringBuffer();
       
       buff
-          ..writeln("Username: <a href=\"${baseUser.url}\">${user.login}</a>")
+          ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")
           ..writeln("Created: ${friendlyDateTime(user.createdAt)}")
           ..writeln("Updated: ${friendlyDateTime(user.updatedAt)}");
       

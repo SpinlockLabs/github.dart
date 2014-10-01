@@ -17,7 +17,7 @@ void main() {
 }
 
 void loadReleases() {
-  github.releases(new RepositorySlug("twbs", "bootstrap")).toList().then((releases) {
+  github.repositories.listReleases(new RepositorySlug("twbs", "bootstrap")).toList().then((releases) {
     for (var release in releases) {
       $releases.appendHtml("""
       <div class="repo box" id="release-${release.id}">

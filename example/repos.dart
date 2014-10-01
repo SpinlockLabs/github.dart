@@ -115,7 +115,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
     compare = (a, b) => a.name.compareTo(b.name);
   }
 
-  github.userRepositories(user).toList().then((repos) {
+  github.repositories.listUserRepositories(user).toList().then((repos) {
     _reposCache = repos;
     updateRepos(repos, compare);
   });
