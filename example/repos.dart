@@ -58,7 +58,7 @@ void updateRepos(List<Repository> repos, [int compare(Repository a, Repository b
     $repos.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
-          <h2><a href="${repo.url}">${repo.name}</a></h2>
+          <h2><a href="${repo.htmlUrl}">${repo.name}</a></h2>
           ${repo.description != "" && repo.description != null ? "<b>Description</b>: ${repo.description}<br/>" : ""}
           <b>Language</b>: ${repo.language != null ? repo.language : "Unknown"}
           <br/>

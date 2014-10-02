@@ -47,7 +47,7 @@ void loadOrganization() {
           h.classes.add("user");
           h.style.textAlign = "center";
           h.append(new ImageElement(src: member.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
-          h.append(new AnchorElement(href: member.url)..append(new ParagraphElement()..text = member.login));
+          h.append(new AnchorElement(href: member.htmlUrl)..append(new ParagraphElement()..text = member.login));
           return h;
         });
         divs.forEach(e.append);

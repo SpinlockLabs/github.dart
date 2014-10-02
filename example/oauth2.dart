@@ -33,7 +33,7 @@ void main() {
 
 void loadUsername(String token) {
   var github = new GitHub(auth: new Authentication.withToken(token));
-  github.currentUser().then((user) {
+  github.users.getCurrentUser().then((user) {
     querySelector("#username").setInnerHtml("Hello, ${user.name}");
   });
 }

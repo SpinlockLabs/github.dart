@@ -5,6 +5,6 @@ void main() {
   
   var github = new GitHub();
   
-  github.explore.trendingRepositories(language: "Dart", since: "month")
+  github.explore.listTrendingRepositories(language: "Dart", since: "month")
     .listen((repo) => print("${repo.title}: ${repo.description}"));
 }
