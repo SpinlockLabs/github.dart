@@ -55,14 +55,14 @@ class MiscService extends Service {
   /// Gets API Rate Limit Information
   /// 
   /// API docs: https://developer.github.com/v3/rate_limit/
-  Future<RateLimit> rateLimit() {
+  Future<RateLimit> getRateLimit() {
     return _github.request("GET", "/").then((response) {
       return RateLimit.fromHeaders(response.headers);
     });
   }
   
   /// Gets the GitHub API Status.
-  Future<APIStatus> apiStatus() {
+  Future<APIStatus> getApiStatus() {
     return _github.getJSON("https://status.github.com/api/status.json", 
         statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
   }
@@ -70,7 +70,7 @@ class MiscService extends Service {
   /// Returns a stream of Octocats from Octodex.
   /// 
   /// See: https://octodex.github.com/
-  Stream<Octocat> octodex({bool cors: false}) {
+  Stream<Octocat> listOctodex({bool cors: false}) {
     var controller = new StreamController();
 
     var u = "feeds.feedburner.com/Octocats.xml";
@@ -96,7 +96,7 @@ class MiscService extends Service {
   }
 
   /// Returns an ASCII Octocat with the specified [text].
-  Future<String> octocat([String text]) {
+  Future<String> getOctocat([String text]) {
     var params = {};
     
     if (text != null) {
@@ -109,9 +109,9 @@ class MiscService extends Service {
   }
   
   /// Returns an ASCII Octocat with some wisdom.
-  Future<String> wisdom() => octocat();
+  Future<String> getWisdom() => getOctocat();
   
-  Future<String> zen() => _github.request("GET", "/zen").then((response) => response.body);
+  Future<String> getZen() => _github.request("GET", "/zen").then((response) => response.body);
 }
 
 class Octocat {

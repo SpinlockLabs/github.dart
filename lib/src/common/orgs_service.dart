@@ -47,8 +47,8 @@ class OrganizationsService extends Service {
   /// Lists all of the teams for the specified organization.
   /// 
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
-  Stream<Team> listTeams(String org) {    
-    return new PaginationHelper(_github).objects("GET", "/orgs/${org}/teams", 
+  Stream<Team> listTeams(String orgName) {    
+    return new PaginationHelper(_github).objects("GET", "/orgs/${orgName}/teams", 
         Team.fromJSON);
   }
   

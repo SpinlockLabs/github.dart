@@ -6,7 +6,7 @@ part of github.common;
 class ExploreService extends Service {
   ExploreService(GitHub github) : super(github);
   
-  Stream<TrendingRepository> trendingRepositories({String language, String since: "daily"}) {
+  Stream<TrendingRepository> listTrendingRepositories({String language, String since: "daily"}) {
     var url = "https://github.com/trending";
     
     if (language != null) url += "?l=${language}";
@@ -40,7 +40,7 @@ class ExploreService extends Service {
     return controller.stream;
   }
   
-  Future<Showcase> showcase(ShowcaseInfo info) {
+  Future<Showcase> getShowcase(ShowcaseInfo info) {
     var completer = new Completer();
     
     _github.client.request(new http.Request(info.url)).then((response) {
@@ -81,7 +81,7 @@ class ExploreService extends Service {
     return completer.future;
   }
 
-  Stream<ShowcaseInfo> showcases() {
+  Stream<ShowcaseInfo> listShowcases() {
     var controller = new StreamController();
     
     Function handleResponse;

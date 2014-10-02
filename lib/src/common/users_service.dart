@@ -47,7 +47,7 @@ class UsersService extends Service {
   }
   
   /// Checks if a user exists.
-  Future<bool> userExists(String name) =>
+  Future<bool> isUser(String name) =>
       _github.request("GET", "/users/${name}").then((resp) => resp.statusCode == StatusCodes.OK);
 
   // TODO: Implement editUser: https://developer.github.com/v3/users/#update-the-authenticated-user
@@ -73,13 +73,13 @@ class UsersService extends Service {
   
   // TODO: Implement follower methods: https://developer.github.com/v3/users/followers/
   
-  /// Lists the verified public keys for a [user]. If no [user] is specified,
+  /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
   /// the public keys for the authenticated user are fetched.
   /// 
   /// API docs: https://developer.github.com/v3/users/keys/#list-public-keys-for-a-user
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
-  Stream<PublicKey> listPublicKeys([String user]) {
-    var path = user == null ? "/user/keys" : "/users/${user}/keys";
+  Stream<PublicKey> listPublicKeys([String userLogin]) {
+    var path = userLogin == null ? "/user/keys" : "/users/${userLogin}/keys";
     return new PaginationHelper(_github).objects("GET", path, PublicKey.fromJSON);
   }
   

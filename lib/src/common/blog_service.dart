@@ -5,7 +5,7 @@ class BlogService extends Service {
   BlogService(GitHub github) : super(github);
   
   /// Returns a stream of blog posts for the specified [url].
-  Stream<BlogPost> blogPosts([String url = "https://github.com/blog.atom"]) {
+  Stream<BlogPost> listPosts([String url = "https://github.com/blog.atom"]) {
     var controller = new StreamController();
     _github.client.request(new http.Request(url)).then((response) {
       var document = xml.parse(response.body);
