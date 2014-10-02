@@ -3,7 +3,7 @@ library github.test.util_test;
 import "package:unittest/unittest.dart";
 import "helper.dart";
 
-import "package:github/src/common/util.dart"; // Subject under test.
+import "package:github/common.dart"; 
 
 main() {
   group("slugFromAPIUrl()", () {

@@ -8,7 +8,7 @@ void main() {
   
   var github = new GitHub(auth: new Authentication.withToken("7d8ec1e36b6b60352dd52a6b0b6520a8390e3152"));
   
-  github.repository(slug).then((repository) {
+  github.repositories.getRepository(slug).then((repository) {
     print("Name: ${repository.name}");
     print("Description: ${repository.description}");
     print("Owner: ${repository.owner.login}");

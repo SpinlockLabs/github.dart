@@ -16,5 +16,5 @@ void main() {
 }
 
 void loadZen() {
-  github.zen().then((zen) => $zen.appendText(zen));
+  github.misc.getZen().then((zen) => $zen.appendText(zen));
 }

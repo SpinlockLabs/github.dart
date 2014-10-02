@@ -46,7 +46,7 @@ void main() {
   /* Creates a GitHub Client */
   var github = createGitHubClient();
   
-  github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
+  github.repositories.getRepository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
     /* Do Something */
   });
 }
@@ -60,7 +60,7 @@ void main() {
   /* Creates a GitHub Client */
   var github = createGitHubClient();
   
-  github.repository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
+  github.repositories.getRepository(new RepositorySlug("DirectMyFile", "github.dart")).then((Repository repo) {
     /* Do Something */
   });
 }

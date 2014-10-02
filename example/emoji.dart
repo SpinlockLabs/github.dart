@@ -30,7 +30,7 @@ void loadEmojis() {
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.emojis().then((info) {
+  github.misc.listEmojis().then((info) {
     emojis = info;
     info.forEach((name, url) {
       var h = new DivElement();

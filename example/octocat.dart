@@ -21,7 +21,7 @@ void main() {
 }
 
 void loadCat() {
-  github.octocats(cors: true).toList().then((cats) {
+  github.misc.listOctodex(cors: true).toList().then((cats) {
     print("${cats.length} octocats");
     var index = random.nextInt(cats.length);
     var cat = cats[index];

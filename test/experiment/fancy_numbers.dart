@@ -1,4 +1,4 @@
-import "package:github/src/common/util.dart";
+import "package:github/common.dart";
 
 void main() {
   print(parseFancyNumber("12k"));
