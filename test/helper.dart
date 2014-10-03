@@ -18,14 +18,16 @@ part 'helper/mock.dart';
 part 'helper/expect.dart';
 part 'helper/assets.dart';
 
-void initUnitTests() {
-  var dir = new Directory("build");
+void initUnitTests({bool junit: false}) {
+  if (junit) {
+    var dir = new Directory("build");
 
-  if (!dir.existsSync()) dir.createSync();
+    if (!dir.existsSync()) dir.createSync();
 
-  var file = new File("${dir.path}/tests.xml");
+    var file = new File("${dir.path}/tests.xml");
 
-  if (file.existsSync()) file.deleteSync();
+    if (file.existsSync()) file.deleteSync();
 
-  JUnitConfiguration.install(output: file.openWrite());
+    JUnitConfiguration.install(output: file.openWrite());
+  }
 }
