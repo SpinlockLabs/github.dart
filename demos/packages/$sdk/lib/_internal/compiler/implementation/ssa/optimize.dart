@@ -91,13 +91,12 @@ class SsaOptimizerTask extends CompilerTask {
 }
 
 bool isFixedLength(mask, Compiler compiler) {
-  ClassWorld classWorld = compiler.world;
   JavaScriptBackend backend = compiler.backend;
   if (mask.isContainer && mask.length != null) {
     // A container on which we have inferred the length.
     return true;
   } else if (mask.containsOnly(backend.jsFixedArrayClass)
-             || mask.containsOnlyString(classWorld)
+             || mask.containsOnlyString(compiler)
              || backend.isTypedArray(mask)) {
     return true;
   }
@@ -148,7 +147,7 @@ class SsaInstructionSimplifier extends HBaseVisitor
           // If we can replace [instruction] with [replacement], then
           // [replacement]'s type can be narrowed.
           TypeMask newType = replacement.instructionType.intersection(
-              instruction.instructionType, compiler.world);
+              instruction.instructionType, compiler);
           replacement.instructionType = newType;
         }
 
@@ -187,7 +186,7 @@ class SsaInstructionSimplifier extends HBaseVisitor
     if (input.isBoolean(compiler)) return input;
     // All values that cannot be 'true' are boolified to false.
     TypeMask mask = input.instructionType;
-    if (!mask.contains(backend.jsBoolClass, compiler.world)) {
+    if (!mask.contains(backend.jsBoolClass, compiler)) {
       return graph.addConstantBool(false, compiler);
     }
     return node;
@@ -266,13 +265,12 @@ class SsaInstructionSimplifier extends HBaseVisitor
     Selector selector = node.selector;
     HInstruction input = node.inputs[1];
 
-    World world = compiler.world;
     if (selector.isCall || selector.isOperator) {
       Element target;
       if (input.isExtendableArray(compiler)) {
-        if (selector.applies(backend.jsArrayRemoveLast, world)) {
+        if (selector.applies(backend.jsArrayRemoveLast, compiler)) {
           target = backend.jsArrayRemoveLast;
-        } else if (selector.applies(backend.jsArrayAdd, world)) {
+        } else if (selector.applies(backend.jsArrayAdd, compiler)) {
           // The codegen special cases array calls, but does not
           // inline argument type checks.
           if (!compiler.enableTypeAssertions) {
@@ -280,12 +278,12 @@ class SsaInstructionSimplifier extends HBaseVisitor
           }
         }
       } else if (input.isStringOrNull(compiler)) {
-        if (selector.applies(backend.jsStringSplit, world)) {
+        if (selector.applies(backend.jsStringSplit, compiler)) {
           HInstruction argument = node.inputs[2];
           if (argument.isString(compiler)) {
             target = backend.jsStringSplit;
           }
-        } else if (selector.applies(backend.jsStringOperatorAdd, world)) {
+        } else if (selector.applies(backend.jsStringOperatorAdd, compiler)) {
           // `operator+` is turned into a JavaScript '+' so we need to
           // make sure the receiver and the argument are not null.
           // TODO(sra): Do this via [node.specializer].
@@ -295,7 +293,7 @@ class SsaInstructionSimplifier extends HBaseVisitor
             return new HStringConcat(input, argument, null,
                                      node.instructionType);
           }
-        } else if (selector.applies(backend.jsStringToString, world)
+        } else if (selector.applies(backend.jsStringToString, compiler)
                    && !input.canBeNull()) {
           return input;
         }
@@ -315,7 +313,7 @@ class SsaInstructionSimplifier extends HBaseVisitor
         return result;
       }
     } else if (selector.isGetter) {
-      if (selector.asUntyped.applies(backend.jsIndexableLength, world)) {
+      if (selector.asUntyped.applies(backend.jsIndexableLength, compiler)) {
         HInstruction optimized = tryOptimizeLengthInterceptedGetter(node);
         if (optimized != null) return optimized;
       }
@@ -331,8 +329,8 @@ class SsaInstructionSimplifier extends HBaseVisitor
     }
 
     TypeMask receiverType = node.getDartReceiver(compiler).instructionType;
-    Selector selector =
-        new TypedSelector(receiverType, node.selector, compiler.world);
+    Selector selector = new TypedSelector(receiverType, node.selector,
+        compiler);
     Element element = compiler.world.locateSingleElement(selector);
     // TODO(ngeoffray): Also fold if it's a getter or variable.
     if (element != null
@@ -504,7 +502,7 @@ class SsaInstructionSimplifier extends HBaseVisitor
     // Intersection of int and double return conflicting, so
     // we don't optimize on numbers to preserve the runtime semantics.
     if (!(left.isNumberOrNull(compiler) && right.isNumberOrNull(compiler))) {
-      TypeMask intersection = leftType.intersection(rightType, compiler.world);
+      TypeMask intersection = leftType.intersection(rightType, compiler);
       if (intersection.isEmpty && !intersection.isNullable) {
         return graph.addConstantBool(false, compiler);
       }
@@ -590,7 +588,6 @@ class SsaInstructionSimplifier extends HBaseVisitor
       return graph.addConstantBool(true, compiler);
     }
 
-    ClassWorld classWorld = compiler.world;
     HInstruction expression = node.expression;
     if (expression.isInteger(compiler)) {
       if (identical(element, compiler.intClass)
@@ -634,14 +631,12 @@ class SsaInstructionSimplifier extends HBaseVisitor
     // raw type.
     } else if (!RuntimeTypes.hasTypeArguments(type)) {
       TypeMask expressionMask = expression.instructionType;
-      assert(TypeMask.isNormalized(expressionMask, classWorld));
       TypeMask typeMask = (element == compiler.nullClass)
-          ? new TypeMask.subtype(element, classWorld)
-          : new TypeMask.nonNullSubtype(element, classWorld);
-      if (expressionMask.union(typeMask, classWorld) == typeMask) {
+          ? new TypeMask.subtype(element)
+          : new TypeMask.nonNullSubtype(element);
+      if (expressionMask.union(typeMask, compiler) == typeMask) {
         return graph.addConstantBool(true, compiler);
-      } else if (expressionMask.intersection(typeMask,
-                                             compiler.world).isEmpty) {
+      } else if (expressionMask.intersection(typeMask, compiler).isEmpty) {
         return graph.addConstantBool(false, compiler);
       }
     }
@@ -673,22 +668,20 @@ class SsaInstructionSimplifier extends HBaseVisitor
   }
 
   HInstruction removeIfCheckAlwaysSucceeds(HCheck node, TypeMask checkedType) {
-    ClassWorld classWorld = compiler.world;
-    if (checkedType.containsAll(classWorld)) return node;
+    if (checkedType.containsAll(compiler)) return node;
     HInstruction input = node.checkedInput;
     TypeMask inputType = input.instructionType;
-    return inputType.isInMask(checkedType, classWorld) ? input : node;
+    return inputType.isInMask(checkedType, compiler) ? input : node;
   }
 
   VariableElement findConcreteFieldForDynamicAccess(HInstruction receiver,
                                                     Selector selector) {
     TypeMask receiverType = receiver.instructionType;
     return compiler.world.locateSingleField(
-        new TypedSelector(receiverType, selector, compiler.world));
+        new TypedSelector(receiverType, selector, compiler));
   }
 
   HInstruction visitFieldGet(HFieldGet node) {
-    if (node.isNullCheck) return node;
     var receiver = node.receiver;
     if (node.element == backend.jsIndexableLength) {
       JavaScriptItemCompilationContext context = work.compilationContext;
@@ -719,21 +712,6 @@ class SsaInstructionSimplifier extends HBaseVisitor
         }
       }
     }
-
-    // HFieldGet of a constructed constant can be replaced with the constant's
-    // field.
-    if (receiver is HConstant) {
-      Constant constant = receiver.constant;
-      if (constant.isConstructedObject) {
-        ConstructedConstant constructedConstant = constant;
-        Map<Element, Constant> fields = constructedConstant.fieldElements;
-        Constant value = fields[node.element];
-        if (value != null) {
-          return graph.addConstant(value, compiler);
-        }
-      }
-    }
-
     return node;
   }
 
@@ -1637,8 +1615,7 @@ class SsaTypeConversionInserter extends HBaseVisitor
 
     if (ifUsers.isEmpty && notIfUsers.isEmpty) return;
 
-    TypeMask convertedType =
-        new TypeMask.nonNullSubtype(element, compiler.world);
+    TypeMask convertedType = new TypeMask.nonNullSubtype(element);
     HInstruction input = instruction.expression;
 
     for (HIf ifUser in ifUsers) {
@@ -1896,7 +1873,7 @@ class MemorySet {
     // Typed arrays of different types might have a shared buffer.
     if (couldBeTypedArray(first) && couldBeTypedArray(second)) return true;
     TypeMask intersection = first.instructionType.intersection(
-        second.instructionType, compiler.world);
+        second.instructionType, compiler);
     if (intersection.isEmpty) return false;
     return true;
   }
@@ -2066,7 +2043,7 @@ class MemorySet {
     if (first == null || second == null) return null;
     if (first == second) return first;
     TypeMask phiType = second.instructionType.union(
-          first.instructionType, compiler.world);
+          first.instructionType, compiler);
     if (first is HPhi && first.block == block) {
       HPhi phi = first;
       phi.addInput(second);

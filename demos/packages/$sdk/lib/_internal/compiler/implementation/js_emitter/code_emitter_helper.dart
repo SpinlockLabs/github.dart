@@ -5,17 +5,17 @@
 part of dart2js.js_emitter;
 
 class CodeEmitterHelper {
-  OldEmitter emitter;
+  CodeEmitterTask task;
 
-  Namer get namer => emitter.namer;
+  Namer get namer => task.namer;
 
-  JavaScriptBackend get backend => emitter.backend;
+  JavaScriptBackend get backend => task.backend;
 
-  Compiler get compiler => emitter.compiler;
+  Compiler get compiler => task.compiler;
 
-  String get n => emitter.n;
+  String get n => task.n;
 
-  String get _ => emitter._;
+  String get _ => task._;
 
-  String get N => emitter.N;
+  String get N => task.N;
 }

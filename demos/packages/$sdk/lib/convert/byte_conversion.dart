@@ -78,7 +78,8 @@ class _ByteCallbackSink extends ByteConversionSinkBase {
   static const _INITIAL_BUFFER_SIZE = 1024;
 
   final _ChunkedConversionCallback<List<int>> _callback;
-  List<int> _buffer = new Uint8List(_INITIAL_BUFFER_SIZE);
+  // TODO(11971, floitsch): use Uint8List instead of normal lists.
+  List<int> _buffer = new List<int>(_INITIAL_BUFFER_SIZE);
   int _bufferIndex = 0;
 
   _ByteCallbackSink(void callback(List<int> accumulated))
@@ -90,7 +91,8 @@ class _ByteCallbackSink extends ByteConversionSinkBase {
       // Grow the buffer.
       int oldLength = _buffer.length;
       int newLength = _roundToPowerOf2(chunk.length + oldLength) * 2;
-      List<int> grown = new Uint8List(newLength);
+      // TODO(11971, floitsch): use Uint8List instead of normal lists.
+      List<int> grown = new List<int>(newLength);
       grown.setRange(0, _buffer.length, _buffer);
       _buffer = grown;
     }

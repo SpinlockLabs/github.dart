@@ -92,12 +92,6 @@ abstract class TypeSystem<T> {
   T addPhiInput(Local variable, T phiType, T newType);
 
   /**
-   * Returns `true` if `selector` should be updated to reflect the new
-   * `receiverType`.
-   */
-  bool selectorNeedsUpdate(T receiverType, Selector selector);
-
-  /**
    * Returns a new receiver type for this [selector] applied to
    * [receiverType].
    */
@@ -602,7 +596,6 @@ class LocalsHandler<T> {
 
 abstract class InferrerVisitor
     <T, E extends MinimalInferrerEngine<T>> extends ResolvedVisitor<T> {
-  final Compiler compiler;
   final AstElement analyzedElement;
   final TypeSystem<T> types;
   final E inferrer;
@@ -633,11 +626,12 @@ abstract class InferrerVisitor
   InferrerVisitor(AstElement analyzedElement,
                   this.inferrer,
                   this.types,
-                  this.compiler,
+                  Compiler compiler,
                   [LocalsHandler<T> handler])
     : this.analyzedElement = analyzedElement,
       this.locals = handler,
-      super(analyzedElement.resolvedAst.elements) {
+      super(analyzedElement.resolvedAst.elements,
+            compiler) {
     if (handler != null) return;
     Node node = analyzedElement.node;
     FieldInitializationScope<T> fieldScope =
@@ -765,11 +759,12 @@ abstract class InferrerVisitor
   T get thisType {
     if (_thisType != null) return _thisType;
     ClassElement cls = outermostElement.enclosingClass;
-    ClassWorld classWorld = compiler.world;
-    if (classWorld.isUsedAsMixin(cls)) {
+    if (compiler.world.isUsedAsMixin(cls)) {
       return _thisType = types.nonNullSubtype(cls);
-    } else {
+    } else if (compiler.world.hasAnySubclass(cls)) {
       return _thisType = types.nonNullSubclass(cls);
+    } else {
+      return _thisType = types.nonNullExact(cls);
     }
   }
 

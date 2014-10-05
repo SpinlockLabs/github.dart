@@ -32,7 +32,7 @@ class MetadataEmitter extends CodeEmitterHelper {
           if (value == null) {
             compiler.internalError(annotation, 'Annotation value is null.');
           } else {
-            metadata.add(emitter.constantReference(value));
+            metadata.add(task.constantReference(value));
           }
         }
       }
@@ -50,7 +50,7 @@ class MetadataEmitter extends CodeEmitterHelper {
       Constant value = backend.constants.getConstantForVariable(element);
       String stringRepresentation = (value == null)
           ? "null"
-          : jsAst.prettyPrint(emitter.constantReference(value), compiler)
+          : jsAst.prettyPrint(task.constantReference(value), compiler)
               .getText();
       defaultValues.add(addGlobalMetadata(stringRepresentation));
     }
@@ -64,20 +64,15 @@ class MetadataEmitter extends CodeEmitterHelper {
       return -1;
     }
     return addGlobalMetadata(
-        jsAst.prettyPrint(emitter.constantReference(value), compiler).getText());
+        jsAst.prettyPrint(task.constantReference(value), compiler).getText());
   }
 
   int reifyType(DartType type) {
     jsAst.Expression representation =
-        backend.rti.getTypeRepresentation(
-            type,
-            (variable) {
-              return js.number(
-                  emitter.typeVariableHandler.reifyTypeVariable(variable.element));
-            },
-            (TypedefType typedef) {
-              return backend.isAccessibleByReflection(typedef.element);
-            });
+        backend.rti.getTypeRepresentation(type, (variable) {
+          return js.number(
+              task.typeVariableHandler.reifyTypeVariable(variable.element));
+        });
 
     return addGlobalMetadata(
         jsAst.prettyPrint(representation, compiler).getText());
@@ -95,9 +90,7 @@ class MetadataEmitter extends CodeEmitterHelper {
   }
 
   void emitMetadata(CodeBuffer buffer) {
-    String metadataAccess = emitter.generateEmbeddedGlobalAccessString(
-          embeddedNames.METADATA);
-    buffer.write('$metadataAccess$_=$_[');
+    buffer.write('init.metadata$_=$_[');
     for (String metadata in globalMetadata) {
       if (metadata is String) {
         if (metadata != 'null') {

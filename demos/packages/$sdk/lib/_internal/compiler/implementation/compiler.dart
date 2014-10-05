@@ -73,12 +73,6 @@ class CodegenRegistry extends Registry {
     treeElements.registerDependency(element);
   }
 
-  void registerInlining(Element inlinedElement, Element context) {
-    if (compiler.dumpInfo) {
-      compiler.dumpInfoTask.registerInlined(inlinedElement, context);
-    }
-  }
-
   void registerInstantiatedClass(ClassElement element) {
     world.registerInstantiatedClass(element, this);
   }
@@ -133,8 +127,8 @@ class CodegenRegistry extends Registry {
     backend.registerTypeVariableBoundsSubtypeCheck(subtype, supertype);
   }
 
-  void registerClosureWithFreeTypeVariables(FunctionElement element) {
-    backend.registerClosureWithFreeTypeVariables(element, world, this);
+  void registerGenericClosure(FunctionElement element) {
+    backend.registerGenericClosure(element, world, this);
   }
 
   void registerGetOfStaticFunction(FunctionElement element) {
@@ -278,9 +272,9 @@ abstract class Backend {
   /// Called during codegen when [constant] has been used.
   void registerCompileTimeConstant(Constant constant, Registry registry) {}
 
-  /// Called during resolution when a constant value for [metadata] on
-  /// [annotatedElement] has been evaluated.
-  void registerMetadataConstant(MetadataAnnotation metadata,
+  /// Called during resolution when a metadata [constant] for [annotatedElement]
+  /// has been evaluated.
+  void registerMetadataConstant(Constant constant,
                                 Element annotatedElement,
                                 Registry registry) {}
 
@@ -307,19 +301,16 @@ abstract class Backend {
    * Call this to register that an instantiated generic class has a call
    * method.
    */
-  void registerCallMethodWithFreeTypeVariables(
-      Element callMethod,
-      Enqueuer enqueuer,
-      Registry registry) {}
-
+  void registerGenericCallMethod(Element callMethod,
+                                 Enqueuer enqueuer,
+                                 Registry registry) {}
   /**
    * Call this to register that a getter exists for a function on an
    * instantiated generic class.
    */
-  void registerClosureWithFreeTypeVariables(
-      Element closure,
-      Enqueuer enqueuer,
-      Registry registry) {}
+  void registerGenericClosure(Element closure,
+                              Enqueuer enqueuer,
+                              Registry registry) {}
 
   /// Call this to register that a member has been closurized.
   void registerBoundClosure(Enqueuer enqueuer) {}
@@ -666,13 +657,11 @@ abstract class Compiler implements DiagnosticListener {
    */
   final bool analyzeSignaturesOnly;
   final bool enableNativeLiveTypeAnalysis;
-
   /**
    * If true, stop compilation after type inference is complete. Used for
    * debugging and testing purposes only.
    */
   bool stopAfterTypeInference = false;
-
   /**
    * If [:true:], comment tokens are collected in [commentMap] during scanning.
    */
@@ -851,14 +840,13 @@ abstract class Compiler implements DiagnosticListener {
   ParserTask parser;
   PatchParserTask patchParser;
   LibraryLoaderTask libraryLoader;
+  TreeValidatorTask validator;
   ResolverTask resolver;
   closureMapping.ClosureTask closureToClassMapper;
   TypeCheckerTask checker;
   IrBuilderTask irBuilder;
   ti.TypesTask typesTask;
   Backend backend;
-
-  GenericTask reuseLibraryTask;
 
   /// The constant environment for the frontend interpretation of compile-time
   /// constants.
@@ -904,11 +892,7 @@ abstract class Compiler implements DiagnosticListener {
   bool enabledInvokeOn = false;
   bool hasIsolateSupport = false;
 
-  Stopwatch progress;
-
-  bool get shouldPrintProgress {
-    return verbose && progress.elapsedMilliseconds > 500;
-  }
+  Stopwatch progress = new Stopwatch()..start();
 
   static const int PHASE_SCANNING = 0;
   static const int PHASE_RESOLVING = 1;
@@ -932,7 +916,6 @@ abstract class Compiler implements DiagnosticListener {
             this.enableMinification: false,
             this.enableNativeLiveTypeAnalysis: false,
             bool emitJavaScript: true,
-            bool dart2dartMultiFile: false,
             bool generateSourceMap: true,
             bool analyzeAllFlag: false,
             bool analyzeOnly: false,
@@ -949,7 +932,7 @@ abstract class Compiler implements DiagnosticListener {
             this.useContentSecurityPolicy: false,
             this.suppressWarnings: false,
             bool hasIncrementalSupport: false,
-            api.CompilerOutputProvider outputProvider,
+            outputProvider,
             List<String> strips: const []})
       : this.disableTypeInferenceFlag =
           disableTypeInferenceFlag || !emitJavaScript,
@@ -964,11 +947,7 @@ abstract class Compiler implements DiagnosticListener {
             : outputProvider {
     world = new World(this);
     types = new Types(this);
-    tracer = new Tracer(this, this.outputProvider);
-
-    if (verbose) {
-      progress = new Stopwatch()..start();
-    }
+    tracer = new Tracer(this.outputProvider);
 
     // TODO(johnniwinther): Separate the dependency tracking from the enqueueing
     // for global dependencies.
@@ -983,9 +962,11 @@ abstract class Compiler implements DiagnosticListener {
       backend = jsBackend;
     } else {
       closureNamer = new closureMapping.ClosureNamer();
-      backend = new dart_backend.DartBackend(this, strips,
-                                             multiFile: dart2dartMultiFile);
+      backend = new dart_backend.DartBackend(this, strips);
     }
+
+    // No-op in production mode.
+    validator = new TreeValidatorTask(this);
 
     tasks = [
       libraryLoader = new LibraryLoaderTask(this),
@@ -1002,9 +983,7 @@ abstract class Compiler implements DiagnosticListener {
       deferredLoadTask = new DeferredLoadTask(this),
       mirrorUsageAnalyzerTask = new MirrorUsageAnalyzerTask(this),
       enqueuer = new EnqueueTask(this),
-      dumpInfoTask = new DumpInfoTask(this),
-      reuseLibraryTask = new GenericTask('Reuse library', this),
-    ];
+      dumpInfoTask = new DumpInfoTask(this)];
 
     tasks.addAll(backend.tasks);
   }
@@ -1316,7 +1295,7 @@ abstract class Compiler implements DiagnosticListener {
     Selector.canonicalizedValues.clear();
     TypedSelector.canonicalizedValues.clear();
 
-    assert(uri != null || analyzeOnly || hasIncrementalSupport);
+    assert(uri != null || analyzeOnly);
     return new Future.sync(() {
       if (librariesToAnalyzeWhenRun != null) {
         return Future.forEach(librariesToAnalyzeWhenRun, (libraryUri) {
@@ -1459,6 +1438,8 @@ abstract class Compiler implements DiagnosticListener {
     assert(mainFunction != null);
     phase = PHASE_DONE_RESOLVING;
 
+    // TODO(ahe): Remove this line. Eventually, enqueuer.resolution
+    // should know this.
     world.populate();
     // Compute whole-program-knowledge that the backend needs. (This might
     // require the information computed in [world.populate].)
@@ -1472,7 +1453,7 @@ abstract class Compiler implements DiagnosticListener {
     log('Inferring types...');
     typesTask.onResolutionComplete(mainFunction);
 
-    if (stopAfterTypeInference) return;
+    if(stopAfterTypeInference) return;
 
     log('Compiling...');
     phase = PHASE_COMPILING;
@@ -1552,9 +1533,7 @@ abstract class Compiler implements DiagnosticListener {
       }
       world.addToWorkList(main);
     }
-    if (verbose) {
-      progress.reset();
-    }
+    progress.reset();
     world.forEach((WorkItem work) {
       withCurrentElement(work.element, () => work.run(this, world));
     });
@@ -1622,6 +1601,7 @@ abstract class Compiler implements DiagnosticListener {
     assert(parser != null);
     Node tree = parser.parse(element);
     assert(invariant(element, !element.isSynthesized || tree == null));
+    if (tree != null) validator.validate(tree);
     TreeElements elements = resolver.resolve(element);
     if (elements != null) {
       if (tree != null && !analyzeSignaturesOnly &&
@@ -1637,7 +1617,7 @@ abstract class Compiler implements DiagnosticListener {
     assert(invariant(work.element, identical(world, enqueuer.resolution)));
     assert(invariant(work.element, !work.isAnalyzed(),
         message: 'Element ${work.element} has already been analyzed'));
-    if (shouldPrintProgress) {
+    if (progress.elapsedMilliseconds > 500) {
       // TODO(ahe): Add structured diagnostics to the compiler API and
       // use it to separate this from the --verbose option.
       if (phase == PHASE_RESOLVING) {
@@ -1654,13 +1634,18 @@ abstract class Compiler implements DiagnosticListener {
 
   void codegen(CodegenWorkItem work, CodegenEnqueuer world) {
     assert(invariant(work.element, identical(world, enqueuer.codegen)));
-    if (shouldPrintProgress) {
+    if (progress.elapsedMilliseconds > 500) {
       // TODO(ahe): Add structured diagnostics to the compiler API and
       // use it to separate this from the --verbose option.
       log('Compiled ${enqueuer.codegen.generatedCode.length} methods.');
       progress.reset();
     }
     backend.codegen(work);
+  }
+
+  FunctionSignature resolveSignature(FunctionElement element) {
+    return withCurrentElement(element,
+                              () => resolver.resolveSignature(element));
   }
 
   void reportError(Spannable node,
@@ -1988,9 +1973,6 @@ abstract class Compiler implements DiagnosticListener {
     return libraryUri;
   }
 
-  void diagnoseCrashInUserCode(String message, exception, stackTrace) {
-    // Overridden by Compiler in apiimpl.dart.
-  }
 }
 
 class CompilerTask {
@@ -2004,8 +1986,6 @@ class CompilerTask {
 
   String get name => 'Unknown task';
   int get timing => (watch != null) ? watch.elapsedMilliseconds : 0;
-
-  int get timingMicroseconds => (watch != null) ? watch.elapsedMicroseconds : 0;
 
   UserTag getProfilerTag() {
     if (profilerTag == null) profilerTag = new UserTag(name);
@@ -2128,11 +2108,4 @@ class NullSink implements EventSink<String> {
 class SuppressionInfo {
   int warnings = 0;
   int hints = 0;
-}
-
-class GenericTask extends CompilerTask {
-  final String name;
-
-  GenericTask(this.name, Compiler compiler)
-      : super(compiler);
 }

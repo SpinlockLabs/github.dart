@@ -238,13 +238,7 @@ abstract class _BroadcastStreamController<T>
   }
 
   void addError(Object error, [StackTrace stackTrace]) {
-    error = _nonNullError(error);
     if (!_mayAddEvent) throw _addEventError();
-    AsyncError replacement = Zone.current.errorCallback(error, stackTrace);
-    if (replacement != null) {
-      error = _nonNullError(replacement.error);
-      stackTrace = replacement.stackTrace;
-    }
     _sendError(error, stackTrace);
   }
 
@@ -275,6 +269,7 @@ abstract class _BroadcastStreamController<T>
   }
 
   void _addError(Object error, StackTrace stackTrace) {
+    assert(_isAddingStream);
     _sendError(error, stackTrace);
   }
 
@@ -464,8 +459,7 @@ class _AsBroadcastStreamController<T>
       _addPendingEvent(new _DelayedError(error, stackTrace));
       return;
     }
-    if (!_mayAddEvent) throw _addEventError();
-    _sendError(error, stackTrace);
+    super.addError(error, stackTrace);
     while (_hasPending) {
       _pending.handleNext(this);
     }

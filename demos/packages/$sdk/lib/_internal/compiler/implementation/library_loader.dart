@@ -22,8 +22,8 @@ import 'elements/modelx.dart'
          ErroneousElementX,
          LibraryElementX,
          PrefixElementX;
-import 'helpers/helpers.dart';  // Included for debug helpers.
-import 'native/native.dart' as native;
+import 'helpers/helpers.dart';
+import 'native_handler.dart' as native;
 import 'tree/tree.dart';
 import 'util/util.dart' show Link, LinkBuilder;
 
@@ -48,7 +48,7 @@ import 'util/util.dart' show Link, LinkBuilder;
  * 'http://example.com/bar.dart', but such URIs cannot necessarily be used for
  * locating source files, since the scheme must be supported by the input
  * provider. The standard input provider for dart2js only supports the 'file'
- * and 'http' scheme.
+ * scheme.
  *
  * ## Resolved URI ##
  *
@@ -143,9 +143,6 @@ abstract class LibraryLoaderTask implements CompilerTask {
   ///
   /// This method is used for incremental compilation.
   void reset({bool reuseLibrary(LibraryElement library)});
-
-  /// Asynchronous version of [reset].
-  Future resetAsync(Future<bool> reuseLibrary(LibraryElement library));
 }
 
 /// Handle for creating synthesized/patch libraries during library loading.
@@ -267,57 +264,17 @@ class _LibraryLoaderTask extends CompilerTask implements LibraryLoaderTask {
   }
 
   void reset({bool reuseLibrary(LibraryElement library)}) {
-    measure(() {
-      assert(currentHandler == null);
+    assert(currentHandler == null);
+    Iterable<LibraryElement> libraries =
+        new List.from(libraryCanonicalUriMap.values);
 
-      Iterable<LibraryElement> reusedLibraries = null;
-      if (reuseLibrary != null) {
-        reusedLibraries = compiler.reuseLibraryTask.measure(() {
-          // Call [toList] to force eager calls to [reuseLibrary].
-          return libraryCanonicalUriMap.values.where(reuseLibrary).toList();
-        });
-      }
+    libraryCanonicalUriMap.clear();
+    libraryResourceUriMap.clear();
+    libraryNames.clear();
 
-      resetImplementation(reusedLibraries);
-    });
-  }
+    if (reuseLibrary == null) return;
 
-  void resetImplementation(Iterable<LibraryElement> reusedLibraries) {
-    measure(() {
-      libraryCanonicalUriMap.clear();
-      libraryResourceUriMap.clear();
-      libraryNames.clear();
-
-      if (reusedLibraries != null) {
-        reusedLibraries.forEach(mapLibrary);
-      }
-    });
-  }
-
-  Future resetAsync(Future<bool> reuseLibrary(LibraryElement library)) {
-    return measure(() {
-      assert(currentHandler == null);
-
-      Future<LibraryElement> wrapper(LibraryElement library) {
-        try {
-          return reuseLibrary(library).then(
-              (bool reuse) => reuse ? library : null);
-        } catch (exception, trace) {
-          compiler.diagnoseCrashInUserCode(
-              'Uncaught exception in reuseLibrary', exception, trace);
-          rethrow;
-        }
-      }
-
-      List<Future<LibraryElement>> reusedLibrariesFuture =
-          compiler.reuseLibraryTask.measure(
-              () => libraryCanonicalUriMap.values.map(wrapper).toList());
-
-      return Future.wait(reusedLibrariesFuture).then(
-          (List<LibraryElement> reusedLibraries) {
-            resetImplementation(reusedLibraries.where((e) => e != null));
-          });
-    });
+    libraries.where(reuseLibrary).forEach(mapLibrary);
   }
 
   /// Insert [library] in the internal maps. Used for compiler reuse.
@@ -437,22 +394,6 @@ class _LibraryLoaderTask extends CompilerTask implements LibraryLoaderTask {
     });
   }
 
-  /// True if the uris are pointing to a library that is shared between dart2js
-  /// and the core libraries. By construction they must be imported into the
-  /// runtime, and, at the same time, into dart2js. This can lead to
-  /// duplicated imports, like in the docgen.
-  // TODO(johnniwinther): is this necessary, or should we change docgen not
-  //   to include both libraries (compiler and lib) at the same time?
-  bool _isSharedDart2jsLibrary(Uri uri1, Uri uri2) {
-    bool inJsLibShared(Uri uri) {
-      List<String> segments = uri.pathSegments;
-      if (segments.length < 3) return false;
-      if (segments[segments.length - 2] != 'shared') return false;
-      return (segments[segments.length - 3] == 'js_lib');
-    }
-    return inJsLibShared(uri1) && inJsLibShared(uri2);
-  }
-
   void checkDuplicatedLibraryName(LibraryElement library) {
     Uri resourceUri = library.entryCompilationUnit.script.resourceUri;
     LibraryName tag = library.libraryTag;
@@ -478,8 +419,7 @@ class _LibraryLoaderTask extends CompilerTask implements LibraryLoaderTask {
     } else if (tag != null) {
       String name = library.getLibraryOrScriptName();
       existing = libraryNames.putIfAbsent(name, () => library);
-      if (!identical(existing, library) &&
-          !_isSharedDart2jsLibrary(resourceUri, existing.canonicalUri)) {
+      if (!identical(existing, library)) {
         compiler.withCurrentElement(library, () {
           compiler.reportWarning(tag.name,
               MessageKind.DUPLICATED_LIBRARY_NAME,
@@ -558,33 +498,23 @@ class _LibraryLoaderTask extends CompilerTask implements LibraryLoaderTask {
       return new Future.value(library);
     }
     return compiler.withCurrentElement(importingLibrary, () {
-      return compiler.readScript(node, readableUri).then((Script script) {
-        if (script == null) return null;
-        LibraryElement element =
-            createLibrarySync(handler, script, resolvedUri);
-        return processLibraryTags(handler, element).then((_) {
-          compiler.withCurrentElement(element, () {
-            handler.registerLibraryExports(element);
+      return compiler.readScript(node, readableUri)
+          .then((Script script) {
+            if (script == null) return null;
+            LibraryElement element = new LibraryElementX(script, resolvedUri);
+            compiler.withCurrentElement(element, () {
+              handler.registerNewLibrary(element);
+              native.maybeEnableNative(compiler, element);
+              libraryCanonicalUriMap[resolvedUri] = element;
+              compiler.scanner.scanLibrary(element);
+            });
+            return processLibraryTags(handler, element).then((_) {
+              compiler.withCurrentElement(element, () {
+                handler.registerLibraryExports(element);
+              });
+              return element;
+            });
           });
-          return element;
-        });
-      });
-    });
-  }
-
-  LibraryElement createLibrarySync(
-      LibraryDependencyHandler handler,
-      Script script,
-      Uri resolvedUri) {
-    LibraryElement element = new LibraryElementX(script, resolvedUri);
-    return compiler.withCurrentElement(element, () {
-      if (handler != null) {
-        handler.registerNewLibrary(element);
-        libraryCanonicalUriMap[resolvedUri] = element;
-      }
-      native.maybeEnableNative(compiler, element);
-      compiler.scanner.scanLibrary(element);
-      return element;
     });
   }
 }

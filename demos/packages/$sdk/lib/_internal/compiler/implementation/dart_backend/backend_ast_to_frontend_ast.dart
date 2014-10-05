@@ -23,10 +23,6 @@ tree.FunctionExpression emit(dart2js.TreeElementMapping treeElements,
 /// backend.
 const bool INSERT_NEW_BACKEND_COMMENT = true;
 
-/// The comment inserted in front of every function body.
-const String NEW_BACKEND_COMMENT =
-    INSERT_NEW_BACKEND_COMMENT ? '/* new backend */ ' : '';
-
 /// Converts backend ASTs to frontend ASTs.
 class TreePrinter {
   dart2js.TreeElementMapping treeElements;
@@ -104,8 +100,6 @@ class TreePrinter {
   final Token catchToken = makeIdToken('catch');
   final Token onToken = makeIdToken('on');
   final Token finallyToken = makeIdToken('finally');
-  final Token getToken = makeIdToken('get');
-  final Token setToken = makeIdToken('set');
 
   static tree.Identifier makeIdentifier(String name) {
     return new tree.Identifier(
@@ -242,12 +236,11 @@ class TreePrinter {
 
   tree.Node makeStaticReceiver(elements.Element element) {
     if (treeElements == null) return null;
-    if (element.isStatic) {
-      elements.ClassElement enclosingClass = element.enclosingClass;
+    if (element.enclosingElement is elements.ClassElement) {
       tree.Send send = new tree.Send(
           null,
-          makeIdentifier(enclosingClass.name));
-      treeElements[send] = enclosingClass;
+          makeIdentifier(element.enclosingElement.name));
+      treeElements[send] = element.enclosingElement;
       return send;
     } else {
       return null;
@@ -395,25 +388,21 @@ class TreePrinter {
       if (beginStmt && exp.name != null) {
         needParen = true; // Do not mistake for function declaration.
       }
-      Token getOrSet = exp.isGetter
-          ? getToken
-          : exp.isSetter
-              ? setToken
-              : null;
-      tree.NodeList parameters = exp.isGetter
-          ? makeList("", [])
-          : makeParameters(exp.parameters);
-      tree.Node body = makeFunctionBody(exp.body);
+      // exp.element can only be null in tests.
+      tree.Node body = exp.element != null &&
+          exp.element.node.body is tree.EmptyStatement
+        ? exp.element.node.body
+        : makeFunctionBody(exp.body);
       result = new tree.FunctionExpression(
           functionName(exp),
-          parameters,
+          makeParameters(exp.parameters),
           body,
           exp.returnType == null || exp.element.isConstructor
             ? null
             : makeType(exp.returnType),
           makeFunctionModifiers(exp),
           null,  // initializers
-          getOrSet);
+          null); // get/set
       setElement(result, exp.element, exp);
     } else if (exp is Identifier) {
       precedence = CALLEE;
@@ -529,7 +518,6 @@ class TreePrinter {
           null,
           makeIdentifier(exp.name));
       setElement(result, exp.element, exp);
-      setType(result, exp.element.type, exp);
     } else if (exp is StringConcat) {
       precedence = PRIMARY;
       result = unparseStringLiteral(exp);
@@ -593,7 +581,7 @@ class TreePrinter {
 
   /// A comment token to be inserted when [INSERT_NEW_BACKEND_COMMENT] is true.
   final SymbolToken newBackendComment = new SymbolToken(
-      const PrecedenceInfo(NEW_BACKEND_COMMENT, 0, OPEN_CURLY_BRACKET_TOKEN),
+      const PrecedenceInfo('/* new backend */ ', 0, OPEN_CURLY_BRACKET_TOKEN),
       -1);
 
   tree.Node makeFunctionBody(Statement stmt) {
@@ -607,9 +595,9 @@ class TreePrinter {
 
   /// Produces a statement in a context where only blocks are allowed.
   tree.Node makeBlock(Statement stmt) {
-    if (stmt is Block || stmt is EmptyStatement) {
+    if (stmt is Block)
       return makeStatement(stmt);
-    } else {
+    else {
       return new tree.Block(braceList('', [makeStatement(stmt)]));
     }
   }
@@ -939,7 +927,8 @@ class TreePrinter {
   tree.Modifiers makeFunctionModifiers(FunctionExpression exp) {
     if (exp.element == null) return makeEmptyModifiers();
     List<tree.Node> modifiers = new List<tree.Node>();
-    if (exp.element.isFactoryConstructor) {
+    if (exp.element is elements.ConstructorElement &&
+        exp.element.isFactoryConstructor) {
       modifiers.add(makeIdentifier("factory"));
     }
     if (exp.element.isStatic) {

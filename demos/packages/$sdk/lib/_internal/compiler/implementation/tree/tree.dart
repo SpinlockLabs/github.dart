@@ -19,3 +19,4 @@ part 'dartstring.dart';
 part 'nodes.dart';
 part 'prettyprint.dart';
 part 'unparser.dart';
+part 'visitors.dart';

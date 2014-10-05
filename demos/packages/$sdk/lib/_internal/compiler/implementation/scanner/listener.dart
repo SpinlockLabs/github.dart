@@ -634,13 +634,13 @@ class Listener {
     return skipToEof(token);
   }
 
-  Token expectedDeclaration(Token token) {
+  Link<Token> expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       error("expected a declaration, but got '${token.value}'", token);
     }
-    return skipToEof(token);
+    return const Link<Token>();
   }
 
   Token unmatched(Token token) {
@@ -934,9 +934,8 @@ class ElementListener extends Listener {
     NodeList typeVariables = popNode(); // TOOD(karlklose): do not throw away.
     Identifier name = popNode();
     TypeAnnotation returnType = popNode();
-    pushElement(
-        new PartialTypedefElement(
-            name.source, compilationUnitElement, typedefKeyword, endToken));
+    pushElement(new PartialTypedefElement(name.source, compilationUnitElement,
+                                          typedefKeyword));
     rejectBuiltInIdentifier(name);
   }
 
@@ -1214,14 +1213,14 @@ class ElementListener extends Listener {
     return unexpected(token);
   }
 
-  Token expectedDeclaration(Token token) {
+  Link<Token> expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       reportFatalError(token,
                        "Expected a declaration, but got '${token.value}'.");
     }
-    return skipToEof(token);
+    return const Link<Token>();
   }
 
   Token unmatched(Token token) {
@@ -1605,7 +1604,6 @@ class NodeListener extends ElementListener {
   Token expectedClassBody(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
-      return skipToEof(token);
     } else {
       reportFatalError(token,
                        "Expected a class body, but got '${token.value}'.");
@@ -2170,15 +2168,13 @@ class NodeListener extends ElementListener {
   }
 }
 
-abstract class PartialElement implements DeclarationSite {
-  Token beginToken;
-  Token endToken;
+abstract class PartialElement implements Element {
+  Token get beginToken;
+  Token get endToken;
 
   bool hasParseError = false;
 
   bool get isErroneous => hasParseError;
-
-  DeclarationSite get declarationSite => this;
 }
 
 abstract class PartialFunctionMixin implements FunctionElement {
@@ -2257,16 +2253,16 @@ class PartialConstructorElement extends ConstructorElementX
   }
 }
 
-class PartialFieldList extends VariableList with PartialElement {
-  PartialFieldList(Token beginToken,
-                   Token endToken,
+class PartialFieldList extends VariableList {
+  final Token beginToken;
+  final Token endToken;
+  final bool hasParseError;
+
+  PartialFieldList(this.beginToken,
+                   this.endToken,
                    Modifiers modifiers,
-                   bool hasParseError)
-      : super(modifiers) {
-    super.beginToken = beginToken;
-    super.endToken = endToken;
-    super.hasParseError = hasParseError;
-  }
+                   this.hasParseError)
+      : super(modifiers);
 
   VariableDefinitions parseNode(Element element, DiagnosticListener listener) {
     if (definitions != null) return definitions;
@@ -2312,19 +2308,11 @@ class PartialFieldList extends VariableList with PartialElement {
   }
 }
 
-class PartialTypedefElement extends TypedefElementX with PartialElement {
+class PartialTypedefElement extends TypedefElementX {
+  final Token token;
 
-  PartialTypedefElement(
-      String name,
-      Element enclosing,
-      Token beginToken,
-      Token endToken)
-      : super(name, enclosing) {
-    this.beginToken = beginToken;
-    this.endToken = endToken;
-  }
-
-  Token get token => beginToken;
+  PartialTypedefElement(String name, Element enclosing, this.token)
+      : super(name, enclosing);
 
   Node parseNode(DiagnosticListener listener) {
     if (cachedNode != null) return cachedNode;
@@ -2376,8 +2364,7 @@ Node parse(DiagnosticListener diagnosticListener,
     doParse(new Parser(listener));
   } on ParserError catch (e) {
     if (element is PartialElement) {
-      PartialElement partial = element as PartialElement;
-      partial.hasParseError = true;
+      element.hasParseError = true;
     }
     return new ErrorNode(element.position, e.reason);
   }

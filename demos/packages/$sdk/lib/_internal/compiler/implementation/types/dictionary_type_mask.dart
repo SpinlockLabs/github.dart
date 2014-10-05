@@ -57,15 +57,15 @@ class DictionaryTypeMask extends MapTypeMask {
 
   }
 
-  TypeMask intersection(TypeMask other, ClassWorld classWorld) {
-    TypeMask forwardIntersection = forwardTo.intersection(other, classWorld);
+  TypeMask intersection(TypeMask other, Compiler compiler) {
+    TypeMask forwardIntersection = forwardTo.intersection(other, compiler);
     if (forwardIntersection.isEmpty) return forwardIntersection;
     return forwardIntersection.isNullable
         ? nullable()
         : nonNullable();
   }
 
-  TypeMask union(other, ClassWorld classWorld) {
+  TypeMask union(other, Compiler compiler) {
     if (this == other) {
       return this;
     } else if (equalsDisregardNull(other)) {
@@ -73,9 +73,9 @@ class DictionaryTypeMask extends MapTypeMask {
     } else if (other.isEmpty) {
       return other.isNullable ? this.nullable() : this;
     } else if (other.isDictionary) {
-      TypeMask newForwardTo = forwardTo.union(other.forwardTo, classWorld);
-      TypeMask newKeyType = keyType.union(other.keyType, classWorld);
-      TypeMask newValueType = valueType.union(other.valueType, classWorld);
+      TypeMask newForwardTo = forwardTo.union(other.forwardTo, compiler);
+      TypeMask newKeyType = keyType.union(other.keyType, compiler);
+      TypeMask newValueType = valueType.union(other.valueType, compiler);
       Map<String, TypeMask> mappings = <String, TypeMask>{};
       typeMap.forEach((k,v) {
               if (!other.typeMap.containsKey(k)) {
@@ -84,7 +84,7 @@ class DictionaryTypeMask extends MapTypeMask {
             });
       other.typeMap.forEach((k,v) {
         if (typeMap.containsKey(k)) {
-          mappings[k] = v.union(typeMap[k], classWorld);
+          mappings[k] = v.union(typeMap[k], compiler);
         } else {
           mappings[k] = v.nullable();
         }
@@ -94,13 +94,13 @@ class DictionaryTypeMask extends MapTypeMask {
     } else if (other.isMap &&
                (other.keyType != null) &&
                (other.valueType != null)) {
-      TypeMask newForwardTo = forwardTo.union(other.forwardTo, classWorld);
-      TypeMask newKeyType = keyType.union(other.keyType, classWorld);
-      TypeMask newValueType = valueType.union(other.valueType, classWorld);
+      TypeMask newForwardTo = forwardTo.union(other.forwardTo, compiler);
+      TypeMask newKeyType = keyType.union(other.keyType, compiler);
+      TypeMask newValueType = valueType.union(other.valueType, compiler);
       return new MapTypeMask(newForwardTo, null, null,
                              newKeyType, newValueType);
     } else {
-      return forwardTo.union(other, classWorld);
+      return forwardTo.union(other, compiler);
     }
   }
 

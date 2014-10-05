@@ -75,7 +75,8 @@ class _UnicodeSubsetEncoder extends Converter<String, List<int>> {
   const _UnicodeSubsetEncoder(this._subsetMask);
 
   List<int> convert(String string) {
-    List result = new Uint8List(string.length);
+    // TODO(11971): Use Uint8List when possible.
+    List result = new List<int>(string.length);
     for (int i = 0; i < string.length; i++) {
       var codeUnit = string.codeUnitAt(i);
       if ((codeUnit & ~_subsetMask) != 0) {

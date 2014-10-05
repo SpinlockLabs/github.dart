@@ -20,8 +20,6 @@ import 'util/util.dart' as util;
 
 import 'elements/elements.dart' as elements;
 
-import 'elements/modelx.dart' as modelx;
-
 import 'elements/visitor.dart' as elements_visitor;
 
 import 'js/js.dart' as js;
@@ -46,8 +44,6 @@ import 'cps_ir/cps_ir_nodes_sexpr.dart' as cps_ir_nodes_sexpr;
 
 import 'cps_ir/cps_ir_builder.dart' as ir_builder;
 
-import 'js_emitter/js_emitter.dart' as js_emitter;
-
 class ElementVisitor extends elements_visitor.ElementVisitor {
   visitElement(e) {}
 }
@@ -59,7 +55,6 @@ void main(List<String> arguments) {
   useNode(null);
   useUtil(null);
   useSetlet(null);
-  useImmutableEmptySet(null);
   useElementVisitor(new ElementVisitor());
   useJs(new js.Program(null));
   useJs(new js.Blob(null));
@@ -70,11 +65,9 @@ void main(List<String> arguments) {
   useSsa(null);
   useCodeBuffer(null);
   usedByTests();
-  useElements(null, null, null);
-  useIr(null, null, null);
+  useElements(null, null);
+  useIr(null, null);
   useCompiler(null);
-  useTypes();
-  useCodeEmitterTask(null);
 }
 
 useApi() {
@@ -131,17 +124,10 @@ void useNode(tree.Node node) {
 
 void useUtil(util.Link link) {
   link.reversePrependAll(link);
-  util.longestCommonPrefixLength(null, null);
-  new util.Pair(null, null);
 }
 
 void useSetlet(util.Setlet setlet) {
   setlet.difference(setlet);
-  setlet.retainWhere(null);
-}
-
-void useImmutableEmptySet(util.ImmutableEmptySet set) {
-  set.retainWhere(null);
 }
 
 void useElementVisitor(ElementVisitor visitor) {
@@ -211,22 +197,20 @@ usedByTests() {
   typeGraphInferrer.getCallersOf(null);
   dart_types.Types.sorted(null);
   new dart_types.Types(compiler).copy(compiler);
-  new universe.TypedSelector.subclass(null, null, compiler.world);
-  new universe.TypedSelector.subtype(null, null, compiler.world);
-  new universe.TypedSelector.exact(null, null, compiler.world);
+  new universe.TypedSelector.subclass(null, null, compiler);
+  new universe.TypedSelector.subtype(null, null, compiler);
+  new universe.TypedSelector.exact(null, null, compiler);
   sourceFileProvider.readStringFromUri(null);
 }
 
-useElements(elements.ClassElement e, elements.Name n, modelx.FieldElementX f) {
+useElements(elements.ClassElement e, elements.Name n) {
   e.lookupClassMember(null);
   e.lookupInterfaceMember(null);
   n.isAccessibleFrom(null);
-  f.reuseElement();
 }
 
 useIr(cps_ir_nodes_sexpr.SExpressionStringifier stringifier,
-      ir_builder.IrBuilderTask task,
-      ir_builder.IrBuilder builder) {
+      ir_builder.IrBuilderTask task) {
   new cps_ir_nodes_sexpr.SExpressionStringifier();
   stringifier
     ..newContinuationName()
@@ -243,25 +227,9 @@ useIr(cps_ir_nodes_sexpr.SExpressionStringifier stringifier,
   task
     ..hasIr(null)
     ..getIr(null);
-  builder
-    ..buildIntegerLiteral(null)
-    ..buildDoubleLiteral(null)
-    ..buildBooleanLiteral(null)
-    ..buildNullLiteral()
-    ..buildStringLiteral(null);
 }
 
 useCompiler(dart2jslib.Compiler compiler) {
-  compiler.libraryLoader
-      ..reset()
-      ..resetAsync(null)
-      ..lookupLibrary(null);
-}
-
-useTypes() {
-  new dart_types.ResolvedTypedefType(null, null, null).unalias(null);
-}
-
-useCodeEmitterTask(js_emitter.CodeEmitterTask codeEmitterTask) {
-  codeEmitterTask.oldEmitter.clearCspPrecompiledNodes();
+  compiler.libraryLoader.reset();
+  compiler.libraryLoader.lookupLibrary(null);
 }

@@ -27,7 +27,7 @@ void loadUser() {
 
     var github = createClient(token.value);
 
-    github.currentUser().then((CurrentUser user) {
+    github.users.getCurrentUser().then((CurrentUser user) {
       info.children.clear();
       info.hidden = false;
       info.appendHtml("""

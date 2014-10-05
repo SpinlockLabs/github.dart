@@ -67,11 +67,7 @@ class Printer extends Indentation implements NodeVisitor {
           // parsing error is avoided, so we can only do this trick if the
           // next line is not something that can be glued onto a valid
           // expression to make a new valid expression.
-
-          // If we're using the new emitter where most pretty printed code
-          // is escaped in strings, it is a lot easier to deal with semicolons
-          // than newlines because the former doesn't need escaping.
-          if (USE_NEW_EMITTER || expressionContinuationRegExp.hasMatch(str)) {
+          if (expressionContinuationRegExp.hasMatch(str)) {
             outBuffer.add(";");
           } else {
             outBuffer.add("\n");
@@ -970,7 +966,7 @@ class VarCollector extends BaseVisitor {
   void visitThis(This node) {}
 
   void visitVariableDeclaration(VariableDeclaration decl) {
-    if (decl.allowRename) vars.add(decl.name);
+    vars.add(decl.name);
   }
 }
 

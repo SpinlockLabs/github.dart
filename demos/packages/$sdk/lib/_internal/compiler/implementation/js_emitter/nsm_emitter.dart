@@ -37,15 +37,15 @@ class NsmEmitter extends CodeEmitterHelper {
       for (Selector selector in selectors) {
         TypeMask mask = selector.mask;
         if (mask == null) {
-          mask = new TypeMask.subclass(compiler.objectClass, compiler.world);
+          mask = new TypeMask.subclass(compiler.objectClass);
         }
 
-        if (!mask.needsNoSuchMethodHandling(selector, compiler.world)) continue;
+        if (!mask.needsNoSuchMethodHandling(selector, compiler)) continue;
         String jsName = namer.invocationMirrorInternalName(selector);
         addedJsNames[jsName] = selector;
-        String reflectionName = emitter.getReflectionName(selector, jsName);
+        String reflectionName = task.getReflectionName(selector, jsName);
         if (reflectionName != null) {
-          emitter.mangledFieldNames[jsName] = reflectionName;
+          task.mangledFieldNames[jsName] = reflectionName;
         }
       }
     }
@@ -72,7 +72,7 @@ class NsmEmitter extends CodeEmitterHelper {
 
       String methodName = selector.invocationMirrorMemberName;
       String internalName = namer.invocationMirrorInternalName(selector);
-      String reflectionName = emitter.getReflectionName(selector, internalName);
+      String reflectionName = task.getReflectionName(selector, internalName);
       if (!haveVeryFewNoSuchMemberHandlers &&
           isTrivialNsmHandler(type, argNames, selector, internalName) &&
           reflectionName == null) {
@@ -104,7 +104,7 @@ class NsmEmitter extends CodeEmitterHelper {
       jsAst.Expression method = generateMethod(jsName, selector);
       if (method != null) {
         addProperty(jsName, method);
-        String reflectionName = emitter.getReflectionName(selector, jsName);
+        String reflectionName = task.getReflectionName(selector, jsName);
         if (reflectionName != null) {
           bool accessible = compiler.world.allFunctions.filter(selector).any(
               (Element e) => backend.isAccessibleByReflection(e));
@@ -337,7 +337,7 @@ class NsmEmitter extends CodeEmitterHelper {
     }
 
     // TODO(9631): This is no longer valid for native methods.
-    String whatToPatch = emitter.nativeEmitter.handleNoSuchMethod ?
+    String whatToPatch = task.nativeEmitter.handleNoSuchMethod ?
                          "Object.prototype" :
                          "objectClassObject";
 

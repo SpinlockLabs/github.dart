@@ -26,7 +26,7 @@ class GitHubBrowserHelper {
         return it.length >= indent ? it.substring(indent) : it;
       }).join("\n");
       
-      github.renderMarkdown(md).then((html) {
+      github.misc.renderMarkdown(md).then((html) {
         e.hidden = false;
         e.setAttribute("rendered", "");
         e.classes.add("markdown-body");

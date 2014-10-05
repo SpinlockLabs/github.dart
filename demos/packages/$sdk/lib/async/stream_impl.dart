@@ -1008,10 +1008,9 @@ class _StreamIteratorImpl<T> implements StreamIterator<T> {
           _subscription.resume();
           return new _Future<bool>.immediate(true);
         case _STATE_EXTRA_ERROR:
-          AsyncError prefetch = _futureOrPrefetch;
+          Object prefetch = _futureOrPrefetch;
           _clear();
-          return new _Future<bool>.immediateError(prefetch.error,
-                                                  prefetch.stackTrace);
+          return new _Future<bool>.immediateError(prefetch);
         case _STATE_EXTRA_DONE:
           _clear();
           return new _Future<bool>.immediate(false);
@@ -1064,7 +1063,7 @@ class _StreamIteratorImpl<T> implements StreamIterator<T> {
     }
     _subscription.pause();
     assert(_futureOrPrefetch == null);
-    _futureOrPrefetch = new AsyncError(error, stackTrace);
+    _futureOrPrefetch = error;
     _state = _STATE_EXTRA_ERROR;
   }
 

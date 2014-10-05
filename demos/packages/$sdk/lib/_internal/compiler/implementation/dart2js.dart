@@ -9,6 +9,7 @@ import 'dart:async'
 import 'dart:io'
     show exit, File, FileMode, Platform, RandomAccessFile, FileSystemException,
          stdin, stderr;
+import 'dart:math' as math;
 
 import '../compiler.dart' as api;
 import 'source_file.dart';
@@ -100,6 +101,7 @@ void parseCommandLine(List<OptionHandler> handlers, List<String> argv) {
 FormattingDiagnosticHandler diagnosticHandler;
 
 Future compile(List<String> argv) {
+  bool isWindows = (Platform.operatingSystem == 'windows');
   stackTraceFilePrefix = '$currentDirectory';
   Uri libraryRoot = currentDirectory;
   Uri out = currentDirectory.resolve('out.js');
@@ -113,8 +115,6 @@ Future compile(List<String> argv) {
   bool stripArgumentSet = false;
   bool analyzeOnly = false;
   bool analyzeAll = false;
-  bool trustTypeAnnotations = false;
-  bool checkedMode = false;
   // List of provided options that imply that output is expected.
   List<String> optionsImplyCompilation = <String>[];
   bool hasDisallowUnsafeEval = false;
@@ -155,8 +155,7 @@ Future compile(List<String> argv) {
 
   setOutputType(String argument) {
     optionsImplyCompilation.add(argument);
-    if (argument == '--output-type=dart' ||
-        argument == '--output-type=dart-multi') {
+    if (argument == '--output-type=dart') {
       outputLanguage = OUTPUT_LANGUAGE_DART;
       if (!explicitOut) {
         out = currentDirectory.resolve('out.dart');
@@ -195,16 +194,6 @@ Future compile(List<String> argv) {
 
   implyCompilation(String argument) {
     optionsImplyCompilation.add(argument);
-    passThrough(argument);
-  }
-
-  setTrustTypeAnnotations(String argument) {
-    trustTypeAnnotations = true;
-    implyCompilation(argument);
-  }
-
-  setCheckedMode(String argument) {
-    checkedMode = true;
     passThrough(argument);
   }
 
@@ -258,7 +247,7 @@ Future compile(List<String> argv) {
           wantHelp = true;
           break;
         case 'c':
-          setCheckedMode('--enable-checked-mode');
+          passThrough('--enable-checked-mode');
           break;
         case 'm':
           implyCompilation('--minify');
@@ -266,6 +255,17 @@ Future compile(List<String> argv) {
         default:
           throw 'Internal error: "$shortOption" did not match';
       }
+    }
+  }
+
+  Uri computePrecompiledUri() {
+    String extension = 'precompiled.js';
+    String outPath = out.path;
+    if (outPath.endsWith('.js')) {
+      outPath = outPath.substring(0, outPath.length - 3);
+      return out.resolve('$outPath.$extension');
+    } else {
+      return out.resolve(extension);
     }
   }
 
@@ -279,9 +279,7 @@ Future compile(List<String> argv) {
     }),
     new OptionHandler('--suppress-hints',
                       (_) => diagnosticHandler.showHints = false),
-    new OptionHandler(
-        '--output-type=dart|--output-type=dart-multi|--output-type=js',
-        setOutputType),
+    new OptionHandler('--output-type=dart|--output-type=js', setOutputType),
     new OptionHandler('--verbose', setVerbose),
     new OptionHandler('--version', (_) => wantVersion = true),
     new OptionHandler('--library-root=.+', setLibraryRoot),
@@ -294,13 +292,12 @@ Future compile(List<String> argv) {
     new OptionHandler('--enable-diagnostic-colors',
                       (_) => diagnosticHandler.enableColors = true),
     new OptionHandler('--enable[_-]checked[_-]mode|--checked',
-                      (_) => setCheckedMode('--enable-checked-mode')),
+                      (_) => passThrough('--enable-checked-mode')),
     new OptionHandler('--enable-concrete-type-inference',
                       (_) => implyCompilation(
                           '--enable-concrete-type-inference')),
     new OptionHandler('--trust-type-annotations',
-                      (_) => setTrustTypeAnnotations(
-                          '--trust-type-annotations')),
+                      (_) => implyCompilation('--trust-type-annotations')),
     new OptionHandler(r'--help|/\?|/h', (_) => wantHelp = true),
     new OptionHandler('--package-root=.+|-p.+', setPackageRoot),
     new OptionHandler('--analyze-all', setAnalyzeAll),
@@ -333,9 +330,7 @@ Future compile(List<String> argv) {
 
   if (hasDisallowUnsafeEval) {
     String precompiledName =
-        relativize(currentDirectory,
-                   RandomAccessFileOutputProvider.computePrecompiledUri(out),
-                   Platform.isWindows);
+        relativize(currentDirectory, computePrecompiledUri(), isWindows);
     helpAndFail("Option '--disallow-unsafe-eval' has been removed."
                 " Instead, the compiler generates a file named"
                 " '$precompiledName'.");
@@ -351,11 +346,6 @@ Future compile(List<String> argv) {
   if (arguments.length > 1) {
     var extra = arguments.sublist(1);
     helpAndFail('Extra arguments: ${extra.join(" ")}');
-  }
-
-  if (checkedMode && trustTypeAnnotations) {
-    helpAndFail("Option '--trust-type-annotations' may not be used in "
-                "checked mode.");
   }
 
   Uri uri = currentDirectory.resolve(arguments[0]);
@@ -378,12 +368,12 @@ Future compile(List<String> argv) {
 
   diagnosticHandler.info('Package root is $packageRoot');
 
+  int totalCharactersWritten = 0;
+
   options.add('--out=$out');
   options.add('--source-map=$sourceMapOut');
 
-  RandomAccessFileOutputProvider outputProvider =
-      new RandomAccessFileOutputProvider(
-          out, sourceMapOut, onInfo: diagnosticHandler.info, onFailure: fail);
+  List<String> allOutputFiles = new List<String>();
 
   compilationDone(String code) {
     if (analyzeOnly) return;
@@ -394,27 +384,103 @@ Future compile(List<String> argv) {
                 getDepsOutput(inputProvider.sourceFiles));
     diagnosticHandler.info(
          'Compiled ${inputProvider.dartCharactersRead} characters Dart '
-         '-> ${outputProvider.totalCharactersWritten} characters '
-         '$outputLanguage in '
-         '${relativize(currentDirectory, out, Platform.isWindows)}');
+         '-> $totalCharactersWritten characters $outputLanguage '
+         'in ${relativize(currentDirectory, out, isWindows)}');
     if (diagnosticHandler.verbose) {
       String input = uriPathToNative(arguments[0]);
       print('Dart file ($input) compiled to $outputLanguage.');
       print('Wrote the following files:');
-      for (String filename in outputProvider.allOutputFiles) {
+      for (String filename in allOutputFiles) {
         print("  $filename");
       }
     } else if (!explicitOut) {
       String input = uriPathToNative(arguments[0]);
-      String output = relativize(currentDirectory, out, Platform.isWindows);
+      String output = relativize(currentDirectory, out, isWindows);
       print('Dart file ($input) compiled to $outputLanguage: $output');
     }
+  }
+
+  EventSink<String> outputProvider(String name, String extension) {
+    Uri uri;
+    String sourceMapFileName;
+    bool isPrimaryOutput = false;
+    if (name == '') {
+      if (extension == 'js' || extension == 'dart') {
+        isPrimaryOutput = true;
+        uri = out;
+        sourceMapFileName =
+            sourceMapOut.path.substring(sourceMapOut.path.lastIndexOf('/') + 1);
+      } else if (extension == 'precompiled.js') {
+        uri = computePrecompiledUri();
+        diagnosticHandler.info(
+            "File ($uri) is compatible with header"
+            " \"Content-Security-Policy: script-src 'self'\"");
+      } else if (extension == 'js.map' || extension == 'dart.map') {
+        uri = sourceMapOut;
+      } else if (extension == 'info.html' || extension == "info.json") {
+        String outName = out.path.substring(out.path.lastIndexOf('/') + 1);
+        uri = out.resolve('$outName.$extension');
+      } else {
+        fail('Unknown extension: $extension');
+      }
+    } else {
+      uri = out.resolve('$name.$extension');
+    }
+
+    if (uri.scheme != 'file') {
+      fail('Unhandled scheme ${uri.scheme} in $uri.');
+    }
+
+    RandomAccessFile output;
+    try {
+      output = new File(uri.toFilePath()).openSync(mode: FileMode.WRITE);
+    } on FileSystemException catch(e) {
+      fail('$e');
+    }
+
+    allOutputFiles.add(relativize(currentDirectory, uri, isWindows));
+
+    int charactersWritten = 0;
+
+    writeStringSync(String data) {
+      // Write the data in chunks of 8kb, otherwise we risk running OOM.
+      int chunkSize = 8*1024;
+
+      int offset = 0;
+      while (offset < data.length) {
+        output.writeStringSync(
+            data.substring(offset, math.min(offset + chunkSize, data.length)));
+        offset += chunkSize;
+      }
+      charactersWritten += data.length;
+    }
+
+    onDone() {
+      output.closeSync();
+      if (isPrimaryOutput) {
+        totalCharactersWritten += charactersWritten;
+      }
+    }
+
+    return new EventSinkWrapper(writeStringSync, onDone);
   }
 
   return compileFunc(uri, libraryRoot, packageRoot,
                      inputProvider, diagnosticHandler,
                      options, outputProvider, environment)
             .then(compilationDone);
+}
+
+class EventSinkWrapper extends EventSink<String> {
+  var onAdd, onClose;
+
+  EventSinkWrapper(this.onAdd, this.onClose);
+
+  void add(String data) => onAdd(data);
+
+  void addError(error, [StackTrace stackTrace]) => throw error;
+
+  void close() => onClose();
 }
 
 class AbortLeg {
@@ -560,7 +626,7 @@ be removed in a future version:
   --dump-info
     Generates an out.info.json file with information about the generated code.
     You can inspect the generated file with the viewer at:
-    https://dart-lang.github.io/dump-info-visualizer/
+    http://dart-lang.github.io/dump-info-visualizer/build/web/viewer.html
 
 '''.trim());
 }

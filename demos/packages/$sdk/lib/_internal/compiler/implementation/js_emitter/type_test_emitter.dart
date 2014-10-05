@@ -71,7 +71,7 @@ class TypeTestEmitter extends CodeEmitterHelper {
       jsAst.Expression encoding = rti.getSignatureEncoding(type, thisAccess);
       String operatorSignature = namer.operatorSignature();
       if (!type.containsTypeVariables) {
-        builder.functionType = '${emitter.metadataEmitter.reifyType(type)}';
+        builder.functionType = '${task.metadataEmitter.reifyType(type)}';
       } else {
         builder.addProperty(operatorSignature, encoding);
       }
@@ -81,7 +81,7 @@ class TypeTestEmitter extends CodeEmitterHelper {
       if (cls.typeVariables.isEmpty) return;
       RuntimeTypes rti = backend.rti;
       jsAst.Expression expression;
-      bool needsNativeCheck = emitter.nativeEmitter.requiresNativeIsCheck(cls);
+      bool needsNativeCheck = task.nativeEmitter.requiresNativeIsCheck(cls);
       expression = rti.getSupertypeSubstitution(
           classElement, cls, alwaysGenerateFunction: true);
       if (expression == null && (emitNull || needsNativeCheck)) {
@@ -273,7 +273,7 @@ class TypeTestEmitter extends CodeEmitterHelper {
   }
 
   void emitRuntimeTypeSupport(CodeBuffer buffer, OutputUnit outputUnit) {
-    emitter.addComment('Runtime type support', buffer);
+    task.addComment('Runtime type support', buffer);
     RuntimeTypes rti = backend.rti;
     TypeChecks typeChecks = rti.requiredChecks;
 
@@ -394,28 +394,16 @@ class TypeTestEmitter extends CodeEmitterHelper {
         return false;
       } else if (function.isInstanceMember) {
         if (!function.enclosingClass.isClosure) {
-          return compiler.codegenWorld.hasInvokedGetter(
-              function, compiler.world);
+          return compiler.codegenWorld.hasInvokedGetter(function, compiler);
         }
       }
       return false;
     }
 
-    bool canBeReflectedAsFunction(Element element) {
-      return element.kind == ElementKind.FUNCTION ||
-          element.kind == ElementKind.GETTER ||
-          element.kind == ElementKind.SETTER ||
-          element.kind == ElementKind.GENERATIVE_CONSTRUCTOR;
-    }
-
-    bool canBeReified(Element element) {
-      return (canTearOff(element) || backend.isAccessibleByReflection(element));
-    }
-
-    // Find all types referenced from the types of elements that can be
-    // reflected on 'as functions'.
     backend.generatedCode.keys.where((element) {
-      return canBeReflectedAsFunction(element) && canBeReified(element);
+      return element is FunctionElement &&
+          element is! ConstructorBodyElement &&
+          (canTearOff(element) || backend.isAccessibleByReflection(element));
     }).forEach((FunctionElement function) {
       DartType type = function.computeType(compiler);
       for (ClassElement cls in backend.rti.getReferencedClasses(type)) {

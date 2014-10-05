@@ -190,7 +190,7 @@ class IntConstant extends NumConstant {
     return value == otherInt.value;
   }
 
-  int get hashCode => value & SMI_MASK;
+  int get hashCode => value.hashCode;
   DartString toDartString() => new DartString.literal(value.toString());
 
   accept(ConstantVisitor visitor) => visitor.visitInt(this);
@@ -609,7 +609,7 @@ class ConstructedConstant extends ObjectConstant {
     if (compiler.backend.isInterceptorClass(type.element)) {
       return compiler.typesTask.nonNullType;
     }
-    return new ti.TypeMask.nonNullExact(type.element, compiler.world);
+    return new ti.TypeMask.nonNullExact(type.element);
   }
 
   accept(ConstantVisitor visitor) => visitor.visitConstructed(this);

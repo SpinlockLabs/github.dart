@@ -292,14 +292,15 @@ class JsBuilder {
 
   /// Creates a literal js string from [value].
   LiteralString escapedString(String value) {
-   // Start by escaping the backslashes.
-    String escaped = value.replaceAll('\\', '\\\\');
     // Do not escape unicode characters and ' because they are allowed in the
     // string literal anyway.
-    escaped = escaped.replaceAllMapped(new RegExp('\n|"|\b|\t|\v'), (match) {
+    String escaped =
+        value.replaceAllMapped(new RegExp('\n|"|\\|\0|\b|\t|\v'), (match) {
       switch (match.group(0)) {
         case "\n" : return r"\n";
+        case "\\" : return r"\\";
         case "\"" : return r'\"';
+        case "\0" : return r"\0";
         case "\b" : return r"\b";
         case "\t" : return r"\t";
         case "\f" : return r"\f";
@@ -323,19 +324,10 @@ class JsBuilder {
 
   LiteralNumber number(num value) => new LiteralNumber('$value');
 
-  ArrayInitializer numArray(Iterable<int> list) =>
-      new ArrayInitializer.from(list.map(number));
-
-  ArrayInitializer stringArray(Iterable<String> list) =>
-      new ArrayInitializer.from(list.map(string));
-
   Comment comment(String text) => new Comment(text);
 }
 
 LiteralString string(String value) => js.string(value);
-LiteralNumber number(num value) => js.number(value);
-ArrayInitializer numArray(Iterable<int> list) => js.numArray(list);
-ArrayInitializer stringArray(Iterable<String> list) => js.stringArray(list);
 
 class MiniJsParserError {
   MiniJsParserError(this.parser, this.message) { }

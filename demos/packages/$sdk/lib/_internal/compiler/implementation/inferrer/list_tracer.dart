@@ -127,8 +127,8 @@ Set<String> doNotChangeLengthSelectorsSet = new Set<String>.from(
 
 
 class ListTracerVisitor extends TracerVisitor<ListTypeInformation> {
-  // The [Set] of found assignments to the list.
-  Set<TypeInformation> assignments = new Setlet<TypeInformation>();
+  // The [List] of found assignments to the list.
+  List<TypeInformation> assignments = <TypeInformation>[];
   bool callsGrowableMethod = false;
 
   ListTracerVisitor(tracedType, inferrer) : super(tracedType, inferrer);
@@ -161,7 +161,7 @@ class ListTracerVisitor extends TracerVisitor<ListTypeInformation> {
   visitStaticCallSiteTypeInformation(StaticCallSiteTypeInformation info) {
     super.visitStaticCallSiteTypeInformation(info);
     Element called = info.calledElement;
-    if (called.isForeign(compiler.backend) && called.name == 'JS') {
+    if (called.isForeign(compiler) && called.name == 'JS') {
       bailout('Used in JS ${info.call}');
     }
   }

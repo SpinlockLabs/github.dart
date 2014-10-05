@@ -493,11 +493,6 @@ class FunctionDefinition extends Node {
 
   FunctionDefinition(this.element, this.parameters, this.body,
       this.localConstants, this.defaultParameterValues);
-
-  /// Returns `true` if this function is abstract.
-  ///
-  /// If `true` [body] is `null` and [localConstants] is empty.
-  bool get isAbstract => body == null;
 }
 
 abstract class ExpressionVisitor<E> {

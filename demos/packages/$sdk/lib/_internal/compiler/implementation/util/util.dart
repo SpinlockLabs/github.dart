@@ -9,14 +9,9 @@ import 'characters.dart';
 
 export 'setlet.dart';
 export 'maplet.dart';
-export 'emptyset.dart';
 
 part 'indentation.dart';
 part 'link.dart';
-
-/// If an integer is masked by this constant, the result is guaranteed to be in
-/// Smi range.
-const int SMI_MASK = 0x3fffffff;
 
 /**
  * Tagging interface for classes from which source spans can be generated.
@@ -169,49 +164,4 @@ String modifiersToString({bool isStatic: false,
   StringBuffer buffer = new StringBuffer();
   builder.toLink().printOn(buffer, ', ');
   return buffer.toString();
-}
-
-class Pair<A, B> {
-  final A a;
-  final B b;
-
-  Pair(this.a, this.b);
-
-  int get hashCode => 13 * a.hashCode + 17 * b.hashCode;
-
-  bool operator ==(var other) {
-    if (identical(this, other)) return true;
-    if (other is! Pair) return false;
-    return a == other.a && b == other.b;
-  }
-
-  String toString() => '($a,$b)';
-}
-
-
-int longestCommonPrefixLength(List a, List b) {
-  int index = 0;
-  for ( ; index < a.length && index < b.length; index++) {
-    if (a[index] != b[index]) {
-      break;
-    }
-  }
-  return index;
-}
-
-/// Returns [suggestedName] if it is not in [usedNames]. Otherwise concatenates
-/// the smallest number that makes it not appear in [usedNames].
-///
-/// Adds the result to [usedNames].
-String makeUnique(String suggestedName, Set<String> usedNames) {
-  String result = suggestedName;
-  if (usedNames.contains(suggestedName)) {
-    int counter = 0;
-    while (usedNames.contains(result)) {
-      counter++;
-      result = "$suggestedName$counter";
-    }
-  }
-  usedNames.add(result);
-  return result;
 }

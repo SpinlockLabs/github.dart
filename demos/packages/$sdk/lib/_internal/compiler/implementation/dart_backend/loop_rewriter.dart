@@ -34,8 +34,6 @@ class LoopRewriter extends RecursiveVisitor {
   Set<Label> usedContinueLabels = new Set<Label>();
 
   void rewrite(FunctionDefinition function) {
-    if (function.isAbstract) return;
-
     function.body = visitStatement(function.body);
   }
 

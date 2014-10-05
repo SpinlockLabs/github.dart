@@ -117,7 +117,7 @@ abstract class Future<T> {
       try {
         result._complete(computation());
       } catch (e, s) {
-        _completeWithErrorCallback(result, e, s);
+        result._completeError(e, s);
       }
     });
     return result;
@@ -143,7 +143,7 @@ abstract class Future<T> {
       try {
         result._complete(computation());
       } catch (e, s) {
-        _completeWithErrorCallback(result, e, s);
+        result._completeError(e, s);
       }
     });
     return result;
@@ -187,19 +187,9 @@ abstract class Future<T> {
   /**
    * A future that completes with an error in the next event-loop iteration.
    *
-   * If [error] is `null`, it is replaced by a [NullThrownError].
-   *
-   * Use [Completer] to create a future and complete it later.
+   * Use [Completer] to create a Future and complete it later.
    */
   factory Future.error(Object error, [StackTrace stackTrace]) {
-    error = _nonNullError(error);
-    if (!identical(Zone.current, _ROOT_ZONE)) {
-      AsyncError replacement = Zone.current.errorCallback(error, stackTrace);
-      if (replacement != null) {
-        error = _nonNullError(replacement.error);
-        stackTrace = replacement.stackTrace;
-      }
-    }
     return new _Future<T>.immediateError(error, stackTrace);
   }
 
@@ -222,14 +212,12 @@ abstract class Future<T> {
    * later time that isn't necessarily after a known fixed duration.
    */
   factory Future.delayed(Duration duration, [T computation()]) {
-    _Future result = new _Future<T>();
-    new Timer(duration, () {
-      try {
-        result._complete(computation == null ? null : computation());
-      } catch (e, s) {
-        _completeWithErrorCallback(result, e, s);
-      }
-    });
+    Completer completer = new Completer.sync();
+    Future result = completer.future;
+    if (computation != null) {
+      result = result.then((ignored) => computation());
+    }
+    new Timer(duration, completer.complete);
     return result;
   }
 
@@ -247,7 +235,7 @@ abstract class Future<T> {
    * error to occur, the remaining errors are silently dropped).
    */
   static Future<List> wait(Iterable<Future> futures, {bool eagerError: false}) {
-    final _Future<List> result = new _Future<List>();
+    Completer completer;  // Completer for the returned future.
     List values;  // Collects the values. Set to null on error.
     int remaining = 0;  // How many futures are we waiting for.
     var error;   // The first error from a future.
@@ -255,18 +243,18 @@ abstract class Future<T> {
 
     // Handle an error from any of the futures.
     handleError(theError, theStackTrace) {
-      final bool isFirstError = (values != null);
+      bool isFirstError = values != null;
       values = null;
       remaining--;
       if (isFirstError) {
         if (remaining == 0 || eagerError) {
-          result._completeError(theError, theStackTrace);
+          completer.completeError(theError, theStackTrace);
         } else {
           error = theError;
           stackTrace = theStackTrace;
         }
       } else if (remaining == 0 && !eagerError) {
-        result._completeError(error, stackTrace);
+        completer.completeError(error, stackTrace);
       }
     }
 
@@ -279,10 +267,10 @@ abstract class Future<T> {
         if (values != null) {
           values[pos] = value;
           if (remaining == 0) {
-            result._completeWithValue(values);
+            completer.complete(values);
           }
         } else if (remaining == 0 && !eagerError) {
-          result._completeError(error, stackTrace);
+          completer.completeError(error, stackTrace);
         }
       }, onError: handleError);
     }
@@ -290,7 +278,8 @@ abstract class Future<T> {
       return new Future.value(const []);
     }
     values = new List(remaining);
-    return result;
+    completer = new Completer<List>();
+    return completer.future;
   }
 
   /**
@@ -661,18 +650,3 @@ abstract class Completer<T> {
    */
   bool get isCompleted;
 }
-
-// Helper function completing a _Future with error, but checking the zone
-// for error replacement first.
-void _completeWithErrorCallback(_Future result, error, stackTrace) {
-  AsyncError replacement = Zone.current.errorCallback(error, stackTrace);
-  if (replacement != null) {
-    error = _nonNullError(replacement.error);
-    stackTrace = replacement.stackTrace;
-  }
-  result._completeError(error, stackTrace);
-}
-
-/** Helper function that converts `null` to a [NullThrownError]. */
-Object _nonNullError(Object error) =>
-  (error != null) ? error : new NullThrownError();

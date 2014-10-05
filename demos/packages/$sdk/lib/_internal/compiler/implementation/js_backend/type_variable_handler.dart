@@ -36,7 +36,7 @@ class TypeVariableHandler {
 
   ClassElement get typeVariableClass => backend.typeVariableClass;
   CodeEmitterTask get task => backend.emitter;
-  MetadataEmitter get emitter => task.oldEmitter.metadataEmitter;
+  MetadataEmitter get emitter => task.metadataEmitter;
   Compiler get compiler => backend.compiler;
 
   void registerClassWithTypeVariables(ClassElement cls) {
@@ -122,8 +122,8 @@ class TypeVariableHandler {
    * there, otherwise a new entry for [c] is created.
    */
   int reifyTypeVariableConstant(Constant c, TypeVariableElement variable) {
-    String name = jsAst.prettyPrint(task.oldEmitter.constantReference(c),
-                                    compiler).getText();
+    String name =
+        jsAst.prettyPrint(task.constantReference(c), compiler).getText();
     int index;
     if (typeVariableConstants.containsKey(variable)) {
       index = typeVariableConstants[variable];
@@ -137,7 +137,8 @@ class TypeVariableHandler {
 
   /**
    * Returns the index pointing to the constant in [emitter.globalMetadata]
-   * representing this type variable.
+   * representing this type variable
+   *.
    *
    * If the constant has not yet been constructed, an entry is  allocated in
    * the global metadata list and the index pointing to this entry is returned.

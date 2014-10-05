@@ -7,11 +7,8 @@
 
 library dart2js.helpers;
 
-import 'dart:async' show EventSink;
-import 'dart:collection';
+import "dart:collection";
 import 'dart:convert';
-
-import '../../compiler.dart';
 import '../dart2jslib.dart';
 import '../util/util.dart';
 

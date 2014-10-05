@@ -11,14 +11,7 @@ _runUserCode(userCode(),
   try {
     onSuccess(userCode());
   } catch (e, s) {
-    AsyncError replacement = Zone.current.errorCallback(e, s);
-    if (replacement == null) {
-      onError(e, s);
-    } else {
-      var error = _nonNullError(replacement.error);
-      var stackTrace = replacement.stackTrace;
-      onError(error, stackTrace);
-    }
+    onError(e, s);
   }
 }
 
@@ -34,17 +27,6 @@ void _cancelAndError(StreamSubscription subscription,
   } else {
     future._completeError(error, stackTrace);
   }
-}
-
-void _cancelAndErrorWithReplacement(StreamSubscription subscription,
-                                    _Future future,
-                                    error, StackTrace stackTrace) {
-  AsyncError replacement = Zone.current.errorCallback(error, stackTrace);
-  if (replacement != null) {
-    error = _nonNullError(replacement.error);
-    stackTrace = replacement.stackTrace;
-  }
-  _cancelAndError(subscription, future, error, stackTrace);
 }
 
 /** Helper function to make an onError argument to [_runUserCode]. */
@@ -187,16 +169,6 @@ class _ForwardingStreamSubscription<S, T>
 
 typedef bool _Predicate<T>(T value);
 
-void _addErrorWithReplacement(_EventSink sink, error, stackTrace) {
-  AsyncError replacement = Zone.current.errorCallback(error, stackTrace);
-  if (replacement != null) {
-    error = _nonNullError(replacement.error);
-    stackTrace = replacement.stackTrace;
-  }
-  sink._addError(error, stackTrace);
-}
-
-
 class _WhereStream<T> extends _ForwardingStream<T, T> {
   final _Predicate<T> _test;
 
@@ -208,7 +180,7 @@ class _WhereStream<T> extends _ForwardingStream<T, T> {
     try {
       satisfies = _test(inputEvent);
     } catch (e, s) {
-      _addErrorWithReplacement(sink, e, s);
+      sink._addError(e, s);
       return;
     }
     if (satisfies) {
@@ -234,7 +206,7 @@ class _MapStream<S, T> extends _ForwardingStream<S, T> {
     try {
       outputEvent = _transform(inputEvent);
     } catch (e, s) {
-      _addErrorWithReplacement(sink, e, s);
+      sink._addError(e, s);
       return;
     }
     sink._add(outputEvent);
@@ -258,7 +230,7 @@ class _ExpandStream<S, T> extends _ForwardingStream<S, T> {
     } catch (e, s) {
       // If either _expand or iterating the generated iterator throws,
       // we abort the iteration.
-      _addErrorWithReplacement(sink, e, s);
+      sink._addError(e, s);
     }
   }
 }
@@ -285,7 +257,7 @@ class _HandleErrorStream<T> extends _ForwardingStream<T, T> {
       try {
         matches = _test(error);
       } catch (e, s) {
-        _addErrorWithReplacement(sink, e, s);
+        sink._addError(e, s);
         return;
       }
     }
@@ -296,7 +268,7 @@ class _HandleErrorStream<T> extends _ForwardingStream<T, T> {
         if (identical(e, error)) {
           sink._addError(error, stackTrace);
         } else {
-          _addErrorWithReplacement(sink, e, s);
+          sink._addError(e, s);
         }
         return;
       }
@@ -342,7 +314,7 @@ class _TakeWhileStream<T> extends _ForwardingStream<T, T> {
     try {
       satisfies = _test(inputEvent);
     } catch (e, s) {
-      _addErrorWithReplacement(sink, e, s);
+      sink._addError(e, s);
       // The test didn't say true. Didn't say false either, but we stop anyway.
       sink._close();
       return;
@@ -390,7 +362,7 @@ class _SkipWhileStream<T> extends _ForwardingStream<T, T> {
     try {
       satisfies = _test(inputEvent);
     } catch (e, s) {
-      _addErrorWithReplacement(sink, e, s);
+      sink._addError(e, s);
       // A failure to return a boolean is considered "not matching".
       _hasFailed = true;
       return;
@@ -426,7 +398,7 @@ class _DistinctStream<T> extends _ForwardingStream<T, T> {
           isEqual = _equals(_previous, inputEvent);
         }
       } catch (e, s) {
-        _addErrorWithReplacement(sink, e, s);
+        sink._addError(e, s);
         return null;
       }
       if (!isEqual) {

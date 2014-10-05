@@ -230,7 +230,6 @@ class DartConstantCompiler extends ConstantCompilerBase {
   }
 }
 
-// TODO(johnniwinther): Change to create [ConstExp] instead of [Constant].
 class CompileTimeConstantEvaluator extends Visitor {
   bool isEvaluatingConstant;
   final ConstantCompilerBase handler;
@@ -510,13 +509,12 @@ class CompileTimeConstantEvaluator extends Visitor {
 
     Function compileArgument = evaluateConstant;
     Function compileConstant = handler.compileConstant;
-    target.computeSignature(compiler);
     bool succeeded = selector.addArgumentsToList(arguments,
                                                  compiledArguments,
                                                  target,
                                                  compileArgument,
                                                  compileConstant,
-                                                 compiler.world);
+                                                 compiler);
     if (!succeeded) {
       String name = Elements.constructorNameForDiagnostics(
           target.enclosingClass.name, target.name);
@@ -790,7 +788,7 @@ class ConstructorEvaluator extends CompileTimeConstantEvaluator {
                                                    target,
                                                    compileArgument,
                                                    compileConstant,
-                                                   compiler.world);
+                                                   compiler);
       evaluateSuperOrRedirectSend(compiledArguments, target);
       return;
     }

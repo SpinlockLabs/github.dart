@@ -7,223 +7,257 @@ part of dart_backend;
 Comparator get _compareNodes =>
     compareBy((n) => n.getBeginToken().charOffset);
 
-abstract class Renamable implements Comparable {
+typedef String _Renamer(Renamable renamable);
+
+abstract class Renamable {
   final int RENAMABLE_TYPE_ELEMENT = 1;
   final int RENAMABLE_TYPE_MEMBER = 2;
   final int RENAMABLE_TYPE_LOCAL = 3;
 
   final Set<Node> nodes;
+  final _Renamer renamer;
 
-  Renamable(this.nodes);
+  Renamable(this.nodes, this.renamer);
   int compareTo(Renamable other) {
     int nodesDiff = other.nodes.length.compareTo(this.nodes.length);
     if (nodesDiff != 0) return nodesDiff;
-    int typeDiff = this.kind.compareTo(other.kind);
+    int typeDiff = this.getTypeId().compareTo(other.getTypeId());
     return typeDiff != 0 ? typeDiff : compareInternals(other);
   }
 
   int compareInternals(Renamable other);
-  int get kind;
+  int getTypeId();
 
-  String createNewName(PlaceholderRenamer placeholderRenamer);
+  String rename() => renamer(this);
 }
 
-class GlobalRenamable extends Renamable {
-  final Entity entity;
+class ElementRenamable extends Renamable {
+  final Element element;
 
-  GlobalRenamable(this.entity, Set<Node> nodes)
-      : super(nodes);
+  ElementRenamable(this.element, Set<Node> nodes, _Renamer renamer)
+      : super(nodes, renamer);
 
-  int compareInternals(GlobalRenamable other) =>
-      compareElements(this.entity, other.entity);
-  int get kind => RENAMABLE_TYPE_ELEMENT;
-  String createNewName(PlaceholderRenamer placeholderRenamer) {
-    return placeholderRenamer._renameGlobal(entity);
-  }
+  int compareInternals(ElementRenamable other) =>
+      compareElements(this.element, other.element);
+  int getTypeId() => RENAMABLE_TYPE_ELEMENT;
 }
 
 class MemberRenamable extends Renamable {
   final String identifier;
-  MemberRenamable(this.identifier, Set<Node> nodes)
-      : super(nodes);
+  MemberRenamable(this.identifier, Set<Node> nodes, _Renamer renamer)
+      : super(nodes, renamer);
   int compareInternals(MemberRenamable other) =>
       this.identifier.compareTo(other.identifier);
-  int get kind => RENAMABLE_TYPE_MEMBER;
-  String createNewName(PlaceholderRenamer placeholderRenamer) {
-    return placeholderRenamer._generateMemberName(identifier);
-  }
+  int getTypeId() => RENAMABLE_TYPE_MEMBER;
 }
 
 class LocalRenamable extends Renamable {
-  LocalRenamable(Set<Node> nodes)
-      : super(nodes);
+  LocalRenamable(Set<Node> nodes, _Renamer renamer) : super(nodes, renamer);
   int compareInternals(LocalRenamable other) =>
       _compareNodes(sorted(this.nodes, _compareNodes)[0],
           sorted(other.nodes, _compareNodes)[0]);
-  int get kind => RENAMABLE_TYPE_LOCAL;
-  String createNewName(PlaceholderRenamer placeholderRenamer) {
-    return placeholderRenamer._generateUniqueTopLevelName("");
-  }
+  int getTypeId() => RENAMABLE_TYPE_LOCAL;
 }
 
 /**
- * Renames only top-level elements that would lead to ambiguity if not renamed.
+ * Renames only top-level elements that would let to ambiguity if not renamed.
  */
-class PlaceholderRenamer {
-  /// After running [computeRenames] this will contain the computed renames.
-  final Map<Node, String> renames = new Map<Node, String>();
-  /// After running [computeRenames] this will contain the used platform
-  /// libraries.
-  final Set<LibraryElement> platformImports = new Set<LibraryElement>();
+void renamePlaceholders(
+    Compiler compiler,
+    PlaceholderCollector placeholderCollector,
+    Map<Node, String> renames,
+    Map<LibraryElement, String> imports,
+    Set<String> fixedMemberNames,
+    Map<Element, LibraryElement> reexportingLibraries,
+    bool cutDeclarationTypes,
+    {bool uniqueGlobalNaming: false}) {
+  final Map<LibraryElement, Map<String, String>> renamed
+      = new Map<LibraryElement, Map<String, String>>();
 
-  final bool enableMinification;
-  final Set<String> fixedMemberNames;
-  final Map<Element, LibraryElement> reexportingLibraries;
-  final bool cutDeclarationTypes;
-
-  final Map<Entity, String> _renamedCache = new Map<Entity, String>();
-  final Map<Entity, Map<String, String>> _privateCache =
-      new Map<Entity, Map<String, String>>();
-
-  // Identifiers that has already been used, or are reserved by the
-  // language/platform.
-  Set<String> _forbiddenIdentifiers;
-  Set<String> _allNamedParameterIdentifiers;
-
-  Generator _generator;
-
-  PlaceholderRenamer(this.fixedMemberNames,
-                     this.reexportingLibraries,
-                     {this.enableMinification, this.cutDeclarationTypes});
-
-  void _renameNodes(Iterable<Node> nodes, String renamer(Node node)) {
+  renameNodes(Iterable<Node> nodes, renamer) {
     for (Node node in sorted(nodes, _compareNodes)) {
       renames[node] = renamer(node);
     }
   }
 
-  String _generateUniqueTopLevelName(originalName) {
-    String newName = _generator.generate(originalName, (name) {
-      return _forbiddenIdentifiers.contains(name) ||
-             _allNamedParameterIdentifiers.contains(name);
-    });
-    _forbiddenIdentifiers.add(newName);
-    return newName;
+  sortedForEach(Map<Element, dynamic> map, f) {
+    for (Element element in sortElements(map.keys)) {
+      f(element, map[element]);
+    }
   }
 
-  String _generateMemberName(String original) {
-    return _generator.generate(original, _forbiddenIdentifiers.contains);
-  }
-
-  /// Looks up [originalName] in the [_privateCache] cache of [library].
-  /// If [originalName] was not renamed before, generate a new name.
-  String _getPrivateName(LibraryElement library, String originalName) {
-    return _privateCache.putIfAbsent(library, () => new Map<String, String>())
-        .putIfAbsent(originalName,
-                     () => _generateUniqueTopLevelName(originalName));
-  }
-
-  String _renameConstructor(ConstructorPlaceholder placeholder) {
-    String name = placeholder.element.name;
-    if (name == '') return "";
-    String result = _renameGlobal(placeholder.element);
-    return result;
-  }
-
-  String _renameGlobal(Entity entity) {
-    assert(entity is! Element ||
-           Elements.isErroneousElement(entity) ||
-           Elements.isStaticOrTopLevel(entity) ||
-           entity is TypeVariableElement);
-    // TODO(smok): We may want to reuse class static field and method names.
-    if (entity is Element) {
-      LibraryElement library = entity.library;
-      if (reexportingLibraries.containsKey(entity)) {
-        library = reexportingLibraries[entity];
+  String renameType(DartType type, Function renameElement) {
+    if (type.isDynamic) return 'dynamic';
+    // TODO(smok): Do not rename type if it is in platform library or
+    // js-helpers.
+    StringBuffer result = new StringBuffer(renameElement(type.element));
+    if (type is GenericType && !type.treatAsRaw) {
+      result.write('<');
+      List<DartType> arguments = type.typeArguments;
+      result.write(renameType(arguments.first, renameElement));
+      for (int index = 1; index < arguments.length; index++) {
+        result.write(',');
+        result.write(renameType(arguments[index], renameElement));
       }
-      if (library.isPlatformLibrary) {
-        if (library.canonicalUri != Compiler.DART_CORE) {
-          platformImports.add(library);
-        }
-        if (library.isInternalLibrary) {
-          throw new SpannableAssertionFailure(entity,
-              "Internal library $library should never have been imported from "
-              "the code compiled by dart2dart.");
-        }
-        return entity.name;
+      result.write('>');
+    }
+    return result.toString();
+  }
+
+  String renameConstructor(Element element, ConstructorPlaceholder placeholder,
+      Function renameString, Function renameElement) {
+    assert(element.isConstructor);
+    StringBuffer result = new StringBuffer();
+    String name = element.name;
+    if (element.name != '') {
+      // Named constructor or factory. Is there a more reliable way to check
+      // this case?
+      if (!placeholder.isRedirectingCall) {
+        result.write(renameType(placeholder.type, renameElement));
+        result.write('.');
+      }
+      if (!element.library.isPlatformLibrary) {
+        name = renameString(element.library, name);
+      }
+      result.write(name);
+    } else {
+      assert(!placeholder.isRedirectingCall);
+      result.write(renameType(placeholder.type, renameElement));
+    }
+    return result.toString();
+  }
+
+  Function makeElementRenamer(rename, generateUniqueName) => (element) {
+    assert(Elements.isErroneousElement(element) ||
+           Elements.isStaticOrTopLevel(element) ||
+           element is TypeVariableElement);
+    // TODO(smok): We may want to reuse class static field and method names.
+    String originalName = element.name;
+    LibraryElement library = element.library;
+    if (identical(element.library, compiler.coreLibrary)) {
+      return originalName;
+    }
+    if (library.isPlatformLibrary) {
+      assert(element.isTopLevel);
+      if (reexportingLibraries.containsKey(element)) {
+        library = reexportingLibraries[element];
+      }
+      if (!library.isInternalLibrary) {
+        final prefix =
+            imports.putIfAbsent(library, () => generateUniqueName('p'));
+        return '$prefix.$originalName';
       }
     }
-    String name = _renamedCache.putIfAbsent(entity,
-            () => _generateUniqueTopLevelName(entity.name));
-    // Look up in [_renamedCache] for a name for [entity] .
-    // If it was not renamed before, generate a new name.
-    return name;
+
+    return rename(library, originalName);
+  };
+
+  Function makeRenamer(generateUniqueName) =>
+      (library, originalName) =>
+          renamed.putIfAbsent(library, () => {})
+              .putIfAbsent(originalName,
+                  () => generateUniqueName(originalName));
+
+  // Renamer function that takes library and original name and returns a new
+  // name for given identifier.
+  Function rename;
+  Function renameElement;
+  // A function that takes original identifier name and generates a new unique
+  // identifier.
+  Function generateUniqueName;
+
+  Set<String> allNamedParameterIdentifiers = new Set<String>();
+  for (var functionScope in placeholderCollector.functionScopes.values) {
+    allNamedParameterIdentifiers.addAll(functionScope.parameterIdentifiers);
   }
 
-  void _computeMinifiedRenames(PlaceholderCollector placeholderCollector) {
-    _generator = new MinifyingGenerator();
+  if (compiler.enableMinification) {
+    MinifyingGenerator generator = new MinifyingGenerator();
+    Set<String> forbiddenIdentifiers = new Set<String>.from(['main']);
+    forbiddenIdentifiers.addAll(Keyword.keywords.keys);
+    forbiddenIdentifiers.addAll(fixedMemberNames);
+    generateUniqueName = (_) =>
+        generator.generate((name) =>
+            forbiddenIdentifiers.contains(name)
+            || allNamedParameterIdentifiers.contains(name));
+    rename = makeRenamer(generateUniqueName);
+    renameElement = makeElementRenamer(rename, generateUniqueName);
+
+    List<Set<Node>> allLocals = new List<Set<Node>>();
 
     // Build a list sorted by usage of local nodes that will be renamed to
     // the same identifier. So the top-used local variables in all functions
     // will be renamed first and will all share the same new identifier.
-    int maxLength = placeholderCollector.functionScopes.values.fold(0,
-        (a, b) => max(a, b.localPlaceholders.length));
-
-    List<Set<Node>> allLocals = new List<Set<Node>>
-        .generate(maxLength, (_) => new Set<Node>());
-
-    for (FunctionScope functionScope
-        in placeholderCollector.functionScopes.values) {
+    for (var functionScope in placeholderCollector.functionScopes.values) {
       // Add current sorted local identifiers to the whole sorted list
       // of all local identifiers for all functions.
       List<LocalPlaceholder> currentSortedPlaceholders =
           sorted(functionScope.localPlaceholders,
               compareBy((LocalPlaceholder ph) => -ph.nodes.length));
-
-      List<Set<Node>> currentSortedNodes = currentSortedPlaceholders
-          .map((LocalPlaceholder ph) => ph.nodes).toList();
-
+      List<Set<Node>> currentSortedNodes =
+          currentSortedPlaceholders.map((ph) => ph.nodes).toList();
+      // Make room in all sorted locals list for new stuff.
+      while (currentSortedNodes.length > allLocals.length) {
+        allLocals.add(new Set<Node>());
+      }
       for (int i = 0; i < currentSortedNodes.length; i++) {
         allLocals[i].addAll(currentSortedNodes[i]);
       }
     }
 
-    // Rename elements, members and locals together based on their usage
-    // count, otherwise when we rename elements first there will be no good
-    // identifiers left for members even if they are used often.
-    List<Renamable> renamables = new List<Renamable>();
+    // Rename elements, members and locals together based on their usage count,
+    // otherwise when we rename elements first there will be no good identifiers
+    // left for members even if they are used often.
+    String elementRenamer(ElementRenamable elementRenamable) =>
+        renameElement(elementRenamable.element);
+    String memberRenamer(MemberRenamable memberRenamable) =>
+        generator.generate(forbiddenIdentifiers.contains);
+    Function localRenamer = generateUniqueName;
+    List<Renamable> renamables = [];
     placeholderCollector.elementNodes.forEach(
         (Element element, Set<Node> nodes) {
-      renamables.add(new GlobalRenamable(element, nodes));
+      renamables.add(new ElementRenamable(element, nodes, elementRenamer));
     });
     placeholderCollector.memberPlaceholders.forEach(
         (String memberName, Set<Identifier> identifiers) {
-      renamables.add(new MemberRenamable(memberName, identifiers));
+      renamables.add(
+          new MemberRenamable(memberName, identifiers, memberRenamer));
     });
     for (Set<Node> localIdentifiers in allLocals) {
-      renamables.add(new LocalRenamable(localIdentifiers));
+      renamables.add(new LocalRenamable(localIdentifiers, localRenamer));
     }
-    renamables.sort();
+    renamables.sort((Renamable renamable1, Renamable renamable2) =>
+        renamable1.compareTo(renamable2));
     for (Renamable renamable in renamables) {
-      String newName = renamable.createNewName(this);
-      _renameNodes(renamable.nodes, (_) => newName);
+      String newName = renamable.rename();
+      renameNodes(renamable.nodes, (_) => newName);
     }
-  }
-
-  void _computeNonMinifiedRenames(PlaceholderCollector placeholderCollector) {
-    _generator = new ConservativeGenerator();
+  } else {
+    // Never rename anything to 'main'.
+    final usedTopLevelOrMemberIdentifiers = new Set<String>();
+    usedTopLevelOrMemberIdentifiers.add('main');
+    usedTopLevelOrMemberIdentifiers.addAll(fixedMemberNames);
+    generateUniqueName = (originalName) {
+      String newName = conservativeGenerator(
+          originalName, (name) =>
+              usedTopLevelOrMemberIdentifiers.contains(name)
+              || allNamedParameterIdentifiers.contains(name));
+      usedTopLevelOrMemberIdentifiers.add(newName);
+      return newName;
+    };
+    rename = makeRenamer(generateUniqueName);
+    renameElement = makeElementRenamer(rename, generateUniqueName);
     // Rename elements.
-    placeholderCollector.elementNodes.forEach(
+    sortedForEach(placeholderCollector.elementNodes,
         (Element element, Set<Node> nodes) {
-      _renameNodes(nodes, (_) => _renameGlobal(element));
+      renameNodes(nodes, (_) => renameElement(element));
     });
 
     // Rename locals.
-    placeholderCollector.functionScopes.forEach(
+    sortedForEach(placeholderCollector.functionScopes,
         (functionElement, functionScope) {
-
-      Set<String> memberIdentifiers = new Set<String>();
       Set<LocalPlaceholder> placeholders = functionScope.localPlaceholders;
+      Set<String> memberIdentifiers = new Set<String>();
       if (functionElement.enclosingClass != null) {
         functionElement.enclosingClass.forEachMember(
             (enclosingClass, member) {
@@ -232,75 +266,46 @@ class PlaceholderRenamer {
       }
       Set<String> usedLocalIdentifiers = new Set<String>();
       for (LocalPlaceholder placeholder in placeholders) {
-        String nextId = _generator.generate(placeholder.identifier, (name) {
-          return functionScope.parameterIdentifiers.contains(name)
-              || _forbiddenIdentifiers.contains(name)
-              || usedLocalIdentifiers.contains(name)
-              || memberIdentifiers.contains(name);
-        });
+        String nextId =
+            conservativeGenerator(placeholder.identifier, (name) =>
+                functionScope.parameterIdentifiers.contains(name)
+                || usedTopLevelOrMemberIdentifiers.contains(name)
+                || usedLocalIdentifiers.contains(name)
+                || memberIdentifiers.contains(name));
         usedLocalIdentifiers.add(nextId);
-        _renameNodes(placeholder.nodes, (_) => nextId);
+        renameNodes(placeholder.nodes, (_) => nextId);
       }
     });
 
+    final usedMemberIdentifiers = new Set<String>.from(fixedMemberNames);
     // Do not rename members to top-levels, that allows to avoid renaming
     // members to constructors.
+    usedMemberIdentifiers.addAll(usedTopLevelOrMemberIdentifiers);
     placeholderCollector.memberPlaceholders.forEach((identifier, nodes) {
-      String newIdentifier = _generateMemberName(identifier);
-      _renameNodes(nodes, (_) => newIdentifier);
+      String newIdentifier = conservativeGenerator(
+          identifier, usedMemberIdentifiers.contains);
+      renameNodes(nodes, (_) => newIdentifier);
     });
   }
 
-  /// Finds renamings for all the placeholders in [placeholderCollector] and
-  /// stores them in [renames].
-  /// Also adds to [platformImports] all the platform-libraries that are used.
-  void computeRenames(PlaceholderCollector placeholderCollector) {
-    _allNamedParameterIdentifiers = new Set<String>();
-    for (FunctionScope functionScope in
-        placeholderCollector.functionScopes.values) {
-      _allNamedParameterIdentifiers.addAll(functionScope.parameterIdentifiers);
-    }
-
-    _forbiddenIdentifiers = new Set<String>.from(fixedMemberNames);
-    _forbiddenIdentifiers.addAll(Keyword.keywords.keys);
-    _forbiddenIdentifiers.add('main');
-
-    if (enableMinification) {
-      _computeMinifiedRenames(placeholderCollector);
-    } else {
-      _computeNonMinifiedRenames(placeholderCollector);
-    }
-
-    // Rename constructors.
-    for (ConstructorPlaceholder placeholder in
-        placeholderCollector.constructorPlaceholders) {
-      renames[placeholder.node] =
-          _renameConstructor(placeholder);
-    };
-
-    // Rename private identifiers uniquely for each library.
-    placeholderCollector.privateNodes.forEach(
-        (LibraryElement library, Set<Identifier> identifiers) {
-      for (Identifier identifier in identifiers) {
-        renames[identifier] = _getPrivateName(library, identifier.source);
-      }
-    });
-
-    // Rename unresolved nodes, to make sure they still do not resolve.
-    for (Node node in placeholderCollector.unresolvedNodes) {
-      renames[node] = _generateUniqueTopLevelName('Unresolved');
-    }
-
-    // Erase prefixes that are now not needed.
-    for (Node node in placeholderCollector.prefixNodesToErase) {
-      renames[node] = '';
-    }
-
-    if (cutDeclarationTypes) {
-      for (DeclarationTypePlaceholder placeholder in
-           placeholderCollector.declarationTypePlaceholders) {
-        renames[placeholder.typeNode] = placeholder.requiresVar ? 'var' : '';
-      }
+  // Rename constructors.
+  sortedForEach(placeholderCollector.constructorPlaceholders,
+      (Element constructor, List<ConstructorPlaceholder> placeholders) {
+        for (ConstructorPlaceholder ph in placeholders) {
+          renames[ph.node] =
+              renameConstructor(constructor, ph, rename, renameElement);
+        }
+  });
+  sortedForEach(placeholderCollector.privateNodes, (library, nodes) {
+    renameNodes(nodes, (node) => rename(library, node.source));
+  });
+  renameNodes(placeholderCollector.unresolvedNodes,
+      (_) => generateUniqueName('Unresolved'));
+  renameNodes(placeholderCollector.nullNodes, (_) => '');
+  if (cutDeclarationTypes) {
+    for (DeclarationTypePlaceholder placeholder in
+         placeholderCollector.declarationTypePlaceholders) {
+      renames[placeholder.typeNode] = placeholder.requiresVar ? 'var' : '';
     }
   }
 }
@@ -330,29 +335,25 @@ String generateMiniId(int index) {
   return resultBuilder.toString();
 }
 
-abstract class Generator {
-  String generate(String originalName, bool isForbidden(String name));
-}
 
-/// Always tries to return original identifier name unless it is forbidden.
-class ConservativeGenerator implements Generator {
-  String generate(String originalName, bool isForbidden(String name)) {
-    String result = originalName;
-    int index = 0;
-    while (isForbidden(result) ){ //|| result == originalName) {
-      result = '${originalName}_${generateMiniId(index++)}';
-    }
-    return result;
+/** Always tries to return original identifier name unless it is forbidden. */
+String conservativeGenerator(String name, bool isForbidden(String name)) {
+  String result = name;
+  int index = 0;
+  while (isForbidden(result)) {
+    result = '${generateMiniId(index++)}_$name';
   }
+  return result;
 }
 
-/// Always tries to generate the most compact identifier.
-class MinifyingGenerator implements Generator {
+
+/** Always tries to generate the most compact identifier. */
+class MinifyingGenerator {
   int index = 0;
 
   MinifyingGenerator();
 
-  String generate(String originalName, bool isForbidden(String name)) {
+  String generate(bool isForbidden(String name)) {
     String result;
     do {
       result = generateMiniId(index++);

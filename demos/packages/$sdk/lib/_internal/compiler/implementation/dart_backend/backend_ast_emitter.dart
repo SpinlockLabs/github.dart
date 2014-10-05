@@ -82,55 +82,47 @@ class ASTEmitter extends tree.Visitor<dynamic, Expression> {
       declaredVariables.add(param);
     }
 
-    Statement body;
-    if (definition.isAbstract) {
-      body = new EmptyStatement();
-    } else {
-      firstStatement = definition.body;
-      visitStatement(definition.body);
-      removeTrailingReturn();
+    firstStatement = definition.body;
+    visitStatement(definition.body);
+    removeTrailingReturn();
 
-      // Some of the variable declarations have already been added
-      // if their first assignment could be pulled into the initializer.
-      // Add the remaining variable declarations now.
-      for (tree.Variable variable in variableNames.keys) {
-        if (!declaredVariables.contains(variable)) {
-          addDeclaration(variable);
-        }
+    // Some of the variable declarations have already been added
+    // if their first assignment could be pulled into the initializer.
+    // Add the remaining variable declarations now.
+    for (tree.Variable variable in variableNames.keys) {
+      if (!declaredVariables.contains(variable)) {
+        addDeclaration(variable);
       }
-
-      // Add constant declarations.
-      List<VariableDeclaration> constants = <VariableDeclaration>[];
-      for (ConstDeclaration constDecl in definition.localConstants) {
-        if (!constantNames.containsKey(constDecl.element))
-          continue; // Discard unused constants declarations.
-        String name = getConstantName(constDecl.element);
-        Expression value = emitConstant(constDecl.expression);
-        VariableDeclaration decl = new VariableDeclaration(name, value);
-        decl.element = constDecl.element;
-        constants.add(decl);
-      }
-
-      List<Statement> bodyParts = [];
-      if (constants.length > 0) {
-        bodyParts.add(new VariableDeclarations(constants, isConst: true));
-      }
-      if (variables.length > 0) {
-        bodyParts.add(new VariableDeclarations(variables));
-      }
-      bodyParts.addAll(statementBuffer);
-
-      body = new Block(bodyParts);
     }
+
+    // Add constant declarations.
+    List<VariableDeclaration> constants = <VariableDeclaration>[];
+    for (ConstDeclaration constDecl in definition.localConstants) {
+      if (!constantNames.containsKey(constDecl.element))
+        continue; // Discard unused constants declarations.
+      String name = getConstantName(constDecl.element);
+      Expression value = emitConstant(constDecl.expression);
+      VariableDeclaration decl = new VariableDeclaration(name, value);
+      decl.element = constDecl.element;
+      constants.add(decl);
+    }
+
+    List<Statement> bodyParts = [];
+    if (constants.length > 0) {
+      bodyParts.add(new VariableDeclarations(constants, isConst: true));
+    }
+    if (variables.length > 0) {
+      bodyParts.add(new VariableDeclarations(variables));
+    }
+    bodyParts.addAll(statementBuffer);
+
     FunctionType functionType = functionElement.type;
 
     return new FunctionExpression(
         parameters,
-        body,
+        new Block(bodyParts),
         name: functionElement.name,
-        returnType: emitOptionalType(functionType.returnType),
-        isGetter: functionElement.isGetter,
-        isSetter: functionElement.isSetter)
+        returnType: emitOptionalType(functionType.returnType))
         ..element = functionElement;
   }
 
@@ -423,7 +415,7 @@ class ASTEmitter extends tree.Visitor<dynamic, Expression> {
     Statement body = new Block(statementBuffer);
     Statement statement = new While(new Literal(new dart2js.TrueConstant()),
                                     body);
-    if (usedLabels.remove(stmt.label)) {
+    if (usedLabels.remove(stmt.label.name)) {
       statement = new LabeledStatement(stmt.label.name, statement);
     }
     savedBuffer.add(statement);
@@ -444,7 +436,7 @@ class ASTEmitter extends tree.Visitor<dynamic, Expression> {
     Statement body = new Block(statementBuffer);
     Statement statement;
     statement = new While(condition, body);
-    if (usedLabels.remove(stmt.label)) {
+    if (usedLabels.remove(stmt.label.name)) {
       statement = new LabeledStatement(stmt.label.name, statement);
     }
     savedBuffer.add(statement);
@@ -631,9 +623,6 @@ class ASTEmitter extends tree.Visitor<dynamic, Expression> {
 
   TypeAnnotation emitType(DartType type) {
     if (type is GenericType) {
-      if (type.treatAsRaw) {
-        return new TypeAnnotation(type.element.name)..dartType = type;
-      }
       return new TypeAnnotation(
           type.element.name,
           type.typeArguments.map(emitType).toList(growable:false))
@@ -788,8 +777,6 @@ class UnshadowParameters extends tree.RecursiveVisitor {
   Set<tree.Variable> hasShadowedUse = new Set<tree.Variable>();
 
   void unshadow(tree.FunctionDefinition definition) {
-    if (definition.isAbstract) return;
-
     visitFunctionDefinition(definition);
   }
 

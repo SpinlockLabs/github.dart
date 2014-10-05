@@ -879,8 +879,6 @@ class ClosureTranslator extends Visitor {
     return sb.toString();
   }
 
-  JavaScriptBackend get backend => compiler.backend;
-
   ClosureClassMap globalizeClosure(FunctionExpression node,
                                    LocalFunctionElement element) {
     String closureName = computeClosureName(element);
@@ -890,7 +888,6 @@ class ClosureTranslator extends Visitor {
         new SynthesizedCallMethodElementX(Compiler.CALL_OPERATOR_NAME,
                                           element,
                                           globalizedElement);
-    backend.maybeMarkClosureAsNeededForReflection(globalizedElement, callElement, element);
     MemberElement enclosing = element.memberContext;
     enclosing.nestedClosures.add(callElement);
     globalizedElement.addMember(callElement, compiler);

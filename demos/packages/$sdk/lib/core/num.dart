@@ -424,15 +424,13 @@ abstract class num implements Comparable<num> {
    * [int.parse] without a radix).
    * If that fails, it tries to parse the [input] as a double (similar to
    * [double.parse]).
-   * If that fails, too, it invokes [onError] with [input], and the result
-   * of that invocation becomes the result of calling `parse`.
+   * If that fails, too, it invokes [onError] with [input].
    *
    * If no [onError] is supplied, it defaults to a function that throws a
    * [FormatException].
    *
    * For any number `n`, this function satisfies
-   * `identical(n, num.parse(n.toString()))` (except when `n` is a NaN `double`
-   * with a payload).
+   * `identical(n, num.parse(n.toString()))`.
    */
   static num parse(String input, [num onError(String input)]) {
     String source = input.trim();

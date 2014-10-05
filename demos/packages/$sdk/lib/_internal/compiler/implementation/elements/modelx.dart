@@ -5,7 +5,7 @@
 library elements.modelx;
 
 import 'elements.dart';
-import '../helpers/helpers.dart';  // Included for debug helpers.
+import '../helpers/helpers.dart';
 import '../tree/tree.dart';
 import '../util/util.dart';
 import '../resolution/resolution.dart';
@@ -24,7 +24,6 @@ import '../dart2jslib.dart' show invariant,
                                  Selector,
                                  Constant,
                                  Compiler,
-                                 Backend,
                                  isPrivateName;
 
 import '../dart_types.dart';
@@ -37,9 +36,6 @@ import '../scanner/scannerlib.dart' show
 import '../ordered_typeset.dart' show OrderedTypeSet;
 
 import 'visitor.dart' show ElementVisitor;
-
-abstract class DeclarationSite {
-}
 
 abstract class ElementX extends Element {
   static int elementHashCode = 0;
@@ -120,8 +116,6 @@ abstract class ElementX extends Element {
   bool get isForwardingConstructor => false;
 
   bool get isMixinApplication => false;
-
-  bool get isLocal => false;
 
   // TODO(johnniwinther): This breaks for libraries (for which enclosing
   // elements are null) and is invalid for top level variable declarations for
@@ -251,7 +245,7 @@ abstract class ElementX extends Element {
   FunctionElement asFunctionElement() => null;
 
   bool get isAbstract => modifiers.isAbstract;
-  bool isForeign(Backend backend) => backend.isForeign(this);
+  bool isForeign(Compiler compiler) => compiler.backend.isForeign(this);
 
   void diagnose(Element context, DiagnosticListener listener) {}
 
@@ -264,8 +258,6 @@ abstract class ElementX extends Element {
     if (element.isAbstractField || element.isPrefix) return element.library;
     return element;
   }
-
-  DeclarationSite get declarationSite => null;
 }
 
 class ErroneousElementX extends ElementX implements ErroneousElement {
@@ -275,8 +267,6 @@ class ErroneousElementX extends ElementX implements ErroneousElement {
   ErroneousElementX(this.messageKind, this.messageArguments,
                     String name, Element enclosing)
       : super(name, ElementKind.ERROR, enclosing);
-
-  bool get isTopLevel => false;
 
   bool get isSynthesized => true;
 
@@ -309,7 +299,7 @@ class ErroneousElementX extends ElementX implements ErroneousElement {
 
   computeEffectiveTargetType(InterfaceType newType) => unsupported();
 
-  get definingConstructor => null;
+  get definingConstructor => this;
 
   FunctionElement asFunctionElement() => this;
 
@@ -435,8 +425,6 @@ class AmbiguousElementX extends ElementX implements AmbiguousElement {
   }
 
   accept(ElementVisitor visitor) => visitor.visitAmbiguousElement(this);
-
-  bool get isTopLevel => false;
 }
 
 class ScopeX {
@@ -747,8 +735,6 @@ class LibraryElementX
     }
   }
 
-  bool get isDartCore => canonicalUri == Compiler.DART_CORE;
-
   Link<MetadataAnnotation> get metadata {
     return (libraryTag == null) ? super.metadata : libraryTag.metadata;
   }
@@ -990,8 +976,6 @@ class PrefixElementX extends ElementX implements PrefixElement {
   PrefixElementX(String prefix, Element enclosing, this.firstPosition)
       : super(prefix, ElementKind.PREFIX, enclosing);
 
-  bool get isTopLevel => false;
-
   Element lookupLocalMember(String memberName) => importScope[memberName];
 
   DartType computeType(Compiler compiler) => const DynamicType();
@@ -1085,7 +1069,7 @@ class TypedefElementX extends ElementX
 // This class holds common information for a list of variable or field
 // declarations. It contains the node, and the type. A [VariableElementX]
 // forwards its [computeType] and [parseNode] methods to this class.
-class VariableList implements DeclarationSite {
+class VariableList {
   VariableDefinitions definitions;
   DartType type;
   final Modifiers modifiers;
@@ -1214,8 +1198,6 @@ abstract class VariableElementX extends ElementX with AstElementMixin
   Token get position => token;
 
   accept(ElementVisitor visitor) => visitor.visitVariableElement(this);
-
-  DeclarationSite get declarationSite => variables;
 }
 
 class LocalVariableElementX extends VariableElementX
@@ -1238,8 +1220,6 @@ class LocalVariableElementX extends VariableElementX
   ExecutableElement get executableContext => enclosingElement;
 
   ExecutableElement get memberContext => executableContext.memberContext;
-
-  bool get isLocal => true;
 }
 
 class FieldElementX extends VariableElementX
@@ -1255,11 +1235,6 @@ class FieldElementX extends VariableElementX
   accept(ElementVisitor visitor) => visitor.visitFieldElement(this);
 
   MemberElement get memberContext => this;
-
-  void reuseElement() {
-    super.reuseElement();
-    nestedClosures.clear();
-  }
 }
 
 /// [Element] for a parameter-like element.
@@ -1346,8 +1321,6 @@ abstract class ParameterElementX extends FormalElementX
   MemberElement get memberContext => executableContext.memberContext;
 
   accept(ElementVisitor visitor) => visitor.visitParameterElement(this);
-
-  bool get isLocal => true;
 }
 
 class LocalParameterElementX extends ParameterElementX
@@ -1377,8 +1350,6 @@ class InitializingFormalElementX extends ParameterElementX
   accept(ElementVisitor visitor) => visitor.visitFieldParameterElement(this);
 
   MemberElement get memberContext => enclosingElement;
-
-  bool get isLocal => false;
 }
 
 
@@ -1442,7 +1413,6 @@ class AbstractFieldElementX extends ElementX implements AbstractFieldElement {
 
 // TODO(johnniwinther): [FunctionSignature] should be merged with
 // [FunctionType].
-// TODO(karlklose): all these lists should have element type [FormalElement].
 class FunctionSignatureX implements FunctionSignature {
   final Link<Element> requiredParameters;
   final Link<Element> optionalParameters;
@@ -1451,17 +1421,14 @@ class FunctionSignatureX implements FunctionSignature {
   final bool optionalParametersAreNamed;
   final List<Element> orderedOptionalParameters;
   final FunctionType type;
-  final bool hasOptionalParameters;
 
   FunctionSignatureX(this.requiredParameters,
-                     Link<Element> optionalParameters,
+                     this.optionalParameters,
                      this.requiredParameterCount,
                      this.optionalParameterCount,
                      this.optionalParametersAreNamed,
                      this.orderedOptionalParameters,
-                     this.type)
-      : optionalParameters = optionalParameters,
-        hasOptionalParameters = !optionalParameters.isEmpty;
+                     this.type);
 
   void forEachRequiredParameter(void function(Element parameter)) {
     for (Link<Element> link = requiredParameters;
@@ -1563,7 +1530,7 @@ abstract class BaseFunctionElementX
   FunctionSignature computeSignature(Compiler compiler) {
     if (functionSignatureCache != null) return functionSignatureCache;
     compiler.withCurrentElement(this, () {
-      functionSignatureCache = compiler.resolver.resolveSignature(this);
+      functionSignatureCache = compiler.resolveSignature(this);
     });
     return functionSignatureCache;
   }
@@ -1620,11 +1587,6 @@ abstract class FunctionElementX extends BaseFunctionElementX
       : super(name, kind, modifiers, enclosing, hasNoBody);
 
   MemberElement get memberContext => this;
-
-  void reuseElement() {
-    super.reuseElement();
-    nestedClosures.clear();
-  }
 }
 
 class LocalFunctionElementX extends BaseFunctionElementX
@@ -1654,8 +1616,6 @@ class LocalFunctionElementX extends BaseFunctionElementX
       return node.getBeginToken();
     }
   }
-
-  bool get isLocal => true;
 }
 
 abstract class ConstructorElementX extends FunctionElementX
@@ -1723,7 +1683,7 @@ class DeferredLoaderGetterElementX extends FunctionElementX {
 
   bool get isClassMember => false;
 
-  bool isForeign(Backend backend) => true;
+  bool isForeign(Compiler compiler) => true;
 
   bool get isSynthesized => true;
 
@@ -1733,7 +1693,6 @@ class DeferredLoaderGetterElementX extends FunctionElementX {
 
   bool get isGetter => true;
 
-  bool get isTopLevel => true;
   // By having position null, the enclosing elements location is printed in
   // error messages.
   Token get position => null;
@@ -2077,15 +2036,16 @@ abstract class BaseClassElementX extends ElementX
    * When called on the implementation element both members declared in the
    * origin and the patch class are returned.
    */
-  Element lookupSelector(Selector selector) {
-    return internalLookupSelector(selector, false);
+  Element lookupSelector(Selector selector, Compiler compiler) {
+    return internalLookupSelector(selector, compiler, false);
   }
 
-  Element lookupSuperSelector(Selector selector) {
-    return internalLookupSelector(selector, true);
+  Element lookupSuperSelector(Selector selector, Compiler compiler) {
+    return internalLookupSelector(selector, compiler, true);
   }
 
   Element internalLookupSelector(Selector selector,
+                                 Compiler compiler,
                                  bool isSuperLookup) {
     String name = selector.name;
     bool isPrivate = isPrivateName(name);
@@ -2312,13 +2272,8 @@ abstract class BaseClassElementX extends ElementX
   bool get isNative => nativeTagInfo != null;
 
   void setNative(String name) {
-    // TODO(johnniwinther): Assert that this is only called once. The memory
-    // compiler copies pre-processed elements into a new compiler through
-    // [Compiler.onLibraryScanned] and thereby causes multiple calls to this
-    // method.
-    assert(invariant(this, nativeTagInfo == null || nativeTagInfo == name,
-        message: "Native tag info set inconsistently on $this: "
-                 "Existing name '$nativeTagInfo', new name '$name'."));
+    assert(invariant(this, nativeTagInfo == null,
+        message: "Native tag info set twice on $this."));
     nativeTagInfo = name;
   }
 

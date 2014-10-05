@@ -260,10 +260,6 @@ class Namer implements ClosureNamer {
   final Map<Constant, String> constantLongNames;
   ConstantCanonicalHasher constantHasher;
 
-  // All alphanumeric characters.
-  static const String _alphaNumeric =
-      'abcdefghijklmnopqrstuvwxyzABZDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
   Namer(Compiler compiler)
       : compiler = compiler,
         globals = new Map<Element, String>(),
@@ -506,8 +502,7 @@ class Namer implements ClosureNamer {
     // If a class is used anywhere as a mixin, we must make the name unique so
     // that it does not accidentally shadow.  Also, the mixin name must be
     // constant over all mixins.
-    ClassWorld classWorld = compiler.world;
-    if (classWorld.isUsedAsMixin(element.enclosingClass) ||
+    if (compiler.world.isUsedAsMixin(element.enclosingClass) ||
         shadowingAnotherField(element)) {
       // Construct a new name for the element based on the library and class it
       // is in.  The name here is not important, we just need to make sure it is
@@ -826,7 +821,6 @@ class Namer implements ClosureNamer {
         // other elements, such as bound closures also live in [currentIsolate].
         !element.isAccessor &&
         !element.isClass &&
-        !element.isTypedef &&
         !element.isConstructor &&
         !element.isFunction &&
         !element.isLibrary;
@@ -887,8 +881,6 @@ class Namer implements ClosureNamer {
   String operatorAsPrefix() => r'$as';
 
   String operatorSignature() => r'$signature';
-
-  String typedefTag() => r'typedef';
 
   String functionTypeTag() => r'func';
 

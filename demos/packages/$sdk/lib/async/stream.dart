@@ -84,14 +84,14 @@ abstract class Stream<T> {
     // Use the controller's buffering to fill in the value even before
     // the stream has a listener. For a single value, it's not worth it
     // to wait for a listener before doing the `then` on the future.
-    _StreamController<T> controller = new StreamController<T>(sync: true);
+    StreamController<T> controller = new StreamController<T>(sync: true);
     future.then((value) {
-        controller._add(value);
-        controller._closeUnchecked();
+        controller.add(value);
+        controller.close();
       },
       onError: (error, stackTrace) {
-        controller._addError(error, stackTrace);
-        controller._closeUnchecked();
+        controller.addError(error, stackTrace);
+        controller.close();
       });
     return controller.stream;
   }
@@ -313,11 +313,8 @@ abstract class Stream<T> {
     StreamController controller;
     StreamSubscription subscription;
     void onListen () {
-      final add = controller.add;
-      assert(controller is _StreamController ||
-             controller is _BroadcastStreamController);
-      final eventSink = controller;
-      final addError = eventSink._addError;
+      var add = controller.add;
+      var addError = controller.addError;
       subscription = this.listen(
           (T event) {
             var newValue;
@@ -374,9 +371,6 @@ abstract class Stream<T> {
     StreamController controller;
     StreamSubscription subscription;
     void onListen() {
-      assert(controller is _StreamController ||
-             controller is _BroadcastStreamController);
-      final eventSink = controller;
       subscription = this.listen(
           (T event) {
             Stream newStream;
@@ -392,7 +386,7 @@ abstract class Stream<T> {
                         .whenComplete(subscription.resume);
             }
           },
-          onError: eventSink._addError,  // Avoid Zone error replacement.
+          onError: controller.addError,
           onDone: controller.close
       );
     }
@@ -510,7 +504,7 @@ abstract class Stream<T> {
           try {
             throw IterableElementError.noElement();
           } catch (e, s) {
-            _completeWithErrorCallback(result, e,  s);
+            result._completeError(e, s);
           }
         } else {
           result._complete(value);
@@ -568,7 +562,7 @@ abstract class Stream<T> {
         try {
           buffer.write(element);
         } catch (e, s) {
-          _cancelAndErrorWithReplacement(subscription, result, e, s);
+          _cancelAndError(subscription, result, e, s);
         }
       },
       onError: (e) {
@@ -915,7 +909,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -950,7 +944,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -977,7 +971,7 @@ abstract class Stream<T> {
           try {
             throw IterableElementError.tooMany();
           } catch (e, s) {
-            _cancelAndErrorWithReplacement(subscription, future, e, s);
+            _cancelAndError(subscription, future, e, s);
           }
           return;
         }
@@ -993,7 +987,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -1045,7 +1039,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -1090,7 +1084,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -1118,7 +1112,7 @@ abstract class Stream<T> {
                 try {
                   throw IterableElementError.tooMany();
                 } catch (e, s) {
-                  _cancelAndErrorWithReplacement(subscription, future, e, s);
+                  _cancelAndError(subscription, future, e, s);
                 }
                 return;
               }
@@ -1138,7 +1132,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          _completeWithErrorCallback(future, e, s);
+          future._completeError(e, s);
         }
       },
       cancelOnError: true);
@@ -1218,10 +1212,7 @@ abstract class Stream<T> {
     }
     void onError(error, StackTrace stackTrace) {
       timer.cancel();
-      assert(controller is _StreamController ||
-             controller is _BroadcastStreamController);
-      var eventSink = controller;
-      eventSink._addError(error, stackTrace);  // Avoid Zone error replacement.
+      controller.addError(error, stackTrace);
       timer = zone.createTimer(timeLimit, timeout);
     }
     void onDone() {
@@ -1237,7 +1228,7 @@ abstract class Stream<T> {
       if (onTimeout == null) {
         timeout = () {
           controller.addError(new TimeoutException("No stream event",
-                                                   timeLimit), null);
+                                                   timeLimit));
         };
       } else {
         onTimeout = zone.registerUnaryCallback(onTimeout);
@@ -1382,7 +1373,7 @@ abstract class EventSink<T> implements Sink<T> {
   void add(T event);
   /** Send an async error to a stream. */
   void addError(errorEvent, [StackTrace stackTrace]);
-  /** Send a done event to a stream. */
+  /** Send a done event to a stream.*/
   void close();
 }
 

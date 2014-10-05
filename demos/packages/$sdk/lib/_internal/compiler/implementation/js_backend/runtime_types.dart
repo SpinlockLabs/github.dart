@@ -13,7 +13,6 @@ abstract class TypeChecks {
 }
 
 typedef jsAst.Expression OnVariableCallback(TypeVariableType variable);
-typedef bool ShouldEncodeTypedefCallback(TypedefType variable);
 
 class RuntimeTypes {
   final Compiler compiler;
@@ -128,10 +127,12 @@ class RuntimeTypes {
       classesNeedingRti.add(cls);
 
       // TODO(ngeoffray): This should use subclasses, not subtypes.
-      Iterable<ClassElement> classes = compiler.world.subtypesOf(cls);
-      classes.forEach((ClassElement sub) {
-        potentiallyAddForRti(sub);
-      });
+      Set<ClassElement> classes = compiler.world.subtypesOf(cls);
+      if (classes != null) {
+        classes.forEach((ClassElement sub) {
+          potentiallyAddForRti(sub);
+        });
+      }
 
       Set<ClassElement> dependencies = rtiDependencies[cls];
       if (dependencies != null) {
@@ -185,10 +186,8 @@ class RuntimeTypes {
               methodsNeedingRti.add(method);
             }
           }
-          compiler.resolverWorld.closuresWithFreeTypeVariables.forEach(
-              analyzeMethod);
-          compiler.resolverWorld.callMethodsWithFreeTypeVariables.forEach(
-              analyzeMethod);
+          compiler.resolverWorld.genericClosures.forEach(analyzeMethod);
+          compiler.resolverWorld.genericCallMethods.forEach(analyzeMethod);
         }
       }
     });
@@ -201,10 +200,8 @@ class RuntimeTypes {
           methodsNeedingRti.add(method);
         }
       }
-      compiler.resolverWorld.closuresWithFreeTypeVariables.forEach(
-          analyzeMethod);
-      compiler.resolverWorld.callMethodsWithFreeTypeVariables.forEach(
-          analyzeMethod);
+      compiler.resolverWorld.genericClosures.forEach(analyzeMethod);
+      compiler.resolverWorld.genericCallMethods.forEach(analyzeMethod);
     }
     // Add the classes that need RTI because they use a type variable as
     // expression.
@@ -561,12 +558,9 @@ class RuntimeTypes {
     return jsAst.prettyPrint(representation, compiler).buffer.toString();
   }
 
-  jsAst.Expression getTypeRepresentation(
-      DartType type,
-      OnVariableCallback onVariable,
-      [ShouldEncodeTypedefCallback shouldEncodeTypedef]) {
-    return representationGenerator.getTypeRepresentation(
-        type, onVariable, shouldEncodeTypedef);
+  jsAst.Expression getTypeRepresentation(DartType type,
+                                         OnVariableCallback onVariable) {
+    return representationGenerator.getTypeRepresentation(type, onVariable);
   }
 
   bool isSimpleFunctionType(FunctionType type) {
@@ -610,7 +604,6 @@ class RuntimeTypes {
 class TypeRepresentationGenerator extends DartTypeVisitor {
   final Compiler compiler;
   OnVariableCallback onVariable;
-  ShouldEncodeTypedefCallback shouldEncodeTypedef;
 
   JavaScriptBackend get backend => compiler.backend;
   Namer get namer => backend.namer;
@@ -621,16 +614,11 @@ class TypeRepresentationGenerator extends DartTypeVisitor {
    * Creates a type representation for [type]. [onVariable] is called to provide
    * the type representation for type variables.
    */
-  jsAst.Expression getTypeRepresentation(
-      DartType type,
-      OnVariableCallback onVariable,
-      ShouldEncodeTypedefCallback encodeTypedef) {
+  jsAst.Expression getTypeRepresentation(DartType type,
+                                         OnVariableCallback onVariable) {
     this.onVariable = onVariable;
-    this.shouldEncodeTypedef =
-        (encodeTypedef != null) ? encodeTypedef : (TypedefType type) => false;
     jsAst.Expression representation = visit(type);
     this.onVariable = null;
-    this.shouldEncodeTypedef = null;
     return representation;
   }
 
@@ -639,7 +627,7 @@ class TypeRepresentationGenerator extends DartTypeVisitor {
   }
 
   visit(DartType type) {
-    return type.accept(this, null);
+    return type.unalias(compiler).accept(this, null);
   }
 
   visitTypeVariableType(TypeVariableType type, _) {
@@ -713,25 +701,6 @@ class TypeRepresentationGenerator extends DartTypeVisitor {
   visitVoidType(VoidType type, _) {
     // TODO(ahe): Reify void type ("null" means "dynamic").
     return js('null');
-  }
-
-  visitTypedefType(TypedefType type, _) {
-    bool shouldEncode = shouldEncodeTypedef(type);
-    DartType unaliasedType = type.unalias(compiler);
-    if (shouldEncode) {
-      jsAst.ObjectInitializer initializer = unaliasedType.accept(this, null);
-      // We have to encode the aliased type.
-      jsAst.Expression name = getJavaScriptClassName(type.element);
-      jsAst.Expression encodedTypedef =
-          type.treatAsRaw ? name : visitList(type.typeArguments, head: name);
-
-      // Add it to the function-type object.
-      jsAst.LiteralString tag = js.string(namer.typedefTag());
-      initializer.properties.add(new jsAst.Property(tag, encodedTypedef));
-      return initializer;
-    } else {
-      return unaliasedType.accept(this, null);
-    }
   }
 
   visitType(DartType type, _) {

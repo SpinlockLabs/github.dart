@@ -352,25 +352,20 @@ abstract class TracerVisitor<T extends TypeInformation>
     return outermost.declaration != element.declaration;
   }
 
-  void visitMemberTypeInformation(MemberTypeInformation info) {
+  void visitElementTypeInformation(ElementTypeInformation info) {
     Element element = info.element;
+    if (element.isParameter
+        && inferrer.isNativeElement(element.enclosingElement)) {
+      bailout('Passed to a native method');
+    }
     if (info.isClosurized) {
       bailout('Returned from a closurized method');
     }
     if (isClosure(info.element)) {
       bailout('Returned from a closure');
     }
-    if (!inferrer.compiler.backend
-        .canBeUsedForGlobalOptimizations(info.element)) {
-      bailout('Escape to code that has special backend treatment');
-    }
-    addNewEscapeInformation(info);
-  }
-
-  void visitParameterTypeInformation(ParameterTypeInformation info) {
-    ParameterElement element = info.element;
-    if (inferrer.isNativeElement(element.functionDeclaration)) {
-      bailout('Passed to a native method');
+    if (compiler.backend.isAccessibleByReflection(info.element)) {
+      bailout('Escape in reflection');
     }
     if (!inferrer.compiler.backend
         .canBeUsedForGlobalOptimizations(info.element)) {

@@ -4,13 +4,9 @@
 
 library dart2js.js_emitter;
 
-import '../hash/sha1.dart' show hashOfString;
-
 import '../common.dart';
 
 import '../js/js.dart' as jsAst;
-
-import '../new_js_emitter/emitter.dart' as new_js_emitter;
 
 import '../closure.dart' show
     ClosureClassElement,
@@ -21,11 +17,10 @@ import '../closure.dart' show
 import '../dart2jslib.dart' show
     CodeBuffer;
 
-import '../elements/elements.dart' show ConstructorBodyElement, ElementKind, ParameterElement, TypeVariableElement;
-
-import '../dart_types.dart' show
-    TypedefType;
-
+import '../elements/elements.dart' show
+    TypeVariableElement,
+    ConstructorBodyElement,
+    ParameterElement;
 
 import '../js/js.dart' show
     js, templateManager;
@@ -44,7 +39,7 @@ import '../js_backend/js_backend.dart' show
     TypeChecks,
     TypeVariableHandler;
 
-import '../helpers/helpers.dart';  // Included for debug helpers.
+import '../helpers/helpers.dart';
 
 import '../source_file.dart' show
     SourceFile,
@@ -74,22 +69,17 @@ import '../util/util.dart' show
 import '../deferred_load.dart' show
     OutputUnit;
 
-import '../../js_lib/shared/runtime_data.dart' as encoding;
-import '../../js_lib/shared/embedded_names.dart' as embeddedNames;
-
-import '../hash/sha1.dart';
+import '../runtime_data.dart' as encoding;
 
 part 'class_builder.dart';
-part 'class_stub_generator.dart';
+part 'class_emitter.dart';
 part 'code_emitter_helper.dart';
 part 'code_emitter_task.dart';
 part 'container_builder.dart';
 part 'declarations.dart';
 part 'helpers.dart';
+part 'interceptor_emitter.dart';
 part 'metadata_emitter.dart';
 part 'nsm_emitter.dart';
 part 'reflection_data_parser.dart';
 part 'type_test_emitter.dart';
-
-part 'old_emitter/class_emitter.dart';
-part 'old_emitter/interceptor_emitter.dart';

@@ -65,8 +65,6 @@ class LogicalRewriter extends Visitor<Statement, Expression> {
   Statement fallthrough;
 
   void rewrite(FunctionDefinition definition) {
-    if (definition.isAbstract) return;
-
     definition.body = visitStatement(definition.body);
   }
 

@@ -110,8 +110,6 @@ class StatementRewriter extends Visitor<Statement, Expression> {
   }
 
   void rewrite(FunctionDefinition definition) {
-    if (definition.isAbstract) return;
-
     environment = <Assign>[];
     definition.body = visitStatement(definition.body);
 
