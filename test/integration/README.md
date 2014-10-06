@@ -7,5 +7,6 @@ GitHub API.
 To run these tests a GitHub repository and OAuth token will need to be defined
 in the `config/config.dart` file. 
 
-As these tests make modifications it is highly recommended that a dedicated 
-test account is used.
+**Warning:** The test will delete and recreate the specified repository to 
+start with a clean repo. It is highly recommended that a dedicated test account 
+is used!
