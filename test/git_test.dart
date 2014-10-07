@@ -163,7 +163,7 @@ main() {
       
       expect(body['sha'], equals('someSHA'));
       expect(body['force'], equals(true));
-      expect(headers['content-length'], equals(30));
+      expect(headers['content-length'], equals('30'));
     });
   });
   
