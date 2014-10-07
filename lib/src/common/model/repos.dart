@@ -285,7 +285,31 @@ class CreateRepository {
   }
 }
 
-/// A Breakdown of the Languages a repository uses
+/// Model class for a branch.
+class Branch {
+  
+  /// The name of the branch.
+  String name;
+  
+  /// The [RepositoryCommit] which wraps the raw [GitCommit].
+  RepositoryCommit commit;
+  
+  static Branch fromJSON(input) {
+    if (input == null) return null;
+    
+    var branch = new Branch()
+        ..name = input['name'];
+    
+    if (input['commit'] != null) {
+      branch.commit = RepositoryCommit.fromJSON(input['commit']);
+    }
+    
+    return branch;
+  }
+}
+
+
+/// A Breakdown of the Languages a repository uses.
 class LanguageBreakdown {
   final Map<String, int> _data;
   

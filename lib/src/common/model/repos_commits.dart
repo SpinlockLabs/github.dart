@@ -7,12 +7,19 @@ part of github.common;
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
 class RepositoryCommit {
 
-  /// Url to Commit Page
-  @ApiName("html_url")
-  String htmlUrl;
+  /// API url.
+  String url;
 
   /// Commit SHA
   String sha;
+  
+  /// Url to Commit Page
+  @ApiName("html_url")
+  String htmlUrl;
+  
+  /// Comments url.
+  @ApiName("comments_url")
+  String commentsUrl;
 
   /// A reference to the raw [GitCommit].
   GitCommit commit;
@@ -36,8 +43,10 @@ class RepositoryCommit {
     if (input == null) return null;
     
     var commit = new RepositoryCommit()
-        ..htmlUrl = input['html_url']
+        ..url = input['url']
         ..sha = input['sha']
+        ..htmlUrl = input['html_url']
+        ..commentsUrl = input['comments_url']
         ..commit = GitCommit.fromJSON(input['commit'])
         ..author = User.fromJSON(input['author'])
         ..committer = User.fromJSON(input['committer'])

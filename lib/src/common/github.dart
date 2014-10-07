@@ -281,15 +281,18 @@ class GitHub {
         var buff = new StringBuffer();
         buff.writeln();
         buff.writeln("  Message: ${msg}");
-        buff.writeln("  Errors:");
-        for (Map<String, String> error in errors) {
-          var resource = error['resource'];
-          var field = error['field'];
-          var code = error['code'];
-          buff
-          ..writeln("    Resource: ${resource}")
-          ..writeln("    Field ${field}")
-          ..write("    Code: ${code}");
+        
+        if (errors != null) {
+          buff.writeln("  Errors:");
+          for (Map<String, String> error in errors) {
+            var resource = error['resource'];
+            var field = error['field'];
+            var code = error['code'];
+            buff
+            ..writeln("    Resource: ${resource}")
+            ..writeln("    Field ${field}")
+            ..write("    Code: ${code}");
+          }
         }
         throw new ValidationFailed(this, buff.toString());
     }
@@ -311,8 +314,8 @@ class GitHub {
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
-      var userAndPass = UTF8.encode("${auth.username}:${auth.password}");
-      headers.putIfAbsent("Authorization", () => "basic ${CryptoUtils.bytesToBase64(userAndPass)}");
+      var userAndPass = utf8ToBase64('${auth.username}:${auth.password}');
+      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
     }
 
     var queryString = "";
