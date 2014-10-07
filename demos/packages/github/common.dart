@@ -21,13 +21,14 @@ import 'http.dart' as http;
 part 'src/common/github.dart';
 
 // Util
-part 'src/common/util/utils.dart';
 part 'src/common/util/auth.dart';
+part 'src/common/util/encoding_utils.dart';
 part 'src/common/util/json.dart';
 part 'src/common/util/oauth2.dart';
 part 'src/common/util/errors.dart';
 part 'src/common/util/pagination.dart';
 part 'src/common/util/service.dart';
+part 'src/common/util/utils.dart';
 
 // Services
 part 'src/common/activity_service.dart';

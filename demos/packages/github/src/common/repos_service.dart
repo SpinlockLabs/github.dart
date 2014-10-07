@@ -116,10 +116,21 @@ class RepositoriesService extends Service {
   }
   
   // TODO: Implement editRepository: https://developer.github.com/v3/repos/#edit
-  // TODO: Implement deleteRepository: https://developer.github.com/v3/repos/#delete-a-repository
+  
+  /// Deletes a repository.
+  /// 
+  /// Returns true if it was successfully deleted.
+  /// 
+  /// API docs: https://developer.github.com/v3/repos/#delete-a-repository
+  Future<bool> deleteRepository(RepositorySlug slug) {
+    return _github.request('DELETE', '/repos/${slug.fullName}')
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  }
+  
   // TODO: Implement listContributors: https://developer.github.com/v3/repos/#list-contributors
   
   /// Gets a language breakdown for the specified repository.
+  /// 
   /// API docs: https://developer.github.com/v3/repos/#list-languages
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages", statusCode: StatusCodes.OK, 
@@ -127,10 +138,23 @@ class RepositoriesService extends Service {
   
   // TODO: Implement listTeams: https://developer.github.com/v3/repos/#list-teams
   // TODO: Implement listTags: https://developer.github.com/v3/repos/#list-tags
-  // TODO: Implement listBranches: https://developer.github.com/v3/repos/#list-branches
   
-  // TODO: Implement getBranch: https://developer.github.com/v3/repos/#get-branch
   
+  /// Lists the branches of the specified repository.
+  /// 
+  /// API docs: https://developer.github.com/v3/repos/#list-branches
+  Stream<Branch> listBranches(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects('GET', '/repos/${slug.fullName}/branches', 
+        Branch.fromJSON);
+  }
+  
+  /// Fetches the specified branch.
+  /// 
+  /// API docs: https://developer.github.com/v3/repos/#get-branch
+  Future<Branch> getBranch(RepositorySlug slug, String branch) {
+    return _github.getJSON("/repos/${slug.fullName}/branches/${branch}",
+        convert: Branch.fromJSON);
+  }
   
   /// Lists the users that have access to the repository identified by [slug].
   /// 

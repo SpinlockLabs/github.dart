@@ -6719,7 +6719,7 @@ var $$ = {};
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure(this));
       else if (t1.isBasic) {
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
-        headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
+        headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(M._CryptoUtils_bytesToBase64(C.Utf8Codec_false.get$encoder().convert$1(t1), false, false)));
       }
       url = P.StringBuffer$("");
       if (C.JSString_methods.startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://")) {
@@ -6746,7 +6746,7 @@ var $$ = {};
   GitHub_request_closure0: {
     "^": "Closure:7;userAndPass_1",
     call$0: function() {
-      return "basic " + M._CryptoUtils_bytesToBase64(this.userAndPass_1, false, false);
+      return "basic " + this.userAndPass_1;
     }
   },
   MiscService: {

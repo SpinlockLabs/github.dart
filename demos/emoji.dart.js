@@ -9519,22 +9519,24 @@ var $$ = {};
           buff.write$1("\n");
           buff.write$1("  Message: " + H.S(msg));
           buff.write$1("\n");
-          buff.write$1("  Errors:");
-          buff.write$1("\n");
-          for (t1 = J.get$iterator$ax(errors); t1.moveNext$0();) {
-            error = t1.get$current();
-            t2 = J.getInterceptor$asx(error);
-            resource = t2.$index(error, "resource");
-            field = t2.$index(error, "field");
-            code = t2.$index(error, "code");
-            t2 = "    Resource: " + H.S(resource);
-            t2 = buff._contents += t2;
-            buff._contents = t2 + "\n";
-            t2 = "    Field " + H.S(field);
-            t2 = buff._contents += t2;
-            buff._contents = t2 + "\n";
-            t2 = "    Code: " + H.S(code);
-            buff._contents += t2;
+          if (errors != null) {
+            buff.write$1("  Errors:");
+            buff.write$1("\n");
+            for (t1 = J.get$iterator$ax(errors); t1.moveNext$0();) {
+              error = t1.get$current();
+              t2 = J.getInterceptor$asx(error);
+              resource = t2.$index(error, "resource");
+              field = t2.$index(error, "field");
+              code = t2.$index(error, "code");
+              t2 = "    Resource: " + H.S(resource);
+              t2 = buff._contents += t2;
+              buff._contents = t2 + "\n";
+              t2 = "    Field " + H.S(field);
+              t2 = buff._contents += t2;
+              buff._contents = t2 + "\n";
+              t2 = "    Code: " + H.S(code);
+              buff._contents += t2;
+            }
           }
           throw H.wrapException(T.ValidationFailed$(this, buff.toString$0(0)));
       }
@@ -9547,7 +9549,7 @@ var $$ = {};
         headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure(this));
       else if (t1.isBasic) {
         t1 = H.S(t1.username) + ":" + H.S(t1.password);
-        headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(C.Utf8Codec_false.get$encoder().convert$1(t1)));
+        headers.putIfAbsent$2("Authorization", new T.GitHub_request_closure0(M._CryptoUtils_bytesToBase64(C.Utf8Codec_false.get$encoder().convert$1(t1), false, false)));
       }
       url = P.StringBuffer$("");
       if (C.JSString_methods.startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://")) {
@@ -9594,7 +9596,7 @@ var $$ = {};
   GitHub_request_closure0: {
     "^": "Closure:8;userAndPass_1",
     call$0: function() {
-      return "basic " + M._CryptoUtils_bytesToBase64(this.userAndPass_1, false, false);
+      return "basic " + this.userAndPass_1;
     }
   },
   MiscService: {

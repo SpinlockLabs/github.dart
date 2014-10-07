@@ -124,7 +124,14 @@ class CommitUser {
   
   CommitUser(this.name, this.email);
   
-  Map<String, String> toMap() => { "name": name, "email": email };
+  Map<String, dynamic> toMap() {
+    var map = {};
+    
+    putValue('name', name, map);
+    putValue('email', email, map);
+    
+    return map;
+  }
 }
 
 /// Model class for the response of a content creation.

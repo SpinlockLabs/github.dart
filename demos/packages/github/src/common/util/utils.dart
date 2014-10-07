@@ -37,6 +37,14 @@ DateTime parseDateTime(String input) {
   return DateTime.parse(input);
 }
 
+/// Converts the [date] to GitHub's ISO-8601 format:
+/// 
+/// The format is "YYYY-MM-DDTHH:mm:ssZ"
+String dateToGithubIso8601(DateTime date) {
+  // Regex removes the milliseconds.
+  return date.toUtc().toIso8601String().replaceAll(new RegExp(r'\.\d*'), '');
+}
+
 String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();
   
@@ -68,7 +76,9 @@ dynamic copyOf(dynamic input) {
   }
 }
 
-void putValue(String name, dynamic value, Map map) {
+/// Puts a [name] and [value] into the [map] if [value] is not null. If [value]
+/// is null, nothing is added. 
+void putValue(String name, dynamic value, Map<String, dynamic> map) {
   if (value != null) {
     map[name] = value;
   }
