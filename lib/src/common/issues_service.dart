@@ -55,7 +55,7 @@ class IssuesService extends Service {
   /// 
   /// API docs: https://developer.github.com/v3/issues/#get-a-single-issue
   Future<Issue> get(RepositorySlug slug, int issueNumber) {
-    return _github.getJSON("/repos/${slug.fullName}/issues/${id}",
+    return _github.getJSON("/repos/${slug.fullName}/issues/${issueNumber}",
         convert: Issue.fromJSON);
   }
   
