@@ -12,6 +12,6 @@ import 'git_test.dart' as git_test;
 /// Runs all unit tests.
 void main() {
   initUnitTests(junit: Platform.environment.containsKey("TEAMCITY_VERSION"));
-  group('[util_test]', util_test.main);
-  group('[git_test]', git_test.main);
+  group('[Utilities]', util_test.main);
+  group('[Git Service]', git_test.main);
 }
