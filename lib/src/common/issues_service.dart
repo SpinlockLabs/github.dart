@@ -40,15 +40,30 @@ class IssuesService extends Service {
     return new PaginationHelper(_github).objects("GET", "/repos/${slug.fullName}/issues", 
         Issue.fromJSON, params: {"state": state});
   }
-  
-  // TODO: Implement get: https://developer.github.com/v3/issues/#get-a-single-issue
-  // TODO: Implement create: https://developer.github.com/v3/issues/#create-an-issue
  
   /// Edit an issue.
   /// 
   /// API docs: https://developer.github.com/v3/issues/#edit-an-issue
   Future<Issue> edit(RepositorySlug slug, int issueNumber, IssueRequest issue) {
     return _github.request("PATCH", '/repos/${slug.fullName}/issues/${issueNumber}', 
+        body: issue.toJSON()).then((response) {
+      return Issue.fromJSON(JSON.decode(response.body));
+    });
+  }
+  
+  /// Get an issue.
+  /// 
+  /// API docs: https://developer.github.com/v3/issues/#get-a-single-issue
+  Future<Issue> get(RepositorySlug slug, int issueNumber) {
+    return _github.getJSON("/repos/${slug.fullName}/issues/${id}",
+        convert: Issue.fromJSON);
+  }
+  
+  /// Create an issue.
+  /// 
+  /// API docs: https://developer.github.com/v3/issues/#create-an-issue
+  Future<Issue> create(RepositorySlug slug, IssueRequest issue) {
+    return _github.request("POST", '/repos/${slug.fullName}/issues', 
         body: issue.toJSON()).then((response) {
       return Issue.fromJSON(JSON.decode(response.body));
     });
