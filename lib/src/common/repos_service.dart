@@ -10,7 +10,7 @@ class RepositoriesService extends Service {
   /// Lists the repositories of the currently authenticated user.
   /// 
   /// API docs: https://developer.github.com/v3/repos/#list-your-repositories
-  Stream<Repository> listRepositories({String type: "owner", 
+  Stream<Repository> list({String type: "owner", 
       String sort: "full_name", String direction: "asc"}) {
     var params = {
       "type": type,
