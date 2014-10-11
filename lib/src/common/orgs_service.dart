@@ -12,10 +12,10 @@ class OrganizationsService extends Service {
   /// for the authenticated user. 
   ///
   /// API docs: : https://developer.github.com/v3/orgs/#list-user-organizations
-  Stream<Organization> listOrganizations([String userName]) {
-    String requestPath = "/users/$userName/orgs/";
+  Stream<Organization> list([String userName]) {
+    String requestPath = "/users/$userName/orgs";
     if (userName == null) {
-      requestPath = "/user/orgs/";
+      requestPath = "/user/orgs";
     }
     return new PaginationHelper(_github).objects("GET", requestPath, 
         Organization.fromJSON);
