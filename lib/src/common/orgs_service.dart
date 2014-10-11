@@ -13,9 +13,9 @@ class OrganizationsService extends Service {
   ///
   /// API docs: : https://developer.github.com/v3/orgs/#list-user-organizations
   Stream<Organization> list([String userName]) {
-    String requestPath = "/users/$userName/orgs/";
+    String requestPath = "/users/$userName/orgs";
     if (userName == null) {
-      requestPath = "/user/orgs/";
+      requestPath = "/user/orgs";
     }
     return new PaginationHelper(_github).objects("GET", requestPath, 
         Organization.fromJSON);
