@@ -38,7 +38,7 @@ class SearchService extends Service {
       List<dynamic> items = input['items'];
       
       items
-        .map((item) => Repository.fromJSON(_github, item))
+        .map((item) => Repository.fromJSON(item))
         .forEach(controller.add);
     }).onDone(controller.close);
     
