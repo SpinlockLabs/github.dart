@@ -267,7 +267,6 @@ class EventPoller {
           var event = Event.fromJSON(item);
           
           if (event.createdAt.toUtc().isBefore(after)) {
-            print("Skipping Event");
             continue;
           }
           
