@@ -21,6 +21,8 @@ typedef ZoneUnaryCallback RegisterUnaryCallbackHandler(
     Zone self, ZoneDelegate parent, Zone zone, f(arg));
 typedef ZoneBinaryCallback RegisterBinaryCallbackHandler(
     Zone self, ZoneDelegate parent, Zone zone, f(arg1, arg2));
+typedef AsyncError ErrorCallbackHandler(Zone self, ZoneDelegate parent,
+    Zone zone, Object error, StackTrace stackTrace);
 typedef void ScheduleMicrotaskHandler(
     Zone self, ZoneDelegate parent, Zone zone, f());
 typedef Timer CreateTimerHandler(
@@ -33,6 +35,17 @@ typedef void PrintHandler(
 typedef Zone ForkHandler(Zone self, ZoneDelegate parent, Zone zone,
                          ZoneSpecification specification,
                          Map zoneValues);
+
+/** Pair of error and stack trace. Returned by [Zone.errorCallback]. */
+class AsyncError implements Error {
+  final error;
+  final StackTrace stackTrace;
+
+  AsyncError(this.error, this.stackTrace);
+
+  String toString() => error.toString();
+}
+
 
 class _ZoneFunction {
   final _Zone zone;
@@ -77,6 +90,8 @@ abstract class ZoneSpecification {
         Zone self, ZoneDelegate parent, Zone zone, f(arg)),
     ZoneBinaryCallback registerBinaryCallback(
         Zone self, ZoneDelegate parent, Zone zone, f(arg1, arg2)),
+    AsyncError errorCallback(Zone self, ZoneDelegate parent, Zone zone,
+                             Object error, StackTrace stackTrace),
     void scheduleMicrotask(
         Zone self, ZoneDelegate parent, Zone zone, f()),
     Timer createTimer(Zone self, ZoneDelegate parent, Zone zone,
@@ -106,6 +121,8 @@ abstract class ZoneSpecification {
         Zone self, ZoneDelegate parent, Zone zone, f(arg)): null,
     ZoneBinaryCallback registerBinaryCallback(
         Zone self, ZoneDelegate parent, Zone zone, f(arg1, arg2)): null,
+    AsyncError errorCallback(Zone self, ZoneDelegate parent, Zone zone,
+                             Object error, StackTrace stackTrace),
     void scheduleMicrotask(
         Zone self, ZoneDelegate parent, Zone zone, f()): null,
     Timer createTimer(Zone self, ZoneDelegate parent, Zone zone,
@@ -133,6 +150,9 @@ abstract class ZoneSpecification {
       registerBinaryCallback: registerBinaryCallback != null
                          ? registerBinaryCallback
                          : other.registerBinaryCallback,
+      errorCallback: errorCallback != null
+                         ? errorCallback
+                         : other.errorCallback,
       scheduleMicrotask: scheduleMicrotask != null
                          ? scheduleMicrotask
                          : other.scheduleMicrotask,
@@ -151,6 +171,7 @@ abstract class ZoneSpecification {
   RegisterCallbackHandler get registerCallback;
   RegisterUnaryCallbackHandler get registerUnaryCallback;
   RegisterBinaryCallbackHandler get registerBinaryCallback;
+  ErrorCallbackHandler get errorCallback;
   ScheduleMicrotaskHandler get scheduleMicrotask;
   CreateTimerHandler get createTimer;
   CreatePeriodicTimerHandler get createPeriodicTimer;
@@ -174,6 +195,7 @@ class _ZoneSpecification implements ZoneSpecification {
     this.registerCallback: null,
     this.registerUnaryCallback: null,
     this.registerBinaryCallback: null,
+    this.errorCallback: null,
     this.scheduleMicrotask: null,
     this.createTimer: null,
     this.createPeriodicTimer: null,
@@ -189,6 +211,7 @@ class _ZoneSpecification implements ZoneSpecification {
   final /*RegisterCallbackHandler*/ registerCallback;
   final /*RegisterUnaryCallbackHandler*/ registerUnaryCallback;
   final /*RegisterBinaryCallbackHandler*/ registerBinaryCallback;
+  final /*ErrorCallbackHandler*/ errorCallback;
   final /*ScheduleMicrotaskHandler*/ scheduleMicrotask;
   final /*CreateTimerHandler*/ createTimer;
   final /*CreatePeriodicTimerHandler*/ createPeriodicTimer;
@@ -214,6 +237,7 @@ abstract class ZoneDelegate {
   ZoneCallback registerCallback(Zone zone, f());
   ZoneUnaryCallback registerUnaryCallback(Zone zone, f(arg));
   ZoneBinaryCallback registerBinaryCallback(Zone zone, f(arg1, arg2));
+  AsyncError errorCallback(Zone zone, Object error, StackTrace stackTrace);
   void scheduleMicrotask(Zone zone, f());
   Timer createTimer(Zone zone, Duration duration, void f());
   Timer createPeriodicTimer(Zone zone, Duration period, void f(Timer timer));
@@ -231,10 +255,10 @@ abstract class Zone {
   // Private constructor so that it is not possible instantiate a Zone class.
   Zone._();
 
-  /// The root zone that is implicitly created.
+  /** The root zone that is implicitly created. */
   static const Zone ROOT = _ROOT_ZONE;
 
-  /// The currently running zone.
+  /** The currently running zone. */
   static Zone _current = _ROOT_ZONE;
 
   static Zone get current => _current;
@@ -380,6 +404,24 @@ abstract class Zone {
       f(arg1, arg2), { bool runGuarded: true });
 
   /**
+   * Intercepts errors when added programmtically to a `Future` or `Stream`.
+   *
+   * When caling [Completer.completeError], [Stream.addError],
+   * or [Future] constructors that take an error or a callback that may throw,
+   * the current zone is allowed to intercept and replace the error.
+   *
+   * When other libraries use intermediate controllers or completers, such
+   * calls may contain errors that have already been processed.
+   *
+   * Return `null` if no replacement is desired.
+   * The original error is used unchanged in that case.
+   * Otherwise return an instance of [AsyncError] holding
+   * the new pair of error and stack trace.
+   * If the [AsyncError.error] is `null`, it is replaced by a [NullThrownError].
+   */
+  AsyncError errorCallback(Object error, StackTrace stackTrace);
+
+  /**
    * Runs [f] asynchronously in this zone.
    */
   void scheduleMicrotask(void f());
@@ -495,6 +537,14 @@ class _ZoneDelegate implements ZoneDelegate {
         implZone, _parentDelegate(implZone), zone, f);
   }
 
+  AsyncError errorCallback(Zone zone, Object error, StackTrace stackTrace) {
+    _ZoneFunction implementation = _delegationTarget._errorCallback;
+    _Zone implZone = implementation.zone;
+    if (identical(implZone, _ROOT_ZONE)) return null;
+    return (implementation.function)(implZone, _parentDelegate(implZone), zone,
+                                     error, stackTrace);
+  }
+
   void scheduleMicrotask(Zone zone, f()) {
     _ZoneFunction implementation = _delegationTarget._scheduleMicrotask;
     _Zone implZone = implementation.zone;
@@ -545,6 +595,7 @@ abstract class _Zone implements Zone {
   _ZoneFunction get _registerCallback;
   _ZoneFunction get _registerUnaryCallback;
   _ZoneFunction get _registerBinaryCallback;
+  _ZoneFunction get _errorCallback;
   _ZoneFunction get _scheduleMicrotask;
   _ZoneFunction get _createTimer;
   _ZoneFunction get _createPeriodicTimer;
@@ -556,7 +607,8 @@ abstract class _Zone implements Zone {
   Map get _map;
 
   bool inSameErrorZone(Zone otherZone) {
-    return identical(errorZone, otherZone.errorZone);
+    return identical(this, otherZone) ||
+           identical(errorZone, otherZone.errorZone);
   }
 }
 
@@ -569,6 +621,7 @@ class _CustomZone extends _Zone {
   _ZoneFunction _registerCallback;
   _ZoneFunction _registerUnaryCallback;
   _ZoneFunction _registerBinaryCallback;
+  _ZoneFunction _errorCallback;
   _ZoneFunction _scheduleMicrotask;
   _ZoneFunction _createTimer;
   _ZoneFunction _createPeriodicTimer;
@@ -615,6 +668,9 @@ class _CustomZone extends _Zone {
     _registerBinaryCallback = (specification.registerBinaryCallback != null)
         ? new _ZoneFunction(this, specification.registerBinaryCallback)
         : parent._registerBinaryCallback;
+    _errorCallback = (specification.errorCallback != null)
+        ? new _ZoneFunction(this, specification.errorCallback)
+        : parent._errorCallback;
     _scheduleMicrotask = (specification.scheduleMicrotask != null)
         ? new _ZoneFunction(this, specification.scheduleMicrotask)
         : parent._scheduleMicrotask;
@@ -781,6 +837,16 @@ class _CustomZone extends _Zone {
         implementation.zone, parentDelegate, this, f);
   }
 
+  AsyncError errorCallback(Object error, StackTrace stackTrace) {
+    final _ZoneFunction implementation = this._errorCallback;
+    assert(implementation != null);
+    final Zone implementationZone = implementation.zone;
+    if (identical(implementationZone, _ROOT_ZONE)) return null;
+    final ZoneDelegate parentDelegate = _parentDelegate(implementationZone);
+    return (implementation.function)(
+        implementationZone, parentDelegate, this, error, stackTrace);
+  }
+
   void scheduleMicrotask(void f()) {
     _ZoneFunction implementation = this._scheduleMicrotask;
     assert(implementation != null);
@@ -870,9 +936,13 @@ ZoneBinaryCallback _rootRegisterBinaryCallback(
   return f;
 }
 
+AsyncError _rootErrorCallback(Zone self, ZoneDelegate parent, Zone zone,
+                              Object error, StackTrace stackTrace) => null;
+
 void _rootScheduleMicrotask(Zone self, ZoneDelegate parent, Zone zone, f()) {
   if (!identical(_ROOT_ZONE, zone)) {
-    f = zone.bindCallback(f);
+    bool hasErrorHandler = !_ROOT_ZONE.inSameErrorZone(zone);
+    f = zone.bindCallback(f, runGuarded: hasErrorHandler);
   }
   _scheduleAsyncCallback(f);
 }
@@ -940,6 +1010,7 @@ class _RootZoneSpecification implements ZoneSpecification {
       _rootRegisterUnaryCallback;
   RegisterBinaryCallbackHandler get registerBinaryCallback =>
       _rootRegisterBinaryCallback;
+  ErrorCallbackHandler get errorCallback => _rootErrorCallback;
   ScheduleMicrotaskHandler get scheduleMicrotask => _rootScheduleMicrotask;
   CreateTimerHandler get createTimer => _rootCreateTimer;
   CreatePeriodicTimerHandler get createPeriodicTimer =>
@@ -963,6 +1034,8 @@ class _RootZone extends _Zone {
       const _ZoneFunction(_ROOT_ZONE, _rootRegisterUnaryCallback);
   _ZoneFunction get _registerBinaryCallback =>
       const _ZoneFunction(_ROOT_ZONE, _rootRegisterBinaryCallback);
+  _ZoneFunction get _errorCallback =>
+      const _ZoneFunction(_ROOT_ZONE, _rootErrorCallback);
   _ZoneFunction get _scheduleMicrotask =>
       const _ZoneFunction(_ROOT_ZONE, _rootScheduleMicrotask);
   _ZoneFunction get _createTimer =>
@@ -1093,6 +1166,8 @@ class _RootZone extends _Zone {
   ZoneUnaryCallback registerUnaryCallback(f(arg)) => f;
 
   ZoneBinaryCallback registerBinaryCallback(f(arg1, arg2)) => f;
+
+  AsyncError errorCallback(Object error, StackTrace stackTrace) => null;
 
   void scheduleMicrotask(void f()) {
     _rootScheduleMicrotask(null, null, this, f);

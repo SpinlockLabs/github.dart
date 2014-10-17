@@ -4,11 +4,11 @@
 
 library backend_ast_nodes;
 
-import '../dart2jslib.dart' as dart2js;
+import '../constants/values.dart' as values;
+import '../dart_types.dart' as types;
+import '../elements/elements.dart' as elements;
 import '../tree/tree.dart' as tree;
 import '../util/characters.dart' as characters;
-import '../elements/elements.dart' as elements;
-import '../dart_types.dart' as types;
 
 /// The following nodes correspond to [tree.Send] expressions:
 /// [FieldExpression], [IndexExpression], [Assignment], [Increment],
@@ -301,13 +301,17 @@ class FunctionExpression extends Expression {
   String name;
   final Parameters parameters;
   final Statement body;
+  final bool isGetter;
+  final bool isSetter;
 
   elements.FunctionElement element;
 
   FunctionExpression(this.parameters,
                      this.body,
                      { this.name,
-                       this.returnType }) {
+                       this.returnType,
+                       this.isGetter: false,
+                       this.isSetter: false }) {
     // Function must have a name if it has a return type
     assert(returnType == null || name != null);
   }
@@ -340,7 +344,7 @@ class Identifier extends Expression {
 }
 
 class Literal extends Expression {
-  final dart2js.PrimitiveConstant value;
+  final values.PrimitiveConstantValue value;
 
   Literal(this.value);
 }
@@ -762,6 +766,7 @@ class Unparser {
     if (e is SuperReceiver) {
       write('super');
     } else if (e is FunctionExpression) {
+      assert(!e.isGetter && !e.isSetter);
       Statement stmt = unfoldBlocks(e.body);
       int precedence = stmt is Return ? EXPRESSION : PRIMARY;
       withPrecedence(precedence, () {
@@ -802,11 +807,11 @@ class Unparser {
     } else if (e is Identifier) {
       write(e.name);
     } else if (e is Literal) {
-      if (e.value is dart2js.StringConstant) {
+      if (e.value.isString) {
         writeStringLiteral(e);
       }
-      else if (e.value is dart2js.DoubleConstant) {
-        double v = e.value.value;
+      else if (e.value.isDouble) {
+        double v = e.value.primitiveValue;
         if (v == double.INFINITY) {
           withPrecedence(MULTIPLICATIVE, () {
             write('1/0.0');
@@ -823,7 +828,9 @@ class Unparser {
           write(v.toString());
         }
       } else {
-        write(e.value.toString());
+        // TODO(sigurdm): Use [ConstExp] to generate valid code for any
+        // constant.
+        write(e.value.unparse());
       }
     } else if (e is LiteralList) {
       if (e.isConst) {
@@ -1185,6 +1192,7 @@ class Unparser {
       writeVariableDefinitions(stmt);
       write(';');
     } else if (stmt is FunctionDeclaration) {
+      assert(!stmt.function.isGetter && !stmt.function.isSetter);
       if (stmt.returnType != null) {
         writeType(stmt.returnType);
         write(' ');
@@ -1283,8 +1291,8 @@ class Unparser {
     void collectParts(Expression e) {
       if (e is StringConcat) {
         e.expressions.forEach(collectParts);
-      } else if (e is Literal && e.value is dart2js.StringConstant) {
-        for (int char in e.value.value) {
+      } else if (e is Literal && e.value.isString) {
+        for (int char in e.value.primitiveValue) {
           parts.add(char);
         }
       } else {

@@ -168,15 +168,27 @@ abstract class HttpServer implements Stream<HttpRequest> {
    *
    * By default the following headers are in this set:
    *
-   *    Content-Type: text/plain; charset=utf-8
-   *    X-Frame-Options: SAMEORIGIN
-   *    X-Content-Type-Options: nosniff
-   *    X-XSS-Protection: 1; mode=block
+   *     Content-Type: text/plain; charset=utf-8
+   *     X-Frame-Options: SAMEORIGIN
+   *     X-Content-Type-Options: nosniff
+   *     X-XSS-Protection: 1; mode=block
    *
    * If the `Server` header is added here and the `serverHeader` is set as
    * well then the value of `serverHeader` takes precedence.
    */
   HttpHeaders get defaultResponseHeaders;
+
+   /**
+   * Whether the [HttpServer] should compress the content, if possible.
+   *
+   * The content can only be compressed when the response is using
+   * chunked Transfer-Encoding and the incoming request has `gzip`
+   * as an accepted encoding in the Accept-Encoding header.
+   *
+   * The default value is `false` (compression disabled).
+   * To enable, set `autoCompress` to `true`.
+   */
+  bool autoCompress;
 
   /**
    * Get or set the timeout used for idle keep-alive connections. If no further

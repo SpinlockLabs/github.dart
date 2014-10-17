@@ -13,6 +13,8 @@ import 'elements/elements.dart' as elements;
 import '../../libraries.dart';
 import 'source_file.dart';
 
+const bool forceIncrementalSupport =
+    const bool.fromEnvironment('DART2JS_EXPERIMENTAL_INCREMENTAL_SUPPORT');
 
 class Compiler extends leg.Compiler {
   api.CompilerInputProvider provider;
@@ -23,6 +25,9 @@ class Compiler extends leg.Compiler {
   Map<String, dynamic> environment;
   bool mockableLibraryUsed = false;
   final Set<String> allowedLibraryCategories;
+
+  leg.GenericTask userHandlerTask;
+  leg.GenericTask userProviderTask;
 
   Compiler(this.provider,
            api.CompilerOutputProvider outputProvider,
@@ -42,7 +47,9 @@ class Compiler extends leg.Compiler {
             enableMinification: hasOption(options, '--minify'),
             enableNativeLiveTypeAnalysis:
                 !hasOption(options, '--disable-native-live-type-analysis'),
-            emitJavaScript: !hasOption(options, '--output-type=dart'),
+            emitJavaScript: !(hasOption(options, '--output-type=dart') ||
+                              hasOption(options, '--output-type=dart-multi')),
+            dart2dartMultiFile: hasOption(options, '--output-type=dart-multi'),
             generateSourceMap: !hasOption(options, '--no-source-maps'),
             analyzeAllFlag: hasOption(options, '--analyze-all'),
             analyzeOnly: hasOption(options, '--analyze-only'),
@@ -66,8 +73,14 @@ class Compiler extends leg.Compiler {
             showPackageWarnings:
                 hasOption(options, '--show-package-warnings'),
             useContentSecurityPolicy: hasOption(options, '--csp'),
-            hasIncrementalSupport: hasOption(options, '--incremental-support'),
+            hasIncrementalSupport:
+                forceIncrementalSupport ||
+                hasOption(options, '--incremental-support'),
             suppressWarnings: hasOption(options, '--suppress-warnings')) {
+    tasks.addAll([
+        userHandlerTask = new leg.GenericTask('Diagnostic handler', this),
+        userProviderTask = new leg.GenericTask('Input provider', this),
+    ]);
     if (!libraryRoot.path.endsWith("/")) {
       throw new ArgumentError("libraryRoot must end with a /");
     }
@@ -276,8 +289,11 @@ class Compiler extends leg.Compiler {
     return super.run(uri).then((bool success) {
       int cumulated = 0;
       for (final task in tasks) {
-        cumulated += task.timing;
-        log('${task.name} took ${task.timing}msec');
+        int elapsed = task.timing;
+        if (elapsed != 0) {
+          cumulated += elapsed;
+          log('${task.name} took ${elapsed}msec');
+        }
       }
       int total = totalCompileTime.elapsedMilliseconds;
       log('Total compile-time ${total}msec;'
@@ -312,7 +328,9 @@ class Compiler extends leg.Compiler {
   void callUserHandler(Uri uri, int begin, int end,
                        String message, api.Diagnostic kind) {
     try {
-      handler(uri, begin, end, message, kind);
+      userHandlerTask.measure(() {
+        handler(uri, begin, end, message, kind);
+      });
     } catch (ex, s) {
       diagnoseCrashInUserCode(
           'Uncaught exception in diagnostic handler', ex, s);
@@ -322,7 +340,7 @@ class Compiler extends leg.Compiler {
 
   Future callUserProvider(Uri uri) {
     try {
-      return provider(uri);
+      return userProviderTask.measure(() => provider(uri));
     } catch (ex, s) {
       diagnoseCrashInUserCode('Uncaught exception in input provider', ex, s);
       rethrow;

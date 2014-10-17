@@ -105,8 +105,14 @@ abstract class String implements Comparable<String>, Pattern {
    *     var clef = new String.fromCharCodes([0x1D11E]);
    *     clef.codeUnitAt(0); // 0xD834
    *     clef.codeUnitAt(1); // 0xDD1E
+   *
+   * If [start] and [end] is provided, only the values of [charCodes]
+   * at positions from `start` to, but not including, `end`, are used.
+   * The `start` and `end` values must satisfy
+   * `0 <= start <= end <= charCodes.length`.
    */
-  external factory String.fromCharCodes(Iterable<int> charCodes);
+  external factory String.fromCharCodes(Iterable<int> charCodes,
+                                        [int start = 0, int end]);
 
   /**
    * Allocates a new String for the specified [charCode].
@@ -409,11 +415,12 @@ abstract class String implements Comparable<String>, Pattern {
 
   /**
    * Returns a new string in which  the first occurence of [from] in this string
-   * is replaced with [to]:
+   * is replaced with [to], starting from [startIndex]:
    *
    *     '0.0001'.replaceFirst(new RegExp(r'0'), ''); // '.0001'
+   *     '0.0001'.replaceFirst(new RegExp(r'0'), '7', 1); // '0.7001'
    */
-  String replaceFirst(Pattern from, String to);
+  String replaceFirst(Pattern from, String to, [int startIndex = 0]);
 
   /**
    * Replaces all substrings that match [from] with [replace].

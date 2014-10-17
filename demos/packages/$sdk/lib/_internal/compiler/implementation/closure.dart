@@ -18,10 +18,15 @@ import "elements/modelx.dart"
          LocalFunctionElementX;
 import "elements/visitor.dart" show ElementVisitor;
 
+import 'universe/universe.dart' show
+    Universe;
+
 class ClosureNamer {
   String getClosureVariableName(String name, int id) {
     return "${name}_$id";
   }
+
+  void forgetElement(Element element) {}
 }
 
 class ClosureTask extends CompilerTask {
@@ -74,6 +79,20 @@ class ClosureTask extends CompilerTask {
       }
       return nestedClosureData;
     });
+  }
+
+  void forgetElement(var closure) {
+    ClosureClassElement cls;
+    if (closure is ClosureFieldElement) {
+      cls = closure.closureClass;
+    } else if (closure is SynthesizedCallMethodElementX) {
+      cls = closure.closureClass;
+    } else {
+      throw new SpannableAssertionFailure(
+          closure, 'Not a closure: $closure (${closure.runtimeType}).');
+    }
+    namer.forgetElement(cls);
+    compiler.enqueuer.codegen.forgetElement(cls);
   }
 }
 
@@ -419,6 +438,14 @@ class ClosureClassMap {
     });
     capturingScopes.values.forEach((ClosureScope scope) {
       scope.forEachCapturedVariable(f);
+    });
+  }
+
+  void removeMyselfFrom(Universe universe) {
+    _freeVariableMapping.values.forEach((e) {
+      universe.closurizedMembers.remove(e);
+      universe.fieldSetters.remove(e);
+      universe.fieldGetters.remove(e);
     });
   }
 }
@@ -879,6 +906,8 @@ class ClosureTranslator extends Visitor {
     return sb.toString();
   }
 
+  JavaScriptBackend get backend => compiler.backend;
+
   ClosureClassMap globalizeClosure(FunctionExpression node,
                                    LocalFunctionElement element) {
     String closureName = computeClosureName(element);
@@ -888,6 +917,7 @@ class ClosureTranslator extends Visitor {
         new SynthesizedCallMethodElementX(Compiler.CALL_OPERATOR_NAME,
                                           element,
                                           globalizedElement);
+    backend.maybeMarkClosureAsNeededForReflection(globalizedElement, callElement, element);
     MemberElement enclosing = element.memberContext;
     enclosing.nestedClosures.add(callElement);
     globalizedElement.addMember(callElement, compiler);

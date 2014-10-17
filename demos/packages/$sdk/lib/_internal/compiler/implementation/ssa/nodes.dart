@@ -138,11 +138,11 @@ class HGraph {
 
   // We canonicalize all constants used within a graph so we do not
   // have to worry about them for global value numbering.
-  Map<Constant, HConstant> constants;
+  Map<ConstantValue, HConstant> constants;
 
   HGraph()
       : blocks = new List<HBasicBlock>(),
-        constants = new Map<Constant, HConstant>() {
+        constants = new Map<ConstantValue, HConstant>() {
     entry = addNewBlock();
     // The exit block will be added later, so it has an id that is
     // after all others in the system.
@@ -170,7 +170,7 @@ class HGraph {
     return result;
   }
 
-  HConstant addConstant(Constant constant, Compiler compiler) {
+  HConstant addConstant(ConstantValue constant, Compiler compiler) {
     HConstant result = constants[constant];
     if (result == null) {
       TypeMask type = constant.computeMask(compiler);
@@ -184,9 +184,9 @@ class HGraph {
     return result;
   }
 
-  HConstant addDeferredConstant(Constant constant, PrefixElement prefix,
+  HConstant addDeferredConstant(ConstantValue constant, PrefixElement prefix,
                                 Compiler compiler) {
-    Constant wrapper = new DeferredConstant(constant, prefix);
+    ConstantValue wrapper = new DeferredConstantValue(constant, prefix);
     compiler.deferredLoadTask.registerConstantDeferredUse(wrapper, prefix);
     return addConstant(wrapper, compiler);
   }
@@ -866,33 +866,37 @@ abstract class HInstruction implements Spannable {
   }
 
   bool canBePrimitiveNumber(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
     // TODO(sra): It should be possible to test only jsDoubleClass and
     // jsUInt31Class, since all others are superclasses of these two.
-    return instructionType.contains(backend.jsNumberClass, compiler)
-        || instructionType.contains(backend.jsIntClass, compiler)
-        || instructionType.contains(backend.jsPositiveIntClass, compiler)
-        || instructionType.contains(backend.jsUInt32Class, compiler)
-        || instructionType.contains(backend.jsUInt31Class, compiler)
-        || instructionType.contains(backend.jsDoubleClass, compiler);
+    return instructionType.contains(backend.jsNumberClass, classWorld)
+        || instructionType.contains(backend.jsIntClass, classWorld)
+        || instructionType.contains(backend.jsPositiveIntClass, classWorld)
+        || instructionType.contains(backend.jsUInt32Class, classWorld)
+        || instructionType.contains(backend.jsUInt31Class, classWorld)
+        || instructionType.contains(backend.jsDoubleClass, classWorld);
   }
 
   bool canBePrimitiveBoolean(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.contains(backend.jsBoolClass, compiler);
+    return instructionType.contains(backend.jsBoolClass, classWorld);
   }
 
   bool canBePrimitiveArray(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.contains(backend.jsArrayClass, compiler)
-        || instructionType.contains(backend.jsFixedArrayClass, compiler)
-        || instructionType.contains(backend.jsExtendableArrayClass, compiler);
+    return instructionType.contains(backend.jsArrayClass, classWorld)
+        || instructionType.contains(backend.jsFixedArrayClass, classWorld)
+        || instructionType.contains(backend.jsExtendableArrayClass, classWorld);
   }
 
   bool isIndexablePrimitive(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.containsOnlyString(compiler)
-        || instructionType.satisfies(backend.jsIndexableClass, compiler);
+    return instructionType.containsOnlyString(classWorld)
+        || instructionType.satisfies(backend.jsIndexableClass, classWorld);
   }
 
   bool isFixedArray(Compiler compiler) {
@@ -906,93 +910,112 @@ abstract class HInstruction implements Spannable {
   }
 
   bool isMutableArray(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.satisfies(backend.jsMutableArrayClass, compiler);
+    return instructionType.satisfies(backend.jsMutableArrayClass, classWorld);
   }
 
   bool isReadableArray(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.satisfies(backend.jsArrayClass, compiler);
+    return instructionType.satisfies(backend.jsArrayClass, classWorld);
   }
 
   bool isMutableIndexable(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.satisfies(backend.jsMutableIndexableClass, compiler);
+    return instructionType.satisfies(
+        backend.jsMutableIndexableClass, classWorld);
   }
 
   bool isArray(Compiler compiler) => isReadableArray(compiler);
 
   bool canBePrimitiveString(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.contains(backend.jsStringClass, compiler);
+    return instructionType.contains(backend.jsStringClass, classWorld);
   }
 
   bool isInteger(Compiler compiler) {
-    return instructionType.containsOnlyInt(compiler)
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyInt(classWorld)
         && !instructionType.isNullable;
   }
 
   bool isUInt32(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
     return !instructionType.isNullable
-        && instructionType.satisfies(backend.jsUInt32Class, compiler);
+        && instructionType.satisfies(backend.jsUInt32Class, classWorld);
   }
 
   bool isUInt31(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
     return !instructionType.isNullable
-        && instructionType.satisfies(backend.jsUInt31Class, compiler);
+        && instructionType.satisfies(backend.jsUInt31Class, classWorld);
   }
 
   bool isPositiveInteger(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
     return !instructionType.isNullable
-        && instructionType.satisfies(backend.jsPositiveIntClass, compiler);
+        && instructionType.satisfies(backend.jsPositiveIntClass, classWorld);
   }
 
   bool isPositiveIntegerOrNull(Compiler compiler) {
+    ClassWorld classWorld = compiler.world;
     JavaScriptBackend backend = compiler.backend;
-    return instructionType.satisfies(backend.jsPositiveIntClass, compiler);
+    return instructionType.satisfies(backend.jsPositiveIntClass, classWorld);
   }
 
   bool isIntegerOrNull(Compiler compiler) {
-    return instructionType.containsOnlyInt(compiler);
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyInt(classWorld);
   }
 
   bool isNumber(Compiler compiler) {
-    return instructionType.containsOnlyNum(compiler)
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyNum(classWorld)
         && !instructionType.isNullable;
   }
 
   bool isNumberOrNull(Compiler compiler) {
-    return instructionType.containsOnlyNum(compiler);
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyNum(classWorld);
   }
 
   bool isDouble(Compiler compiler) {
-    return instructionType.containsOnlyDouble(compiler)
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyDouble(classWorld)
         && !instructionType.isNullable;
   }
 
   bool isDoubleOrNull(Compiler compiler) {
-    return instructionType.containsOnlyDouble(compiler);
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyDouble(classWorld);
   }
 
   bool isBoolean(Compiler compiler) {
-    return instructionType.containsOnlyBool(compiler)
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyBool(classWorld)
         && !instructionType.isNullable;
   }
 
   bool isBooleanOrNull(Compiler compiler) {
-    return instructionType.containsOnlyBool(compiler);
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyBool(classWorld);
   }
 
   bool isString(Compiler compiler) {
-    return instructionType.containsOnlyString(compiler)
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyString(classWorld)
         && !instructionType.isNullable;
   }
 
   bool isStringOrNull(Compiler compiler) {
-    return instructionType.containsOnlyString(compiler);
+    ClassWorld classWorld = compiler.world;
+    return instructionType.containsOnlyString(classWorld);
   }
 
   bool isPrimitive(Compiler compiler) {
@@ -1242,7 +1265,8 @@ abstract class HInstruction implements Spannable {
     } else if (kind == HTypeConversion.CHECKED_MODE_CHECK && !type.treatAsRaw) {
       throw 'creating compound check to $type (this = ${this})';
     } else {
-      TypeMask subtype = new TypeMask.subtype(element.declaration);
+      TypeMask subtype = new TypeMask.subtype(element.declaration,
+                                              compiler.world);
       return new HTypeConversion(type, kind, subtype, this);
     }
   }
@@ -2003,7 +2027,7 @@ class HLoopBranch extends HConditionalBranch {
 }
 
 class HConstant extends HInstruction {
-  final Constant constant;
+  final ConstantValue constant;
   HConstant.internal(this.constant, TypeMask constantType)
       : super(<HInstruction>[], constantType);
 

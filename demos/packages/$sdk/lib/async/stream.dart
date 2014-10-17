@@ -84,14 +84,14 @@ abstract class Stream<T> {
     // Use the controller's buffering to fill in the value even before
     // the stream has a listener. For a single value, it's not worth it
     // to wait for a listener before doing the `then` on the future.
-    StreamController<T> controller = new StreamController<T>(sync: true);
+    _StreamController<T> controller = new StreamController<T>(sync: true);
     future.then((value) {
-        controller.add(value);
-        controller.close();
+        controller._add(value);
+        controller._closeUnchecked();
       },
       onError: (error, stackTrace) {
-        controller.addError(error, stackTrace);
-        controller.close();
+        controller._addError(error, stackTrace);
+        controller._closeUnchecked();
       });
     return controller.stream;
   }
@@ -313,8 +313,11 @@ abstract class Stream<T> {
     StreamController controller;
     StreamSubscription subscription;
     void onListen () {
-      var add = controller.add;
-      var addError = controller.addError;
+      final add = controller.add;
+      assert(controller is _StreamController ||
+             controller is _BroadcastStreamController);
+      final eventSink = controller;
+      final addError = eventSink._addError;
       subscription = this.listen(
           (T event) {
             var newValue;
@@ -371,6 +374,9 @@ abstract class Stream<T> {
     StreamController controller;
     StreamSubscription subscription;
     void onListen() {
+      assert(controller is _StreamController ||
+             controller is _BroadcastStreamController);
+      final eventSink = controller;
       subscription = this.listen(
           (T event) {
             Stream newStream;
@@ -386,7 +392,7 @@ abstract class Stream<T> {
                         .whenComplete(subscription.resume);
             }
           },
-          onError: controller.addError,
+          onError: eventSink._addError,  // Avoid Zone error replacement.
           onDone: controller.close
       );
     }
@@ -504,7 +510,7 @@ abstract class Stream<T> {
           try {
             throw IterableElementError.noElement();
           } catch (e, s) {
-            result._completeError(e, s);
+            _completeWithErrorCallback(result, e,  s);
           }
         } else {
           result._complete(value);
@@ -562,7 +568,7 @@ abstract class Stream<T> {
         try {
           buffer.write(element);
         } catch (e, s) {
-          _cancelAndError(subscription, result, e, s);
+          _cancelAndErrorWithReplacement(subscription, result, e, s);
         }
       },
       onError: (e) {
@@ -909,7 +915,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -944,7 +950,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -971,7 +977,7 @@ abstract class Stream<T> {
           try {
             throw IterableElementError.tooMany();
           } catch (e, s) {
-            _cancelAndError(subscription, future, e, s);
+            _cancelAndErrorWithReplacement(subscription, future, e, s);
           }
           return;
         }
@@ -987,7 +993,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -1039,7 +1045,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -1084,7 +1090,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -1112,7 +1118,7 @@ abstract class Stream<T> {
                 try {
                   throw IterableElementError.tooMany();
                 } catch (e, s) {
-                  _cancelAndError(subscription, future, e, s);
+                  _cancelAndErrorWithReplacement(subscription, future, e, s);
                 }
                 return;
               }
@@ -1132,7 +1138,7 @@ abstract class Stream<T> {
         try {
           throw IterableElementError.noElement();
         } catch (e, s) {
-          future._completeError(e, s);
+          _completeWithErrorCallback(future, e, s);
         }
       },
       cancelOnError: true);
@@ -1212,7 +1218,10 @@ abstract class Stream<T> {
     }
     void onError(error, StackTrace stackTrace) {
       timer.cancel();
-      controller.addError(error, stackTrace);
+      assert(controller is _StreamController ||
+             controller is _BroadcastStreamController);
+      var eventSink = controller;
+      eventSink._addError(error, stackTrace);  // Avoid Zone error replacement.
       timer = zone.createTimer(timeLimit, timeout);
     }
     void onDone() {
@@ -1228,7 +1237,7 @@ abstract class Stream<T> {
       if (onTimeout == null) {
         timeout = () {
           controller.addError(new TimeoutException("No stream event",
-                                                   timeLimit));
+                                                   timeLimit), null);
         };
       } else {
         onTimeout = zone.registerUnaryCallback(onTimeout);
@@ -1325,9 +1334,19 @@ abstract class StreamSubscription<T> {
   /**
    * Request that the stream pauses events until further notice.
    *
+   * While paused, the subscription will not fire any events.
+   * If it receives events from its source, they will be buffered until
+   * the subscription is resumed.
+   * The underlying source is usually informed about the pause,
+   * so it can stop generating events until the subscription is resumed.
+   *
+   * To avoid buffering events on a broadcast stream, it is better to
+   * cancel this subscription, and start to listen again when events
+   * are needed.
+   *
    * If [resumeSignal] is provided, the stream will undo the pause
    * when the future completes. If the future completes with an error,
-   * it will not be handled!
+   * the stream will resume, but the error will not be handled!
    *
    * A call to [resume] will also undo a pause.
    *
@@ -1371,9 +1390,11 @@ abstract class StreamSubscription<T> {
 abstract class EventSink<T> implements Sink<T> {
   /** Send a data event to a stream. */
   void add(T event);
+
   /** Send an async error to a stream. */
   void addError(errorEvent, [StackTrace stackTrace]);
-  /** Send a done event to a stream.*/
+
+  /** Close the sink. No further events can be added after closing. */
   void close();
 }
 
@@ -1479,7 +1500,6 @@ abstract class StreamSink<S> implements StreamConsumer<S>, EventSink<S> {
  * It is good practice to write transformers that can be used multiple times.
  */
 abstract class StreamTransformer<S, T> {
-
   /**
    * Creates a [StreamTransformer].
    *
@@ -1564,6 +1584,16 @@ abstract class StreamTransformer<S, T> {
       void handleDone(EventSink<T> sink)})
           = _StreamHandlerTransformer;
 
+  /**
+   * Transform the incoming [stream]'s events.
+   *
+   * Creates a new stream.
+   * When this stream is listened to, it will start listening on [stream],
+   * and generate events on the new stream based on the events from [stream].
+   *
+   * Subscriptions on the returned stream should propagate pause state
+   * to the subscription on [stream].
+   */
   Stream<T> bind(Stream<S> stream);
 }
 

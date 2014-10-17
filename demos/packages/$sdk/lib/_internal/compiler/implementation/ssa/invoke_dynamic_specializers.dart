@@ -108,7 +108,7 @@ class IndexSpecializer extends InvokeDynamicSpecializer {
     TypeMask receiverType =
         instruction.getDartReceiver(compiler).instructionType;
     Selector refined = new TypedSelector(receiverType, instruction.selector,
-        compiler);
+        compiler.world);
     TypeMask type = TypeMaskFactory.inferredTypeForSelector(refined, compiler);
     return new HIndex(
         instruction.inputs[1], instruction.inputs[2],
@@ -234,7 +234,7 @@ abstract class BinaryArithmeticSpecializer extends InvokeDynamicSpecializer {
         selector.argumentCount);
     return selector.mask == null
         ? newSelector
-        : new TypedSelector(selector.mask, newSelector, compiler);
+        : new TypedSelector(selector.mask, newSelector, compiler.world);
   }
 }
 
@@ -369,8 +369,8 @@ class TruncatingDivideSpecializer extends BinaryArithmeticSpecializer {
   bool isNotZero(HInstruction instruction, Compiler compiler) {
     if (!instruction.isConstantInteger()) return false;
     HConstant rightConstant = instruction;
-    IntConstant intConstant = rightConstant.constant;
-    int count = intConstant.value;
+    IntConstantValue intConstant = rightConstant.constant;
+    int count = intConstant.primitiveValue;
     return count != 0;
   }
 
@@ -419,8 +419,8 @@ abstract class BinaryBitOpSpecializer extends BinaryArithmeticSpecializer {
   bool argumentLessThan32(HInstruction instruction) {
     if (!instruction.isConstantInteger()) return false;
     HConstant rightConstant = instruction;
-    IntConstant intConstant = rightConstant.constant;
-    int count = intConstant.value;
+    IntConstantValue intConstant = rightConstant.constant;
+    int count = intConstant.primitiveValue;
     return count >= 0 && count <= 31;
   }
 
@@ -636,9 +636,9 @@ class EqualsSpecializer extends RelationalSpecializer {
     if (right.isConstantNull() || left.isPrimitiveOrNull(compiler)) {
       return newBuiltinVariant(instruction, compiler);
     }
-    Selector selector =
-        new TypedSelector(instructionType, instruction.selector, compiler);
     World world = compiler.world;
+    Selector selector =
+        new TypedSelector(instructionType, instruction.selector, world);
     JavaScriptBackend backend = compiler.backend;
     Iterable<Element> matches = world.allFunctions.filter(selector);
     // This test relies the on `Object.==` and `Interceptor.==` always being

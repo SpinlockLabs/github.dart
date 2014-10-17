@@ -56,6 +56,8 @@ class JavaScriptBackend extends Backend {
   static final Uri DART_JS_HELPER = new Uri(scheme: 'dart', path: '_js_helper');
   static final Uri DART_INTERCEPTORS =
       new Uri(scheme: 'dart', path: '_interceptors');
+  static final Uri DART_INTERNAL =
+      new Uri(scheme: 'dart', path: '_internal');
   static final Uri DART_FOREIGN_HELPER =
       new Uri(scheme: 'dart', path: '_foreign_helper');
   static final Uri DART_JS_MIRRORS =
@@ -69,6 +71,24 @@ class JavaScriptBackend extends Backend {
 
   static const String INVOKE_ON = '_getCachedInvocation';
   static const String START_ROOT_ISOLATE = 'startRootIsolate';
+
+
+  /// The list of functions for classes in the [internalLibrary] that we want
+  /// to inline always.  Any function in this list must be inlinable with
+  /// respect to the conditions used in [InlineWeeder.canInline], except for
+  /// size/complexity heuristics.
+  static const Map<String, List<String>> ALWAYS_INLINE =
+      const <String, List<String>> {
+    'IterableMixinWorkaround': const <String>['forEach'],
+  };
+
+  /// List of [FunctionElement]s that we want to inline always.  This list is
+  /// filled when resolution is complete by looking up in [internalLibrary].
+  List<FunctionElement> functionsToAlwaysInline;
+
+  /// Reference to the internal library to lookup functions to always inline.
+  LibraryElement internalLibrary;
+
 
   /// Set of classes that need to be considered for reflection although not
   /// otherwise visible during resolution.
@@ -173,12 +193,60 @@ class JavaScriptBackend extends Backend {
   TypeMask get dynamicType => compiler.typesTask.dynamicType;
   TypeMask get nullType => compiler.typesTask.nullType;
   TypeMask get emptyType => const TypeMask.nonNullEmpty();
-  TypeMask indexablePrimitiveType;
-  TypeMask readableArrayType;
-  TypeMask mutableArrayType;
-  TypeMask fixedArrayType;
-  TypeMask extendableArrayType;
-  TypeMask nonNullType;
+
+  TypeMask _indexablePrimitiveTypeCache;
+  TypeMask get indexablePrimitiveType {
+    if (_indexablePrimitiveTypeCache == null) {
+      _indexablePrimitiveTypeCache =
+          new TypeMask.nonNullSubtype(jsIndexableClass, compiler.world);
+    }
+    return _indexablePrimitiveTypeCache;
+  }
+
+  TypeMask _readableArrayTypeCache;
+  TypeMask get readableArrayType {
+    if (_readableArrayTypeCache == null) {
+      _readableArrayTypeCache = new TypeMask.nonNullSubclass(jsArrayClass,
+          compiler.world);
+    }
+    return _readableArrayTypeCache;
+  }
+
+  TypeMask _mutableArrayTypeCache;
+  TypeMask get mutableArrayType {
+    if (_mutableArrayTypeCache == null) {
+      _mutableArrayTypeCache = new TypeMask.nonNullSubclass(jsMutableArrayClass,
+          compiler.world);
+    }
+    return _mutableArrayTypeCache;
+  }
+
+  TypeMask _fixedArrayTypeCache;
+  TypeMask get fixedArrayType {
+    if (_fixedArrayTypeCache == null) {
+      _fixedArrayTypeCache = new TypeMask.nonNullExact(jsFixedArrayClass,
+          compiler.world);
+    }
+    return _fixedArrayTypeCache;
+  }
+
+  TypeMask _extendableArrayTypeCache;
+  TypeMask get extendableArrayType {
+    if (_extendableArrayTypeCache == null) {
+      _extendableArrayTypeCache =
+          new TypeMask.nonNullExact(jsExtendableArrayClass, compiler.world);
+    }
+    return _extendableArrayTypeCache;
+  }
+
+  TypeMask _nonNullTypeCache;
+  TypeMask get nonNullType {
+    if (_nonNullTypeCache == null) {
+      _nonNullTypeCache =
+          compiler.typesTask.dynamicType.nonNullable();
+    }
+    return _nonNullTypeCache;
+  }
 
   /// Maps special classes to their implementation (JSXxx) class.
   Map<ClassElement, ClassElement> implementationClasses;
@@ -328,7 +396,7 @@ class JavaScriptBackend extends Backend {
 
   /// Set of methods that are needed by reflection. Computed using
   /// [computeMembersNeededForReflection] on first use.
-  Iterable<Element> _membersNeededForReflection = null;
+  Set<Element> _membersNeededForReflection = null;
   Iterable<Element> get membersNeededForReflection {
     assert(_membersNeededForReflection != null);
     return _membersNeededForReflection;
@@ -360,7 +428,7 @@ class JavaScriptBackend extends Backend {
 
   JavaScriptConstantTask constantCompilerTask;
 
-  JavaScriptionResolutionCallbacks resolutionCallbacks;
+  JavaScriptResolutionCallbacks resolutionCallbacks;
 
   JavaScriptBackend(Compiler compiler, bool generateSourceMap)
       : namer = determineNamer(compiler),
@@ -376,7 +444,7 @@ class JavaScriptBackend extends Backend {
     typeVariableHandler = new TypeVariableHandler(this);
     customElementsAnalysis = new CustomElementsAnalysis(this);
     constantCompilerTask = new JavaScriptConstantTask(compiler);
-    resolutionCallbacks = new JavaScriptionResolutionCallbacks(this);
+    resolutionCallbacks = new JavaScriptResolutionCallbacks(this);
   }
 
   ConstantSystem get constantSystem => constants.constantSystem;
@@ -505,7 +573,7 @@ class JavaScriptBackend extends Backend {
 
     if (elements == null) return false;
     if (elements.isEmpty) return false;
-    return elements.any((element) => selector.applies(element, compiler));
+    return elements.any((element) => selector.applies(element, compiler.world));
   }
 
   final Map<String, Set<ClassElement>> interceptedClassesCache =
@@ -539,17 +607,15 @@ class JavaScriptBackend extends Backend {
   }
 
   Set<ClassElement> nativeSubclassesOfMixin(ClassElement mixin) {
-    Set<MixinApplicationElement> uses = compiler.world.mixinUses[mixin];
-    if (uses == null) return null;
+    ClassWorld classWorld = compiler.world;
+    Iterable<MixinApplicationElement> uses = classWorld.mixinUsesOf(mixin);
     Set<ClassElement> result = null;
     for (MixinApplicationElement use in uses) {
-      Iterable<ClassElement> subclasses = compiler.world.subclassesOf(use);
-      if (subclasses != null) {
-        for (ClassElement subclass in subclasses) {
-          if (Elements.isNativeOrExtendsNative(subclass)) {
-            if (result == null) result = new Set<ClassElement>();
-            result.add(subclass);
-          }
+      Iterable<ClassElement> subclasses = classWorld.subclassesOf(use);
+      for (ClassElement subclass in subclasses) {
+        if (Elements.isNativeOrExtendsNative(subclass)) {
+          if (result == null) result = new Set<ClassElement>();
+          result.add(subclass);
         }
       }
     }
@@ -639,24 +705,24 @@ class JavaScriptBackend extends Backend {
     }
   }
 
-  void registerCompileTimeConstant(Constant constant, Registry registry) {
+  void registerCompileTimeConstant(ConstantValue constant, Registry registry) {
     registerCompileTimeConstantInternal(constant, registry);
-    for (Constant dependency in constant.getDependencies()) {
+    for (ConstantValue dependency in constant.getDependencies()) {
       registerCompileTimeConstant(dependency, registry);
     }
   }
 
-  void registerCompileTimeConstantInternal(Constant constant,
+  void registerCompileTimeConstantInternal(ConstantValue constant,
                                            Registry registry) {
     DartType type = constant.computeType(compiler);
     registerInstantiatedConstantType(type, registry);
 
     if (constant.isFunction) {
-      FunctionConstant function = constant;
+      FunctionConstantValue function = constant;
       registry.registerGetOfStaticFunction(function.element);
     } else if (constant.isInterceptor) {
       // An interceptor constant references the class's prototype chain.
-      InterceptorConstant interceptor = constant;
+      InterceptorConstantValue interceptor = constant;
       registerInstantiatedConstantType(interceptor.dispatchedType, registry);
     } else if (constant.isType) {
       enqueueInResolution(getCreateRuntimeType(), registry);
@@ -681,10 +747,11 @@ class JavaScriptBackend extends Backend {
     }
   }
 
-  void registerMetadataConstant(Constant constant,
+  void registerMetadataConstant(MetadataAnnotation metadata,
                                 Element annotatedElement,
                                 Registry registry) {
     assert(registry.isForResolution);
+    ConstantValue constant = constants.getConstantForMetadata(metadata).value;
     registerCompileTimeConstant(constant, registry);
     metadataConstants.add(new Dependency(constant, annotatedElement));
   }
@@ -840,6 +907,26 @@ class JavaScriptBackend extends Backend {
     super.onResolutionComplete();
     computeMembersNeededForReflection();
     rti.computeClassesNeedingRti();
+    computeFunctionsToAlwaysInline();
+  }
+
+  void computeFunctionsToAlwaysInline() {
+    functionsToAlwaysInline = <FunctionElement>[];
+    if (internalLibrary == null) return;
+
+    // Try to find all functions intended to always inline.  If their enclosing
+    // class is not resolved we skip the methods, but it is an error to mention
+    // a function or class that cannot be found.
+    for (String className in ALWAYS_INLINE.keys) {
+      ClassElement cls = find(internalLibrary, className);
+      if (cls.resolutionState != STATE_DONE) continue;
+      for (String functionName in ALWAYS_INLINE[className]) {
+        Element function = cls.lookupMember(functionName);
+        assert(invariant(cls, function is FunctionElement,
+            message: 'unable to find function $functionName in $className'));
+        functionsToAlwaysInline.add(function);
+      }
+    }
   }
 
   void registerGetRuntimeTypeArgument(Registry registry) {
@@ -848,15 +935,19 @@ class JavaScriptBackend extends Backend {
     enqueueInResolution(getCopyTypeArguments(), registry);
   }
 
-  void registerGenericCallMethod(Element callMethod,
-                                 Enqueuer enqueuer, Registry registry) {
+  void registerCallMethodWithFreeTypeVariables(
+      Element callMethod,
+      Enqueuer enqueuer,
+      Registry registry) {
     if (enqueuer.isResolutionQueue || methodNeedsRti(callMethod)) {
       registerComputeSignature(enqueuer, registry);
     }
   }
 
-  void registerGenericClosure(Element closure,
-                              Enqueuer enqueuer, Registry registry) {
+  void registerClosureWithFreeTypeVariables(
+      Element closure,
+      Enqueuer enqueuer,
+      Registry registry) {
     if (enqueuer.isResolutionQueue || methodNeedsRti(closure)) {
       registerComputeSignature(enqueuer, registry);
     }
@@ -939,12 +1030,26 @@ class JavaScriptBackend extends Backend {
     enqueueClass(compiler.enqueuer.resolution, compiler.stringClass, registry);
   }
 
-  void enableNoSuchMethod(context, Enqueuer world) {
+  void enableNoSuchMethod(Element context, Enqueuer world) {
     enqueue(world, getCreateInvocationMirror(), compiler.globalDependencies);
     world.registerInvocation(compiler.noSuchMethodSelector);
+    // TODO(tyoverby): Send the context element to DumpInfoTask to be
+    // blamed.
   }
 
   void enableIsolateSupport(Enqueuer enqueuer) {
+    // TODO(floitsch): We should also ensure that the class IsolateMessage is
+    // instantiated. Currently, just enabling isolate support works.
+    if (compiler.mainFunction != null) {
+      // The JavaScript backend implements [Isolate.spawn] by looking up
+      // top-level functions by name. So all top-level function tear-off
+      // closures have a private name field.
+      //
+      // The JavaScript backend of [Isolate.spawnUri] uses the same internal
+      // implementation as [Isolate.spawn], and fails if it cannot look main up
+      // by name.
+      enqueuer.registerGetOfStaticFunction(compiler.mainFunction);
+    }
     if (enqueuer.isResolutionQueue) {
       for (String name in const [START_ROOT_ISOLATE,
                                  '_currentIsolate',
@@ -1061,10 +1166,10 @@ class JavaScriptBackend extends Backend {
       return;
     }
     if (kind.category == ElementCategory.VARIABLE) {
-      Constant initialValue = constants.getConstantForVariable(element);
+      ConstantExpression initialValue = constants.getConstantForVariable(element);
       if (initialValue != null) {
-        registerCompileTimeConstant(initialValue, work.registry);
-        constants.addCompileTimeConstantForEmission(initialValue);
+        registerCompileTimeConstant(initialValue.value, work.registry);
+        constants.addCompileTimeConstantForEmission(initialValue.value);
         // We don't need to generate code for static or top-level
         // variables. For instance variables, we may need to generate
         // the checked setter.
@@ -1513,14 +1618,13 @@ class JavaScriptBackend extends Backend {
     return symbolsUsed.contains(name);
   }
 
-  bool get rememberLazies => isTreeShakingDisabled;
-
   bool retainMetadataOf(Element element) {
     if (mustRetainMetadata) hasRetainedMetadata = true;
     if (mustRetainMetadata && referencedFromMirrorSystem(element)) {
       for (MetadataAnnotation metadata in element.metadata) {
         metadata.ensureResolved(compiler);
-        Constant constant = constants.getConstantForMetadata(metadata);
+        ConstantValue constant =
+            constants.getConstantForMetadata(metadata).value;
         constants.addCompileTimeConstantForEmission(constant);
       }
       return true;
@@ -1532,6 +1636,8 @@ class JavaScriptBackend extends Backend {
     Uri uri = library.canonicalUri;
     if (uri == DART_JS_HELPER) {
       jsHelperLibrary = library;
+    } else if (uri == DART_INTERNAL) {
+      internalLibrary = library;
     } else if (uri ==  DART_INTERCEPTORS) {
       interceptorsLibrary = library;
     } else if (uri ==  DART_FOREIGN_HELPER) {
@@ -1703,13 +1809,6 @@ class JavaScriptBackend extends Backend {
         ..add(jsInterceptorClass)
         ..add(jsNullClass);
 
-    indexablePrimitiveType = new TypeMask.nonNullSubtype(jsIndexableClass);
-    readableArrayType = new TypeMask.nonNullSubclass(jsArrayClass);
-    mutableArrayType = new TypeMask.nonNullSubclass(jsMutableArrayClass);
-    fixedArrayType = new TypeMask.nonNullExact(jsFixedArrayClass);
-    extendableArrayType = new TypeMask.nonNullExact(jsExtendableArrayClass);
-    nonNullType = compiler.typesTask.dynamicType.nonNullable();
-
     validateInterceptorImplementsAllObjectMethods(jsInterceptorClass);
     // The null-interceptor must also implement *all* methods.
     validateInterceptorImplementsAllObjectMethods(jsNullClass);
@@ -1754,15 +1853,6 @@ class JavaScriptBackend extends Backend {
     if (element.isClass) {
       element = getDartClass(element);
     }
-    // We have to treat closure classes specially here, as they only come into
-    // existence after [membersNeededForReflection] has been computed.
-    if (element is SynthesizedCallMethodElementX) {
-      SynthesizedCallMethodElementX closure = element;
-      element = closure.expression;
-    } else if (element is ClosureClassElement) {
-      ClosureClassElement closure = element;
-      element = closure.methodElement;
-    }
     return membersNeededForReflection.contains(element);
   }
 
@@ -1803,7 +1893,7 @@ class JavaScriptBackend extends Backend {
       // all metadata but only stuff that potentially would match one
       // of the used meta targets.
       metadata.ensureResolved(compiler);
-      Constant value = metadata.value;
+      ConstantValue value = metadata.constant.value;
       if (value == null) continue;
       DartType type = value.computeType(compiler);
       if (metaTargetsUsed.contains(type.element)) return true;
@@ -1826,7 +1916,8 @@ class JavaScriptBackend extends Backend {
   computeMembersNeededForReflection() {
     if (_membersNeededForReflection != null) return;
     if (compiler.mirrorsLibrary == null) {
-      _membersNeededForReflection = const [];
+      _membersNeededForReflection = const ImmutableEmptySet<Element>();
+      return;
     }
     // Compute a mapping from class to the closures it contains, so we
     // can include the correct ones when including the class.
@@ -1838,35 +1929,38 @@ class JavaScriptBackend extends Backend {
     bool foundClosure = false;
     Set<Element> reflectableMembers = new Set<Element>();
     ResolutionEnqueuer resolution = compiler.enqueuer.resolution;
-    for (ClassElement cls in resolution.universe.instantiatedClasses) {
+    for (ClassElement cls in resolution.universe.directlyInstantiatedClasses) {
       // Do not process internal classes.
       if (cls.library.isInternalLibrary || cls.isInjected) continue;
       if (referencedFromMirrorSystem(cls)) {
         Set<Name> memberNames = new Set<Name>();
-        // 1) the class (should be live)
-        assert(invariant(cls, resolution.isLive(cls)));
+        // 1) the class (should be resolved)
+        assert(invariant(cls, cls.isResolved));
         reflectableMembers.add(cls);
-        // 2) its constructors (if live)
+        // 2) its constructors (if resolved)
         cls.constructors.forEach((Element constructor) {
-          if (resolution.isLive(constructor)) {
+          if (resolution.hasBeenResolved(constructor)) {
             reflectableMembers.add(constructor);
           }
         });
-        // 3) all members, including fields via getter/setters (if live)
+        // 3) all members, including fields via getter/setters (if resolved)
         cls.forEachClassMember((Member member) {
-          if (resolution.isLive(member.element)) {
+          if (resolution.hasBeenResolved(member.element)) {
             memberNames.add(member.name);
             reflectableMembers.add(member.element);
           }
         });
-        // 4) all overriding members of subclasses/subtypes (should be live)
+        // 4) all overriding members of subclasses/subtypes (should be resolved)
         if (compiler.world.hasAnySubtype(cls)) {
           for (ClassElement subcls in compiler.world.subtypesOf(cls)) {
             subcls.forEachClassMember((Member member) {
               if (memberNames.contains(member.name)) {
-                assert(invariant(member.element,
-                    resolution.isLive(member.element)));
-                reflectableMembers.add(member.element);
+                // TODO(20993): find out why this assertion fails.
+                // assert(invariant(member.element,
+                //    resolution.hasBeenResolved(member.element)));
+                if (resolution.hasBeenResolved(member.element)) {
+                  reflectableMembers.add(member.element);
+                }
               }
             });
           }
@@ -1880,13 +1974,13 @@ class JavaScriptBackend extends Backend {
       } else {
         // check members themselves
         cls.constructors.forEach((ConstructorElement element) {
-          if (!compiler.enqueuer.resolution.isLive(element)) return;
+          if (!resolution.hasBeenResolved(element)) return;
           if (referencedFromMirrorSystem(element, false)) {
             reflectableMembers.add(element);
           }
         });
         cls.forEachClassMember((Member member) {
-          if (!compiler.enqueuer.resolution.isLive(member.element)) return;
+          if (!resolution.hasBeenResolved(member.element)) return;
           if (referencedFromMirrorSystem(member.element, false)) {
             reflectableMembers.add(member.element);
           }
@@ -1911,7 +2005,7 @@ class JavaScriptBackend extends Backend {
       if (lib.isInternalLibrary) continue;
       lib.forEachLocalMember((Element member) {
         if (!member.isClass &&
-            compiler.enqueuer.resolution.isLive(member) &&
+            resolution.hasBeenResolved(member) &&
             referencedFromMirrorSystem(member)) {
           reflectableMembers.add(member);
         }
@@ -1946,15 +2040,28 @@ class JavaScriptBackend extends Backend {
     _membersNeededForReflection = reflectableMembers;
   }
 
+  // TODO(20791): compute closure classes after resolution and move this code to
+  // [computeMembersNeededForReflection].
+  void maybeMarkClosureAsNeededForReflection(
+      ClosureClassElement globalizedElement,
+      FunctionElement callFunction,
+      FunctionElement function) {
+    if (!_membersNeededForReflection.contains(function)) return;
+    _membersNeededForReflection.add(callFunction);
+    _membersNeededForReflection.add(globalizedElement);
+  }
+
   jsAst.Call generateIsJsIndexableCall(jsAst.Expression use1,
                                        jsAst.Expression use2) {
-    String dispatchPropertyName = 'init.dispatchPropertyName';
+    String dispatchPropertyName = embeddedNames.DISPATCH_PROPERTY_NAME;
+    jsAst.Expression dispatchProperty =
+        emitter.generateEmbeddedGlobalAccess(dispatchPropertyName);
 
     // We pass the dispatch property record to the isJsIndexable
     // helper rather than reading it inside the helper to increase the
     // chance of making the dispatch record access monomorphic.
-    jsAst.PropertyAccess record = new jsAst.PropertyAccess(
-        use2, js(dispatchPropertyName));
+    jsAst.PropertyAccess record =
+        new jsAst.PropertyAccess(use2, dispatchProperty);
 
     List<jsAst.Expression> arguments = <jsAst.Expression>[use1, record];
     FunctionElement helper = findHelper('isJsIndexable');
@@ -1967,17 +2074,20 @@ class JavaScriptBackend extends Backend {
     // abstract class any user-defined class can implement. So we also
     // check for the interface [JavaScriptIndexingBehavior].
     return compiler.typedDataClass != null
-        && mask.satisfies(compiler.typedDataClass, compiler)
-        && mask.satisfies(jsIndexingBehaviorInterface, compiler);
+        && mask.satisfies(compiler.typedDataClass, compiler.world)
+        && mask.satisfies(jsIndexingBehaviorInterface, compiler.world);
   }
 
   bool couldBeTypedArray(TypeMask mask) {
     bool intersects(TypeMask type1, TypeMask type2) =>
-        !type1.intersection(type2, compiler).isEmpty;
-
-    return compiler.typedDataClass != null
-        && intersects(mask, new TypeMask.subtype(compiler.typedDataClass))
-        && intersects(mask, new TypeMask.subtype(jsIndexingBehaviorInterface));
+        !type1.intersection(type2, compiler.world).isEmpty;
+    // TODO(herhut): Maybe cache the TypeMask for typedDataClass and
+    //               jsIndexingBehaviourInterface.
+    return compiler.typedDataClass != null &&
+           intersects(mask, new TypeMask.subtype(compiler.typedDataClass,
+                                                 compiler.world)) &&
+           intersects(mask, new TypeMask.subtype(jsIndexingBehaviorInterface,
+                                                 compiler.world));
   }
 
   /// Returns all static fields that are referenced through [targetsUsed].
@@ -2054,8 +2164,8 @@ class JavaScriptBackend extends Backend {
     bool hasNoSideEffects = false;
     for (MetadataAnnotation metadata in element.metadata) {
       metadata.ensureResolved(compiler);
-      if (!metadata.value.isConstructedObject) continue;
-      ObjectConstant value = metadata.value;
+      if (!metadata.constant.value.isConstructedObject) continue;
+      ObjectConstantValue value = metadata.constant.value;
       ClassElement cls = value.type.element;
       if (cls == noInlineClass) {
         hasNoInline = true;
@@ -2114,12 +2224,25 @@ class JavaScriptBackend extends Backend {
   FunctionElement helperForMainArity() {
     return findHelper('mainHasTooManyParameters');
   }
+
+  void forgetElement(Element element) {
+    constants.forgetElement(element);
+    constantCompilerTask.dartConstantCompiler.forgetElement(element);
+  }
+
+  void registerMainHasArguments(Enqueuer enqueuer) {
+    // If the main method takes arguments, this compilation could be the target
+    // of Isolate.spawnUri. Strictly speaking, that can happen also if main
+    // takes no arguments, but in this case the spawned isolate can't
+    // communicate with the spawning isolate.
+    enqueuer.enableIsolateSupport();
+  }
 }
 
-class JavaScriptionResolutionCallbacks extends ResolutionCallbacks {
+class JavaScriptResolutionCallbacks extends ResolutionCallbacks {
   final JavaScriptBackend backend;
 
-  JavaScriptionResolutionCallbacks(this.backend);
+  JavaScriptResolutionCallbacks(this.backend);
 
   void registerBackendStaticInvocation(Element element, Registry registry) {
     registry.registerStaticInvocation(backend.registerBackendUse(element));
@@ -2315,7 +2438,7 @@ class JavaScriptionResolutionCallbacks extends ResolutionCallbacks {
 
 /// Records that [constant] is used by the element behind [registry].
 class Dependency {
-  final Constant constant;
+  final ConstantValue constant;
   final Element annotatedElement;
 
   const Dependency(this.constant, this.annotatedElement);

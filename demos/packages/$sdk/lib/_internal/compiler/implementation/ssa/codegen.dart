@@ -1261,7 +1261,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
       use(right);
       push(new js.Binary(mapRelationalOperator(op, inverse), jsLeft, pop()));
     } else {
-      assert(NullConstant.JsNull == 'null');
+      assert(NullConstantValue.JsNull == 'null');
       use(left);
       js.Binary leftEqualsNull =
           new js.Binary("==", pop(), new js.LiteralNull());
@@ -1575,8 +1575,9 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
       // type because our optimizations might end up in a state where the
       // invoke dynamic knows more than the receiver.
       ClassElement enclosing = node.element.enclosingClass;
-      TypeMask receiverType = new TypeMask.nonNullExact(enclosing.declaration);
-      return new TypedSelector(receiverType, selector, compiler);
+      TypeMask receiverType =
+          new TypeMask.nonNullExact(enclosing.declaration, compiler.world);
+      return new TypedSelector(receiverType, selector, compiler.world);
     }
     // If [JSInvocationMirror._invokeOn] is enabled, and this call
     // might hit a `noSuchMethod`, we register an untyped selector.
@@ -1673,8 +1674,9 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
         // If the selector we need to register a typed getter to the
         // [world]. The emitter needs to know if it needs to emit a
         // bound closure for a method.
-        TypeMask receiverType = new TypeMask.nonNullExact(superClass);
-        selector = new TypedSelector(receiverType, selector, compiler);
+        TypeMask receiverType =
+            new TypeMask.nonNullExact(superClass, compiler.world);
+        selector = new TypedSelector(receiverType, selector, compiler.world);
         // TODO(floitsch): we know the target. We shouldn't register a
         // dynamic getter.
         registry.registerDynamicGetter(selector);
@@ -1801,15 +1803,15 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
     }
   }
 
-  void generateConstant(Constant constant) {
+  void generateConstant(ConstantValue constant) {
     if (constant.isFunction) {
-      FunctionConstant function = constant;
+      FunctionConstantValue function = constant;
       registry.registerStaticUse(function.element);
     }
     if (constant.isType) {
       // If the type is a web component, we need to ensure the constructors are
       // available to 'upgrade' the native object.
-      TypeConstant type = constant;
+      TypeConstantValue type = constant;
       Element element = type.representedType.element;
       if (element != null && element.isClass) {
         registry.registerTypeConstant(element);
@@ -2186,7 +2188,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
       => checkTypeOf(input, cmp, 'boolean');
 
   void checkObject(HInstruction input, String cmp) {
-    assert(NullConstant.JsNull == 'null');
+    assert(NullConstantValue.JsNull == 'null');
     if (cmp == "===") {
       checkTypeOf(input, '===', 'object');
       js.Expression left = pop();
@@ -2250,7 +2252,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
   }
 
   bool checkIndexingBehavior(HInstruction input, {bool negative: false}) {
-    if (!compiler.enqueuer.resolution.seenClasses.contains(
+    if (!compiler.resolverWorld.isInstantiated(
           backend.jsIndexingBehaviorInterface)) {
       return false;
     }
@@ -2465,39 +2467,40 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
   }
 
   js.Expression generateTest(HInstruction input, TypeMask checkedType) {
+    ClassWorld classWorld = compiler.world;
     TypeMask receiver = input.instructionType;
     // Figure out if it is beneficial to turn this into a null check.
     // V8 generally prefers 'typeof' checks, but for integers and
     // indexable primitives we cannot compile this test into a single
     // typeof check so the null check is cheaper.
     bool turnIntoNumCheck = input.isIntegerOrNull(compiler)
-        && checkedType.containsOnlyInt(compiler);
+        && checkedType.containsOnlyInt(classWorld);
     bool turnIntoNullCheck = !turnIntoNumCheck
         && (checkedType.nullable() == receiver)
-        && (checkedType.containsOnlyInt(compiler)
-            || checkedType.satisfies(backend.jsIndexableClass, compiler));
+        && (checkedType.containsOnlyInt(classWorld)
+            || checkedType.satisfies(backend.jsIndexableClass, classWorld));
     js.Expression test;
     if (turnIntoNullCheck) {
       use(input);
       test = new js.Binary("==", pop(), new js.LiteralNull());
-    } else if (checkedType.containsOnlyInt(compiler) && !turnIntoNumCheck) {
+    } else if (checkedType.containsOnlyInt(classWorld) && !turnIntoNumCheck) {
       // input is !int
       checkInt(input, '!==');
       test = pop();
-    } else if (checkedType.containsOnlyNum(compiler) || turnIntoNumCheck) {
+    } else if (checkedType.containsOnlyNum(classWorld) || turnIntoNumCheck) {
       // input is !num
       checkNum(input, '!==');
       test = pop();
-    } else if (checkedType.containsOnlyBool(compiler)) {
+    } else if (checkedType.containsOnlyBool(classWorld)) {
       // input is !bool
       checkBool(input, '!==');
       test = pop();
-    } else if (checkedType.containsOnlyString(compiler)) {
+    } else if (checkedType.containsOnlyString(classWorld)) {
       // input is !string
       checkString(input, '!==');
       test = pop();
     } else if (checkedType.satisfies(backend.jsExtendableArrayClass,
-                                     compiler)) {
+                                     classWorld)) {
       // input is !Object || input is !Array || input.isFixed
       checkObject(input, '!==');
       js.Expression objectTest = pop();
@@ -2506,7 +2509,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
       checkFixedArray(input);
       test = new js.Binary('||', objectTest, arrayTest);
       test = new js.Binary('||', test, pop());
-    } else if (checkedType.satisfies(backend.jsMutableArrayClass, compiler)) {
+    } else if (checkedType.satisfies(backend.jsMutableArrayClass, classWorld)) {
       // input is !Object
       // || ((input is !Array || input.isImmutable)
       //     && input is !JsIndexingBehavior)
@@ -2521,7 +2524,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
           ? new js.Binary('&&', notArrayOrImmutable, pop())
           : notArrayOrImmutable;
       test = new js.Binary('||', objectTest, notIndexing);
-    } else if (checkedType.satisfies(backend.jsArrayClass, compiler)) {
+    } else if (checkedType.satisfies(backend.jsArrayClass, classWorld)) {
       // input is !Object
       // || (input is !Array && input is !JsIndexingBehavior)
       checkObject(input, '!==');
@@ -2533,7 +2536,7 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
           ? new js.Binary('&&', arrayTest, pop())
           : arrayTest;
       test = new js.Binary('||', objectTest, notIndexing);
-    } else if (checkedType.satisfies(backend.jsIndexableClass, compiler)) {
+    } else if (checkedType.satisfies(backend.jsIndexableClass, classWorld)) {
       // input is !String
       // && (input is !Object
       //     || (input is !Array && input is !JsIndexingBehavior))
@@ -2558,9 +2561,10 @@ class SsaCodeGenerator implements HVisitor, HBlockInformationVisitor {
 
   void visitTypeConversion(HTypeConversion node) {
     if (node.isArgumentTypeCheck || node.isReceiverTypeCheck) {
+      ClassWorld classWorld = compiler.world;
       // An int check if the input is not int or null, is not
       // sufficient for doing a argument or receiver check.
-      assert(!node.checkedType.containsOnlyInt(compiler) ||
+      assert(!node.checkedType.containsOnlyInt(classWorld) ||
              node.checkedInput.isIntegerOrNull(compiler));
       js.Expression test = generateTest(node.checkedInput, node.checkedType);
       js.Block oldContainer = currentContainer;

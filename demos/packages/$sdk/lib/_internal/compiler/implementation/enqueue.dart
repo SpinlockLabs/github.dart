@@ -25,17 +25,22 @@ class EnqueueTask extends CompilerTask {
     resolution.nativeEnqueuer =
         compiler.backend.nativeResolutionEnqueuer(resolution);
   }
+
+  void forgetElement(Element element) {
+    resolution.forgetElement(element);
+    codegen.forgetElement(element);
+  }
 }
 
 abstract class Enqueuer {
   final String name;
   final Compiler compiler; // TODO(ahe): Remove this dependency.
   final ItemCompilationContextCreator itemCompilationContextCreator;
-  final Map<String, Link<Element>> instanceMembersByName
-      = new Map<String, Link<Element>>();
-  final Map<String, Link<Element>> instanceFunctionsByName
-      = new Map<String, Link<Element>>();
-  final Set<ClassElement> seenClasses = new Set<ClassElement>();
+  final Map<String, Set<Element>> instanceMembersByName
+      = new Map<String, Set<Element>>();
+  final Map<String, Set<Element>> instanceFunctionsByName
+      = new Map<String, Set<Element>>();
+  final Set<ClassElement> _processedClasses = new Set<ClassElement>();
   Set<ClassElement> recentClasses = new Setlet<ClassElement>();
   final Universe universe = new Universe();
 
@@ -80,30 +85,18 @@ abstract class Enqueuer {
   bool internalAddToWorkList(Element element);
 
   void registerInstantiatedType(InterfaceType type, Registry registry,
-                                {mirrorUsage: false}) {
+                                {bool mirrorUsage: false}) {
     task.measure(() {
       ClassElement cls = type.element;
       registry.registerDependency(cls);
       cls.ensureResolved(compiler);
-      universe.instantiatedTypes.add(type);
-      if (!cls.isAbstract
-          // We can't use the closed-world assumption with native abstract
-          // classes; a native abstract class may have non-abstract subclasses
-          // not declared to the program.  Instances of these classes are
-          // indistinguishable from the abstract class.
-          || cls.isNative
-          // Likewise, if this registration comes from the mirror system,
-          // all bets are off.
-          // TODO(herhut): Track classes required by mirrors seperately.
-          || mirrorUsage) {
-        universe.instantiatedClasses.add(cls);
-      }
-      onRegisterInstantiatedClass(cls);
+      universe.registerTypeInstantiation(type, byMirrors: mirrorUsage);
+      processInstantiatedClass(cls);
     });
   }
 
   void registerInstantiatedClass(ClassElement cls, Registry registry,
-                                 {mirrorUsage: false}) {
+                                 {bool mirrorUsage: false}) {
     cls.ensureResolved(compiler);
     registerInstantiatedType(cls.rawType, registry, mirrorUsage: mirrorUsage);
   }
@@ -112,7 +105,7 @@ abstract class Enqueuer {
     return filter.checkNoEnqueuedInvokedInstanceMethods(this);
   }
 
-  void processInstantiatedClass(ClassElement cls) {
+  void processInstantiatedClassMembers(ClassElement cls) {
     cls.implementation.forEachMember(processInstantiatedClassMember);
   }
 
@@ -134,8 +127,8 @@ abstract class Enqueuer {
       if (cls.isNative) {
         compiler.world.registerUsedElement(member);
         nativeEnqueuer.handleFieldAnnotations(member);
-        if (universe.hasInvokedGetter(member, compiler) ||
-            universe.hasInvocation(member, compiler)) {
+        if (universe.hasInvokedGetter(member, compiler.world) ||
+            universe.hasInvocation(member, compiler.world)) {
           nativeEnqueuer.registerFieldLoad(member);
           // In handleUnseenSelector we can't tell if the field is loaded or
           // stored.  We need the basic algorithm to be Church-Rosser, since the
@@ -148,7 +141,7 @@ abstract class Enqueuer {
           addToWorkList(member);
           return;
         }
-        if (universe.hasInvokedSetter(member, compiler)) {
+        if (universe.hasInvokedSetter(member, compiler.world)) {
           nativeEnqueuer.registerFieldStore(member);
           // See comment after registerFieldLoad above.
           nativeEnqueuer.registerFieldLoad(member);
@@ -165,68 +158,73 @@ abstract class Enqueuer {
         return;
       }
     } else if (member.kind == ElementKind.FUNCTION) {
-      if (member.name == Compiler.NO_SUCH_METHOD) {
-        enableNoSuchMethod(member);
+      FunctionElement function = member;
+      function.computeSignature(compiler);
+      if (function.name == Compiler.NO_SUCH_METHOD) {
+        enableNoSuchMethod(function);
       }
-      if (member.name == Compiler.CALL_OPERATOR_NAME &&
+      if (function.name == Compiler.CALL_OPERATOR_NAME &&
           !cls.typeVariables.isEmpty) {
-        registerGenericCallMethod(member, compiler.globalDependencies);
+        registerCallMethodWithFreeTypeVariables(
+            function, compiler.globalDependencies);
       }
       // If there is a property access with the same name as a method we
       // need to emit the method.
-      if (universe.hasInvokedGetter(member, compiler)) {
-        registerClosurizedMember(member, compiler.globalDependencies);
-        addToWorkList(member);
+      if (universe.hasInvokedGetter(function, compiler.world)) {
+        registerClosurizedMember(function, compiler.globalDependencies);
+        addToWorkList(function);
         return;
       }
       // Store the member in [instanceFunctionsByName] to catch
       // getters on the function.
-      Link<Element> members = instanceFunctionsByName.putIfAbsent(
-          memberName, () => const Link<Element>());
-      instanceFunctionsByName[memberName] = members.prepend(member);
-      if (universe.hasInvocation(member, compiler)) {
-        addToWorkList(member);
+      instanceFunctionsByName.putIfAbsent(memberName, () => new Set<Element>())
+          .add(member);
+      if (universe.hasInvocation(function, compiler.world)) {
+        addToWorkList(function);
         return;
       }
     } else if (member.kind == ElementKind.GETTER) {
-      if (universe.hasInvokedGetter(member, compiler)) {
-        addToWorkList(member);
+      FunctionElement getter = member;
+      getter.computeSignature(compiler);
+      if (universe.hasInvokedGetter(getter, compiler.world)) {
+        addToWorkList(getter);
         return;
       }
       // We don't know what selectors the returned closure accepts. If
       // the set contains any selector we have to assume that it matches.
-      if (universe.hasInvocation(member, compiler)) {
-        addToWorkList(member);
+      if (universe.hasInvocation(getter, compiler.world)) {
+        addToWorkList(getter);
         return;
       }
     } else if (member.kind == ElementKind.SETTER) {
-      if (universe.hasInvokedSetter(member, compiler)) {
-        addToWorkList(member);
+      FunctionElement setter = member;
+      setter.computeSignature(compiler);
+      if (universe.hasInvokedSetter(setter, compiler.world)) {
+        addToWorkList(setter);
         return;
       }
     }
 
     // The element is not yet used. Add it to the list of instance
     // members to still be processed.
-    Link<Element> members = instanceMembersByName.putIfAbsent(
-        memberName, () => const Link<Element>());
-    instanceMembersByName[memberName] = members.prepend(member);
+    instanceMembersByName.putIfAbsent(memberName, () => new Set<Element>())
+        .add(member);
   }
 
   void enableNoSuchMethod(Element element) {}
   void enableIsolateSupport() {}
 
-  void onRegisterInstantiatedClass(ClassElement cls) {
+  void processInstantiatedClass(ClassElement cls) {
     task.measure(() {
-      if (seenClasses.contains(cls)) return;
+      if (_processedClasses.contains(cls)) return;
       // The class must be resolved to compute the set of all
       // supertypes.
       cls.ensureResolved(compiler);
 
       void processClass(ClassElement cls) {
-        if (seenClasses.contains(cls)) return;
+        if (_processedClasses.contains(cls)) return;
 
-        seenClasses.add(cls);
+        _processedClasses.add(cls);
         recentClasses.add(cls);
         cls.ensureResolved(compiler);
         cls.implementation.forEachMember(processInstantiatedClassMember);
@@ -326,7 +324,7 @@ abstract class Enqueuer {
         // We need to enqueue all members matching this one in subclasses, as
         // well.
         // TODO(herhut): Use TypedSelector.subtype for enqueueing
-        Selector selector = new Selector.fromElement(element, compiler);
+        Selector selector = new Selector.fromElement(element);
         registerSelectorUse(selector);
         if (element.isField) {
           Selector selector =
@@ -412,7 +410,7 @@ abstract class Enqueuer {
       // as recently seen, as we do not know how many rounds of resolution might
       // have run before tree shaking is disabled and thus everything is
       // enqueued.
-      recents = seenClasses.toSet();
+      recents = _processedClasses.toSet();
       compiler.log('Enqueuing everything');
       for (LibraryElement lib in compiler.libraryLoader.libraries) {
         enqueueReflectiveElementsInLibrary(lib, recents);
@@ -443,34 +441,34 @@ abstract class Enqueuer {
     }
   }
 
-  processLink(Map<String, Link<Element>> map,
-              String memberName,
-              bool f(Element e)) {
-    Link<Element> members = map[memberName];
-    if (members != null) {
-      // [f] might add elements to [: map[memberName] :] during the loop below
-      // so we create a new list for [: map[memberName] :] and prepend the
-      // [remaining] members after the loop.
-      map[memberName] = const Link<Element>();
-      LinkBuilder<Element> remaining = new LinkBuilder<Element>();
-      for (; !members.isEmpty; members = members.tail) {
-        if (!f(members.head)) remaining.addLast(members.head);
-      }
-      map[memberName] = remaining.toLink(map[memberName]);
+  void processSet(
+      Map<String, Set<Element>> map,
+      String memberName,
+      bool f(Element e)) {
+    Set<Element> members = map[memberName];
+    if (members == null) return;
+    // [f] might add elements to [: map[memberName] :] during the loop below
+    // so we create a new list for [: map[memberName] :] and prepend the
+    // [remaining] members after the loop.
+    map[memberName] = new Set<Element>();
+    Set<Element> remaining = new Set<Element>();
+    for (Element member in members) {
+      if (!f(member)) remaining.add(member);
     }
+    map[memberName].addAll(remaining);
   }
 
   processInstanceMembers(String n, bool f(Element e)) {
-    processLink(instanceMembersByName, n, f);
+    processSet(instanceMembersByName, n, f);
   }
 
   processInstanceFunctions(String n, bool f(Element e)) {
-    processLink(instanceFunctionsByName, n, f);
+    processSet(instanceFunctionsByName, n, f);
   }
 
   void handleUnseenSelector(String methodName, Selector selector) {
     processInstanceMembers(methodName, (Element member) {
-      if (selector.appliesUnnamed(member, compiler)) {
+      if (selector.appliesUnnamed(member, compiler.world)) {
         if (member.isFunction && selector.isGetter) {
           registerClosurizedMember(member, compiler.globalDependencies);
         }
@@ -499,7 +497,7 @@ abstract class Enqueuer {
     });
     if (selector.isGetter) {
       processInstanceFunctions(methodName, (Element member) {
-        if (selector.appliesUnnamed(member, compiler)) {
+        if (selector.appliesUnnamed(member, compiler.world)) {
           registerClosurizedMember(member, compiler.globalDependencies);
           return true;
         }
@@ -579,28 +577,32 @@ abstract class Enqueuer {
     universe.usingFactoryWithTypeArguments = true;
   }
 
-  void registerGenericCallMethod(Element element, Registry registry) {
-    compiler.backend.registerGenericCallMethod(element, this, registry);
-    universe.genericCallMethods.add(element);
+  void registerCallMethodWithFreeTypeVariables(
+      Element element,
+      Registry registry) {
+    compiler.backend.registerCallMethodWithFreeTypeVariables(
+        element, this, registry);
+    universe.callMethodsWithFreeTypeVariables.add(element);
   }
 
   void registerClosurizedMember(Element element, Registry registry) {
     assert(element.isInstanceMember);
-    registerIfGeneric(element, registry);
+    registerClosureIfFreeTypeVariables(element, registry);
     compiler.backend.registerBoundClosure(this);
     universe.closurizedMembers.add(element);
   }
 
-  void registerIfGeneric(Element element, Registry registry) {
+  void registerClosureIfFreeTypeVariables(Element element, Registry registry) {
     if (element.computeType(compiler).containsTypeVariables) {
-      compiler.backend.registerGenericClosure(element, this, registry);
-      universe.genericClosures.add(element);
+      compiler.backend.registerClosureWithFreeTypeVariables(
+          element, this, registry);
+      universe.closuresWithFreeTypeVariables.add(element);
     }
   }
 
   void registerClosure(LocalFunctionElement element, Registry registry) {
     universe.allClosures.add(element);
-    registerIfGeneric(element, registry);
+    registerClosureIfFreeTypeVariables(element, registry);
   }
 
   void forEach(void f(WorkItem work)) {
@@ -634,6 +636,11 @@ abstract class Enqueuer {
   void _logSpecificSummary(log(message));
 
   String toString() => 'Enqueuer($name)';
+
+  void forgetElement(Element element) {
+    universe.forgetElement(element, compiler);
+    _processedClasses.remove(element);
+  }
 }
 
 /// [Enqueuer] which is specific to resolution.
@@ -673,13 +680,6 @@ class ResolutionEnqueuer extends Enqueuer {
   /// Registers [element] as resolved for the resolution enqueuer.
   void registerResolvedElement(AstElement element) {
     resolvedElements.add(element);
-  }
-
-  /// Returns [:true:] if [element] has actually been used.
-  bool isLive(Element element) {
-    if (seenClasses.contains(element)) return true;
-    if (hasBeenResolved(element)) return true;
-    return false;
   }
 
   /**
@@ -789,8 +789,17 @@ class ResolutionEnqueuer extends Enqueuer {
     nativeEnqueuer.registerJsCall(node, resolver);
   }
 
+  void registerJsEmbeddedGlobalCall(Send node, ResolverVisitor resolver) {
+    nativeEnqueuer.registerJsEmbeddedGlobalCall(node, resolver);
+  }
+
   void _logSpecificSummary(log(message)) {
     log('Resolved ${resolvedElements.length} elements.');
+  }
+
+  void forgetElement(Element element) {
+    super.forgetElement(element);
+    resolvedElements.remove(element);
   }
 }
 
@@ -824,11 +833,8 @@ class CodegenEnqueuer extends Enqueuer {
   }
 
   bool internalAddToWorkList(Element element) {
-    if (compiler.hasIncrementalSupport) {
-      newlyEnqueuedElements.add(element);
-    }
     // Don't generate code for foreign elements.
-    if (element.isForeign(compiler)) return false;
+    if (element.isForeign(compiler.backend)) return false;
 
     // Codegen inlines field initializers. It only needs to generate
     // code for checked setters.
@@ -837,6 +843,10 @@ class CodegenEnqueuer extends Enqueuer {
           || element.enclosingElement.isClosure) {
         return false;
       }
+    }
+
+    if (compiler.hasIncrementalSupport && !isProcessed(element)) {
+      newlyEnqueuedElements.add(element);
     }
 
     if (queueIsClosed) {
@@ -852,6 +862,18 @@ class CodegenEnqueuer extends Enqueuer {
   void _logSpecificSummary(log(message)) {
     log('Compiled ${generatedCode.length} methods.');
   }
+
+  void forgetElement(Element element) {
+    super.forgetElement(element);
+    generatedCode.remove(element);
+    if (element is MemberElement) {
+      for (Element closure in element.nestedClosures) {
+        generatedCode.remove(closure);
+        removeFromSet(instanceMembersByName, closure);
+        removeFromSet(instanceFunctionsByName, closure);
+      }
+    }
+  }
 }
 
 /// Parameterizes filtering of which work items are enqueued.
@@ -859,11 +881,12 @@ class QueueFilter {
   bool checkNoEnqueuedInvokedInstanceMethods(Enqueuer enqueuer) {
     enqueuer.task.measure(() {
       // Run through the classes and see if we need to compile methods.
-      for (ClassElement classElement in enqueuer.universe.instantiatedClasses) {
+      for (ClassElement classElement in
+               enqueuer.universe.directlyInstantiatedClasses) {
         for (ClassElement currentClass = classElement;
              currentClass != null;
              currentClass = currentClass.superclass) {
-          enqueuer.processInstantiatedClass(currentClass);
+          enqueuer.processInstantiatedClassMembers(currentClass);
         }
       }
     });
@@ -873,4 +896,10 @@ class QueueFilter {
   void processWorkItem(void f(WorkItem work), WorkItem work) {
     f(work);
   }
+}
+
+void removeFromSet(Map<String, Set<Element>> map, Element element) {
+  Set<Element> set = map[element.name];
+  if (set == null) return;
+  set.remove(element);
 }

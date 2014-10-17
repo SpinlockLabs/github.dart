@@ -24,6 +24,7 @@ class HTracer extends HGraphVisitor with TracerUtil {
   HTracer(this.output, this.compiler, this.context);
 
   void traceGraph(String name, HGraph graph) {
+    DEBUG_MODE = true;
     tag("cfg", () {
       printProperty("name", name);
       visitDominatorTree(graph);
@@ -145,7 +146,7 @@ class HInstructionStringifier implements HVisitor<String> {
       prefix = 'd';
     } else if (instruction.isNumber(compiler)) {
       prefix = 'n';
-    } else if (instruction.instructionType.containsAll(compiler)) {
+    } else if (instruction.instructionType.containsAll(compiler.world)) {
       prefix = 'v';
     } else {
       prefix = 'U';

@@ -5,12 +5,13 @@
 library dart_backend;
 
 import 'dart:async' show Future;
+import 'dart:math' show max;
 import '../elements/elements.dart';
-import '../elements/modelx.dart' show SynthesizedConstructorElementX;
 import '../dart2jslib.dart';
 import '../dart_types.dart';
 import '../tree/tree.dart';
 import '../cps_ir/cps_ir_nodes.dart' as cps_ir;
+import '../constants/expressions.dart';
 import '../cps_ir/optimizers.dart';
 import 'tree_ir_builder.dart' as tree_builder;
 import 'tree_ir_nodes.dart' as tree_ir;
@@ -23,6 +24,8 @@ import 'statement_rewriter.dart' show StatementRewriter;
 import 'backend_ast_emitter.dart' as backend_ast_emitter;
 import 'backend_ast_nodes.dart' as backend_ast;
 import 'backend_ast_to_frontend_ast.dart' as backend2frontend;
+import '../tracer.dart';
+import '../../compiler.dart' show CompilerOutputProvider;
 
 import '../scanner/scannerlib.dart' show StringToken,
                                          Keyword,
@@ -32,6 +35,6 @@ import '../scanner/scannerlib.dart' show StringToken,
                                          IDENTIFIER_INFO;
 
 part 'backend.dart';
-part 'emitter.dart';
 part 'renamer.dart';
 part 'placeholder_collector.dart';
+part 'outputter.dart';

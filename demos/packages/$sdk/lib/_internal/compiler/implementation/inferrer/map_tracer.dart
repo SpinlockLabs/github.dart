@@ -47,7 +47,7 @@ class MapTracerVisitor extends TracerVisitor<MapTypeInformation> {
     analyze();
     MapTypeInformation map = tracedType;
     if (continueAnalyzing) {
-      map.flowsInto.addAll(flowsInto);
+      map.addFlowsIntoTargets(flowsInto);
       return true;
     }
     keyAssignments = valueAssignments = mapAssignments = null;
@@ -61,7 +61,7 @@ class MapTracerVisitor extends TracerVisitor<MapTypeInformation> {
   visitStaticCallSiteTypeInformation(StaticCallSiteTypeInformation info) {
     super.visitStaticCallSiteTypeInformation(info);
     Element called = info.calledElement;
-    if (called.isForeign(compiler) && called.name == 'JS') {
+    if (called.isForeign(compiler.backend) && called.name == 'JS') {
       bailout('Used in JS ${info.call}');
     }
   }

@@ -427,6 +427,24 @@ class CompressedTextureAtc extends Interceptor {
 
 
 @DocsEditable()
+@DomName('WebGLCompressedTextureETC1')
+@Experimental() // untriaged
+@Native("WebGLCompressedTextureETC1")
+class CompressedTextureETC1 extends Interceptor {
+  // To suppress missing implicit constructor warnings.
+  factory CompressedTextureETC1._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('WebGLCompressedTextureETC1.COMPRESSED_RGB_ETC1_WEBGL')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const int COMPRESSED_RGB_ETC1_WEBGL = 0x8D64;
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+
+@DocsEditable()
 @DomName('WebGLCompressedTexturePVRTC')
 // http://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/
 @Experimental() // experimental
@@ -781,6 +799,29 @@ class DrawBuffers extends Interceptor {
 
 
 @DocsEditable()
+@DomName('EXTBlendMinMax')
+@Experimental() // untriaged
+@Native("EXTBlendMinMax")
+class ExtBlendMinMax extends Interceptor {
+  // To suppress missing implicit constructor warnings.
+  factory ExtBlendMinMax._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('EXTBlendMinMax.MAX_EXT')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const int MAX_EXT = 0x8008;
+
+  @DomName('EXTBlendMinMax.MIN_EXT')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const int MIN_EXT = 0x8007;
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+
+@DocsEditable()
 @DomName('EXTFragDepth')
 // http://www.khronos.org/registry/webgl/extensions/EXT_frag_depth/
 @Experimental()
@@ -788,6 +829,19 @@ class DrawBuffers extends Interceptor {
 class ExtFragDepth extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory ExtFragDepth._() { throw new UnsupportedError("Not supported"); }
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+
+@DocsEditable()
+@DomName('EXTShaderTextureLOD')
+@Experimental() // untriaged
+@Native("EXTShaderTextureLOD")
+class ExtShaderTextureLod extends Interceptor {
+  // To suppress missing implicit constructor warnings.
+  factory ExtShaderTextureLod._() { throw new UnsupportedError("Not supported"); }
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -1013,7 +1067,7 @@ class Renderbuffer extends Interceptor {
 @Experimental()
 @Unstable()
 @Native("WebGLRenderingContext")
-class RenderingContext extends CanvasRenderingContext {
+class RenderingContext extends Interceptor implements CanvasRenderingContext {
   // To suppress missing implicit constructor warnings.
   factory RenderingContext._() { throw new UnsupportedError("Not supported"); }
 
@@ -1423,6 +1477,16 @@ class RenderingContext extends CanvasRenderingContext {
   @DomName('WebGLRenderingContext.HIGH_INT')
   @DocsEditable()
   static const int HIGH_INT = 0x8DF5;
+
+  @DomName('WebGLRenderingContext.IMPLEMENTATION_COLOR_READ_FORMAT')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const int IMPLEMENTATION_COLOR_READ_FORMAT = 0x8B9B;
+
+  @DomName('WebGLRenderingContext.IMPLEMENTATION_COLOR_READ_TYPE')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const int IMPLEMENTATION_COLOR_READ_TYPE = 0x8B9A;
 
   @DomName('WebGLRenderingContext.INCR')
   @DocsEditable()
@@ -2200,6 +2264,13 @@ class RenderingContext extends CanvasRenderingContext {
   @DocsEditable()
   static const int ZERO = 0;
 
+  // From WebGLRenderingContextBase
+
+  @DomName('WebGLRenderingContext.canvas')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final CanvasElement canvas;
+
   @DomName('WebGLRenderingContext.drawingBufferHeight')
   @DocsEditable()
   final int drawingBufferHeight;
@@ -2496,7 +2567,7 @@ class RenderingContext extends CanvasRenderingContext {
 
   @DomName('WebGLRenderingContext.getAttachedShaders')
   @DocsEditable()
-  void getAttachedShaders(Program program) native;
+  List<Shader> getAttachedShaders(Program program) native;
 
   @DomName('WebGLRenderingContext.getAttribLocation')
   @DocsEditable()
@@ -2711,7 +2782,7 @@ class RenderingContext extends CanvasRenderingContext {
   @DomName('WebGLRenderingContext.texImage2D')
   @DocsEditable()
   void texImage2D(int target, int level, int internalformat, int format_OR_width, int height_OR_type, border_OR_canvas_OR_image_OR_pixels_OR_video, [int format, int type, TypedData pixels]) {
-    if (pixels != null && type != null && format != null && (border_OR_canvas_OR_image_OR_pixels_OR_video is int || border_OR_canvas_OR_image_OR_pixels_OR_video == null)) {
+    if (pixels != null && type != null && format != null && (border_OR_canvas_OR_image_OR_pixels_OR_video is int)) {
       _texImage2D_1(target, level, internalformat, format_OR_width, height_OR_type, border_OR_canvas_OR_image_OR_pixels_OR_video, format, type, pixels);
       return;
     }
@@ -2720,15 +2791,15 @@ class RenderingContext extends CanvasRenderingContext {
       _texImage2D_2(target, level, internalformat, format_OR_width, height_OR_type, pixels_1);
       return;
     }
-    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is ImageElement || border_OR_canvas_OR_image_OR_pixels_OR_video == null) && format == null && type == null && pixels == null) {
+    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is ImageElement) && format == null && type == null && pixels == null) {
       _texImage2D_3(target, level, internalformat, format_OR_width, height_OR_type, border_OR_canvas_OR_image_OR_pixels_OR_video);
       return;
     }
-    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is CanvasElement || border_OR_canvas_OR_image_OR_pixels_OR_video == null) && format == null && type == null && pixels == null) {
+    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is CanvasElement) && format == null && type == null && pixels == null) {
       _texImage2D_4(target, level, internalformat, format_OR_width, height_OR_type, border_OR_canvas_OR_image_OR_pixels_OR_video);
       return;
     }
-    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is VideoElement || border_OR_canvas_OR_image_OR_pixels_OR_video == null) && format == null && type == null && pixels == null) {
+    if ((border_OR_canvas_OR_image_OR_pixels_OR_video is VideoElement) && format == null && type == null && pixels == null) {
       _texImage2D_5(target, level, internalformat, format_OR_width, height_OR_type, border_OR_canvas_OR_image_OR_pixels_OR_video);
       return;
     }
@@ -2881,7 +2952,7 @@ class RenderingContext extends CanvasRenderingContext {
   @DomName('WebGLRenderingContext.texSubImage2D')
   @DocsEditable()
   void texSubImage2D(int target, int level, int xoffset, int yoffset, int format_OR_width, int height_OR_type, canvas_OR_format_OR_image_OR_pixels_OR_video, [int type, TypedData pixels]) {
-    if (pixels != null && type != null && (canvas_OR_format_OR_image_OR_pixels_OR_video is int || canvas_OR_format_OR_image_OR_pixels_OR_video == null)) {
+    if (pixels != null && type != null && (canvas_OR_format_OR_image_OR_pixels_OR_video is int)) {
       _texSubImage2D_1(target, level, xoffset, yoffset, format_OR_width, height_OR_type, canvas_OR_format_OR_image_OR_pixels_OR_video, type, pixels);
       return;
     }
@@ -2890,15 +2961,15 @@ class RenderingContext extends CanvasRenderingContext {
       _texSubImage2D_2(target, level, xoffset, yoffset, format_OR_width, height_OR_type, pixels_1);
       return;
     }
-    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is ImageElement || canvas_OR_format_OR_image_OR_pixels_OR_video == null) && type == null && pixels == null) {
+    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is ImageElement) && type == null && pixels == null) {
       _texSubImage2D_3(target, level, xoffset, yoffset, format_OR_width, height_OR_type, canvas_OR_format_OR_image_OR_pixels_OR_video);
       return;
     }
-    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is CanvasElement || canvas_OR_format_OR_image_OR_pixels_OR_video == null) && type == null && pixels == null) {
+    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is CanvasElement) && type == null && pixels == null) {
       _texSubImage2D_4(target, level, xoffset, yoffset, format_OR_width, height_OR_type, canvas_OR_format_OR_image_OR_pixels_OR_video);
       return;
     }
-    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is VideoElement || canvas_OR_format_OR_image_OR_pixels_OR_video == null) && type == null && pixels == null) {
+    if ((canvas_OR_format_OR_image_OR_pixels_OR_video is VideoElement) && type == null && pixels == null) {
       _texSubImage2D_5(target, level, xoffset, yoffset, format_OR_width, height_OR_type, canvas_OR_format_OR_image_OR_pixels_OR_video);
       return;
     }
@@ -3272,4 +3343,16 @@ class UniformLocation extends Interceptor {
 class VertexArrayObject extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory VertexArrayObject._() { throw new UnsupportedError("Not supported"); }
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+
+@DocsEditable()
+@DomName('WebGLRenderingContextBase')
+@Experimental() // untriaged
+abstract class _WebGLRenderingContextBase extends Interceptor {
+  // To suppress missing implicit constructor warnings.
+  factory _WebGLRenderingContextBase._() { throw new UnsupportedError("Not supported"); }
 }

@@ -7,7 +7,19 @@ part of github.common;
 class OrganizationsService extends Service {
   OrganizationsService(GitHub github) : super(github);
   
-  // TODO: Implement list: https://developer.github.com/v3/orgs/#list-user-organizations
+  /// Lists all of the memberships in organizations for the given [userName].
+  /// If [userName] is not specified we list the memberships in organizations
+  /// for the authenticated user. 
+  ///
+  /// API docs: : https://developer.github.com/v3/orgs/#list-user-organizations
+  Stream<Organization> list([String userName]) {
+    String requestPath = "/users/$userName/orgs";
+    if (userName == null) {
+      requestPath = "/user/orgs";
+    }
+    return new PaginationHelper(_github).objects("GET", requestPath, 
+        Organization.fromJSON);
+  }
   
   /// Fetches the organization specified by [name].
   /// 

@@ -5,6 +5,7 @@
 library elements;
 
 
+import '../constants/expressions.dart';
 import '../tree/tree.dart';
 import '../util/util.dart';
 import '../resolution/resolution.dart';
@@ -21,9 +22,11 @@ import '../dart2jslib.dart' show InterfaceType,
                                  Selector,
                                  Constant,
                                  Compiler,
+                                 Backend,
                                  isPrivateName;
 
 import '../dart_types.dart';
+import '../helpers/helpers.dart';
 
 import '../scanner/scannerlib.dart' show Token,
                                          isUserDefinableOperator,
@@ -331,6 +334,10 @@ abstract class Element implements Entity {
   /// is declared `static`.
   bool get isStatic;
 
+  /// `true` if this element is local element, that is, a local variable,
+  /// local function or parameter.
+  bool get isLocal;
+
   bool get impliesType;
 
   Token get position;
@@ -401,7 +408,7 @@ abstract class Element implements Entity {
   String get fixedBackendName;
 
   bool get isAbstract;
-  bool isForeign(Compiler compiler);
+  bool isForeign(Backend backend);
 
   void addMetadata(MetadataAnnotation annotation);
   void setNative(String name);
@@ -441,13 +448,7 @@ class Elements {
   }
 
   static bool isLocal(Element element) {
-    return !Elements.isUnresolved(element)
-            && !element.isInstanceMember
-            && !isStaticOrTopLevelField(element)
-            && !isStaticOrTopLevelFunction(element)
-            && (identical(element.kind, ElementKind.VARIABLE) ||
-                identical(element.kind, ElementKind.PARAMETER) ||
-                identical(element.kind, ElementKind.FUNCTION));
+    return !Elements.isUnresolved(element) && element.isLocal;
   }
 
   static bool isInstanceField(Element element) {
@@ -459,14 +460,13 @@ class Elements {
   }
 
   static bool isStaticOrTopLevel(Element element) {
-    // TODO(ager): This should not be necessary when patch support has
-    // been reworked.
-    if (!Elements.isUnresolved(element)
-        && element.isStatic) {
-      return true;
-    }
-    return !Elements.isUnresolved(element)
-           && !element.isAmbiguous
+    // TODO(johnniwinther): Clean this up. This currently returns true for a
+    // PartialConstructorElement, SynthesizedConstructorElementX, and
+    // TypeVariableElementX though neither `element.isStatic` nor
+    // `element.isTopLevel` is true.
+    if (Elements.isUnresolved(element)) return false;
+    if (element.isStatic || element.isTopLevel) return true;
+    return !element.isAmbiguous
            && !element.isInstanceMember
            && !element.isPrefix
            && element.enclosingElement != null
@@ -506,6 +506,17 @@ class Elements {
     return !Elements.isUnresolved(element)
            && element.isInstanceMember
            && (identical(element.kind, ElementKind.FUNCTION));
+  }
+
+  /// Also returns true for [ConstructorBodyElement]s.
+  static bool isNonAbstractInstanceMethod(Element element) {
+    // The generative constructor body is not a function. We therefore treat
+    // it specially.
+    if (element.isGenerativeConstructorBody) return true;
+    return !Elements.isUnresolved(element) &&
+        !element.isAbstract &&
+        element.isInstanceMember &&
+        element.isFunction;
   }
 
   static bool isNativeOrExtendsNative(ClassElement element) {
@@ -738,8 +749,8 @@ class Elements {
     ClassElement cls = constructor.enclosingClass;
     return cls.library == compiler.typedDataLibrary
         && cls.isNative
-        && compiler.world.isSubtype(compiler.typedDataClass, cls)
-        && compiler.world.isSubtype(compiler.listClass, cls)
+        && compiler.world.isSubtypeOf(cls, compiler.typedDataClass)
+        && compiler.world.isSubtypeOf(cls, compiler.listClass)
         && constructor.name == '';
   }
 
@@ -843,6 +854,10 @@ abstract class LibraryElement extends Element
    * libraries the canonical uri is of the form [:dart:x:].
    */
   Uri get canonicalUri;
+
+  /// Returns `true` if this library is 'dart:core'.
+  bool get isDartCore;
+
   CompilationUnitElement get entryCompilationUnit;
   Link<CompilationUnitElement> get compilationUnits;
   Iterable<LibraryTag> get tags;
@@ -959,7 +974,7 @@ abstract class ExecutableElement extends Element
   MemberElement get memberContext;
 }
 
-/// A top-level or static field or method, or a constructor.
+/// A top-level, static or instance field or method, or a constructor.
 ///
 /// A [MemberElement] is the outermost executable element for any executable
 /// context.
@@ -1034,6 +1049,10 @@ abstract class FormalElement extends Element
 /// the form `this.x`, are modeled by [InitializingFormalParameter].
 abstract class ParameterElement extends Element
     implements VariableElement, FormalElement, LocalElement {
+  /// Use [functionDeclaration] instead.
+  @deprecated
+  get enclosingElement;
+
   /// The function on which this parameter is declared.
   FunctionElement get functionDeclaration;
 }
@@ -1076,6 +1095,7 @@ abstract class FunctionSignature {
   int get optionalParameterCount;
   bool get optionalParametersAreNamed;
   FormalElement get firstOptionalParameter;
+  bool get hasOptionalParameters;
 
   int get parameterCount;
   List<FormalElement> get orderedOptionalParameters;
@@ -1110,7 +1130,13 @@ abstract class FunctionElement extends Element
   /// Trying to access a function signature that has not been computed in
   /// resolution is an error and calling [computeSignature] covers that error.
   /// This method will go away!
+  // TODO(johnniwinther): Rename to `ensureFunctionSignature`.
   @deprecated FunctionSignature computeSignature(Compiler compiler);
+
+  bool get hasFunctionSignature;
+
+  /// The type of this function.
+  FunctionType get type;
 }
 
 /// A top level, static or instance function.
@@ -1273,7 +1299,9 @@ abstract class ClassElement extends TypeDeclarationElement
   bool get hasBackendMembers;
   bool get hasLocalScopeMembers;
 
-  bool isObject(Compiler compiler);
+  /// Returns `true` if this class is `Object` from dart:core.
+  bool get isObject;
+
   bool isSubclassOf(ClassElement cls);
   /// Returns true if `this` explicitly/nominally implements [intrface].
   ///
@@ -1298,8 +1326,8 @@ abstract class ClassElement extends TypeDeclarationElement
   void reverseBackendMembers();
 
   Element lookupMember(String memberName);
-  Element lookupSelector(Selector selector, Compiler compiler);
-  Element lookupSuperSelector(Selector selector, Compiler compiler);
+  Element lookupSelector(Selector selector);
+  Element lookupSuperSelector(Selector selector);
 
   Element lookupLocalMember(String memberName);
   Element lookupBackendMember(String memberName);
@@ -1407,11 +1435,14 @@ abstract class TypeVariableElement extends Element
 
 abstract class MetadataAnnotation implements Spannable {
   /// The front-end constant of this metadata annotation.
-  Constant get value;
+  ConstantExpression get constant;
   Element get annotatedElement;
   int get resolutionState;
   Token get beginToken;
   Token get endToken;
+
+  bool get hasNode;
+  Node get node;
 
   MetadataAnnotation ensureResolved(Compiler compiler);
 }

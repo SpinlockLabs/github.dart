@@ -11,7 +11,7 @@ abstract class TreeElements {
   /// Iterables of the dependencies that this [TreeElement] records of
   /// [analyzedElement].
   Iterable<Element> get allElements;
-  void forEachConstantNode(f(Node n, Constant c));
+  void forEachConstantNode(f(Node n, ConstantExpression c));
 
   /// A set of additional dependencies.  See [registerDependency] below.
   Iterable<Element> get otherDependencies;
@@ -35,8 +35,8 @@ abstract class TreeElements {
   void setIteratorSelector(ForIn node, Selector selector);
   void setMoveNextSelector(ForIn node, Selector selector);
   void setCurrentSelector(ForIn node, Selector selector);
-  void setConstant(Node node, Constant constant);
-  Constant getConstant(Node node);
+  void setConstant(Node node, ConstantExpression constant);
+  ConstantExpression getConstant(Node node);
   bool isAssert(Send send);
 
   /// Returns the [FunctionElement] defined by [node].
@@ -93,7 +93,7 @@ class TreeElementMapping implements TreeElements {
   Map<Node, DartType> _types;
   Setlet<Node> _superUses;
   Setlet<Element> _otherDependencies;
-  Map<Node, Constant> _constants;
+  Map<Node, ConstantExpression> _constants;
   Map<VariableElement, List<Node>> _potentiallyMutated;
   Map<Node, Map<VariableElement, List<Node>>> _potentiallyMutatedIn;
   Map<VariableElement, List<Node>> _potentiallyMutatedInClosure;
@@ -236,14 +236,14 @@ class TreeElementMapping implements TreeElements {
     return this[node];
   }
 
-  void setConstant(Node node, Constant constant) {
+  void setConstant(Node node, ConstantExpression constant) {
     if (_constants == null) {
-      _constants = new Maplet<Node, Constant>();
+      _constants = new Maplet<Node, ConstantExpression>();
     }
     _constants[node] = constant;
   }
 
-  Constant getConstant(Node node) {
+  ConstantExpression getConstant(Node node) {
     return _constants != null ? _constants[node] : null;
   }
 
@@ -344,7 +344,7 @@ class TreeElementMapping implements TreeElements {
     return _elements != null ? _elements : const <Element>[];
   }
 
-  void forEachConstantNode(f(Node n, Constant c)) {
+  void forEachConstantNode(f(Node n, ConstantExpression c)) {
     if (_constants != null) {
       _constants.forEach(f);
     }
@@ -712,13 +712,11 @@ class ResolverTask extends CompilerTask {
         ClassElement enclosingClass = element.enclosingClass;
         if (enclosingClass != null) {
           // TODO(johnniwinther): Find another way to obtain mixin uses.
-          Set<MixinApplicationElement> mixinUses =
-              compiler.world.mixinUses[enclosingClass];
-          if (mixinUses != null) {
-            ClassElement mixin = enclosingClass;
-            for (MixinApplicationElement mixinApplication in mixinUses) {
-              checkMixinSuperUses(resolutionTree, mixinApplication, mixin);
-            }
+          Iterable<MixinApplicationElement> mixinUses =
+              compiler.world.allMixinUsesOf(enclosingClass);
+          ClassElement mixin = enclosingClass;
+          for (MixinApplicationElement mixinApplication in mixinUses) {
+            checkMixinSuperUses(resolutionTree, mixinApplication, mixin);
           }
         }
         return resolutionTree;
@@ -746,6 +744,9 @@ class ResolverTask extends CompilerTask {
     }
     ResolverVisitor visitor = visitorFor(element);
     ResolutionRegistry registry = visitor.registry;
+    // TODO(johnniwinther): Maybe remove this when placeholderCollector migrates
+    // to the backend ast.
+    registry.defineElement(tree.definitions.nodes.head, element);
     // TODO(johnniwinther): Share the resolved type between all variables
     // declared in the same declaration.
     if (tree.type != null) {
@@ -1011,7 +1012,8 @@ class ResolverTask extends CompilerTask {
   void _postProcessClassElement(BaseClassElementX element) {
     for (MetadataAnnotation metadata in element.metadata) {
       metadata.ensureResolved(compiler);
-      if (!element.isProxy && metadata.value == compiler.proxyConstant) {
+      if (!element.isProxy &&
+          metadata.constant.value == compiler.proxyConstant) {
         element.isProxy = true;
       }
     }
@@ -1077,7 +1079,7 @@ class ResolverTask extends CompilerTask {
     }
 
     // Check that the mixed in class has Object as its superclass.
-    if (!mixin.superclass.isObject(compiler)) {
+    if (!mixin.superclass.isObject) {
       compiler.reportError(mixin, MessageKind.ILLEGAL_MIXIN_SUPERCLASS);
     }
 
@@ -1123,7 +1125,7 @@ class ResolverTask extends CompilerTask {
 
   void checkClassMembers(ClassElement cls) {
     assert(invariant(cls, cls.isDeclaration));
-    if (cls.isObject(compiler)) return;
+    if (cls.isObject) return;
     // TODO(johnniwinther): Should this be done on the implementation element as
     // well?
     List<Element> constConstructors = <Element>[];
@@ -1400,13 +1402,13 @@ class ResolverTask extends CompilerTask {
       node.accept(visitor);
       // TODO(johnniwinther): Avoid passing the [TreeElements] to
       // [compileMetadata].
-      annotation.value =
+      annotation.constant =
           constantCompiler.compileMetadata(annotation, node, registry.mapping);
       // TODO(johnniwinther): Register the relation between the annotation
       // and the annotated element instead. This will allow the backend to
       // retrieve the backend constant and only register metadata on the
       // elements for which it is needed. (Issue 17732).
-      registry.registerMetadataConstant(annotation.value, annotatedElement);
+      registry.registerMetadataConstant(annotation, annotatedElement);
       annotation.resolutionState = STATE_DONE;
     }));
   }
@@ -1612,7 +1614,8 @@ class InitializerResolver {
       visitor.compiler.reportError(
           diagnosticNode, kind, {'constructorName': fullConstructorName});
     } else {
-      if (!call.applies(lookedupConstructor, visitor.compiler)) {
+      lookedupConstructor.computeSignature(visitor.compiler);
+      if (!call.applies(lookedupConstructor, visitor.compiler.world)) {
         MessageKind kind = isImplicitSuperCall
                            ? MessageKind.NO_MATCHING_CONSTRUCTOR_FOR_IMPLICIT
                            : MessageKind.NO_MATCHING_CONSTRUCTOR;
@@ -2387,7 +2390,10 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     Link<Node> parameterNodes = (node.parameters == null)
         ? const Link<Node>() : node.parameters.nodes;
     functionParameters.forEachParameter((ParameterElement element) {
-      if (element == functionParameters.optionalParameters.head) {
+      // TODO(karlklose): should be a list of [FormalElement]s, but the actual
+      // implementation uses [Element].
+      Link<Element> optionals = functionParameters.optionalParameters;
+      if (!optionals.isEmpty && element == optionals.head) {
         NodeList nodes = parameterNodes.head;
         parameterNodes = nodes.nodes;
       }
@@ -2596,7 +2602,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       }
       // TODO(johnniwinther): Ensure correct behavior if currentClass is a
       // patch.
-      target = currentClass.lookupSuperSelector(selector, compiler);
+      target = currentClass.lookupSuperSelector(selector);
       // [target] may be null which means invoking noSuchMethod on
       // super.
       if (target == null) {
@@ -2896,21 +2902,29 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
         // We call 'call()' on a Type instance returned from the reference to a
         // class or typedef literal. We do not need to register this call as a
         // dynamic invocation, because we statically know what the target is.
-      } else if (!selector.applies(target, compiler)) {
-        registry.registerThrowNoSuchMethod();
-        if (node.isSuperCall) {
-          // Similar to what we do when we can't find super via selector
-          // in [resolveSend] above, we still need to register the invocation,
-          // because we might call [:super.noSuchMethod:] which calls
-          // [JSInvocationMirror._invokeOn].
-          registry.registerDynamicInvocation(selector);
-          registry.registerSuperNoSuchMethod();
+      } else {
+        if (target is FunctionElement) {
+          FunctionElement function = target;
+          function.computeSignature(compiler);
+        }
+        if (!selector.applies(target, compiler.world)) {
+          registry.registerThrowNoSuchMethod();
+          if (node.isSuperCall) {
+            // Similar to what we do when we can't find super via selector
+            // in [resolveSend] above, we still need to register the invocation,
+            // because we might call [:super.noSuchMethod:] which calls
+            // [JSInvocationMirror._invokeOn].
+            registry.registerDynamicInvocation(selector);
+            registry.registerSuperNoSuchMethod();
+          }
         }
       }
 
-      if (target != null && target.isForeign(compiler)) {
+      if (target != null && target.isForeign(compiler.backend)) {
         if (selector.name == 'JS') {
           registry.registerJsCall(node, this);
+        } else if (selector.name == 'JS_EMBEDDED_GLOBAL') {
+          registry.registerJsEmbeddedGlobalCall(node, this);
         } else if (selector.name == 'JS_INTERCEPTOR_CONSTANT') {
           if (!node.argumentsNode.isEmpty) {
             Node argument = node.argumentsNode.nodes.head;
@@ -3011,7 +3025,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       registerSend(getterSelector, getter);
       registry.setGetterSelectorInComplexSendSet(node, getterSelector);
       if (node.isSuperCall) {
-        getter = currentClass.lookupSuperSelector(getterSelector, compiler);
+        getter = currentClass.lookupSuperSelector(getterSelector);
         if (getter == null) {
           target = warnAndCreateErroneousElement(
               node, selector.name, MessageKind.NO_SUCH_SUPER_MEMBER,
@@ -3186,6 +3200,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     });
 
     registry.registerStaticUse(redirectionTarget);
+    // TODO(johnniwinther): Register the effective target type instead.
     registry.registerInstantiatedClass(
         redirectionTarget.enclosingClass.declaration);
     if (isSymbolConstructor) {
@@ -3269,7 +3284,8 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     if (Elements.isUnresolved(constructor)) {
       return new ElementResult(constructor);
     }
-    if (!callSelector.applies(constructor, compiler)) {
+    constructor.computeSignature(compiler);
+    if (!callSelector.applies(constructor, compiler.world)) {
       registry.registerThrowNoSuchMethod();
     }
 
@@ -3282,6 +3298,8 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       compiler.reportError(node.send.selector,
                            MessageKind.TYPE_VARIABLE_IN_CONSTANT);
     }
+    // TODO(johniwinther): Avoid registration of `type` in face of redirecting
+    // factory constructors.
     registry.registerInstantiatedType(type);
     if (constructor.isFactoryConstructor && !type.typeArguments.isEmpty) {
       registry.registerFactoryWithTypeArguments();
@@ -3294,14 +3312,16 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     if (isSymbolConstructor) {
       if (node.isConst) {
         Node argumentNode = node.send.arguments.head;
-        Constant name = compiler.resolver.constantCompiler.compileNode(
-            argumentNode, registry.mapping);
+        ConstantExpression constant =
+            compiler.resolver.constantCompiler.compileNode(
+                argumentNode, registry.mapping);
+        ConstantValue name = constant.value;
         if (!name.isString) {
           DartType type = name.computeType(compiler);
           compiler.reportError(argumentNode, MessageKind.STRING_EXPECTED,
                                    {'type': type});
         } else {
-          StringConstant stringConstant = name;
+          StringConstantValue stringConstant = name;
           String nameString = stringConstant.toDartString().slowToString();
           if (validateSymbol(argumentNode, nameString)) {
             registry.registerConstSymbol(nameString);
@@ -3327,10 +3347,10 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
   }
 
   void checkConstMapKeysDontOverrideEquals(Spannable spannable,
-                                           MapConstant map) {
-    for (Constant key in map.keys) {
+                                           MapConstantValue map) {
+    for (ConstantValue key in map.keys) {
       if (!key.isObject) continue;
-      ObjectConstant objectConstant = key;
+      ObjectConstantValue objectConstant = key;
       DartType keyType = objectConstant.type;
       ClassElement cls = keyType.element;
       if (cls == compiler.stringClass) continue;
@@ -3345,11 +3365,13 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
 
   void analyzeConstant(Node node) {
     addDeferredAction(enclosingElement, () {
-      Constant constant = compiler.resolver.constantCompiler.compileNode(
-          node, registry.mapping);
+      ConstantExpression constant =
+          compiler.resolver.constantCompiler.compileNode(
+              node, registry.mapping);
 
-      if (constant.isMap) {
-        checkConstMapKeysDontOverrideEquals(node, constant);
+      ConstantValue value = constant.value;
+      if (value.isMap) {
+        checkConstMapKeysDontOverrideEquals(node, value);
       }
 
       // The type constant that is an argument to JS_INTERCEPTOR_CONSTANT names
@@ -3357,8 +3379,8 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
       // native class dispatch record referencing the interceptor.
       if (argumentsToJsInterceptorConstant != null &&
           argumentsToJsInterceptorConstant.contains(node)) {
-        if (constant.isType) {
-          TypeConstant typeConstant = constant;
+        if (value.isType) {
+          TypeConstantValue typeConstant = value;
           if (typeConstant.representedType is InterfaceType) {
             registry.registerInstantiatedType(typeConstant.representedType);
           } else {
@@ -3694,7 +3716,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     visit(node.expression);
   }
 
-  DartType typeOfConstant(Constant constant) {
+  DartType typeOfConstant(ConstantValue constant) {
     if (constant.isInt) return compiler.intClass.rawType;
     if (constant.isBool) return compiler.boolClass.rawType;
     if (constant.isDouble) return compiler.doubleClass.rawType;
@@ -3702,7 +3724,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     if (constant.isNull) return compiler.nullClass.rawType;
     if (constant.isFunction) return compiler.functionClass.rawType;
     assert(constant.isObject);
-    ObjectConstant objectConstant = constant;
+    ObjectConstantValue objectConstant = constant;
     return objectConstant.type;
   }
 
@@ -3717,7 +3739,6 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
     Map<String, LabelDefinition> continueLabels = <String, LabelDefinition>{};
 
     Link<Node> cases = node.cases.nodes;
-    SwitchCase switchCase = cases.head;
     CaseMatch firstCase = null;
     DartType firstCaseType = null;
     bool hasReportedProblem = false;
@@ -3732,11 +3753,12 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
         if (caseMatch == null) continue;
 
         // Analyze the constant.
-        Constant constant = registry.getConstant(caseMatch.expression);
+        ConstantExpression constant =
+            registry.getConstant(caseMatch.expression);
         assert(invariant(node, constant != null,
             message: 'No constant computed for $node'));
 
-        DartType caseType = typeOfConstant(constant);
+        DartType caseType = typeOfConstant(constant.value);
 
         if (firstCaseType == null) {
           firstCase = caseMatch;
@@ -3751,7 +3773,7 @@ class ResolverVisitor extends MappingVisitor<ResolutionResult> {
           } else if (caseType.element == compiler.functionClass) {
             compiler.reportError(node, MessageKind.SWITCH_CASE_FORBIDDEN,
                                  {'type': "Function"});
-          } else if (constant.isObject && overridesEquals(caseType)) {
+          } else if (constant.value.isObject && overridesEquals(caseType)) {
             compiler.reportError(firstCase.expression,
                 MessageKind.SWITCH_CASE_VALUE_OVERRIDES_EQUALS,
                 {'type': caseType});
@@ -4220,8 +4242,10 @@ class ClassResolverVisitor extends TypeDefinitionVisitor {
             kind, arguments, '', element);
         registry.registerThrowNoSuchMethod();
       } else {
+        ConstructorElement superConstructor = superMember;
         Selector callToMatch = new Selector.call("", element.library, 0);
-        if (!callToMatch.applies(superMember, compiler)) {
+        superConstructor.computeSignature(compiler);
+        if (!callToMatch.applies(superConstructor, compiler.world)) {
           MessageKind kind = MessageKind.NO_MATCHING_CONSTRUCTOR_FOR_IMPLICIT;
           compiler.reportError(node, kind);
           superMember = new ErroneousElementX(kind, {}, '', element);
@@ -4903,6 +4927,10 @@ abstract class AnalyzableElementX implements AnalyzableElement {
     assert(invariant(this, _treeElements !=null,
         message: "TreeElements have not been computed for $this."));
     return _treeElements;
+  }
+
+  void reuseElement() {
+    _treeElements = null;
   }
 }
 

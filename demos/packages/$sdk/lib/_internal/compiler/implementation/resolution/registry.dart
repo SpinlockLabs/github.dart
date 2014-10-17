@@ -31,6 +31,10 @@ class ResolutionRegistry extends Registry {
 
   /// Register [node] as the declaration of [element].
   void defineFunction(FunctionExpression node, FunctionElement element) {
+    // TODO(sigurdm): Remove when not needed by the dart2dart backend.
+    if (node.name != null) {
+      mapping[node.name] = element;
+    }
     mapping[node] = element;
   }
 
@@ -110,7 +114,7 @@ class ResolutionRegistry extends Registry {
   //  Node-to-Constant mapping functionality.
   //////////////////////////////////////////////////////////////////////////////
 
-  Constant getConstant(Node node) => mapping.getConstant(node);
+  ConstantExpression getConstant(Node node) => mapping.getConstant(node);
 
   //////////////////////////////////////////////////////////////////////////////
   //  Target/Label functionality.
@@ -201,8 +205,9 @@ class ResolutionRegistry extends Registry {
     backend.resolutionCallbacks.onLazyField(this);
   }
 
-  void registerMetadataConstant(Constant constant, Element annotatedElement) {
-    backend.registerMetadataConstant(constant, annotatedElement, this);
+  void registerMetadataConstant(MetadataAnnotation metadata,
+                                Element annotatedElement) {
+    backend.registerMetadataConstant(metadata, annotatedElement, this);
   }
 
   void registerThrowRuntimeError() {
@@ -261,6 +266,12 @@ class ResolutionRegistry extends Registry {
   // needed to lookup types in the current scope.
   void registerJsCall(Node node, ResolverVisitor visitor) {
     world.registerJsCall(node, visitor);
+  }
+
+  // TODO(johnniwinther): Remove the [ResolverVisitor] dependency. Its only
+  // needed to lookup types in the current scope.
+  void registerJsEmbeddedGlobalCall(Node node, ResolverVisitor visitor) {
+    world.registerJsEmbeddedGlobalCall(node, visitor);
   }
 
   void registerGetOfStaticFunction(FunctionElement element) {

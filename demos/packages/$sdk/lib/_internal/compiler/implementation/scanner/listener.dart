@@ -634,13 +634,13 @@ class Listener {
     return skipToEof(token);
   }
 
-  Link<Token> expectedDeclaration(Token token) {
+  Token expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       error("expected a declaration, but got '${token.value}'", token);
     }
-    return const Link<Token>();
+    return skipToEof(token);
   }
 
   Token unmatched(Token token) {
@@ -934,8 +934,9 @@ class ElementListener extends Listener {
     NodeList typeVariables = popNode(); // TOOD(karlklose): do not throw away.
     Identifier name = popNode();
     TypeAnnotation returnType = popNode();
-    pushElement(new PartialTypedefElement(name.source, compilationUnitElement,
-                                          typedefKeyword));
+    pushElement(
+        new PartialTypedefElement(
+            name.source, compilationUnitElement, typedefKeyword, endToken));
     rejectBuiltInIdentifier(name);
   }
 
@@ -1115,8 +1116,50 @@ class ElementListener extends Listener {
   /// Finds the preceding token via the begin token of the last AST node pushed
   /// on the [nodes] stack.
   Token findPrecedingToken(Token token) {
-    if (!nodes.isEmpty && nodes.head != null) {
-      Token current = nodes.head.getBeginToken();
+    Token result;
+    Link<Node> nodes = this.nodes;
+    while (!nodes.isEmpty) {
+      result = findPrecedingTokenFromNode(nodes.head, token);
+      if (result != null) {
+        return result;
+      }
+      nodes = nodes.tail;
+    }
+    if (compilationUnitElement != null) {
+      if (compilationUnitElement is CompilationUnitElementX) {
+        CompilationUnitElementX unit = compilationUnitElement;
+        Link<Element> members = unit.localMembers;
+        while (!members.isEmpty) {
+          ElementX member = members.head;
+          DeclarationSite site = member.declarationSite;
+          if (site is PartialElement) {
+            result = findPrecedingTokenFromToken(site.endToken, token);
+            if (result != null) {
+              return result;
+            }
+          }
+          members = members.tail;
+        }
+        result =
+            findPrecedingTokenFromNode(compilationUnitElement.partTag, token);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return token;
+  }
+
+  Token findPrecedingTokenFromNode(Node node, Token token) {
+    if (node != null) {
+      return findPrecedingTokenFromToken(node.getBeginToken(), token);
+    }
+    return null;
+  }
+
+  Token findPrecedingTokenFromToken(Token start, Token token) {
+    if (start != null) {
+      Token current = start;
       while (current.kind != EOF_TOKEN && current.next != token) {
         current = current.next;
       }
@@ -1124,7 +1167,7 @@ class ElementListener extends Listener {
         return current;
       }
     }
-    return token;
+    return null;
   }
 
   Token expectedIdentifier(Token token) {
@@ -1213,14 +1256,14 @@ class ElementListener extends Listener {
     return unexpected(token);
   }
 
-  Link<Token> expectedDeclaration(Token token) {
+  Token expectedDeclaration(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
     } else {
       reportFatalError(token,
                        "Expected a declaration, but got '${token.value}'.");
     }
-    return const Link<Token>();
+    return skipToEof(token);
   }
 
   Token unmatched(Token token) {
@@ -1604,6 +1647,7 @@ class NodeListener extends ElementListener {
   Token expectedClassBody(Token token) {
     if (token is ErrorToken) {
       reportErrorToken(token);
+      return skipToEof(token);
     } else {
       reportFatalError(token,
                        "Expected a class body, but got '${token.value}'.");
@@ -2168,13 +2212,15 @@ class NodeListener extends ElementListener {
   }
 }
 
-abstract class PartialElement implements Element {
-  Token get beginToken;
-  Token get endToken;
+abstract class PartialElement implements DeclarationSite {
+  Token beginToken;
+  Token endToken;
 
   bool hasParseError = false;
 
   bool get isErroneous => hasParseError;
+
+  DeclarationSite get declarationSite => this;
 }
 
 abstract class PartialFunctionMixin implements FunctionElement {
@@ -2223,6 +2269,10 @@ abstract class PartialFunctionMixin implements FunctionElement {
   }
 
   Token get position => _position;
+
+  void reusePartialFunctionMixin() {
+    cachedNode = null;
+  }
 }
 
 class PartialFunctionElement extends FunctionElementX
@@ -2238,6 +2288,11 @@ class PartialFunctionElement extends FunctionElementX
       : super(name, kind, modifiers, enclosing, hasNoBody) {
     init(beginToken, getOrSet, endToken);
   }
+
+  void reuseElement() {
+    super.reuseElement();
+    reusePartialFunctionMixin();
+  }
 }
 
 class PartialConstructorElement extends ConstructorElementX
@@ -2251,18 +2306,23 @@ class PartialConstructorElement extends ConstructorElementX
       : super(name, kind, modifiers, enclosing) {
     init(beginToken, null, endToken);
   }
+
+  void reuseElement() {
+    super.reuseElement();
+    reusePartialFunctionMixin();
+  }
 }
 
-class PartialFieldList extends VariableList {
-  final Token beginToken;
-  final Token endToken;
-  final bool hasParseError;
-
-  PartialFieldList(this.beginToken,
-                   this.endToken,
+class PartialFieldList extends VariableList with PartialElement {
+  PartialFieldList(Token beginToken,
+                   Token endToken,
                    Modifiers modifiers,
-                   this.hasParseError)
-      : super(modifiers);
+                   bool hasParseError)
+      : super(modifiers) {
+    super.beginToken = beginToken;
+    super.endToken = endToken;
+    super.hasParseError = hasParseError;
+  }
 
   VariableDefinitions parseNode(Element element, DiagnosticListener listener) {
     if (definitions != null) return definitions;
@@ -2308,11 +2368,19 @@ class PartialFieldList extends VariableList {
   }
 }
 
-class PartialTypedefElement extends TypedefElementX {
-  final Token token;
+class PartialTypedefElement extends TypedefElementX with PartialElement {
 
-  PartialTypedefElement(String name, Element enclosing, this.token)
-      : super(name, enclosing);
+  PartialTypedefElement(
+      String name,
+      Element enclosing,
+      Token beginToken,
+      Token endToken)
+      : super(name, enclosing) {
+    this.beginToken = beginToken;
+    this.endToken = endToken;
+  }
+
+  Token get token => beginToken;
 
   Node parseNode(DiagnosticListener listener) {
     if (cachedNode != null) return cachedNode;
@@ -2351,6 +2419,13 @@ class PartialMetadataAnnotation extends MetadataAnnotationX {
     cachedNode = metadata.expression;
     return cachedNode;
   }
+
+  bool get hasNode => cachedNode != null;
+
+  Node get node {
+    assert(invariant(this, hasNode));
+    return cachedNode;
+  }
 }
 
 Node parse(DiagnosticListener diagnosticListener,
@@ -2364,7 +2439,8 @@ Node parse(DiagnosticListener diagnosticListener,
     doParse(new Parser(listener));
   } on ParserError catch (e) {
     if (element is PartialElement) {
-      element.hasParseError = true;
+      PartialElement partial = element as PartialElement;
+      partial.hasParseError = true;
     }
     return new ErrorNode(element.position, e.reason);
   }

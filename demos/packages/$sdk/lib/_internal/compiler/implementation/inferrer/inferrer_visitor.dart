@@ -11,6 +11,7 @@ import '../tree/tree.dart';
 import '../universe/universe.dart';
 import '../util/util.dart';
 import '../types/types.dart' show TypeMask;
+import 'dart:collection' show IterableMixin;
 
 /**
  * The interface [InferrerVisitor] will use when working on types.
@@ -90,6 +91,12 @@ abstract class TypeSystem<T> {
    * Adds [newType] as an input of [phiType].
    */
   T addPhiInput(Local variable, T phiType, T newType);
+
+  /**
+   * Returns `true` if `selector` should be updated to reflect the new
+   * `receiverType`.
+   */
+  bool selectorNeedsUpdate(T receiverType, Selector selector);
 
   /**
    * Returns a new receiver type for this [selector] applied to
@@ -235,7 +242,7 @@ class FieldInitializationScope<T> {
 /**
  * Placeholder for inferred arguments types on sends.
  */
-class ArgumentsTypes<T> {
+class ArgumentsTypes<T> extends IterableMixin<T> {
   final List<T> positional;
   final Map<String, T> named;
   ArgumentsTypes(this.positional, named)
@@ -245,6 +252,8 @@ class ArgumentsTypes<T> {
   }
 
   int get length => positional.length + named.length;
+
+  Iterator<T> get iterator => new ArgumentsTypesIterator(this);
 
   String toString() => "{ positional = $positional, named = $named }";
 
@@ -281,6 +290,29 @@ class ArgumentsTypes<T> {
     return positional.contains(type) || named.containsValue(type);
   }
 }
+
+class ArgumentsTypesIterator<T> implements Iterator<T> {
+  final Iterator<T> positional;
+  final Iterator<T> named;
+  bool _iteratePositional = true;
+
+  ArgumentsTypesIterator(ArgumentsTypes<T> iteratee)
+      : positional = iteratee.positional.iterator,
+        named = iteratee.named.values.iterator;
+
+  Iterator<T> get _currentIterator => _iteratePositional ? positional : named;
+
+  T get current => _currentIterator.current;
+
+  bool moveNext() {
+    if (_iteratePositional && positional.moveNext()) {
+      return true;
+    }
+    _iteratePositional = false;
+    return named.moveNext();
+  }
+}
+
 
 abstract class MinimalInferrerEngine<T> {
   /**
@@ -596,6 +628,7 @@ class LocalsHandler<T> {
 
 abstract class InferrerVisitor
     <T, E extends MinimalInferrerEngine<T>> extends ResolvedVisitor<T> {
+  final Compiler compiler;
   final AstElement analyzedElement;
   final TypeSystem<T> types;
   final E inferrer;
@@ -626,12 +659,11 @@ abstract class InferrerVisitor
   InferrerVisitor(AstElement analyzedElement,
                   this.inferrer,
                   this.types,
-                  Compiler compiler,
+                  this.compiler,
                   [LocalsHandler<T> handler])
     : this.analyzedElement = analyzedElement,
       this.locals = handler,
-      super(analyzedElement.resolvedAst.elements,
-            compiler) {
+      super(analyzedElement.resolvedAst.elements) {
     if (handler != null) return;
     Node node = analyzedElement.node;
     FieldInitializationScope<T> fieldScope =
@@ -759,12 +791,11 @@ abstract class InferrerVisitor
   T get thisType {
     if (_thisType != null) return _thisType;
     ClassElement cls = outermostElement.enclosingClass;
-    if (compiler.world.isUsedAsMixin(cls)) {
+    ClassWorld classWorld = compiler.world;
+    if (classWorld.isUsedAsMixin(cls)) {
       return _thisType = types.nonNullSubtype(cls);
-    } else if (compiler.world.hasAnySubclass(cls)) {
-      return _thisType = types.nonNullSubclass(cls);
     } else {
-      return _thisType = types.nonNullExact(cls);
+      return _thisType = types.nonNullSubclass(cls);
     }
   }
 

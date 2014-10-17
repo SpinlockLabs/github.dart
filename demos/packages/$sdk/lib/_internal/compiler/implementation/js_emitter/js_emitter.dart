@@ -6,7 +6,8 @@ library dart2js.js_emitter;
 
 import '../common.dart';
 
-import '../js/js.dart' as jsAst;
+import '../constants/expressions.dart';
+import '../constants/values.dart';
 
 import '../closure.dart' show
     ClosureClassElement,
@@ -14,14 +15,23 @@ import '../closure.dart' show
     ClosureFieldElement,
     CapturedVariable;
 
+import '../dart_types.dart' show
+    TypedefType;
+
 import '../dart2jslib.dart' show
     CodeBuffer;
 
 import '../elements/elements.dart' show
-    TypeVariableElement,
     ConstructorBodyElement,
-    ParameterElement;
+    ElementKind,
+    ParameterElement,
+    TypeVariableElement;
 
+import '../hash/sha1.dart' show hashOfString;
+
+// import '../helpers/helpers.dart';  // Included for debug helpers.
+
+import '../js/js.dart' as jsAst;
 import '../js/js.dart' show
     js, templateManager;
 
@@ -39,7 +49,10 @@ import '../js_backend/js_backend.dart' show
     TypeChecks,
     TypeVariableHandler;
 
-import '../helpers/helpers.dart';
+import 'model.dart';
+import 'program_builder.dart';
+
+import 'new_emitter/emitter.dart' as new_js_emitter;
 
 import '../source_file.dart' show
     SourceFile,
@@ -69,17 +82,24 @@ import '../util/util.dart' show
 import '../deferred_load.dart' show
     OutputUnit;
 
-import '../runtime_data.dart' as encoding;
+import '../../js_lib/shared/runtime_data.dart' as encoding;
+import '../../js_lib/shared/embedded_names.dart' as embeddedNames;
 
-part 'class_builder.dart';
-part 'class_emitter.dart';
-part 'code_emitter_helper.dart';
+import '../hash/sha1.dart';
+
+part 'class_stub_generator.dart';
 part 'code_emitter_task.dart';
-part 'container_builder.dart';
-part 'declarations.dart';
 part 'helpers.dart';
-part 'interceptor_emitter.dart';
-part 'metadata_emitter.dart';
-part 'nsm_emitter.dart';
-part 'reflection_data_parser.dart';
-part 'type_test_emitter.dart';
+part 'interceptor_stub_generator.dart';
+
+part 'old_emitter/class_builder.dart';
+part 'old_emitter/class_emitter.dart';
+part 'old_emitter/code_emitter_helper.dart';
+part 'old_emitter/container_builder.dart';
+part 'old_emitter/declarations.dart';
+part 'old_emitter/emitter.dart';
+part 'old_emitter/interceptor_emitter.dart';
+part 'old_emitter/metadata_emitter.dart';
+part 'old_emitter/nsm_emitter.dart';
+part 'old_emitter/reflection_data_parser.dart';
+part 'old_emitter/type_test_emitter.dart';

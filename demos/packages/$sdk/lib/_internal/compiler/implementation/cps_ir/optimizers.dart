@@ -4,8 +4,17 @@
 
 library dart2js.optimizers;
 
+import '../constants/expressions.dart' show
+    ConstantExpression,
+    PrimitiveConstantExpression;
+import '../constants/values.dart';
+import '../dart_types.dart' as types;
+import '../dart2jslib.dart' as dart2js;
+import '../tree/tree.dart' show LiteralDartString;
+import '../util/util.dart';
 import 'cps_ir_nodes.dart';
 
+part 'constant_propagation.dart';
 part 'redundant_phi.dart';
 part 'shrinking_reductions.dart';
 

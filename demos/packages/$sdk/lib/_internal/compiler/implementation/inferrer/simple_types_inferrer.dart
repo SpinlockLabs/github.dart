@@ -9,7 +9,7 @@ import '../dart_types.dart'
     show DartType, InterfaceType, FunctionType, TypeKind;
 import '../elements/elements.dart';
 import '../js_backend/js_backend.dart' as js;
-import '../native_handler.dart' as native;
+import '../native/native.dart' as native;
 import '../tree/tree.dart' as ast;
 import '../cps_ir/cps_ir_nodes.dart' as cps_ir show Node;
 import '../util/util.dart' show Link, Spannable, Setlet;
@@ -29,7 +29,10 @@ import '../universe/universe.dart' show Selector, SideEffects, TypedSelector;
  */
 class TypeMaskSystem implements TypeSystem<TypeMask> {
   final Compiler compiler;
-  TypeMaskSystem(this.compiler);
+  final ClassWorld classWorld;
+  TypeMaskSystem(Compiler compiler)
+      : this.compiler = compiler,
+        this.classWorld = compiler.world;
 
   TypeMask narrowType(TypeMask type,
                       DartType annotation,
@@ -46,11 +49,11 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
       otherType = nullType;
     } else {
       assert(annotation.isInterfaceType);
-      otherType = new TypeMask.nonNullSubtype(annotation.element);
+      otherType = new TypeMask.nonNullSubtype(annotation.element, classWorld);
     }
     if (isNullable) otherType = otherType.nullable();
     if (type == null) return otherType;
-    return type.intersection(otherType, compiler);
+    return type.intersection(otherType, classWorld);
   }
 
   TypeMask computeLUB(TypeMask firstType, TypeMask secondType) {
@@ -61,10 +64,10 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
     } else if (firstType == secondType) {
       return firstType;
     } else {
-      TypeMask union = firstType.union(secondType, compiler);
+      TypeMask union = firstType.union(secondType, classWorld);
       // TODO(kasperl): If the union isn't nullable it seems wasteful
       // to use dynamic. Fix that.
-      return union.containsAll(compiler) ? dynamicType : union;
+      return union.containsAll(classWorld) ? dynamicType : union;
     }
   }
 
@@ -95,11 +98,11 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
   TypeMask stringLiteralType(ast.DartString value) => stringType;
 
   TypeMask nonNullSubtype(ClassElement type)
-      => new TypeMask.nonNullSubtype(type.declaration);
+      => new TypeMask.nonNullSubtype(type.declaration, classWorld);
   TypeMask nonNullSubclass(ClassElement type)
-      => new TypeMask.nonNullSubclass(type.declaration);
+      => new TypeMask.nonNullSubclass(type.declaration, classWorld);
   TypeMask nonNullExact(ClassElement type)
-      => new TypeMask.nonNullExact(type.declaration);
+      => new TypeMask.nonNullExact(type.declaration, classWorld);
   TypeMask nonNullEmpty() => new TypeMask.nonNullEmpty();
 
   TypeMask allocateList(TypeMask type,
@@ -119,7 +122,7 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
   }
 
   Selector newTypedSelector(TypeMask receiver, Selector selector) {
-    return new TypedSelector(receiver, selector, compiler);
+    return new TypedSelector(receiver, selector, compiler.world);
   }
 
   TypeMask addPhiInput(Local variable,
@@ -140,9 +143,13 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
     return phiType;
   }
 
+  bool selectorNeedsUpdate(TypeMask type, Selector selector) {
+    return type != selector.mask;
+  }
+
   TypeMask refineReceiver(Selector selector, TypeMask receiverType) {
     TypeMask newType = compiler.world.allFunctions.receiverType(selector);
-    return receiverType.intersection(newType, compiler);
+    return receiverType.intersection(newType, classWorld);
   }
 
   TypeMask getConcreteTypeFor(TypeMask mask) => mask;
@@ -156,16 +163,29 @@ class TypeMaskSystem implements TypeSystem<TypeMask> {
 abstract class InferrerEngine<T, V extends TypeSystem>
     implements MinimalInferrerEngine<T> {
   final Compiler compiler;
+  final ClassWorld classWorld;
   final V types;
   final Map<ast.Node, T> concreteTypes = new Map<ast.Node, T>();
   final Set<Element> generativeConstructorsExposingThis = new Set<Element>();
 
-  InferrerEngine(this.compiler, this.types);
+  InferrerEngine(Compiler compiler, this.types)
+      : this.compiler = compiler,
+        this.classWorld = compiler.world;
 
   /**
    * Records the default type of parameter [parameter].
    */
   void setDefaultTypeOfParameter(ParameterElement parameter, T type);
+
+  /**
+   * This helper breaks abstractions but is currently required to work around
+   * the wrong modelling of default values of optional parameters of
+   * synthetic constructors.
+   *
+   * TODO(johnniwinther): Remove once default values of synthetic parameters
+   * are fixed.
+   */
+  bool hasAlreadyComputedTypeOfParameterDefault(ParameterElement paramemter);
 
   /**
    * Returns the type of [element].
@@ -338,17 +358,8 @@ abstract class InferrerEngine<T, V extends TypeSystem>
         mappedType = types.nullType;
       } else if (type.isDynamic) {
         return types.dynamicType;
-      } else if (!compiler.world.hasAnySubtype(type.element)) {
-        mappedType = types.nonNullExact(type.element);
       } else {
-        ClassElement element = type.element;
-        Set<ClassElement> subtypes = compiler.world.subtypesOf(element);
-        Set<ClassElement> subclasses = compiler.world.subclassesOf(element);
-        if (subclasses != null && subtypes.length == subclasses.length) {
-          mappedType = types.nonNullSubclass(element);
-        } else {
-          mappedType = types.nonNullSubtype(element);
-        }
+        mappedType = types.nonNullSubtype(type.element);
       }
       returnType = types.computeLUB(returnType, mappedType);
       if (returnType == types.dynamicType) {
@@ -479,7 +490,19 @@ class SimpleTypeInferrerVisitor<T>
     FunctionSignature signature = function.functionSignature;
     signature.forEachOptionalParameter((ParameterElement element) {
       ast.Expression defaultValue = element.initializer;
-      T type = (defaultValue == null) ? types.nullType : visit(defaultValue);
+      // If this is a default value from a different context (because
+      // the current function is synthetic, e.g., a constructor from
+      // a mixin application), we have to start a new inferrer visitor
+      // with the correct context.
+      // TODO(johnniwinther): Remove once function signatures are fixed.
+      SimpleTypeInferrerVisitor visitor = this;
+      if (inferrer.hasAlreadyComputedTypeOfParameterDefault(element)) return;
+      if (element.functionDeclaration != analyzedElement) {
+        visitor = new SimpleTypeInferrerVisitor(
+            element.functionDeclaration, compiler, inferrer);
+      }
+      T type =
+          (defaultValue == null) ? types.nullType : visitor.visit(defaultValue);
       inferrer.setDefaultTypeOfParameter(element, type);
     });
 
@@ -526,7 +549,7 @@ class SimpleTypeInferrerVisitor<T>
         // exists.
         if (!isConstructorRedirect
             && !seenSuperConstructorCall
-            && !cls.isObject(compiler)) {
+            && !cls.isObject) {
           Selector selector =
               new Selector.callDefaultConstructor(analyzedElement.library);
           FunctionElement target = cls.superclass.lookupConstructor(selector);
@@ -573,6 +596,11 @@ class SimpleTypeInferrerVisitor<T>
   }
 
   T visitFunctionExpression(ast.FunctionExpression node) {
+    // We loose track of [this] in closures (see issue 20840). To be on
+    // the safe side, we mark [this] as exposed here. We could do better by
+    // analyzing the closure.
+    // TODO(herhut): Analyze whether closure exposes this.
+    isThisExposed = true;
     LocalFunctionElement element = elements.getFunctionDefinition(node);
     // We don't put the closure in the work queue of the
     // inferrer, because it will share information with its enclosing
@@ -680,9 +708,9 @@ class SimpleTypeInferrerVisitor<T>
   bool isThisOrSuper(ast.Node node) => node.isThis() || node.isSuper();
 
   bool isInClassOrSubclass(Element element) {
-    ClassElement cls = outermostElement.enclosingClass;
-    ClassElement enclosing = element.enclosingClass;
-    return (enclosing == cls) || compiler.world.isSubclass(cls, enclosing);
+    ClassElement cls = outermostElement.enclosingClass.declaration;
+    ClassElement enclosing = element.enclosingClass.declaration;
+    return compiler.world.isSubclassOf(enclosing, cls);
   }
 
   void checkIfExposesThis(Selector selector) {
@@ -842,7 +870,7 @@ class SimpleTypeInferrerVisitor<T>
             node, operatorSelector, getterType, operatorArguments);
         handleDynamicSend(node, setterSelector, receiverType,
                           new ArgumentsTypes<T>([newType], null));
-      } else if (Elements.isLocal(element)) {
+      } else if (element.isLocal) {
         LocalElement local = element;
         getterType = locals.use(local);
         newType = handleDynamicSend(
@@ -908,7 +936,7 @@ class SimpleTypeInferrerVisitor<T>
               node, setterSelector, receiverType, arguments);
         }
       }
-    } else if (Elements.isLocal(element)) {
+    } else if (element.isLocal) {
       locals.update(element, rhsType, node);
     }
     return rhsType;
@@ -928,7 +956,7 @@ class SimpleTypeInferrerVisitor<T>
     // are calling does not expose this.
     isThisExposed = true;
     if (Elements.isUnresolved(element)
-        || !selector.applies(element, compiler)) {
+        || !selector.applies(element, compiler.world)) {
       // Ensure we create a node, to make explicit the call to the
       // `noSuchMethod` handler.
       return handleDynamicSend(node, selector, superType, arguments);
@@ -956,8 +984,8 @@ class SimpleTypeInferrerVisitor<T>
                && compiler.world.fieldNeverChanges(element)) {
       var constant =
           compiler.backend.constants.getConstantForVariable(element);
-      if (constant != null && constant.isInt) {
-        return constant.value;
+      if (constant != null && constant.value.isInt) {
+        return constant.value.primitiveValue;
       }
     }
     return null;
@@ -978,14 +1006,26 @@ class SimpleTypeInferrerVisitor<T>
         analyzeSuperConstructorCall(element, arguments);
       }
     }
-    if (element.isForeign(compiler)) {
+    // If we are looking at a new expression on a forwarding factory,
+    // we have to forward the call to the effective target of the
+    // factory.
+    if (element.isFactoryConstructor) {
+      // TODO(herhut): Remove the while loop once effectiveTarget forwards to
+      //               patches.
+      while (element.isFactoryConstructor) {
+        ConstructorElement constructor = element;
+        if (!constructor.isRedirectingFactory) break;
+        element = constructor.effectiveTarget.implementation;
+      }
+    }
+    if (element.isForeign(compiler.backend)) {
       return handleForeignSend(node);
     }
     Selector selector = elements.getSelector(node);
     // In erroneous code the number of arguments in the selector might not
     // match the function element.
     // TODO(polux): return nonNullEmpty and check it doesn't break anything
-    if (!selector.applies(element, compiler)) return types.dynamicType;
+    if (!selector.applies(element, compiler.world)) return types.dynamicType;
 
     T returnType = handleStaticSend(node, selector, element, arguments);
     if (Elements.isGrowableListConstructorCall(element, node, compiler)) {
@@ -1031,7 +1071,7 @@ class SimpleTypeInferrerVisitor<T>
     Selector selector = elements.getSelector(node);
     String name = selector.name;
     handleStaticSend(node, selector, elements[node], arguments);
-    if (name == 'JS') {
+    if (name == 'JS' || name == 'JS_EMBEDDED_GLOBAL') {
       native.NativeBehavior nativeBehavior =
           compiler.enqueuer.resolution.nativeEnqueuer.getNativeBehaviorOf(node);
       sideEffects.add(nativeBehavior.sideEffects);
@@ -1079,7 +1119,7 @@ class SimpleTypeInferrerVisitor<T>
       return handleStaticSend(node, selector, element, null);
     } else if (Elements.isErroneousElement(element)) {
       return types.dynamicType;
-    } else if (Elements.isLocal(element)) {
+    } else if (element.isLocal) {
       LocalElement local = element;
       assert(locals.use(local) != null);
       return locals.use(local);
@@ -1096,7 +1136,7 @@ class SimpleTypeInferrerVisitor<T>
     Element element = elements[node];
     Selector selector = elements.getSelector(node);
     if (element != null && element.isFunction) {
-      assert(Elements.isLocal(element));
+      assert(element.isLocal);
       // This only works for function statements. We need a
       // more sophisticated type system with function types to support
       // more.
@@ -1114,6 +1154,8 @@ class SimpleTypeInferrerVisitor<T>
                      Selector selector,
                      Element element,
                      ArgumentsTypes arguments) {
+    assert(!element.isFactoryConstructor ||
+           !(element as ConstructorElement).isRedirectingFactory);
     // Erroneous elements may be unresolved, for example missing getters.
     if (Elements.isUnresolved(element)) return types.dynamicType;
     // TODO(herhut): should we follow redirecting constructors here? We would
@@ -1129,7 +1171,7 @@ class SimpleTypeInferrerVisitor<T>
                       T receiverType,
                       ArgumentsTypes arguments) {
     assert(receiverType != null);
-    if (selector.mask != receiverType) {
+    if (types.selectorNeedsUpdate(receiverType, selector)) {
       selector = (receiverType == types.dynamicType)
           ? selector.asUntyped
           : types.newTypedSelector(receiverType, selector);

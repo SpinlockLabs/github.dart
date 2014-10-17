@@ -1,11 +1,11 @@
 part of github.common;
 
-/// The [UsersService] handles communication with authorizations related methods 
+/// The [AuthorizationsService] handles communication with authorizations related methods 
 /// of the GitHub API.
 /// 
 /// Note: You can only access this API via Basic Authentication using your 
 /// username and password, not tokens.
-///  
+///
 /// API docs: https://developer.github.com/v3/oauth_authorizations/
 class AuthorizationsService extends Service {
   

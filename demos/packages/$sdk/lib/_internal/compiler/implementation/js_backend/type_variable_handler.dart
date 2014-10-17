@@ -36,7 +36,7 @@ class TypeVariableHandler {
 
   ClassElement get typeVariableClass => backend.typeVariableClass;
   CodeEmitterTask get task => backend.emitter;
-  MetadataEmitter get emitter => task.metadataEmitter;
+  MetadataEmitter get emitter => task.oldEmitter.metadataEmitter;
   Compiler get compiler => backend.compiler;
 
   void registerClassWithTypeVariables(ClassElement cls) {
@@ -65,27 +65,42 @@ class TypeVariableHandler {
     List<int> constants = <int>[];
 
     for (TypeVariableType currentTypeVariable in cls.typeVariables) {
-      List<Constant> createArguments(FunctionElement constructor) {
-      if (constructor != typeVariableConstructor) {
-          compiler.internalError(currentTypeVariable.element,
-              'Unexpected constructor $constructor');
-        }
-        Constant name = backend.constantSystem.createString(
-            new DartString.literal(currentTypeVariable.name));
-        Constant bound = backend.constantSystem.createInt(
-            emitter.reifyType(currentTypeVariable.element.bound));
-        Constant type = backend.constants.createTypeConstant(cls);
-        return [type, name, bound];
+      TypeVariableElement typeVariableElement = currentTypeVariable.element;
+
+      AstConstant wrapConstant(ConstantExpression constant) {
+        return new AstConstant(typeVariableElement,
+                                     typeVariableElement.node,
+                                     constant);
       }
 
-      Constant c = CompileTimeConstantEvaluator.makeConstructedConstant(
-          compiler, backend.constants,
-          currentTypeVariable.element, typeVariableType,
-          typeVariableConstructor, createArguments);
-      backend.registerCompileTimeConstant(c, compiler.globalDependencies);
-      backend.constants.addCompileTimeConstantForEmission(c);
+      ConstantExpression name = new PrimitiveConstantExpression(
+          backend.constantSystem.createString(
+              new DartString.literal(currentTypeVariable.name)));
+      ConstantExpression bound = new PrimitiveConstantExpression(
+          backend.constantSystem.createInt(
+              emitter.reifyType(typeVariableElement.bound)));
+      ConstantExpression type = backend.constants.createTypeConstant(cls);
+      List<AstConstant> arguments =
+          [wrapConstant(type), wrapConstant(name), wrapConstant(bound)];
+
+      // TODO(johnniwinther): Support a less front-end specific creation of
+      // constructed constants.
+      AstConstant constant =
+          CompileTimeConstantEvaluator.makeConstructedConstant(
+              compiler,
+              backend.constants,
+              typeVariableElement,
+              typeVariableElement.node,
+              typeVariableType,
+              typeVariableConstructor,
+              new Selector.callConstructor('', null, 3),
+              arguments,
+              arguments);
+      ConstantValue value = constant.value;
+      backend.registerCompileTimeConstant(value, compiler.globalDependencies);
+      backend.constants.addCompileTimeConstantForEmission(value);
       constants.add(
-          reifyTypeVariableConstant(c, currentTypeVariable.element));
+          reifyTypeVariableConstant(value, currentTypeVariable.element));
     }
     typeVariables[cls] = constants;
   }
@@ -121,9 +136,9 @@ class TypeVariableHandler {
    * entry in the list has already been reserved and the constant is added
    * there, otherwise a new entry for [c] is created.
    */
-  int reifyTypeVariableConstant(Constant c, TypeVariableElement variable) {
-    String name =
-        jsAst.prettyPrint(task.constantReference(c), compiler).getText();
+  int reifyTypeVariableConstant(ConstantValue c, TypeVariableElement variable) {
+    String name = jsAst.prettyPrint(task.constantReference(c),
+                                    compiler).getText();
     int index;
     if (typeVariableConstants.containsKey(variable)) {
       index = typeVariableConstants[variable];
@@ -137,8 +152,7 @@ class TypeVariableHandler {
 
   /**
    * Returns the index pointing to the constant in [emitter.globalMetadata]
-   * representing this type variable
-   *.
+   * representing this type variable.
    *
    * If the constant has not yet been constructed, an entry is  allocated in
    * the global metadata list and the index pointing to this entry is returned.

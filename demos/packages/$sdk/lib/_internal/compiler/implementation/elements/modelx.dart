@@ -5,7 +5,8 @@
 library elements.modelx;
 
 import 'elements.dart';
-import '../helpers/helpers.dart';
+import '../constants/expressions.dart';
+import '../helpers/helpers.dart';  // Included for debug helpers.
 import '../tree/tree.dart';
 import '../util/util.dart';
 import '../resolution/resolution.dart';
@@ -24,6 +25,7 @@ import '../dart2jslib.dart' show invariant,
                                  Selector,
                                  Constant,
                                  Compiler,
+                                 Backend,
                                  isPrivateName;
 
 import '../dart_types.dart';
@@ -36,6 +38,9 @@ import '../scanner/scannerlib.dart' show
 import '../ordered_typeset.dart' show OrderedTypeSet;
 
 import 'visitor.dart' show ElementVisitor;
+
+abstract class DeclarationSite {
+}
 
 abstract class ElementX extends Element {
   static int elementHashCode = 0;
@@ -116,6 +121,8 @@ abstract class ElementX extends Element {
   bool get isForwardingConstructor => false;
 
   bool get isMixinApplication => false;
+
+  bool get isLocal => false;
 
   // TODO(johnniwinther): This breaks for libraries (for which enclosing
   // elements are null) and is invalid for top level variable declarations for
@@ -245,7 +252,7 @@ abstract class ElementX extends Element {
   FunctionElement asFunctionElement() => null;
 
   bool get isAbstract => modifiers.isAbstract;
-  bool isForeign(Compiler compiler) => compiler.backend.isForeign(this);
+  bool isForeign(Backend backend) => backend.isForeign(this);
 
   void diagnose(Element context, DiagnosticListener listener) {}
 
@@ -258,6 +265,8 @@ abstract class ElementX extends Element {
     if (element.isAbstractField || element.isPrefix) return element.library;
     return element;
   }
+
+  DeclarationSite get declarationSite => null;
 }
 
 class ErroneousElementX extends ElementX implements ErroneousElement {
@@ -267,6 +276,8 @@ class ErroneousElementX extends ElementX implements ErroneousElement {
   ErroneousElementX(this.messageKind, this.messageArguments,
                     String name, Element enclosing)
       : super(name, ElementKind.ERROR, enclosing);
+
+  bool get isTopLevel => false;
 
   bool get isSynthesized => true;
 
@@ -295,11 +306,13 @@ class ErroneousElementX extends ElementX implements ErroneousElement {
 
   computeSignature(compiler) => unsupported();
 
+  bool get hasFunctionSignature => false;
+
   get effectiveTarget => this;
 
   computeEffectiveTargetType(InterfaceType newType) => unsupported();
 
-  get definingConstructor => this;
+  get definingConstructor => null;
 
   FunctionElement asFunctionElement() => this;
 
@@ -425,6 +438,8 @@ class AmbiguousElementX extends ElementX implements AmbiguousElement {
   }
 
   accept(ElementVisitor visitor) => visitor.visitAmbiguousElement(this);
+
+  bool get isTopLevel => false;
 }
 
 class ScopeX {
@@ -735,6 +750,8 @@ class LibraryElementX
     }
   }
 
+  bool get isDartCore => canonicalUri == Compiler.DART_CORE;
+
   Link<MetadataAnnotation> get metadata {
     return (libraryTag == null) ? super.metadata : libraryTag.metadata;
   }
@@ -976,6 +993,8 @@ class PrefixElementX extends ElementX implements PrefixElement {
   PrefixElementX(String prefix, Element enclosing, this.firstPosition)
       : super(prefix, ElementKind.PREFIX, enclosing);
 
+  bool get isTopLevel => false;
+
   Element lookupLocalMember(String memberName) => importScope[memberName];
 
   DartType computeType(Compiler compiler) => const DynamicType();
@@ -1069,7 +1088,7 @@ class TypedefElementX extends ElementX
 // This class holds common information for a list of variable or field
 // declarations. It contains the node, and the type. A [VariableElementX]
 // forwards its [computeType] and [parseNode] methods to this class.
-class VariableList {
+class VariableList implements DeclarationSite {
   VariableDefinitions definitions;
   DartType type;
   final Modifiers modifiers;
@@ -1198,6 +1217,8 @@ abstract class VariableElementX extends ElementX with AstElementMixin
   Token get position => token;
 
   accept(ElementVisitor visitor) => visitor.visitVariableElement(this);
+
+  DeclarationSite get declarationSite => variables;
 }
 
 class LocalVariableElementX extends VariableElementX
@@ -1220,6 +1241,8 @@ class LocalVariableElementX extends VariableElementX
   ExecutableElement get executableContext => enclosingElement;
 
   ExecutableElement get memberContext => executableContext.memberContext;
+
+  bool get isLocal => true;
 }
 
 class FieldElementX extends VariableElementX
@@ -1235,6 +1258,11 @@ class FieldElementX extends VariableElementX
   accept(ElementVisitor visitor) => visitor.visitFieldElement(this);
 
   MemberElement get memberContext => this;
+
+  void reuseElement() {
+    super.reuseElement();
+    nestedClosures.clear();
+  }
 }
 
 /// [Element] for a parameter-like element.
@@ -1321,6 +1349,8 @@ abstract class ParameterElementX extends FormalElementX
   MemberElement get memberContext => executableContext.memberContext;
 
   accept(ElementVisitor visitor) => visitor.visitParameterElement(this);
+
+  bool get isLocal => true;
 }
 
 class LocalParameterElementX extends ParameterElementX
@@ -1350,6 +1380,8 @@ class InitializingFormalElementX extends ParameterElementX
   accept(ElementVisitor visitor) => visitor.visitFieldParameterElement(this);
 
   MemberElement get memberContext => enclosingElement;
+
+  bool get isLocal => false;
 }
 
 
@@ -1413,6 +1445,7 @@ class AbstractFieldElementX extends ElementX implements AbstractFieldElement {
 
 // TODO(johnniwinther): [FunctionSignature] should be merged with
 // [FunctionType].
+// TODO(karlklose): all these lists should have element type [FormalElement].
 class FunctionSignatureX implements FunctionSignature {
   final Link<Element> requiredParameters;
   final Link<Element> optionalParameters;
@@ -1421,14 +1454,17 @@ class FunctionSignatureX implements FunctionSignature {
   final bool optionalParametersAreNamed;
   final List<Element> orderedOptionalParameters;
   final FunctionType type;
+  final bool hasOptionalParameters;
 
   FunctionSignatureX(this.requiredParameters,
-                     this.optionalParameters,
+                     Link<Element> optionalParameters,
                      this.requiredParameterCount,
                      this.optionalParameterCount,
                      this.optionalParametersAreNamed,
                      this.orderedOptionalParameters,
-                     this.type);
+                     this.type)
+      : optionalParameters = optionalParameters,
+        hasOptionalParameters = !optionalParameters.isEmpty;
 
   void forEachRequiredParameter(void function(Element parameter)) {
     for (Link<Element> link = requiredParameters;
@@ -1527,10 +1563,12 @@ abstract class BaseFunctionElementX
            && !isStatic;
   }
 
+  bool get hasFunctionSignature => functionSignatureCache != null;
+
   FunctionSignature computeSignature(Compiler compiler) {
     if (functionSignatureCache != null) return functionSignatureCache;
     compiler.withCurrentElement(this, () {
-      functionSignatureCache = compiler.resolveSignature(this);
+      functionSignatureCache = compiler.resolver.resolveSignature(this);
     });
     return functionSignatureCache;
   }
@@ -1587,6 +1625,13 @@ abstract class FunctionElementX extends BaseFunctionElementX
       : super(name, kind, modifiers, enclosing, hasNoBody);
 
   MemberElement get memberContext => this;
+
+  void reuseElement() {
+    super.reuseElement();
+    nestedClosures.clear();
+    functionSignatureCache = null;
+    typeCache = null;
+  }
 }
 
 class LocalFunctionElementX extends BaseFunctionElementX
@@ -1616,6 +1661,8 @@ class LocalFunctionElementX extends BaseFunctionElementX
       return node.getBeginToken();
     }
   }
+
+  bool get isLocal => true;
 }
 
 abstract class ConstructorElementX extends FunctionElementX
@@ -1683,7 +1730,7 @@ class DeferredLoaderGetterElementX extends FunctionElementX {
 
   bool get isClassMember => false;
 
-  bool isForeign(Compiler compiler) => true;
+  bool isForeign(Backend backend) => true;
 
   bool get isSynthesized => true;
 
@@ -1693,6 +1740,7 @@ class DeferredLoaderGetterElementX extends FunctionElementX {
 
   bool get isGetter => true;
 
+  bool get isTopLevel => true;
   // By having position null, the enclosing elements location is printed in
   // error messages.
   Token get position => null;
@@ -1958,11 +2006,11 @@ abstract class BaseClassElementX extends ElementX
     return allSupertypesAndSelf.asInstanceOf(cls);
   }
 
-  /**
-   * Return [:true:] if this element is the [:Object:] class for the [compiler].
-   */
-  bool isObject(Compiler compiler) =>
-      identical(declaration, compiler.objectClass);
+  bool get isObject {
+    assert(invariant(this, isResolved,
+        message: "isObject has not been computed for $this."));
+    return supertype == null;
+  }
 
   void ensureResolved(Compiler compiler) {
     if (resolutionState == STATE_NOT_STARTED) {
@@ -2036,16 +2084,15 @@ abstract class BaseClassElementX extends ElementX
    * When called on the implementation element both members declared in the
    * origin and the patch class are returned.
    */
-  Element lookupSelector(Selector selector, Compiler compiler) {
-    return internalLookupSelector(selector, compiler, false);
+  Element lookupSelector(Selector selector) {
+    return internalLookupSelector(selector, false);
   }
 
-  Element lookupSuperSelector(Selector selector, Compiler compiler) {
-    return internalLookupSelector(selector, compiler, true);
+  Element lookupSuperSelector(Selector selector) {
+    return internalLookupSelector(selector, true);
   }
 
   Element internalLookupSelector(Selector selector,
-                                 Compiler compiler,
                                  bool isSuperLookup) {
     String name = selector.name;
     bool isPrivate = isPrivateName(name);
@@ -2272,8 +2319,13 @@ abstract class BaseClassElementX extends ElementX
   bool get isNative => nativeTagInfo != null;
 
   void setNative(String name) {
-    assert(invariant(this, nativeTagInfo == null,
-        message: "Native tag info set twice on $this."));
+    // TODO(johnniwinther): Assert that this is only called once. The memory
+    // compiler copies pre-processed elements into a new compiler through
+    // [Compiler.onLibraryScanned] and thereby causes multiple calls to this
+    // method.
+    assert(invariant(this, nativeTagInfo == null || nativeTagInfo == name,
+        message: "Native tag info set inconsistently on $this: "
+                 "Existing name '$nativeTagInfo', new name '$name'."));
     nativeTagInfo = name;
   }
 
@@ -2565,7 +2617,7 @@ class TypeVariableElementX extends ElementX with AstElementMixin
  *
  * In this example, there are three instances of [MetadataAnnotation]
  * and they correspond each to a location in the source code where
- * there is an at-sign, '@'. The [value] of each of these instances
+ * there is an at-sign, '@'. The [constant] of each of these instances
  * are the same compile-time constant, [: const Data() :].
  *
  * The mirror system does not have a concept matching this class.
@@ -2575,7 +2627,7 @@ abstract class MetadataAnnotationX implements MetadataAnnotation {
    * The compile-time constant which this annotation resolves to.
    * In the mirror system, this would be an object mirror.
    */
-  Constant value;
+  ConstantExpression constant;
   Element annotatedElement;
   int resolutionState;
 
@@ -2587,6 +2639,10 @@ abstract class MetadataAnnotationX implements MetadataAnnotation {
   MetadataAnnotationX([this.resolutionState = STATE_NOT_STARTED]);
 
   MetadataAnnotation ensureResolved(Compiler compiler) {
+    if (annotatedElement.isClass || annotatedElement.isTypedef) {
+      TypeDeclarationElement typeDeclaration = annotatedElement;
+      typeDeclaration.ensureResolved(compiler);
+    }
     if (resolutionState == STATE_NOT_STARTED) {
       compiler.resolver.resolveMetadataAnnotation(this);
     }
@@ -2595,7 +2651,7 @@ abstract class MetadataAnnotationX implements MetadataAnnotation {
 
   Node parseNode(DiagnosticListener listener);
 
-  String toString() => 'MetadataAnnotation($value, $resolutionState)';
+  String toString() => 'MetadataAnnotation($constant, $resolutionState)';
 }
 
 /// Metadata annotation on a parameter.
@@ -2609,6 +2665,10 @@ class ParameterMetadataAnnotation extends MetadataAnnotationX {
   Token get beginToken => metadata.getBeginToken();
 
   Token get endToken => metadata.getEndToken();
+
+  bool get hasNode => true;
+
+  Metadata get node => metadata;
 }
 
 /// Mixin for the implementation of patched elements.

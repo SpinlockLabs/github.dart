@@ -7,8 +7,9 @@ library source_file_provider;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 
-import '../compiler.dart' as api show Diagnostic;
+import '../compiler.dart' as api show Diagnostic, DiagnosticHandler;
 import 'dart2js.dart' show AbortLeg;
 import 'colors.dart' as colors;
 import 'source_file.dart';
@@ -37,9 +38,17 @@ abstract class SourceFileProvider {
   }
 
   Future<List<int>> readUtf8BytesFromUri(Uri resourceUri) {
-    if (resourceUri.scheme != 'file') {
+    if (resourceUri.scheme == 'file') {
+      return _readFromFile(resourceUri);
+    } else if (resourceUri.scheme == 'http' || resourceUri.scheme == 'https') {
+      return _readFromHttp(resourceUri);
+    } else {
       throw new ArgumentError("Unknown scheme in uri '$resourceUri'");
     }
+  }
+
+  Future<List<int>> _readFromFile(Uri resourceUri) {
+    assert(resourceUri.scheme == 'file');
     List<int> source;
     try {
       source = readAll(resourceUri.toFilePath());
@@ -49,12 +58,45 @@ abstract class SourceFileProvider {
           "(${ex.osError})");
     }
     dartCharactersRead += source.length;
-    sourceFiles[resourceUri.toString()] = new Utf8BytesSourceFile(
-        relativize(cwd, resourceUri, isWindows), source);
+    sourceFiles[resourceUri.toString()] =
+        new CachingUtf8BytesSourceFile(relativizeUri(resourceUri), source);
     return new Future.value(source);
   }
 
+  Future<List<int>> _readFromHttp(Uri resourceUri) {
+    assert(resourceUri.scheme == 'http');
+    HttpClient client = new HttpClient();
+    return client.getUrl(resourceUri)
+        .then((HttpClientRequest request) => request.close())
+        .then((HttpClientResponse response) {
+          if (response.statusCode != HttpStatus.OK) {
+            String msg = 'Failure getting $resourceUri: '
+                      '${response.statusCode} ${response.reasonPhrase}';
+            throw msg;
+          }
+          return response.toList();
+        })
+        .then((List<List<int>> splitContent) {
+           int totalLength = splitContent.fold(0, (int old, List list) {
+             return old + list.length;
+           });
+           Uint8List result = new Uint8List(totalLength);
+           int offset = 0;
+           for (List<int> contentPart in splitContent) {
+             result.setRange(
+                 offset, offset + contentPart.length, contentPart);
+             offset += contentPart.length;
+           }
+           dartCharactersRead += totalLength;
+           sourceFiles[resourceUri.toString()] =
+               new CachingUtf8BytesSourceFile(resourceUri.toString(), result);
+           return result;
+         });
+  }
+
   Future/*<List<int> | String>*/ call(Uri resourceUri);
+
+  relativizeUri(Uri uri) => relativize(cwd, uri, isWindows);
 }
 
 class CompilerSourceFileProvider extends SourceFileProvider {
@@ -158,9 +200,11 @@ class FormattingDiagnosticHandler {
     } else {
       SourceFile file = provider.sourceFiles[uri.toString()];
       if (file != null) {
-        print(file.getLocationMessage(color(message), begin, end, true, color));
+        print(file.getLocationMessage(
+          color(message), begin, end, colorize: color));
       } else {
-        throw '$uri: file is null';
+        print('${provider.relativizeUri(uri)}@$begin+${end - begin}:'
+              ' [$kind] ${color(message)}');
       }
     }
     if (fatal && ++fatalCount >= throwOnErrorCount && throwOnError) {
@@ -172,4 +216,108 @@ class FormattingDiagnosticHandler {
   void call(Uri uri, int begin, int end, String message, api.Diagnostic kind) {
     return diagnosticHandler(uri, begin, end, message, kind);
   }
+}
+
+typedef void MessageCallback(String message);
+
+class RandomAccessFileOutputProvider {
+  final Uri out;
+  final Uri sourceMapOut;
+  final MessageCallback onInfo;
+  final MessageCallback onFailure;
+
+  int totalCharactersWritten = 0;
+  List<String> allOutputFiles = new List<String>();
+
+  RandomAccessFileOutputProvider(this.out,
+                                 this.sourceMapOut,
+                                 {this.onInfo,
+                                  this.onFailure});
+
+  static Uri computePrecompiledUri(Uri out) {
+    String extension = 'precompiled.js';
+    String outPath = out.path;
+    if (outPath.endsWith('.js')) {
+      outPath = outPath.substring(0, outPath.length - 3);
+      return out.resolve('$outPath.$extension');
+    } else {
+      return out.resolve(extension);
+    }
+  }
+
+  EventSink<String> call(String name, String extension) {
+    Uri uri;
+    String sourceMapFileName;
+    bool isPrimaryOutput = false;
+    if (name == '') {
+      if (extension == 'js' || extension == 'dart') {
+        isPrimaryOutput = true;
+        uri = out;
+        sourceMapFileName =
+            sourceMapOut.path.substring(sourceMapOut.path.lastIndexOf('/') + 1);
+      } else if (extension == 'precompiled.js') {
+        uri = computePrecompiledUri(out);
+        onInfo("File ($uri) is compatible with header"
+               " \"Content-Security-Policy: script-src 'self'\"");
+      } else if (extension == 'js.map' || extension == 'dart.map') {
+        uri = sourceMapOut;
+      } else if (extension == 'info.html' || extension == "info.json") {
+        String outName = out.path.substring(out.path.lastIndexOf('/') + 1);
+        uri = out.resolve('$outName.$extension');
+      } else {
+        onFailure('Unknown extension: $extension');
+      }
+    } else {
+      uri = out.resolve('$name.$extension');
+    }
+
+    if (uri.scheme != 'file') {
+      onFailure('Unhandled scheme ${uri.scheme} in $uri.');
+    }
+
+    RandomAccessFile output;
+    try {
+      output = new File(uri.toFilePath()).openSync(mode: FileMode.WRITE);
+    } on FileSystemException catch(e) {
+      onFailure('$e');
+    }
+
+    allOutputFiles.add(relativize(currentDirectory, uri, Platform.isWindows));
+
+    int charactersWritten = 0;
+
+    writeStringSync(String data) {
+      // Write the data in chunks of 8kb, otherwise we risk running OOM.
+      int chunkSize = 8*1024;
+
+      int offset = 0;
+      while (offset < data.length) {
+        output.writeStringSync(
+            data.substring(offset, math.min(offset + chunkSize, data.length)));
+        offset += chunkSize;
+      }
+      charactersWritten += data.length;
+    }
+
+    onDone() {
+      output.closeSync();
+      if (isPrimaryOutput) {
+        totalCharactersWritten += charactersWritten;
+      }
+    }
+
+    return new EventSinkWrapper(writeStringSync, onDone);
+  }
+}
+
+class EventSinkWrapper extends EventSink<String> {
+  var onAdd, onClose;
+
+  EventSinkWrapper(this.onAdd, this.onClose);
+
+  void add(String data) => onAdd(data);
+
+  void addError(error, [StackTrace stackTrace]) => throw error;
+
+  void close() => onClose();
 }

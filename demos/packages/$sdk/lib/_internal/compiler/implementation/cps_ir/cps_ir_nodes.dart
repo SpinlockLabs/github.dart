@@ -6,13 +6,12 @@
 // dependencies on other parts of the system.
 library dart2js.ir_nodes;
 
-import '../dart2jslib.dart' as dart2js show Constant, ConstructedConstant,
-  StringConstant, ListConstant, MapConstant;
+import '../constants/expressions.dart';
+import '../constants/values.dart' as values show ConstantValue;
+import '../dart2jslib.dart' as dart2js show invariant;
 import '../elements/elements.dart';
 import '../universe/universe.dart' show Selector, SelectorKind;
 import '../dart_types.dart' show DartType, GenericType;
-import 'const_expression.dart';
-import '../helpers/helpers.dart';
 
 abstract class Node {
   static int hashCount = 0;
@@ -132,13 +131,13 @@ class LetPrim extends Expression implements InteriorNode {
 /// During one-pass construction a LetCont with an empty continuation body is
 /// used to represent the one-level context 'let cont k(v) = [] in E'.
 class LetCont extends Expression implements InteriorNode {
-  final Continuation continuation;
+  Continuation continuation;
   Expression body;
 
   LetCont(this.continuation, this.body);
 
   Expression plug(Expression expr) {
-    assert(continuation.body == null);
+    assert(continuation != null && continuation.body == null);
     return continuation.body = expr;
   }
 
@@ -261,9 +260,16 @@ class InvokeConstructor extends Expression implements Invoke {
                     List<Definition> args)
       : continuation = new Reference(cont),
         arguments = _referenceList(args) {
-    assert(target.isErroneous || target.isConstructor);
-    assert(target.isErroneous || type.isDynamic ||
-           type.element == target.enclosingElement);
+    assert(dart2js.invariant(target,
+        target.isErroneous || target.isConstructor,
+        message: "Constructor invocation target is not a constructor: "
+                 "$target."));
+    assert(dart2js.invariant(target,
+        target.isErroneous ||
+        type.isDynamic ||
+        type.element == target.enclosingClass.declaration,
+        message: "Constructor invocation type ${type} does not match enclosing "
+                 "class of target ${target}."));
   }
 
   accept(Visitor visitor) => visitor.visitInvokeConstructor(this);
@@ -387,8 +393,8 @@ class DeclareFunction extends Expression implements InteriorNode {
 
 /// Invoke a continuation in tail position.
 class InvokeContinuation extends Expression {
-  final Reference continuation;
-  final List<Reference> arguments;
+  Reference continuation;
+  List<Reference> arguments;
 
   // An invocation of a continuation is recursive if it occurs in the body of
   // the continuation itself.
@@ -403,6 +409,16 @@ class InvokeContinuation extends Expression {
         cont.parameters.length == args.length);
     if (recursive) cont.isRecursive = true;
   }
+
+  /// A continuation invocation whose target and arguments will be filled
+  /// in later.
+  ///
+  /// Used as a placeholder for a jump whose target is not yet created
+  /// (e.g., in the translation of break and continue).
+  InvokeContinuation.uninitialized({recursive: false})
+      : continuation = null,
+        arguments = null,
+        isRecursive = recursive;
 
   accept(Visitor visitor) => visitor.visitInvokeContinuation(this);
 }
@@ -433,10 +449,11 @@ class Branch extends Expression {
 }
 
 class Constant extends Primitive {
-  final ConstExp expression;
-  final dart2js.Constant value;
+  final ConstantExpression expression;
 
-  Constant(this.expression, this.value);
+  Constant(this.expression);
+
+  values.ConstantValue get value => expression.value;
 
   accept(Visitor visitor) => visitor.visitConstant(this);
 }
@@ -454,7 +471,7 @@ class ReifyTypeVar extends Primitive {
 
   ReifyTypeVar(this.typeVariable);
 
-  dart2js.Constant get constant => null;
+  values.ConstantValue get constant => null;
 
   accept(Visitor visitor) => visitor.visitReifyTypeVar(this);
 }
@@ -528,13 +545,25 @@ class FunctionDefinition extends Node implements InteriorNode {
   final List<ConstDeclaration> localConstants;
 
   /// Values for optional parameters.
-  final List<ConstExp> defaultParameterValues;
+  final List<ConstantExpression> defaultParameterValues;
 
   FunctionDefinition(this.element, this.returnContinuation,
       this.parameters, this.body, this.localConstants,
       this.defaultParameterValues);
 
+  FunctionDefinition.abstract(this.element,
+                              this.parameters,
+                              this.defaultParameterValues)
+      : this.returnContinuation = null,
+        this.localConstants = const <ConstDeclaration>[];
+
   accept(Visitor visitor) => visitor.visitFunctionDefinition(this);
+
+  /// Returns `true` if this function is abstract.
+  ///
+  /// If `true`, [body] and [returnContinuation] are `null` and [localConstants]
+  /// is empty.
+  bool get isAbstract => body == null;
 }
 
 List<Reference> _referenceList(List<Definition> definitions) {
@@ -805,7 +834,9 @@ class RegisterAllocator extends Visitor {
   }
 
   void visitFunctionDefinition(FunctionDefinition node) {
-    visit(node.body);
+    if (!node.isAbstract) {
+      visit(node.body);
+    }
     node.parameters.forEach(allocate); // Assign indices to unused parameters.
     elementRegisters.clear();
   }

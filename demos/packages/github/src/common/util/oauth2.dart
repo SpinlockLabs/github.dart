@@ -57,7 +57,8 @@ class OAuth2Flow {
   /// Exchanges the given [code] for a token.
   Future<ExchangeResponse> exchange(String code, [String origin]) {
     var headers = {
-      "Accept": "application/json"
+      "Accept": "application/json",
+      "content-type": "application/json"
     };
     
     if (origin != null) {

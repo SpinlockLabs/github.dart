@@ -15,14 +15,27 @@ part 'function_set.dart';
 part 'side_effects.dart';
 
 class Universe {
-  /**
-   * Documentation wanted -- johnniwinther
-   *
-   * Invariant: Elements are declaration elements.
-   */
-  // TODO(karlklose): these sets should be merged.
-  final Set<ClassElement> instantiatedClasses = new Set<ClassElement>();
-  final Set<DartType> instantiatedTypes = new Set<DartType>();
+  /// The set of all directly instantiated classes, that is, classes with a
+  /// generative constructor that has been called directly and not only through
+  /// a super-call.
+  ///
+  /// Invariant: Elements are declaration elements.
+  // TODO(johnniwinther): [_directlyInstantiatedClasses] and
+  // [_instantiatedTypes] sets should be merged.
+  final Set<ClassElement> _directlyInstantiatedClasses =
+      new Set<ClassElement>();
+
+  /// The set of all directly instantiated types, that is, the types of the
+  /// directly instantiated classes.
+  ///
+  /// See [_directlyInstantiatedClasses].
+  final Set<DartType> _instantiatedTypes = new Set<DartType>();
+
+  /// The set of all instantiated classes, either directly, as superclasses or
+  /// as supertypes.
+  ///
+  /// Invariant: Elements are declaration elements.
+  final Set<ClassElement> _allInstantiatedClasses = new Set<ClassElement>();
 
   /**
    * Documentation wanted -- johnniwinther
@@ -54,15 +67,19 @@ class Universe {
   final Set<DartType> isChecks = new Set<DartType>();
 
   /**
-   * Set of [:call:] methods in instantiated classes that use type variables
-   * in their signature.
+   * Set of (live) [:call:] methods whose signatures reference type variables.
+   *
+   * A live [:call:] method is one whose enclosing class has been instantiated.
    */
-  final Set<Element> genericCallMethods = new Set<Element>();
+  final Set<Element> callMethodsWithFreeTypeVariables = new Set<Element>();
 
   /**
-   * Set of closures that use type variables in their signature.
+   * Set of (live) local functions (closures) whose signatures reference type
+   * variables.
+   *
+   * A live function is one whose enclosing member function has been enqueued.
    */
-  final Set<Element> genericClosures = new Set<Element>();
+  final Set<Element> closuresWithFreeTypeVariables = new Set<Element>();
 
   /**
    * Set of all closures in the program. Used by the mirror tracking system
@@ -78,26 +95,85 @@ class Universe {
 
   bool usingFactoryWithTypeArguments = false;
 
+  /// All directly instantiated classes, that is, classes with a generative
+  /// constructor that has been called directly and not only through a
+  /// super-call.
+  // TODO(johnniwinther): Improve semantic precision.
+  Iterable<ClassElement> get directlyInstantiatedClasses {
+    return _directlyInstantiatedClasses;
+  }
+
+  /// All instantiated classes, either directly, as superclasses or as
+  /// supertypes.
+  // TODO(johnniwinther): Improve semantic precision.
+  Iterable<ClassElement> get allInstantiatedClasses {
+    return _allInstantiatedClasses;
+  }
+
+  /// All directly instantiated types, that is, the types of the directly
+  /// instantiated classes.
+  ///
+  /// See [directlyInstantiatedClasses].
+  // TODO(johnniwinther): Improve semantic precision.
+  Iterable<DartType> get instantiatedTypes => _instantiatedTypes;
+
+  /// Returns `true` if [cls] is considered to be instantiated, either directly,
+  /// through subclasses or throught subtypes.
+  // TODO(johnniwinther): Improve semantic precision.
+  bool isInstantiated(ClassElement cls) {
+    return _allInstantiatedClasses.contains(cls);
+  }
+
+  /// Register [type] as (directly) instantiated.
+  ///
+  /// If [byMirrors] is `true`, the instantiation is through mirrors.
+  // TODO(johnniwinther): Fully enforce the separation between exact, through
+  // subclass and through subtype instantiated types/classes.
+  // TODO(johnniwinther): Support unknown type arguments for generic types.
+  void registerTypeInstantiation(InterfaceType type,
+                                 {bool byMirrors: false}) {
+    _instantiatedTypes.add(type);
+    ClassElement cls = type.element;
+    if (!cls.isAbstract
+        // We can't use the closed-world assumption with native abstract
+        // classes; a native abstract class may have non-abstract subclasses
+        // not declared to the program.  Instances of these classes are
+        // indistinguishable from the abstract class.
+        || cls.isNative
+        // Likewise, if this registration comes from the mirror system,
+        // all bets are off.
+        // TODO(herhut): Track classes required by mirrors seperately.
+        || byMirrors) {
+      _directlyInstantiatedClasses.add(cls);
+    }
+
+    // TODO(johnniwinther): Replace this by separate more specific mappings.
+    if (!_allInstantiatedClasses.add(cls)) return;
+    cls.allSupertypes.forEach((InterfaceType supertype) {
+      _allInstantiatedClasses.add(supertype.element);
+    });
+  }
+
   bool hasMatchingSelector(Set<Selector> selectors,
                            Element member,
-                           Compiler compiler) {
+                           World world) {
     if (selectors == null) return false;
     for (Selector selector in selectors) {
-      if (selector.appliesUnnamed(member, compiler)) return true;
+      if (selector.appliesUnnamed(member, world)) return true;
     }
     return false;
   }
 
-  bool hasInvocation(Element member, Compiler compiler) {
-    return hasMatchingSelector(invokedNames[member.name], member, compiler);
+  bool hasInvocation(Element member, World world) {
+    return hasMatchingSelector(invokedNames[member.name], member, world);
   }
 
-  bool hasInvokedGetter(Element member, Compiler compiler) {
-    return hasMatchingSelector(invokedGetters[member.name], member, compiler);
+  bool hasInvokedGetter(Element member, World world) {
+    return hasMatchingSelector(invokedGetters[member.name], member, world);
   }
 
-  bool hasInvokedSetter(Element member, Compiler compiler) {
-    return hasMatchingSelector(invokedSetters[member.name], member, compiler);
+  bool hasInvokedSetter(Element member, World world) {
+    return hasMatchingSelector(invokedSetters[member.name], member, world);
   }
 
   DartType registerIsCheck(DartType type, Compiler compiler) {
@@ -107,6 +183,34 @@ class Universe {
     // against the type variable of a typedef.
     isChecks.add(type);
     return type;
+  }
+
+  void forgetElement(Element element, Compiler compiler) {
+    allClosures.remove(element);
+    slowDirectlyNestedClosures(element).forEach(compiler.forgetElement);
+    closurizedMembers.remove(element);
+    fieldSetters.remove(element);
+    fieldGetters.remove(element);
+    _directlyInstantiatedClasses.remove(element);
+    _allInstantiatedClasses.remove(element);
+    if (element is ClassElement) {
+      assert(invariant(
+          element, element.thisType.isRaw,
+          message: 'Generic classes not supported (${element.thisType}).'));
+      _instantiatedTypes
+          ..remove(element.rawType)
+          ..remove(element.thisType);
+    }
+  }
+
+  // TODO(ahe): Replace this method with something that is O(1), for example,
+  // by using a map.
+  List<LocalFunctionElement> slowDirectlyNestedClosures(Element element) {
+    // Return new list to guard against concurrent modifications.
+    return new List<LocalFunctionElement>.from(
+        allClosures.where((LocalFunctionElement closure) {
+          return closure.executableContext == element;
+        }));
   }
 }
 
@@ -191,7 +295,7 @@ class Selector {
     return result;
   }
 
-  factory Selector.fromElement(Element element, Compiler compiler) {
+  factory Selector.fromElement(Element element) {
     String name = element.name;
     if (element.isFunction) {
       if (name == '[]') {
@@ -200,7 +304,7 @@ class Selector {
         return new Selector.indexSet();
       }
       FunctionSignature signature =
-          element.asFunctionElement().computeSignature(compiler);
+          element.asFunctionElement().functionSignature;
       int arity = signature.parameterCount;
       List<String> namedArguments = null;
       if (signature.optionalParametersAreNamed) {
@@ -323,16 +427,16 @@ class Selector {
     return kind;
   }
 
-  bool appliesUnnamed(Element element, Compiler compiler) {
-    assert(sameNameHack(element, compiler));
-    return appliesUntyped(element, compiler);
+  bool appliesUnnamed(Element element, World world) {
+    assert(sameNameHack(element, world));
+    return appliesUntyped(element, world);
   }
 
-  bool appliesUntyped(Element element, Compiler compiler) {
-    assert(sameNameHack(element, compiler));
+  bool appliesUntyped(Element element, World world) {
+    assert(sameNameHack(element, world));
     if (Elements.isUnresolved(element)) return false;
     if (isPrivateName(name) && library != element.library) return false;
-    if (element.isForeign(compiler)) return true;
+    if (world.isForeign(element)) return true;
     if (element.isSetter) return isSetter;
     if (element.isGetter) return isGetter || isCall;
     if (element.isField) {
@@ -342,11 +446,11 @@ class Selector {
     }
     if (isGetter) return true;
     if (isSetter) return false;
-    return signatureApplies(element, compiler);
+    return signatureApplies(element);
   }
 
-  bool signatureApplies(FunctionElement function, Compiler compiler) {
-    FunctionSignature parameters = function.computeSignature(compiler);
+  bool signatureApplies(FunctionElement function) {
+    FunctionSignature parameters = function.functionSignature;
     if (argumentCount > parameters.parameterCount) return false;
     int requiredParameterCount = parameters.requiredParameterCount;
     int optionalParameterCount = parameters.optionalParameterCount;
@@ -378,25 +482,25 @@ class Selector {
     }
   }
 
-  bool sameNameHack(Element element, Compiler compiler) {
+  bool sameNameHack(Element element, World world) {
     // TODO(ngeoffray): Remove workaround checks.
     return element.isConstructor ||
            name == element.name ||
-           name == 'assert' && compiler.backend.isAssertMethod(element);
+           name == 'assert' && world.isAssertMethod(element);
   }
 
-  bool applies(Element element, Compiler compiler) {
-    if (!sameNameHack(element, compiler)) return false;
-    return appliesUnnamed(element, compiler);
+  bool applies(Element element, World world) {
+    if (!sameNameHack(element, world)) return false;
+    return appliesUnnamed(element, world);
   }
 
   /**
-   * Fills [list] with the arguments in a defined order.
+   * Fills [list] with the arguments in the normalized order.
    *
    * [compileArgument] is a function that returns a compiled version
    * of an argument located in [arguments].
    *
-   * [compileConstant] is a function that returns a compiled constant
+   * [compileDefaultValue] is a function that returns a compiled constant
    * of an optional argument that is not in [arguments].
    *
    * Returns [:true:] if the selector and the [element] match; [:false:]
@@ -404,28 +508,29 @@ class Selector {
    *
    * Invariant: [element] must be the implementation element.
    */
-  bool addArgumentsToList(Link<Node> arguments,
-                          List list,
-                          FunctionElement element,
-                          compileArgument(Node argument),
-                          compileConstant(Element element),
-                          Compiler compiler) {
+  /*<T>*/ bool addArgumentsToList(
+      Link<Node> arguments,
+      List/*<T>*/ list,
+      FunctionElement element,
+      /*T*/ compileArgument(Node argument),
+      /*T*/ compileDefaultValue(ParameterElement element),
+      World world) {
     assert(invariant(element, element.isImplementation));
-    if (!this.applies(element, compiler)) return false;
+    if (!this.applies(element, world)) return false;
 
     FunctionSignature parameters = element.functionSignature;
-    parameters.forEachRequiredParameter((element) {
+    parameters.forEachRequiredParameter((ParameterElement element) {
       list.add(compileArgument(arguments.head));
       arguments = arguments.tail;
     });
 
     if (!parameters.optionalParametersAreNamed) {
-      parameters.forEachOptionalParameter((element) {
+      parameters.forEachOptionalParameter((ParameterElement element) {
         if (!arguments.isEmpty) {
           list.add(compileArgument(arguments.head));
           arguments = arguments.tail;
         } else {
-          list.add(compileConstant(element));
+          list.add(compileDefaultValue(element));
         }
       });
     } else {
@@ -438,12 +543,12 @@ class Selector {
       // Iterate over the optional parameters of the signature, and try to
       // find them in [compiledNamedArguments]. If found, we use the
       // value in the temporary list, otherwise the default value.
-      parameters.orderedOptionalParameters.forEach((element) {
+      parameters.orderedOptionalParameters.forEach((ParameterElement element) {
         int foundIndex = namedArguments.indexOf(element.name);
         if (foundIndex != -1) {
           list.add(compiledNamedArguments[foundIndex]);
         } else {
-          list.add(compileConstant(element));
+          list.add(compileDefaultValue(element));
         }
       });
     }
@@ -469,7 +574,7 @@ class Selector {
       FunctionElement callee,
       compileArgument(Element element),
       compileConstant(Element element),
-      Compiler compiler) {
+      World world) {
 
     FunctionSignature signature = caller.functionSignature;
     Map mapping = new Map();
@@ -521,7 +626,7 @@ class Selector {
                                        callee,
                                        internalCompileArgument,
                                        compileConstant,
-                                       compiler);
+                                       world);
   }
 
   static bool sameNames(List<String> first, List<String> second) {
@@ -578,7 +683,7 @@ class Selector {
     // Combine the two hash values.
     int high = existing >> 15;
     int low = existing & 0x7fff;
-    return (high * 13) ^ (low * 997) ^ h;
+    return ((high * 13) ^ (low * 997) ^ h) & SMI_MASK;
   }
 
   List<String> getOrderedNamedArguments() {
@@ -614,7 +719,8 @@ class Selector {
   }
 
   Selector extendIfReachesAll(Compiler compiler) {
-    return new TypedSelector(compiler.typesTask.dynamicType, this, compiler);
+    return new TypedSelector(
+        compiler.typesTask.dynamicType, this, compiler.world);
   }
 
   Selector toCallSelector() => new Selector.callClosureFrom(this);
@@ -640,9 +746,9 @@ class TypedSelector extends Selector {
   static Map<Selector, Map<TypeMask, TypedSelector>> canonicalizedValues =
       new Map<Selector, Map<TypeMask, TypedSelector>>();
 
-  factory TypedSelector(TypeMask mask, Selector selector, Compiler compiler) {
+  factory TypedSelector(TypeMask mask, Selector selector, World world) {
     // TODO(johnniwinther): Allow more TypeSelector kinds during resoluton.
-    assert(compiler.phase > Compiler.PHASE_RESOLVING || mask.isExact);
+    assert(world.isClosed || mask.isExact);
     if (selector.mask == mask) return selector;
     Selector untyped = selector.asUntyped;
     Map<TypeMask, TypedSelector> map = canonicalizedValues.putIfAbsent(untyped,
@@ -655,20 +761,23 @@ class TypedSelector extends Selector {
     return result;
   }
 
-  factory TypedSelector.exact(ClassElement base, Selector selector,
-      Compiler compiler)
-      => new TypedSelector(new TypeMask.exact(base), selector, compiler);
+  factory TypedSelector.exact(
+      ClassElement base, Selector selector, World world)
+          => new TypedSelector(new TypeMask.exact(base, world), selector,
+              world);
 
-  factory TypedSelector.subclass(ClassElement base, Selector selector,
-      Compiler compiler)
-      => new TypedSelector(new TypeMask.subclass(base), selector, compiler);
+  factory TypedSelector.subclass(
+      ClassElement base, Selector selector, World world)
+          => new TypedSelector(new TypeMask.subclass(base, world),
+                               selector, world);
 
-  factory TypedSelector.subtype(ClassElement base, Selector selector,
-      Compiler compiler)
-      => new TypedSelector(new TypeMask.subtype(base), selector, compiler);
+  factory TypedSelector.subtype(
+      ClassElement base, Selector selector, World world)
+          => new TypedSelector(new TypeMask.subtype(base, world),
+                               selector, world);
 
-  bool appliesUnnamed(Element element, Compiler compiler) {
-    assert(sameNameHack(element, compiler));
+  bool appliesUnnamed(Element element, World world) {
+    assert(sameNameHack(element, world));
     // [TypedSelector] are only used after resolution.
     if (!element.isClassMember) return false;
 
@@ -678,18 +787,19 @@ class TypedSelector extends Selector {
     //   bar() => foo(); // The call to 'foo' is a typed selector.
     // }
     if (element.enclosingClass.isClosure) {
-      return appliesUntyped(element, compiler);
+      return appliesUntyped(element, world);
     }
 
-    if (!mask.canHit(element, this, compiler)) return false;
-    return appliesUntyped(element, compiler);
+    if (!mask.canHit(element, this, world)) return false;
+    return appliesUntyped(element, world);
   }
 
   Selector extendIfReachesAll(Compiler compiler) {
     bool canReachAll = compiler.enabledInvokeOn
-        && mask.needsNoSuchMethodHandling(this, compiler);
+        && mask.needsNoSuchMethodHandling(this, compiler.world);
     return canReachAll
-        ? new TypedSelector(compiler.typesTask.dynamicType, this, compiler)
+        ? new TypedSelector(
+            compiler.typesTask.dynamicType, this, compiler.world)
         : this;
   }
 }
