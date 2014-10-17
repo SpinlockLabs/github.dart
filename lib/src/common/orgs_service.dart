@@ -64,10 +64,24 @@ class OrganizationsService extends Service {
         Team.fromJSON);
   }
   
-  // TODO: Implement getTeam: https://developer.github.com/v3/orgs/teams/#get-team
+  /// Gets the team specified by the [teamId].
+  /// 
+  /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
+  Future<Team> getTeam(int teamId) {
+    return _github.getJSON("/teams/${teamId}", convert: Organization.fromJSON, statusCode: 200);
+  }
+  
   // TODO: Implement createTeam: https://developer.github.com/v3/orgs/teams/#create-team
   // TODO: Implement editTeam: https://developer.github.com/v3/orgs/teams/#edit-team
-  // TODO: Implement deleteTeam: https://developer.github.com/v3/orgs/teams/#delete-team
+  
+  /// Deletes the team specified by the [teamId]
+  /// 
+  /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
+  Future<bool> deleteTeam(int teamId) {
+    return _github.request("DELETE", "/teams/${teamId}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
   
   /// Lists the team members of the team with [teamId].
   /// 
