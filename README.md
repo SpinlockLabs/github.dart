@@ -1,4 +1,4 @@
-# GitHub for Dart [![Build Status](http://ci.directcode.org/app/rest/builds/buildType:(id:DartGitHub_Main)/statusIcon)](http://ci.directcode.org/viewType.html?buildTypeId=DartGitHub_Main&guest=1)
+# GitHub for Dart [![Build Status](http://services.directcode.org/teamcity/buildStatus/DartGitHub_Main.png)
 
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
 
