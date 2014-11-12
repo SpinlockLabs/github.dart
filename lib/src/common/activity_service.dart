@@ -41,14 +41,14 @@ class ActivityService extends Service {
   /// Lists public events for an organization.
   /// 
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
-  Stream<Event> listEventsForOranization(String name, {int pages}) {
+  Stream<Event> listEventsForOrganization(String name, {int pages}) {
     return new PaginationHelper(_github).objects("GET", "/orgs/${name}/events", Event.fromJSON, pages: pages);
   }
   
   /// Returns an [EventPoller] for public events for an organization.
   /// 
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
-  EventPoller pollEventsForOranization(String name) =>
+  EventPoller pollEventsForOrganization(String name) =>
       new EventPoller(_github, "/orgs/${name}/events");
   
   /// Returns an [EventPoller] for events performed by a user.
