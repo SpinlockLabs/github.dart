@@ -48,7 +48,7 @@ class OAuth2Flow {
   String createAuthorizeUrl() {
     return baseUrl + "/authorize" + buildQueryString({
       "client_id": clientId,
-      "scopes": scopes.join(","),
+      "scope": scopes.join(","),
       "redirect_uri": redirectUri,
       "state": state
     });
