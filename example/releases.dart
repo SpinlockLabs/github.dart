@@ -29,7 +29,7 @@ void loadReleases() {
         if (value == null) return;
         rel.appendHtml("<br/><b>${key}</b>: ${value}");
       }
-      append("Tag Name", release.tagName);
+      append("Tag", '<a href=${release.htmlUrl}>${release.tagName}</a>');
       append("Download", '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>');
     }
   });
