@@ -87,16 +87,16 @@ class ReleaseAsset {
   /// Asset ID
   int id;
   
-  /// Assert Name
+  /// Asset Name
   String name;
   
-  /// Assert Label
+  /// Asset Label
   String label;
   
-  /// Assert State
+  /// Asset State
   String state;
 
-  /// Assert Content Type
+  /// Asset Content Type
   @ApiName("content_type")
   String contentType;
 
@@ -107,7 +107,7 @@ class ReleaseAsset {
   @ApiName("download_count")
   int downloadCount;
 
-  /// Time the assert was created at
+  /// Time the asset was created at
   @ApiName("created_at")
   DateTime createdAt;
 
