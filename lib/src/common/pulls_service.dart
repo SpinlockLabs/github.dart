@@ -6,8 +6,10 @@ part of github.common;
 /// API docs: https://developer.github.com/v3/pulls/
 class PullRequestsService extends Service {
   PullRequestsService(GitHub github) : super(github);
-  
-  // TODO: implement list: https://developer.github.com/v3/pulls/#list-pull-requests
+
+  Stream<PullRequest> list(RepositorySlug slug, {int pages}) {
+    return new PaginationHelper(_github).objects("GET", "/repos/${slug.fullName}/pulls", PullRequest.fromJSON, pages: pages);
+  }
   
   /// Fetches a single pull request.
   /// 
@@ -49,9 +51,17 @@ class PullRequestsService extends Service {
     return new PaginationHelper(_github).objects("GET", '/repos/${slug.fullName}/pulls/${number}/commits', 
         RepositoryCommit.fromJSON);
   }
-  
-  // TODO: implement listFiles: https://developer.github.com/v3/pulls/#list-pull-requests-files
-  // TODO: implement isMerged: https://developer.github.com/v3/pulls/#get-if-a-pull-request-has-been-merged
+
+  Stream<RepositoryCommit> listFiles(RepositorySlug slug, int number) {
+    return new PaginationHelper(_github).objects("GET", '/repos/${slug.fullName}/pulls/${number}/files',
+      PullRequestFile.fromJSON);
+  }
+
+  Future<bool> isMerged(RepositorySlug slug, int number) {
+    return _github.request("GET", "/repos/${slug.fullName}/pulls/${number}/merge").then((response) {
+      return response.statusCode == 204;
+    });
+  }
   
 
   /// Merge a pull request (Merge Button).
@@ -98,6 +108,4 @@ class PullRequestsService extends Service {
   
   // TODO: Implement editComment: https://developer.github.com/v3/pulls/comments/#edit-a-comment
   // TODO: Implement deleteComment: https://developer.github.com/v3/pulls/comments/#delete-a-comment
-  
-  
 }

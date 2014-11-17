@@ -284,3 +284,32 @@ class CreatePullRequestComment {
     return JSON.encode(map);
   }
 }
+
+class PullRequestFile {
+  String sha;
+  String filename;
+  String status;
+  @ApiName("additions")
+  int additionsCount;
+  @ApiName("deletions")
+  int deletionsCount;
+  @ApiName("changes")
+  int changesCount;
+  String blobUrl;
+  String rawUrl;
+  String patch;
+
+  static PullRequestFile fromJSON(input) {
+    var file = new PullRequestFile();
+    file.sha = input['sha'];
+    file.filename = input['filename'];
+    file.status = input['status'];
+    file.additionsCount = input['additions'];
+    file.deletionsCount = input['deletions'];
+    file.changesCount = input['changes'];
+    file.blobUrl = input['blob_url'];
+    file.rawUrl = input['raw_url'];
+    file.patch = input['patch'];
+    return file;
+  }
+}
