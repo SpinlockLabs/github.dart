@@ -36,8 +36,18 @@ class RepositoriesService extends Service {
     return new PaginationHelper(_github).objects("GET", "/users/${user}/repos", 
         Repository.fromJSON, params: params);
   }
-  
-  // TODO: Implement listRepositoriesByOrg: https://developer.github.com/v3/repos/#list-organization-repositories
+    
+  /// List repositories for the specified [org].
+  /// 
+  /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
+  Stream<Repository> listOrganizationRepositories(String org, {String type: "all"}) {
+    var params = {
+      "type": type,
+    };
+    
+    return new PaginationHelper(_github).objects("GET", "/orgs/${org}/repos", 
+        Repository.fromJSON, params: params);
+  }
   
   /// Lists all the public repositories on GitHub, in the order that they were
   /// created.
