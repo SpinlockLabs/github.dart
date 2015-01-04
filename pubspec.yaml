@@ -1,5 +1,5 @@
 name: github
-version: 2.1.4
+version: 2.1.4+1
 author: Kenneth Endfinger <kaendfinger@gmail.com>
 description: GitHub API Client Library
 homepage: https://github.com/DirectMyFile/github.dart
@@ -13,7 +13,7 @@ dependencies:
 dev_dependencies:
   browser: '>=0.10.0+2 <0.11.0'
   hop: '>=0.31.0+1 <0.32.0'
+  junitconfiguration: '>=1.0.0 <2.0.0'
   mock: '>=0.11.0+2 <0.12.0'
   unittest: '>=0.11.0+3 <0.12.0'
   yaml: '>=2.0.0 <2.2.0'
-  junitconfiguration: '>=1.0.0 <2.0.0'
