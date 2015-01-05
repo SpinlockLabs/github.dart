@@ -21,17 +21,17 @@ void initGitHub() {
 /**
  * Creates a GitHub Client
  */
-GitHub createGitHubClient({Authentication auth, String endpoint: "https://api.github.com"}) {
+GitHub createGitHubClient(
+    {Authentication auth, String endpoint: "https://api.github.com"}) {
   initGitHub();
   return new GitHub(auth: auth, endpoint: endpoint);
 }
 
 class _IOClient extends http.Client {
-  
   final HttpClient client;
-  
+
   _IOClient() : client = new HttpClient();
-  
+
   @override
   Future<http.Response> request(http.Request request) {
     var completer = new Completer<http.Response>();
@@ -41,7 +41,7 @@ class _IOClient extends http.Client {
       // implemented: https://code.google.com/p/dart/issues/detail?id=17085
       // Once this issue is resolved, we can reenable setting this header.
       // req.headers.set("Time-Zone", timezoneName);
-      
+
       if (request.body != null) {
         req.write(request.body);
       }
@@ -49,14 +49,14 @@ class _IOClient extends http.Client {
     }).then((response) {
       response.transform(UTF8.decoder).join().then((value) {
         var map = {};
-        
+
         response.headers.forEach((key, value) => map[key] = value.first);
-        
+
         var resp = new http.Response(value, map, response.statusCode);
         completer.complete(resp);
       });
     });
-    
+
     return completer.future;
   }
 

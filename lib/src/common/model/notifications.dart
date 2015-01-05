@@ -18,13 +18,13 @@ class Notification {
     if (input == null) return null;
 
     return new Notification()
-        ..id = input['id']
-        ..repository = Repository.fromJSON(input['repository'])
-        ..subject = NotificationSubject.fromJSON(input['subject'])
-        ..reason = input['reason']
-        ..unread = input['unread']
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..lastReadAt = parseDateTime(input['last_read_at']);
+      ..id = input['id']
+      ..repository = Repository.fromJSON(input['repository'])
+      ..subject = NotificationSubject.fromJSON(input['subject'])
+      ..reason = input['reason']
+      ..unread = input['unread']
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..lastReadAt = parseDateTime(input['last_read_at']);
   }
 }
 
@@ -35,9 +35,9 @@ class NotificationSubject {
 
   static NotificationSubject fromJSON(input) {
     if (input == null) return null;
-    
+
     return new NotificationSubject()
-        ..title = input['title']
-        ..type = input['type'];
+      ..title = input['title']
+      ..type = input['type'];
   }
 }

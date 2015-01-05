@@ -5,6 +5,6 @@ class Request {
   final String method;
   final String body;
   final Map<String, String> headers;
-  
+
   Request(this.url, {this.method: "GET", this.body, this.headers: const {}});
 }

@@ -60,23 +60,24 @@ class Issue {
     if (input == null) return null;
 
     return new Issue()
-        ..url = input['url']
-        ..htmlUrl = input['html_url']
-        ..number = input['number']
-        ..state = input['state']
-        ..title = input['title']
-        ..user = User.fromJSON(input['user'])
-        ..labels = input['labels'].map((label) => IssueLabel.fromJSON(label))
-            .toList(growable: false)
-        ..assignee = User.fromJSON(input['assignee'])
-        ..milestone = Milestone.fromJSON(input['milestone'])
-        ..commentsCount = input['comments']
-        ..pullRequest = IssuePullRequest.fromJSON(input['pull_request'])
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..closedAt = parseDateTime(input['closed_at'])
-        ..closedBy = User.fromJSON(input['closed_by'])
-        ..body = input['body'];
+      ..url = input['url']
+      ..htmlUrl = input['html_url']
+      ..number = input['number']
+      ..state = input['state']
+      ..title = input['title']
+      ..user = User.fromJSON(input['user'])
+      ..labels = input['labels']
+      .map((label) => IssueLabel.fromJSON(label))
+      .toList(growable: false)
+      ..assignee = User.fromJSON(input['assignee'])
+      ..milestone = Milestone.fromJSON(input['milestone'])
+      ..commentsCount = input['comments']
+      ..pullRequest = IssuePullRequest.fromJSON(input['pull_request'])
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..closedAt = parseDateTime(input['closed_at'])
+      ..closedBy = User.fromJSON(input['closed_by'])
+      ..body = input['body'];
   }
 
   bool get isOpen => state == "open";
@@ -124,9 +125,9 @@ class IssuePullRequest {
     if (input == null) return null;
 
     return new IssuePullRequest()
-        ..htmlUrl = input['html_url']
-        ..diffUrl = input['diff_url']
-        ..patchUrl = input['patch_url'];
+      ..htmlUrl = input['html_url']
+      ..diffUrl = input['diff_url']
+      ..patchUrl = input['patch_url'];
   }
 }
 
@@ -154,14 +155,14 @@ class IssueComment {
     if (input == null) return null;
 
     return new IssueComment()
-        ..id = input['id']
-        ..body = input['body']
-        ..user = User.fromJSON(input['user'])
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..url = input['url']
-        ..htmlUrl = input['html_url']
-        ..issueUrl = input['issue_url'];
+      ..id = input['id']
+      ..body = input['body']
+      ..user = User.fromJSON(input['user'])
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..url = input['url']
+      ..htmlUrl = input['html_url']
+      ..issueUrl = input['issue_url'];
   }
 }
 
@@ -177,8 +178,8 @@ class IssueLabel {
     if (input == null) return null;
 
     return new IssueLabel()
-        ..name = input['name']
-        ..color = input['color'];
+      ..name = input['name']
+      ..color = input['color'];
   }
 }
 
@@ -224,16 +225,16 @@ class Milestone {
     if (input == null) return null;
 
     return new Milestone()
-        ..number = input['number']
-        ..state = input['state']
-        ..title = input['title']
-        ..description = input['description']
-        ..creator = User.fromJSON(input['creator'])
-        ..openIssuesCount = input['open_issues']
-        ..closedIssuesCount = input['closed_issues']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..dueOn = parseDateTime(input['due_on']);
+      ..number = input['number']
+      ..state = input['state']
+      ..title = input['title']
+      ..description = input['description']
+      ..creator = User.fromJSON(input['creator'])
+      ..openIssuesCount = input['open_issues']
+      ..closedIssuesCount = input['closed_issues']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..dueOn = parseDateTime(input['due_on']);
   }
 }
 

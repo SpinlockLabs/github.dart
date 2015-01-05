@@ -10,7 +10,8 @@ DivElement $repos;
 List<Repository> repos;
 
 Map<String, Comparator<Repository>> sorts = {
-  "stars": (Repository a, Repository b) => b.stargazersCount.compareTo(a.stargazersCount),
+  "stars": (Repository a, Repository b) =>
+      b.stargazersCount.compareTo(a.stargazersCount),
   "forks": (Repository a, Repository b) => b.forksCount.compareTo(a.forksCount),
   "created": (Repository a, Repository b) => b.createdAt.compareTo(a.createdAt),
   "pushed": (Repository a, Repository b) => b.pushedAt.compareTo(a.pushedAt),
@@ -21,7 +22,9 @@ void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
   initGitHub();
-  github = new GitHub(auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
+  github = new GitHub(
+      auth: new Authentication.withToken(
+          "5fdec2b77527eae85f188b7b2bfeeda170f26883"));
 
   $repos = querySelector("#repos");
 
@@ -51,7 +54,8 @@ void main() {
 
 List<Repository> _reposCache;
 
-void updateRepos(List<Repository> repos, [int compare(Repository a, Repository b)]) {
+void updateRepos(List<Repository> repos,
+    [int compare(Repository a, Repository b)]) {
   document.querySelector("#repos").children.clear();
   repos.sort(compare);
   for (var repo in repos) {
@@ -78,12 +82,11 @@ void updateRepos(List<Repository> repos, [int compare(Repository a, Repository b
 }
 
 void loadRepos([int compare(Repository a, Repository b)]) {
-
   var title = querySelector("#title");
   if (title.text.contains("(")) {
     title.replaceWith(new HeadingElement.h2()
-        ..text = "GitHub for Dart - Repositories"
-        ..id = "title");
+      ..text = "GitHub for Dart - Repositories"
+      ..id = "title");
   }
 
   var user = "DirectMyFile";
@@ -91,7 +94,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
   var showForks = true;
 
   var params = queryString;
-  
+
   if (params.containsKey("user")) {
     user = params['user'];
   }

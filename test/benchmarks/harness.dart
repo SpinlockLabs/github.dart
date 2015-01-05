@@ -6,12 +6,13 @@ class BenchmarkHelper {
   static void prettyPrint(Map<String, List<Stopwatch>> results) {
     print("Results:");
     results.forEach((name, result) {
-      int total = result.map((it) => it.elapsedMilliseconds).reduce((a, b) => a + b);
+      int total =
+          result.map((it) => it.elapsedMilliseconds).reduce((a, b) => a + b);
       num avg = total / result.length;
       print("  - ${name}:");
       print("    - Average: ${avg}ms");
       print("    - Times:");
-      
+
       for (var resultz in result) {
         print("        - ${resultz.elapsedMilliseconds}ms");
       }
@@ -33,17 +34,18 @@ void warmup() {
     if (n < 2) return n;
     return fib(n - 1) + fib(n - 2);
   }
-  
+
   for (var i = 1; i <= 5; i++) {
     fib(20);
   }
-  
+
   print("Warm Up Complete");
 }
 
-Future<Map<String, List<Stopwatch>>> runBenchmarks(int times, Map<String, Benchmark> benchmarks) {
+Future<Map<String, List<Stopwatch>>> runBenchmarks(
+    int times, Map<String, Benchmark> benchmarks) {
   warmup();
-  
+
   var group = new FutureGroup();
   var results = {};
   benchmarks.forEach((String name, Benchmark benchmark) {
@@ -54,7 +56,7 @@ Future<Map<String, List<Stopwatch>>> runBenchmarks(int times, Map<String, Benchm
       }));
     }
   });
-  
+
   return group.future.then((_) {
     return results;
   });

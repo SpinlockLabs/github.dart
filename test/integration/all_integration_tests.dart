@@ -10,6 +10,6 @@ import 'git_integration_test.dart' as git_integration_test;
 void main() {
   // Configuration.
   useIntegrationTestConfig();
-  
+
   group('[git_integration_test]', git_integration_test.main);
 }

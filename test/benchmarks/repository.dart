@@ -10,8 +10,11 @@ Future<Stopwatch> fetchRepository() {
 
 Future<Stopwatch> fetchCommits() {
   var watch = new Stopwatch()..start();
-  
-  return github.repositories.listCommits(REPOSITORY_SLUG).toList().then((commits) {
+
+  return github.repositories
+      .listCommits(REPOSITORY_SLUG)
+      .toList()
+      .then((commits) {
     watch.stop();
     return watch;
   });

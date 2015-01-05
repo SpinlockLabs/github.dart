@@ -28,19 +28,19 @@ class Release {
 
   /// Release Name
   String name;
-  
+
   /// Release Notes
   String body;
-  
+
   /// Release Description
   String description;
-  
+
   /// If the release is a draft.
   bool draft;
-  
+
   /// If the release is a pre release.
   bool prerelease;
-  
+
   /// The time this release was created at.
   @ApiName("created_at")
   DateTime createdAt;
@@ -57,23 +57,24 @@ class Release {
 
   static Release fromJSON(input) {
     if (input == null) return null;
-    
+
     return new Release()
-        ..htmlUrl = input['html_url']
-        ..tarballUrl = input['tarball_url']
-        ..zipballUrl = input['zipball_url']
-        ..id = input['id']
-        ..tagName = input['tag_name']
-        ..targetCommitsh = input['target_commitish']
-        ..body = input['body']
-        ..description = input['description']
-        ..draft = input['draft']
-        ..prerelease = input['prelease']
-        ..author = input['author']
-        ..assets = new List.from(input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
-        ..name = input['name']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..publishedAt = parseDateTime(input['published_at']);
+      ..htmlUrl = input['html_url']
+      ..tarballUrl = input['tarball_url']
+      ..zipballUrl = input['zipball_url']
+      ..id = input['id']
+      ..tagName = input['tag_name']
+      ..targetCommitsh = input['target_commitish']
+      ..body = input['body']
+      ..description = input['description']
+      ..draft = input['draft']
+      ..prerelease = input['prelease']
+      ..author = input['author']
+      ..assets = new List.from(
+          input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
+      ..name = input['name']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..publishedAt = parseDateTime(input['published_at']);
   }
 }
 
@@ -86,13 +87,13 @@ class ReleaseAsset {
 
   /// Asset ID
   int id;
-  
+
   /// Asset Name
   String name;
-  
+
   /// Asset Label
   String label;
-  
+
   /// Asset State
   String state;
 
@@ -117,39 +118,39 @@ class ReleaseAsset {
 
   static ReleaseAsset fromJSON(input) {
     if (input == null) return null;
-    
+
     return new ReleaseAsset()
-        ..browserDownloadUrl = input['browser_download_url']
-        ..name = input['name']
-        ..id = input['id']
-        ..label = input['label']
-        ..state = input['state']
-        ..contentType = input['content_type']
-        ..size = input['size']
-        ..downloadCount = input['download_count']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at']);
+      ..browserDownloadUrl = input['browser_download_url']
+      ..name = input['name']
+      ..id = input['id']
+      ..label = input['label']
+      ..state = input['state']
+      ..contentType = input['content_type']
+      ..size = input['size']
+      ..downloadCount = input['download_count']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
 
 /// Model class for a new release to be created.
 class CreateRelease {
-  
+
   /// Tag Name to Base off of
   final String tagName;
-  
+
   /// Commit to Target
   String targetCommitish;
-  
+
   /// Release Name
   String name;
-  
+
   /// Release Body
   String body;
-  
+
   /// If the release is a draft
   bool draft;
-  
+
   /// If the release should actually be released.
   bool release;
 

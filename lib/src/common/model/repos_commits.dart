@@ -1,8 +1,8 @@
 part of github.common;
 
 /// Model class for a commit in a repository.
-/// 
-/// Note: The [RepositoryCommit] wraps a [GitCommit], so author/committer 
+///
+/// Note: The [RepositoryCommit] wraps a [GitCommit], so author/committer
 /// information is in two places, but contain different details about them:
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
 class RepositoryCommit {
@@ -12,11 +12,11 @@ class RepositoryCommit {
 
   /// Commit SHA
   String sha;
-  
+
   /// Url to Commit Page
   @ApiName("html_url")
   String htmlUrl;
-  
+
   /// Comments url.
   @ApiName("comments_url")
   String commentsUrl;
@@ -29,7 +29,7 @@ class RepositoryCommit {
 
   /// Commit Committer.
   User committer;
-  
+
   /// Commit parents.
   List<GitCommit> parents;
 
@@ -41,25 +41,25 @@ class RepositoryCommit {
 
   static RepositoryCommit fromJSON(input) {
     if (input == null) return null;
-    
+
     var commit = new RepositoryCommit()
-        ..url = input['url']
-        ..sha = input['sha']
-        ..htmlUrl = input['html_url']
-        ..commentsUrl = input['comments_url']
-        ..commit = GitCommit.fromJSON(input['commit'])
-        ..author = User.fromJSON(input['author'])
-        ..committer = User.fromJSON(input['committer'])
-        ..stats = CommitStats.fromJSON(input['stats']);
+      ..url = input['url']
+      ..sha = input['sha']
+      ..htmlUrl = input['html_url']
+      ..commentsUrl = input['comments_url']
+      ..commit = GitCommit.fromJSON(input['commit'])
+      ..author = User.fromJSON(input['author'])
+      ..committer = User.fromJSON(input['committer'])
+      ..stats = CommitStats.fromJSON(input['stats']);
 
     if (input['parents'] != null) {
-      commit.parents = input['parents'].map((parent) 
-          => GitCommit.fromJSON(parent)).toList();
+      commit.parents =
+          input['parents'].map((parent) => GitCommit.fromJSON(parent)).toList();
     }
-    
+
     if (input['files'] != null) {
-      commit.files = input['files'].map((file) 
-          => CommitFile.fromJSON(file)).toList();
+      commit.files =
+          input['files'].map((file) => CommitFile.fromJSON(file)).toList();
     }
 
     return commit;
@@ -68,29 +68,28 @@ class RepositoryCommit {
 
 /// Model class for commit statistics.
 class CommitStats {
-  
+
   /// Number of Additions.
   int additions;
 
   /// Number of Deletions.
   int deletions;
-  
+
   /// Total changes.
   int total;
-  
+
   static CommitStats fromJSON(input) {
     if (input == null) return null;
-    
+
     return new CommitStats()
-        ..additions = input['additions']
-        ..deletions = input['deletions']
-        ..total = input['total'];
+      ..additions = input['additions']
+      ..deletions = input['deletions']
+      ..total = input['total'];
   }
 }
 
 /// Model class of a file that was changed in a commit.
 class CommitFile {
-
   @ApiName("filename")
   String name;
 
@@ -111,16 +110,16 @@ class CommitFile {
 
   static CommitFile fromJSON(input) {
     if (input == null) return null;
-    
+
     return new CommitFile()
-        ..name = input['filename']
-        ..additions = input['additions']
-        ..deletions = input['deletions']
-        ..changes = input['changes']
-        ..status = input['status']
-        ..rawUrl = input['raw_url']
-        ..blobUrl = input['blob_url']
-        ..patch = input['patch']
-        ..json = input;
+      ..name = input['filename']
+      ..additions = input['additions']
+      ..deletions = input['deletions']
+      ..changes = input['changes']
+      ..status = input['status']
+      ..rawUrl = input['raw_url']
+      ..blobUrl = input['blob_url']
+      ..patch = input['patch']
+      ..json = input;
   }
 }

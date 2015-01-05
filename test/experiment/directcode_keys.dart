@@ -3,7 +3,9 @@ import "package:github/server.dart";
 import "package:quiver/async.dart";
 
 void main() {
-  var github = createGitHubClient(auth: new Authentication.withToken("5fdec2b77527eae85f188b7b2bfeeda170f26883"));
+  var github = createGitHubClient(
+      auth: new Authentication.withToken(
+          "5fdec2b77527eae85f188b7b2bfeeda170f26883"));
   github.organizations.get("DirectMyFile").then((organization) {
     return github.organizations.listTeams(organization.name).toList();
   }).then((teams) {
@@ -14,7 +16,9 @@ void main() {
     return group.future;
   }).then((mems) {
     return mems.reduce((value, e) {
-      return new Set()..addAll(value)..addAll(e);
+      return new Set()
+        ..addAll(value)
+        ..addAll(e);
     });
   }).then((members) {
     var group = new FutureGroup();

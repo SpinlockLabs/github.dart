@@ -7,7 +7,7 @@ GitHub createMockGitHub() {
 
 /// A [Mock] class that keeps track of named arguments for method calls.
 /// (The normal [Mock] unfortunately only tracks positional parameters.)
-/// 
+///
 /// TODO: Remove this when [Issue 21133](https://code.google.com/p/dart/issues/detail?id=21133)
 /// is resolved.
 class MockWithNamedArgs extends Mock {
@@ -30,18 +30,14 @@ class LogEntryNamedArgs extends LogEntry {
 /// The named arguments.
   final Map<Symbol, dynamic> namedArgs;
 
-  LogEntryNamedArgs(LogEntry logEntry, this.namedArgs)
-      : super(
-          logEntry.mockName,
-          logEntry.methodName,
-          logEntry.args,
+  LogEntryNamedArgs(LogEntry logEntry, this.namedArgs) : super(
+          logEntry.mockName, logEntry.methodName, logEntry.args,
           logEntry.action);
 }
 
 /// A [LogEntryList] that keeps track of named arguments for method calls.
 /// All [add]ed [LogEntry]s of this List will be of type [LogEntryNamedArgs].
 class LogEntryListNamedArgs extends LogEntryList {
-
   final Function getLastNamedArgs;
 
   LogEntryListNamedArgs(this.getLastNamedArgs);

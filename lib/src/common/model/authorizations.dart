@@ -19,16 +19,16 @@ class Authorization {
     if (input == null) return null;
 
     return new Authorization()
-        ..id = input['id']
-        ..scopes = input['scopes']
-        ..token = input['token']
-        ..app = AuthorizationApplication.fromJSON(input['app'])
-        ..note = input['note']
-        ..noteUrl = input['note_url']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..json = input
-        ..user = User.fromJSON(input['user']);
+      ..id = input['id']
+      ..scopes = input['scopes']
+      ..token = input['token']
+      ..app = AuthorizationApplication.fromJSON(input['app'])
+      ..note = input['note']
+      ..noteUrl = input['note_url']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..json = input
+      ..user = User.fromJSON(input['user']);
   }
 }
 
@@ -46,22 +46,22 @@ class AuthorizationApplication {
     if (input == null) return null;
 
     return new AuthorizationApplication()
-        ..url = input['url']
-        ..name = input['name']
-        ..clientID = input['client_id'];
+      ..url = input['url']
+      ..name = input['name']
+      ..clientID = input['client_id'];
   }
 }
 
 class CreateAuthorization {
   final String note;
-  
+
   List<String> scopes;
   String noteUrl;
   String clientID;
   String clientSecret;
-  
+
   CreateAuthorization(this.note);
-  
+
   String toJSON() {
     var map = {};
     putValue("note", note, map);
