@@ -17,7 +17,10 @@ void main() {
 }
 
 void loadReleases() {
-  github.repositories.listReleases(new RepositorySlug("twbs", "bootstrap")).toList().then((releases) {
+  github.repositories
+      .listReleases(new RepositorySlug("twbs", "bootstrap"))
+      .toList()
+      .then((releases) {
     for (var release in releases) {
       $releases.appendHtml("""
       <div class="repo box" id="release-${release.id}">
@@ -30,7 +33,8 @@ void loadReleases() {
         rel.appendHtml("<br/><b>${key}</b>: ${value}");
       }
       append("Tag", '<a href=${release.htmlUrl}>${release.tagName}</a>');
-      append("Download", '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>');
+      append("Download",
+          '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>');
     }
   });
 }

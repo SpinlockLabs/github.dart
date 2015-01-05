@@ -5,39 +5,39 @@ class Repository {
 
   /// Repository Name
   String name;
-  
+
   /// Repository ID
   int id;
 
   /// Full Repository Name
   @ApiName("full_name")
   String fullName;
-  
+
   /// Repository Owner
   UserInformation owner;
-  
+
   /// If the Repository is Private
   @ApiName("private")
   bool isPrivate;
-  
+
   /// If the Repository is a fork
   @ApiName("fork")
   bool isFork;
-  
+
   /// Url to the GitHub Repository Page
   @ApiName("html_url")
   String htmlUrl;
-  
+
   /// Repository Description
   String description;
-  
+
   /// Repository Clone Urls
   @ApiName("clone_urls")
   CloneUrls cloneUrls;
-  
+
   /// Url to the Repository Homepage
   String homepage;
-  
+
   /// Repository Size
   int size;
 
@@ -93,67 +93,66 @@ class Repository {
 
   static Repository fromJSON(input, [Repository instance]) {
     if (input == null) return null;
-    
+
     if (instance == null) instance = new Repository();
-    
+
     return instance
-        ..name = input['name']
-        ..id = input['id']
-        ..fullName = input['full_name']
-        ..isFork = input['fork']
-        ..htmlUrl = input['html_url']
-        ..description = input['description']
-        ..cloneUrls = CloneUrls.fromJSON(input)
-        ..homepage = input['homepage']
-        ..size = input['size']
-        ..stargazersCount = input['stargazers_count']
-        ..watchersCount = input['watchers_count']
-        ..language = input['language']
-        ..hasIssues = input['has_issues']
-        ..hasDownloads = input['has_downloads']
-        ..hasWiki = input['has_wiki']
-        ..defaultBranch = input['default_branch']
-        ..openIssuesCount = input['open_issues_count']
-        ..networkCount = input['network_count']
-        ..subscribersCount = input['subscribers_count']
-        ..forksCount = input['forks_count']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..pushedAt = parseDateTime(input['pushed_at'])
-        ..isPrivate = input['private']
-        ..owner = UserInformation.fromJSON(input['owner']);
+      ..name = input['name']
+      ..id = input['id']
+      ..fullName = input['full_name']
+      ..isFork = input['fork']
+      ..htmlUrl = input['html_url']
+      ..description = input['description']
+      ..cloneUrls = CloneUrls.fromJSON(input)
+      ..homepage = input['homepage']
+      ..size = input['size']
+      ..stargazersCount = input['stargazers_count']
+      ..watchersCount = input['watchers_count']
+      ..language = input['language']
+      ..hasIssues = input['has_issues']
+      ..hasDownloads = input['has_downloads']
+      ..hasWiki = input['has_wiki']
+      ..defaultBranch = input['default_branch']
+      ..openIssuesCount = input['open_issues_count']
+      ..networkCount = input['network_count']
+      ..subscribersCount = input['subscribers_count']
+      ..forksCount = input['forks_count']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..pushedAt = parseDateTime(input['pushed_at'])
+      ..isPrivate = input['private']
+      ..owner = UserInformation.fromJSON(input['owner']);
   }
 
   /// Gets the Repository Slug (Full Name).
   RepositorySlug slug() => new RepositorySlug(owner.login, name);
-
 }
 
 /// Repository Clone Urls
 class CloneUrls {
-  
+
   /// Git Protocol
-  /// 
+  ///
   /// git://github.com/user/repo.git
   String git;
-  
+
   /// SSH Protocol
-  /// 
+  ///
   /// git@github.com:user/repo.git
   String ssh;
-  
+
   /// HTTPS Protocol
-  /// 
+  ///
   /// https://github.com/user/repo.git
   String https;
-  
+
   /// Subversion Protocol
-  /// 
+  ///
   /// https://github.com/user/repo
   String svn;
-  
+
   static CloneUrls fromJSON(input) {
     if (input == null) return null;
-    
+
     return new CloneUrls()
       ..git = input['git_url']
       ..ssh = input['ssh_url']
@@ -164,10 +163,10 @@ class CloneUrls {
 
 /// User Information
 class UserInformation {
-  
+
   /// Owner Username
   String login;
-  
+
   /// Owner ID
   int id;
 
@@ -181,7 +180,7 @@ class UserInformation {
 
   static UserInformation fromJSON(input) {
     if (input == null) return null;
-    
+
     return new UserInformation()
       ..login = input['login']
       ..id = input['id']
@@ -192,15 +191,15 @@ class UserInformation {
 
 /// A Repository Slug
 class RepositorySlug {
-  
+
   /// Repository Owner
   final String owner;
-  
+
   /// Repository Name
   final String name;
 
   RepositorySlug(this.owner, this.name);
-  
+
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {
     var split = f.split("/");
@@ -210,30 +209,31 @@ class RepositorySlug {
   }
 
   /// The Full Name of the Repository
-  /// 
+  ///
   /// Example: owner/name
   String get fullName => "${owner}/${name}";
 
-  bool operator ==(Object obj) => obj is RepositorySlug && obj.fullName == fullName;
-  
+  bool operator ==(Object obj) =>
+      obj is RepositorySlug && obj.fullName == fullName;
+
   int get hashCode => fullName.hashCode;
-  
+
   @override
   String toString() => "${owner}/${name}";
 }
 
 /// Model class for a new repository to be created.
 class CreateRepository {
-  
+
   /// Repository Name
   final String name;
-  
+
   /// Repository Description
   String description;
-  
+
   /// Repository Homepage
   String homepage;
-  
+
   /// If the repository should be private or not.
   bool private = false;
 
@@ -287,34 +287,32 @@ class CreateRepository {
 
 /// Model class for a branch.
 class Branch {
-  
+
   /// The name of the branch.
   String name;
-  
+
   /// The [RepositoryCommit] which wraps the raw [GitCommit].
   RepositoryCommit commit;
-  
+
   static Branch fromJSON(input) {
     if (input == null) return null;
-    
-    var branch = new Branch()
-        ..name = input['name'];
-    
+
+    var branch = new Branch()..name = input['name'];
+
     if (input['commit'] != null) {
       branch.commit = RepositoryCommit.fromJSON(input['commit']);
     }
-    
+
     return branch;
   }
 }
 
-
 /// A Breakdown of the Languages a repository uses.
 class LanguageBreakdown {
   final Map<String, int> _data;
-  
+
   LanguageBreakdown(Map<String, int> data) : _data = data;
-  
+
   /// The Primary Language
   String get primary {
     var list = mapToList(_data);
@@ -323,15 +321,15 @@ class LanguageBreakdown {
     });
     return list.first.key;
   }
-  
+
   /// Names of Languages Used
   List<String> get names => _data.keys.toList()..sort();
-  
+
   /// Actual Information
-  /// 
+  ///
   /// This is a Map of the Language Name to the Number of Bytes of that language in the repository.
   Map<String, int> get info => _data;
-  
+
   /// Creates a list of lists with a tuple of the language name and the bytes.
   List<List<dynamic>> toList() {
     var out = [];
@@ -340,7 +338,7 @@ class LanguageBreakdown {
     }
     return out;
   }
-  
+
   @override
   String toString() {
     var buffer = new StringBuffer();

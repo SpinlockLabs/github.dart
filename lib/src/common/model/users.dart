@@ -68,31 +68,31 @@ class User {
 
   static User fromJSON(input) {
     if (input == null) return null;
-    
+
     if (input['avatar_url'] == null) {
       print(input);
       return null;
     }
-    
+
     return new User()
-        ..login = input['login']
-        ..id = input['id']
-        ..avatarUrl = input['avatar_url']
-        ..htmlUrl = input['html_url']
-        ..bio = input['bio']
-        ..name = input['name']
-        ..siteAdmin = input['site_admin']
-        ..company = input['company']
-        ..blog = input['blog']
-        ..location = input['location']
-        ..email = input['email']
-        ..hirable = input['hirable']
-        ..publicGistsCount = input['public_gists']
-        ..publicReposCount = input['public_repos']
-        ..followersCount = input['followers']
-        ..followingCount = input['following']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at']);
+      ..login = input['login']
+      ..id = input['id']
+      ..avatarUrl = input['avatar_url']
+      ..htmlUrl = input['html_url']
+      ..bio = input['bio']
+      ..name = input['name']
+      ..siteAdmin = input['site_admin']
+      ..company = input['company']
+      ..blog = input['blog']
+      ..location = input['location']
+      ..email = input['email']
+      ..hirable = input['hirable']
+      ..publicGistsCount = input['public_gists']
+      ..publicReposCount = input['public_repos']
+      ..followersCount = input['followers']
+      ..followingCount = input['following']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
 
@@ -116,29 +116,29 @@ class CurrentUser extends User {
 
   static CurrentUser fromJSON(input) {
     if (input == null) return null;
-    
+
     return new CurrentUser()
-        ..login = input['login']
-        ..id = input['id']
-        ..avatarUrl = input['avatar_url']
-        ..htmlUrl = input['html_url']
-        ..bio = input['bio']
-        ..name = input['name']
-        ..siteAdmin = input['site_admin']
-        ..company = input['company']
-        ..blog = input['blog']
-        ..location = input['location']
-        ..email = input['email']
-        ..hirable = input['hirable']
-        ..publicGistsCount = input['public_gists']
-        ..publicReposCount = input['public_repos']
-        ..followersCount = input['followers']
-        ..followingCount = input['following']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..privateReposCount = input['total_private_repos']
-        ..ownedPrivateReposCount = input['owned_private_repos']
-        ..plan = UserPlan.fromJSON(input['plan']);
+      ..login = input['login']
+      ..id = input['id']
+      ..avatarUrl = input['avatar_url']
+      ..htmlUrl = input['html_url']
+      ..bio = input['bio']
+      ..name = input['name']
+      ..siteAdmin = input['site_admin']
+      ..company = input['company']
+      ..blog = input['blog']
+      ..location = input['location']
+      ..email = input['email']
+      ..hirable = input['hirable']
+      ..publicGistsCount = input['public_gists']
+      ..publicReposCount = input['public_repos']
+      ..followersCount = input['followers']
+      ..followingCount = input['following']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..privateReposCount = input['total_private_repos']
+      ..ownedPrivateReposCount = input['owned_private_repos']
+      ..plan = UserPlan.fromJSON(input['plan']);
   }
 }
 
@@ -172,10 +172,10 @@ class UserPlan {
   static UserPlan fromJSON(input) {
     if (input == null) return null;
     return new UserPlan()
-        ..name = input['name']
-        ..space = input['space']
-        ..privateReposCount = input['private_repos']
-        ..collaboratorsCount = input['collaborators'];
+      ..name = input['name']
+      ..space = input['space']
+      ..privateReposCount = input['private_repos']
+      ..collaboratorsCount = input['collaborators'];
   }
 }
 
@@ -189,8 +189,8 @@ class UserEmail {
     if (input == null) return null;
 
     return new UserEmail()
-        ..email = input['email']
-        ..primary = input['primary']
-        ..verified = input['verified'];
+      ..email = input['email']
+      ..primary = input['primary']
+      ..verified = input['verified'];
   }
 }

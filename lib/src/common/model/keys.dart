@@ -1,8 +1,8 @@
 part of github.common;
 
 /// Model class for a public key.
-/// 
-/// Note: [PublicKey] is used both by the repositories' deploy keys and by the 
+///
+/// Note: [PublicKey] is used both by the repositories' deploy keys and by the
 /// users' public keys.
 class PublicKey {
   int id;
@@ -11,11 +11,11 @@ class PublicKey {
 
   static PublicKey fromJSON(input) {
     if (input == null) return null;
-    
+
     return new PublicKey()
-        ..id = input['id']
-        ..key = input['key']
-        ..title = input['title'];
+      ..id = input['id']
+      ..key = input['key']
+      ..title = input['title'];
   }
 }
 
@@ -23,9 +23,9 @@ class PublicKey {
 class CreatePublicKey {
   final String title;
   final String key;
-  
+
   CreatePublicKey(this.title, this.key);
-  
+
   String toJSON() {
     var map = {};
     putValue("title", title, map);

@@ -6,7 +6,9 @@ import "common.dart";
 void main() {
   initGitHub();
   var url = window.location.href;
-  var flow = new OAuth2Flow("ff718b16cbfc71defcba", "a0c004e014feed76bdd659fcef0445e8f632c236", redirectUri: url, scopes: ["user:email"]);
+  var flow = new OAuth2Flow(
+      "ff718b16cbfc71defcba", "a0c004e014feed76bdd659fcef0445e8f632c236",
+      redirectUri: url, scopes: ["user:email"]);
 
   void authorize() {
     window.location.href = flow.createAuthorizeUrl();

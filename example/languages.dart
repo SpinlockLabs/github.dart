@@ -24,7 +24,7 @@ void loadRepository() {
   var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
 
   var params = queryString;
-  
+
   if (params.containsKey("user")) {
     user = params["user"];
   }
@@ -36,12 +36,13 @@ void loadRepository() {
   if (params.containsKey("repo")) {
     reponame = params["repo"];
   }
-  
+
   document.getElementById("name").setInnerHtml("${user}/${reponame}");
 
   github = new GitHub(auth: new Authentication.withToken(token));
 
-  github.repositories.listLanguages(new RepositorySlug(user, reponame)).then((b) {
+  github.repositories.listLanguages(new RepositorySlug(user, reponame)).then(
+      (b) {
     breakdown = b;
     reloadTable();
   });
@@ -50,13 +51,12 @@ void loadRepository() {
 bool isReloadingTable = false;
 
 void reloadTable({int accuracy: 4}) {
-  
   if (isReloadingTable) {
     return;
   }
-  
+
   isReloadingTable = true;
-  
+
   github.misc.renderMarkdown(generateMarkdown(accuracy)).then((html) {
     $table.innerHtml = html;
     isReloadingTable = false;
@@ -70,11 +70,11 @@ int totalBytes(LanguageBreakdown breakdown) {
 String generateMarkdown(int accuracy) {
   int total = totalBytes(breakdown);
   var data = breakdown.toList();
-  
+
   var tableData = [];
-  
+
   data.sort((a, b) => b[1].compareTo(a[1]));
-  
+
   data.forEach((info) {
     String name = info[0];
     int bytes = info[1];

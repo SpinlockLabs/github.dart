@@ -2,12 +2,13 @@ import "dart:html";
 
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();
-  
+
   if (onReady != null) {
     document.onReadyStateChange.listen((event) {
       if (document.readyState == ReadyState.COMPLETE) {
         stopwatch.stop();
-        print("Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
+        print(
+            "Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
         onReady();
       }
     });
@@ -16,17 +17,15 @@ void init(String script, {void onReady()}) {
   document.querySelector("#view-source").onClick.listen((_) {
     var popup = window.open("view_source.html", "View Source");
     String code;
-    
+
     var fetched = false;
     var ready = false;
-    
+
     void sendCode() {
-      popup.postMessage({
-        "command": "code",
-        "code": code
-      }, window.location.href);
+      popup.postMessage(
+          {"command": "code", "code": code}, window.location.href);
     }
-    
+
     window.addEventListener("message", (event) {
       if (event.data['command'] == "ready") {
         ready = true;
@@ -35,7 +34,7 @@ void init(String script, {void onReady()}) {
         }
       }
     });
-    
+
     HttpRequest.getString(script).then((c) {
       code = c;
       fetched = true;
@@ -46,4 +45,5 @@ void init(String script, {void onReady()}) {
   });
 }
 
-Map<String, String> get queryString => Uri.parse(window.location.href).queryParameters;
+Map<String, String> get queryString =>
+    Uri.parse(window.location.href).queryParameters;

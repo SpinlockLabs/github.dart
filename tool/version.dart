@@ -37,7 +37,6 @@ String incrementVersion(String old) {
     throw new Exception("the version in the pubspec is not a valid version");
   }
   var match = VERSION_REGEX.firstMatch(old);
-  List<String> split = old.split(".");
   int major = int.parse(match[1]);
   int minor = int.parse(match[2]);
   int bugfix = int.parse(match[3]);

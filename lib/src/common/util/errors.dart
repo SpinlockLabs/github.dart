@@ -6,9 +6,9 @@ class GitHubError {
   final String apiUrl;
   final GitHub github;
   final Object source;
-  
+
   GitHubError(this.github, this.message, {this.apiUrl, this.source});
-  
+
   @override
   String toString() => "GitHub Error: ${message}";
 }
@@ -20,17 +20,20 @@ class NotFound extends GitHubError {
 
 /// GitHub Repository was not found
 class RepositoryNotFound extends NotFound {
-  RepositoryNotFound(GitHub github, String repo) : super(github, "Repository Not Found: ${repo}");
+  RepositoryNotFound(GitHub github, String repo)
+      : super(github, "Repository Not Found: ${repo}");
 }
 
 /// GitHub User was not found
 class UserNotFound extends NotFound {
-  UserNotFound(GitHub github, String user) : super(github, "User Not Found: ${user}");
+  UserNotFound(GitHub github, String user)
+      : super(github, "User Not Found: ${user}");
 }
 
 /// GitHub Organization was not found
 class OrganizationNotFound extends NotFound {
-  OrganizationNotFound(GitHub github, String organization) : super(github, "Organization Not Found: ${organization}");
+  OrganizationNotFound(GitHub github, String organization)
+      : super(github, "Organization Not Found: ${organization}");
 }
 
 /// GitHub Team was not found
@@ -42,7 +45,6 @@ class TeamNotFound extends NotFound {
 class AccessForbidden extends GitHubError {
   AccessForbidden(GitHub github) : super(github, "Access Forbbidden");
 }
-
 
 /// Client hit the rate limit.
 class RateLimitHit extends GitHubError {
@@ -60,9 +62,11 @@ class NotAuthenticated extends GitHubError {
 }
 
 class InvalidJSON extends GitHubError {
-  InvalidJSON(GitHub github, [String message = "Invalid JSON"]) : super(github, message);
+  InvalidJSON(GitHub github, [String message = "Invalid JSON"])
+      : super(github, message);
 }
 
 class ValidationFailed extends GitHubError {
-  ValidationFailed(GitHub github, [String message = "Validation Failed"]) : super(github, message);  
+  ValidationFailed(GitHub github, [String message = "Validation Failed"])
+      : super(github, message);
 }
