@@ -91,20 +91,10 @@ void loadRepos([int compare(Repository a, Repository b)]) {
 
   var user = "DirectMyFile";
 
-  var showForks = true;
-
   var params = queryString;
 
   if (params.containsKey("user")) {
     user = params['user'];
-  }
-
-  if (params.containsKey("forks")) {
-    if (["1", "true", "yes", "sure"].contains(params['forks'])) {
-      showForks = true;
-    } else {
-      showForks = false;
-    }
   }
 
   if (params.containsKey("sort") && compare == null) {

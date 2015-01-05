@@ -117,8 +117,6 @@ class ExploreService extends Service {
 
       var links = pag.querySelectorAll("a");
 
-      var linkNext = null;
-
       bool didFetchMore = false;
 
       for (var link in links) {

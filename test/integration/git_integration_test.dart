@@ -1,6 +1,5 @@
 library github.test.integration.git_integration_test;
 
-import 'dart:async';
 import 'package:unittest/unittest.dart';
 
 import 'config/config.dart';
