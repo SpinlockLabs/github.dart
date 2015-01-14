@@ -1,6 +1,19 @@
 import "package:github/common.dart";
 
 void main() {
-  print(parseFancyNumber("12k"));
-  print(parseFancyNumber("12.4k"));
+  test("1k", 1000);
+  test("2k", 2000);
+  test("2.2k", 2200);
+  test("2.34k", 2340);
+  test("1m", 1000000);
+  test("3,000", 3000);
+}
+
+void test(String input, int expect) {
+  var out = parseFancyNumber(input);
+  if (out != expect) {
+    print("ERROR: ${input} was parsed as ${out} but we expected ${expect}");
+  } else {
+    print("${input} => ${expect}");
+  }
 }

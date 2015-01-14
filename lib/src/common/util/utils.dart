@@ -122,13 +122,24 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
 }
 
 int parseFancyNumber(String input) {
-  var it = input.endsWith('k') ? input.substring(0, input.length - 1) : input;
-  var isThousand = input.endsWith('k');
-  var number = num.parse(it);
-  if (isThousand) {
-    return (number * 1000).toInt();
+  input = input.trim();
+  if (input.contains(",")) input = input.replaceAll(",", "");
+  
+  var multipliers = {
+    "k": 1000,
+    "m": 1000000
+  };
+  int value;
+  
+  if (!multipliers.keys.any((m) => input.endsWith(m))) {
+    value = int.parse(input);
+  } else {
+    var m = multipliers.keys.firstWhere((m) => input.endsWith(m));
+    input = input.substring(0, input.length - m.length);
+    value = num.parse(input) * multipliers[m];
   }
-  return number.toInt();
+  
+  return value;
 }
 
 RepositorySlug slugFromAPIUrl(String url) {
