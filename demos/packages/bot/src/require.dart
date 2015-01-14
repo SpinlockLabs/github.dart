@@ -34,7 +34,8 @@ void requireArgumentNotNullOrEmpty(String argument, String argName) {
   }
 }
 
-void requireArgumentContainsPattern(Pattern pattern, String argValue, String argName) {
+void requireArgumentContainsPattern(Pattern pattern, String argValue,
+    String argName) {
   if (pattern == null) {
     throw new InvalidOperationError("That's just sad. No null pattern");
   }

@@ -3,7 +3,7 @@ part of xml;
 /**
  * Abstract XML node.
  */
-abstract class XmlNode extends Object with XmlWritable, XmlParent {
+abstract class XmlNode extends Object with XmlVisitable, XmlWritable, XmlParent {
 
   /**
    * Return the attribute nodes of this node.
@@ -25,7 +25,7 @@ abstract class XmlNode extends Object with XmlWritable, XmlParent {
   Iterable<XmlNode> get iterable => descendants;
 
   /**
-   * Return an interable of the nodes preceding the opening tag of this node
+   * Return an iterable of the nodes preceding the opening tag of this node
    * in document order.
    */
   Iterable<XmlNode> get preceding => new _XmlPrecedingIterable(this);
@@ -70,10 +70,13 @@ abstract class XmlNode extends Object with XmlWritable, XmlParent {
   XmlNode get lastChild => children.isEmpty ? null : children.last;
 
   /**
-   * Return the text contents of this node and all its descendents.
+   * Return the text contents of this node and all its descendants.
    */
   String get text {
-    return descendants.where((node) => node is XmlText).map((node) => node.text).join();
+    return descendants
+        .where((node) => node is XmlText || node is XmlCDATA)
+        .map((node) => node.text)
+        .join();
   }
 
   /**

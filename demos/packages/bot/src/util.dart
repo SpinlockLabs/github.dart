@@ -25,7 +25,8 @@ class Util {
   static Iterable<String> splitLines(String input) {
     requireArgumentNotNull(input, 'input');
 
-    return new FuncEnumerable(input, (v) => new StringLineIterator(v));
+    return new FuncEnumerable<String, String>(input,
+        (v) => new StringLineIterator(v));
   }
 
   /**

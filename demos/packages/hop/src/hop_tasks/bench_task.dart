@@ -1,7 +1,7 @@
 library hop_tasks.bench;
 
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' hide Console;
 import 'dart:math' as math;
 import 'package:args/args.dart';
 import 'package:bot/bot.dart';

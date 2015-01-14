@@ -9,8 +9,8 @@ class Size {
   const Size(this.width, this.height);
 
   @override
-  bool operator ==(Size other) {
-    return other != null && width == other.width && height == other.height;
+  bool operator ==(other) {
+    return other is Size && width == other.width && height == other.height;
   }
 
   /**

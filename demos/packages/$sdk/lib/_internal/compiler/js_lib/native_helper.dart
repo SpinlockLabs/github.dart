@@ -111,7 +111,8 @@ get interceptorsByTag => JS_EMBEDDED_GLOBAL('=Object', INTERCEPTORS_BY_TAG);
 get leafTags => JS_EMBEDDED_GLOBAL('=Object', LEAF_TAGS);
 
 String findDispatchTagForInterceptorClass(interceptorClassConstructor) {
-  return JS('', r'#.$nativeSuperclassTag', interceptorClassConstructor);
+  return JS('', r'#.#',
+            interceptorClassConstructor, NATIVE_SUPERCLASS_TAG_NAME);
 }
 
 /**
@@ -443,8 +444,11 @@ applyHooksTransformer(transformer, hooks) {
 const _baseHooks = const JS_CONST(r'''
 function() {
   function typeNameInChrome(o) {
-    var name = o.constructor.name;
-    if (name) return name;
+    var constructor = o.constructor;
+    if (constructor) {
+      var name = constructor.name;
+      if (name) return name;
+    }
     var s = Object.prototype.toString.call(o);
     return s.substring(8, s.length - 1);
   }

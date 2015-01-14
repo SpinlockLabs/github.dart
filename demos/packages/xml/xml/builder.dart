@@ -1,7 +1,7 @@
 part of xml;
 
 /**
- * A builder to programmatically create XML trees.
+ * A builder to create XML trees with code.
  */
 class XmlBuilder {
 
@@ -133,7 +133,7 @@ class XmlBuilder {
   /**
    * Binds a namespace [prefix] to the provided [uri]. The [prefix] can be
    * omitted to declare a default namespace. Throws an [ArgumentError] if
-   * the [prefix] is invalid or conflicts with an existing delcaration.
+   * the [prefix] is invalid or conflicts with an existing declaration.
    */
   void namespace(String uri, [String prefix]) {
     if (prefix == _XMLNS || prefix == _XML) {

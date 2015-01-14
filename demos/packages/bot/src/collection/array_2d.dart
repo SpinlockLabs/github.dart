@@ -40,16 +40,18 @@ class Array2d<T> extends ListBase<T> {
     return new Array2d.wrap(width, s);
   }
 
-  Array2d._skinny(this.height) : width = 0, _source = [] {
+  Array2d._skinny(this.height)
+      : width = 0,
+        _source = [] {
     assert(isValidNumber(height));
     assert(height >= 0);
   }
 
-  Array2d.wrap(int width, List<T> source):
-    this.width = width,
-    this._source = source,
-    this.height = (width != null && width > 0 && source != null) ?
-        source.length ~/ width : 0 {
+  Array2d.wrap(int width, List<T> source)
+      : this.width = width,
+        this._source = source,
+        this.height = (width != null && width > 0 && source != null) ?
+            source.length ~/ width : 0 {
     requireArgumentNotNull(width, 'width');
     requireArgumentNotNull(source, 'source');
     requireArgument(width >= 0, 'width', 'width must be non-zero');
@@ -169,7 +171,8 @@ class _Array2dRow<T> extends ListBase<T> {
 
   @override
   bool operator ==(other) {
-    return other is _Array2dRow && other.source == this.source &&
+    return other is _Array2dRow &&
+        other.source == this.source &&
         other.row == this.row;
   }
 

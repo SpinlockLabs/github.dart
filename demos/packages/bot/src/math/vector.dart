@@ -4,7 +4,7 @@ part of bot.math;
  * Class reperesenting a 2d vector.
  **/
 class Vector<T extends num> extends Coordinate<T> {
-  const Vector([T x = 0, T y = 0]): super(x, y);
+  const Vector([T x = 0, T y = 0]) : super(x, y);
 
   Vector get normal => this.scale(1 / this.magnitude);
 

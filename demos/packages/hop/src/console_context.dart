@@ -37,7 +37,7 @@ class ConsoleContext extends TaskRuntime {
     } on FormatException catch (ex, stack) {
       print('There was a problem parsing the provided arguments.');
       print(ex.message);
-      print(parser.getUsage());
+      print(parser.usage);
       io.exit(RunResult.BAD_USAGE.exitCode);
     }
     final ctx = new ConsoleContext._(args);

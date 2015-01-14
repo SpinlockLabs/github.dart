@@ -8,14 +8,13 @@ Stream expandStream(Stream source, Stream convert(input), {Stream onDone()}) {
   var controller = new StreamController();
 
   streamForEachAsync(source, (item) => controller.addStream(convert(item)))
-    .then((_) {
-      if(onDone != null) {
-        return controller.addStream(onDone());
-      }
-    })
-    .then((_) {
-      return controller.close();
-    });
+      .then((_) {
+    if (onDone != null) {
+      return controller.addStream(onDone());
+    }
+  }).then((_) {
+    return controller.close();
+  });
 
   return controller.stream;
 }
@@ -39,21 +38,20 @@ class _StreamForEachAsync<T> {
   Future get future => _completer.future;
 
   void _moveNext() {
-    _iterator.moveNext()
-      .then((bool hasNext) {
-        if(!hasNext) {
-          _completer.complete();
-          return;
-        }
+    _iterator.moveNext().then((bool hasNext) {
+      if (!hasNext) {
+        _completer.complete();
+        return;
+      }
 
-        new Future(() => _action(_iterator.current))
+      new Future(() => _action(_iterator.current))
           .then((_) => _moveNext())
           .catchError((error, stackTrace) {
-            new Future(_iterator.cancel)
-              .then((_) => _completer.completeError(error, stackTrace));
-          });
-      }, onError: (error, stack) {
-        _completer.completeError(error, stack);
+        new Future(_iterator.cancel)
+            .then((_) => _completer.completeError(error, stackTrace));
       });
+    }, onError: (error, stack) {
+      _completer.completeError(error, stack);
+    });
   }
 }

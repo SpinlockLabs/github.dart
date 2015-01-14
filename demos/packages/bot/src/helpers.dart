@@ -19,7 +19,7 @@ class StringLineIterator extends Iterator<String> {
 
   String _current;
 
-  StringLineIterator(String source): _reader = new StringLineReader(source);
+  StringLineIterator(String source) : _reader = new StringLineReader(source);
 
   String get current => _current;
 

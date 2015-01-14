@@ -2,10 +2,10 @@ part of github.common;
 
 /// Marks something as not being ready or complete.
 class NotReadyYet {
-  
+
   /// Informational Message
   final String message;
-  
+
   const NotReadyYet(this.message);
 }
 
@@ -15,16 +15,16 @@ class ApiName {
   /// Original API Field Name
    */
   final String name;
-  
+
   const ApiName(this.name);
 }
 
 /// Specifies that something should be only used when the specified condition is met.
 class OnlyWhen {
-  
+
   /// Condition
   final String condition;
-  
+
   const OnlyWhen(this.condition);
 }
 
@@ -33,12 +33,12 @@ DateTime parseDateTime(String input) {
   if (input == null) {
     return null;
   }
-  
+
   return DateTime.parse(input);
 }
 
 /// Converts the [date] to GitHub's ISO-8601 format:
-/// 
+///
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
 String dateToGithubIso8601(DateTime date) {
   // Regex removes the milliseconds.
@@ -47,11 +47,11 @@ String dateToGithubIso8601(DateTime date) {
 
 String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();
-  
+
   if (params.isNotEmpty && !params.values.every((value) => value == null)) {
     queryString.write("?");
   }
-  
+
   var i = 0;
   for (var key in params.keys) {
     i++;
@@ -77,7 +77,7 @@ dynamic copyOf(dynamic input) {
 }
 
 /// Puts a [name] and [value] into the [map] if [value] is not null. If [value]
-/// is null, nothing is added. 
+/// is null, nothing is added.
 void putValue(String name, dynamic value, Map<String, dynamic> map) {
   if (value != null) {
     map[name] = value;
@@ -109,7 +109,7 @@ String fullNameFromRepoApiUrl(String url) {
 class MapEntry<K, V> {
   final K key;
   final V value;
-  
+
   MapEntry(this.key, this.value);
 }
 
@@ -122,13 +122,26 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
 }
 
 int parseFancyNumber(String input) {
-  var it = input.endsWith('k') ? input.substring(0, input.length - 1) : input;
-  var isThousand = input.endsWith('k');
-  var number = num.parse(it);
-  if (isThousand) {
-    return (number * 1000).toInt();
+  input = input.trim();
+  if (input.contains(",")) input = input.replaceAll(",", "");
+  
+  var multipliers = {
+    "h": 100,
+    "k": 1000,
+    "ht": 100000, 
+    "m": 1000000
+  };
+  int value;
+  
+  if (!multipliers.keys.any((m) => input.endsWith(m))) {
+    value = int.parse(input);
+  } else {
+    var m = multipliers.keys.firstWhere((m) => input.endsWith(m));
+    input = input.substring(0, input.length - m.length);
+    value = num.parse(input) * multipliers[m];
   }
-  return number.toInt();
+  
+  return value;
 }
 
 RepositorySlug slugFromAPIUrl(String url) {
@@ -146,12 +159,12 @@ abstract class StatusCodes {
   static const int NO_CONTENT = 204;
   static const int RESET_CONTENT = 205;
   static const int PARTIAL_CONTENT = 206;
-  
+
   static const int MOVED_PERMANENTLY = 301;
   static const int FOUND = 302;
   static const int NOT_MODIFIED = 304;
   static const int TEMPORARY_REDIRECT = 307;
-  
+
   static const int BAD_REQUEST = 400;
   static const int UNAUTHORIZED = 401;
   static const int PAYMENT_REQUIRED = 402;
@@ -166,6 +179,6 @@ abstract class StatusCodes {
   static const int LENGTH_REQUIRED = 411;
   static const int PRECONDITION_FAILED = 412;
   static const int TOO_MANY_REQUESTS = 429;
-  
+
   static bool isClientError(int code) => code > 400 && code < 500;
 }

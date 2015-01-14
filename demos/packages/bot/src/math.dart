@@ -6,7 +6,6 @@ import 'require.dart';
 import 'util.dart';
 
 part 'math/affine_transform.dart';
-part 'math/box.dart';
 part 'math/bungee_num.dart';
 part 'math/coordinate.dart';
 part 'math/math_functions.dart';

@@ -11,7 +11,7 @@ const _XMLNS = 'xmlns';
 /**
  * XML entity name.
  */
-abstract class XmlName extends Object with XmlWritable, XmlParent {
+abstract class XmlName extends Object with XmlVisitable, XmlWritable, XmlParent {
 
   /**
    * Return the namespace prefix, or `null`.
@@ -59,9 +59,7 @@ abstract class XmlName extends Object with XmlWritable, XmlParent {
   XmlName._();
 
   @override
-  void writeTo(StringBuffer buffer) {
-    buffer.write(qualified);
-  }
+  accept(XmlVisitor visitor) => visitor.visitName(this);
 
   @override
   bool operator == (Object other) => other is XmlName

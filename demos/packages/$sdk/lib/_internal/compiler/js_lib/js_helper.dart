@@ -4,7 +4,7 @@
 
 library _js_helper;
 
-import 'shared/embedded_names.dart' show
+import 'dart:_js_embedded_names' show
     ALL_CLASSES,
     GET_ISOLATE_TAG,
     INTERCEPTED_NAMES,
@@ -14,7 +14,9 @@ import 'shared/embedded_names.dart' show
     DEFERRED_LIBRARY_URIS,
     DEFERRED_LIBRARY_HASHES,
     INITIALIZE_LOADED_HUNK,
-    IS_HUNK_LOADED;
+    IS_HUNK_LOADED,
+    IS_HUNK_INITIALIZED,
+    NATIVE_SUPERCLASS_TAG_NAME;
 
 import 'dart:collection';
 import 'dart:_isolate_helper' show
@@ -76,6 +78,12 @@ class _Patch {
 }
 
 const _Patch patch = const _Patch();
+
+
+/// Marks the internal map in dart2js, so that internal libraries can is-check
+// them.
+abstract class InternalMap {
+}
 
 /// No-op method that is called to inform the compiler that preambles might
 /// be needed when executing the resulting JS file in a command-line
@@ -720,7 +728,7 @@ class Primitives {
     return "Instance of '$name'";
   }
 
-  static num dateNow() => JS('num', r'Date.now()');
+  static num dateNow() => JS('int', r'Date.now()');
 
   static void initTicker() {
     if (timerFrequency != null) return;
@@ -826,7 +834,7 @@ class Primitives {
   }
 
   static String flattenString(String str) {
-    return JS('', "#.charCodeAt(0) == 0 ? # : #", str, str, str);
+    return JS('String', "#.charCodeAt(0) == 0 ? # : #", str, str, str);
   }
 
   static String getTimeZoneName(receiver) {
@@ -1028,63 +1036,32 @@ class Primitives {
   static applyFunction(Function function,
                        List positionalArguments,
                        Map<String, dynamic> namedArguments) {
-    if (namedArguments != null && !namedArguments.isEmpty) {
-      // TODO(ahe): The following code can be shared with
-      // JsInstanceMirror.invoke.
-      var interceptor = getInterceptor(function);
-      var jsFunction = JS('', '#["call*"]', interceptor);
+    // Dispatch on presence of named arguments to improve tree-shaking.
+    //
+    // This dispatch is as simple as possible to help the compiler detect the
+    // common case of `null` namedArguments, either via inlining or
+    // specialization.
+    return namedArguments == null
+        ? applyFunctionWithPositionalArguments(
+            function, positionalArguments)
+        : applyFunctionWithNamedArguments(
+            function, positionalArguments, namedArguments);
+  }
 
-      if (jsFunction == null) {
-        return functionNoSuchMethod(
-            function, positionalArguments, namedArguments);
-      }
-      ReflectionInfo info = new ReflectionInfo(jsFunction);
-      if (info == null || !info.areOptionalParametersNamed) {
-        return functionNoSuchMethod(
-            function, positionalArguments, namedArguments);
-      }
-
-      if (positionalArguments != null) {
-        positionalArguments = new List.from(positionalArguments);
-      } else {
-        positionalArguments = [];
-      }
-      // Check the number of positional arguments is valid.
-      if (info.requiredParameterCount != positionalArguments.length) {
-        return functionNoSuchMethod(
-            function, positionalArguments, namedArguments);
-      }
-      var defaultArguments = new Map();
-      for (int i = 0; i < info.optionalParameterCount; i++) {
-        int index = i + info.requiredParameterCount;
-        var parameterName = info.parameterNameInOrder(index);
-        var value = info.defaultValueInOrder(index);
-        var defaultValue = getMetadata(value);
-        defaultArguments[parameterName] = defaultValue;
-      }
-      bool bad = false;
-      namedArguments.forEach((String parameter, value) {
-        if (defaultArguments.containsKey(parameter)) {
-          defaultArguments[parameter] = value;
-        } else {
-          // Extraneous named argument.
-          bad = true;
-        }
-      });
-      if (bad) {
-        return functionNoSuchMethod(
-            function, positionalArguments, namedArguments);
-      }
-      positionalArguments.addAll(defaultArguments.values);
-      return JS('', '#.apply(#, #)', jsFunction, function, positionalArguments);
-    }
-
+  static applyFunctionWithPositionalArguments(Function function,
+                                              List positionalArguments) {
     int argumentCount = 0;
-    List arguments = [];
+    List arguments;
 
     if (positionalArguments != null) {
-      argumentCount += positionalArguments.length;
-      arguments.addAll(positionalArguments);
+      if (JS('bool', '# instanceof Array', positionalArguments)) {
+        arguments = positionalArguments;
+      } else {
+        arguments = new List.from(positionalArguments);
+      }
+      argumentCount = JS('int', '#.length', arguments);
+    } else {
+      arguments = [];
     }
 
     String selectorName = '${JS_GET_NAME("CALL_PREFIX")}\$$argumentCount';
@@ -1094,13 +1071,69 @@ class Primitives {
       // TODO(ahe): This might occur for optional arguments if there is no call
       // selector with that many arguments.
 
-      return
-          functionNoSuchMethod(function, positionalArguments, namedArguments);
+      return functionNoSuchMethod(function, positionalArguments, null);
     }
     // We bound 'this' to [function] because of how we compile
     // closures: escaped local variables are stored and accessed through
     // [function].
     return JS('var', '#.apply(#, #)', jsFunction, function, arguments);
+  }
+
+  static applyFunctionWithNamedArguments(Function function,
+                                         List positionalArguments,
+                                         Map<String, dynamic> namedArguments) {
+    if (namedArguments.isEmpty) {
+      return applyFunctionWithPositionalArguments(
+          function, positionalArguments);
+    }
+    // TODO(ahe): The following code can be shared with
+    // JsInstanceMirror.invoke.
+    var interceptor = getInterceptor(function);
+    var jsFunction = JS('', '#["call*"]', interceptor);
+
+    if (jsFunction == null) {
+      return functionNoSuchMethod(
+          function, positionalArguments, namedArguments);
+    }
+    ReflectionInfo info = new ReflectionInfo(jsFunction);
+    if (info == null || !info.areOptionalParametersNamed) {
+      return functionNoSuchMethod(
+          function, positionalArguments, namedArguments);
+    }
+
+    if (positionalArguments != null) {
+      positionalArguments = new List.from(positionalArguments);
+    } else {
+      positionalArguments = [];
+    }
+    // Check the number of positional arguments is valid.
+    if (info.requiredParameterCount != positionalArguments.length) {
+      return functionNoSuchMethod(
+          function, positionalArguments, namedArguments);
+    }
+    var defaultArguments = new Map();
+    for (int i = 0; i < info.optionalParameterCount; i++) {
+      int index = i + info.requiredParameterCount;
+      var parameterName = info.parameterNameInOrder(index);
+      var value = info.defaultValueInOrder(index);
+      var defaultValue = getMetadata(value);
+      defaultArguments[parameterName] = defaultValue;
+    }
+    bool bad = false;
+    namedArguments.forEach((String parameter, value) {
+      if (defaultArguments.containsKey(parameter)) {
+        defaultArguments[parameter] = value;
+      } else {
+        // Extraneous named argument.
+        bad = true;
+      }
+    });
+    if (bad) {
+      return functionNoSuchMethod(
+          function, positionalArguments, namedArguments);
+    }
+    positionalArguments.addAll(defaultArguments.values);
+    return JS('', '#.apply(#, #)', jsFunction, function, positionalArguments);
   }
 
   static _mangledNameMatchesType(String mangledName, TypeImpl type) {
@@ -1955,7 +1988,7 @@ abstract class Closure implements Function {
     // var dynClosureConstructor =
     //     new Function('self', 'target', 'receiver', 'name',
     //                  'this._init(self, target, receiver, name)');
-    // proto.constructor = dynClosureConstructor; // Necessary?
+    // proto.constructor = dynClosureConstructor;
     // dynClosureConstructor.prototype = proto;
     // return dynClosureConstructor;
 
@@ -1970,7 +2003,6 @@ abstract class Closure implements Function {
     // So we only use the new instance to access the constructor property and
     // use Object.create to create the desired prototype.
     var prototype = isStatic
-        // TODO(ahe): Safe to use Object.create?
         ? JS('TearOffClosure', 'Object.create(#.constructor.prototype)',
              new TearOffClosure())
         : JS('BoundClosure', 'Object.create(#.constructor.prototype)',
@@ -1986,7 +2018,8 @@ abstract class Closure implements Function {
                      '"this.\$initialize(a,b,c,d);"+#)',
                  functionCounter++);
 
-    // TODO(ahe): Is it necessary to set the constructor property?
+    // It is necessary to set the constructor property, otherwise it will be
+    // "Object".
     JS('', '#.constructor = #', prototype, constructor);
 
     JS('', '#.prototype = #', constructor, prototype);
@@ -2031,7 +2064,7 @@ abstract class Closure implements Function {
       throw 'Error in reflectionInfo.';
     }
 
-    JS('', '#.\$signature = #', prototype, signatureFunction);
+    JS('', '#[#] = #', prototype, JS_SIGNATURE_NAME(), signatureFunction);
 
     JS('', '#[#] = #', prototype, callName, trampoline);
     for (int i = 1; i < functions.length; i++) {
@@ -3238,6 +3271,10 @@ int random64() {
   return int32a + int32b * 0x100000000;
 }
 
+String jsonEncodeNative(String string) {
+  return JS("String", "JSON.stringify(#)", string);
+}
+
 /**
  * Returns a property name for placing data on JavaScript objects shared between
  * DOM isolates.  This happens when multiple programs are loaded in the same
@@ -3277,15 +3314,20 @@ Future<Null> loadDeferredLibrary(String loadId) {
   // The indices into `uris` and `hashes` that we want to load.
   List<int> indices = new List.generate(uris.length, (i) => i);
   var isHunkLoaded = JS_EMBEDDED_GLOBAL('', IS_HUNK_LOADED);
-  return Future.wait(indices
-      // Filter away indices for hunks that have already been loaded.
+  var isHunkInitialized = JS_EMBEDDED_GLOBAL('', IS_HUNK_INITIALIZED);
+  // Filter away indices for hunks that have already been loaded.
+  List<int> indicesToLoad = indices
       .where((int i) => !JS('bool','#(#)', isHunkLoaded, hashes[i]))
-      // Load the rest.
+      .toList();
+  return Future.wait(indicesToLoad
       .map((int i) => _loadHunk(uris[i]))).then((_) {
-    // Now all hunks have been loaded, we call all their initializers
-    for (String hash in hashes) {
+    // Now all hunks have been loaded, we run the needed initializers.
+    List<int> indicesToInitialize = indices
+        .where((int i) => !JS('bool','#(#)', isHunkInitialized, hashes[i]))
+        .toList();  // Load the needed hunks.
+    for (int i in indicesToInitialize) {
       var initializer = JS_EMBEDDED_GLOBAL('', INITIALIZE_LOADED_HUNK);
-      JS('void', '#(#)', initializer, hash);
+      JS('void', '#(#)', initializer, hashes[i]);
     }
     bool updated = _loadedLibraries.add(loadId);
     if (updated && deferredLoadHook != null) {

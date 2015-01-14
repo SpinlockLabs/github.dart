@@ -4,9 +4,8 @@
 
 library matcher.operator_matchers;
 
-import 'core_matchers.dart';
-import 'expect.dart';
 import 'interfaces.dart';
+import 'util.dart';
 
 /// This returns a matcher that inverts [matcher] to its logical negation.
 Matcher isNot(matcher) => new _IsNot(wrapMatcher(matcher));
@@ -14,7 +13,7 @@ Matcher isNot(matcher) => new _IsNot(wrapMatcher(matcher));
 class _IsNot extends Matcher {
   final Matcher _matcher;
 
-  const _IsNot(Matcher this._matcher);
+  const _IsNot(this._matcher);
 
   bool matches(item, Map matchState) => !_matcher.matches(item, matchState);
 
@@ -23,9 +22,10 @@ class _IsNot extends Matcher {
 }
 
 /// This returns a matcher that matches if all of the matchers passed as
-/// arguments (up to 7) match. Instead of passing the matchers separately
-/// they can be passed as a single List argument.
-/// Any argument that is not a matcher is implicitly wrapped in a
+/// arguments (up to 7) match.
+///
+/// Instead of passing the matchers separately they can be passed as a single
+/// List argument. Any argument that is not a matcher is implicitly wrapped in a
 /// Matcher to check for equality.
 Matcher allOf(arg0,
              [arg1 = null,
@@ -64,8 +64,9 @@ class _AllOf extends Matcher {
       description.addAll('(', ' and ', ')', _matchers);
 }
 
-/// Matches if any of the given matchers evaluate to true. The
-/// arguments can be a set of matchers as separate parameters
+/// Matches if any of the given matchers evaluate to true.
+///
+/// The arguments can be a set of matchers as separate parameters
 /// (up to 7), or a List of matchers.
 ///
 /// The matchers are evaluated from left to right using short-circuit
@@ -73,7 +74,6 @@ class _AllOf extends Matcher {
 ///
 /// Any argument that is not a matcher is implicitly wrapped in a
 /// Matcher to check for equality.
-
 Matcher anyOf(arg0,
                [arg1 = null,
                 arg2 = null,
@@ -103,40 +103,21 @@ class _AnyOf extends Matcher {
 }
 
 List<Matcher> _wrapArgs(arg0, arg1, arg2, arg3, arg4, arg5, arg6) {
+  Iterable<Matcher> matchers;
   if (arg0 is List) {
-    // TODO(kevmoo) throw a more helpful error here if any of these args is
-    // not null
-    expect(arg1, isNull);
-    expect(arg2, isNull);
-    expect(arg3, isNull);
-    expect(arg4, isNull);
-    expect(arg5, isNull);
-    expect(arg6, isNull);
+    if (arg1 != null || arg2 != null || arg3 != null || arg4 != null ||
+        arg5 != null || arg6 != null) {
+      throw new ArgumentError('If arg0 is a List, all other arguments must be'
+          ' null.');
+    }
 
-    return arg0.map((a) => wrapMatcher(a)).toList();
+    matchers = arg0;
+  } else {
+    matchers = [arg0, arg1, arg2, arg3, arg4, arg5, arg6]
+        .where((e) => e != null);
   }
 
-  List matchers = new List();
-  if (arg0 != null) {
-    matchers.add(wrapMatcher(arg0));
-  }
-  if (arg1 != null) {
-    matchers.add(wrapMatcher(arg1));
-  }
-  if (arg2 != null) {
-    matchers.add(wrapMatcher(arg2));
-  }
-  if (arg3 != null) {
-    matchers.add(wrapMatcher(arg3));
-  }
-  if (arg4 != null) {
-    matchers.add(wrapMatcher(arg4));
-  }
-  if (arg5 != null) {
-    matchers.add(wrapMatcher(arg5));
-  }
-  if (arg6 != null) {
-    matchers.add(wrapMatcher(arg6));
-  }
-  return matchers;
+  return matchers
+      .map((e) => wrapMatcher(e))
+      .toList();
 }

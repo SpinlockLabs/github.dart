@@ -21,6 +21,11 @@ library quiver.strings;
 bool isBlank(String s) => s == null || s.trim().isEmpty;
 
 /**
+ * Returns [true] if [s] is either null or empty.
+ */
+bool isEmpty(String s) => s == null || s.isEmpty;
+
+/**
  * Returns a string with characters from the given [s] in reverse order.
  */
 String flip(String s) {
@@ -120,6 +125,7 @@ void _repeat(StringBuffer sink, String s, int times) {
  * Returns [input] if `input.length` is equal to or greater than width. [input]
  * can be `null` and is treated as an empty string.
  */
+@deprecated
 String padLeft(String input, int width, String fill) {
   if (fill == null || fill.length == 0) {
     throw new ArgumentError('fill cannot be null or empty');
@@ -138,6 +144,7 @@ String padLeft(String input, int width, String fill) {
  * Returns [input] if `input.length` is equal to or greater than width. [input]
  * can be `null` and is treated as an empty string.
  */
+@deprecated
 String padRight(String input, int width, String fill) {
   if (fill == null || fill.length == 0) {
     throw new ArgumentError('fill cannot be null or empty');
@@ -154,6 +161,7 @@ String padRight(String input, int width, String fill) {
  *
  * Whitespace is defined to be the same as [String.trim].
  */
+@deprecated
 String trimLeft(String input) {
   int i = 0;
   for (var rune in input.runes) {
@@ -171,6 +179,7 @@ String trimLeft(String input) {
  *
  * Whitespace is defined to be the same as [String.trim].
  */
+@deprecated
 String trimRight(String input) {
   int i = 0;
   int lastNonWhitespace = -1;

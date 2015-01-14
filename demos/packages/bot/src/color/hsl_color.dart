@@ -46,8 +46,8 @@ class HslColor {
 
   int get hashCode => Util.getHashCode([h, s, l]);
 
-  bool operator ==(HslColor other) {
-    return other != null && other.h == h && other.s == s && other.l == l;
+  bool operator ==(other) {
+    return other is HslColor && other.h == h && other.s == s && other.l == l;
   }
 
   String toString() => '{HslColor: $h, $s, $l}';
@@ -64,5 +64,4 @@ class HslColor {
     }
     return v1;
   }
-
 }

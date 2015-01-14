@@ -33,18 +33,19 @@ class ArgParser {
   /// after it finds an argument that is neither an option nor a command.
   /// This allows options to be specified after regular arguments. Defaults to
   /// `false`.
-  factory ArgParser({bool allowTrailingOptions}) =>
-      new ArgParser._(<String, Option>{}, <String, ArgParser>{},
-          allowTrailingOptions: allowTrailingOptions);
+  factory ArgParser({bool allowTrailingOptions}) => new ArgParser._(
+      <String, Option>{}, <String, ArgParser>{},
+      allowTrailingOptions: allowTrailingOptions);
 
   ArgParser._(Map<String, Option> options, Map<String, ArgParser> commands,
-      {bool allowTrailingOptions}) :
-    this._options = options,
-    this.options = new UnmodifiableMapView(options),
-    this._commands = commands,
-    this.commands = new UnmodifiableMapView(commands),
-    this.allowTrailingOptions = allowTrailingOptions != null ?
-        allowTrailingOptions : false;
+      {bool allowTrailingOptions})
+      : this._options = options,
+        this.options = new UnmodifiableMapView(options),
+        this._commands = commands,
+        this.commands = new UnmodifiableMapView(commands),
+        this.allowTrailingOptions = allowTrailingOptions != null
+            ? allowTrailingOptions
+            : false;
 
   /// Defines a command.
   ///
@@ -86,8 +87,8 @@ class ArgParser {
 
   void _addOption(String name, String abbr, String help, String valueHelp,
       List<String> allowed, Map<String, String> allowedHelp, defaultsTo,
-      void callback(value), OptionType type, {bool negatable: false,
-      bool hide: false}) {
+      void callback(value), OptionType type,
+      {bool negatable: false, bool hide: false}) {
     // Make sure the name isn't in use.
     if (_options.containsKey(name)) {
       throw new ArgumentError('Duplicate option "$name".');
@@ -103,8 +104,8 @@ class ArgParser {
     }
 
     _options[name] = newOption(name, abbr, help, valueHelp, allowed,
-        allowedHelp, defaultsTo, callback, type, negatable: negatable,
-        hide: hide);
+        allowedHelp, defaultsTo, callback, type,
+        negatable: negatable, hide: hide);
   }
 
   /// Parses [args], a list of command-line arguments, matches them against the
@@ -115,7 +116,13 @@ class ArgParser {
   /// Generates a string displaying usage information for the defined options.
   ///
   /// This is basically the help text shown on the command line.
+  @Deprecated("Replaced with get usage. getUsage() will be removed in args 1.0")
   String getUsage() => new Usage(this).generate();
+
+  /// Generates a string displaying usage information for the defined options.
+  ///
+  /// This is basically the help text shown on the command line.
+  String get usage => new Usage(this).generate();
 
   /// Get the default value for an option. Useful after parsing to test if the
   /// user specified something other than the default.

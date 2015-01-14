@@ -11,7 +11,7 @@ typedef http.Client ClientCreator();
  *      // Use the Client
  */
 class GitHub {
-  
+
   /**
    * Default Client Creator
    */
@@ -31,7 +31,7 @@ class GitHub {
    * HTTP Client
    */
   final http.Client client;
-  
+
   ActivityService _activity;
   AuthorizationsService _authorizations;
   BlogService _blog;
@@ -46,7 +46,7 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
-  
+
   /**
    * Creates a new [GitHub] instance.
    * 
@@ -54,11 +54,11 @@ class GitHub {
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
    */
-  GitHub({Authentication auth, this.endpoint: "https://api.github.com", http.Client client})
+  GitHub({Authentication auth, this.endpoint: "https://api.github.com",
+      http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
         this.client = client == null ? defaultClient() : client;
 
-        
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
     if (_activity == null) {
@@ -66,10 +66,10 @@ class GitHub {
     }
     return _activity;
   }
-  
+
   /// Service for autorizations related methods of the GitHub API.
-  /// 
-  /// Note: You can only access this API via Basic Authentication using your 
+  ///
+  /// Note: You can only access this API via Basic Authentication using your
   /// username and password, not tokens.
   AuthorizationsService get authorizations {
     if (_authorizations == null) {
@@ -77,7 +77,7 @@ class GitHub {
     }
     return _authorizations;
   }
-  
+
   /// Service to retrieve blog posts.
   BlogService get blog {
     if (_blog == null) {
@@ -85,7 +85,7 @@ class GitHub {
     }
     return _blog;
   }
-  
+
   /// Service to explore GitHub.
   ExploreService get explore {
     if (_explore == null) {
@@ -93,7 +93,7 @@ class GitHub {
     }
     return _explore;
   }
-  
+
   /// Service for gist related methods of the GitHub API.
   GistsService get gists {
     if (_gists == null) {
@@ -101,7 +101,7 @@ class GitHub {
     }
     return _gists;
   }
-  
+
   /// Service for git data related methods of the GitHub API.
   GitService get git {
     if (_git == null) {
@@ -109,7 +109,7 @@ class GitHub {
     }
     return _git;
   }
-  
+
   /// Service for issues related methods of the GitHub API.
   IssuesService get issues {
     if (_issues == null) {
@@ -117,7 +117,7 @@ class GitHub {
     }
     return _issues;
   }
-  
+
   /// Service for misc related methods of the GitHub API.
   MiscService get misc {
     if (_misc == null) {
@@ -125,7 +125,7 @@ class GitHub {
     }
     return _misc;
   }
-  
+
   /// Service for organization related methods of the GitHub API.
   OrganizationsService get organizations {
     if (_organizations == null) {
@@ -133,7 +133,7 @@ class GitHub {
     }
     return _organizations;
   }
-  
+
   /// Service for pull requests related methods of the GitHub API.
   PullRequestsService get pullRequests {
     if (_pullRequests == null) {
@@ -141,7 +141,7 @@ class GitHub {
     }
     return _pullRequests;
   }
-  
+
   /// Service for repository related methods of the GitHub API.
   RepositoriesService get repositories {
     if (_repositories == null) {
@@ -149,7 +149,7 @@ class GitHub {
     }
     return _repositories;
   }
-  
+
   /// Service for search related methods of the GitHub API.
   SearchService get search {
     if (_search == null) {
@@ -165,7 +165,7 @@ class GitHub {
     }
     return _urlShortener;
   }
-  
+
   /// Service for user related methods of the GitHub API.
   UsersService get users {
     if (_users == null) {
@@ -173,7 +173,7 @@ class GitHub {
     }
     return _users;
   }
-        
+
   /**
    * Handles Get Requests that respond with JSON
    * 
@@ -194,16 +194,19 @@ class GitHub {
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
    */
-  Future<dynamic> getJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert}) {
+  Future<dynamic> getJSON(String path, {int statusCode,
+      void fail(http.Response response), Map<String, String> headers,
+      Map<String, String> params, JSONConverter convert}) {
     if (headers == null) headers = {};
-    
+
     if (convert == null) {
       convert = (input) => input;
     }
-    
+
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("GET", path, headers: headers, params: params).then((response) {
+    return request("GET", path, headers: headers, params: params).then(
+        (response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
@@ -235,16 +238,19 @@ class GitHub {
    * 
    * [body] is the data to send to the server.
    */
-  Future<dynamic> postJSON(String path, {int statusCode, void fail(http.Response response), Map<String, String> headers, Map<String, String> params, JSONConverter convert, body}) {
+  Future<dynamic> postJSON(String path, {int statusCode,
+      void fail(http.Response response), Map<String, String> headers,
+      Map<String, String> params, JSONConverter convert, body}) {
     if (headers == null) headers = {};
-    
+
     if (convert == null) {
       convert = (input) => input;
     }
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
-    
-    return request("POST", path, headers: headers, params: params, body: body).then((response) {
+
+    return request("POST", path, headers: headers, params: params, body: body)
+        .then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
@@ -253,7 +259,7 @@ class GitHub {
       return convert(JSON.decode(response.body));
     });
   }
-  
+
   /**
    * Internal method to handle status codes
    */
@@ -277,11 +283,11 @@ class GitHub {
         var json = response.asJSON();
         String msg = json['message'];
         var errors = json['errors'];
-        
+
         var buff = new StringBuffer();
         buff.writeln();
         buff.writeln("  Message: ${msg}");
-        
+
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -289,9 +295,9 @@ class GitHub {
             var field = error['field'];
             var code = error['code'];
             buff
-            ..writeln("    Resource: ${resource}")
-            ..writeln("    Field ${field}")
-            ..write("    Code: ${code}");
+              ..writeln("    Resource: ${resource}")
+              ..writeln("    Field ${field}")
+              ..write("    Code: ${code}");
           }
         }
         throw new ValidationFailed(this, buff.toString());
@@ -308,9 +314,10 @@ class GitHub {
    * [params] are query string parameters.
    * [body] is the body content of requests that take content.
    */
-  Future<http.Response> request(String method, String path, {Map<String, String> headers, Map<String, dynamic> params, String body}) {
+  Future<http.Response> request(String method, String path,
+      {Map<String, String> headers, Map<String, dynamic> params, String body}) {
     if (headers == null) headers = {};
-    
+
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
@@ -335,7 +342,8 @@ class GitHub {
       url.write(queryString);
     }
 
-    return client.request(new http.Request(url.toString(), method: method, headers: headers, body: body));
+    return client.request(new http.Request(url.toString(),
+        method: method, headers: headers, body: body));
   }
 
   /**

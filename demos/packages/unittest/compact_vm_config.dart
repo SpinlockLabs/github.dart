@@ -92,13 +92,11 @@ class CompactVMConfiguration extends VMConfiguration {
 
   void onSummary(int passed, int failed, int errors, List<TestCase> results,
       String uncaughtError) {
-    var success = false;
     if (passed == 0 && failed == 0 && errors == 0 && uncaughtError == null) {
       _print('\nNo tests ran.');
     } else if (failed == 0 && errors == 0 && uncaughtError == null) {
       _progressLine('All tests passed!', _NONE);
       _print();
-      success = true;
     } else {
       _progressLine('Some tests failed.', _RED);
       _print();
@@ -134,10 +132,10 @@ class CompactVMConfiguration extends VMConfiguration {
     // Ensure the line fits under MAX_LINE. [buffer] includes the color escape
     // sequences too. Because these sequences are not visible characters, we
     // make sure they are not counted towards the limit.
-    int nonVisible = _nonVisiblePrefix + color.length  +
+    int nonVisible = _nonVisiblePrefix +
+        color.length +
         (_fail != 0 ? (_RED.length + _NONE.length) : 0);
     int len = buffer.length - nonVisible;
-    var mx = MAX_LINE - len;
     buffer.write(_snippet(message, MAX_LINE - len));
     buffer.write(_NONE);
 
@@ -155,7 +153,7 @@ class CompactVMConfiguration extends VMConfiguration {
   }
 
   String _padTime(int time) =>
-    (time == 0) ? '00' : ((time < 10) ? '0$time' : '$time');
+      (time == 0) ? '00' : ((time < 10) ? '0$time' : '$time');
 
   String _timeString(Duration duration) {
     var min = duration.inMinutes;
@@ -181,7 +179,7 @@ class CompactVMConfiguration extends VMConfiguration {
         var buffer = new StringBuffer();
         buffer.write(words.first);
         buffer.write(' ...');
-        for (; i < words.length; i++) {
+        for ( ; i < words.length; i++) {
           buffer.write(' ');
           buffer.write(words[i]);
         }

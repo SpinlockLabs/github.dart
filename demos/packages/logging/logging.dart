@@ -138,16 +138,26 @@ class Logger {
    * If [message] is a [Function], it will be lazy evaluated. Additionally, if
    * [message] or its evaluated value is not a [String], then 'toString()' will
    * be called on it and the result will be logged.
+   *
+   * The log record will contain a field for the zone in which this call was
+   * made.
+   * This can be advantagous if a log listener wants to handle records of
+   * different zones differently (e.g. group log records by http-request if each
+   * http-request handler runs in it's own zone).
    */
-  void log(Level logLevel, message, [Object error, StackTrace stackTrace]) {
+  void log(Level logLevel,
+           message,
+           [Object error, StackTrace stackTrace, Zone zone]) {
     if (isLoggable(logLevel)) {
       // If message is a Function, evaluate it.
       if (message is Function) message = message();
       // If message is still not a String, call toString().
       if (message is! String) message = message.toString();
+      // Only record the current zone if it was not given.
+      if (zone == null) zone = Zone.current;
 
       var record = new LogRecord(logLevel, message, fullName, error,
-          stackTrace);
+          stackTrace, zone);
 
       if (hierarchicalLoggingEnabled) {
         var target = this;
@@ -278,7 +288,7 @@ class Level implements Comparable<Level> {
   static const List<Level> LEVELS = const
       [ALL, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, SHOUT, OFF];
 
-  bool operator ==(Object other) => other is Level && value == other.value;
+  bool operator ==(other) => other is Level && value == other.value;
   bool operator <(Level other) => value < other.value;
   bool operator <=(Level other) => value <= other.value;
   bool operator >(Level other) => value > other.value;
@@ -314,8 +324,12 @@ class LogRecord {
   /** Associated stackTrace (if any) when recording errors messages. */
   final StackTrace stackTrace;
 
+  /** Zone of the calling code which resulted in this LogRecord. */
+  final Zone zone;
+
   LogRecord(this.level, this.message, this.loggerName, [this.error,
-                                                        this.stackTrace])
+                                                        this.stackTrace,
+                                                        this.zone])
       : time = new DateTime.now(),
         sequenceNumber = LogRecord._nextNumber++;
 

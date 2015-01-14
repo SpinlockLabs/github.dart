@@ -1,8 +1,7 @@
 part of bot.math;
 
 class Coordinate<T extends num> extends math.Point<T> {
-
-  const Coordinate([T x = 0, T y = 0]): super(x, y);
+  const Coordinate([T x = 0, T y = 0]) : super(x, y);
 
   bool get isValid => isValidNumber(x) && isValidNumber(y);
 
@@ -21,11 +20,8 @@ class Coordinate<T extends num> extends math.Point<T> {
   Size toSize() => new Size(x, y);
 
   static Vector difference(math.Point a, math.Point b) =>
-    new Vector(a.x - b.x, a.y - b.y);
+      new Vector(a.x - b.x, a.y - b.y);
 
   static bool valid(math.Point point) =>
       isValidNumber(point.x) && isValidNumber(point.y);
-
-  @deprecated
-  dynamic toJson() => { 'x' : x, 'y' : y };
 }

@@ -127,7 +127,7 @@ abstract class Parser {
   Parser plusGreedy(Parser limit) => repeatGreedy(limit, 1, unbounded);
 
   /**
-   * Returns a parser that parses the receiver zero or more times until it
+   * Returns a parser that parses the receiver one or more times until it
    * reaches a [limit]. This is a lazy non-blind implementation of the
    * [Parser.plus] operator. The [limit] is not consumed.
    */
@@ -269,14 +269,17 @@ abstract class Parser {
 
   /**
    * Returns a parser that consumes input before and after the receiver. The
-   * optional argument [trimmer] is a parser that consumes the excess input. By
-   * default `whitespace()` is used.
+   * optional argument is a parser that consumes the excess input. By default
+   * `whitespace()` is used. To arguments can be provided to have different
+   * parsers on the [left] and [right] side.
    *
    * For example, the parser `letter().plus().trim()` returns `['a', 'b']`
    * for the input `' ab\n'` and consumes the complete input string.
    */
-  Parser trim([Parser trimmer]) {
-    return new TrimmingParser(this, trimmer == null ? whitespace() : trimmer);
+  Parser trim([Parser left, Parser right]) {
+    if (left == null) left = whitespace();
+    if (right == null) right = left;
+    return new TrimmingParser(this, left, right);
   }
 
   /**
@@ -295,11 +298,11 @@ abstract class Parser {
    * Returns a parser that points to the receiver, but can be changed to point
    * to something else at a later point in time.
    *
-   * For example, the parser `letter().setable()` behaves exactly the same
+   * For example, the parser `letter().settable()` behaves exactly the same
    * as `letter()`, but it can be replaced with another parser using
-   * [SetableParser.set].
+   * [SettableParser.set].
    */
-  SetableParser setable() => new SetableParser(this);
+  SettableParser settable() => new SettableParser(this);
 
   /**
    * Returns a parser that evaluates a [function] as the production action
@@ -388,13 +391,13 @@ abstract class Parser {
   Parser copy();
 
   /**
-   * Recusively tests for the equality of two parsers.
+   * Recursively tests for structural equality of two parsers.
    *
    * The code can automatically deals with recursive parsers and parsers that
    * refer to other parsers. This code is supposed to be overridden by parsers
    * that add other state.
    */
-  bool equals(Parser other, [Set<Parser> seen]) {
+  bool isEqualTo(Parser other, [Set<Parser> seen]) {
     if (seen == null) {
       seen = new Set();
     }
@@ -403,8 +406,8 @@ abstract class Parser {
     }
     seen.add(this);
     return runtimeType == other.runtimeType
-        && equalProperties(other)
-        && equalChildren(other, seen);
+        && hasEqualProperties(other)
+        && hasEqualChildren(other, seen);
   }
 
   /**
@@ -413,7 +416,7 @@ abstract class Parser {
    *
    * Override this method in all subclasses that add new state.
    */
-  bool equalProperties(Parser other) => true;
+  bool hasEqualProperties(Parser other) => true;
 
   /**
    * Compare the children of two parsers. Normally this method should not be
@@ -422,13 +425,13 @@ abstract class Parser {
    * Normally this method does not need to be overridden, as this method works
    * generically on the returned [Parser#children].
    */
-  bool equalChildren(Parser other, Set<Parser> seen) {
+  bool hasEqualChildren(Parser other, Set<Parser> seen) {
     var thisChildren = children, otherChildren = other.children;
     if (thisChildren.length != otherChildren.length) {
       return false;
     }
     for (var i = 0; i < thisChildren.length; i++) {
-      if (!thisChildren[i].equals(otherChildren[i], seen)) {
+      if (!thisChildren[i].isEqualTo(otherChildren[i], seen)) {
         return false;
       }
     }

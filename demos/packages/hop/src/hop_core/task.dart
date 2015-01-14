@@ -40,9 +40,7 @@ abstract class Task {
     requireArgumentNotNull(_exec, '_exec');
   }
 
-  String getUsage() {
-    return argParser.getUsage();
-  }
+  String getUsage() => argParser.usage;
 
   String getExtendedArgsUsage() =>
     _extendedArgs.map((TaskArgument arg) {

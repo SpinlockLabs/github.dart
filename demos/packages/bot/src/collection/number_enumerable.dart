@@ -5,8 +5,7 @@ NumberEnumerable n$(Iterable<num> source) {
 }
 
 abstract class NumberEnumerable<T extends num> extends IterableBase<T> {
-
-  const NumberEnumerable(): super();
+  const NumberEnumerable() : super();
 
   factory NumberEnumerable.from(Iterable<T> source) {
     requireArgumentNotNull(source, 'source');
@@ -50,7 +49,7 @@ abstract class NumberEnumerable<T extends num> extends IterableBase<T> {
 class _SimpleNumEnumerable<T extends num> extends NumberEnumerable<T> {
   final Iterable<T> _source;
 
-  const _SimpleNumEnumerable(this._source): super();
+  const _SimpleNumEnumerable(this._source) : super();
 
   Iterator<T> get iterator => _source.iterator;
 }
@@ -59,7 +58,7 @@ class _FuncNumEnumerable<TSource> extends NumberEnumerable {
   final Iterable<TSource> _source;
   final Func1<Iterator<TSource>, Iterator<num>> _func;
 
-  const _FuncNumEnumerable(this._source, this._func): super();
+  const _FuncNumEnumerable(this._source, this._func) : super();
 
   Iterator<num> get iterator => _func(_source.iterator);
 }

@@ -1,6 +1,5 @@
 part of bot.graph;
 
-
 /**
  * [Tarjan's strongly connected components algorithm](http://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm)
  */
@@ -12,25 +11,11 @@ List<List> stronglyConnectedComponents(Map<dynamic, Iterable> graph) {
   return tarjan.calculate();
 }
 
-/**
- * Use top-level [stronglyConnectedComponents] instead.
- */
-@deprecated
-class TarjanCycleDetect<TNode> {
-
-  /**
-   * Use top-level [stronglyConnectedComponents] instead.
-   */
-  @deprecated
-  static List<List> getStronglyConnectedComponents(Map graph) =>
-      stronglyConnectedComponents(graph);
-}
-
 class _TarjanCycleDetect<T> {
   final _indexExpando = new Expando<int>('index');
   final _linkExpando = new Expando<int>('link');
 
-  final Queue<_GraphNode> _stack = new Queue<_GraphNode<T>>();
+  final Queue<_GraphNode<T>> _stack = new Queue<_GraphNode<T>>();
   final List<List<T>> _scc = new List<List<T>>();
   final _Graph<T> _list;
 
@@ -82,4 +67,3 @@ class _TarjanCycleDetect<T> {
 
   int _setLowLink(_GraphNode<T> node, int value) => _linkExpando[node] = value;
 }
-

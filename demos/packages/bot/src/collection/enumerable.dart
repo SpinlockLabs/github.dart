@@ -19,7 +19,7 @@ abstract class Enumerable<T> extends IterableBase<T> {
   int count(Func1<T, bool> f) => CollectionUtil.count(this, f);
 
   @override
-  Enumerable map(Func1<T, Object> f) => $(super.map(f));
+  Enumerable map(Func1<T, dynamic> f) => $(super.map(f));
 
   @override
   Enumerable<T> where(Func1<T, bool> f) => $(super.where(f));
@@ -28,8 +28,7 @@ abstract class Enumerable<T> extends IterableBase<T> {
       CollectionUtil.exclude(this, items);
 
   @override
-  Enumerable expand(Func1<T, Iterable> f) =>
-      $(super.expand(f));
+  Enumerable expand(Func1<T, Iterable> f) => $(super.expand(f));
 
   Enumerable<T> distinct([Func2<T, T, bool> comparer = null]) =>
       CollectionUtil.distinct(this, comparer);
@@ -40,9 +39,6 @@ abstract class Enumerable<T> extends IterableBase<T> {
 
   Enumerable<T> concat(Iterable<T> source) =>
       $([this, source]).expand((e) => e);
-
-  @deprecated
-  ReadOnlyCollection<T> toReadOnlyCollection() => new ReadOnlyCollection<T>(this);
 
   void forEachWithIndex(Action2<T, int> f) {
     int i = 0;

@@ -32,11 +32,16 @@ part 'xml/utils/parent.dart';
 part 'xml/utils/type.dart';
 part 'xml/utils/writable.dart';
 
+part 'xml/visitors/transformer.dart';
+part 'xml/visitors/visitable.dart';
+part 'xml/visitors/visitor.dart';
+part 'xml/visitors/writer.dart';
+
 part 'xml/builder.dart';
 part 'xml/grammar.dart';
 part 'xml/parser.dart';
 
-final XmlParser _PARSER = new XmlParser();
+final Parser _PARSER = new XmlParserDefinition().build();
 
 /**
  * Return an [XmlDocument] for the given `input` string, or throws an

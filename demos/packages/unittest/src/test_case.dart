@@ -55,14 +55,12 @@ class TestCase {
 
   bool get enabled => _enabled;
 
-  bool _doneTeardown = false;
-
   Completer _testComplete;
 
   TestCase._internal(this.id, this.description, this._testFunction)
-      : currentGroup = _currentContext.fullName,
-        _setUp = _currentContext.testSetup,
-        _tearDown = _currentContext.testTeardown;
+      : currentGroup = _environment.currentContext.fullName,
+        _setUp = _environment.currentContext.testSetup,
+        _tearDown = _environment.currentContext.testTeardown;
 
   bool get isComplete => !enabled || result != null;
 
@@ -104,7 +102,8 @@ class TestCase {
       // would a callback, so if a failure occurs while waiting, we can abort.
       if (testReturn is Future) {
         ++_callbackFunctionsOutstanding;
-        testReturn.catchError(_errorHandler('Test'))
+        testReturn
+            .catchError(_errorHandler('Test'))
             .whenComplete(_markCallbackComplete);
       }
     }).catchError(_errorHandler('Test')).then((_) {
@@ -142,8 +141,8 @@ class TestCase {
     }
   }
 
-  void _complete(String testResult, [String messageText = '',
-      StackTrace stack]) {
+  void _complete(String testResult,
+      [String messageText = '', StackTrace stack]) {
     if (runningTime == null) {
       // The startTime can be `null` if an error happened during setup. In this
       // case we simply report a running time of 0.

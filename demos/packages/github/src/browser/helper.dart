@@ -4,7 +4,7 @@ part of github.browser;
  * Browser-Specific Helpers
  */
 class GitHubBrowserHelper {
-  
+
   /**
    * Renders Markdown in HTML using the GitHub API
    * 
@@ -16,16 +16,16 @@ class GitHubBrowserHelper {
    */
   static void renderMarkdown(GitHub github, String selector, {int indent: 4}) {
     ElementList elements = document.querySelectorAll(selector);
-    
+
     elements.removeWhere((Element it) => it.attributes.containsKey("rendered"));
-    
+
     for (Element e in elements) {
       var txt = e.text;
-      
+
       var md = txt.split("\n").map((it) {
         return it.length >= indent ? it.substring(indent) : it;
       }).join("\n");
-      
+
       github.misc.renderMarkdown(md).then((html) {
         e.hidden = false;
         e.setAttribute("rendered", "");
@@ -34,11 +34,12 @@ class GitHubBrowserHelper {
       });
     }
   }
-  
+
   /**
    * Creates an Image Element from a User that has the user's avatar.
    */
-  static ImageElement createAvatarImage(User user, {int width: 128, int height: 128}) {
+  static ImageElement createAvatarImage(User user,
+      {int width: 128, int height: 128}) {
     return new ImageElement(src: user.avatarUrl, width: width, height: height);
   }
 }

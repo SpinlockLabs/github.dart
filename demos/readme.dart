@@ -16,7 +16,8 @@ void main() {
 }
 
 void loadReadme() {
-  github.repositories.getReadme(new RepositorySlug("DirectMyFile", "github.dart"))
-    .then((file) => github.misc.renderMarkdown(file.content))
-    .then((html) => $readme.appendHtml(html));
+  github.repositories
+      .getReadme(new RepositorySlug("DirectMyFile", "github.dart"))
+      .then((file) => github.misc.renderMarkdown(file.content))
+      .then((html) => $readme.appendHtml(html));
 }

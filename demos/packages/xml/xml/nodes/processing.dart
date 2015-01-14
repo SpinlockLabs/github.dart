@@ -19,20 +19,6 @@ class XmlProcessing extends XmlData {
   XmlNodeType get nodeType => XmlNodeType.PROCESSING;
 
   @override
-  void writeTo(StringBuffer buffer) {
-    buffer.write('<?');
-    buffer.write(target);
-    if (!text.isEmpty) {
-      buffer.write(' ');
-      buffer.write(text);
-    }
-    buffer.write('?>');
-  }
-
-  @override
-  void writePrettyTo(StringBuffer buffer, int level, String indent) {
-    _writeIndentTo(buffer, level, indent);
-    writeTo(buffer);
-  }
+  accept(XmlVisitor visitor) => visitor.visitProcessing(this);
 
 }

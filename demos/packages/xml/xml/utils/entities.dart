@@ -1,9 +1,95 @@
 part of xml;
 
+// hexadecimal character reference
+final _ENTITY_HEX = pattern('xX')
+    .seq(pattern('A-Fa-f0-9').plus().flatten().map((value) {
+      return new String.fromCharCode(int.parse(value, radix: 16));
+    })).pick(1);
+
+// decimal character reference
+final _ENTITY_DIGIT = char('#')
+    .seq(_ENTITY_HEX.or(digit().plus().flatten().map((value) {
+      return new String.fromCharCode(int.parse(value));
+    })))
+    .pick(1);
+
+// named character reference
+final _ENTITY = char('&')
+    .seq(_ENTITY_DIGIT.or(word().plus().flatten().map((value) {
+      return _ENTITY_TO_CHAR[value];
+    })))
+    .seq(char(';'))
+    .pick(1);
+
+/**
+ * Optimized parser to read character data.
+ */
+class _XmlCharacterDataParser extends Parser {
+
+  final String _stopper;
+  final int _stopperCode;
+  final int _minLength;
+
+  _XmlCharacterDataParser(String stopper, int minLength)
+      : _stopper = stopper,
+        _stopperCode = stopper.codeUnitAt(0),
+        _minLength = minLength;
+
+  @override
+  Result parseOn(Context context) {
+    var input = context.buffer;
+    var length = input.length;
+    var output = new StringBuffer();
+    var position = context.position;
+    var start = position;
+
+    // helper to append the range scanned up to now
+    appendRun() {
+      if (start != position) {
+        output.write(input.substring(start, position));
+        start = position;
+      }
+    }
+
+    // scan over the characters as fast as possible
+    while (position < length) {
+      var value = input.codeUnitAt(position);
+      if (value == _stopperCode) {
+        break;
+      } else if (value == 38) {
+        var result = _ENTITY.parseOn(context.success(null, position));
+        if (result.isSuccess && result.value != null) {
+          appendRun();
+          output.write(result.value);
+          position = result.position;
+          start = position;
+        } else {
+          position++;
+        }
+      } else {
+        position++;
+      }
+    }
+    appendRun();
+
+    // check for the minimum length
+    return output.length < _minLength
+        ? context.failure('Unable to parse chracter data.')
+        : context.success(output.toString(), position);
+  }
+
+  List<Parser> get children => [_ENTITY];
+
+  @override
+  Parser copy() => new _XmlCharacterDataParser(_stopper, _minLength);
+
+}
+
 /**
  * Decode a string with numeric character references and common named entities
  * to a plain string.
  */
+@deprecated
 String _decodeXml(String input) {
   return input.replaceAllMapped(_ENTITY_PATTERN, (match) {
     if (match.group(2) != null) {
@@ -22,6 +108,7 @@ String _decodeXml(String input) {
   });
 }
 
+@deprecated
 final Pattern _ENTITY_PATTERN = new RegExp(r'&(#[xX]([A-Fa-f0-9]+)|#(\d+)|(\w+));');
 
 final Map<String, String> _ENTITY_TO_CHAR = const {

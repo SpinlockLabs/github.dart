@@ -43,12 +43,13 @@ class Option {
 
   Option._(this.name, this.abbreviation, this.help, this.valueHelp,
       List<String> allowed, Map<String, String> allowedHelp, this.defaultValue,
-      this.callback, this.type, {this.negatable, this.hide: false}) :
-        this.allowed = allowed == null ?
-            null : new UnmodifiableListView(allowed),
-        this.allowedHelp = allowedHelp == null ?
-            null : new UnmodifiableMapView(allowedHelp) {
-
+      this.callback, this.type, {this.negatable, this.hide: false})
+      : this.allowed = allowed == null
+          ? null
+          : new UnmodifiableListView(allowed),
+        this.allowedHelp = allowedHelp == null
+            ? null
+            : new UnmodifiableMapView(allowedHelp) {
     if (name.isEmpty) {
       throw new ArgumentError('Name cannot be empty.');
     } else if (name.startsWith('-')) {
@@ -63,7 +64,7 @@ class Option {
     if (abbreviation != null) {
       if (abbreviation.length != 1) {
         throw new ArgumentError('Abbreviation must be null or have length 1.');
-      } else if(abbreviation == '-') {
+      } else if (abbreviation == '-') {
         throw new ArgumentError('Abbreviation cannot be "-".');
       }
 

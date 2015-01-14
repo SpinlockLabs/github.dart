@@ -70,7 +70,10 @@ class JSArray<E> extends Interceptor implements List<E>, JSIndexable {
       JS('JSExtendableArray', '#', new JSArray<E>.typed(allocation));
 
   static List markFixedList(List list) {
-    JS('void', r'#.fixed$length = init', list);
+    // Functions are stored in the hidden class and not as properties in
+    // the object. We never actually look at the value, but only want
+    // to know if the property exists.
+    JS('void', r'#.fixed$length = Array', list);
     return JS('JSFixedArray', '#', list);
   }
 
@@ -165,11 +168,10 @@ class JSArray<E> extends Interceptor implements List<E>, JSIndexable {
   }
 
   void forEach(void f(E element)) {
-    int getLength() => JS('int', '#.length', this);
-    int length = getLength();
+    int length = this.length;
     for (int i = 0; i < length; i++) {
       f(JS('', '#[#]', this, i));
-      if (length != getLength()) {
+      if (length != this.length) {
         throw new ConcurrentModificationError(this);
       }
     }
@@ -211,11 +213,11 @@ class JSArray<E> extends Interceptor implements List<E>, JSIndexable {
     return IterableMixinWorkaround.fold(this, initialValue, combine);
   }
 
-  dynamic firstWhere(bool test(E value), {Object orElse()}) {
+  E firstWhere(bool test(E value), {E orElse()}) {
     return IterableMixinWorkaround.firstWhere(this, test, orElse);
   }
 
-  dynamic lastWhere(bool test(E value), {Object orElse()}) {
+  E lastWhere(bool test(E value), {E orElse()}) {
     return IterableMixinWorkaround.lastWhereList(this, test, orElse);
   }
 

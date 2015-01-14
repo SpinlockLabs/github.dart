@@ -31,11 +31,11 @@ class Gist {
     if (input == null) return null;
 
     var gist = new Gist()
-        ..id = input['id']
-        ..description = input['description']
-        ..public = input['public']
-        ..owner = User.fromJSON(input['owner'])
-        ..user = User.fromJSON(input['user']);
+      ..id = input['id']
+      ..description = input['description']
+      ..public = input['public']
+      ..owner = User.fromJSON(input['owner'])
+      ..user = User.fromJSON(input['user']);
 
     if (input['files'] != null) {
       gist.files = [];
@@ -48,12 +48,12 @@ class Gist {
     }
 
     gist
-        ..htmlUrl = input['html_url']
-        ..commentsCount = input['comments']
-        ..gitPullUrl = input['git_pull_url']
-        ..gitPushUrl = input['git_push_url']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at']);
+      ..htmlUrl = input['html_url']
+      ..commentsCount = input['comments']
+      ..gitPullUrl = input['git_pull_url']
+      ..gitPushUrl = input['git_push_url']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at']);
 
     return gist;
   }
@@ -63,29 +63,29 @@ class Gist {
 class GistFile {
   String name;
   int size;
-  
+
   @ApiName("raw_url")
   String rawUrl;
-  
+
   String type;
-  
+
   String language;
-  
+
   bool truncated;
-  
+
   String content;
 
   static GistFile fromJSON(input) {
     if (input == null) return null;
-    
+
     return new GistFile()
-        ..name = input['name']
-        ..size = input['size']
-        ..rawUrl = input['raw_url']
-        ..type = input['type']
-        ..language = input['language']
-        ..truncated = input['truncated']
-        ..content = input['content'];
+      ..name = input['name']
+      ..size = input['size']
+      ..rawUrl = input['raw_url']
+      ..type = input['type']
+      ..language = input['language']
+      ..truncated = input['truncated']
+      ..content = input['content'];
   }
 }
 
@@ -104,10 +104,10 @@ class GistFork {
     if (input == null) return null;
 
     return new GistFork()
-        ..user = User.fromJSON(input['user'])
-        ..id = input['id']
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at']);
+      ..user = User.fromJSON(input['user'])
+      ..id = input['id']
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at']);
   }
 }
 
@@ -131,14 +131,14 @@ class GistHistoryEntry {
 
   static GistHistoryEntry fromJSON(input) {
     if (input == null) return null;
-    
+
     return new GistHistoryEntry()
-        ..version = input['version']
-        ..user = User.fromJSON(input['user'])
-        ..deletions = input['change_status']['deletions']
-        ..additions = input['change_status']['additions']
-        ..totalChanges = input['change_status']['total']
-        ..committedAt = parseDateTime(input['committed_at']);
+      ..version = input['version']
+      ..user = User.fromJSON(input['user'])
+      ..deletions = input['change_status']['deletions']
+      ..additions = input['change_status']['additions']
+      ..totalChanges = input['change_status']['total']
+      ..committedAt = parseDateTime(input['committed_at']);
   }
 }
 
@@ -146,33 +146,33 @@ class GistHistoryEntry {
 class GistComment {
   int id;
   User user;
-  
+
   @ApiName("created_at")
   DateTime createdAt;
-  
+
   @ApiName("updated_at")
   DateTime updatedAt;
-  
+
   String body;
-  
+
   static GistComment fromJSON(input) {
     if (input == null) return null;
-  
+
     return new GistComment()
-        ..id = input['id']
-        ..user = User.fromJSON(input['user'])
-        ..createdAt = parseDateTime(input['created_at'])
-        ..updatedAt = parseDateTime(input['updated_at'])
-        ..body = input['body'];
+      ..id = input['id']
+      ..user = User.fromJSON(input['user'])
+      ..createdAt = parseDateTime(input['created_at'])
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..body = input['body'];
   }
 }
-  
+
 /// Model class for a new gist comment to be created.
 class CreateGistComment {
   final String body;
-  
+
   CreateGistComment(this.body);
-  
+
   String toJSON() {
     var map = {};
     map['body'] = body;

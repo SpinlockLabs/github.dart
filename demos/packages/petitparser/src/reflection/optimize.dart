@@ -1,11 +1,11 @@
 part of reflection;
 
 /**
- * Returns a copy of [parser] with all setable parsers removed.
+ * Returns a copy of [parser] with all settable parsers removed.
  */
-Parser removeSetables(Parser parser) {
+Parser removeSettables(Parser parser) {
   return transformParser(parser, (each) {
-    while (each is SetableParser) {
+    while (each is SettableParser) {
       each = each.children.first;
     }
     return each;
@@ -19,7 +19,7 @@ Parser removeDuplicates(Parser parser) {
   var uniques = new Set();
   return transformParser(parser, (source) {
     var target = uniques.firstWhere((each) {
-      return source != each && source.equals(each);
+      return source != each && source.isEqualTo(each);
     }, orElse: () => null);
     if (target == null) {
       uniques.add(source);

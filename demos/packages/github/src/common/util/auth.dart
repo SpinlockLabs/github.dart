@@ -2,22 +2,22 @@ part of github.common;
 
 /// Authentication information.
 class Authentication {
-  
+
   /// OAuth2 Token
   final String token;
-  
+
   /// GitHub Username
   final String username;
-  
+
   /// GitHub Password
   final String password;
 
   /// Anonymous Authentication Flag
   final bool isAnonymous;
-  
+
   /// Basic Authentication Flag
   final bool isBasic;
-  
+
   /// Token Authentication Flag
   final bool isToken;
 

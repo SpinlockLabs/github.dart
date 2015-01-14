@@ -17,6 +17,9 @@ part 'src/lisp/natives.dart';
 part 'src/lisp/parser.dart';
 part 'src/lisp/standard.dart';
 
+/** The standard lisp parser definition. */
+final lispParser = new LispParser();
+
 /** The evaluation function. */
 eval(Environment env, expr) {
   if (expr is Cons) {
@@ -38,7 +41,7 @@ evalList(Environment env, expr) {
   return result;
 }
 
-/** The arguments evaluatation function. */
+/** The arguments evaluation function. */
 evalArguments(Environment env, args) {
   if (args is Cons) {
     return new Cons(eval(env, args.head), evalArguments(env, args.tail));
@@ -48,7 +51,7 @@ evalArguments(Environment env, args) {
 }
 
 /** Reads and evaluates a [script]. */
-evalString(LispParser parser, Environment env, String script) {
+evalString(Parser parser, Environment env, String script) {
   var result = null;
   for (var cell in parser.parse(script).value) {
     result = eval(env, cell);

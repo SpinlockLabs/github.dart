@@ -15,6 +15,4 @@ export 'collection/array_2d.dart';
 part 'collection/collection_util.dart';
 part 'collection/enumerable.dart';
 part 'collection/grouping.dart';
-part 'collection/sequence.dart';
 part 'collection/number_enumerable.dart';
-part 'collection/read_only_collection.dart';

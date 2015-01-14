@@ -340,7 +340,8 @@ Iterable<String> _getParserOptionCompletions(ArgParser parser,
       parser.options.containsValue(option)));
 
   return parser.options.values
-      .where((Option o) => !existingOptions.contains(o) || o.allowMultiple)
+      .where((opt) =>
+          !existingOptions.contains(opt) || opt.type == OptionType.MULTIPLE)
       .expand(_getArgsOptionCompletions);
 }
 

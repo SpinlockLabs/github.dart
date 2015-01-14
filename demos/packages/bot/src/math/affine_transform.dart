@@ -174,8 +174,8 @@ class AffineTransform {
     return new AffineTransform(_scX, _shY, _shX, _scY, _tX, _tY);
   }
 
-  bool operator ==(AffineTransform other) {
-    return other != null &&
+  bool operator ==(other) {
+    return other is AffineTransform &&
         _scX == other._scX && _shX == other._shX && _tX == other._tX &&
         _shY == other._shY && _scY == other._scY && _tY == other._tY;
   }

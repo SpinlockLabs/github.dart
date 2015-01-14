@@ -37,32 +37,33 @@ class GitHubFile {
   Links links;
 
   /// Text Content
-  String get text => new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
+  String get text =>
+      new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
 
   /// Source Repository
   RepositorySlug sourceRepository;
-  
+
   static GitHubFile fromJSON(input, [RepositorySlug slug]) {
     if (input == null) return null;
-    
+
     return new GitHubFile()
-        ..type = input['type']
-        ..encoding = input['encoding']
-        ..size = input['size']
-        ..name = input['name']
-        ..path = input['path']
-        ..content = input['content']
-        ..sha = input['sha']
-        ..gitUrl = input['git_url']
-        ..htmlUrl = input['html_url']
-        ..links = Links.fromJSON(input['_links'])
-        ..sourceRepository = slug;
+      ..type = input['type']
+      ..encoding = input['encoding']
+      ..size = input['size']
+      ..name = input['name']
+      ..path = input['path']
+      ..content = input['content']
+      ..sha = input['sha']
+      ..gitUrl = input['git_url']
+      ..htmlUrl = input['html_url']
+      ..links = Links.fromJSON(input['_links'])
+      ..sourceRepository = slug;
   }
 }
 
 /// File links.
 class Links {
-  
+
   /// Git Link
   @ApiName("git")
   String git;
@@ -77,7 +78,7 @@ class Links {
 
   static Links fromJSON(input) {
     if (input == null) return null;
-    
+
     var links = new Links();
     links.git = input['git'];
     links.self = input['self'];
@@ -90,7 +91,7 @@ class Links {
 class RepositoryContents {
   GitHubFile file;
   List<GitHubFile> tree;
-  
+
   bool get isFile => file != null;
   bool get isDirectory => tree != null;
 }
@@ -100,12 +101,12 @@ class CreateFile {
   final String path;
   final String message;
   final String content;
-  
+
   String branch;
   CommitUser committer;
-  
+
   CreateFile(this.path, this.content, this.message);
-  
+
   String toJSON() {
     var map = {};
     putValue("path", path, map);
@@ -121,15 +122,15 @@ class CreateFile {
 class CommitUser {
   final String name;
   final String email;
-  
+
   CommitUser(this.name, this.email);
-  
+
   Map<String, dynamic> toMap() {
     var map = {};
-    
+
     putValue('name', name, map);
     putValue('email', email, map);
-    
+
     return map;
   }
 }
@@ -138,13 +139,13 @@ class CommitUser {
 class ContentCreation {
   final RepositoryCommit commit;
   final GitHubFile content;
-  
+
   ContentCreation(this.commit, this.content);
-  
+
   static ContentCreation fromJSON(input) {
     if (input == null) return null;
-    
-    return new ContentCreation(RepositoryCommit.fromJSON(input['commit']), 
+
+    return new ContentCreation(RepositoryCommit.fromJSON(input['commit']),
         GitHubFile.fromJSON(input['content']));
   }
 }

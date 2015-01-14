@@ -4,7 +4,7 @@
 
 library _interceptors;
 
-import 'shared/embedded_names.dart' show
+import 'dart:_js_embedded_names' show
     DISPATCH_PROPERTY_NAME;
 
 import 'dart:collection';
@@ -23,6 +23,7 @@ import 'dart:_js_helper' show allMatchesInStringUnchecked,
                               initNativeDispatch,
                               initNativeDispatchFlag,
                               regExpGetNative,
+                              regExpCaptureCount,
                               stringContainsUnchecked,
                               stringLastIndexOfUnchecked,
                               stringReplaceAllFuncUnchecked,

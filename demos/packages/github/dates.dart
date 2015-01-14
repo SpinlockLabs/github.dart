@@ -23,7 +23,7 @@ String friendlyDate(DateTime time) {
 String friendlyTime(DateTime time) {
   var suffix = time.hour >= 12 ? "PM" : "AM";
   var hour = ((time.hour + 11) % 12 + 1);
-  
+
   return "${hour}:${time.minute}:${friendlySecond(time.second)} ${suffix} (in ${time.timeZoneName})";
 }
 

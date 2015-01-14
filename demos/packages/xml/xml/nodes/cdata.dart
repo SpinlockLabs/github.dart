@@ -14,16 +14,6 @@ class XmlCDATA extends XmlData {
   XmlNodeType get nodeType => XmlNodeType.CDATA;
 
   @override
-  void writeTo(StringBuffer buffer) {
-    buffer.write('<![CDATA[');
-    buffer.write(text);
-    buffer.write(']]>');
-  }
-
-  @override
-  void writePrettyTo(StringBuffer buffer, int level, String indent) {
-    _writeIndentTo(buffer, level, indent);
-    writeTo(buffer);
-  }
+  accept(XmlVisitor visitor) => visitor.visitCDATA(this);
 
 }

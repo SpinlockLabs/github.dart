@@ -17,18 +17,14 @@ class XmlAttribute extends XmlNode implements XmlNamed {
    * Create an attribute with `name` and `value`.
    */
   XmlAttribute(this.name, this.value) {
-    name._parent = this;
+    assert(this.name._parent == null);
+    this.name._parent = this;
   }
 
   @override
   XmlNodeType get nodeType => XmlNodeType.ATTRIBUTE;
 
   @override
-  void writeTo(StringBuffer buffer) {
-    name.writeTo(buffer);
-    buffer.write('="');
-    buffer.write(_encodeXmlAttributeValue(value));
-    buffer.write('"');
-  }
+  accept(XmlVisitor visitor) => visitor.visitAttribute(this);
 
 }

@@ -14,16 +14,6 @@ class XmlDoctype extends XmlData {
   XmlNodeType get nodeType => XmlNodeType.DOCUMENT_TYPE;
 
   @override
-  void writeTo(StringBuffer buffer) {
-    buffer.write('<!DOCTYPE ');
-    buffer.write(text);
-    buffer.write('>');
-  }
-
-  @override
-  void writePrettyTo(StringBuffer buffer, int level, String indent) {
-    _writeIndentTo(buffer, level, indent);
-    writeTo(buffer);
-  }
+  accept(XmlVisitor visitor) => visitor.visitDoctype(this);
 
 }

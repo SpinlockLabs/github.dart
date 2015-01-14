@@ -91,7 +91,7 @@ String _getUsage({bool showOptions: true, String taskName: '<task>', String exte
 
 void _printHopArgsHelp(_Printer printer, ArgParser hopArgParser) {
   printer(_getTitle('Hop options'));
-  printer(_indent(hopArgParser.getUsage()));
+  printer(_indent(hopArgParser.usage));
   printer('');
 }
 

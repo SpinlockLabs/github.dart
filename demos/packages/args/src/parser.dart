@@ -46,6 +46,7 @@ class Parser {
 
   /// Parses the arguments. This can only be called once.
   ArgResults parse() {
+    var arguments = args.toList();
     var commandResults = null;
 
     // Parse the args.
@@ -91,7 +92,8 @@ class Parser {
     // Add in the leftover arguments we didn't parse to the innermost command.
     rest.addAll(args);
     args.clear();
-    return newArgResults(grammar, results, commandName, commandResults, rest);
+    return newArgResults(
+        grammar, results, commandName, commandResults, rest, arguments);
   }
 
   /// Pulls the value for [option] from the second argument in [args].
@@ -99,8 +101,7 @@ class Parser {
   /// Validates that there is a valid value there.
   void readNextArgAsValue(Option option) {
     // Take the option argument from the next command line arg.
-    validate(args.length > 0,
-        'Missing argument for "${option.name}".');
+    validate(args.length > 0, 'Missing argument for "${option.name}".');
 
     // Make sure it isn't an option itself.
     validate(!_ABBR_OPT.hasMatch(current) && !_LONG_OPT.hasMatch(current),
@@ -122,8 +123,8 @@ class Parser {
     var option = grammar.findByAbbreviation(soloOpt[1]);
     if (option == null) {
       // Walk up to the parent command if possible.
-      validate(parent != null,
-          'Could not find an option or flag "-${soloOpt[1]}".');
+      validate(
+          parent != null, 'Could not find an option or flag "-${soloOpt[1]}".');
       return parent.parseSoloOption();
     }
 
@@ -151,8 +152,8 @@ class Parser {
     var first = grammar.findByAbbreviation(c);
     if (first == null) {
       // Walk up to the parent command if possible.
-      validate(parent != null,
-          'Could not find an option with short name "-$c".');
+      validate(
+          parent != null, 'Could not find an option with short name "-$c".');
       return parent.parseAbbreviation(innermostCommand);
     } else if (!first.isFlag) {
       // The first character is a non-flag option, so the rest must be the
@@ -163,8 +164,8 @@ class Parser {
       // If we got some non-flag characters, then it must be a value, but
       // if we got here, it's a flag, which is wrong.
       validate(abbrOpt[2] == '',
-        'Option "-$c" is a flag and cannot handle value '
-        '"${abbrOpt[1].substring(1)}${abbrOpt[2]}".');
+          'Option "-$c" is a flag and cannot handle value '
+          '"${abbrOpt[1].substring(1)}${abbrOpt[2]}".');
 
       // Not an option, so all characters should be flags.
       // We use "innermostCommand" here so that if a parent command parses the
@@ -184,16 +185,16 @@ class Parser {
     var option = grammar.findByAbbreviation(c);
     if (option == null) {
       // Walk up to the parent command if possible.
-      validate(parent != null,
-          'Could not find an option with short name "-$c".');
+      validate(
+          parent != null, 'Could not find an option with short name "-$c".');
       parent.parseShortFlag(c);
       return;
     }
 
     // In a list of short options, only the first can be a non-flag. If
     // we get here we've checked that already.
-    validate(option.isFlag,
-        'Option "-$c" must be a flag to be in a collapsed "-".');
+    validate(
+        option.isFlag, 'Option "-$c" must be a flag to be in a collapsed "-".');
 
     setOption(results, option, true);
   }

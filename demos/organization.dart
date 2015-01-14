@@ -40,14 +40,20 @@ void loadOrganization() {
       e.classes.add("team");
       $org.append(e);
       e.append(new HeadingElement.h3()..text = team.name);
-      github.organizations.listTeamMembers(team.id).toList().then((List<TeamMember> members) {
+      github.organizations
+          .listTeamMembers(team.id)
+          .toList()
+          .then((List<TeamMember> members) {
         var divs = members.map((member) {
           var h = new DivElement();
           h.classes.add("box");
           h.classes.add("user");
           h.style.textAlign = "center";
-          h.append(new ImageElement(src: member.avatarUrl, width: 64, height: 64)..classes.add("avatar"));
-          h.append(new AnchorElement(href: member.htmlUrl)..append(new ParagraphElement()..text = member.login));
+          h.append(new ImageElement(
+              src: member.avatarUrl, width: 64, height: 64)
+            ..classes.add("avatar"));
+          h.append(new AnchorElement(href: member.htmlUrl)
+            ..append(new ParagraphElement()..text = member.login));
           return h;
         });
         divs.forEach(e.append);

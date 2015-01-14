@@ -55,5 +55,4 @@ class BungeeNum {
       return true;
     }
   }
-
 }

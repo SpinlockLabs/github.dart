@@ -14,18 +14,20 @@ class _SpreadArgsHelper {
   final int maxExpectedCalls;
   final Function isDone;
   final String id;
+  final String reason;
   int actualCalls = 0;
   final TestCase testCase;
   bool complete;
 
   _SpreadArgsHelper(Function callback, int minExpected, int maxExpected,
-      String id, {bool isDone()})
+      String id, String reason, {bool isDone()})
       : this.callback = callback,
         minExpectedCalls = minExpected,
         maxExpectedCalls = (maxExpected == 0 && minExpected > 0)
             ? minExpected
             : maxExpected,
         this.isDone = isDone,
+        this.reason = reason == null ? '' : '\n$reason',
         this.testCase = currentTestCase,
         this.id = _makeCallbackId(id, callback) {
     ensureInitialized();
@@ -70,15 +72,14 @@ class _SpreadArgsHelper {
       // the current test, but we do mark the old test as having an error
       // if it previously passed.
       if (testCase.result == PASS) {
-        testCase._error(
-            'Callback ${id}called ($actualCalls) after test case '
+        testCase._error('Callback ${id}called ($actualCalls) after test case '
             '${testCase.description} has already been marked as '
-            '${testCase.result}.');
+            '${testCase.result}.$reason');
       }
       return false;
     } else if (maxExpectedCalls >= 0 && actualCalls > maxExpectedCalls) {
       throw new TestFailure('Callback ${id}called more times than expected '
-                            '($maxExpectedCalls).');
+          '($maxExpectedCalls).$reason');
     }
     return true;
   }
@@ -134,13 +135,11 @@ class _SpreadArgsHelper {
     var args = [a0, a1, a2, a3, a4, a5];
     args.removeWhere((a) => a == _PLACE_HOLDER);
 
-    return _guardAsync(
-        () {
-          if (shouldCallBack()) {
-            return Function.apply(callback, args);
-          }
-        },
-        after, testCase);
+    return _guardAsync(() {
+      if (shouldCallBack()) {
+        return Function.apply(callback, args);
+      }
+    }, after, testCase);
   }
 
   _guardAsync(Function tryBody, Function finallyBody, TestCase testCase) {

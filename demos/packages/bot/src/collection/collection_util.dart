@@ -30,10 +30,10 @@ class CollectionUtil {
     return $(source.where(f));
   }
 
-  static Iterable distinct(Iterable source,
-                           [bool comparer(dynamic a, dynamic b) = null]) {
-    if(comparer == null) {
-      comparer = (a,b) => a == b;
+  static Iterable distinct(
+      Iterable source, [bool comparer(dynamic a, dynamic b) = null]) {
+    if (comparer == null) {
+      comparer = (a, b) => a == b;
     }
     return new FuncEnumerable(source, (Iterable s) =>
         new _DistinctIterator(s.iterator, comparer));
@@ -46,8 +46,9 @@ class CollectionUtil {
     }
   }
 
-  static Map toMap(Iterable source, Func1 valueFunc, [dynamic keyFunc(dynamic)]) {
-    if(keyFunc == null) {
+  static Map toMap(
+      Iterable source, Func1 valueFunc, [dynamic keyFunc(dynamic)]) {
+    if (keyFunc == null) {
       keyFunc = (a) => a;
     }
 
@@ -70,8 +71,7 @@ class _DistinctIterator<T> implements Iterator<T> {
   final List<T> _found;
   T _current;
 
-  _DistinctIterator(this._source, this._comparer)
-      : _found = new List<T>();
+  _DistinctIterator(this._source, this._comparer) : _found = new List<T>();
 
   T get current => _current;
 

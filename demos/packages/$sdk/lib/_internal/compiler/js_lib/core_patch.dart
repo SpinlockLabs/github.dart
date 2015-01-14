@@ -6,8 +6,9 @@
 import "dart:_internal" as _symbol_dev;
 import 'dart:_interceptors';
 import 'dart:_js_helper' show patch,
-                              checkNull,
+                              checkInt,
                               getRuntimeType,
+                              jsonEncodeNative,
                               JSSyntaxRegExp,
                               Primitives,
                               stringJoinUnchecked,
@@ -58,12 +59,12 @@ class Function {
                List positionalArguments,
                [Map<Symbol, dynamic> namedArguments]) {
     return Primitives.applyFunction(
-        function, positionalArguments, _toMangledNames(namedArguments));
+        function, positionalArguments,
+        namedArguments == null ? null : _toMangledNames(namedArguments));
   }
 
   static Map<String, dynamic> _toMangledNames(
       Map<Symbol, dynamic> namedArguments) {
-    if (namedArguments == null) return null;
     Map<String, dynamic> result = {};
     namedArguments.forEach((symbol, value) {
       result[_symbolToString(symbol)] = value;
@@ -141,6 +142,11 @@ class Error {
   }
 
   @patch
+  static String _stringToSafeString(String string) {
+    return jsonEncodeNative(string);
+  }
+
+  @patch
   StackTrace get stackTrace => Primitives.extractStackTrace(this);
 }
 
@@ -156,19 +162,16 @@ class DateTime {
                      int second,
                      int millisecond,
                      bool isUtc)
-      : this.isUtc = checkNull(isUtc),
-        millisecondsSinceEpoch = Primitives.valueFromDecomposedDate(
-            year, month, day, hour, minute, second, millisecond, isUtc) {
-    if (millisecondsSinceEpoch == null) throw new ArgumentError();
-    Primitives.lazyAsJsDate(this);
-  }
+        // checkBool is manually inlined here because dart2js doesn't inline it
+        // and [isUtc] is usually a constant.
+      : this.isUtc = isUtc is bool ? isUtc : throw new ArgumentError(isUtc),
+        millisecondsSinceEpoch = checkInt(Primitives.valueFromDecomposedDate(
+            year, month, day, hour, minute, second, millisecond, isUtc));
 
   @patch
   DateTime._now()
       : isUtc = false,
-        millisecondsSinceEpoch = Primitives.dateNow() {
-    Primitives.lazyAsJsDate(this);
-  }
+        millisecondsSinceEpoch = Primitives.dateNow();
 
   @patch
   static int _brokenDownDateToMillisecondsSinceEpoch(
@@ -256,9 +259,9 @@ class List<E> {
   }
 
   @patch
-  factory List.from(Iterable other, { bool growable: true }) {
+  factory List.from(Iterable elements, { bool growable: true }) {
     List<E> list = new List<E>();
-    for (E e in other) {
+    for (E e in elements) {
       list.add(e);
     }
     if (growable) return list;
@@ -360,29 +363,26 @@ bool identical(Object a, Object b) {
 
 @patch
 class StringBuffer {
-  String _contents = "";
+  String _contents;
 
   @patch
-  StringBuffer([Object content = ""]) {
-    if (content is String) {
-      _contents = content;
-    } else {
-      write(content);
-    }
-  }
+  StringBuffer([Object content = ""]) : _contents = '$content';
 
   @patch
   int get length => _contents.length;
 
   @patch
   void write(Object obj) {
-    String str = obj is String ? obj : "$obj";
-    _contents = Primitives.stringConcatUnchecked(_contents, str);
+    _writeString('$obj');
   }
 
   @patch
   void writeCharCode(int charCode) {
-    write(new String.fromCharCode(charCode));
+    _writeString(new String.fromCharCode(charCode));
+  }
+
+  void _writeString(str) {
+    _contents = Primitives.stringConcatUnchecked(_contents, str);
   }
 
   @patch

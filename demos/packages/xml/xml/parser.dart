@@ -1,23 +1,36 @@
 part of xml;
 
 /**
- * XML parser definition.
+ * XML parser that defines standard actions to the the XML tree.
  */
-class XmlParser extends XmlGrammar {
+class XmlParserDefinition extends XmlGrammarDefinition {
 
   @override
-  void initialize() {
-    super.initialize();
+  XmlAttribute createAttribute(XmlName name, String text) => new XmlAttribute(name, text);
 
-    action('attribute', (each) => new XmlAttribute(each[0], each[1]));
-    action('comment', (each) => new XmlComment(each));
-    action('cdata', (each) => new XmlCDATA(each));
-    action('doctype', (each) => new XmlDoctype(each));
-    action('document', (each) => new XmlDocument(each));
-    action('element', (each) => new XmlElement(each[0], each[1], each[2]));
-    action('processing', (each) => new XmlProcessing(each[0], each[1]));
-    action('qualified', (each) => new XmlName.fromString(each));
-    action('characterData', (each) => new XmlText(each));
-  }
+  @override
+  XmlComment createComment(String text) => new XmlComment(text);
+
+  @override
+  XmlCDATA createCDATA(String text) => new XmlCDATA(text);
+
+  @override
+  XmlDoctype createDoctype(String text) => new XmlDoctype(text);
+
+  @override
+  XmlDocument createDocument(Iterable<XmlNode> children) => new XmlDocument(children);
+
+  @override
+  XmlElement createElement(XmlName name, Iterable<XmlNode> attributes,
+      Iterable<XmlNode> children) => new XmlElement(name, attributes, children);
+
+  @override
+  XmlProcessing createProcessing(String target, String text) => new XmlProcessing(target, text);
+
+  @override
+  XmlName createQualified(String name) => new XmlName.fromString(name);
+
+  @override
+  XmlText createText(String text) => new XmlText(text);
 
 }

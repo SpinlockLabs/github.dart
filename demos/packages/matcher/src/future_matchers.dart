@@ -6,21 +6,24 @@ library matcher.future_matchers;
 
 import 'dart:async';
 
-import 'core_matchers.dart';
 import 'expect.dart';
 import 'interfaces.dart';
+import 'util.dart';
 
-/// Matches a [Future] that completes successfully with a value. Note that this
-/// creates an asynchronous expectation. The call to `expect()` that includes
-/// this will return immediately and execution will continue. Later, when the
-/// future completes, the actual expectation will run.
+/// Matches a [Future] that completes successfully with a value.
+///
+/// Note that this creates an asynchronous expectation. The call to `expect()`
+/// that includes this will return immediately and execution will continue.
+/// Later, when the future completes, the actual expectation will run.
 ///
 /// To test that a Future completes with an exception, you can use [throws] and
 /// [throwsA].
 final Matcher completes = const _Completes(null, '');
 
 /// Matches a [Future] that completes succesfully with a value that matches
-/// [matcher]. Note that this creates an asynchronous expectation. The call to
+/// [matcher].
+///
+/// Note that this creates an asynchronous expectation. The call to
 /// `expect()` that includes this will return immediately and execution will
 /// continue. Later, when the future completes, the actual expectation will run.
 ///

@@ -21,9 +21,9 @@ List topologicalSort(Map<dynamic, Iterable<dynamic>> dependencies) {
         .map((node) => node.value)
         .toList();
 
-    if(zeros.isEmpty) throw new ArgumentError('There is a loop in the map');
+    if (zeros.isEmpty) throw new ArgumentError('There is a loop in the map');
 
-    for(var item in zeros) {
+    for (var item in zeros) {
       var added = items.add(item);
       assert(added);
     }

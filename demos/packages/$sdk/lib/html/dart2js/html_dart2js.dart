@@ -127,7 +127,6 @@ Future<Isolate> spawnDomUri(Uri uri, List<String> args, message) {
 
 @DocsEditable()
 @DomName('AbstractWorker')
-@Native("AbstractWorker")
 abstract class AbstractWorker extends Interceptor implements EventTarget {
   // To suppress missing implicit constructor warnings.
   factory AbstractWorker._() { throw new UnsupportedError("Not supported"); }
@@ -1430,6 +1429,31 @@ class CDataSection extends Text {
 class CacheStorage extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory CacheStorage._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('CacheStorage.create')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future create(String cacheName) native;
+
+  @DomName('CacheStorage.delete')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future delete(String cacheName) native;
+
+  @DomName('CacheStorage.get')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future get(String cacheName) native;
+
+  @DomName('CacheStorage.has')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future has(String cacheName) native;
+
+  @DomName('CacheStorage.keys')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future keys() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -2819,6 +2843,42 @@ class Credential extends Interceptor {
 class CredentialsContainer extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory CredentialsContainer._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('CredentialsContainer.notifyFailedSignIn')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future notifyFailedSignIn([Credential credential]) native;
+
+  @DomName('CredentialsContainer.notifySignedIn')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future notifySignedIn([Credential credential]) native;
+
+  @DomName('CredentialsContainer.notifySignedOut')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future notifySignedOut() native;
+
+  @DomName('CredentialsContainer.request')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future request([Map options]) {
+    if (options != null) {
+      var options_1 = convertDartToNative_Dictionary(options);
+      return _request_1(options_1);
+    }
+    return _request_2();
+  }
+  @JSName('request')
+  @DomName('CredentialsContainer.request')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _request_1(options) native;
+  @JSName('request')
+  @DomName('CredentialsContainer.request')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _request_2() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -7425,6 +7485,16 @@ class Document extends Node
   // To suppress missing implicit constructor warnings.
   factory Document._() { throw new UnsupportedError("Not supported"); }
 
+  @DomName('Document.pointerlockchangeEvent')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const EventStreamProvider<Event> pointerLockChangeEvent = const EventStreamProvider<Event>('pointerlockchange');
+
+  @DomName('Document.pointerlockerrorEvent')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const EventStreamProvider<Event> pointerLockErrorEvent = const EventStreamProvider<Event>('pointerlockerror');
+
   /**
    * Static factory designed to expose `readystatechange` events to event
    * handlers that are not necessarily instances of [Document].
@@ -8043,6 +8113,16 @@ class Document extends Node
   @DocsEditable()
   @Experimental() // untriaged
   Stream<Event> get onPlaying => Element.playingEvent.forTarget(this);
+
+  @DomName('Document.onpointerlockchange')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Stream<Event> get onPointerLockChange => pointerLockChangeEvent.forTarget(this);
+
+  @DomName('Document.onpointerlockerror')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Stream<Event> get onPointerLockError => pointerLockErrorEvent.forTarget(this);
 
   @DomName('Document.onratechange')
   @DocsEditable()
@@ -9162,7 +9242,7 @@ class DomStringList extends Interceptor with ListMixin<String>, ImmutableListMix
   String operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("String", "#[#]", this, index);
   }
   void operator[]=(int index, String value) {
@@ -9986,19 +10066,12 @@ abstract class ElementList<T extends Element> extends ListBase<T> {
 
 }
 
-// TODO(jacobr): this is an inefficient implementation but it is hard to see
-// a better option given that we cannot quite force NodeList to be an
-// ElementList as there are valid cases where a NodeList JavaScript object
-// contains Node objects that are not Elements.
-class _FrozenElementList<T extends Element> extends ListBase<T>
-    implements ElementList<T>, NodeListWrapper {
+// Wrapper over an immutable NodeList to make it implement ElementList<Element>.
+class _FrozenElementList extends ListBase
+    implements ElementList, NodeListWrapper {
   final List<Node> _nodeList;
-  // The subset of _nodeList that are Elements.
-  List<Element> _elementList;
 
-  _FrozenElementList._wrap(this._nodeList) {
-    _elementList = _nodeList.where((e) => e is Element).toList();
-  }
+  _FrozenElementList._wrap(this._nodeList);
 
   int get length => _nodeList.length;
 
@@ -10026,22 +10099,22 @@ class _FrozenElementList<T extends Element> extends ListBase<T>
 
   Element get single => _nodeList.single;
 
-  CssClassSet get classes => new _MultiElementCssClassSet(_elementList);
+  CssClassSet get classes => new _MultiElementCssClassSet(this);
 
   CssStyleDeclarationBase get style =>
-      new _CssStyleDeclarationSet(_elementList);
+      new _CssStyleDeclarationSet(this);
 
   void set classes(Iterable<String> value) {
-    _elementList.forEach((e) => e.classes = value);
+    _nodeList.forEach((e) => e.classes = value);
   }
 
-  CssRect get contentEdge => new _ContentCssListRect(_elementList);
+  CssRect get contentEdge => new _ContentCssListRect(this);
 
-  CssRect get paddingEdge => _elementList.first.paddingEdge;
+  CssRect get paddingEdge => this.first.paddingEdge;
 
-  CssRect get borderEdge => _elementList.first.borderEdge;
+  CssRect get borderEdge => this.first.borderEdge;
 
-  CssRect get marginEdge => _elementList.first.marginEdge;
+  CssRect get marginEdge => this.first.marginEdge;
 
   List<Node> get rawList => _nodeList;
 
@@ -13894,6 +13967,27 @@ class FederatedCredential extends Credential {
 class FetchBodyStream extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory FetchBodyStream._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('FetchBodyStream.asArrayBuffer')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future asArrayBuffer() native;
+
+  @DomName('FetchBodyStream.asBlob')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future asBlob() native;
+
+  @JSName('asJSON')
+  @DomName('FetchBodyStream.asJSON')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future asJson() native;
+
+  @DomName('FetchBodyStream.asText')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future asText() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -13916,7 +14010,7 @@ class FetchEvent extends Event {
   @DomName('FetchEvent.request')
   @DocsEditable()
   @Experimental() // untriaged
-  final Request request;
+  final _Request request;
 
   @DomName('FetchEvent.respondWith')
   @DocsEditable()
@@ -14169,7 +14263,7 @@ class FileList extends Interceptor with ListMixin<File>, ImmutableListMixin<File
   File operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("File", "#[#]", this, index);
   }
   void operator[]=(int index, File value) {
@@ -14660,6 +14754,11 @@ class FontFace extends Interceptor {
   @Experimental() // untriaged
   String featureSettings;
 
+  @DomName('FontFace.loaded')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final Future loaded;
+
   @DomName('FontFace.status')
   @DocsEditable()
   @Experimental() // untriaged
@@ -14689,6 +14788,11 @@ class FontFace extends Interceptor {
   @DocsEditable()
   @Experimental() // untriaged
   String weight;
+
+  @DomName('FontFace.load')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future load() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -14999,6 +15103,21 @@ class GamepadEvent extends Event {
 class Geofencing extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory Geofencing._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('Geofencing.getRegisteredRegions')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future getRegisteredRegions() native;
+
+  @DomName('Geofencing.registerRegion')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future registerRegion(GeofencingRegion region) native;
+
+  @DomName('Geofencing.unregisterRegion')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future unregisterRegion(String regionId) native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -16002,7 +16121,7 @@ class HtmlCollection extends Interceptor with ListMixin<Node>, ImmutableListMixi
   Node operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Node", "#[#]", this, index);
   }
   void operator[]=(int index, Node value) {
@@ -18380,6 +18499,11 @@ class InstallEvent extends InstallPhaseEvent {
   // To suppress missing implicit constructor warnings.
   factory InstallEvent._() { throw new UnsupportedError("Not supported"); }
 
+  @DomName('InstallEvent.reloadAll')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future reloadAll() native;
+
   @DomName('InstallEvent.replace')
   @DocsEditable()
   @Experimental() // untriaged
@@ -19584,6 +19708,11 @@ class MediaKeySession extends EventTarget {
   // To suppress missing implicit constructor warnings.
   factory MediaKeySession._() { throw new UnsupportedError("Not supported"); }
 
+  @DomName('MediaKeySession.closed')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final Future closed;
+
   @DomName('MediaKeySession.error')
   @DocsEditable()
   final MediaKeyError error;
@@ -19595,6 +19724,16 @@ class MediaKeySession extends EventTarget {
   @DomName('MediaKeySession.sessionId')
   @DocsEditable()
   final String sessionId;
+
+  @DomName('MediaKeySession.release')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future release() native;
+
+  @JSName('update')
+  @DomName('MediaKeySession.update')
+  @DocsEditable()
+  Future _update(response) native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -19613,6 +19752,16 @@ class MediaKeys extends Interceptor {
   @DomName('MediaKeys.keySystem')
   @DocsEditable()
   final String keySystem;
+
+  @DomName('MediaKeys.create')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static Future create(String keySystem) native;
+
+  @JSName('createSession')
+  @DomName('MediaKeys.createSession')
+  @DocsEditable()
+  Future _createSession(String initDataType, initData, [String sessionType]) native;
 
   @DomName('MediaKeys.isTypeSupported')
   @DocsEditable()
@@ -20666,7 +20815,7 @@ class MimeTypeArray extends Interceptor with ListMixin<MimeType>, ImmutableListM
   MimeType operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("MimeType", "#[#]", this, index);
   }
   void operator[]=(int index, MimeType value) {
@@ -21114,7 +21263,7 @@ class MutationRecord extends Interceptor {
 
 @DomName('Navigator')
 @Native("Navigator")
-class Navigator extends NavigatorCpu implements NavigatorLanguage, NavigatorOnLine, NavigatorID {
+class Navigator extends Interceptor implements NavigatorCpu, NavigatorLanguage, NavigatorOnLine, NavigatorID {
 
   @DomName('Navigator.language')
   String get language => JS('String', '#.language || #.userLanguage', this,
@@ -21279,6 +21428,11 @@ class Navigator extends NavigatorCpu implements NavigatorLanguage, NavigatorOnLi
   // http://www.w3.org/TR/quota-api/#accessing-storagequota
   final DeprecatedStorageQuota temporaryStorage;
 
+  @DomName('Navigator.getBattery')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future getBattery() native;
+
   @DomName('Navigator.getGamepads')
   @DocsEditable()
   @Experimental() // untriaged
@@ -21311,6 +21465,13 @@ class Navigator extends NavigatorCpu implements NavigatorLanguage, NavigatorOnLi
   @DocsEditable()
   @Experimental() // untriaged
   void unregisterProtocolHandler(String scheme, String url) native;
+
+  // From NavigatorCPU
+
+  @DomName('Navigator.hardwareConcurrency')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final int hardwareConcurrency;
 
   // From NavigatorID
 
@@ -21368,14 +21529,10 @@ class Navigator extends NavigatorCpu implements NavigatorLanguage, NavigatorOnLi
 @DocsEditable()
 @DomName('NavigatorCPU')
 @Experimental() // untriaged
-@Native("NavigatorCPU")
-class NavigatorCpu extends Interceptor {
+abstract class NavigatorCpu extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory NavigatorCpu._() { throw new UnsupportedError("Not supported"); }
 
-  @DomName('NavigatorCPU.hardwareConcurrency')
-  @DocsEditable()
-  @Experimental() // untriaged
   final int hardwareConcurrency;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -21412,19 +21569,12 @@ abstract class NavigatorID extends Interceptor {
 @DocsEditable()
 @DomName('NavigatorLanguage')
 @Experimental() // untriaged
-@Native("NavigatorLanguage")
-class NavigatorLanguage extends Interceptor {
+abstract class NavigatorLanguage extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory NavigatorLanguage._() { throw new UnsupportedError("Not supported"); }
 
-  @DomName('NavigatorLanguage.language')
-  @DocsEditable()
-  @Experimental() // untriaged
   final String language;
 
-  @DomName('NavigatorLanguage.languages')
-  @DocsEditable()
-  @Experimental() // untriaged
   final List<String> languages;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -22217,7 +22367,7 @@ class NodeList extends Interceptor with ListMixin<Node>, ImmutableListMixin<Node
   Node operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Node", "#[#]", this, index);
   }
   void operator[]=(int index, Node value) {
@@ -23396,7 +23546,7 @@ class PluginArray extends Interceptor with ListMixin<Plugin>, ImmutableListMixin
   Plugin operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Plugin", "#[#]", this, index);
   }
   void operator[]=(int index, Plugin value) {
@@ -23678,6 +23828,11 @@ class PushEvent extends Event {
 class PushManager extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory PushManager._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('PushManager.register')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future register(String senderId) native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -23976,66 +24131,6 @@ class RelatedEvent extends Event {
   @DocsEditable()
   @Experimental() // untriaged
   final dynamic _get_relatedTarget;
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-
-@DocsEditable()
-@DomName('Request')
-@Experimental() // untriaged
-@Native("Request")
-class Request extends Interceptor {
-  // To suppress missing implicit constructor warnings.
-  factory Request._() { throw new UnsupportedError("Not supported"); }
-
-  @DomName('Request.Request')
-  @DocsEditable()
-  factory Request(input, [Map requestInitDict]) {
-    if ((input is String || input == null) && requestInitDict == null) {
-      return Request._create_1(input);
-    }
-    if ((requestInitDict is Map || requestInitDict == null) && (input is String || input == null)) {
-      return Request._create_2(input, requestInitDict);
-    }
-    if ((input is Request || input == null) && requestInitDict == null) {
-      return Request._create_3(input);
-    }
-    if ((requestInitDict is Map || requestInitDict == null) && (input is Request || input == null)) {
-      return Request._create_4(input, requestInitDict);
-    }
-    throw new ArgumentError("Incorrect number or type of arguments");
-  }
-  static Request _create_1(input) => JS('Request', 'new Request(#)', input);
-  static Request _create_2(input, requestInitDict) => JS('Request', 'new Request(#,#)', input, requestInitDict);
-  static Request _create_3(input) => JS('Request', 'new Request(#)', input);
-  static Request _create_4(input, requestInitDict) => JS('Request', 'new Request(#,#)', input, requestInitDict);
-
-  @DomName('Request.credentials')
-  @DocsEditable()
-  @Experimental() // untriaged
-  final String credentials;
-
-  @DomName('Request.headers')
-  @DocsEditable()
-  @Experimental() // untriaged
-  final Headers headers;
-
-  @DomName('Request.mode')
-  @DocsEditable()
-  @Experimental() // untriaged
-  final String mode;
-
-  @DomName('Request.referrer')
-  @DocsEditable()
-  @Experimental() // untriaged
-  final String referrer;
-
-  @DomName('Request.url')
-  @DocsEditable()
-  @Experimental() // untriaged
-  final String url;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -24924,6 +25019,11 @@ class ScreenOrientation extends EventTarget {
   @Experimental() // untriaged
   final String type;
 
+  @DomName('ScreenOrientation.lock')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future lock(String orientation) native;
+
   @DomName('ScreenOrientation.unlock')
   @DocsEditable()
   @Experimental() // untriaged
@@ -25335,6 +25435,11 @@ class ServiceWorkerClient extends Interceptor {
 class ServiceWorkerClients extends Interceptor {
   // To suppress missing implicit constructor warnings.
   factory ServiceWorkerClients._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('ServiceWorkerClients.getServiced')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future getServiced() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -25364,10 +25469,41 @@ class ServiceWorkerContainer extends Interceptor {
   @Experimental() // untriaged
   final _ServiceWorker installing;
 
+  @DomName('ServiceWorkerContainer.ready')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final Future ready;
+
   @DomName('ServiceWorkerContainer.waiting')
   @DocsEditable()
   @Experimental() // untriaged
   final _ServiceWorker waiting;
+
+  @DomName('ServiceWorkerContainer.register')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future register(String url, [Map options]) {
+    if (options != null) {
+      var options_1 = convertDartToNative_Dictionary(options);
+      return _register_1(url, options_1);
+    }
+    return _register_2(url);
+  }
+  @JSName('register')
+  @DomName('ServiceWorkerContainer.register')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _register_1(url, options) native;
+  @JSName('register')
+  @DomName('ServiceWorkerContainer.register')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _register_2(url) native;
+
+  @DomName('ServiceWorkerContainer.unregister')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future unregister([String scope]) native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -25401,6 +25537,47 @@ class ServiceWorkerGlobalScope extends WorkerGlobalScope {
   @DocsEditable()
   @Experimental() // untriaged
   final String scope;
+
+  @DomName('ServiceWorkerGlobalScope.fetch')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _fetch(request, [Map requestInitDict]) {
+    if ((request is String || request == null) && requestInitDict == null) {
+      return _fetch_1(request);
+    }
+    if (requestInitDict != null && (request is String || request == null)) {
+      var requestInitDict_1 = convertDartToNative_Dictionary(requestInitDict);
+      return _fetch_2(request, requestInitDict_1);
+    }
+    if ((request is _Request || request == null) && requestInitDict == null) {
+      return _fetch_3(request);
+    }
+    if (requestInitDict != null && (request is _Request || request == null)) {
+      var requestInitDict_2 = convertDartToNative_Dictionary(requestInitDict);
+      return _fetch_4(request, requestInitDict_2);
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
+  }
+  @JSName('fetch')
+  @DomName('ServiceWorkerGlobalScope.fetch')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _fetch_1(String request) native;
+  @JSName('fetch')
+  @DomName('ServiceWorkerGlobalScope.fetch')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _fetch_2(String request, requestInitDict) native;
+  @JSName('fetch')
+  @DomName('ServiceWorkerGlobalScope.fetch')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _fetch_3(_Request request) native;
+  @JSName('fetch')
+  @DomName('ServiceWorkerGlobalScope.fetch')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future _fetch_4(_Request request, requestInitDict) native;
 
   @DomName('ServiceWorkerGlobalScope.onmessage')
   @DocsEditable()
@@ -25439,6 +25616,11 @@ class ServiceWorkerRegistration extends EventTarget {
   @DocsEditable()
   @Experimental() // untriaged
   final _ServiceWorker waiting;
+
+  @DomName('ServiceWorkerRegistration.unregister')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future unregister() native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -25748,7 +25930,7 @@ class SourceBufferList extends EventTarget with ListMixin<SourceBuffer>, Immutab
   SourceBuffer operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("SourceBuffer", "#[#]", this, index);
   }
   void operator[]=(int index, SourceBuffer value) {
@@ -25954,7 +26136,7 @@ class SpeechGrammarList extends Interceptor with ListMixin<SpeechGrammar>, Immut
   SpeechGrammar operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("SpeechGrammar", "#[#]", this, index);
   }
   void operator[]=(int index, SpeechGrammar value) {
@@ -26830,6 +27012,16 @@ class StorageQuota extends Interceptor {
   @DocsEditable()
   @Experimental() // untriaged
   final List<String> supportedTypes;
+
+  @DomName('StorageQuota.queryInfo')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future queryInfo(String type) native;
+
+  @DomName('StorageQuota.requestPersistentQuota')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future requestPersistentQuota(int newQuota) native;
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -27809,7 +28001,7 @@ class TextTrackCueList extends Interceptor with ListMixin<TextTrackCue>, Immutab
   TextTrackCue operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("TextTrackCue", "#[#]", this, index);
   }
   void operator[]=(int index, TextTrackCue value) {
@@ -27894,7 +28086,7 @@ class TextTrackList extends EventTarget with ListMixin<TextTrack>, ImmutableList
   TextTrack operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("TextTrack", "#[#]", this, index);
   }
   void operator[]=(int index, TextTrack value) {
@@ -28295,7 +28487,7 @@ class TouchList extends Interceptor with ListMixin<Touch>, ImmutableListMixin<To
   Touch operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Touch", "#[#]", this, index);
   }
   void operator[]=(int index, Touch value) {
@@ -32550,7 +32742,7 @@ class _ClientRectList extends Interceptor with ListMixin<Rectangle>, ImmutableLi
   Rectangle operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Rectangle", "#[#]", this, index);
   }
   void operator[]=(int index, Rectangle value) {
@@ -32628,7 +32820,7 @@ class _CssRuleList extends Interceptor with ListMixin<CssRule>, ImmutableListMix
   CssRule operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("CssRule", "#[#]", this, index);
   }
   void operator[]=(int index, CssRule value) {
@@ -32694,7 +32886,7 @@ class _CssValueList extends _CSSValue with ListMixin<_CSSValue>, ImmutableListMi
   _CSSValue operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("_CSSValue", "#[#]", this, index);
   }
   void operator[]=(int index, _CSSValue value) {
@@ -32998,7 +33190,7 @@ class _GamepadList extends Interceptor with ListMixin<Gamepad>, ImmutableListMix
   Gamepad operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Gamepad", "#[#]", this, index);
   }
   void operator[]=(int index, Gamepad value) {
@@ -33226,7 +33418,7 @@ class _NamedNodeMap extends Interceptor with ListMixin<Node>, ImmutableListMixin
   Node operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("Node", "#[#]", this, index);
   }
   void operator[]=(int index, Node value) {
@@ -33369,6 +33561,66 @@ abstract class _Rect extends Interceptor {
 
 
 @DocsEditable()
+@DomName('Request')
+@Experimental() // untriaged
+@Native("Request")
+class _Request extends Interceptor {
+  // To suppress missing implicit constructor warnings.
+  factory _Request._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('Request.Request')
+  @DocsEditable()
+  factory _Request(input, [Map requestInitDict]) {
+    if ((input is String || input == null) && requestInitDict == null) {
+      return _Request._create_1(input);
+    }
+    if ((requestInitDict is Map || requestInitDict == null) && (input is String || input == null)) {
+      return _Request._create_2(input, requestInitDict);
+    }
+    if ((input is _Request || input == null) && requestInitDict == null) {
+      return _Request._create_3(input);
+    }
+    if ((requestInitDict is Map || requestInitDict == null) && (input is _Request || input == null)) {
+      return _Request._create_4(input, requestInitDict);
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
+  }
+  static _Request _create_1(input) => JS('_Request', 'new Request(#)', input);
+  static _Request _create_2(input, requestInitDict) => JS('_Request', 'new Request(#,#)', input, requestInitDict);
+  static _Request _create_3(input) => JS('_Request', 'new Request(#)', input);
+  static _Request _create_4(input, requestInitDict) => JS('_Request', 'new Request(#,#)', input, requestInitDict);
+
+  @DomName('Request.credentials')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final String credentials;
+
+  @DomName('Request.headers')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final Headers headers;
+
+  @DomName('Request.mode')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final String mode;
+
+  @DomName('Request.referrer')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final String referrer;
+
+  @DomName('Request.url')
+  @DocsEditable()
+  @Experimental() // untriaged
+  final String url;
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+
+@DocsEditable()
 @DomName('Response')
 @Experimental() // untriaged
 @Native("Response")
@@ -33432,7 +33684,7 @@ class _SpeechRecognitionResultList extends Interceptor with ListMixin<SpeechReco
   SpeechRecognitionResult operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("SpeechRecognitionResult", "#[#]", this, index);
   }
   void operator[]=(int index, SpeechRecognitionResult value) {
@@ -33496,7 +33748,7 @@ class _StyleSheetList extends Interceptor with ListMixin<StyleSheet>, ImmutableL
   StyleSheet operator[](int index) {
     if (JS("bool", "# >>> 0 !== # || # >= #", index,
         index, index, length))
-      throw new RangeError.range(index, 0, length);
+      throw new RangeError.index(index, this);
     return JS("StyleSheet", "#[#]", this, index);
   }
   void operator[]=(int index, StyleSheet value) {
@@ -33660,9 +33912,11 @@ abstract class _WorkerLocation extends Interceptor implements UrlUtilsReadOnly {
 // http://www.whatwg.org/specs/web-apps/current-work/multipage/workers.html#workernavigator
 @Experimental()
 @Native("WorkerNavigator")
-abstract class _WorkerNavigator extends NavigatorCpu implements NavigatorOnLine, NavigatorID {
+abstract class _WorkerNavigator extends Interceptor implements NavigatorCpu, NavigatorOnLine, NavigatorID {
   // To suppress missing implicit constructor warnings.
   factory _WorkerNavigator._() { throw new UnsupportedError("Not supported"); }
+
+  // From NavigatorCPU
 
   // From NavigatorID
 

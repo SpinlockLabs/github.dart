@@ -52,4 +52,7 @@ class XmlDocument extends XmlBranch {
   @override
   XmlNodeType get nodeType => XmlNodeType.DOCUMENT;
 
+  @override
+  accept(XmlVisitor visitor) => visitor.visitDocument(this);
+
 }
