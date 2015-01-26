@@ -161,6 +161,29 @@ class CloneUrls {
   }
 }
 
+class Tag {
+  String name;
+  CommitInfo commit;
+  String zipUrl;
+  String tarUrl;
+
+  static Tag fromJSON(input) {
+    if (input == null) {
+      return null;
+    }
+
+    return new Tag()
+      ..name = input['name']
+      ..commit = (new CommitInfo()..sha = input['commit']['sha'])
+      ..tarUrl = input['tarball_url']
+      ..zipUrl = input['zipball_url'];
+  }
+}
+
+class CommitInfo {
+  String sha;
+}
+
 /// User Information
 class UserInformation {
 
@@ -291,8 +314,8 @@ class Branch {
   /// The name of the branch.
   String name;
 
-  /// The [RepositoryCommit] which wraps the raw [GitCommit].
-  RepositoryCommit commit;
+  /// Commit Information
+  CommitInfo commit;
 
   static Branch fromJSON(input) {
     if (input == null) return null;
@@ -300,7 +323,7 @@ class Branch {
     var branch = new Branch()..name = input['name'];
 
     if (input['commit'] != null) {
-      branch.commit = RepositoryCommit.fromJSON(input['commit']);
+      branch.commit = new CommitInfo()..sha = input['commit']['sha'];
     }
 
     return branch;

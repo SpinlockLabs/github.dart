@@ -119,6 +119,7 @@ class RepositoriesService extends Service {
     return controller.stream;
   }
 
+
   // TODO: Implement editRepository: https://developer.github.com/v3/repos/#edit
 
   /// Deletes a repository.
@@ -143,7 +144,14 @@ class RepositoriesService extends Service {
           convert: (input) => new LanguageBreakdown(input));
 
   // TODO: Implement listTeams: https://developer.github.com/v3/repos/#list-teams
-  // TODO: Implement listTags: https://developer.github.com/v3/repos/#list-tags
+
+  /// Lists the tags of the specified repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#list-tags
+  Stream<Tag> listTags(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects(
+      'GET', '/repos/${slug.fullName}/tags', Tag.fromJSON);
+  }
 
   /// Lists the branches of the specified repository.
   ///
