@@ -51,7 +51,7 @@ class GistsService extends Service {
   /// Creates a Gist
   ///
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
-  Future<Gist> createGist(List<CreateGistFile> files, {String description, bool public: false}) {
+  Future<Gist> createGist(Map<String, String> files, {String description, bool public: false}) {
     var map = {
       "files": {}
     };
@@ -62,13 +62,52 @@ class GistsService extends Service {
 
     map["public"] = public;
 
-    files.forEach((file) => file.addToMap(map["files"]));
+    var f = {};
+
+    for (var key in files.keys) {
+      f[key] = {
+        "content": files[key]
+      };
+    }
+
+    map["files"] = f;
 
     return _github.postJSON("/gists", statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
-  // TODO: Implement editGist: https://developer.github.com/v3/gists/#edit-a-gist
-  // TODO: Implement deleteGist: https://developer.github.com/v3/gists/#delete-a-gist
+  Future<bool> deleteGist(String id) {
+    return _github.request("DELETE", "/gists/${id}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// Edits a Gist
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
+  Future<Gist> editGist(Map<String, String> files, {String description, bool public: false}) {
+    var map = {
+      "files": {}
+    };
+
+    if (description != null) {
+      map["description"] = description;
+    }
+
+    map["public"] = public;
+
+    var f = {};
+
+    for (var key in files.keys) {
+      f[key] = files[key] == null ? null : {
+        "content": files[key]
+      };
+    }
+
+    map["files"] = f;
+
+    return _github.postJSON("/gists", statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
+  }
+
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
   // TODO: Implement starGist: https://developer.github.com/v3/gists/#star-a-gist
   // TODO: Implement unstarGist: https://developer.github.com/v3/gists/#unstar-a-gist
