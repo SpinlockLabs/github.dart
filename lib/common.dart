@@ -29,6 +29,7 @@ part 'src/common/util/errors.dart';
 part 'src/common/util/pagination.dart';
 part 'src/common/util/service.dart';
 part 'src/common/util/utils.dart';
+part 'src/common/util/crawler.dart';
 
 // Services
 part 'src/common/activity_service.dart';
