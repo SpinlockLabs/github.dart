@@ -232,7 +232,7 @@ class _File extends FileSystemEntity implements File {
   }
 
   Future<bool> exists() {
-    return _IOService.dispatch(_FILE_EXISTS, [path]).then((response) {
+    return _IOService._dispatch(_FILE_EXISTS, [path]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(response, "Cannot check existence", path);
       }
@@ -258,7 +258,7 @@ class _File extends FileSystemEntity implements File {
     var result = recursive ? parent.create(recursive: true)
                            : new Future.value(null);
     return result
-      .then((_) => _IOService.dispatch(_FILE_CREATE, [path]))
+      .then((_) => _IOService._dispatch(_FILE_CREATE, [path]))
       .then((response) {
         if (_isErrorResponse(response)) {
           throw _exceptionFromResponse(response, "Cannot create file", path);
@@ -285,7 +285,7 @@ class _File extends FileSystemEntity implements File {
     if (recursive) {
       return new Directory(path).delete(recursive: true).then((_) => this);
     }
-    return _IOService.dispatch(_FILE_DELETE, [path]).then((response) {
+    return _IOService._dispatch(_FILE_DELETE, [path]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(response, "Cannot delete file", path);
       }
@@ -306,7 +306,7 @@ class _File extends FileSystemEntity implements File {
   }
 
   Future<File> rename(String newPath) {
-    return _IOService.dispatch(_FILE_RENAME, [path, newPath]).then((response) {
+    return _IOService._dispatch(_FILE_RENAME, [path, newPath]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(
             response, "Cannot rename file to '$newPath'", path);
@@ -326,7 +326,7 @@ class _File extends FileSystemEntity implements File {
   }
 
   Future<File> copy(String newPath) {
-    return _IOService.dispatch(_FILE_COPY, [path, newPath]).then((response) {
+    return _IOService._dispatch(_FILE_COPY, [path, newPath]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(
             response, "Cannot copy file to '$newPath'", path);
@@ -349,7 +349,7 @@ class _File extends FileSystemEntity implements File {
         mode != FileMode.APPEND) {
       return new Future.error(new ArgumentError());
     }
-    return _IOService.dispatch(_FILE_OPEN, [path, mode._mode]).then((response) {
+    return _IOService._dispatch(_FILE_OPEN, [path, mode._mode]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(response, "Cannot open file", path);
       }
@@ -358,7 +358,7 @@ class _File extends FileSystemEntity implements File {
   }
 
   Future<int> length() {
-    return _IOService.dispatch(_FILE_LENGTH_FROM_PATH, [path]).then((response) {
+    return _IOService._dispatch(_FILE_LENGTH_FROM_PATH, [path]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(response,
                                      "Cannot retrieve length of file",
@@ -378,7 +378,7 @@ class _File extends FileSystemEntity implements File {
   }
 
   Future<DateTime> lastModified() {
-    return _IOService.dispatch(_FILE_LAST_MODIFIED, [path]).then((response) {
+    return _IOService._dispatch(_FILE_LAST_MODIFIED, [path]).then((response) {
       if (_isErrorResponse(response)) {
         throw _exceptionFromResponse(response,
                                      "Cannot retrieve modification time",
@@ -940,6 +940,85 @@ class _RandomAccessFile
     }
   }
 
+  static final int LOCK_UNLOCK = 0;
+  static final int LOCK_SHARED = 1;
+  static final int LOCK_EXCLUSIVE = 2;
+
+  Future<RandomAccessFile> lock(
+      [FileLock mode = FileLock.EXCLUSIVE, int start = 0, int end]) {
+    if ((start != null && start is !int) ||
+        (end != null && end is !int) ||
+         mode is !FileLock) {
+      throw new ArgumentError();
+    }
+    if (start == null) start = 0;
+    if (end == null) end = -1;
+    if (start < 0 || end < -1 || (end != -1 && start >= end)) {
+      throw new ArgumentError();
+    }
+    int lock = mode == FileLock.EXCLUSIVE ? LOCK_EXCLUSIVE : LOCK_SHARED;
+    return _dispatch(_FILE_LOCK, [_id, lock, start, end])
+        .then((response) {
+          if (_isErrorResponse(response)) {
+            throw _exceptionFromResponse(response, 'lock failed', path);
+          }
+          return this;
+        });
+  }
+
+  Future<RandomAccessFile> unlock([int start = 0, int end]) {
+    if ((start != null && start is !int) ||
+        (end != null && end is !int)) {
+      throw new ArgumentError();
+    }
+    if (start == null) start = 0;
+    if (end == null) end = -1;
+    if (start == end) throw new ArgumentError();
+    return _dispatch(_FILE_LOCK, [_id, LOCK_UNLOCK, start, end])
+        .then((response) {
+          if (_isErrorResponse(response)) {
+            throw _exceptionFromResponse(response, 'unlock failed', path);
+          }
+          return this;
+        });
+  }
+
+  external static _lock(int id, int lock, int start, int end);
+
+  void lockSync([FileLock mode = FileLock.EXCLUSIVE, int start = 0, int end]) {
+    _checkAvailable();
+    if ((start != null && start is !int) ||
+        (end != null && end is !int) ||
+         mode is !FileLock) {
+      throw new ArgumentError();
+    }
+    if (start == null) start = 0;
+    if (end == null) end = -1;
+    if (start < 0 || end < -1 || (end != -1 && start >= end)) {
+      throw new ArgumentError();
+    }
+    int lock = mode == FileLock.EXCLUSIVE ? LOCK_EXCLUSIVE : LOCK_SHARED;
+    var result = _lock(_id, lock, start, end);
+    if (result is OSError) {
+      throw new FileSystemException('lock failed', path, result);
+    }
+  }
+
+  void unlockSync([int start = 0, int end]) {
+    _checkAvailable();
+    if ((start != null && start is !int) ||
+        (end != null && end is !int)) {
+      throw new ArgumentError();
+    }
+    if (start == null) start = 0;
+    if (end == null) end = -1;
+    if (start == end) throw new ArgumentError();
+    var result = _lock(_id, LOCK_UNLOCK, start, end);
+    if (result is OSError) {
+      throw new FileSystemException('unlock failed', path, result);
+    }
+  }
+
   bool get closed => _id == 0;
 
   Future _dispatch(int request, List data, { bool markClosed: false }) {
@@ -956,7 +1035,7 @@ class _RandomAccessFile
       _id = 0;
     }
     _asyncDispatched = true;
-    return _IOService.dispatch(request, data)
+    return _IOService._dispatch(request, data)
         .whenComplete(() {
           _asyncDispatched = false;
         });

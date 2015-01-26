@@ -4,8 +4,8 @@ part of xml;
  * A builder to create XML trees with code.
  */
 class XmlBuilder {
-
-  final List<_XmlNodeBuilder> _stack = new List.from([new _XmlDocumentBuilder()]);
+  final List<_XmlNodeBuilder> _stack =
+      new List.from([new _XmlDocumentBuilder()]);
 
   /**
    * Adds a [XmlText] node with the provided [text].
@@ -95,11 +95,9 @@ class XmlBuilder {
    *     });
    *
    */
-  void element(String name, {
-      String namespace: null,
+  void element(String name, {String namespace: null,
       Map<String, String> namespaces: const {},
-      Map<String, String> attributes: const {},
-      nest: null}) {
+      Map<String, String> attributes: const {}, nest: null}) {
     var element = new _XmlElementBuilder();
     _stack.add(element);
     namespaces.forEach(this.namespace);
@@ -127,7 +125,8 @@ class XmlBuilder {
    *
    */
   void attribute(String name, value, {String namespace}) {
-    _stack.last.attributes.add(new XmlAttribute(_buildName(name, namespace), value.toString()));
+    _stack.last.attributes
+        .add(new XmlAttribute(_buildName(name, namespace), value.toString()));
   }
 
   /**
@@ -140,7 +139,8 @@ class XmlBuilder {
       throw new ArgumentError('The "$prefix" prefix cannot be bound.');
     }
     if (_stack.last.namespaces.containsValue(prefix)) {
-      throw new ArgumentError('The "$prefix" prefix conflicts with existing binding.');
+      throw new ArgumentError(
+          'The "$prefix" prefix conflicts with existing binding.');
     }
     var name = prefix == null || prefix.isEmpty
         ? new XmlName(_XMLNS)
@@ -164,8 +164,8 @@ class XmlBuilder {
   // Internal method to lookup an namespace prefix.
   String _lookup(String uri) {
     var builder = _stack.lastWhere(
-      (builder) => builder.namespaces.containsKey(uri),
-      orElse: () => throw new ArgumentError('Undefined namespace: $uri'));
+        (builder) => builder.namespaces.containsKey(uri),
+        orElse: () => throw new ArgumentError('Undefined namespace: $uri'));
     return builder.namespaces[uri];
   }
 
@@ -179,7 +179,6 @@ class XmlBuilder {
       text(value.toString());
     }
   }
-
 }
 
 abstract class _XmlNodeBuilder {
@@ -190,13 +189,13 @@ abstract class _XmlNodeBuilder {
 }
 
 class _XmlDocumentBuilder extends _XmlNodeBuilder {
-
   @override
-  final Map<String, String> namespaces = const { _XML_URI: _XML };
+  final Map<String, String> namespaces = const {_XML_URI: _XML};
 
   @override
   List<XmlAttribute> get attributes {
-    throw new ArgumentError('Unable to define attributes at the document level.');
+    throw new ArgumentError(
+        'Unable to define attributes at the document level.');
   }
 
   @override
@@ -204,11 +203,9 @@ class _XmlDocumentBuilder extends _XmlNodeBuilder {
 
   @override
   XmlNode build() => new XmlDocument(children);
-
 }
 
 class _XmlElementBuilder extends _XmlNodeBuilder {
-
   @override
   final Map<String, String> namespaces = new Map();
 
@@ -222,5 +219,4 @@ class _XmlElementBuilder extends _XmlNodeBuilder {
 
   @override
   XmlNode build() => new XmlElement(name, attributes, children);
-
 }

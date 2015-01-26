@@ -5,7 +5,6 @@ part of xml;
  */
 
 class XmlWriter extends XmlVisitor {
-
   final StringBuffer buffer;
 
   XmlWriter(this.buffer);
@@ -99,11 +98,9 @@ class XmlWriter extends XmlVisitor {
       visit(child);
     }
   }
-
 }
 
 class XmlPrettyWriter extends XmlWriter {
-
   int level = 0;
   String indent;
 
@@ -173,5 +170,4 @@ class XmlPrettyWriter extends XmlWriter {
       buffer.write(indent);
     }
   }
-
 }

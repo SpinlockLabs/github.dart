@@ -4,27 +4,27 @@ part of xml;
  * Iterable to walk over the followers of a node.
  */
 class _XmlFollowingIterable extends IterableBase<XmlNode> {
-
   final XmlNode start;
 
   _XmlFollowingIterable(this.start);
 
   @override
   Iterator<XmlNode> get iterator => new _XmlFollowingIterator(start);
-
 }
 
 /**
  * Iterator to walk over the followers of a node.
  */
 class _XmlFollowingIterator extends Iterator<XmlNode> {
-
   final List<XmlNode> todo = new List();
 
   _XmlFollowingIterator(XmlNode start) {
     var following = new List();
-    for (var parent = start.parent, child = start; parent != null;
-        parent = parent.parent, child = child.parent) {
+    for (var parent = start.parent,
+            child = start;
+        parent != null;
+        parent = parent.parent,
+        child = child.parent) {
       var attributes_index = parent.attributes.indexOf(child);
       if (attributes_index != -1) {
         following.addAll(parent.attributes.sublist(attributes_index + 1));
@@ -56,5 +56,4 @@ class _XmlFollowingIterator extends Iterator<XmlNode> {
       return true;
     }
   }
-
 }

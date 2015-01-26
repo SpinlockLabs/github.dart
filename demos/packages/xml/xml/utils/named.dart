@@ -9,7 +9,6 @@ abstract class XmlNamed {
    * Return the name of the node.
    */
   XmlName get name;
-
 }
 
 /**
@@ -35,8 +34,8 @@ _XmlNamedMatcher _createMatcher(String name, String namespace) {
     } else if (namespace == '*') {
       return (XmlNamed named) => named.name.local == name;
     } else {
-      return (XmlNamed named) => named.name.local == name
-          && named.name.namespaceUri == namespace;
+      return (XmlNamed named) =>
+          named.name.local == name && named.name.namespaceUri == namespace;
     }
   }
 }

@@ -4,7 +4,6 @@ part of xml;
  * Enum of the different XML Node types.
  */
 class XmlNodeType {
-
   static const ELEMENT = const XmlNodeType._('ELEMENT');
   static const ATTRIBUTE = const XmlNodeType._('ATTRIBUTE');
   static const TEXT = const XmlNodeType._('TEXT');
@@ -20,5 +19,4 @@ class XmlNodeType {
 
   @override
   String toString() => 'XmlNodeType.$_type';
-
 }

@@ -3,29 +3,25 @@ part of xml;
 // hexadecimal character reference
 final _ENTITY_HEX = pattern('xX')
     .seq(pattern('A-Fa-f0-9').plus().flatten().map((value) {
-      return new String.fromCharCode(int.parse(value, radix: 16));
-    })).pick(1);
+  return new String.fromCharCode(int.parse(value, radix: 16));
+})).pick(1);
 
 // decimal character reference
 final _ENTITY_DIGIT = char('#')
     .seq(_ENTITY_HEX.or(digit().plus().flatten().map((value) {
-      return new String.fromCharCode(int.parse(value));
-    })))
-    .pick(1);
+  return new String.fromCharCode(int.parse(value));
+}))).pick(1);
 
 // named character reference
 final _ENTITY = char('&')
     .seq(_ENTITY_DIGIT.or(word().plus().flatten().map((value) {
-      return _ENTITY_TO_CHAR[value];
-    })))
-    .seq(char(';'))
-    .pick(1);
+  return _ENTITY_TO_CHAR[value];
+}))).seq(char(';')).pick(1);
 
 /**
  * Optimized parser to read character data.
  */
 class _XmlCharacterDataParser extends Parser {
-
   final String _stopper;
   final int _stopperCode;
   final int _minLength;
@@ -82,34 +78,7 @@ class _XmlCharacterDataParser extends Parser {
 
   @override
   Parser copy() => new _XmlCharacterDataParser(_stopper, _minLength);
-
 }
-
-/**
- * Decode a string with numeric character references and common named entities
- * to a plain string.
- */
-@deprecated
-String _decodeXml(String input) {
-  return input.replaceAllMapped(_ENTITY_PATTERN, (match) {
-    if (match.group(2) != null) {
-      // hexadecimal numeric character reference
-      return new String.fromCharCode(int.parse(match.group(2), radix: 16));
-    } else if (match.group(3) != null) {
-      // decimal numeric character reference
-      return new String.fromCharCode(int.parse(match.group(3)));
-    } else if (_ENTITY_TO_CHAR.containsKey(match.group(4))) {
-      // named character reference
-      return _ENTITY_TO_CHAR[match.group(4)];
-    } else {
-      // unknown character reference (throw error?)
-      return match.group(0);
-    }
-  });
-}
-
-@deprecated
-final Pattern _ENTITY_PATTERN = new RegExp(r'&(#[xX]([A-Fa-f0-9]+)|#(\d+)|(\w+));');
 
 final Map<String, String> _ENTITY_TO_CHAR = const {
 
@@ -369,7 +338,6 @@ final Map<String, String> _ENTITY_TO_CHAR = const {
   'zeta': '\u03B6',
   'zwj': '\u200D',
   'zwnj': '\u200C'
-
 };
 
 /**

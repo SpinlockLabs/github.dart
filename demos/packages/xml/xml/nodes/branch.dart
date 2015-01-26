@@ -4,14 +4,14 @@ part of xml;
  * Abstract XML node with actual children.
  */
 abstract class XmlBranch extends XmlNode {
-
   @override
   final List<XmlNode> children;
 
   /**
    * Create a node with a list of `children`.
    */
-  XmlBranch(Iterable<XmlNode> children): children = children.toList(growable: false) {
+  XmlBranch(Iterable<XmlNode> children)
+      : children = children.toList(growable: false) {
     for (var child in this.children) {
       assert(child._parent == null);
       child._parent = this;
@@ -32,11 +32,11 @@ abstract class XmlBranch extends XmlNode {
     return _filterElements(descendants, name, namespace);
   }
 
-  Iterable<XmlElement> _filterElements(Iterable<XmlNode> iterable, String name, String namespace) {
+  Iterable<XmlElement> _filterElements(
+      Iterable<XmlNode> iterable, String name, String namespace) {
     var matcher = _createMatcher(name, namespace);
     return iterable
         .where((node) => node is XmlElement && matcher(node))
         .map((node) => node as XmlElement);
   }
-
 }

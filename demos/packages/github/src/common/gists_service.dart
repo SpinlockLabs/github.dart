@@ -44,7 +44,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
   Future<Gist> getGist(String id) {
-    return _github.getJSON("/gist/${id}",
+    return _github.getJSON("/gists/${id}",
         statusCode: StatusCodes.OK, convert: Gist.fromJSON);
   }
 

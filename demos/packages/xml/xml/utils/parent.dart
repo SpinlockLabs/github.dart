@@ -4,7 +4,6 @@ part of xml;
  * Mixin for objects with an [XmlNode] as parent.
  */
 abstract class XmlParent {
-
   XmlNode _parent;
 
   /**
@@ -17,5 +16,4 @@ abstract class XmlParent {
    * a document or another element.
    */
   XmlNode get root => parent == null ? this : parent.root;
-
 }

@@ -13,12 +13,11 @@ class XmlProcessing extends XmlData {
   /**
    * Create a processing node with `target` and `text`.
    */
-  XmlProcessing(this.target, String text): super(text);
+  XmlProcessing(this.target, String text) : super(text);
 
   @override
   XmlNodeType get nodeType => XmlNodeType.PROCESSING;
 
   @override
   accept(XmlVisitor visitor) => visitor.visitProcessing(this);
-
 }

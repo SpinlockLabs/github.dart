@@ -70,7 +70,7 @@ class ArgResults {
   /// This includes the options whose values were parsed or that have defaults.
   /// Options that weren't present and have no default will be omitted.
   Iterable<String> get options {
-    var result = new Set.from(_parsed.keys);
+    var result = new Set<String>.from(_parsed.keys);
 
     // Include the options that have defaults.
     _parser.options.forEach((name, option) {

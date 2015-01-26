@@ -4,7 +4,6 @@ part of xml;
  * XML element node.
  */
 class XmlElement extends XmlBranch implements XmlNamed {
-
   @override
   final XmlName name;
 
@@ -14,7 +13,8 @@ class XmlElement extends XmlBranch implements XmlNamed {
   /**
    * Create an [XmlElement] with the given `name`, `attributes`, and `children`.
    */
-  XmlElement(XmlName name, Iterable<XmlAttribute> attributes, Iterable<XmlNode> children)
+  XmlElement(XmlName name, Iterable<XmlAttribute> attributes,
+      Iterable<XmlNode> children)
       : super(children),
         name = name,
         attributes = attributes.toList(growable: false) {
@@ -38,7 +38,8 @@ class XmlElement extends XmlBranch implements XmlNamed {
    * Return the attribute node with the given `name`.
    */
   XmlAttribute getAttributeNode(String name, {String namespace}) {
-    return attributes.firstWhere(_createMatcher(name, namespace), orElse: () => null);
+    return attributes.firstWhere(_createMatcher(name, namespace),
+        orElse: () => null);
   }
 
   @override
@@ -46,5 +47,4 @@ class XmlElement extends XmlBranch implements XmlNamed {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitElement(this);
-
 }

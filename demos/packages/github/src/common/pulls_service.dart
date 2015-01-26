@@ -30,8 +30,6 @@ class PullRequestsService extends Service {
         convert: PullRequestInformation.fromJSON, body: request.toJSON());
   }
 
-  // TODO: implement edit: https://developer.github.com/v3/pulls/#update-a-pull-request
-
   /// Edit a pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
@@ -95,23 +93,21 @@ class PullRequestsService extends Service {
   /// Lists all comments on the specified pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
-  Stream<IssueComment> listCommentsByPullRequest(
+  Stream<PullRequestComment> listCommentsByPullRequest(
       RepositorySlug slug, int number) {
     return new PaginationHelper(_github).objects("GET",
         "/repos/${slug.fullName}/pulls/${number}/comments",
-        IssueComment.fromJSON);
+        PullRequestComment.fromJSON);
   }
 
   /// Lists all comments on all pull requests for the repository.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
-  Stream<IssueComment> listComments(RepositorySlug slug) {
+  Stream<PullRequestComment> listComments(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/pulls/comments", IssueComment.fromJSON);
+        "GET", "/repos/${slug.fullName}/pulls/comments", PullRequestComment.fromJSON);
   }
-
-  // TODO: Implement getComment: https://developer.github.com/v3/pulls/comments/#get-a-single-comment
-
+  
   /// Creates a new pull request comment.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment
@@ -119,7 +115,7 @@ class PullRequestsService extends Service {
       RepositorySlug slug, int number, CreatePullRequestComment comment) {
     return _github.postJSON('/repos/${slug.fullName}/pulls/${number}/comments',
         body: comment.toJSON(),
-        convert: IssueComment.fromJSON,
+        convert: PullRequestComment.fromJSON,
         statusCode: 201);
   }
 

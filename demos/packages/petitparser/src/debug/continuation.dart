@@ -3,7 +3,8 @@ part of debug;
 /**
  * Handler function for the [ContinuationParser].
  */
-typedef Result ContinuationHandler(Result continuation(Context context), Context context);
+typedef Result ContinuationHandler(
+    Result continuation(Context context), Context context);
 
 /**
  * Continuation parser that when activated captures a continuation function
@@ -16,21 +17,20 @@ typedef Result ContinuationHandler(Result continuation(Context context), Context
  * The following example shows a simple wrapper. Messages are printed before and
  * after the `digit()` parser is activated:
  *
- *    var wrapped = digit();
- *    var parser = new ContinuationParser(wrapped, (continuation, context) {
- *      print('Parser will be activated, the context is $context.');
- *      var result = continuation(context);
- *      print('Parser was activated, the result is $result.');
- *      return result;
- *    });
+ *     var wrapped = digit();
+ *     var parser = new ContinuationParser(wrapped, (continuation, context) {
+ *       print('Parser will be activated, the context is $context.');
+ *       var result = continuation(context);
+ *       print('Parser was activated, the result is $result.');
+ *       return result;
+ *     });
  *
  * See [profile], [progress], and [trace] for more elaborate examples.
  */
 class ContinuationParser extends DelegateParser {
-
   final ContinuationHandler handler;
 
-  ContinuationParser(parser, this.handler): super(parser);
+  ContinuationParser(parser, this.handler) : super(parser);
 
   @override
   Result parseOn(Context context) {
@@ -39,5 +39,4 @@ class ContinuationParser extends DelegateParser {
 
   @override
   Parser copy() => new ContinuationParser(children[0], handler);
-
 }

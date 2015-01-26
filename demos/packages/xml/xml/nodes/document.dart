@@ -8,7 +8,7 @@ class XmlDocument extends XmlBranch {
   /**
    * Create a document node with `children`.
    */
-  XmlDocument(Iterable<XmlNode> children): super(children);
+  XmlDocument(Iterable<XmlNode> children) : super(children);
 
   /**
    * Return the [XmlDoctype] element, or `null` if not defined.
@@ -21,8 +21,7 @@ class XmlDocument extends XmlBranch {
    *
    */
   XmlDoctype get doctypeElement {
-    return children.firstWhere(
-        (node) => node is XmlDoctype,
+    return children.firstWhere((node) => node is XmlDoctype,
         orElse: () => null);
   }
 
@@ -38,8 +37,7 @@ class XmlDocument extends XmlBranch {
    *
    */
   XmlElement get rootElement {
-    return children.firstWhere(
-        (node) => node is XmlElement,
+    return children.firstWhere((node) => node is XmlElement,
         orElse: () => throw new StateError('Empty XML document'));
   }
 
@@ -54,5 +52,4 @@ class XmlDocument extends XmlBranch {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitDocument(this);
-
 }

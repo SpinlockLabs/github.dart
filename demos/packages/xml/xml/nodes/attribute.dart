@@ -4,7 +4,6 @@ part of xml;
  * XML attribute node.
  */
 class XmlAttribute extends XmlNode implements XmlNamed {
-
   @override
   final XmlName name;
 
@@ -26,5 +25,4 @@ class XmlAttribute extends XmlNode implements XmlNamed {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitAttribute(this);
-
 }

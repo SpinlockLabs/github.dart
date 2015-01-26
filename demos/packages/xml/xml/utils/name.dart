@@ -11,7 +11,8 @@ const _XMLNS = 'xmlns';
 /**
  * XML entity name.
  */
-abstract class XmlName extends Object with XmlVisitable, XmlWritable, XmlParent {
+abstract class XmlName extends Object
+    with XmlVisitable, XmlWritable, XmlParent {
 
   /**
    * Return the namespace prefix, or `null`.
@@ -62,20 +63,18 @@ abstract class XmlName extends Object with XmlVisitable, XmlWritable, XmlParent 
   accept(XmlVisitor visitor) => visitor.visitName(this);
 
   @override
-  bool operator == (Object other) => other is XmlName
-      && other.local == local
-      && other.namespaceUri == namespaceUri;
+  bool operator ==(Object other) => other is XmlName &&
+      other.local == local &&
+      other.namespaceUri == namespaceUri;
 
   @override
   int get hashCode => qualified.hashCode;
-
 }
 
 /**
  * An XML entity name without a prefix.
  */
 class _XmlSimpleName extends XmlName {
-
   @override
   String get prefix => null;
 
@@ -98,14 +97,12 @@ class _XmlSimpleName extends XmlName {
   }
 
   _XmlSimpleName(this.local) : super._();
-
 }
 
 /**
  * An XML entity name with a prefix.
  */
 class _XmlPrefixName extends XmlName {
-
   @override
   final String prefix;
 
@@ -128,5 +125,4 @@ class _XmlPrefixName extends XmlName {
   }
 
   _XmlPrefixName(this.prefix, this.local, this.qualified) : super._();
-
 }

@@ -61,5 +61,4 @@ abstract class XmlVisitor {
    * Visit an [XmlText] node.
    */
   visitText(XmlText node);
-
 }
