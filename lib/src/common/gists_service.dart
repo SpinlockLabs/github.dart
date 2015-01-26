@@ -48,7 +48,25 @@ class GistsService extends Service {
         statusCode: StatusCodes.OK, convert: Gist.fromJSON);
   }
 
-  // TODO: Implement createGist: https://developer.github.com/v3/gists/#create-a-gist
+  /// Creates a Gist
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#create-a-gist
+  Future<Gist> createGist(List<CreateGistFile> files, {String description, bool public: false}) {
+    var map = {
+      "files": {}
+    };
+
+    if (description != null) {
+      map["description"] = description;
+    }
+
+    map["public"] = public;
+
+    files.forEach((file) => file.addToMap(map["files"]));
+
+    return _github.postJSON("/gists", statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
+  }
+
   // TODO: Implement editGist: https://developer.github.com/v3/gists/#edit-a-gist
   // TODO: Implement deleteGist: https://developer.github.com/v3/gists/#delete-a-gist
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits

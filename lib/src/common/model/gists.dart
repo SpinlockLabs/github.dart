@@ -59,6 +59,20 @@ class Gist {
   }
 }
 
+/// Model Class for Creates a Gist File
+class CreateGistFile {
+  final String name;
+  final String content;
+
+  CreateGistFile(this.name, this.content);
+
+  void addToMap(Map<String, Map> map) {
+    map[name] = {
+      "content": content
+    };
+  }
+}
+
 /// Model class for a gist file.
 class GistFile {
   String name;
@@ -66,13 +80,9 @@ class GistFile {
 
   @ApiName("raw_url")
   String rawUrl;
-
   String type;
-
   String language;
-
   bool truncated;
-
   String content;
 
   static GistFile fromJSON(input) {

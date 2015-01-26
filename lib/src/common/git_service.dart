@@ -91,7 +91,6 @@ class GitService extends Service {
       RepositorySlug slug, String ref, String sha, {bool force: false}) {
     String body = JSON.encode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
-    // TODO (marcojakob): Ensure this is the correct way to set it.
     var headers = {'content-length': body.length.toString()};
 
     return _github
