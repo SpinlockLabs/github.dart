@@ -65,6 +65,10 @@ class PaginationHelper<T> {
         p = new Map.from(params);
         p['page'] = start;
       }
+      else if (!first) {
+        p = null;
+      }
+
 
       return github.request(method, realPath,
           headers: headers, params: p, body: body);
