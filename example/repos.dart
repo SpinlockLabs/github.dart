@@ -22,9 +22,7 @@ void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
   initGitHub();
-  github = new GitHub(
-      auth: new Authentication.withToken(
-          "6f266b306ef2d9ef2b7ce54e688a6422f1d056d6"));
+  github = createGitHubClient();
 
   $repos = querySelector("#repos");
 
