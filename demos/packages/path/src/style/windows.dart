@@ -38,7 +38,7 @@ class WindowsStyle extends InternalStyle {
     if (path.isEmpty) return 0;
     if (path.codeUnitAt(0) == chars.SLASH) return 1;
     if (path.codeUnitAt(0) == chars.BACKSLASH) {
-    if (path.length < 2 || path.codeUnitAt(1) != chars.BACKSLASH) return 1;
+      if (path.length < 2 || path.codeUnitAt(1) != chars.BACKSLASH) return 1;
       // The path is a network share. Search for up to two '\'s, as they are
       // the server and share - and part of the root part.
       var index = path.indexOf('\\', 2);
@@ -101,8 +101,8 @@ class WindowsStyle extends InternalStyle {
         parsed.parts.add("");
       }
 
-      return new Uri(scheme: 'file', host: rootParts.first,
-          pathSegments: parsed.parts);
+      return new Uri(
+          scheme: 'file', host: rootParts.first, pathSegments: parsed.parts);
     } else {
       // Drive-letter paths become "file:///C:/path/to/file".
 
@@ -116,8 +116,8 @@ class WindowsStyle extends InternalStyle {
 
       // Get rid of the trailing "\" in "C:\" because the URI constructor will
       // add a separator on its own.
-      parsed.parts.insert(0,
-          parsed.root.replaceAll("/", "").replaceAll("\\", ""));
+      parsed.parts.insert(
+          0, parsed.root.replaceAll("/", "").replaceAll("\\", ""));
 
       return new Uri(scheme: 'file', pathSegments: parsed.parts);
     }

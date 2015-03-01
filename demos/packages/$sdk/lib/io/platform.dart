@@ -100,7 +100,7 @@ class Platform {
   static final bool isLinux = (_operatingSystem == "linux");
 
   /**
-   * Returns true if the operating system is Mac OS.
+   * Returns true if the operating system is OS X.
    */
   static final bool isMacOS = (_operatingSystem == "macos");
 
@@ -173,6 +173,11 @@ class Platform {
 
   /**
    * Returns the version of the current Dart runtime.
+   *
+   * The returned `String` is formatted as the
+   * [semver](http://semver.org) version string of the current dart
+   * runtime, possibly followed by whitespace and other version and
+   * build details.
    */
   static String get version => _version;
 }

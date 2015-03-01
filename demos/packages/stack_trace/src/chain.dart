@@ -136,21 +136,7 @@ class Chain implements StackTrace {
   ///
   /// This calls [Trace.terse] on every trace in [traces], and discards any
   /// trace that contain only internal frames.
-  Chain get terse {
-    var terseTraces = traces.map((trace) => trace.terse);
-    var nonEmptyTraces = terseTraces.where((trace) {
-      // Ignore traces that contain only internal processing.
-      return trace.frames.length > 1;
-    });
-
-    // If all the traces contain only internal processing, preserve the last
-    // (top-most) one so that the chain isn't empty.
-    if (nonEmptyTraces.isEmpty && terseTraces.isNotEmpty) {
-      return new Chain([terseTraces.last]);
-    }
-
-    return new Chain(nonEmptyTraces);
-  }
+  Chain get terse => foldFrames((_) => false, terse: true);
 
   /// Returns a new [Chain] based on [this] where multiple stack frames matching
   /// [predicate] are folded together.
@@ -161,8 +147,13 @@ class Chain implements StackTrace {
   ///
   /// This is useful for limiting the amount of library code that appears in a
   /// stack trace by only showing user code and code that's called by user code.
-  Chain foldFrames(bool predicate(Frame frame)) {
-    var foldedTraces = traces.map((trace) => trace.foldFrames(predicate));
+  ///
+  /// If [terse] is true, this will also fold together frames from the core
+  /// library or from this package, and simplify core library frames as in
+  /// [Trace.terse].
+  Chain foldFrames(bool predicate(Frame frame), {bool terse: false}) {
+    var foldedTraces = traces.map(
+        (trace) => trace.foldFrames(predicate, terse: terse));
     var nonEmptyTraces = foldedTraces.where((trace) {
       // Ignore traces that contain only folded frames. These traces will be
       // folded into a single frame each.

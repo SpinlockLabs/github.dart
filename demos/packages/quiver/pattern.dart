@@ -32,8 +32,7 @@ final _specialChars = new RegExp(r'([\\\^\$\.\|\+\[\]\(\)\{\}])');
  * as defined here: http://ecma-international.org/ecma-262/5.1/#sec-15.10
  */
 String escapeRegex(String str) => str.splitMapJoin(_specialChars,
-    onMatch: (Match m) => '\\${m.group(0)}',
-    onNonMatch: (s) => s);
+    onMatch: (Match m) => '\\${m.group(0)}', onNonMatch: (s) => s);
 
 /**
  * Returns a [Pattern] that matches against every pattern in [include] and
@@ -50,14 +49,14 @@ class _MultiPattern extends Pattern {
   _MultiPattern(Iterable<Pattern> this.include,
       {Iterable<Pattern> this.exclude});
 
-  Iterable<Match> allMatches(String str) {
+  Iterable<Match> allMatches(String str, [int start = 0]) {
     var _allMatches = [];
     for (var pattern in include) {
-      var matches = pattern.allMatches(str);
+      var matches = pattern.allMatches(str, start);
       if (_hasMatch(matches)) {
         if (exclude != null) {
           for (var excludePattern in exclude) {
-            if (_hasMatch(excludePattern.allMatches(str))) {
+            if (_hasMatch(excludePattern.allMatches(str, start))) {
               return [];
             }
           }

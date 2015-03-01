@@ -34,16 +34,11 @@ const APPEND = FileMode.APPEND;
 
 
 /// Type of lock when requesting a lock on a file.
-class FileLock {
-  final int _lock;
-
+enum FileLock {
   /// Shared file lock.
-  static const SHARED = const FileLock._internal(0);
-
+  SHARED,
   /// Exclusive file lock.
-  static const EXCLUSIVE = const FileLock._internal(1);
-
-  const FileLock._internal(this._lock);
+  EXCLUSIVE
 }
 
 /**
@@ -729,7 +724,7 @@ abstract class RandomAccessFile {
    * *NOTE* file locking does have slight differences in behavior across
    * platforms:
    *
-   * On Linux and Mac OS this uses advisory locks, which have the
+   * On Linux and OS X this uses advisory locks, which have the
    * surprising semantics that all locks associated with a given file
    * are removed when *any* file descriptor for that file is closed by
    * the process. Note that this does not actually lock the file for
@@ -762,7 +757,7 @@ abstract class RandomAccessFile {
    * *NOTE* file locking does have slight differences in behavior across
    * platforms:
    *
-   * On Linux and Mac OS this uses advisory locks, which have the
+   * On Linux and OS X this uses advisory locks, which have the
    * surprising semantics that all locks associated with a given file
    * are removed when *any* file descriptor for that file is closed by
    * the process. Note that this does not actually lock the file for

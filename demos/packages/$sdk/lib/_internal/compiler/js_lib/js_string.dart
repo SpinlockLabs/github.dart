@@ -73,10 +73,16 @@ class JSString extends Interceptor implements String, JSIndexable {
   String replaceFirst(Pattern from, String to, [int startIndex = 0]) {
     checkString(to);
     checkInt(startIndex);
-    if (startIndex < 0 || startIndex > this.length) {
-      throw new RangeError.range(startIndex, 0, this.length);
-    }
+    RangeError.checkValueInInterval(startIndex, 0, this.length, "startIndex");
     return stringReplaceFirstUnchecked(this, from, to, startIndex);
+  }
+
+  String replaceFirstMapped(Pattern from, String replace(Match match),
+                            [int startIndex = 0]) {
+    checkNull(replace);
+    checkInt(startIndex);
+    RangeError.checkValueInInterval(startIndex, 0, this.length, "startIndex");
+    return stringReplaceFirstMappedUnchecked(this, from, replace, startIndex);
   }
 
   List<String> split(Pattern pattern) {
@@ -89,6 +95,14 @@ class JSString extends Interceptor implements String, JSIndexable {
     } else {
       return _defaultSplit(pattern);
     }
+  }
+
+  String replaceRange(int start, int end, String replacement) {
+    checkString(replacement);
+    checkInt(start);
+    end = RangeError.checkValidRange(start, end, this.length);
+    checkInt(end);
+    return stringReplaceRangeUnchecked(this, start, end, replacement);
   }
 
   List<String> _defaultSplit(Pattern pattern) {
@@ -359,7 +373,7 @@ class JSString extends Interceptor implements String, JSIndexable {
     return this + padding * delta;
   }
 
-  List<int> get codeUnits => new _CodeUnits(this);
+  List<int> get codeUnits => new CodeUnits(this);
 
   Runes get runes => new Runes(this);
 
@@ -455,17 +469,4 @@ class JSString extends Interceptor implements String, JSIndexable {
     if (index >= length || index < 0) throw new RangeError.value(index);
     return JS('String', '#[#]', this, index);
   }
-}
-
-/**
- * An [Iterable] of the UTF-16 code units of a [String] in index order.
- */
-class _CodeUnits extends UnmodifiableListBase<int> {
-  /** The string that this is the code units of. */
-  String _string;
-
-  _CodeUnits(this._string);
-
-  int get length => _string.length;
-  int operator[](int i) => _string.codeUnitAt(i);
 }

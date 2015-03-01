@@ -16,14 +16,17 @@ const TYPE_INFORMATION = 'typeInformation';
 const GLOBAL_FUNCTIONS = 'globalFunctions';
 const STATICS = 'statics';
 
-/**
- * If [JSInvocationMirror._invokeOn] is being used, this embedded global
- * contains a JavaScript map with the names of methods that are
- * intercepted.
- */
+/// If [JSInvocationMirror._invokeOn] is being used, this embedded global
+/// contains a JavaScript map with the names of methods that are
+/// intercepted.
 const INTERCEPTED_NAMES = 'interceptedNames';
 
+/// A JS map from mangled global names to their unmangled names.
+///
+/// If the program does not use reflection may be empty (but not null or
+/// undefined).
 const MANGLED_GLOBAL_NAMES = 'mangledGlobalNames';
+
 const MANGLED_NAMES = 'mangledNames';
 const LIBRARIES = 'libraries';
 const FINISHED_CLASSES = 'finishedClasses';
@@ -41,6 +44,13 @@ const INITIALIZE_LOADED_HUNK = 'initializeLoadedHunk';
 const IS_HUNK_LOADED = 'isHunkLoaded';
 const IS_HUNK_INITIALIZED = 'isHunkInitialized';
 const DEFERRED_INITIALIZED = 'deferredInitialized';
+
+/// Returns a function that creates a new Isolate (its static state).
+///
+/// (floitsch): Note that this will probably go away, since one JS heap will
+/// only contain one Dart isolate.
+const CREATE_NEW_ISOLATE = 'createNewIsolate';
+
 const CLASS_ID_EXTRACTOR = 'classIdExtractor';
 const CLASS_FIELDS_EXTRACTOR = 'classFieldsExtractor';
 const INSTANCE_FROM_CLASS_ID = "instanceFromClassId";
@@ -49,4 +59,21 @@ const TYPEDEF_TYPE_PROPERTY_NAME = r"$typedefType";
 const TYPEDEF_PREDICATE_PROPERTY_NAME = r"$$isTypedef";
 const NATIVE_SUPERCLASS_TAG_NAME = r"$nativeSuperclassTag";
 
-const MAP_TYPE_TO_INTERCEPTOR = "mapTypeToInterceptor";
+/// Returns the type given the name of a class.
+/// This function is called by the runtime when computing rti.
+const GET_TYPE_FROM_NAME = 'getTypeFromName';
+const TYPE_TO_INTERCEPTOR_MAP = "typeToInterceptorMap";
+
+/// Names that are supported by [JS_GET_NAME].
+// TODO(herhut): Make entries lower case (as in fields) and find a better name.
+enum JsGetName {
+  GETTER_PREFIX,
+  SETTER_PREFIX,
+  CALL_PREFIX,
+  CALL_CATCH_ALL,
+  REFLECTABLE,
+  CLASS_DESCRIPTOR_PROPERTY,
+  REQUIRED_PARAMETER_PROPERTY,
+  DEFAULT_VALUES_PROPERTY,
+  CALL_NAME_PROPERTY
+}

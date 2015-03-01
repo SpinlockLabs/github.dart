@@ -595,7 +595,7 @@ class CallMixin extends Visitor {
    * Given a mixin's defined arguments return a cloned mixin defintion that has
    * replaced all defined arguments with user's supplied VarUsages.
    */
-  MixinDefinition transform(List<TreeNode> callArgs) {
+  MixinDefinition transform(List callArgs) {
     // TODO(terry): Handle default arguments and varArgs.
     // Transform mixin with callArgs.
     var index = 0;

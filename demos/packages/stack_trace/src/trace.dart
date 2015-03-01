@@ -203,25 +203,43 @@ class Trace implements StackTrace {
   /// core library or from this package, as in [foldFrames]. Remaining core
   /// library frames have their libraries, "-patch" suffixes, and line numbers
   /// removed.
-  Trace get terse {
-    return new Trace(foldFrames((frame) {
-      return frame.isCore || frame.package == 'stack_trace';
-    }).frames.map((frame) {
-      if (!frame.isCore) return frame;
-      var library = frame.library.replaceAll(_terseRegExp, '');
-      return new Frame(Uri.parse(library), null, null, frame.member);
-    }));
-  }
+  ///
+  /// For custom folding, see [foldFrames].
+  Trace get terse => foldFrames((_) => false, terse: true);
 
   /// Returns a new [Trace] based on [this] where multiple stack frames matching
-  /// [predicate] are folded together. This means that whenever there are
-  /// multiple frames in a row that match [predicate], only the last one is
-  /// kept.
+  /// [predicate] are folded together.
   ///
-  /// This is useful for limiting the amount of library code that appears in a
-  /// stack trace by only showing user code and code that's called by user code.
-  Trace foldFrames(bool predicate(Frame frame)) {
-    var newFrames = <Frame>[];
+  /// This means that whenever there are multiple frames in a row that match
+  /// [predicate], only the last one is kept. This is useful for limiting the
+  /// amount of library code that appears in a stack trace by only showing user
+  /// code and code that's called by user code.
+  ///
+  /// If [terse] is true, this will also fold together frames from the core
+  /// library or from this package, and simplify core library frames as in
+  /// [Trace.terse].
+  Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) {
+    if (terse) {
+      var oldPredicate = predicate;
+      predicate = (frame) {
+        if (oldPredicate(frame)) return true;
+
+        if (frame.isCore) return true;
+        if (frame.package == 'stack_trace') return true;
+
+        // Ignore async stack frames without any line or column information.
+        // These come from the VM's async/await implementation and represent
+        // internal frames. They only ever show up in stack chains and are
+        // always surrounded by other traces that are actually useful, so we can
+        // just get rid of them.
+        // TODO(nweiz): Get rid of this logic some time after issue 22009 is
+        // fixed.
+        if (!frame.member.contains('<async>')) return false;
+        return frame.line == null;
+      };
+    }
+
+    var newFrames = [];
     for (var frame in frames.reversed) {
       if (!predicate(frame)) {
         newFrames.add(frame);
@@ -229,6 +247,14 @@ class Trace implements StackTrace {
         newFrames.add(new Frame(
             frame.uri, frame.line, frame.column, frame.member));
       }
+    }
+
+    if (terse) {
+      newFrames = newFrames.map((frame) {
+        if (!frame.isCore) return frame;
+        var library = frame.library.replaceAll(_terseRegExp, '');
+        return new Frame(Uri.parse(library), null, null, frame.member);
+      }).toList();
     }
 
     return new Trace(newFrames.reversed);

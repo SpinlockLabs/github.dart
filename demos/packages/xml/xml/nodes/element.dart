@@ -15,9 +15,9 @@ class XmlElement extends XmlBranch implements XmlNamed {
    */
   XmlElement(XmlName name, Iterable<XmlAttribute> attributes,
       Iterable<XmlNode> children)
-      : super(children),
-        name = name,
-        attributes = attributes.toList(growable: false) {
+      : name = name,
+        attributes = attributes.toList(growable: false),
+        super(children) {
     assert(this.name._parent == null);
     this.name._parent = this;
     for (var attribute in this.attributes) {

@@ -276,7 +276,7 @@ class Process {
        Map<String, String> environment,
        bool includeParentEnvironment: true,
        bool runInShell: false,
-       bool detach: false}) {
+       ProcessStartMode mode: ProcessStartMode.NORMAL}) {
     throw new UnsupportedError("Process.start");
   }
 
@@ -304,6 +304,12 @@ class Process {
        Encoding stdoutEncoding: SYSTEM_ENCODING,
        Encoding stderrEncoding: SYSTEM_ENCODING}) {
     throw new UnsupportedError("Process.runSync");
+  }
+
+  @patch
+  static bool killPid(
+      int pid, [ProcessSignal signal = ProcessSignal.SIGTERM]) {
+    throw new UnsupportedError("Process.killPid");
   }
 }
 
@@ -353,7 +359,8 @@ class RawServerSocket {
   static Future<RawServerSocket> bind(address,
                                       int port,
                                       {int backlog: 0,
-                                       bool v6Only: false}) {
+                                       bool v6Only: false,
+                                       bool shared: false}) {
     throw new UnsupportedError("RawServerSocket.bind");
   }
 }
@@ -364,7 +371,8 @@ class ServerSocket {
   static Future<ServerSocket> bind(address,
                                    int port,
                                    {int backlog: 0,
-                                    bool v6Only: false}) {
+                                    bool v6Only: false,
+                                    bool shared: false}) {
     throw new UnsupportedError("ServerSocket.bind");
   }
 }
@@ -372,7 +380,7 @@ class ServerSocket {
 @patch
 class RawSocket {
   @patch
-  static Future<RawSocket> connect(host, int port) {
+  static Future<RawSocket> connect(host, int port, {sourceAddress}) {
     throw new UnsupportedError("RawSocket constructor");
   }
 }
@@ -380,7 +388,7 @@ class RawSocket {
 @patch
 class Socket {
   @patch
-  static Future<Socket> connect(host, int port) {
+  static Future<Socket> connect(host, int port, {sourceAddress}) {
     throw new UnsupportedError("Socket constructor");
   }
 }
@@ -512,7 +520,7 @@ class Stdout {
 @patch
 class _FileSystemWatcher {
   @patch
-  static Stream<FileSystemEvent> watch(
+  static Stream<FileSystemEvent> _watch(
       String path, int events, bool recursive) {
     throw new UnsupportedError("_FileSystemWatcher.watch");
   }

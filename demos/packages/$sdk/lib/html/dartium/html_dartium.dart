@@ -140,6 +140,7 @@ final htmlBlinkMap = {
   'BatteryManager': () => BatteryManager,
   'BeforeUnloadEvent': () => BeforeUnloadEvent,
   'Blob': () => Blob,
+  'Body': () => Body,
   'CDATASection': () => CDataSection,
   'CSS': () => Css,
   'CSSCharsetRule': () => CssCharsetRule,
@@ -169,7 +170,7 @@ final htmlBlinkMap = {
   'CanvasRenderingContext2D': () => CanvasRenderingContext2D,
   'CharacterData': () => CharacterData,
   'ChildNode': () => ChildNode,
-  'CircularRegion': () => CircularRegion,
+  'CircularGeofencingRegion': () => CircularGeofencingRegion,
   'ClientRect': () => _ClientRect,
   'ClientRectList': () => _ClientRectList,
   'CloseEvent': () => CloseEvent,
@@ -203,7 +204,6 @@ final htmlBlinkMap = {
   'DataTransfer': () => DataTransfer,
   'DataTransferItem': () => DataTransferItem,
   'DataTransferItemList': () => DataTransferItemList,
-  'DatabaseSync': () => _DatabaseSync,
   'DedicatedWorkerGlobalScope': () => DedicatedWorkerGlobalScope,
   'DeprecatedStorageInfo': () => DeprecatedStorageInfo,
   'DeprecatedStorageQuota': () => DeprecatedStorageQuota,
@@ -226,8 +226,8 @@ final htmlBlinkMap = {
   'Event': () => Event,
   'EventSource': () => EventSource,
   'EventTarget': () => EventTarget,
+  'ExtendableEvent': () => ExtendableEvent,
   'FederatedCredential': () => FederatedCredential,
-  'FetchBodyStream': () => FetchBodyStream,
   'FetchEvent': () => FetchEvent,
   'File': () => File,
   'FileEntry': () => FileEntry,
@@ -338,15 +338,17 @@ final htmlBlinkMap = {
   'InjectedScriptHost': () => InjectedScriptHost,
   'InputMethodContext': () => InputMethodContext,
   'InstallEvent': () => InstallEvent,
-  'InstallPhaseEvent': () => InstallPhaseEvent,
+  'Iterator': () => DomIterator,
   'KeyboardEvent': () => KeyboardEvent,
   'LocalCredential': () => LocalCredential,
   'Location': () => Location,
   'MIDIAccess': () => MidiAccess,
   'MIDIConnectionEvent': () => MidiConnectionEvent,
   'MIDIInput': () => MidiInput,
+  'MIDIInputMap': () => MidiInputMap,
   'MIDIMessageEvent': () => MidiMessageEvent,
   'MIDIOutput': () => MidiOutput,
+  'MIDIOutputMap': () => MidiOutputMap,
   'MIDIPort': () => MidiPort,
   'MediaController': () => MediaController,
   'MediaDeviceInfo': () => MediaDeviceInfo,
@@ -359,6 +361,7 @@ final htmlBlinkMap = {
   'MediaKeys': () => MediaKeys,
   'MediaList': () => MediaList,
   'MediaQueryList': () => MediaQueryList,
+  'MediaQueryListEvent': () => MediaQueryListEvent,
   'MediaSource': () => MediaSource,
   'MediaStream': () => MediaStream,
   'MediaStreamEvent': () => MediaStreamEvent,
@@ -387,7 +390,6 @@ final htmlBlinkMap = {
   'NodeFilter': () => NodeFilter,
   'NodeIterator': () => NodeIterator,
   'NodeList': () => NodeList,
-  'Notation': () => _Notation,
   'Notification': () => Notification,
   'OverflowEvent': () => OverflowEvent,
   'PagePopupController': () => _PagePopupController,
@@ -403,8 +405,10 @@ final htmlBlinkMap = {
   'PerformanceTiming': () => PerformanceTiming,
   'Plugin': () => Plugin,
   'PluginArray': () => PluginArray,
+  'PluginPlaceholderElement': () => PluginPlaceholderElement,
   'PopStateEvent': () => PopStateEvent,
   'PositionError': () => PositionError,
+  'Presentation': () => Presentation,
   'ProcessingInstruction': () => ProcessingInstruction,
   'ProgressEvent': () => ProgressEvent,
   'PushEvent': () => PushEvent,
@@ -497,7 +501,6 @@ final htmlBlinkMap = {
   'WebKitCSSFilterValue': () => _WebKitCSSFilterValue,
   'WebKitCSSMatrix': () => _WebKitCSSMatrix,
   'WebKitCSSTransformValue': () => _WebKitCSSTransformValue,
-  'WebKitPoint': () => _DomPoint,
   'WebSocket': () => WebSocket,
   'WheelEvent': () => WheelEvent,
   'Window': () => Window,
@@ -958,15 +961,10 @@ class AnimationPlayer extends EventTarget {
   @Experimental() // untriaged
   void set currentTime(num value) => _blink.BlinkAnimationPlayer.instance.currentTime_Setter_(this, value);
 
-  @DomName('AnimationPlayer.finished')
+  @DomName('AnimationPlayer.playState')
   @DocsEditable()
   @Experimental() // untriaged
-  bool get finished => _blink.BlinkAnimationPlayer.instance.finished_Getter_(this);
-
-  @DomName('AnimationPlayer.paused')
-  @DocsEditable()
-  @Experimental() // untriaged
-  bool get paused => _blink.BlinkAnimationPlayer.instance.paused_Getter_(this);
+  String get playState => _blink.BlinkAnimationPlayer.instance.playState_Getter_(this);
 
   @DomName('AnimationPlayer.playbackRate')
   @DocsEditable()
@@ -1781,6 +1779,46 @@ class Blob extends NativeFieldWrapperClass2 {
 
 
 @DocsEditable()
+@DomName('Body')
+@Experimental() // untriaged
+class Body extends NativeFieldWrapperClass2 {
+  // To suppress missing implicit constructor warnings.
+  factory Body._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('Body.bodyUsed')
+  @DocsEditable()
+  @Experimental() // untriaged
+  bool get bodyUsed => _blink.BlinkBody.instance.bodyUsed_Getter_(this);
+
+  @DomName('Body.arrayBuffer')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future arrayBuffer() => _blink.BlinkBody.instance.arrayBuffer_Callback_0_(this);
+
+  @DomName('Body.blob')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future blob() => _blink.BlinkBody.instance.blob_Callback_0_(this);
+
+  @DomName('Body.json')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future json() => _blink.BlinkBody.instance.json_Callback_0_(this);
+
+  @DomName('Body.text')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future text() => _blink.BlinkBody.instance.text_Callback_0_(this);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
 @DomName('HTMLBodyElement')
 class BodyElement extends HtmlElement implements WindowEventHandlers {
   // To suppress missing implicit constructor warnings.
@@ -2467,6 +2505,11 @@ class CanvasPattern extends NativeFieldWrapperClass2 {
   // To suppress missing implicit constructor warnings.
   factory CanvasPattern._() { throw new UnsupportedError("Not supported"); }
 
+  @DomName('CanvasPattern.setTransform')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void setTransform(Matrix transform) => _blink.BlinkCanvasPattern.instance.setTransform_Callback_1_(this, transform);
+
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -2496,6 +2539,16 @@ class CanvasRenderingContext2D extends NativeFieldWrapperClass2 implements Canva
   @DocsEditable()
   @Experimental() // untriaged
   void set currentTransform(Matrix value) => _blink.BlinkCanvasRenderingContext2D.instance.currentTransform_Setter_(this, value);
+
+  @DomName('CanvasRenderingContext2D.direction')
+  @DocsEditable()
+  @Experimental() // untriaged
+  String get direction => _blink.BlinkCanvasRenderingContext2D.instance.direction_Getter_(this);
+
+  @DomName('CanvasRenderingContext2D.direction')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void set direction(String value) => _blink.BlinkCanvasRenderingContext2D.instance.direction_Setter_(this, value);
 
   @DomName('CanvasRenderingContext2D.fillStyle')
   @DocsEditable()
@@ -3325,42 +3378,42 @@ abstract class ChildNode extends NativeFieldWrapperClass2 {
 
 
 @DocsEditable()
-@DomName('CircularRegion')
+@DomName('CircularGeofencingRegion')
 @Experimental() // untriaged
-class CircularRegion extends GeofencingRegion {
+class CircularGeofencingRegion extends GeofencingRegion {
   // To suppress missing implicit constructor warnings.
-  factory CircularRegion._() { throw new UnsupportedError("Not supported"); }
+  factory CircularGeofencingRegion._() { throw new UnsupportedError("Not supported"); }
 
-  @DomName('CircularRegion.CircularRegion')
+  @DomName('CircularGeofencingRegion.CircularGeofencingRegion')
   @DocsEditable()
-  factory CircularRegion(Map init) {
-    return _blink.BlinkCircularRegion.instance.constructorCallback_1_(init);
+  factory CircularGeofencingRegion(Map init) {
+    return _blink.BlinkCircularGeofencingRegion.instance.constructorCallback_1_(init);
   }
 
-  @DomName('CircularRegion.MAX_RADIUS')
+  @DomName('CircularGeofencingRegion.MAX_RADIUS')
   @DocsEditable()
   @Experimental() // untriaged
   static const num MAX_RADIUS = 100.0;
 
-  @DomName('CircularRegion.MIN_RADIUS')
+  @DomName('CircularGeofencingRegion.MIN_RADIUS')
   @DocsEditable()
   @Experimental() // untriaged
   static const num MIN_RADIUS = 1.0;
 
-  @DomName('CircularRegion.latitude')
+  @DomName('CircularGeofencingRegion.latitude')
   @DocsEditable()
   @Experimental() // untriaged
-  double get latitude => _blink.BlinkCircularRegion.instance.latitude_Getter_(this);
+  double get latitude => _blink.BlinkCircularGeofencingRegion.instance.latitude_Getter_(this);
 
-  @DomName('CircularRegion.longitude')
+  @DomName('CircularGeofencingRegion.longitude')
   @DocsEditable()
   @Experimental() // untriaged
-  double get longitude => _blink.BlinkCircularRegion.instance.longitude_Getter_(this);
+  double get longitude => _blink.BlinkCircularGeofencingRegion.instance.longitude_Getter_(this);
 
-  @DomName('CircularRegion.radius')
+  @DomName('CircularGeofencingRegion.radius')
   @DocsEditable()
   @Experimental() // untriaged
-  double get radius => _blink.BlinkCircularRegion.instance.radius_Getter_(this);
+  double get radius => _blink.BlinkCircularGeofencingRegion.instance.radius_Getter_(this);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -3732,19 +3785,15 @@ class CredentialsContainer extends NativeFieldWrapperClass2 {
   // To suppress missing implicit constructor warnings.
   factory CredentialsContainer._() { throw new UnsupportedError("Not supported"); }
 
-  Future notifyFailedSignIn([Credential credential]) {
-    if (credential != null) {
-      return _blink.BlinkCredentialsContainer.instance.notifyFailedSignIn_Callback_1_(this, credential);
-    }
-    return _blink.BlinkCredentialsContainer.instance.notifyFailedSignIn_Callback_0_(this);
-  }
+  @DomName('CredentialsContainer.notifyFailedSignIn')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future notifyFailedSignIn(Credential credential) => _blink.BlinkCredentialsContainer.instance.notifyFailedSignIn_Callback_1_(this, credential);
 
-  Future notifySignedIn([Credential credential]) {
-    if (credential != null) {
-      return _blink.BlinkCredentialsContainer.instance.notifySignedIn_Callback_1_(this, credential);
-    }
-    return _blink.BlinkCredentialsContainer.instance.notifySignedIn_Callback_0_(this);
-  }
+  @DomName('CredentialsContainer.notifySignedIn')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future notifySignedIn(Credential credential) => _blink.BlinkCredentialsContainer.instance.notifySignedIn_Callback_1_(this, credential);
 
   @DomName('CredentialsContainer.notifySignedOut')
   @DocsEditable()
@@ -7847,7 +7896,7 @@ class DataTransferItemList extends NativeFieldWrapperClass2 {
 @DomName('DatabaseCallback')
 // http://www.w3.org/TR/webdatabase/#databasecallback
 @Experimental() // deprecated
-typedef void DatabaseCallback(database);
+typedef void DatabaseCallback(SqlDatabase database);
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
@@ -8767,6 +8816,11 @@ class Document extends Node
   @DocsEditable()
   String queryCommandValue(String command) => _blink.BlinkDocument.instance.queryCommandValue_Callback_1_(this, command);
 
+  @DomName('Document.transformDocumentToTreeView')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void transformDocumentToTreeView(String noStyleMessage) => _blink.BlinkDocument.instance.transformDocumentToTreeView_Callback_1_(this, noStyleMessage);
+
   @DomName('Document.webkitExitFullscreen')
   @DocsEditable()
   @SupportedBrowser(SupportedBrowser.CHROME)
@@ -9205,7 +9259,7 @@ class Document extends Node
    * For details about CSS selector syntax, see the
    * [CSS selector specification](http://www.w3.org/TR/css3-selectors/).
    */
-  ElementList querySelectorAll(String selectors) {
+  ElementList<Element> querySelectorAll(String selectors) {
     return new _FrozenElementList._wrap(_querySelectorAll(selectors));
   }
 
@@ -9225,7 +9279,7 @@ class Document extends Node
   @deprecated
   @Experimental()
   @DomName('Document.querySelectorAll')
-  ElementList queryAll(String relativeSelectors) =>
+  ElementList<Element> queryAll(String relativeSelectors) =>
       querySelectorAll(relativeSelectors);
 
   /// Checks if [registerElement] is supported on the current platform.
@@ -9302,7 +9356,7 @@ class DocumentFragment extends Node implements ParentNode {
    * For details about CSS selector syntax, see the
    * [CSS selector specification](http://www.w3.org/TR/css3-selectors/).
    */
-  ElementList querySelectorAll(String selectors) =>
+  ElementList<Element> querySelectorAll(String selectors) =>
     new _FrozenElementList._wrap(_querySelectorAll(selectors));
 
 
@@ -9360,7 +9414,7 @@ class DocumentFragment extends Node implements ParentNode {
   @deprecated
   @Experimental()
   @DomName('DocumentFragment.querySelectorAll')
-  ElementList queryAll(String relativeSelectors) {
+  ElementList<Element> queryAll(String relativeSelectors) {
     return querySelectorAll(relativeSelectors);
   }
   // To suppress missing implicit constructor warnings.
@@ -9508,6 +9562,28 @@ class DomImplementation extends NativeFieldWrapperClass2 {
   @DomName('DOMImplementation.hasFeature')
   @DocsEditable()
   bool hasFeature(String feature, String version) => _blink.BlinkDOMImplementation.instance.hasFeature_Callback_2_(this, feature, version);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
+@DomName('Iterator')
+@Experimental() // untriaged
+class DomIterator extends NativeFieldWrapperClass2 {
+  // To suppress missing implicit constructor warnings.
+  factory DomIterator._() { throw new UnsupportedError("Not supported"); }
+
+  Object next([Object value]) {
+    if (value != null) {
+      return _blink.BlinkIterator.instance.next_Callback_1_(this, value);
+    }
+    return _blink.BlinkIterator.instance.next_Callback_0_(this);
+  }
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -9756,6 +9832,65 @@ class DomMatrix extends DomMatrixReadOnly {
   @Experimental() // untriaged
   void set m44(num value) => _blink.BlinkDOMMatrix.instance.m44_Setter_(this, value);
 
+  @DomName('DOMMatrix.multiplySelf')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomMatrix multiplySelf(DomMatrix other) => _blink.BlinkDOMMatrix.instance.multiplySelf_Callback_1_(this, other);
+
+  @DomName('DOMMatrix.preMultiplySelf')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomMatrix preMultiplySelf(DomMatrix other) => _blink.BlinkDOMMatrix.instance.preMultiplySelf_Callback_1_(this, other);
+
+  DomMatrix scale3dSelf(num scale, [num ox, num oy, num oz]) {
+    if (oz != null) {
+      return _blink.BlinkDOMMatrix.instance.scale3dSelf_Callback_4_(this, scale, ox, oy, oz);
+    }
+    if (oy != null) {
+      return _blink.BlinkDOMMatrix.instance.scale3dSelf_Callback_3_(this, scale, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrix.instance.scale3dSelf_Callback_2_(this, scale, ox);
+    }
+    return _blink.BlinkDOMMatrix.instance.scale3dSelf_Callback_1_(this, scale);
+  }
+
+  DomMatrix scaleNonUniformSelf(num sx, [num sy, num sz, num ox, num oy, num oz]) {
+    if (oz != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_6_(this, sx, sy, sz, ox, oy, oz);
+    }
+    if (oy != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_5_(this, sx, sy, sz, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_4_(this, sx, sy, sz, ox);
+    }
+    if (sz != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_3_(this, sx, sy, sz);
+    }
+    if (sy != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_2_(this, sx, sy);
+    }
+    return _blink.BlinkDOMMatrix.instance.scaleNonUniformSelf_Callback_1_(this, sx);
+  }
+
+  DomMatrix scaleSelf(num scale, [num ox, num oy]) {
+    if (oy != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleSelf_Callback_3_(this, scale, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrix.instance.scaleSelf_Callback_2_(this, scale, ox);
+    }
+    return _blink.BlinkDOMMatrix.instance.scaleSelf_Callback_1_(this, scale);
+  }
+
+  DomMatrix translateSelf(num tx, num ty, [num tz]) {
+    if (tz != null) {
+      return _blink.BlinkDOMMatrix.instance.translateSelf_Callback_3_(this, tx, ty, tz);
+    }
+    return _blink.BlinkDOMMatrix.instance.translateSelf_Callback_2_(this, tx, ty);
+  }
+
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -9890,6 +10025,70 @@ class DomMatrixReadOnly extends NativeFieldWrapperClass2 {
   @DocsEditable()
   @Experimental() // untriaged
   double get m44 => _blink.BlinkDOMMatrixReadOnly.instance.m44_Getter_(this);
+
+  @DomName('DOMMatrixReadOnly.multiply')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomMatrix multiply(DomMatrix other) => _blink.BlinkDOMMatrixReadOnly.instance.multiply_Callback_1_(this, other);
+
+  DomMatrix scale(num scale, [num ox, num oy]) {
+    if (oy != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scale_Callback_3_(this, scale, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scale_Callback_2_(this, scale, ox);
+    }
+    return _blink.BlinkDOMMatrixReadOnly.instance.scale_Callback_1_(this, scale);
+  }
+
+  DomMatrix scale3d(num scale, [num ox, num oy, num oz]) {
+    if (oz != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scale3d_Callback_4_(this, scale, ox, oy, oz);
+    }
+    if (oy != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scale3d_Callback_3_(this, scale, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scale3d_Callback_2_(this, scale, ox);
+    }
+    return _blink.BlinkDOMMatrixReadOnly.instance.scale3d_Callback_1_(this, scale);
+  }
+
+  DomMatrix scaleNonUniform(num sx, [num sy, num sz, num ox, num oy, num oz]) {
+    if (oz != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_6_(this, sx, sy, sz, ox, oy, oz);
+    }
+    if (oy != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_5_(this, sx, sy, sz, ox, oy);
+    }
+    if (ox != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_4_(this, sx, sy, sz, ox);
+    }
+    if (sz != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_3_(this, sx, sy, sz);
+    }
+    if (sy != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_2_(this, sx, sy);
+    }
+    return _blink.BlinkDOMMatrixReadOnly.instance.scaleNonUniform_Callback_1_(this, sx);
+  }
+
+  @DomName('DOMMatrixReadOnly.toFloat32Array')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Float32List toFloat32Array() => _blink.BlinkDOMMatrixReadOnly.instance.toFloat32Array_Callback_0_(this);
+
+  @DomName('DOMMatrixReadOnly.toFloat64Array')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Float64List toFloat64Array() => _blink.BlinkDOMMatrixReadOnly.instance.toFloat64Array_Callback_0_(this);
+
+  DomMatrix translate(num tx, num ty, [num tz]) {
+    if (tz != null) {
+      return _blink.BlinkDOMMatrixReadOnly.instance.translate_Callback_3_(this, tx, ty, tz);
+    }
+    return _blink.BlinkDOMMatrixReadOnly.instance.translate_Callback_2_(this, tx, ty);
+  }
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -11133,6 +11332,12 @@ class _FrozenElementList extends ListBase
       new _CssStyleDeclarationSet(this);
 
   void set classes(Iterable<String> value) {
+    // TODO(sra): This might be faster for Sets:
+    //
+    //     new _MultiElementCssClassSet(this).writeClasses(value)
+    //
+    // as the code below converts the Iterable[value] to a string multiple
+    // times.  Maybe compute the string and set className here.
     _nodeList.forEach((e) => e.classes = value);
   }
 
@@ -11894,7 +12099,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
    * [CSS selector specification](http://www.w3.org/TR/css3-selectors/).
    */
   @DomName('Element.querySelectorAll')
-  ElementList querySelectorAll(String selectors) =>
+  ElementList<Element> querySelectorAll(String selectors) =>
     new _FrozenElementList._wrap(_querySelectorAll(selectors));
 
   /**
@@ -11913,7 +12118,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
   @deprecated
   @DomName('Element.querySelectorAll')
   @Experimental()
-  ElementList queryAll(String relativeSelectors) =>
+  ElementList<Element> queryAll(String relativeSelectors) =>
       querySelectorAll(relativeSelectors);
 
   /**
@@ -11929,6 +12134,8 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
   CssClassSet get classes => new _ElementCssClassSet(this);
 
   void set classes(Iterable<String> value) {
+    // TODO(sra): Do this without reading the classes in clear() and addAll(),
+    // or writing the classes in clear().
     CssClassSet classSet = classes;
     classSet.clear();
     classSet.addAll(value);
@@ -13151,6 +13358,8 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
 
   String contentEditable;
 
+  MenuElement contextMenu;
+
   String dir;
 
   bool draggable;
@@ -13257,19 +13466,19 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
 
   @DomName('Element.scrollLeft')
   @DocsEditable()
-  int get _scrollLeft => _blink.BlinkElement.instance.scrollLeft_Getter_(this);
+  num get _scrollLeft => _blink.BlinkElement.instance.scrollLeft_Getter_(this);
 
   @DomName('Element.scrollLeft')
   @DocsEditable()
-  void set _scrollLeft(int value) => _blink.BlinkElement.instance.scrollLeft_Setter_(this, value);
+  void set _scrollLeft(num value) => _blink.BlinkElement.instance.scrollLeft_Setter_(this, value);
 
   @DomName('Element.scrollTop')
   @DocsEditable()
-  int get _scrollTop => _blink.BlinkElement.instance.scrollTop_Getter_(this);
+  num get _scrollTop => _blink.BlinkElement.instance.scrollTop_Getter_(this);
 
   @DomName('Element.scrollTop')
   @DocsEditable()
-  void set _scrollTop(int value) => _blink.BlinkElement.instance.scrollTop_Setter_(this, value);
+  void set _scrollTop(num value) => _blink.BlinkElement.instance.scrollTop_Setter_(this, value);
 
   @DomName('Element.scrollWidth')
   @DocsEditable()
@@ -14764,6 +14973,26 @@ class EventTarget extends NativeFieldWrapperClass2 {
 
 
 @DocsEditable()
+@DomName('ExtendableEvent')
+@Experimental() // untriaged
+class ExtendableEvent extends Event {
+  // To suppress missing implicit constructor warnings.
+  factory ExtendableEvent._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('ExtendableEvent.waitUntil')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void waitUntil(Object value) => _blink.BlinkExtendableEvent.instance.waitUntil_Callback_1_(this, value);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
 @DomName('FederatedCredential')
 @Experimental() // untriaged
 class FederatedCredential extends Credential {
@@ -14780,41 +15009,6 @@ class FederatedCredential extends Credential {
   @DocsEditable()
   @Experimental() // untriaged
   String get federation => _blink.BlinkFederatedCredential.instance.federation_Getter_(this);
-
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// WARNING: Do not edit - generated code.
-
-
-@DocsEditable()
-@DomName('FetchBodyStream')
-@Experimental() // untriaged
-class FetchBodyStream extends NativeFieldWrapperClass2 {
-  // To suppress missing implicit constructor warnings.
-  factory FetchBodyStream._() { throw new UnsupportedError("Not supported"); }
-
-  @DomName('FetchBodyStream.asArrayBuffer')
-  @DocsEditable()
-  @Experimental() // untriaged
-  Future asArrayBuffer() => _blink.BlinkFetchBodyStream.instance.asArrayBuffer_Callback_0_(this);
-
-  @DomName('FetchBodyStream.asBlob')
-  @DocsEditable()
-  @Experimental() // untriaged
-  Future asBlob() => _blink.BlinkFetchBodyStream.instance.asBlob_Callback_0_(this);
-
-  @DomName('FetchBodyStream.asJSON')
-  @DocsEditable()
-  @Experimental() // untriaged
-  Future asJson() => _blink.BlinkFetchBodyStream.instance.asJSON_Callback_0_(this);
-
-  @DomName('FetchBodyStream.asText')
-  @DocsEditable()
-  @Experimental() // untriaged
-  Future asText() => _blink.BlinkFetchBodyStream.instance.asText_Callback_0_(this);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -15707,10 +15901,12 @@ class FontFaceSet extends EventTarget {
   @Experimental() // untriaged
   void add(FontFace fontFace) => _blink.BlinkFontFaceSet.instance.add_Callback_1_(this, fontFace);
 
-  @DomName('FontFaceSet.check')
-  @DocsEditable()
-  @Experimental() // untriaged
-  bool check(String font, String text) => _blink.BlinkFontFaceSet.instance.check_Callback_2_(this, font, text);
+  bool check(String font, [String text]) {
+    if (text != null) {
+      return _blink.BlinkFontFaceSet.instance.check_Callback_2_(this, font, text);
+    }
+    return _blink.BlinkFontFaceSet.instance.check_Callback_1_(this, font);
+  }
 
   @DomName('FontFaceSet.clear')
   @DocsEditable()
@@ -17620,6 +17816,16 @@ class HtmlElement extends Element implements GlobalEventHandlers {
   @DocsEditable()
   void set contentEditable(String value) => _blink.BlinkHTMLElement.instance.contentEditable_Setter_(this, value);
 
+  @DomName('HTMLElement.contextMenu')
+  @DocsEditable()
+  @Experimental() // untriaged
+  MenuElement get contextMenu => _blink.BlinkHTMLElement.instance.contextMenu_Getter_(this);
+
+  @DomName('HTMLElement.contextMenu')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void set contextMenu(MenuElement value) => _blink.BlinkHTMLElement.instance.contextMenu_Setter_(this, value);
+
   @DomName('HTMLElement.dir')
   @DocsEditable()
   String get dir => _blink.BlinkHTMLElement.instance.dir_Getter_(this);
@@ -18116,7 +18322,7 @@ class HttpRequest extends HttpRequestEventTarget {
   static Future<String> getString(String url,
       {bool withCredentials, void onProgress(ProgressEvent e)}) {
     return request(url, withCredentials: withCredentials,
-        onProgress: onProgress).then((xhr) => xhr.responseText);
+        onProgress: onProgress).then((HttpRequest xhr) => xhr.responseText);
   }
 
   /**
@@ -19641,6 +19847,10 @@ class InputElement extends HtmlElement implements
       _blink.BlinkHTMLInputElement.instance.setRangeText_Callback_1_(this, replacement);
       return;
     }
+    if ((end is int || end == null) && (start is int || start == null) && (replacement is String || replacement == null) && selectionMode == null) {
+      _blink.BlinkHTMLInputElement.instance.setRangeText_Callback_3_(this, replacement, start, end);
+      return;
+    }
     if ((selectionMode is String || selectionMode == null) && (end is int || end == null) && (start is int || start == null) && (replacement is String || replacement == null)) {
       _blink.BlinkHTMLInputElement.instance.setRangeText_Callback_4_(this, replacement, start, end, selectionMode);
       return;
@@ -20280,7 +20490,7 @@ class InputMethodContext extends EventTarget {
 @DocsEditable()
 @DomName('InstallEvent')
 @Experimental() // untriaged
-class InstallEvent extends InstallPhaseEvent {
+class InstallEvent extends ExtendableEvent {
   // To suppress missing implicit constructor warnings.
   factory InstallEvent._() { throw new UnsupportedError("Not supported"); }
 
@@ -20293,26 +20503,6 @@ class InstallEvent extends InstallPhaseEvent {
   @DocsEditable()
   @Experimental() // untriaged
   void replace() => _blink.BlinkInstallEvent.instance.replace_Callback_0_(this);
-
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// WARNING: Do not edit - generated code.
-
-
-@DocsEditable()
-@DomName('InstallPhaseEvent')
-@Experimental() // untriaged
-class InstallPhaseEvent extends Event {
-  // To suppress missing implicit constructor warnings.
-  factory InstallPhaseEvent._() { throw new UnsupportedError("Not supported"); }
-
-  @DomName('InstallPhaseEvent.waitUntil')
-  @DocsEditable()
-  @Experimental() // untriaged
-  void waitUntil(Object value) => _blink.BlinkInstallPhaseEvent.instance.waitUntil_Callback_1_(this, value);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -20850,6 +21040,7 @@ class Location extends NativeFieldWrapperClass2 implements LocationBase {
   @DomName('Location.toString')
   @DocsEditable()
   String toString() => _blink.BlinkLocation.instance.toString_Callback_0_(this);
+
 
 
 }
@@ -21403,7 +21594,7 @@ class MediaElement extends HtmlElement {
   @DomName('HTMLMediaElement.setMediaKeys')
   @DocsEditable()
   @Experimental() // untriaged
-  void setMediaKeys(MediaKeys mediaKeys) => _blink.BlinkHTMLMediaElement.instance.setMediaKeys_Callback_1_(this, mediaKeys);
+  Future setMediaKeys(MediaKeys mediaKeys) => _blink.BlinkHTMLMediaElement.instance.setMediaKeys_Callback_1_(this, mediaKeys);
 
   void addKey(String keySystem, Uint8List key, [Uint8List initData, String sessionId]) {
     if (initData != null) {
@@ -21675,6 +21866,16 @@ class MediaKeySession extends EventTarget {
   @DocsEditable()
   String get sessionId => _blink.BlinkMediaKeySession.instance.sessionId_Getter_(this);
 
+  Future generateRequest(String initDataType, initData) {
+    if ((initData is TypedData) && (initDataType is String)) {
+      return _blink.BlinkMediaKeySession.instance.generateRequest_Callback_2_(this, initDataType, initData);
+    }
+    if ((initData is ByteBuffer) && (initDataType is String)) {
+      return _blink.BlinkMediaKeySession.instance.generateRequest_Callback_2_(this, initDataType, initData);
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
+  }
+
   @DomName('MediaKeySession.release')
   @DocsEditable()
   @Experimental() // untriaged
@@ -21715,20 +21916,11 @@ class MediaKeys extends NativeFieldWrapperClass2 {
   @Experimental() // untriaged
   static Future create(String keySystem) => _blink.BlinkMediaKeys.instance.create_Callback_1_(keySystem);
 
-  Future _createSession(String initDataType, initData, [String sessionType]) {
-    if ((initData is TypedData) && (initDataType is String) && sessionType == null) {
-      return _blink.BlinkMediaKeys.instance.createSession_Callback_2_(this, initDataType, initData);
+  MediaKeySession _createSession([String sessionType]) {
+    if (sessionType != null) {
+      return _blink.BlinkMediaKeys.instance.createSession_Callback_1_(this, sessionType);
     }
-    if ((sessionType is String || sessionType == null) && (initData is TypedData) && (initDataType is String)) {
-      return _blink.BlinkMediaKeys.instance.createSession_Callback_3_(this, initDataType, initData, sessionType);
-    }
-    if ((initData is ByteBuffer) && (initDataType is String) && sessionType == null) {
-      return _blink.BlinkMediaKeys.instance.createSession_Callback_2_(this, initDataType, initData);
-    }
-    if ((sessionType is String || sessionType == null) && (initData is ByteBuffer) && (initDataType is String)) {
-      return _blink.BlinkMediaKeys.instance.createSession_Callback_3_(this, initDataType, initData, sessionType);
-    }
-    throw new ArgumentError("Incorrect number or type of arguments");
+    return _blink.BlinkMediaKeys.instance.createSession_Callback_0_(this);
   }
 
   @DomName('MediaKeys.isTypeSupported')
@@ -21786,9 +21978,14 @@ class MediaList extends NativeFieldWrapperClass2 {
 @DocsEditable()
 @DomName('MediaQueryList')
 @Unstable()
-class MediaQueryList extends NativeFieldWrapperClass2 {
+class MediaQueryList extends EventTarget {
   // To suppress missing implicit constructor warnings.
   factory MediaQueryList._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('MediaQueryList.changeEvent')
+  @DocsEditable()
+  @Experimental() // untriaged
+  static const EventStreamProvider<Event> changeEvent = const EventStreamProvider<Event>('change');
 
   @DomName('MediaQueryList.matches')
   @DocsEditable()
@@ -21797,6 +21994,44 @@ class MediaQueryList extends NativeFieldWrapperClass2 {
   @DomName('MediaQueryList.media')
   @DocsEditable()
   String get media => _blink.BlinkMediaQueryList.instance.media_Getter_(this);
+
+  @DomName('MediaQueryList.addListener')
+  @DocsEditable()
+  void addListener(EventListener listener) => _blink.BlinkMediaQueryList.instance.addListener_Callback_1_(this, listener);
+
+  @DomName('MediaQueryList.removeListener')
+  @DocsEditable()
+  void removeListener(EventListener listener) => _blink.BlinkMediaQueryList.instance.removeListener_Callback_1_(this, listener);
+
+  @DomName('MediaQueryList.onchange')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Stream<Event> get onChange => changeEvent.forTarget(this);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
+@DomName('MediaQueryListEvent')
+@Experimental() // untriaged
+class MediaQueryListEvent extends Event {
+  // To suppress missing implicit constructor warnings.
+  factory MediaQueryListEvent._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('MediaQueryListEvent.matches')
+  @DocsEditable()
+  @Experimental() // untriaged
+  bool get matches => _blink.BlinkMediaQueryListEvent.instance.matches_Getter_(this);
+
+  @DomName('MediaQueryListEvent.media')
+  @DocsEditable()
+  @Experimental() // untriaged
+  String get media => _blink.BlinkMediaQueryListEvent.instance.media_Getter_(this);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -22628,18 +22863,18 @@ class MidiAccess extends EventTarget {
   @DocsEditable()
   static const EventStreamProvider<MidiConnectionEvent> disconnectEvent = const EventStreamProvider<MidiConnectionEvent>('disconnect');
 
+  @DomName('MIDIAccess.inputs')
+  @DocsEditable()
+  MidiInputMap get inputs => _blink.BlinkMIDIAccess.instance.inputs_Getter_(this);
+
+  @DomName('MIDIAccess.outputs')
+  @DocsEditable()
+  MidiOutputMap get outputs => _blink.BlinkMIDIAccess.instance.outputs_Getter_(this);
+
   @DomName('MIDIAccess.sysexEnabled')
   @DocsEditable()
   @Experimental() // untriaged
   bool get sysexEnabled => _blink.BlinkMIDIAccess.instance.sysexEnabled_Getter_(this);
-
-  @DomName('MIDIAccess.inputs')
-  @DocsEditable()
-  List<MidiInput> inputs() => _blink.BlinkMIDIAccess.instance.inputs_Callback_0_(this);
-
-  @DomName('MIDIAccess.outputs')
-  @DocsEditable()
-  List<MidiOutput> outputs() => _blink.BlinkMIDIAccess.instance.outputs_Callback_0_(this);
 
   /// Stream of `connect` events handled by this [MidiAccess].
   @DomName('MIDIAccess.onconnect')
@@ -22711,6 +22946,51 @@ class MidiInput extends MidiPort {
 
 
 @DocsEditable()
+@DomName('MIDIInputMap')
+@Experimental() // untriaged
+class MidiInputMap extends NativeFieldWrapperClass2 {
+  // To suppress missing implicit constructor warnings.
+  factory MidiInputMap._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('MIDIInputMap.size')
+  @DocsEditable()
+  @Experimental() // untriaged
+  int get size => _blink.BlinkMIDIInputMap.instance.size_Getter_(this);
+
+  @DomName('MIDIInputMap.entries')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator entries() => _blink.BlinkMIDIInputMap.instance.entries_Callback_0_(this);
+
+  @DomName('MIDIInputMap.get')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Object get(String id) => _blink.BlinkMIDIInputMap.instance.get_Callback_1_(this, id);
+
+  @DomName('MIDIInputMap.has')
+  @DocsEditable()
+  @Experimental() // untriaged
+  bool has(String key) => _blink.BlinkMIDIInputMap.instance.has_Callback_1_(this, key);
+
+  @DomName('MIDIInputMap.keys')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator keys() => _blink.BlinkMIDIInputMap.instance.keys_Callback_0_(this);
+
+  @DomName('MIDIInputMap.values')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator values() => _blink.BlinkMIDIInputMap.instance.values_Callback_0_(this);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
 @DomName('MIDIMessageEvent')
 // http://webaudio.github.io/web-midi-api/#midimessageevent-interface
 @Experimental()
@@ -22750,6 +23030,51 @@ class MidiOutput extends MidiPort {
     _blink.BlinkMIDIOutput.instance.send_Callback_1_(this, data);
     return;
   }
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
+@DomName('MIDIOutputMap')
+@Experimental() // untriaged
+class MidiOutputMap extends NativeFieldWrapperClass2 {
+  // To suppress missing implicit constructor warnings.
+  factory MidiOutputMap._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('MIDIOutputMap.size')
+  @DocsEditable()
+  @Experimental() // untriaged
+  int get size => _blink.BlinkMIDIOutputMap.instance.size_Getter_(this);
+
+  @DomName('MIDIOutputMap.entries')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator entries() => _blink.BlinkMIDIOutputMap.instance.entries_Callback_0_(this);
+
+  @DomName('MIDIOutputMap.get')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Object get(String id) => _blink.BlinkMIDIOutputMap.instance.get_Callback_1_(this, id);
+
+  @DomName('MIDIOutputMap.has')
+  @DocsEditable()
+  @Experimental() // untriaged
+  bool has(String key) => _blink.BlinkMIDIOutputMap.instance.has_Callback_1_(this, key);
+
+  @DomName('MIDIOutputMap.keys')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator keys() => _blink.BlinkMIDIOutputMap.instance.keys_Callback_0_(this);
+
+  @DomName('MIDIOutputMap.values')
+  @DocsEditable()
+  @Experimental() // untriaged
+  DomIterator values() => _blink.BlinkMIDIOutputMap.instance.values_Callback_0_(this);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -23395,6 +23720,11 @@ class Navigator extends NativeFieldWrapperClass2 implements NavigatorCpu, Naviga
   @Experimental() // nonstandard
   MimeTypeArray get mimeTypes => _blink.BlinkNavigator.instance.mimeTypes_Getter_(this);
 
+  @DomName('Navigator.presentation')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Presentation get presentation => _blink.BlinkNavigator.instance.presentation_Getter_(this);
+
   @DomName('Navigator.productSub')
   @DocsEditable()
   @Unstable()
@@ -23985,7 +24315,10 @@ class Node extends EventTarget {
   /**
    * Print out a String representation of this Node.
    */
-  String toString() => nodeValue == null ? super.toString() : nodeValue;
+  String toString() {
+    String value = nodeValue;  // Fetch DOM Node property once.
+    return value == null ? super.toString() : value;
+  }
   // To suppress missing implicit constructor warnings.
   factory Node._() { throw new UnsupportedError("Not supported"); }
 
@@ -24557,7 +24890,10 @@ class Notification extends EventTarget {
   @DomName('Notification.Notification')
   @DocsEditable()
   static Notification _factoryNotification(String title, [Map options]) {
-    return _blink.BlinkNotification.instance.constructorCallback_2_(title, options);
+    if (options != null) {
+      return _blink.BlinkNotification.instance.constructorCallback_2_(title, options);
+    }
+    return _blink.BlinkNotification.instance.constructorCallback_1_(title);
   }
 
   @DomName('Notification.body')
@@ -25809,6 +26145,42 @@ class PluginArray extends NativeFieldWrapperClass2 with ListMixin<Plugin>, Immut
 
 
 @DocsEditable()
+@DomName('PluginPlaceholderElement')
+@Experimental() // untriaged
+class PluginPlaceholderElement extends DivElement {
+  // To suppress missing implicit constructor warnings.
+  factory PluginPlaceholderElement._() { throw new UnsupportedError("Not supported"); }
+  /**
+   * Constructor instantiated by the DOM when a custom element has been created.
+   *
+   * This can only be called by subclasses from their created constructor.
+   */
+  PluginPlaceholderElement.created() : super.created();
+
+  @DomName('PluginPlaceholderElement.message')
+  @DocsEditable()
+  @Experimental() // untriaged
+  String get message => _blink.BlinkPluginPlaceholderElement.instance.message_Getter_(this);
+
+  @DomName('PluginPlaceholderElement.message')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void set message(String value) => _blink.BlinkPluginPlaceholderElement.instance.message_Setter_(this, value);
+
+  @DomName('PluginPlaceholderElement.createdCallback')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void createdCallback() => _blink.BlinkPluginPlaceholderElement.instance.createdCallback_Callback_0_(this);
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
 @DomName('PopStateEvent')
 @SupportedBrowser(SupportedBrowser.CHROME)
 @SupportedBrowser(SupportedBrowser.FIREFOX)
@@ -25900,6 +26272,21 @@ class PreElement extends HtmlElement {
    * This can only be called by subclasses from their created constructor.
    */
   PreElement.created() : super.created();
+
+}
+// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+// WARNING: Do not edit - generated code.
+
+
+@DocsEditable()
+@DomName('Presentation')
+@Experimental() // untriaged
+class Presentation extends EventTarget {
+  // To suppress missing implicit constructor warnings.
+  factory Presentation._() { throw new UnsupportedError("Not supported"); }
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -26232,6 +26619,11 @@ class Range extends NativeFieldWrapperClass2 {
     return;
   }
 
+  @DomName('Range.compareBoundaryPoints')
+  @DocsEditable()
+  @Experimental() // untriaged
+  int compareBoundaryPoints(int how, Range sourceRange) => _blink.BlinkRange.instance.compareBoundaryPoints_Callback_2_(this, how, sourceRange);
+
   @DomName('Range.comparePoint')
   @DocsEditable()
   int comparePoint(Node refNode, int offset) => _blink.BlinkRange.instance.comparePoint_Callback_2_(this, refNode, offset);
@@ -26332,6 +26724,31 @@ class Range extends NativeFieldWrapperClass2 {
 class ReadableStream extends NativeFieldWrapperClass2 {
   // To suppress missing implicit constructor warnings.
   factory ReadableStream._() { throw new UnsupportedError("Not supported"); }
+
+  @DomName('ReadableStream.closed')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future get closed => _blink.BlinkReadableStream.instance.closed_Getter_(this);
+
+  @DomName('ReadableStream.state')
+  @DocsEditable()
+  @Experimental() // untriaged
+  String get state => _blink.BlinkReadableStream.instance.state_Getter_(this);
+
+  @DomName('ReadableStream.cancel')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future cancel(Object reason) => _blink.BlinkReadableStream.instance.cancel_Callback_1_(this, reason);
+
+  @DomName('ReadableStream.read')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Object read() => _blink.BlinkReadableStream.instance.read_Callback_0_(this);
+
+  @DomName('ReadableStream.wait')
+  @DocsEditable()
+  @Experimental() // untriaged
+  Future wait() => _blink.BlinkReadableStream.instance.wait_Callback_0_(this);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -27712,10 +28129,12 @@ class ServiceWorkerClients extends NativeFieldWrapperClass2 {
   // To suppress missing implicit constructor warnings.
   factory ServiceWorkerClients._() { throw new UnsupportedError("Not supported"); }
 
-  @DomName('ServiceWorkerClients.getServiced')
-  @DocsEditable()
-  @Experimental() // untriaged
-  Future getServiced() => _blink.BlinkServiceWorkerClients.instance.getServiced_Callback_0_(this);
+  Future getAll([Map options]) {
+    if (options != null) {
+      return _blink.BlinkServiceWorkerClients.instance.getAll_Callback_1_(this, options);
+    }
+    return _blink.BlinkServiceWorkerClients.instance.getAll_Callback_0_(this);
+  }
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -27732,43 +28151,28 @@ class ServiceWorkerContainer extends NativeFieldWrapperClass2 {
   // To suppress missing implicit constructor warnings.
   factory ServiceWorkerContainer._() { throw new UnsupportedError("Not supported"); }
 
-  @DomName('ServiceWorkerContainer.active')
-  @DocsEditable()
-  @Experimental() // untriaged
-  _ServiceWorker get active => _blink.BlinkServiceWorkerContainer.instance.active_Getter_(this);
-
   @DomName('ServiceWorkerContainer.controller')
   @DocsEditable()
   @Experimental() // untriaged
   _ServiceWorker get controller => _blink.BlinkServiceWorkerContainer.instance.controller_Getter_(this);
-
-  @DomName('ServiceWorkerContainer.installing')
-  @DocsEditable()
-  @Experimental() // untriaged
-  _ServiceWorker get installing => _blink.BlinkServiceWorkerContainer.instance.installing_Getter_(this);
 
   @DomName('ServiceWorkerContainer.ready')
   @DocsEditable()
   @Experimental() // untriaged
   Future get ready => _blink.BlinkServiceWorkerContainer.instance.ready_Getter_(this);
 
-  @DomName('ServiceWorkerContainer.waiting')
-  @DocsEditable()
-  @Experimental() // untriaged
-  _ServiceWorker get waiting => _blink.BlinkServiceWorkerContainer.instance.waiting_Getter_(this);
+  Future getRegistration([String documentURL]) {
+    if (documentURL != null) {
+      return _blink.BlinkServiceWorkerContainer.instance.getRegistration_Callback_1_(this, documentURL);
+    }
+    return _blink.BlinkServiceWorkerContainer.instance.getRegistration_Callback_0_(this);
+  }
 
   Future register(String url, [Map options]) {
     if (options != null) {
       return _blink.BlinkServiceWorkerContainer.instance.register_Callback_2_(this, url, options);
     }
     return _blink.BlinkServiceWorkerContainer.instance.register_Callback_1_(this, url);
-  }
-
-  Future unregister([String scope]) {
-    if (scope != null) {
-      return _blink.BlinkServiceWorkerContainer.instance.unregister_Callback_1_(this, scope);
-    }
-    return _blink.BlinkServiceWorkerContainer.instance.unregister_Callback_0_(this);
   }
 
 }
@@ -27791,20 +28195,25 @@ class ServiceWorkerGlobalScope extends WorkerGlobalScope {
   @Experimental() // untriaged
   static const EventStreamProvider<MessageEvent> messageEvent = const EventStreamProvider<MessageEvent>('message');
 
+  @DomName('ServiceWorkerGlobalScope.caches')
+  @DocsEditable()
+  @Experimental() // untriaged
+  CacheStorage get caches => _blink.BlinkServiceWorkerGlobalScope.instance.caches_Getter_(this);
+
   @DomName('ServiceWorkerGlobalScope.clients')
   @DocsEditable()
   @Experimental() // untriaged
   ServiceWorkerClients get clients => _blink.BlinkServiceWorkerGlobalScope.instance.clients_Getter_(this);
 
-  @DomName('ServiceWorkerGlobalScope.nativeCaches')
-  @DocsEditable()
-  @Experimental() // untriaged
-  CacheStorage get nativeCaches => _blink.BlinkServiceWorkerGlobalScope.instance.nativeCaches_Getter_(this);
-
   @DomName('ServiceWorkerGlobalScope.scope')
   @DocsEditable()
   @Experimental() // untriaged
   String get scope => _blink.BlinkServiceWorkerGlobalScope.instance.scope_Getter_(this);
+
+  @DomName('ServiceWorkerGlobalScope.close')
+  @DocsEditable()
+  @Experimental() // untriaged
+  void close() => _blink.BlinkServiceWorkerGlobalScope.instance.close_Callback_0_(this);
 
   Future _fetch(request, [Map requestInitDict]) {
     if ((request is String || request == null) && requestInitDict == null) {
@@ -32698,7 +33107,7 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
    * convertPointFromNodeToPage and convertPointFromPageToNode are removed.
    * see http://dev.w3.org/csswg/cssom-view/#geometry
    */
-  static bool get supportsPointConversions => _DomPoint.supported;
+  static bool get supportsPointConversions => true;
   // To suppress missing implicit constructor warnings.
   factory Window._() { throw new UnsupportedError("Not supported"); }
 
@@ -33199,7 +33608,7 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
    */
   @DomName('Window.pageXOffset')
   @DocsEditable()
-  int get pageXOffset => _blink.BlinkWindow.instance.pageXOffset_Getter_(this);
+  double get _pageXOffset => _blink.BlinkWindow.instance.pageXOffset_Getter_(this);
 
   /**
    * The distance this window has been scrolled vertically.
@@ -33215,7 +33624,7 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
    */
   @DomName('Window.pageYOffset')
   @DocsEditable()
-  int get pageYOffset => _blink.BlinkWindow.instance.pageYOffset_Getter_(this);
+  double get _pageYOffset => _blink.BlinkWindow.instance.pageYOffset_Getter_(this);
 
   @DomName('Window.parent')
   @DocsEditable()
@@ -33302,11 +33711,11 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
 
   @DomName('Window.scrollX')
   @DocsEditable()
-  int get scrollX => _blink.BlinkWindow.instance.scrollX_Getter_(this);
+  double get _scrollX => _blink.BlinkWindow.instance.scrollX_Getter_(this);
 
   @DomName('Window.scrollY')
   @DocsEditable()
-  int get scrollY => _blink.BlinkWindow.instance.scrollY_Getter_(this);
+  double get _scrollY => _blink.BlinkWindow.instance.scrollY_Getter_(this);
 
   /**
    * This window's scroll bars.
@@ -33594,31 +34003,64 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
   @DocsEditable()
   void resizeTo(num width, num height) => _blink.BlinkWindow.instance.resizeTo_Callback_2_(this, width, height);
 
-  void scroll(int x, int y, [Map scrollOptions]) {
-    if (scrollOptions != null) {
+  void scroll(x, y, [Map scrollOptions]) {
+    if ((y is num) && (x is num) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scroll_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is num) && (x is num)) {
       _blink.BlinkWindow.instance.scroll_Callback_3_(this, x, y, scrollOptions);
       return;
     }
-    _blink.BlinkWindow.instance.scroll_Callback_2_(this, x, y);
-    return;
+    if ((y is int) && (x is int) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scroll_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is int) && (x is int)) {
+      _blink.BlinkWindow.instance.scroll_Callback_3_(this, x, y, scrollOptions);
+      return;
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
   }
 
-  void scrollBy(int x, int y, [Map scrollOptions]) {
-    if (scrollOptions != null) {
+  void scrollBy(x, y, [Map scrollOptions]) {
+    if ((y is num) && (x is num) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scrollBy_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is num) && (x is num)) {
       _blink.BlinkWindow.instance.scrollBy_Callback_3_(this, x, y, scrollOptions);
       return;
     }
-    _blink.BlinkWindow.instance.scrollBy_Callback_2_(this, x, y);
-    return;
+    if ((y is int) && (x is int) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scrollBy_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is int) && (x is int)) {
+      _blink.BlinkWindow.instance.scrollBy_Callback_3_(this, x, y, scrollOptions);
+      return;
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
   }
 
-  void scrollTo(int x, int y, [Map scrollOptions]) {
-    if (scrollOptions != null) {
+  void scrollTo(x, y, [Map scrollOptions]) {
+    if ((y is num) && (x is num) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scrollTo_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is num) && (x is num)) {
       _blink.BlinkWindow.instance.scrollTo_Callback_3_(this, x, y, scrollOptions);
       return;
     }
-    _blink.BlinkWindow.instance.scrollTo_Callback_2_(this, x, y);
-    return;
+    if ((y is int) && (x is int) && scrollOptions == null) {
+      _blink.BlinkWindow.instance.scrollTo_Callback_2_(this, x, y);
+      return;
+    }
+    if ((scrollOptions is Map) && (y is int) && (x is int)) {
+      _blink.BlinkWindow.instance.scrollTo_Callback_3_(this, x, y, scrollOptions);
+      return;
+    }
+    throw new ArgumentError("Incorrect number or type of arguments");
   }
 
   /**
@@ -34110,6 +34552,21 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
     _moveTo(p.x, p.y);
   }
 
+  @DomName('Window.pageXOffset')
+  @DocsEditable()
+  int get pageXOffset => _blink.BlinkWindow.instance.pageXOffset_Getter_(this).round();
+
+  @DomName('Window.pageYOffset')
+  @DocsEditable()
+  int get pageYOffset => _blink.BlinkWindow.instance.pageYOffset_Getter_(this).round();
+
+  @DomName('Window.scrollX')
+  @DocsEditable()
+  int get scrollX => _blink.BlinkWindow.instance.scrollX_Getter_(this).round();
+
+  @DomName('Window.scrollY')
+  @DocsEditable()
+  int get scrollY => _blink.BlinkWindow.instance.scrollY_Getter_(this).round();
 }
 
 
@@ -34407,20 +34864,6 @@ class WorkerGlobalScope extends EventTarget implements _WindowTimers, WindowBase
   @DocsEditable()
   @Experimental() // untriaged
   void importScripts(String urls) => _blink.BlinkWorkerGlobalScope.instance.importScripts_Callback_1_(this, urls);
-
-  SqlDatabase openDatabase(String name, String version, String displayName, int estimatedSize, [DatabaseCallback creationCallback]) {
-    if (creationCallback != null) {
-      return _blink.BlinkWorkerGlobalScope.instance.openDatabase_Callback_5_(this, name, version, displayName, estimatedSize, creationCallback);
-    }
-    return _blink.BlinkWorkerGlobalScope.instance.openDatabase_Callback_4_(this, name, version, displayName, estimatedSize);
-  }
-
-  _DatabaseSync openDatabaseSync(String name, String version, String displayName, int estimatedSize, [DatabaseCallback creationCallback]) {
-    if (creationCallback != null) {
-      return _blink.BlinkWorkerGlobalScope.instance.openDatabaseSync_Callback_5_(this, name, version, displayName, estimatedSize, creationCallback);
-    }
-    return _blink.BlinkWorkerGlobalScope.instance.openDatabaseSync_Callback_4_(this, name, version, displayName, estimatedSize);
-  }
 
   void _webkitRequestFileSystem(int type, int size, [_FileSystemCallback successCallback, _ErrorCallback errorCallback]) {
     if (errorCallback != null) {
@@ -35342,25 +35785,6 @@ abstract class _DOMFileSystemSync extends NativeFieldWrapperClass2 {
 
 
 @DocsEditable()
-@DomName('DatabaseSync')
-@SupportedBrowser(SupportedBrowser.CHROME)
-@SupportedBrowser(SupportedBrowser.SAFARI)
-@Experimental()
-// http://www.w3.org/TR/webdatabase/#databasesync
-@deprecated // deprecated
-abstract class _DatabaseSync extends NativeFieldWrapperClass2 {
-  // To suppress missing implicit constructor warnings.
-  factory _DatabaseSync._() { throw new UnsupportedError("Not supported"); }
-
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// WARNING: Do not edit - generated code.
-
-
-@DocsEditable()
 @DomName('DirectoryEntrySync')
 // http://www.w3.org/TR/file-system-api/#the-directoryentrysync-interface
 @Experimental()
@@ -35399,51 +35823,6 @@ abstract class _DirectoryReaderSync extends NativeFieldWrapperClass2 {
 abstract class _DocumentType extends Node implements ChildNode {
   // To suppress missing implicit constructor warnings.
   factory _DocumentType._() { throw new UnsupportedError("Not supported"); }
-
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// WARNING: Do not edit - generated code.
-
-
-@DocsEditable()
-@DomName('WebKitPoint')
-@SupportedBrowser(SupportedBrowser.CHROME)
-@SupportedBrowser(SupportedBrowser.SAFARI)
-@Experimental()
-// http://developer.apple.com/library/safari/#documentation/DataManagement/Reference/DOMWindowAdditionsReference/DOMWindowAdditions/DOMWindowAdditions.html
-@Experimental() // non-standard
-class _DomPoint extends NativeFieldWrapperClass2 {
-  // To suppress missing implicit constructor warnings.
-  factory _DomPoint._() { throw new UnsupportedError("Not supported"); }
-
-  @DomName('WebKitPoint.WebKitPoint')
-  @DocsEditable()
-  factory _DomPoint(num x, num y) => _create(x, y);
-
-  @DocsEditable()
-  static _DomPoint _create(x, y) => _blink.BlinkWebKitPoint.instance.constructorCallback_2_(x, y);
-
-  /// Checks if this type is supported on the current platform.
-  static bool get supported => true;
-
-  @DomName('WebKitPoint.x')
-  @DocsEditable()
-  num get x => _blink.BlinkWebKitPoint.instance.x_Getter_(this);
-
-  @DomName('WebKitPoint.x')
-  @DocsEditable()
-  void set x(num value) => _blink.BlinkWebKitPoint.instance.x_Setter_(this, value);
-
-  @DomName('WebKitPoint.y')
-  @DocsEditable()
-  num get y => _blink.BlinkWebKitPoint.instance.y_Getter_(this);
-
-  @DomName('WebKitPoint.y')
-  @DocsEditable()
-  void set y(num value) => _blink.BlinkWebKitPoint.instance.y_Setter_(this, value);
 
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
@@ -35939,22 +36318,6 @@ class _NamedNodeMap extends NativeFieldWrapperClass2 with ListMixin<Node>, Immut
 
 
 @DocsEditable()
-@DomName('Notation')
-// http://dom.spec.whatwg.org/#notation
-@deprecated // deprecated
-abstract class _Notation extends Node {
-  // To suppress missing implicit constructor warnings.
-  factory _Notation._() { throw new UnsupportedError("Not supported"); }
-
-}
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
-// WARNING: Do not edit - generated code.
-
-
-@DocsEditable()
 @DomName('PagePopupController')
 @deprecated // nonstandard
 abstract class _PagePopupController extends NativeFieldWrapperClass2 {
@@ -36015,7 +36378,7 @@ abstract class _Rect extends NativeFieldWrapperClass2 {
 @DocsEditable()
 @DomName('Request')
 @Experimental() // untriaged
-class _Request extends NativeFieldWrapperClass2 {
+class _Request extends Body {
   // To suppress missing implicit constructor warnings.
   factory _Request._() { throw new UnsupportedError("Not supported"); }
 
@@ -36062,6 +36425,11 @@ class _Request extends NativeFieldWrapperClass2 {
   @Experimental() // untriaged
   String get url => _blink.BlinkRequest.instance.url_Getter_(this);
 
+  @DomName('Request.clone')
+  @DocsEditable()
+  @Experimental() // untriaged
+  _Request clone() => _blink.BlinkRequest.instance.clone_Callback_0_(this);
+
 }
 // Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
@@ -36073,24 +36441,36 @@ class _Request extends NativeFieldWrapperClass2 {
 @DocsEditable()
 @DomName('Response')
 @Experimental() // untriaged
-abstract class _Response extends NativeFieldWrapperClass2 {
+abstract class _Response extends Body {
   // To suppress missing implicit constructor warnings.
   factory _Response._() { throw new UnsupportedError("Not supported"); }
 
   @DomName('Response.Response')
   @DocsEditable()
-  factory _Response(body, [Map responseInitDict]) {
-    if ((body is String || body == null) && responseInitDict == null) {
-      return _blink.BlinkResponse.instance.constructorCallback_1_(body);
+  factory _Response(body_OR_input, [Map requestInitDict_OR_responseInitDict]) {
+    if ((body_OR_input is String || body_OR_input == null) && requestInitDict_OR_responseInitDict == null) {
+      return _blink.BlinkResponse.instance.constructorCallback_1_(body_OR_input);
     }
-    if ((responseInitDict is Map || responseInitDict == null) && (body is String || body == null)) {
-      return _blink.BlinkResponse.instance.constructorCallback_2_(body, responseInitDict);
+    if ((requestInitDict_OR_responseInitDict is Map || requestInitDict_OR_responseInitDict == null) && (body_OR_input is String || body_OR_input == null)) {
+      return _blink.BlinkResponse.instance.constructorCallback_2_(body_OR_input, requestInitDict_OR_responseInitDict);
     }
-    if ((body is Blob || body == null) && responseInitDict == null) {
-      return _blink.BlinkResponse.instance.constructorCallback_1_(body);
+    if ((body_OR_input is Blob || body_OR_input == null) && requestInitDict_OR_responseInitDict == null) {
+      return _blink.BlinkResponse.instance.constructorCallback_1_(body_OR_input);
     }
-    if ((responseInitDict is Map || responseInitDict == null) && (body is Blob || body == null)) {
-      return _blink.BlinkResponse.instance.constructorCallback_2_(body, responseInitDict);
+    if ((requestInitDict_OR_responseInitDict is Map || requestInitDict_OR_responseInitDict == null) && (body_OR_input is Blob || body_OR_input == null)) {
+      return _blink.BlinkResponse.instance.constructorCallback_2_(body_OR_input, requestInitDict_OR_responseInitDict);
+    }
+    if ((body_OR_input is TypedData || body_OR_input == null) && requestInitDict_OR_responseInitDict == null) {
+      return _blink.BlinkResponse.instance.constructorCallback_1_(body_OR_input);
+    }
+    if ((requestInitDict_OR_responseInitDict is Map || requestInitDict_OR_responseInitDict == null) && (body_OR_input is TypedData || body_OR_input == null)) {
+      return _blink.BlinkResponse.instance.constructorCallback_2_(body_OR_input, requestInitDict_OR_responseInitDict);
+    }
+    if ((body_OR_input is ByteBuffer || body_OR_input == null) && requestInitDict_OR_responseInitDict == null) {
+      return _blink.BlinkResponse.instance.constructorCallback_1_(body_OR_input);
+    }
+    if ((requestInitDict_OR_responseInitDict is Map || requestInitDict_OR_responseInitDict == null) && (body_OR_input is ByteBuffer || body_OR_input == null)) {
+      return _blink.BlinkResponse.instance.constructorCallback_2_(body_OR_input, requestInitDict_OR_responseInitDict);
     }
     throw new ArgumentError("Incorrect number or type of arguments");
   }
@@ -36966,12 +37346,13 @@ class _MultiElementCssClassSet extends CssClassSetImpl {
 
   Set<String> readClasses() {
     var s = new LinkedHashSet<String>();
-    _elementCssClassSetIterable.forEach((e) => s.addAll(e.readClasses()));
+    _elementCssClassSetIterable.forEach(
+        (_ElementCssClassSet e) => s.addAll(e.readClasses()));
     return s;
   }
 
   void writeClasses(Set<String> s) {
-    var classes = new List.from(s).join(' ');
+    var classes = s.join(' ');
     for (Element e in _elementIterable) {
       e.className = classes;
     }
@@ -36987,7 +37368,7 @@ class _MultiElementCssClassSet extends CssClassSetImpl {
    *       className property of this element.
    */
   modify( f(Set<String> s)) {
-    _elementCssClassSetIterable.forEach((e) => e.modify(f));
+    _elementCssClassSetIterable.forEach((_ElementCssClassSet e) => e.modify(f));
   }
 
   /**
@@ -36995,7 +37376,9 @@ class _MultiElementCssClassSet extends CssClassSetImpl {
    * is.
    */
   bool toggle(String value, [bool shouldAdd]) =>
-      _modifyWithReturnValue((e) => e.toggle(value, shouldAdd));
+      _elementCssClassSetIterable.fold(false,
+          (bool changed, _ElementCssClassSet e) =>
+              e.toggle(value, shouldAdd) || changed);
 
   /**
    * Remove the class [value] from element, and return true on successful
@@ -37004,10 +37387,8 @@ class _MultiElementCssClassSet extends CssClassSetImpl {
    * This is the Dart equivalent of jQuery's
    * [removeClass](http://api.jquery.com/removeClass/).
    */
-  bool remove(Object value) => _modifyWithReturnValue((e) => e.remove(value));
-
-  bool _modifyWithReturnValue(f) => _elementCssClassSetIterable.fold(
-      false, (prevValue, element) => f(element) || prevValue);
+  bool remove(Object value) => _elementCssClassSetIterable.fold(false,
+      (bool changed, _ElementCssClassSet e) => e.remove(value) || changed);
 }
 
 class _ElementCssClassSet extends CssClassSetImpl {
@@ -37030,7 +37411,6 @@ class _ElementCssClassSet extends CssClassSetImpl {
   }
 
   void writeClasses(Set<String> s) {
-    List list = new List.from(s);
     _element.className = s.join(' ');
   }
 }
@@ -40460,6 +40840,11 @@ ClassMirror _validateCustomType(Type type) {
   }
 
   var className = MirrorSystem.getName(cls.simpleName);
+  if (cls.isAbstract) {
+    throw new UnsupportedError('Invalid custom element '
+        'class $className is abstract.');
+  }
+
   var createdConstructor = cls.declarations[new Symbol('$className.created')];
   if (createdConstructor == null ||
       createdConstructor is! MethodMirror ||
@@ -40786,7 +41171,7 @@ Element query(String relativeSelectors) => document.query(relativeSelectors);
  */
 @deprecated
 @Experimental()
-ElementList queryAll(String relativeSelectors) => document.queryAll(relativeSelectors);
+ElementList<Element> queryAll(String relativeSelectors) => document.queryAll(relativeSelectors);
 
 /**
  * Finds the first descendant element of this document that matches the
@@ -40823,7 +41208,7 @@ Element querySelector(String selectors) => document.querySelector(selectors);
  * For details about CSS selector syntax, see the
  * [CSS selector specification](http://www.w3.org/TR/css3-selectors/).
  */
-ElementList querySelectorAll(String selectors) => document.querySelectorAll(selectors);
+ElementList<Element> querySelectorAll(String selectors) => document.querySelectorAll(selectors);
 
 /// A utility for changing the Dart wrapper type for elements.
 abstract class ElementUpgrader {
@@ -41023,6 +41408,9 @@ class _Utils {
 
   static window() => _blink.Blink_Utils.window();
   static forwardingPrint(String message) => _blink.Blink_Utils.forwardingPrint(message);
+  static void spawnDomHelper(Function f, int replyTo) =>
+      _blink.Blink_Utils.spawnDomHelper(f, replyTo);
+
   // TODO(vsm): Make this API compatible with spawnUri.  It should also
   // return a Future<Isolate>.
   static spawnDomUri(String uri) => _blink.Blink_Utils.spawnDomUri(uri);
@@ -41341,7 +41729,7 @@ class _Utils {
     return libraryMirror.uri.scheme == 'dart' &&
         SIDE_EFFECT_FREE_LIBRARIES.contains(libraryMirror.uri.toString());
   }
-  
+
   /**
    * Whether we should treat a property as a field for the purposes of the
    * debugger.
@@ -41559,7 +41947,7 @@ class _Utils {
     }
     return ret;
   }
-  
+
   /**
    * Get a property, returning null if the property does not exist.
    * For private property names, we attempt to resolve the property in the
@@ -41569,7 +41957,7 @@ class _Utils {
     var objectMirror = reflect(o);
     var classMirror = objectMirror.type;
     if (propertyName.startsWith("_")) {
-      var attemptedLibraries = new Set<LibraryMirror>(); 
+      var attemptedLibraries = new Set<LibraryMirror>();
       while (classMirror != null) {
         LibraryMirror library = classMirror.owner;
         if (!attemptedLibraries.contains(library)) {
@@ -41581,7 +41969,7 @@ class _Utils {
         }
         classMirror = classMirror.superclass;
       }
-      return null;     
+      return null;
     }
     try {
       return objectMirror.getField(
@@ -41593,7 +41981,7 @@ class _Utils {
 
   /**
    * Helper to wrap the inspect method on InjectedScriptHost to provide the
-   * inspect method required for the 
+   * inspect method required for the
    */
   static List consoleApi(host) {
     return [
@@ -41728,10 +42116,83 @@ class _DOMStringMap extends NativeFieldWrapperClass2 implements Map<String, Stri
   }
 }
 
+// TODO(vsm): Remove DOM isolate code once we have Dartium isolates
+// as workers.  This is only used to support
+// printing and timers in background isolates. As workers they should
+// be able to just do those things natively.
+
+_makeSendPortFuture(spawnRequest) {
+  final completer = new Completer<SendPort>.sync();
+  final port = new ReceivePort();
+  port.listen((result) {
+    completer.complete(result);
+    port.close();
+  });
+  // TODO: SendPort.hashCode is ugly way to access port id.
+  spawnRequest(port.sendPort.hashCode);
+  return completer.future;
+}
+
+Future<SendPort> _spawnDomHelper(Function f) =>
+    _makeSendPortFuture((portId) { _Utils.spawnDomHelper(f, portId); });
+
+final Future<SendPort> __HELPER_ISOLATE_PORT =
+    _spawnDomHelper(_helperIsolateMain);
+
+// Tricky part.
+// Once __HELPER_ISOLATE_PORT gets resolved, it will still delay in .then
+// and to delay Timer.run is used. However, Timer.run will try to register
+// another Timer and here we got stuck: event cannot be posted as then
+// callback is not executed because it's delayed with timer.
+// Therefore once future is resolved, it's unsafe to call .then on it
+// in Timer code.
+SendPort __SEND_PORT;
+
+_sendToHelperIsolate(msg, SendPort replyTo) {
+  if (__SEND_PORT != null) {
+    __SEND_PORT.send([msg, replyTo]);
+  } else {
+    __HELPER_ISOLATE_PORT.then((port) {
+      __SEND_PORT = port;
+      __SEND_PORT.send([msg, replyTo]);
+    });
+  }
+}
+
+final _TIMER_REGISTRY = new Map<SendPort, Timer>();
+
+const _NEW_TIMER = 'NEW_TIMER';
+const _CANCEL_TIMER = 'CANCEL_TIMER';
+const _TIMER_PING = 'TIMER_PING';
+const _PRINT = 'PRINT';
+
+_helperIsolateMain(originalSendPort) {
+  var port = new ReceivePort();
+  originalSendPort.send(port.sendPort);
+  port.listen((args) {
+    var msg = args.first;
+    var replyTo = args.last;
+    final cmd = msg[0];
+    if (cmd == _NEW_TIMER) {
+      final duration = new Duration(milliseconds: msg[1]);
+      bool periodic = msg[2];
+      ping() { replyTo.send(_TIMER_PING); };
+      _TIMER_REGISTRY[replyTo] = periodic ?
+          new Timer.periodic(duration, (_) { ping(); }) :
+          new Timer(duration, ping);
+    } else if (cmd == _CANCEL_TIMER) {
+      _TIMER_REGISTRY.remove(replyTo).cancel();
+    } else if (cmd == _PRINT) {
+      final message = msg[1];
+      // TODO(antonm): we need somehow identify those isolates.
+      print('[From isolate] $message');
+    }
+  });
+}
+
 final _printClosure = (s) => window.console.log(s);
 final _pureIsolatePrintClosure = (s) {
-  throw new UnimplementedError("Printing from a background isolate "
-                               "is not supported in the browser");
+    _sendToHelperIsolate([_PRINT, s], null);
 };
 
 final _forwardingPrintClosure = _Utils.forwardingPrint;
@@ -41780,10 +42241,45 @@ get _timerFactoryClosure =>
   return new _Timer(milliSeconds, callback, repeating);
 };
 
+class _PureIsolateTimer implements Timer {
+  bool _isActive = true;
+  final ReceivePort _port = new ReceivePort();
+  SendPort _sendPort; // Effectively final.
+
+  //  static SendPort _SEND_PORT;
+
+  _PureIsolateTimer(int milliSeconds, callback, repeating) {
+    _sendPort = _port.sendPort;
+    _port.listen((msg) {
+      assert(msg == _TIMER_PING);
+      _isActive = repeating;
+      callback(this);
+      if (!repeating) _cancel();
+    });
+
+    _send([_NEW_TIMER, milliSeconds, repeating]);
+  }
+
+  void cancel() {
+    _cancel();
+    _send([_CANCEL_TIMER]);
+  }
+
+  void _cancel() {
+    _isActive = false;
+    _port.close();
+  }
+
+  _send(msg) {
+    _sendToHelperIsolate(msg, _sendPort);
+  }
+
+  bool get isActive => _isActive;
+}
+
 get _pureIsolateTimerFactoryClosure =>
     ((int milliSeconds, void callback(Timer time), bool repeating) =>
-  throw new UnimplementedError("Timers on background isolates "
-                               "are not supported in the browser"));
+  new _PureIsolateTimer(milliSeconds, callback, repeating));
 
 class _ScheduleImmediateHelper {
   MutationObserver _observer;

@@ -4,7 +4,7 @@
 
 library args.src.arg_results;
 
-import 'package:collection/wrappers.dart';
+import 'dart:collection';
 
 import 'arg_parser.dart';
 

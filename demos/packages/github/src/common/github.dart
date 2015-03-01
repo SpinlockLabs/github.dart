@@ -325,6 +325,10 @@ class GitHub {
       headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
     }
 
+    if (method == "PUT" && body == null) {
+      headers.putIfAbsent("Content-Length", () => "0");
+    }
+
     var queryString = "";
 
     if (params != null) {

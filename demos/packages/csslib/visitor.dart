@@ -40,7 +40,7 @@ abstract class VisitorBase {
 
   void visitRuleSet(RuleSet node);
   void visitDeclarationGroup(DeclarationGroup node);
-  void visitMarginGroup(DeclarationGroup node);
+  void visitMarginGroup(MarginGroup node);
   void visitDeclaration(Declaration node);
   void visitVarDefinition(VarDefinition node);
   void visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node);

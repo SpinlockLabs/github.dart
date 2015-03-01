@@ -66,13 +66,9 @@ class GistFile {
 
   @ApiName("raw_url")
   String rawUrl;
-
   String type;
-
   String language;
-
   bool truncated;
-
   String content;
 
   static GistFile fromJSON(input) {

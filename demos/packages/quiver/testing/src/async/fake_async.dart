@@ -37,7 +37,6 @@ part of quiver.testing.async;
 ///       });
 ///     });
 abstract class FakeAsync {
-
   factory FakeAsync() = _FakeAsync;
 
   FakeAsync._();
@@ -110,12 +109,10 @@ abstract class FakeAsync {
 }
 
 class _FakeAsync extends FakeAsync {
-
   Duration _elapsed = Duration.ZERO;
   Duration _elapsingTo;
   Queue<Function> _microtasks = new Queue();
   Set<_FakeTimer> _timers = new Set<_FakeTimer>();
-  bool _waitingForTimer = false;
 
   _FakeAsync() : super._() {
     _elapsed;
@@ -179,29 +176,13 @@ class _FakeAsync extends FakeAsync {
   Zone _zone;
 
   ZoneSpecification get _zoneSpec => new ZoneSpecification(
-      createTimer: (
-          _,
-          __,
-          ___,
-          Duration duration,
-          Function callback) {
-        return _createTimer(duration, callback, false);
-      },
-      createPeriodicTimer: (
-          _,
-          __,
-          ___,
-          Duration duration,
-          Function callback) {
-        return _createTimer(duration, callback, true);
-      },
-      scheduleMicrotask: (
-          _,
-          __,
-          ___,
-          Function microtask) {
-        _microtasks.add(microtask);
-      });
+      createTimer: (_, __, ___, Duration duration, Function callback) {
+    return _createTimer(duration, callback, false);
+  }, createPeriodicTimer: (_, __, ___, Duration duration, Function callback) {
+    return _createTimer(duration, callback, true);
+  }, scheduleMicrotask: (_, __, ___, Function microtask) {
+    _microtasks.add(microtask);
+  });
 
   _drainTimersWhile(bool predicate(_FakeTimer)) {
     _drainMicrotasks();
@@ -250,11 +231,9 @@ class _FakeAsync extends FakeAsync {
   _hasTimer(_FakeTimer timer) => _timers.contains(timer);
 
   _cancelTimer(_FakeTimer timer) => _timers.remove(timer);
-
 }
 
 class _FakeTimer implements Timer {
-
   final Duration _duration;
   final Function _callback;
   final bool _isPeriodic;

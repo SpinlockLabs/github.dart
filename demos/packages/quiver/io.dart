@@ -47,8 +47,7 @@ Future visitDirectory(Directory dir, Future<bool> visit(FileSystemEntity f)) {
   void _list(Directory dir) {
     var completer = new Completer();
     futureGroup.add(completer.future);
-    var sub;
-    sub = dir.list(followLinks: false).listen((FileSystemEntity entity) {
+    dir.list(followLinks: false).listen((FileSystemEntity entity) {
       var future = visit(entity);
       if (future != null) {
         futureGroup.add(future.then((bool recurse) {
@@ -56,7 +55,7 @@ Future visitDirectory(Directory dir, Future<bool> visit(FileSystemEntity f)) {
           if (entity is! File && recurse == true) {
             if (entity is Link) {
               if (FileSystemEntity.typeSync(entity.path, followLinks: true) ==
-                    FileSystemEntityType.DIRECTORY) {
+                  FileSystemEntityType.DIRECTORY) {
                 var fullPath = getFullPath(entity.path).toString();
                 var dirFullPath = getFullPath(dir.path).toString();
                 if (!dirFullPath.startsWith(fullPath)) {
@@ -69,11 +68,9 @@ Future visitDirectory(Directory dir, Future<bool> visit(FileSystemEntity f)) {
           }
         }));
       }
-    },
-    onDone: () {
+    }, onDone: () {
       completer.complete(null);
-    },
-    cancelOnError: true);
+    }, cancelOnError: true);
   }
   _list(dir);
 

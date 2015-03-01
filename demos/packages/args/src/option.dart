@@ -4,7 +4,7 @@
 
 library args.src.option;
 
-import 'package:collection/wrappers.dart';
+import 'dart:collection';
 
 /// Creates a new [Option].
 ///

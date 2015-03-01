@@ -6,7 +6,6 @@ library path.style.url;
 
 import '../characters.dart' as chars;
 import '../internal_style.dart';
-import '../utils.dart';
 
 /// The style for URL paths.
 class UrlStyle extends InternalStyle {
@@ -19,8 +18,8 @@ class UrlStyle extends InternalStyle {
   // Deprecated properties.
 
   final separatorPattern = new RegExp(r'/');
-  final needsSeparatorPattern = new RegExp(
-      r"(^[a-zA-Z][-+.a-zA-Z\d]*://|[^/])$");
+  final needsSeparatorPattern =
+      new RegExp(r"(^[a-zA-Z][-+.a-zA-Z\d]*://|[^/])$");
   final rootPattern = new RegExp(r"[a-zA-Z][-+.a-zA-Z\d]*://[^/]*");
   final relativeRootPattern = new RegExp(r"^/");
 

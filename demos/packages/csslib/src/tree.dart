@@ -1206,11 +1206,10 @@ class FontExpression extends DartStyleExpression {
             lineHeight: lineHeight),
         super(DartStyleExpression.fontStyle, span);
 
-  FontExpression merged(FontExpression newFontExpr) {
-    if (this.isFont && newFontExpr.isFont) {
+  FontExpression merged(DartStyleExpression newFontExpr) {
+    if (newFontExpr is FontExpression && this.isFont && newFontExpr.isFont) {
       return new FontExpression.merge(this, newFontExpr);
     }
-
     return null;
   }
 
@@ -1222,8 +1221,8 @@ class FontExpression extends DartStyleExpression {
   }
 
   FontExpression._merge(FontExpression x, FontExpression y, SourceSpan span)
-      : super(DartStyleExpression.fontStyle, span),
-        font = new Font.merge(x.font, y.font);
+      : font = new Font.merge(x.font, y.font),
+        super(DartStyleExpression.fontStyle, span);
 
   FontExpression clone() =>
     new FontExpression(span, size: font.size, family: font.family,
@@ -1238,13 +1237,6 @@ abstract class BoxExpression extends DartStyleExpression {
 
   BoxExpression(int styleType, SourceSpan span, this.box)
       : super(styleType, span);
-
-  /*
-   * Merges give 2 DartStyleExpression (or derived from DartStyleExpression,
-   * e.g., FontExpression, etc.) will merge if the two expressions are of the
-   * same property name (implies same exact type e.g, FontExpression).
-   */
-  merged(BoxExpression newDartExpr);
 
   visit(VisitorBase visitor) => visitor.visitBoxExpression(this);
 
@@ -1272,8 +1264,9 @@ class MarginExpression extends BoxExpression {
   MarginExpression.boxEdge(SourceSpan span, BoxEdge box)
       : super(DartStyleExpression.marginStyle, span, box);
 
-  merged(MarginExpression newMarginExpr) {
-    if (this.isMargin && newMarginExpr.isMargin) {
+  merged(DartStyleExpression newMarginExpr) {
+    if (newMarginExpr is MarginExpression && this.isMargin &&
+        newMarginExpr.isMargin) {
       return new MarginExpression.merge(this, newMarginExpr);
     }
 
@@ -1307,8 +1300,8 @@ class BorderExpression extends BoxExpression {
   BorderExpression.boxEdge(SourceSpan span, BoxEdge box)
       : super(DartStyleExpression.borderStyle, span, box);
 
-  merged(BorderExpression newBorderExpr) {
-    if (this.isBorder && newBorderExpr.isBorder) {
+  merged(DartStyleExpression newBorderExpr) {
+    if (newBorderExpr is BorderExpression && this.isBorder && newBorderExpr.isBorder) {
       return new BorderExpression.merge(this, newBorderExpr);
     }
 
@@ -1340,8 +1333,8 @@ class HeightExpression extends DartStyleExpression {
   HeightExpression(SourceSpan span, this.height)
       : super(DartStyleExpression.heightStyle, span);
 
-  merged(HeightExpression newHeightExpr) {
-    if (this.isHeight && newHeightExpr.isHeight) {
+  merged(DartStyleExpression newHeightExpr) {
+    if (newHeightExpr is DartStyleExpression && this.isHeight && newHeightExpr.isHeight) {
       return newHeightExpr;
     }
 
@@ -1358,8 +1351,9 @@ class WidthExpression extends DartStyleExpression {
   WidthExpression(SourceSpan span, this.width)
       : super(DartStyleExpression.widthStyle, span);
 
-  merged(WidthExpression newWidthExpr) {
-    if (this.isWidth && newWidthExpr.isWidth) {
+  merged(DartStyleExpression newWidthExpr) {
+    if (newWidthExpr is WidthExpression && this.isWidth &&
+        newWidthExpr.isWidth) {
       return newWidthExpr;
     }
 
@@ -1379,8 +1373,9 @@ class PaddingExpression extends BoxExpression {
   PaddingExpression.boxEdge(SourceSpan span, BoxEdge box)
       : super(DartStyleExpression.paddingStyle, span, box);
 
-  merged(PaddingExpression newPaddingExpr) {
-    if (this.isPadding && newPaddingExpr.isPadding) {
+  merged(DartStyleExpression newPaddingExpr) {
+    if (newPaddingExpr is PaddingExpression && this.isPadding &&
+        newPaddingExpr.isPadding) {
       return new PaddingExpression.merge(this, newPaddingExpr);
     }
 

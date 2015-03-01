@@ -1,60 +1,101 @@
 library junitconfiguration;
 
 import 'dart:io';
-import 'dart:isolate';
+
 import 'package:unittest/unittest.dart';
 
+part 'exitconfiguration.dart';
+part 'nullconfiguration.dart';
+
 /**
- * A test configuration that emits JUnit compatible XML output.
+ * A test configuration that another test configuration and emits JUnit
+ * compatible XML output.
  */
-class JUnitConfiguration extends SimpleConfiguration {
+class JUnitConfiguration implements Configuration {
 
   /**
-   * Install this configuration with the testing framework.
+   * Install this configuration.
    */
-  static void install({StringSink output, DateTime time, String hostname}) {
+  static void install({Configuration configuration, StringSink output, DateTime time,
+      String hostname}) {
     unittestConfiguration = new JUnitConfiguration(
+        configuration: configuration,
         output: output,
         time: time,
         hostname: hostname);
   }
 
+  /// The wrapped test configuration.
+  final Configuration _configuration;
+
+  /// The string sink where the XML output is written to.
+  final StringSink _output;
+
+  /// The current date and time of this operation.
+  final DateTime _time;
+
+  /// The hostname where this operation is performed on.
+  final String _hostname;
+
+  /// The output logged by test case.
+  final Map<TestCase, List<String>> _logs = new Map();
+
   /**
    * Creates a new configuration instance with an optional output sink.
    */
-  factory JUnitConfiguration({StringSink output, DateTime time, String hostname}) {
+  factory JUnitConfiguration({Configuration configuration, StringSink output, DateTime time,
+        String hostname}) {
     return new JUnitConfiguration._internal(
+        configuration != null ? configuration : new ExitConfiguration(),
         output != null ? output : stdout,
         time != null ? time : new DateTime.now(),
         hostname != null ? hostname : Platform.localHostname);
   }
 
-  final StringSink _output;
-  final DateTime _time;
-  final String _hostname;
-
-  ReceivePort _receivePort;
-  Map<TestCase, List<String>> _stdout;
-
-  JUnitConfiguration._internal(this._output, this._time, this._hostname) : super() {
-    throwOnTestFailures = false;
-    stopTestOnExpectFailure = false;
-  }
+  JUnitConfiguration._internal(this._configuration, this._output, this._time, this._hostname);
 
   @override
-  String get name => 'JUnit Test Configuration';
+  bool get autoStart => _configuration.autoStart;
+
+  @override
+  Duration get timeout => _configuration.timeout;
+
+  @override
+  set timeout(Duration duration) => _configuration.timeout = duration;
 
   @override
   void onInit() {
-    // override to avoid a call to "_postMessage(String)"
-    filterStacks = false;
-    _receivePort = new ReceivePort();
-    _stdout = new Map();
+    _logs.clear();
+    _configuration.onInit();
   }
 
   @override
+  void onStart() => _configuration.onStart();
+
+  @override
+  void onTestStart(TestCase testCase) => _configuration.onTestStart(testCase);
+
+  @override
+  void onTestResult(TestCase testCase) => _configuration.onTestResult(testCase);
+
+  @override
+  void onTestResultChanged(TestCase testCase) => _configuration.onTestResultChanged(testCase);
+
+  @override
   void onLogMessage(TestCase testCase, String message) {
-    _stdout.putIfAbsent(testCase, () => new List()).add(message);
+    _logs.putIfAbsent(testCase, () => new List()).add(message);
+    _configuration.onLogMessage(testCase, message);
+  }
+
+  @override
+  void onDone(bool success) {
+    if (_output is IOSink) {
+      (_output as IOSink).flush().then((_) {
+        _configuration.onDone(success);
+      });
+    } else {
+      _configuration.onDone(success);
+    }
   }
 
   @override
@@ -69,7 +110,7 @@ class JUnitConfiguration extends SimpleConfiguration {
       }
     }
     _output.writeln('<?xml version="1.0" encoding="UTF-8" ?>');
-    _output.writeln('<testsuite name="All tests" hostname="${_xml(this._hostname)}" ' +
+    _output.writeln('<testsuite name="All tests" hostname="${_xml(_hostname)}" ' +
         'tests="${results.length}" failures="$failed" errors="$errors" ' +
         'skipped="$skipped" time="${totalTime / 1000.0}" timestamp="${_time}">');
     for (TestCase testCase in results) {
@@ -83,9 +124,8 @@ class JUnitConfiguration extends SimpleConfiguration {
       } else if (!testCase.enabled) {
         _output.writeln('    <skipped>${_xml(testCase.message)}</skipped>');
       }
-      if (_stdout.containsKey(testCase)) {
-        var output = _stdout[testCase].join('\n');
-        _output.writeln('    <system-out>${_xml(output)}</system-out>');
+      if (_logs.containsKey(testCase)) {
+        _output.writeln('    <system-out>${_xml(_logs[testCase].join('\n'))}</system-out>');
       }
       if (testCase.stackTrace != null) {
         _output.writeln('    <system-err>${_xml(testCase.stackTrace)}</system-err>');
@@ -96,12 +136,7 @@ class JUnitConfiguration extends SimpleConfiguration {
       _output.writeln('  <system-err>${_xml(uncaughtError)}</system-err>');
     }
     _output.writeln('</testsuite>');
-  }
-
-  @override
-  void onDone(bool success) {
-    // override to avoid a call to "_postMessage(String)"
-    _receivePort.close();
+    _configuration.onSummary(passed, failed, errors, results, uncaughtError);
   }
 
   String _xml(value) {
@@ -111,5 +146,7 @@ class JUnitConfiguration extends SimpleConfiguration {
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;');
   }
-
 }
+
+
+

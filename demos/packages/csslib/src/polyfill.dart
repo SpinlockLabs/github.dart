@@ -144,7 +144,7 @@ class _VarDefAndUsage extends Visitor {
     } else if (node.defaultValues.any((e) => e is VarUsage)) {
       // Don't have a VarDefinition need to use default values resolve all
       // default values.
-      var terminalDefaults = [];
+      var terminalDefaults = <Expression>[];
       for (var defaultValue in node.defaultValues) {
         terminalDefaults.addAll(resolveUsageTerminal(defaultValue));
       }
@@ -199,7 +199,7 @@ class _VarDefAndUsage extends Visitor {
     return result;
   }
 
-  _resolveVarUsage(List<Expressions> expressions, int index,
+  _resolveVarUsage(List<Expression> expressions, int index,
                    VarDefinition def) {
     var defExpressions = (def.expression as Expressions).expressions;
     expressions.replaceRange(index, index + 1, defExpressions);

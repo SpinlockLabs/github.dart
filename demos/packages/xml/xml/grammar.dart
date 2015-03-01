@@ -2,8 +2,9 @@ part of xml;
 
 /**
  * XML grammar definition.
+ * Grammar of nodes ot type [TNode] with names of type [TName].
  */
-abstract class XmlGrammarDefinition extends GrammarDefinition {
+abstract class XmlGrammarDefinition<TNode, TName> extends GrammarDefinition {
 
   // name patterns
   static const NAME_START_CHARS =
@@ -35,15 +36,16 @@ abstract class XmlGrammarDefinition extends GrammarDefinition {
   static const CLOSE_PROCESSING = '?>';
 
   // parser callbacks
-  createAttribute(name, value);
-  createComment(value);
-  createCDATA(value);
-  createDoctype(value);
-  createDocument(Iterable children);
-  createElement(name, Iterable attributes, Iterable children);
-  createProcessing(target, value);
-  createQualified(name);
-  createText(value);
+  TNode createAttribute(TName name, String text);
+  TNode createComment(String text);
+  TNode createCDATA(String text);
+  TNode createDoctype(String text);
+  TNode createDocument(Iterable<TNode> children);
+  TNode createElement(TName name, Iterable<TNode> attributes,
+      Iterable<TNode> children);
+  TNode createProcessing(String target, String text);
+  TName createQualified(String name);
+  TNode createText(String text);
 
   // productions
   start() => ref(document).end();

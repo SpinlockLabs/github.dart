@@ -6,6 +6,7 @@ library matcher.pretty_print;
 
 import 'description.dart';
 import 'interfaces.dart';
+import 'util.dart';
 
 /// Returns a pretty-printed representation of [object].
 ///
@@ -80,8 +81,9 @@ String prettyPrint(object, {int maxLineLength, int maxItems}) {
     } else if (object is String) {
       // Escape strings and print each line on its own line.
       var lines = object.split("\n");
-      return "'" + lines.map(_escapeString)
-          .join("\\n'\n${_indent(indent + 2)}'") + "'";
+      return "'" +
+          lines.map(_escapeString).join("\\n'\n${_indent(indent + 2)}'") +
+          "'";
     } else {
       var value = object.toString().replaceAll("\n", _indent(indent) + "\n");
       var defaultToString = value.startsWith("Instance of ");
@@ -93,8 +95,11 @@ String prettyPrint(object, {int maxLineLength, int maxItems}) {
       // Print the type of objects with custom [toString] methods. Primitive
       // objects and objects that don't implement a custom [toString] don't need
       // to have their types printed.
-      if (object is num || object is bool || object is Function ||
-          object == null || defaultToString) {
+      if (object is num ||
+          object is bool ||
+          object is Function ||
+          object == null ||
+          defaultToString) {
         return value;
       } else {
         return "${_typeName(object)}:$value";
@@ -128,20 +133,4 @@ String _typeName(x) {
 ///
 /// This doesn't add quotes to the string, but it does escape single quote
 /// characters so that single quotes can be applied externally.
-String _escapeString(String source) =>
-  source.split("").map(_escapeChar).join("");
-
-/// Return the escaped form of a character [ch].
-String _escapeChar(String ch) {
-  if (ch == "'")
-    return "\\'";
-  else if (ch == '\n')
-    return '\\n';
-  else if (ch == '\r')
-    return '\\r';
-  else if (ch == '\t')
-    return '\\t';
-  else
-    return ch;
-}
-
+String _escapeString(String source) => escape(source).replaceAll("'", r"\'");

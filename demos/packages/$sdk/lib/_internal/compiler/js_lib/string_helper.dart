@@ -82,7 +82,7 @@ stringReplaceFirstRE(receiver, regexp, to, startIndex) {
   if (match == null) return receiver;
   var start = match.start;
   var end = match.end;
-  return "${receiver.substring(0,start)}$to${receiver.substring(end)}";
+  return stringReplaceRangeUnchecked(receiver, start, end, to);
 }
 
 const String ESCAPE_REGEXP = r'[[\]{}()*+?.\\^$|]';
@@ -193,23 +193,43 @@ stringReplaceAllStringFuncUnchecked(receiver, pattern, onMatch, onNonMatch) {
 }
 
 
-stringReplaceFirstUnchecked(receiver, from, to, [int startIndex = 0]) {
+stringReplaceFirstUnchecked(receiver, from, to, int startIndex) {
   if (from is String) {
-    var index = receiver.indexOf(from, startIndex);
+    int index = receiver.indexOf(from, startIndex);
     if (index < 0) return receiver;
-    return '${receiver.substring(0, index)}$to'
-           '${receiver.substring(index + from.length)}';
-  } else if (from is JSSyntaxRegExp) {
+    int end = index + from.length;
+    return stringReplaceRangeUnchecked(receiver, index, end, to);
+  }
+  if (from is JSSyntaxRegExp) {
     return startIndex == 0 ?
         stringReplaceJS(receiver, regExpGetNative(from), to) :
         stringReplaceFirstRE(receiver, from, to, startIndex);
-  } else {
-    checkNull(from);
-    // TODO(floitsch): implement generic String.replace (with patterns).
-    throw "String.replace(Pattern) UNIMPLEMENTED";
   }
+  checkNull(from);
+  Iterator<Match> matches = from.allMatches(receiver, startIndex).iterator;
+  if (!matches.moveNext()) return receiver;
+  Match match = matches.current;
+  return '${receiver.substring(0, match.start)}$to'
+         '${receiver.substring(match.end)}';
+}
+
+stringReplaceFirstMappedUnchecked(receiver, from, replace,
+                                  int startIndex) {
+  Iterator<Match> matches = from.allMatches(receiver, startIndex).iterator;
+  if (!matches.moveNext()) return receiver;
+  Match match = matches.current;
+  String replacement = "${replace(match)}";
+  return '${receiver.substring(0, match.start)}$replacement'
+         '${receiver.substring(match.end)}';
 }
 
 stringJoinUnchecked(array, separator) {
   return JS('String', r'#.join(#)', array, separator);
+}
+
+String stringReplaceRangeUnchecked(String receiver,
+                                   int start, int end, String replacement) {
+  var prefix = JS('String', '#.substring(0, #)', receiver, start);
+  var suffix = JS('String', '#.substring(#)', receiver, end);
+  return "$prefix$replacement$suffix";
 }

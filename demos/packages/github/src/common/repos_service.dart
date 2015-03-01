@@ -119,6 +119,7 @@ class RepositoriesService extends Service {
     return controller.stream;
   }
 
+
   // TODO: Implement editRepository: https://developer.github.com/v3/repos/#edit
 
   /// Deletes a repository.
@@ -132,7 +133,23 @@ class RepositoriesService extends Service {
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
-  // TODO: Implement listContributors: https://developer.github.com/v3/repos/#list-contributors
+  /// Lists the contributors of the specified repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#list-contributors
+  Stream<Tag> listContributors(RepositorySlug slug, {bool anon: false}) {
+    return new PaginationHelper(_github).objects(
+      'GET', '/repos/${slug.fullName}/contributors', User.fromJSON, params: {
+        "anon": anon.toString()
+      });
+  }
+
+  /// Lists the teams of the specified repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#list-teams
+  Stream<Team> listTeams(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects(
+      'GET', '/repos/${slug.fullName}/teams', Team.fromJSON);
+  }
 
   /// Gets a language breakdown for the specified repository.
   ///
@@ -142,8 +159,13 @@ class RepositoriesService extends Service {
           statusCode: StatusCodes.OK,
           convert: (input) => new LanguageBreakdown(input));
 
-  // TODO: Implement listTeams: https://developer.github.com/v3/repos/#list-teams
-  // TODO: Implement listTags: https://developer.github.com/v3/repos/#list-tags
+  /// Lists the tags of the specified repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#list-tags
+  Stream<Tag> listTags(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects(
+      'GET', '/repos/${slug.fullName}/tags', Tag.fromJSON);
+  }
 
   /// Lists the branches of the specified repository.
   ///
@@ -169,9 +191,23 @@ class RepositoriesService extends Service {
         "GET", "/repos/${slug.fullName}/collaborators", User.fromJSON);
   }
 
-  // TODO: Implement isCollaborator: https://developer.github.com/v3/repos/collaborators/#get
-  // TODO: Implement addCollaborator: https://developer.github.com/v3/repos/collaborators/#add-collaborator
-  // TODO: Implement removeCollaborator: https://developer.github.com/v3/repos/collaborators/#remove-collaborator
+  Future<bool> isCollaborator(RepositorySlug slug, String user) {
+    return _github.request("GET", "/repos/${slug.fullName}/collaborators/${user}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  Future<bool> addCollaborator(RepositorySlug slug, String user) {
+    return _github.request("PUT", "/repos/${slug.fullName}/collaborators/${user}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  Future<bool> removeCollaborator(RepositorySlug slug, String user) {
+    return _github.request("DELETE", "/repos/${slug.fullName}/collaborators/${user}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
 
   // TODO: Implement listComments: https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
   // TODO: Implement listCommitComments: https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
@@ -317,7 +353,12 @@ class RepositoriesService extends Service {
         .then((response) => response.statusCode == 204);
   }
 
-  // TODO: Implement deleteHook: https://developer.github.com/v3/repos/hooks/#delete-a-hook
+  Future<bool> deleteHook(RepositorySlug slug, int id) {
+    return _github.request("DELETE", "/repos/${slug.fullName}/hooks/${id}").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
   // TODO: Implement other hook methods: https://developer.github.com/v3/repos/hooks/
 
   /// Lists the deploy keys for a repository.

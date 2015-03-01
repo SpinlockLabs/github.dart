@@ -273,7 +273,7 @@ abstract class FileSystemEntity {
    *
    * [resolveSymbolicLinks] uses the operating system's native
    * file system API to resolve the path, using the `realpath` function
-   * on linux and Mac OS, and the `GetFinalPathNameByHandle` function on
+   * on linux and OS X, and the `GetFinalPathNameByHandle` function on
    * Windows. If the path does not point to an existing file system object,
    * `resolveSymbolicLinks` throws a `FileSystemException`.
    *
@@ -313,7 +313,7 @@ abstract class FileSystemEntity {
    *
    * [resolveSymbolicLinksSync] uses the operating system's native
    * file system API to resolve the path, using the `realpath` function
-   * on linux and Mac OS, and the `GetFinalPathNameByHandle` function on
+   * on linux and OS X, and the `GetFinalPathNameByHandle` function on
    * Windows. If the path does not point to an existing file system object,
    * `resolveSymbolicLinksSync` throws a `FileSystemException`.
    *
@@ -418,7 +418,7 @@ abstract class FileSystemEntity {
    *     files and directories. Recursive watching is not supported.
    *     Note: When watching files directly, delete events might not happen
    *     as expected.
-   *   * `Mac OS`: Uses `FSEvents`. The implementation supports watching both
+   *   * `OS X`: Uses `FSEvents`. The implementation supports watching both
    *     files and directories. Recursive watching is supported.
    *
    * The system will start listening for events once the returned [Stream] is
@@ -439,7 +439,7 @@ abstract class FileSystemEntity {
    */
   Stream<FileSystemEvent> watch({int events: FileSystemEvent.ALL,
                                  bool recursive: false})
-     => _FileSystemWatcher.watch(_trimTrailingPathSeparators(path),
+     => _FileSystemWatcher._watch(_trimTrailingPathSeparators(path),
                                  events,
                                  recursive);
 
@@ -529,7 +529,7 @@ abstract class FileSystemEntity {
   /**
    * Test if [watch] is supported on the current system.
    *
-   * Mac OS 10.6 and below is not supported.
+   * OS X 10.6 and below is not supported.
    */
   static bool get isWatchSupported => _FileSystemWatcher.isSupported;
 
@@ -827,7 +827,7 @@ class FileSystemMoveEvent extends FileSystemEvent {
 
 
 class _FileSystemWatcher {
-  external static Stream<FileSystemEvent> watch(
+  external static Stream<FileSystemEvent> _watch(
       String path, int events, bool recursive);
   external static bool get isSupported;
 }

@@ -63,7 +63,7 @@ abstract class XmlName extends Object
   accept(XmlVisitor visitor) => visitor.visitName(this);
 
   @override
-  bool operator ==(Object other) => other is XmlName &&
+  bool operator ==(other) => other is XmlName &&
       other.local == local &&
       other.namespaceUri == namespaceUri;
 

@@ -29,23 +29,22 @@ abstract class InfiniteIterable<T> extends IterableBase<T> {
 
   T get single => throw new StateError('single');
 
-  bool every(bool f(T)) => throw new UnsupportedError('every');
+  bool every(bool f(T element)) => throw new UnsupportedError('every');
 
   bool fold(initialValue, combine(previousValue, T element)) =>
       throw new UnsupportedError('fold');
 
   void forEach(void f(T element)) => throw new UnsupportedError('forEach');
 
-  String join([String separator]) => throw new UnsupportedError('join');
+  String join([String separator = '']) => throw new UnsupportedError('join');
 
-  dynamic lastWhere(bool test(T value), {Object orElse()}) =>
+  T lastWhere(bool test(T value), {T orElse()}) =>
       throw new UnsupportedError('lastWhere');
 
   T reduce(T combine(T value, T element)) =>
       throw new UnsupportedError('reduce');
 
-  List<T> toList({bool growable: true}) =>
-      throw new UnsupportedError('toList');
+  List<T> toList({bool growable: true}) => throw new UnsupportedError('toList');
 
   Set<T> toSet() => throw new UnsupportedError('toSet');
 }

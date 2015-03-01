@@ -73,11 +73,11 @@ class MiscService extends Service {
   Stream<Octocat> listOctodex({bool cors: false}) {
     var controller = new StreamController();
 
-    var u = "feeds.feedburner.com/Octocats.xml";
+    var u = "http://feeds.feedburner.com/Octocats.xml";
 
     _github.client
         .request(new http.Request(
-            "${cors ? "http://www.corsproxy.com/" : "http://"}${u}"))
+            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}"))
         .then((response) {
       var document = htmlParser.parse(response.body);
       document.querySelectorAll("entry").forEach((entry) {
