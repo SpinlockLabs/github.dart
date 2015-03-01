@@ -64,8 +64,7 @@ class PaginationHelper<T> {
       if (first && start != null) {
         p = new Map.from(params);
         p['page'] = start;
-      }
-      else if (!first) {
+      } else if (!first) {
         p = null;
       }
 

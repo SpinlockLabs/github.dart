@@ -24,7 +24,7 @@ void main() {
   initGitHub();
   github = new GitHub(
       auth: new Authentication.withToken(
-          "5fdec2b77527eae85f188b7b2bfeeda170f26883"));
+          "6f266b306ef2d9ef2b7ce54e688a6422f1d056d6"));
 
   $repos = querySelector("#repos");
 
