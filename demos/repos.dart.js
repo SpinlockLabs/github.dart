@@ -11873,7 +11873,7 @@ var dart = [
     stopwatch.start$0(0);
     M.initGitHub();
     t1 = $.GitHub_defaultClient.call$0();
-    $.github = new T.GitHub(new T.Authentication("5fdec2b77527eae85f188b7b2bfeeda170f26883", null, null, false, false, true), "https://api.github.com", t1, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    $.github = new T.GitHub(new T.Authentication("6f266b306ef2d9ef2b7ce54e688a6422f1d056d6", null, null, false, false, true), "https://api.github.com", t1, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     $.$repos = document.querySelector("#repos");
     t1 = H.setRuntimeTypeInfo(new W._EventStream(document, "readystatechange", false), [null]);
     H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure(stopwatch)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
