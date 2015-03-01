@@ -11866,19 +11866,21 @@ var dart = [
 ["", "repos.dart", , D, {
   "^": "",
   main: [function() {
-    var stopwatch, t1;
+    var stopwatch, t1, t2;
     stopwatch = new P.Stopwatch(null, null);
     H.Primitives_initTicker();
     $.Stopwatch__frequency = $.Primitives_timerFrequency;
     stopwatch.start$0(0);
     M.initGitHub();
-    t1 = $.GitHub_defaultClient.call$0();
-    $.github = new T.GitHub(new T.Authentication("6f266b306ef2d9ef2b7ce54e688a6422f1d056d6", null, null, false, false, true), "https://api.github.com", t1, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    M.initGitHub();
+    t1 = new T.Authentication(null, null, null, true, false, false);
+    t2 = $.GitHub_defaultClient.call$0();
+    $.github = new T.GitHub(t1, "https://api.github.com", t2, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     $.$repos = document.querySelector("#repos");
-    t1 = H.setRuntimeTypeInfo(new W._EventStream(document, "readystatechange", false), [null]);
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure(stopwatch)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
-    t1 = J.get$onClick$x(document.querySelector("#reload"));
-    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new D.main_closure0()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+    t2 = H.setRuntimeTypeInfo(new W._EventStream(document, "readystatechange", false), [null]);
+    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._target, t2._eventType, W._wrapZone(new D.main_closure(stopwatch)), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
+    t2 = J.get$onClick$x(document.querySelector("#reload"));
+    H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t2._target, t2._eventType, W._wrapZone(new D.main_closure0()), t2._useCapture), [H.getTypeArgumentByIndex(t2, 0)])._tryResume$0();
     $.get$sorts().get$keys().forEach$1(0, new D.main_closure1());
     R.init("repos.dart", null);
   }, "call$0", "main$closure", 0, 0, 1],
