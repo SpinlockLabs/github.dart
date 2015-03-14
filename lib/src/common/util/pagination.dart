@@ -7,21 +7,22 @@ class PaginationHelper<T> {
   PaginationHelper(this.github);
 
   Future<List<http.Response>> fetch(String method, String path, {int pages,
-      Map<String, String> headers, Map<String, dynamic> params, String body}) {
+      Map<String, String> headers, Map<String, dynamic> params, String body,
+      int statusCode: 200}) {
     var completer = new Completer();
     var responses = [];
     if (headers == null) headers = {};
     Future<http.Response> actualFetch(String realPath) {
       return github.request(method, realPath,
-          headers: headers, params: params, body: body);
+          headers: headers, params: params, body: body, statusCode: statusCode);
     }
 
     void done() => completer.complete(responses);
 
     var count = 0;
 
-    var handleResponse;
-    handleResponse = (http.Response response) {
+
+    handleResponse(http.Response response) {
       count++;
       responses.add(response);
 
@@ -47,14 +48,16 @@ class PaginationHelper<T> {
       actualFetch(nextUrl).then(handleResponse);
     };
 
-    actualFetch(path).then(handleResponse);
+    actualFetch(path).then(handleResponse).catchError((e, s) {
+      completer.completeError(e, s);
+    });
 
     return completer.future;
   }
 
   Stream<http.Response> fetchStreamed(String method, String path, {int pages,
       bool reverse: false, int start, Map<String, String> headers,
-      Map<String, dynamic> params, String body}) {
+      Map<String, dynamic> params, String body, int statusCode: 200}) {
     if (headers == null) headers = {};
     var controller = new StreamController.broadcast();
 
@@ -70,13 +73,12 @@ class PaginationHelper<T> {
 
 
       return github.request(method, realPath,
-          headers: headers, params: p, body: body);
+          headers: headers, params: p, body: body, statusCode: statusCode);
     }
 
     var count = 0;
 
-    var handleResponse;
-    handleResponse = (http.Response response) {
+    handleResponse(http.Response response) {
       count++;
       controller.add(response);
 
@@ -113,6 +115,9 @@ class PaginationHelper<T> {
       } else {
         handleResponse(response);
       }
+    }).catchError((e, s) {
+      controller.addError(e, s);
+      controller.close();
     });
 
     return controller.stream;
@@ -120,22 +125,19 @@ class PaginationHelper<T> {
 
   Stream<T> objects(String method, String path, JSONConverter converter,
       {int pages, bool reverse: false, int start, Map<String, String> headers,
-      Map<String, dynamic> params, String body}) {
+      Map<String, dynamic> params, String body, int statusCode: 200}) {
     if (headers == null) headers = {};
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
-    var controller = new StreamController();
-    fetchStreamed(method, path,
+    return fetchStreamed(method, path,
         pages: pages,
         start: start,
         reverse: reverse,
         headers: headers,
         params: params,
-        body: body).listen((response) {
-      var json = response.asJSON();
-      for (var item in json) {
-        controller.add(converter(item));
-      }
-    }).onDone(() => controller.close());
-    return controller.stream;
+        body: body,
+        statusCode: statusCode).expand((response) {
+          var json = response.asJSON();
+          return (json as List).map(converter).toList(growable:false);
+        });
   }
 }
