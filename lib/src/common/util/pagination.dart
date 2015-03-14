@@ -21,8 +21,8 @@ class PaginationHelper<T> {
 
     var count = 0;
 
-    var handleResponse;
-    handleResponse = (http.Response response) {
+
+    handleResponse(http.Response response) {
       count++;
       responses.add(response);
 
@@ -48,7 +48,9 @@ class PaginationHelper<T> {
       actualFetch(nextUrl).then(handleResponse);
     };
 
-    actualFetch(path).then(handleResponse);
+    actualFetch(path).then(handleResponse).catchError((e, s) {
+      completer.completeError(e, s);
+    });
 
     return completer.future;
   }
