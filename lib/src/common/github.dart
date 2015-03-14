@@ -205,13 +205,9 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("GET", path, headers: headers, params: params).then(
+    return request("GET", path, headers: headers, params: params,
+        statusCode: statusCode, fail: fail).then(
         (response) {
-      if (statusCode != null && statusCode != response.statusCode) {
-        fail != null ? fail(response) : null;
-        handleStatusCode(response);
-        return new Future.value(null);
-      }
       return convert(JSON.decode(response.body));
     });
   }
@@ -249,13 +245,9 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("POST", path, headers: headers, params: params, body: body)
+    return request("POST", path, headers: headers, params: params, body: body,
+        statusCode: statusCode, fail: fail)
         .then((response) {
-      if (statusCode != null && statusCode != response.statusCode) {
-        fail != null ? fail(response) : null;
-        handleStatusCode(response);
-        return new Future.value(null);
-      }
       return convert(JSON.decode(response.body));
     });
   }
@@ -278,6 +270,7 @@ class GitHub {
         } else if (msg == "Body should be a JSON Hash") {
           throw new InvalidJSON(this, msg);
         }
+        else throw new BadRequest(this);
         break;
       case 422:
         var json = response.asJSON();
@@ -315,7 +308,9 @@ class GitHub {
    * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path,
-      {Map<String, String> headers, Map<String, dynamic> params, String body}) {
+      {Map<String, String> headers, Map<String, dynamic> params, String body,
+        int statusCode,
+        void fail(http.Response response)}) {
     if (headers == null) headers = {};
 
     if (auth.isToken) {
@@ -347,7 +342,14 @@ class GitHub {
     }
 
     return client.request(new http.Request(url.toString(),
-        method: method, headers: headers, body: body));
+        method: method, headers: headers, body: body)).then((response) {
+      if (statusCode != null && statusCode != response.statusCode) {
+        fail != null ? fail(response) : null;
+        handleStatusCode(response);
+        return null;
+      }
+      else return response;
+    });
   }
 
   /**
