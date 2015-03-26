@@ -7,19 +7,20 @@ library _js_helper;
 import 'dart:_async_await_error_codes' as async_error_codes;
 
 import 'dart:_js_embedded_names' show
-    JsGetName,
-    GET_TYPE_FROM_NAME,
-    GET_ISOLATE_TAG,
-    INTERCEPTED_NAMES,
-    INTERCEPTORS_BY_TAG,
-    LEAF_TAGS,
-    METADATA,
     DEFERRED_LIBRARY_URIS,
     DEFERRED_LIBRARY_HASHES,
+    GET_TYPE_FROM_NAME,
+    GET_ISOLATE_TAG,
     INITIALIZE_LOADED_HUNK,
+    INTERCEPTED_NAMES,
+    INTERCEPTORS_BY_TAG,
     IS_HUNK_LOADED,
     IS_HUNK_INITIALIZED,
-    NATIVE_SUPERCLASS_TAG_NAME;
+    JsGetName,
+    LEAF_TAGS,
+    METADATA,
+    NATIVE_SUPERCLASS_TAG_NAME,
+    TYPES;
 
 import 'dart:collection';
 
@@ -30,9 +31,9 @@ import 'dart:_isolate_helper' show
     leaveJsAsync;
 
 import 'dart:async' show
-    Future,
-    DeferredLoadException,
     Completer,
+    DeferredLoadException,
+    Future,
     StreamController,
     Stream,
     StreamSubscription,
@@ -69,7 +70,7 @@ import 'dart:_foreign_helper' show
 
 import 'dart:_interceptors';
 import 'dart:_internal' as _symbol_dev;
-import 'dart:_internal' show MappedIterable, EfficientLength;
+import 'dart:_internal' show EfficientLength, MappedIterable;
 
 import 'dart:_native_typed_data';
 
@@ -536,7 +537,7 @@ class ReflectionInfo {
   @NoInline()
   computeFunctionRti(jsConstructor) {
     if (JS('bool', 'typeof # == "number"', functionType)) {
-      return getMetadata(functionType);
+      return getType(functionType);
     } else if (JS('bool', 'typeof # == "function"', functionType)) {
       var fakeInstance = JS('', 'new #()', jsConstructor);
       setRuntimeTypeInfo(
@@ -554,6 +555,11 @@ class ReflectionInfo {
 getMetadata(int index) {
   var metadata = JS_EMBEDDED_GLOBAL('', METADATA);
   return JS('', '#[#]', metadata, index);
+}
+
+getType(int index) {
+  var types = JS_EMBEDDED_GLOBAL('', TYPES);
+  return JS('', '#[#]', types, index);
 }
 
 class Primitives {
@@ -586,82 +592,93 @@ class Primitives {
     return JS('int', '#', hash);
   }
 
-  static _throwFormatException(String string) {
-    throw new FormatException(string);
+  @NoInline()
+  static int _parseIntError(String source, int handleError(String source)) {
+    if (handleError == null) throw new FormatException(source);
+    return handleError(source);
   }
 
   static int parseInt(String source,
                       int radix,
                       int handleError(String source)) {
-    if (handleError == null) handleError = _throwFormatException;
-
     checkString(source);
-    var match = JS('JSExtendableArray|Null',
-        r'/^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i.exec(#)',
-        source);
+    var re = JS('', r'/^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i');
+    var match = JS('JSExtendableArray|Null', '#.exec(#)', re, source);
     int digitsIndex = 1;
     int hexIndex = 2;
     int decimalIndex = 3;
     int nonDecimalHexIndex = 4;
+    if (match == null) {
+      // TODO(sra): It might be that the match failed due to unrecognized U+0085
+      // spaces.  We could replace them with U+0020 spaces and try matching
+      // again.
+      return _parseIntError(source, handleError);
+    }
+    String decimalMatch = match[decimalIndex];
     if (radix == null) {
-      radix = 10;
-      if (match != null) {
-        if (match[hexIndex] != null) {
-          // Cannot fail because we know that the digits are all hex.
-          return JS('num', r'parseInt(#, 16)', source);
-        }
-        if (match[decimalIndex] != null) {
-          // Cannot fail because we know that the digits are all decimal.
-          return JS('num', r'parseInt(#, 10)', source);
-        }
-        return handleError(source);
+      if (decimalMatch != null) {
+        // Cannot fail because we know that the digits are all decimal.
+        return JS('int', r'parseInt(#, 10)', source);
       }
-    } else {
-      if (radix is! int) throw new ArgumentError("Radix is not an integer");
-      if (radix < 2 || radix > 36) {
-        throw new RangeError("Radix $radix not in range 2..36");
+      if (match[hexIndex] != null) {
+        // Cannot fail because we know that the digits are all hex.
+        return JS('int', r'parseInt(#, 16)', source);
       }
-      if (match != null) {
-        if (radix == 10 && match[decimalIndex] != null) {
-          // Cannot fail because we know that the digits are all decimal.
-          return JS('num', r'parseInt(#, 10)', source);
-        }
-        if (radix < 10 || match[decimalIndex] == null) {
-          // We know that the characters must be ASCII as otherwise the
-          // regexp wouldn't have matched. Lowercasing by doing `| 0x20` is thus
-          // guaranteed to be a safe operation, since it preserves digits
-          // and lower-cases ASCII letters.
-          int maxCharCode;
-          if (radix <= 10) {
-            // Allow all digits less than the radix. For example 0, 1, 2 for
-            // radix 3.
-            // "0".codeUnitAt(0) + radix - 1;
-            maxCharCode = 0x30 + radix - 1;
-          } else {
-            // Letters are located after the digits in ASCII. Therefore we
-            // only check for the character code. The regexp above made already
-            // sure that the string does not contain anything but digits or
-            // letters.
-            // "a".codeUnitAt(0) + (radix - 10) - 1;
-            maxCharCode = 0x61 + radix - 10 - 1;
-          }
-          String digitsPart = match[digitsIndex];
-          for (int i = 0; i < digitsPart.length; i++) {
-            int characterCode = digitsPart.codeUnitAt(0) | 0x20;
-            if (digitsPart.codeUnitAt(i) > maxCharCode) {
-              return handleError(source);
-            }
-          }
+      return _parseIntError(source, handleError);
+    }
+
+    if (radix is! int) throw new ArgumentError("Radix is not an integer");
+    if (radix < 2 || radix > 36) {
+      throw new RangeError.range(radix, 2, 36, "radix");
+    }
+    if (radix == 10 && decimalMatch != null) {
+      // Cannot fail because we know that the digits are all decimal.
+      return JS('int', r'parseInt(#, 10)', source);
+    }
+    // If radix >= 10 and we have only decimal digits the string is safe.
+    // Otherwise we need to check the digits.
+    if (radix < 10 || decimalMatch == null) {
+      // We know that the characters must be ASCII as otherwise the
+      // regexp wouldn't have matched. Lowercasing by doing `| 0x20` is thus
+      // guaranteed to be a safe operation, since it preserves digits
+      // and lower-cases ASCII letters.
+      int maxCharCode;
+      if (radix <= 10) {
+        // Allow all digits less than the radix. For example 0, 1, 2 for
+        // radix 3.
+        // "0".codeUnitAt(0) + radix - 1;
+        maxCharCode = (0x30 - 1) + radix;
+      } else {
+        // Letters are located after the digits in ASCII. Therefore we
+        // only check for the character code. The regexp above made already
+        // sure that the string does not contain anything but digits or
+        // letters.
+        // "a".codeUnitAt(0) + (radix - 10) - 1;
+        maxCharCode = (0x61 - 10 - 1) + radix;
+      }
+      assert(match[digitsIndex] is String);
+      String digitsPart = JS('String', '#[#]', match, digitsIndex);
+      for (int i = 0; i < digitsPart.length; i++) {
+        int characterCode = digitsPart.codeUnitAt(i) | 0x20;
+        if (characterCode > maxCharCode) {
+          return _parseIntError(source, handleError);
         }
       }
     }
-    if (match == null) return handleError(source);
-    return JS('num', r'parseInt(#, #)', source, radix);
+    // The above matching and checks ensures the source has at least one digits
+    // and all digits are suitable for the radix, so parseInt cannot return NaN.
+    return JS('int', r'parseInt(#, #)', source, radix);
+  }
+
+  @NoInline()
+  static double _parseDoubleError(String source,
+                                  double handleError(String source)) {
+    if (handleError == null) throw new FormatException(source);
+    return handleError(source);
   }
 
   static double parseDouble(String source, double handleError(String source)) {
     checkString(source);
-    if (handleError == null) handleError = _throwFormatException;
     // Notice that JS parseFloat accepts garbage at the end of the string.
     // Accept only:
     // - [+/-]NaN
@@ -672,7 +689,7 @@ class Primitives {
             r'/^\s*[+-]?(?:Infinity|NaN|'
                 r'(?:\.\d+|\d+(?:\.\d*)?)(?:[eE][+-]?\d+)?)\s*$/.test(#)',
             source)) {
-      return handleError(source);
+      return _parseDoubleError(source, handleError);
     }
     var result = JS('num', r'parseFloat(#)', source);
     if (result.isNaN) {
@@ -680,7 +697,7 @@ class Primitives {
       if (trimmed == 'NaN' || trimmed == '+NaN' || trimmed == '-NaN') {
         return result;
       }
-      return handleError(source);
+      return _parseDoubleError(source, handleError);
     }
     return result;
   }
@@ -750,12 +767,13 @@ class Primitives {
   static bool get isD8 {
     return JS('bool',
               'typeof version == "function"'
-              ' && typeof os == "object" && "system" in os');
+              ' && typeof os == "object" && "setenv" in os');
   }
 
   static bool get isJsshell {
     return JS('bool',
-              'typeof version == "function" && typeof system == "function"');
+              'typeof version == "function" '
+              ' && typeof os == "object" && "getenv" in os');
   }
 
   static String currentUri() {
@@ -1153,9 +1171,12 @@ class Primitives {
         return functionNoSuchMethod(function, positionalArguments, null);
       }
       ReflectionInfo info = new ReflectionInfo(jsFunction);
-      int maxArgumentCount = info.requiredParameterCount +
+      int requiredArgumentCount = info.requiredParameterCount;
+      int maxArgumentCount = requiredArgumentCount +
           info.optionalParameterCount;
-      if (info.areOptionalParametersNamed || maxArgumentCount < argumentCount) {
+      if (info.areOptionalParametersNamed ||
+          requiredArgumentCount > argumentCount ||
+          maxArgumentCount < argumentCount) {
         return functionNoSuchMethod(function, positionalArguments, null);
       }
       arguments = new List.from(arguments);
@@ -2147,13 +2168,13 @@ abstract class Closure implements Function {
 
     var signatureFunction;
     if (JS('bool', 'typeof # == "number"', functionType)) {
-      var metadata = JS_EMBEDDED_GLOBAL('', METADATA);
+      var types = JS_EMBEDDED_GLOBAL('', TYPES);
       // It is ok, if the access is inlined into the JS. The access is safe in
       // and outside the function. In fact we prefer if there is a textual
       // inlining.
       signatureFunction =
           JS('', '(function(s){return function(){return #[s]}})(#)',
-              metadata,
+              types,
               functionType);
     } else if (!isStatic
                && JS('bool', 'typeof # == "function"', functionType)) {
@@ -3451,9 +3472,6 @@ Future<Null> loadDeferredLibrary(String loadId) {
 }
 
 Future<Null> _loadHunk(String hunkName) {
-  // TODO(ahe): Validate libraryName.  Kasper points out that you want
-  // to be able to experiment with the effect of toggling @DeferLoad,
-  // so perhaps we should silently ignore "bad" library names.
   Future<Null> future = _loadingLibraries[hunkName];
   if (future != null) {
     return future.then((_) => null);
@@ -3464,87 +3482,74 @@ Future<Null> _loadHunk(String hunkName) {
   int index = uri.lastIndexOf('/');
   uri = '${uri.substring(0, index + 1)}$hunkName';
 
-  if (Primitives.isJsshell || Primitives.isD8) {
-    // TODO(ahe): Move this code to a JavaScript command helper script that is
-    // not included in generated output.
-    return _loadingLibraries[hunkName] = new Future<Null>(() {
+  var deferredLibraryLoader = JS('', 'self.dartDeferredLibraryLoader');
+  Completer<Null> completer = new Completer<Null>();
+
+  void success() {
+    completer.complete(null);
+  }
+
+  void failure([error, StackTrace stackTrace]) {
+    _loadingLibraries[hunkName] = null;
+    completer.completeError(
+        new DeferredLoadException("Loading $uri failed: $error"),
+        stackTrace);
+  }
+
+  var jsSuccess = convertDartClosureToJS(success, 0);
+  var jsFailure = convertDartClosureToJS((error) {
+    failure(unwrapException(error), getTraceFromException(error));
+  }, 1);
+
+  if (JS('bool', 'typeof # === "function"', deferredLibraryLoader)) {
+    try {
+      JS('void', '#(#, #, #)', deferredLibraryLoader, uri,
+          jsSuccess, jsFailure);
+    } catch (error, stackTrace) {
+      failure(error, stackTrace);
+    }
+  } else if (isWorker()) {
+    // We are in a web worker. Load the code with an XMLHttpRequest.
+    enterJsAsync();
+    Future<Null> leavingFuture = completer.future.whenComplete(() {
+      leaveJsAsync();
+    });
+
+    int index = uri.lastIndexOf('/');
+    uri = '${uri.substring(0, index + 1)}$hunkName';
+    var xhr = JS('dynamic', 'new XMLHttpRequest()');
+    JS('void', '#.open("GET", #)', xhr, uri);
+    JS('void', '#.addEventListener("load", #, false)',
+       xhr, convertDartClosureToJS((event) {
+      if (JS('int', '#.status', xhr) != 200) {
+        failure("");
+      }
+      String code = JS('String', '#.responseText', xhr);
       try {
         // Create a new function to avoid getting access to current function
         // context.
-        JS('void', '(new Function(#))()', 'load("$uri")');
+        JS('void', '(new Function(#))()', code);
+        success();
       } catch (error, stackTrace) {
-        _loadingLibraries[hunkName] = null;
-        throw new DeferredLoadException("Loading $uri failed.");
+        failure(error, stackTrace);
       }
-      return null;
-    });
-  } else if (isWorker()) {
-    // We are in a web worker. Load the code with an XMLHttpRequest.
-    return _loadingLibraries[hunkName] = new Future<Null>(() {
-      Completer completer = new Completer<Null>();
-      enterJsAsync();
-      Future<Null> leavingFuture = completer.future.whenComplete(() {
-        leaveJsAsync();
-      });
+    }, 1));
 
-      int index = uri.lastIndexOf('/');
-      uri = '${uri.substring(0, index + 1)}$hunkName';
-      var xhr = JS('dynamic', 'new XMLHttpRequest()');
-      JS('void', '#.open("GET", #)', xhr, uri);
-      JS('void', '#.addEventListener("load", #, false)',
-         xhr, convertDartClosureToJS((event) {
-        if (JS('int', '#.status', xhr) != 200) {
-          _loadingLibraries[hunkName] = null;
-          completer.completeError(
-              new DeferredLoadException("Loading $uri failed."));
-          return;
-        }
-        String code = JS('String', '#.responseText', xhr);
-        try {
-          // Create a new function to avoid getting access to current function
-          // context.
-          JS('void', '(new Function(#))()', code);
-        } catch (error, stackTrace) {
-          _loadingLibraries[hunkName] = null;
-          completer.completeError(
-            new DeferredLoadException("Evaluating $uri failed."));
-          return;
-        }
-        completer.complete(null);
-      }, 1));
-
-      var fail = convertDartClosureToJS((event) {
-        _loadingLibraries[hunkName] = null;
-        new DeferredLoadException("Loading $uri failed.");
-      }, 1);
-      JS('void', '#.addEventListener("error", #, false)', xhr, fail);
-      JS('void', '#.addEventListener("abort", #, false)', xhr, fail);
-
-      JS('void', '#.send()', xhr);
-      return leavingFuture;
-    });
-  }
-  // We are in a dom-context.
-  return _loadingLibraries[hunkName] = new Future<Null>(() {
-    Completer completer = new Completer<Null>();
+    JS('void', '#.addEventListener("error", #, false)', xhr, failure);
+    JS('void', '#.addEventListener("abort", #, false)', xhr, failure);
+    JS('void', '#.send()', xhr);
+  } else {
+    // We are in a dom-context.
     // Inject a script tag.
     var script = JS('', 'document.createElement("script")');
     JS('', '#.type = "text/javascript"', script);
     JS('', '#.src = #', script, uri);
-    JS('', '#.addEventListener("load", #, false)',
-       script, convertDartClosureToJS((event) {
-      completer.complete(null);
-    }, 1));
-    JS('', '#.addEventListener("error", #, false)',
-       script, convertDartClosureToJS((event) {
-      _loadingLibraries[hunkName] = null;
-      completer.completeError(
-          new DeferredLoadException("Loading $uri failed."));
-    }, 1));
+    JS('', '#.addEventListener("load", #, false)', script, jsSuccess);
+    JS('', '#.addEventListener("error", #, false)', script, jsFailure);
     JS('', 'document.body.appendChild(#)', script);
-
-    return completer.future;
-  });
+  }
+  _loadingLibraries[hunkName] = completer.future;
+  return completer.future;
 }
 
 class MainError extends Error implements NoSuchMethodError {
@@ -3680,18 +3685,28 @@ void asyncStarHelper(dynamic object,
                      AsyncStarStreamController controller) {
   if (identical(bodyFunctionOrErrorCode, async_error_codes.SUCCESS)) {
     // This happens on return from the async* function.
-    controller.close();
+    if (controller.cancelationCompleter != null) {
+      controller.cancelationCompleter.complete();
+    } else {
+      controller.close();
+    }
     return;
   } else if (identical(bodyFunctionOrErrorCode, async_error_codes.ERROR)) {
     // The error is a js-error.
-    controller.addError(unwrapException(object),
-                        getTraceFromException(object));
-    controller.close();
+    if (controller.cancelationCompleter != null) {
+      controller.cancelationCompleter.completeError(
+          unwrapException(object),
+          getTraceFromException(object));
+    } else {
+      controller.addError(unwrapException(object),
+                          getTraceFromException(object));
+      controller.close();
+    }
     return;
   }
 
   if (object is IterationMarker) {
-    if (controller.stopRunning) {
+    if (controller.cancelationCompleter != null) {
       _wrapJsFunctionForAsync(bodyFunctionOrErrorCode,
           async_error_codes.STREAM_WAS_CANCELED)(null);
       return;
@@ -3748,9 +3763,10 @@ Stream streamOfController(AsyncStarStreamController controller) {
 class AsyncStarStreamController {
   StreamController controller;
   Stream get stream => controller.stream;
-  bool stopRunning = false;
+  Completer cancelationCompleter = null;
+  bool get isCanceled => cancelationCompleter != null;
   bool isAdding = false;
-  bool get isPaused => controller.isPaused;
+  bool isPaused = false;
   add(event) => controller.add(event);
   addStream(Stream stream) {
     return controller.addStream(stream, cancelOnError: false);
@@ -3767,12 +3783,20 @@ class AsyncStarStreamController {
           wrapped(null);
         });
       },
-      onResume: () {
+      onPause: () {
+        isPaused = true;
+      }, onResume: () {
+        isPaused = false;
         if (!isAdding) {
           asyncStarHelper(null, body, this);
         }
       }, onCancel: () {
-        stopRunning = true;
+        if (!controller.isClosed) {
+          cancelationCompleter = new Completer();
+          if (isPaused) asyncStarHelper(null, body, this);
+
+          return cancelationCompleter.future;
+        }
       });
   }
 }
@@ -3823,7 +3847,7 @@ class SyncStarIterator implements Iterator {
 
   SyncStarIterator(this._body);
 
-  runBody() {
+  _runBody() {
     return JS('', '''
       // Invokes [body] with [errorCode] and [result].
       //
@@ -3851,7 +3875,7 @@ class SyncStarIterator implements Iterator {
         _runningNested = false;
       }
     }
-    _current = runBody();
+    _current = _runBody();
     if (_current is IterationMarker) {
       if (_current.state == IterationMarker.ITERATION_ENDED) {
         _current = null;

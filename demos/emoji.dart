@@ -3,12 +3,10 @@ import "dart:html";
 import "package:github/browser.dart";
 import "common.dart";
 
-GitHub github;
 DivElement $emoji;
 Map<String, String> emojis;
 
 void main() {
-  initGitHub();
   init("emoji.dart", onReady: () {
     $emoji = querySelector("#emojis");
     loadEmojis();
@@ -20,16 +18,6 @@ void main() {
 }
 
 void loadEmojis() {
-  var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-
-  var params = queryString;
-
-  if (params.containsKey("token")) {
-    token = params["token"];
-  }
-
-  github = new GitHub(auth: new Authentication.withToken(token));
-
   github.misc.listEmojis().then((info) {
     emojis = info;
     info.forEach((name, url) {

@@ -3,11 +3,9 @@ import "dart:html";
 import "package:github/browser.dart";
 import "common.dart";
 
-GitHub github;
 DivElement $stars;
 
 void main() {
-  initGitHub();
   init("stars.dart", onReady: () {
     $stars = querySelector("#stars");
     loadStars();
@@ -17,23 +15,14 @@ void main() {
 void loadStars() {
   var user = "DirectMyFile";
   var repo = "github.dart";
-  var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
 
-  var params = queryString;
-
-  if (params.containsKey("user")) {
-    user = params["user"];
+  if (queryString.containsKey("user")) {
+    user = queryString["user"];
   }
 
-  if (params.containsKey("repo")) {
-    repo = params["repo"];
+  if (queryString.containsKey("repo")) {
+    repo = queryString["repo"];
   }
-
-  if (params.containsKey("token")) {
-    token = params["token"];
-  }
-
-  github = new GitHub(auth: new Authentication.withToken(token));
 
   querySelector("#title").appendText(" for ${user}/${repo}");
 

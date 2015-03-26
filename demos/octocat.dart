@@ -6,15 +6,12 @@ import "package:github/browser.dart";
 
 import "common.dart";
 
-GitHub github;
 DivElement $octocat;
 
 Random random = new Random();
 
 void main() {
-  initGitHub();
   init("octocat.dart", onReady: () {
-    github = new GitHub();
     $octocat = querySelector("#octocat");
     loadCat();
   });

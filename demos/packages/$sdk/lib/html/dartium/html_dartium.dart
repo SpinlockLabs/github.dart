@@ -951,6 +951,9 @@ class AnimationPlayer extends EventTarget {
   // To suppress missing implicit constructor warnings.
   factory AnimationPlayer._() { throw new UnsupportedError("Not supported"); }
 
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => true;
+
   @DomName('AnimationPlayer.currentTime')
   @DocsEditable()
   @Experimental() // untriaged
@@ -10150,6 +10153,9 @@ class DomPoint extends DomPointReadOnly {
     throw new ArgumentError("Incorrect number or type of arguments");
   }
 
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => true;
+
   @DomName('DOMPoint.w')
   @DocsEditable()
   @Experimental() // untriaged
@@ -14710,11 +14716,11 @@ class Event extends NativeFieldWrapperClass2 {
 // http://www.w3.org/TR/eventsource/#the-eventsource-interface
 @Experimental() // stable
 class EventSource extends EventTarget {
-  factory EventSource(String title, {withCredentials: false}) {
+  factory EventSource(String url, {withCredentials: false}) {
     var parsedOptions = {
       'withCredentials': withCredentials,
     };
-    return EventSource._factoryEventSource(title, parsedOptions);
+    return EventSource._factoryEventSource(url, parsedOptions);
   }
   // To suppress missing implicit constructor warnings.
   factory EventSource._() { throw new UnsupportedError("Not supported"); }
@@ -22043,6 +22049,8 @@ class MediaQueryListEvent extends Event {
 
 @DocsEditable()
 @DomName('MediaSource')
+@SupportedBrowser(SupportedBrowser.CHROME)
+@SupportedBrowser(SupportedBrowser.IE, '11')
 // https://dvcs.w3.org/hg/html-media/raw-file/tip/media-source/media-source.html#mediasource
 @Experimental()
 class MediaSource extends EventTarget {
@@ -22054,6 +22062,9 @@ class MediaSource extends EventTarget {
   factory MediaSource() {
     return _blink.BlinkMediaSource.instance.constructorCallback_0_();
   }
+
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => true;
 
   @DomName('MediaSource.activeSourceBuffers')
   @DocsEditable()
@@ -24832,17 +24843,18 @@ class NodeList extends NativeFieldWrapperClass2 with ListMixin<Node>, ImmutableL
 @Experimental() // experimental
 class Notification extends EventTarget {
 
-  factory Notification(String title, {String titleDir: null, String body: null,
-      String bodyDir: null, String tag: null, String iconUrl: null}) {
+  factory Notification(String title, {String dir: null, String body: null,
+      String lang: null, String tag: null, String icon: null}) {
 
     var parsedOptions = {};
-    if (titleDir != null) parsedOptions['titleDir'] = titleDir;
+    if (dir != null) parsedOptions['dir'] = dir;
     if (body != null) parsedOptions['body'] = body;
-    if (bodyDir != null) parsedOptions['bodyDir'] = bodyDir;
+    if (lang != null) parsedOptions['lang'] = lang;
     if (tag != null) parsedOptions['tag'] = tag;
-    if (iconUrl != null) parsedOptions['iconUrl'] = iconUrl;
-
-    return Notification._factoryNotification(title, parsedOptions);
+    if (icon != null) parsedOptions['icon'] = icon;
+    var nativeOptions;
+    nativeOptions = parsedOptions;
+    return Notification._factoryNotification(title, nativeOptions);
   }
   // To suppress missing implicit constructor warnings.
   factory Notification._() { throw new UnsupportedError("Not supported"); }
@@ -24895,6 +24907,9 @@ class Notification extends EventTarget {
     }
     return _blink.BlinkNotification.instance.constructorCallback_1_(title);
   }
+
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => true;
 
   @DomName('Notification.body')
   @DocsEditable()
@@ -31833,10 +31848,10 @@ class Url extends NativeFieldWrapperClass2 implements UrlUtils {
     if ((blob_OR_source_OR_stream is Blob || blob_OR_source_OR_stream == null)) {
       return _blink.BlinkURL.instance.createObjectURL_Callback_1_(blob_OR_source_OR_stream);
     }
-    if ((blob_OR_source_OR_stream is MediaStream)) {
+    if ((blob_OR_source_OR_stream is MediaSource)) {
       return _blink.BlinkURL.instance.createObjectURL_Callback_1_(blob_OR_source_OR_stream);
     }
-    if ((blob_OR_source_OR_stream is MediaSource)) {
+    if ((blob_OR_source_OR_stream is MediaStream)) {
       return _blink.BlinkURL.instance.createObjectURL_Callback_1_(blob_OR_source_OR_stream);
     }
     throw new ArgumentError("Incorrect number or type of arguments");
@@ -33107,7 +33122,7 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
    * convertPointFromNodeToPage and convertPointFromPageToNode are removed.
    * see http://dev.w3.org/csswg/cssom-view/#geometry
    */
-  static bool get supportsPointConversions => true;
+  static bool get supportsPointConversions => DomPoint.supported;
   // To suppress missing implicit constructor warnings.
   factory Window._() { throw new UnsupportedError("Not supported"); }
 

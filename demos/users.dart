@@ -5,14 +5,10 @@ import "package:github/dates.dart";
 
 import "common.dart";
 
-GitHub github;
 DivElement $users;
-
-var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
 
 void main() {
   init("users.dart", onReady: () {
-    github = createGitHubClient(auth: new Authentication.withToken(token));
     $users = querySelector("#users");
     loadUsers();
   });

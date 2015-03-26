@@ -5,7 +5,6 @@ import "package:github/markdown.dart" as markdown;
 import "package:github/browser.dart";
 import "common.dart";
 
-GitHub github;
 DivElement $table;
 
 LanguageBreakdown breakdown;
@@ -21,7 +20,6 @@ void main() {
 void loadRepository() {
   var user = "dart-lang";
   var reponame = "bleeding_edge";
-  var token = "5fdec2b77527eae85f188b7b2bfeeda170f26883";
 
   var params = queryString;
 
@@ -29,17 +27,11 @@ void loadRepository() {
     user = params["user"];
   }
 
-  if (params.containsKey("token")) {
-    token = params["token"];
-  }
-
   if (params.containsKey("repo")) {
     reponame = params["repo"];
   }
 
   document.getElementById("name").setInnerHtml("${user}/${reponame}");
-
-  github = new GitHub(auth: new Authentication.withToken(token));
 
   github.repositories.listLanguages(new RepositorySlug(user, reponame)).then(
       (b) {

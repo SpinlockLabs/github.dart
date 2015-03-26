@@ -385,6 +385,9 @@ class AnimationPlayer extends EventTarget {
   // To suppress missing implicit constructor warnings.
   factory AnimationPlayer._() { throw new UnsupportedError("Not supported"); }
 
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => JS('bool', '!!(document.body.animate)');
+
   @DomName('AnimationPlayer.currentTime')
   @DocsEditable()
   @Experimental() // untriaged
@@ -9115,6 +9118,9 @@ class DomPoint extends DomPointReadOnly {
   static DomPoint _create_4(point_OR_x, y, z) => JS('DomPoint', 'new DOMPoint(#,#,#)', point_OR_x, y, z);
   static DomPoint _create_5(point_OR_x, y, z, w) => JS('DomPoint', 'new DOMPoint(#,#,#,#)', point_OR_x, y, z, w);
 
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => JS('bool', '!!(window.DOMPoint) || !!(window.WebKitPoint)');
+
   // Shadowing definition.
   num get w => JS("num", "#.w", this);
 
@@ -11195,6 +11201,55 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
   void leftView() {}
 
   /**
+   * Creates a new AnimationEffect object whose target element is the object
+   * on which the method is called, and calls the play() method of the
+   * AnimationTimeline object of the document timeline of the node document
+   * of the element, passing the newly created AnimationEffect as the argument
+   * to the method. Returns an AnimationPlayer for the effect.
+   *
+   * Examples
+   *
+   *     var animation = elem.animate([{"opacity": 75}, {"opacity": 0}], 200);
+   *
+   *     var animation = elem.animate([
+   *       {"transform": "translate(100px, -100%)"},
+   *       {"transform" : "translate(400px, 500px)"}
+   *     ], 1500);  
+   *
+   * The [frames] parameter is an Iterable<Map>, where the
+   * map entries specify CSS animation effects. The
+   * [timing] paramter can be a double, representing the number of milliseconds
+   * for the transition, or a Map with fields corresponding to those
+   * of the [Timing] object.
+   *
+   * This is not yet supported in Dartium.
+  **/
+// TODO(alanknight): Correct above comment once it works in Dartium.
+  @Experimental
+  @SupportedBrowser(SupportedBrowser.CHROME, '36')
+  AnimationPlayer animate(Iterable<Map<String, dynamic>> frames, [timing]) {
+    if (frames is! Iterable || !(frames.every((x) => x is Map))) {
+      throw new ArgumentError("The frames parameter should be a List of Maps "
+          "with frame information");
+    }
+    var convertedFrames = frames;
+    if (convertedFrames is Iterable) {
+      convertedFrames = frames.map(convertDartToNative_Dictionary).toList();
+    }
+    var convertedTiming = timing;
+    if (convertedTiming is Map) {
+      convertedTiming = convertDartToNative_Dictionary(convertedTiming);
+    }
+    return convertedTiming == null
+      ? _animate(convertedFrames)
+      : _animate(convertedFrames, convertedTiming);
+  }
+
+  @DomName('Element.animate')
+  @JSName('animate')
+  @Experimental() // untriaged
+  AnimationPlayer _animate(Object effect, [timing]) native;
+  /**
    * Called by the DOM whenever an attribute on this has been changed.
    */
   void attributeChanged(String name, String oldValue, String newValue) {}
@@ -12670,11 +12725,6 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
   @DocsEditable()
   final String tagName;
 
-  @DomName('Element.animate')
-  @DocsEditable()
-  @Experimental() // untriaged
-  AnimationPlayer animate(Object effect, [Object timing]) native;
-
   @DomName('Element.blur')
   @DocsEditable()
   void blur() native;
@@ -13847,11 +13897,11 @@ class Event extends Interceptor {
 @Experimental() // stable
 @Native("EventSource")
 class EventSource extends EventTarget {
-  factory EventSource(String title, {withCredentials: false}) {
+  factory EventSource(String url, {withCredentials: false}) {
     var parsedOptions = {
       'withCredentials': withCredentials,
     };
-    return EventSource._factoryEventSource(title, parsedOptions);
+    return EventSource._factoryEventSource(url, parsedOptions);
   }
   // To suppress missing implicit constructor warnings.
   factory EventSource._() { throw new UnsupportedError("Not supported"); }
@@ -19992,6 +20042,8 @@ class MediaQueryListEvent extends Event {
 
 @DocsEditable()
 @DomName('MediaSource')
+@SupportedBrowser(SupportedBrowser.CHROME)
+@SupportedBrowser(SupportedBrowser.IE, '11')
 // https://dvcs.w3.org/hg/html-media/raw-file/tip/media-source/media-source.html#mediasource
 @Experimental()
 @Native("MediaSource")
@@ -20005,6 +20057,9 @@ class MediaSource extends EventTarget {
     return MediaSource._create_1();
   }
   static MediaSource _create_1() => JS('MediaSource', 'new MediaSource()');
+
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => JS('bool', '!!(window.MediaSource)');
 
   @DomName('MediaSource.activeSourceBuffers')
   @DocsEditable()
@@ -22681,17 +22736,18 @@ class NodeList extends Interceptor with ListMixin<Node>, ImmutableListMixin<Node
 @Native("Notification")
 class Notification extends EventTarget {
 
-  factory Notification(String title, {String titleDir: null, String body: null,
-      String bodyDir: null, String tag: null, String iconUrl: null}) {
+  factory Notification(String title, {String dir: null, String body: null,
+      String lang: null, String tag: null, String icon: null}) {
 
     var parsedOptions = {};
-    if (titleDir != null) parsedOptions['titleDir'] = titleDir;
+    if (dir != null) parsedOptions['dir'] = dir;
     if (body != null) parsedOptions['body'] = body;
-    if (bodyDir != null) parsedOptions['bodyDir'] = bodyDir;
+    if (lang != null) parsedOptions['lang'] = lang;
     if (tag != null) parsedOptions['tag'] = tag;
-    if (iconUrl != null) parsedOptions['iconUrl'] = iconUrl;
-
-    return Notification._factoryNotification(title, parsedOptions);
+    if (icon != null) parsedOptions['icon'] = icon;
+    var nativeOptions;
+    nativeOptions = convertDartToNative_Dictionary(parsedOptions);
+    return Notification._factoryNotification(title, nativeOptions);
   }
   // To suppress missing implicit constructor warnings.
   factory Notification._() { throw new UnsupportedError("Not supported"); }
@@ -22746,6 +22802,9 @@ class Notification extends EventTarget {
   }
   static Notification _create_1(title, options) => JS('Notification', 'new Notification(#,#)', title, options);
   static Notification _create_2(title) => JS('Notification', 'new Notification(#)', title);
+
+  /// Checks if this type is supported on the current platform.
+  static bool get supported => JS('bool', '!!(window.Notification)');
 
   @DomName('Notification.body')
   @DocsEditable()
@@ -30471,7 +30530,7 @@ class Window extends EventTarget implements WindowEventHandlers, WindowBase, Glo
    * convertPointFromNodeToPage and convertPointFromPageToNode are removed.
    * see http://dev.w3.org/csswg/cssom-view/#geometry
    */
-  static bool get supportsPointConversions => true;
+  static bool get supportsPointConversions => DomPoint.supported;
   // To suppress missing implicit constructor warnings.
   factory Window._() { throw new UnsupportedError("Not supported"); }
 

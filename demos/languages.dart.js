@@ -8,7 +8,21 @@
 //    if this function is defined, the Dart [main] method will not be invoked
 //    directly. Instead, a closure that will invoke [main], and its arguments
 //    [args] is passed to [dartMainRunner].
+//
+// dartDeferredLibraryLoader(uri, successCallback, errorCallback):
+//    if this function is defined, it will be called when a deferered library
+//    is loaded. It should load and eval the javascript of `uri`, and call
+//    successCallback. If it fails to do so, it should call errorCallback with
+//    an error.
 (function($) {
+var supportsDirectProtoAccess = function() {
+  var cls = function() {
+  };
+  cls.prototype = {p: {}};
+  var object = new cls();
+  return object.__proto__ && object.__proto__.p === cls.prototype.p;
+}();
+;
 function map(x) {
   x = Object.create(null);
   x.x = 0;
@@ -104,14 +118,15 @@ function parseReflectionData(reflectionData) {
         str += ", ";
       var field = generateAccessor(fields[i], accessors, name);
       fieldNames += "'" + field + "',";
-      var parameter = "parameter_" + field;
+      var parameter = "p_" + field;
       str += parameter;
       body += "this." + field + " = " + parameter + ";\n";
     }
+    if (supportsDirectProtoAccess)
+      body += "this." + "$deferredAction" + "();";
     str += ") {\n" + body + "}\n";
     str += name + ".builtin$cls=\"" + name + "\";\n";
-    str += "$desc=$collectedClasses." + name + ";\n";
-    str += "if($desc instanceof Array) $desc = \$desc[1];\n";
+    str += "$desc=$collectedClasses." + name + "[1];\n";
     str += name + ".prototype = $desc;\n";
     if (typeof defineClass.name != "string")
       str += name + ".name=\"" + name + "\";\n";
@@ -142,18 +157,19 @@ function parseReflectionData(reflectionData) {
     init.allClasses[name].apply(o, fields);
     return o;
   };
-  var inheritFrom = function() {
+  var inheritFrom = supportsDirectProtoAccess ? function(constructor, superConstructor) {
+    var prototype = constructor.prototype;
+    prototype.__proto__ = superConstructor.prototype;
+    prototype.constructor = constructor;
+    prototype["$is" + constructor.name] = constructor;
+    return convertToFastObject(prototype);
+  } : function() {
     function tmp() {
     }
     return function(constructor, superConstructor) {
-      if (superConstructor == null) {
-        var prototype = constructor.prototype;
-        prototype.constructor = constructor;
-        prototype.$isObject = constructor;
-        return prototype;
-      }
       tmp.prototype = superConstructor.prototype;
       var object = new tmp();
+      convertToSlowObject(object);
       var properties = constructor.prototype;
       var members = Object.keys(properties);
       for (var i = 0; i < members.length; i++) {
@@ -175,11 +191,8 @@ function parseReflectionData(reflectionData) {
       var constructor = constructors[i];
       var cls = constructor.name;
       var desc = processedClasses.collected[cls];
-      var globalObject = $;
-      if (desc instanceof Array) {
-        globalObject = desc[0] || $;
-        desc = desc[1];
-      }
+      var globalObject = desc[0];
+      desc = desc[1];
       allClasses[cls] = constructor;
       globalObject[cls] = constructor;
     }
@@ -206,7 +219,11 @@ function parseReflectionData(reflectionData) {
         }
       }
       if (!superclass || typeof superclass != "string") {
-        inheritFrom(allClasses[cls], null);
+        var constructor = allClasses[cls];
+        var prototype = constructor.prototype;
+        prototype.constructor = constructor;
+        prototype.$isObject = constructor;
+        prototype.$deferredAction = markerFun;
         return;
       }
       finishClass(superclass);
@@ -238,41 +255,72 @@ function parseReflectionData(reflectionData) {
             init.leafTags[tags[i]] = false;
           }
         }
+        if (constructor.prototype.$deferredAction)
+          finishAddStubsHelper(constructor.prototype);
       }
+      if (prototype.$isInterceptor && constructor.prototype.$deferredAction)
+        finishAddStubsHelper(constructor.prototype);
     }
     var properties = Object.keys(processedClasses.pending);
     for (var i = 0; i < properties.length; i++)
       finishClass(properties[i]);
   }
+  function finishAddStubsHelper(prototype) {
+    var prototype = prototype || this;
+    var object;
+    while (prototype.$deferredAction != markerFun) {
+      if (prototype.hasOwnProperty("$deferredAction")) {
+        delete prototype.$deferredAction;
+        var properties = Object.keys(prototype);
+        for (var index = 0; index < properties.length; index++) {
+          var property = properties[index];
+          var firstChar = property.charCodeAt(0);
+          var elem;
+          if (property !== "^" && property !== "$reflectable" && firstChar !== 43 && firstChar !== 42 && (elem = prototype[property]) != null && elem.constructor === Array && property !== "<>")
+            addStubs(prototype, elem, property, false, []);
+        }
+        convertToFastObject(prototype);
+      }
+      prototype = prototype.__proto__;
+    }
+  }
   function processClassData(cls, descriptor, processedClasses) {
-    var newDesc = {};
+    descriptor = convertToSlowObject(descriptor);
     var previousProperty;
     var properties = Object.keys(descriptor);
+    var hasDeferredWork = false;
+    var shouldDeferWork = supportsDirectProtoAccess && cls != "Object";
     for (var i = 0; i < properties.length; i++) {
       var property = properties[i];
-      var firstChar = property.substring(0, 1);
-      if (property === "static")
-        processStatics(init.statics[cls] = descriptor[property], processedClasses);
-      else if (firstChar === "+") {
+      var firstChar = property.charCodeAt(0);
+      if (property === "static") {
+        processStatics(init.statics[cls] = descriptor.static, processedClasses);
+        delete descriptor.static;
+      } else if (firstChar === 43) {
         mangledNames[previousProperty] = property.substring(1);
         var flag = descriptor[property];
         if (flag > 0)
           descriptor[previousProperty].$reflectable = flag;
-      } else if (firstChar === "*") {
-        newDesc[previousProperty].$defaultValues = descriptor[property];
-        var optionalMethods = newDesc.$methodsWithOptionalArguments;
+      } else if (firstChar === 42) {
+        descriptor[previousProperty].$defaultValues = descriptor[property];
+        var optionalMethods = descriptor.$methodsWithOptionalArguments;
         if (!optionalMethods)
-          newDesc.$methodsWithOptionalArguments = optionalMethods = {};
+          descriptor.$methodsWithOptionalArguments = optionalMethods = {};
         optionalMethods[property] = previousProperty;
       } else {
         var elem = descriptor[property];
         if (property !== "^" && elem != null && elem.constructor === Array && property !== "<>")
-          addStubs(newDesc, elem, property, false, descriptor, []);
+          if (shouldDeferWork)
+            hasDeferredWork = true;
+          else
+            addStubs(descriptor, elem, property, false, []);
         else
-          newDesc[previousProperty = property] = elem;
+          previousProperty = property;
       }
     }
-    var classData = newDesc["^"], split, supr, fields = classData;
+    if (hasDeferredWork)
+      descriptor.$deferredAction = finishAddStubsHelper;
+    var classData = descriptor["^"], split, supr, fields = classData;
     var s = fields.split(";");
     fields = s[1] == "" ? [] : s[1].split(",");
     supr = s[0];
@@ -281,9 +329,9 @@ function parseReflectionData(reflectionData) {
       supr = split[0];
       var functionSignature = split[1];
       if (functionSignature)
-        newDesc.$signature = function(s) {
+        descriptor.$signature = function(s) {
           return function() {
-            return init.metadata[s];
+            return init.types[s];
           };
         }(functionSignature);
     }
@@ -291,7 +339,7 @@ function parseReflectionData(reflectionData) {
       processedClasses.pending[cls] = supr;
     processedClasses.combinedConstructorFunction += defineClass(cls, fields);
     processedClasses.constructorsList.push(cls);
-    processedClasses.collected[cls] = [globalObject, newDesc];
+    processedClasses.collected[cls] = [globalObject, descriptor];
     classes.push(cls);
   }
   function processStatics(descriptor, processedClasses) {
@@ -301,16 +349,16 @@ function parseReflectionData(reflectionData) {
       if (property === "^")
         continue;
       var element = descriptor[property];
-      var firstChar = property.substring(0, 1);
+      var firstChar = property.charCodeAt(0);
       var previousProperty;
-      if (firstChar === "+") {
+      if (firstChar === 43) {
         mangledGlobalNames[previousProperty] = property.substring(1);
         var flag = descriptor[property];
         if (flag > 0)
           descriptor[previousProperty].$reflectable = flag;
         if (element && element.length)
           init.typeInformation[previousProperty] = element;
-      } else if (firstChar === "*") {
+      } else if (firstChar === 42) {
         globalObject[previousProperty].$defaultValues = element;
         var optionalMethods = descriptor.$methodsWithOptionalArguments;
         if (!optionalMethods)
@@ -321,14 +369,14 @@ function parseReflectionData(reflectionData) {
         functions.push(property);
         init.globalFunctions[property] = element;
       } else if (element.constructor === Array)
-        addStubs(globalObject, element, property, true, descriptor, functions);
+        addStubs(globalObject, element, property, true, functions);
       else {
         previousProperty = property;
         processClassData(property, element, processedClasses);
       }
     }
   }
-  function addStubs(descriptor, array, name, isStatic, originalDescriptor, functions) {
+  function addStubs(prototype, array, name, isStatic, functions) {
     var index = 0, alias = array[index], f;
     if (typeof alias == "string")
       f = array[++index];
@@ -336,7 +384,7 @@ function parseReflectionData(reflectionData) {
       f = alias;
       alias = name;
     }
-    var funcs = [originalDescriptor[name] = descriptor[name] = descriptor[alias] = f];
+    var funcs = [prototype[name] = prototype[alias] = f];
     f.$stubName = name;
     functions.push(name);
     for (; index < array.length; index += 2) {
@@ -346,13 +394,14 @@ function parseReflectionData(reflectionData) {
       f.$stubName = array[index + 2];
       funcs.push(f);
       if (f.$stubName) {
-        originalDescriptor[f.$stubName] = descriptor[f.$stubName] = f;
+        prototype[f.$stubName] = f;
         functions.push(f.$stubName);
       }
     }
+    index++;
     for (var i = 0; i < funcs.length; index++, i++)
-      funcs[i].$callName = array[index + 1];
-    var getterStubName = array[++index];
+      funcs[i].$callName = array[index];
+    var getterStubName = array[index];
     array = array.slice(++index);
     var requiredParameterInfo = array[0];
     var requiredParameterCount = requiredParameterInfo >> 1;
@@ -367,14 +416,14 @@ function parseReflectionData(reflectionData) {
     var unmangledNameIndex = 2 * optionalParameterCount + requiredParameterCount + 3;
     if (getterStubName) {
       f = tearOff(funcs, array, isStatic, name, isIntercepted);
-      descriptor[name].$getter = f;
+      prototype[name].$getter = f;
       f.$getterStub = true;
-      if (isStatic)
+      if (isStatic) {
         init.globalFunctions[name] = f;
-      originalDescriptor[getterStubName] = descriptor[getterStubName] = f;
-      funcs.push(f);
-      if (getterStubName)
         functions.push(getterStubName);
+      }
+      prototype[getterStubName] = f;
+      funcs.push(f);
       f.$stubName = getterStubName;
       f.$callName = null;
     }
@@ -408,9 +457,9 @@ function parseReflectionData(reflectionData) {
   var mangledGlobalNames = init.mangledGlobalNames;
   var hasOwnProperty = Object.prototype.hasOwnProperty;
   var length = reflectionData.length;
-  var processedClasses = Object.create(null);
-  processedClasses.collected = Object.create(null);
-  processedClasses.pending = Object.create(null);
+  var processedClasses = map();
+  processedClasses.collected = map();
+  processedClasses.pending = map();
   processedClasses.constructorsList = [];
   processedClasses.combinedConstructorFunction = "function $reflectable(fn){fn.$reflectable=1;return fn};\n" + "var $desc;\n";
   for (var i = 0; i < length; i++) {
@@ -710,7 +759,7 @@ var dart = [
       return this.toList$1$growable($receiver, true);
     },
     get$iterator: function(receiver) {
-      return new H.ListIterator(receiver, receiver.length, 0, null);
+      return new J.ArrayIterator(receiver, receiver.length, 0, null);
     },
     get$hashCode: function(receiver) {
       return H.Primitives_objectHashCode(receiver);
@@ -743,6 +792,27 @@ var dart = [
     $isList: 1,
     $asList: null,
     $isEfficientLength: 1
+  },
+  ArrayIterator: {
+    "^": "Object;__interceptors$_iterable,__interceptors$_length,__interceptors$_index,__interceptors$_current",
+    get$current: function() {
+      return this.__interceptors$_current;
+    },
+    moveNext$0: function() {
+      var t1, $length, t2;
+      t1 = this.__interceptors$_iterable;
+      $length = t1.length;
+      if (this.__interceptors$_length !== $length)
+        throw H.wrapException(P.ConcurrentModificationError$(t1));
+      t2 = this.__interceptors$_index;
+      if (t2 >= $length) {
+        this.__interceptors$_current = null;
+        return false;
+      }
+      this.__interceptors$_current = t1[t2];
+      this.__interceptors$_index = t2 + 1;
+      return true;
+    }
   },
   JSNumber: {
     "^": "Interceptor;",
@@ -805,7 +875,7 @@ var dart = [
       var result;
       H.checkInt(fractionDigits);
       if (fractionDigits > 20)
-        throw H.wrapException(P.RangeError$(fractionDigits));
+        throw H.wrapException(new P.RangeError(null, null, false, null, null, fractionDigits));
       result = receiver.toFixed(fractionDigits);
       if (receiver === 0 && this.get$isNegative(receiver))
         return "-" + result;
@@ -815,7 +885,7 @@ var dart = [
       var result, match, t1, exponent;
       H.checkInt(radix);
       if (radix < 2 || radix > 36)
-        throw H.wrapException(P.RangeError$(radix));
+        throw H.wrapException(P.RangeError$range(radix, 2, 36, "radix", null));
       result = receiver.toString(radix);
       if (C.JSString_methods.codeUnitAt$1(result, result.length - 1) !== 41)
         return result;
@@ -1060,7 +1130,14 @@ var dart = [
     if (!J.getInterceptor(t2).$isList)
       throw H.wrapException(P.ArgumentError$("Arguments to main must be a List: " + H.S(t2)));
     t2 = new H._Manager(0, 0, 1, null, null, null, null, null, null, null, null, null, entry);
-    t2._Manager$1(entry);
+    t2._nativeDetectEnvironment$0();
+    t2.topEventLoop = new H._EventLoop(P.ListQueue$(null, H._IsolateEvent), 0);
+    t2.isolates = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H._IsolateContext);
+    t2.managers = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, null);
+    if (t2.isWorker === true) {
+      t2.mainManager = new H._MainManagerStub();
+      t2._nativeInitWorkerMessageHandler$0();
+    }
     init.globalState = t2;
     if (init.globalState.isWorker === true)
       return;
@@ -1090,9 +1167,9 @@ var dart = [
     var currentScript = init.currentScript;
     if (currentScript != null)
       return String(currentScript.src);
-    if (typeof version == "function" && typeof os == "object" && "system" in os)
+    if (typeof version == "function" && typeof os == "object" && "setenv" in os)
       return H.IsolateNatives_computeThisScriptFromTrace();
-    if (typeof version == "function" && typeof system == "function")
+    if (typeof version == "function" && typeof os == "object" && "getenv" in os)
       return thisFilename();
     if (init.globalState.isWorker === true)
       return H.IsolateNatives_computeThisScriptFromTrace();
@@ -1228,7 +1305,7 @@ var dart = [
   },
   _Manager: {
     "^": "Object;nextIsolateId,currentManagerId,nextManagerId,currentContext,rootContext,topEventLoop,fromCommandLine,isWorker,supportsWorkers,isolates,mainManager,managers,entry",
-    _Manager$1: function(entry) {
+    _nativeDetectEnvironment$0: function() {
       var t1, t2, t3;
       t1 = self.window == null;
       t2 = self.Worker;
@@ -1240,26 +1317,21 @@ var dart = [
         t2 = true;
       this.supportsWorkers = t2;
       this.fromCommandLine = t1 && !t3;
-      this.topEventLoop = new H._EventLoop(P.ListQueue$(null, H._IsolateEvent), 0);
-      this.isolates = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H._IsolateContext);
-      this.managers = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, null);
-      if (this.isWorker === true) {
-        t1 = new H._MainManagerStub();
-        this.mainManager = t1;
-        self.onmessage = function(f, a) {
-          return function(e) {
-            f(a, e);
-          };
-        }(H.IsolateNatives__processWorkerMessage, t1);
-        self.dartPrint = self.dartPrint || function(serialize) {
-          return function(object) {
-            if (self.console && self.console.log)
-              self.console.log(object);
-            else
-              self.postMessage(serialize(object));
-          };
-        }(H._Manager__serializePrintMessage);
-      }
+    },
+    _nativeInitWorkerMessageHandler$0: function() {
+      self.onmessage = function(f, a) {
+        return function(e) {
+          f(a, e);
+        };
+      }(H.IsolateNatives__processWorkerMessage, this.mainManager);
+      self.dartPrint = self.dartPrint || function(serialize) {
+        return function(object) {
+          if (self.console && self.console.log)
+            self.console.log(object);
+          else
+            self.postMessage(serialize(object));
+        };
+      }(H._Manager__serializePrintMessage);
     },
     static: {_Manager__serializePrintMessage: function(object) {
         var t1 = P.LinkedHashMap_LinkedHashMap$_literal(["command", "print", "msg", object], null, null);
@@ -1392,7 +1464,7 @@ var dart = [
       message.fixed$length = Array;
       message[0] = J.toString$0(error);
       message[1] = stackTrace == null ? null : J.toString$0(stackTrace);
-      for (t2 = new P.LinkedHashSetIterator(t1, t1._collection$_modifications, null, null), t2._cell = t1._collection$_first; t2.moveNext$0();)
+      for (t2 = new P.LinkedHashSetIterator(t1, t1._collection$_modifications, null, null), t2._collection$_cell = t1._collection$_first; t2.moveNext$0();)
         J.send$1$x(t2._collection$_current, message);
     },
     eval$1: function(code) {
@@ -1454,8 +1526,8 @@ var dart = [
       this.errorPorts.clear$0(0);
       t1 = this.doneHandlers;
       if (t1 != null) {
-        for (t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();)
-          J.send$1$x(t1.__internal$_current, null);
+        for (t1 = new J.ArrayIterator(t1, t1.length, 0, null); t1.moveNext$0();)
+          J.send$1$x(t1.__interceptors$_current, null);
         this.doneHandlers = null;
       }
     }, "call$0", "get$kill", 0, 0, 1]
@@ -2076,69 +2148,36 @@ var dart = [
     }
     return hash;
   },
-  Primitives__throwFormatException: [function(string) {
-    throw H.wrapException(P.FormatException$(string, null, null));
-  }, "call$1", "Primitives__throwFormatException$closure", 2, 0, 4],
+  Primitives__parseIntError: function(source, handleError) {
+    throw H.wrapException(P.FormatException$(source, null, null));
+  },
   Primitives_parseInt: function(source, radix, handleError) {
-    var match, t1, maxCharCode, digitsPart, i, t2;
-    handleError = H.Primitives__throwFormatException$closure();
+    var match, decimalMatch, maxCharCode, digitsPart, t1, i;
     H.checkString(source);
     match = /^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i.exec(source);
-    if (radix == null) {
-      if (match != null) {
-        t1 = match.length;
-        if (2 >= t1)
-          return H.ioore(match, 2);
-        if (match[2] != null)
-          return parseInt(source, 16);
-        if (3 >= t1)
-          return H.ioore(match, 3);
-        if (match[3] != null)
-          return parseInt(source, 10);
-        return handleError.call$1(source);
-      }
-      radix = 10;
-    } else {
-      if (radix < 2 || radix > 36)
-        throw H.wrapException(P.RangeError$("Radix " + H.S(radix) + " not in range 2..36"));
-      if (match != null) {
-        if (radix === 10) {
-          if (3 >= match.length)
-            return H.ioore(match, 3);
-          t1 = match[3] != null;
-        } else
-          t1 = false;
-        if (t1)
-          return parseInt(source, 10);
-        if (!(radix < 10)) {
-          if (3 >= match.length)
-            return H.ioore(match, 3);
-          t1 = match[3] == null;
-        } else
-          t1 = true;
-        if (t1) {
-          maxCharCode = radix <= 10 ? 48 + radix - 1 : 97 + radix - 10 - 1;
-          if (1 >= match.length)
-            return H.ioore(match, 1);
-          digitsPart = match[1];
-          t1 = J.getInterceptor$asx(digitsPart);
-          i = 0;
-          while (true) {
-            t2 = t1.get$length(digitsPart);
-            if (typeof t2 !== "number")
-              return H.iae(t2);
-            if (!(i < t2))
-              break;
-            t1.codeUnitAt$1(digitsPart, 0);
-            if (C.JSString_methods.codeUnitAt$1(digitsPart, i) > maxCharCode)
-              return handleError.call$1(source);
-            ++i;
-          }
-        }
-      }
-    }
     if (match == null)
-      return handleError.call$1(source);
+      return H.Primitives__parseIntError(source, handleError);
+    if (3 >= match.length)
+      return H.ioore(match, 3);
+    decimalMatch = match[3];
+    if (radix == null) {
+      if (decimalMatch != null)
+        return parseInt(source, 10);
+      if (match[2] != null)
+        return parseInt(source, 16);
+      return H.Primitives__parseIntError(source, handleError);
+    }
+    if (radix < 2 || radix > 36)
+      throw H.wrapException(P.RangeError$range(radix, 2, 36, "radix", null));
+    if (radix === 10 && decimalMatch != null)
+      return parseInt(source, 10);
+    if (radix < 10 || decimalMatch == null) {
+      maxCharCode = radix <= 10 ? 47 + radix : 86 + radix;
+      digitsPart = match[1];
+      for (t1 = digitsPart.length, i = 0; i < t1; ++i)
+        if ((C.JSString_methods.codeUnitAt$1(digitsPart, i) | 32) > maxCharCode)
+          return H.Primitives__parseIntError(source, handleError);
+    }
     return parseInt(source, radix);
   },
   Primitives_objectTypeName: function(object) {
@@ -2196,8 +2235,8 @@ var dart = [
     var a, t1, i;
     a = [];
     a.$builtinTypeInfo = [P.$int];
-    for (t1 = new H.ListIterator(codePoints, codePoints.length, 0, null); t1.moveNext$0();) {
-      i = t1.__internal$_current;
+    for (t1 = new J.ArrayIterator(codePoints, codePoints.length, 0, null); t1.moveNext$0();) {
+      i = t1.__interceptors$_current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i <= 65535)
@@ -2212,8 +2251,8 @@ var dart = [
   },
   Primitives_stringFromCharCodes: function(charCodes) {
     var t1, i;
-    for (t1 = new H.ListIterator(charCodes, charCodes.length, 0, null); t1.moveNext$0();) {
-      i = t1.__internal$_current;
+    for (t1 = new J.ArrayIterator(charCodes, charCodes.length, 0, null); t1.moveNext$0();) {
+      i = t1.__interceptors$_current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i < 0)
@@ -2471,7 +2510,7 @@ var dart = [
     if (typeof functionType == "number")
       signatureFunction = function(s) {
         return function() {
-          return init.metadata[s];
+          return init.types[s];
         };
       }(functionType);
     else if (t1 && typeof functionType == "function") {
@@ -3607,7 +3646,7 @@ var dart = [
       var t1, t2;
       t1 = this.__js_helper$_map;
       t2 = new H.LinkedHashMapKeyIterator(t1, t1._modifications, null, null);
-      t2.__js_helper$_cell = t1._first;
+      t2._cell = t1._first;
       return t2;
     },
     forEach$1: function(_, f) {
@@ -3625,7 +3664,7 @@ var dart = [
     $isEfficientLength: 1
   },
   LinkedHashMapKeyIterator: {
-    "^": "Object;__js_helper$_map,_modifications,__js_helper$_cell,__js_helper$_current",
+    "^": "Object;__js_helper$_map,_modifications,_cell,__js_helper$_current",
     get$current: function() {
       return this.__js_helper$_current;
     },
@@ -3634,13 +3673,13 @@ var dart = [
       if (this._modifications !== t1._modifications)
         throw H.wrapException(P.ConcurrentModificationError$(t1));
       else {
-        t1 = this.__js_helper$_cell;
+        t1 = this._cell;
         if (t1 == null) {
           this.__js_helper$_current = null;
           return false;
         } else {
           this.__js_helper$_current = t1.hashMapCellKey;
-          this.__js_helper$_cell = t1._next;
+          this._cell = t1._next;
           return true;
         }
       }
@@ -4404,7 +4443,7 @@ var dart = [
     P._rootHandleUncaughtError(null, null, t1, error, stackTrace);
   }, function(error) {
     return P._nullErrorHandler(error, null);
-  }, null, "call$2", "call$1", "_nullErrorHandler$closure", 2, 2, 7, 37],
+  }, null, "call$2", "call$1", "_nullErrorHandler$closure", 2, 2, 7, 0],
   _nullDoneHandler: [function() {
   }, "call$0", "_nullDoneHandler$closure", 0, 0, 1],
   _runUserCode: function(userCode, onSuccess, onError) {
@@ -4595,7 +4634,7 @@ var dart = [
       this._completeError$2(error, stackTrace);
     }, function(error) {
       return this.completeError$2(error, null);
-    }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 6, 37]
+    }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 6, 0]
   },
   _AsyncCompleter: {
     "^": "_Completer;future",
@@ -4631,7 +4670,7 @@ var dart = [
     }
   },
   _Future: {
-    "^": "Object;_state,_zone<,_resultOrListeners",
+    "^": "Object;_state?,_zone<,_resultOrListeners",
     get$_hasError: function() {
       return this._state === 8;
     },
@@ -4735,7 +4774,7 @@ var dart = [
       P._Future__propagateToListeners(this, listeners);
     }, function(error) {
       return this._completeError$2(error, null);
-    }, "_completeError$1", "call$2", "call$1", "get$_completeError", 2, 2, 7, 37],
+    }, "_completeError$1", "call$2", "call$1", "get$_completeError", 2, 2, 7, 0],
     _asyncComplete$1: function(value) {
       var t1;
       if (value == null)
@@ -4771,8 +4810,16 @@ var dart = [
     },
     $isFuture: 1,
     static: {_Future__chainForeignFuture: function(source, target) {
-        target._state = 2;
-        source.then$2$onError(new P._Future__chainForeignFuture_closure(target), new P._Future__chainForeignFuture_closure0(target));
+        var e, s, exception, t1;
+        target.set$_state(2);
+        try {
+          source.then$2$onError(new P._Future__chainForeignFuture_closure(target), new P._Future__chainForeignFuture_closure0(target));
+        } catch (exception) {
+          t1 = H.unwrapException(exception);
+          e = t1;
+          s = H.getTraceFromException(exception);
+          P.scheduleMicrotask(new P._Future__chainForeignFuture_closure1(target, e, s));
+        }
       }, _Future__chainCoreFuture: function(source, target) {
         var listener;
         target._state = 2;
@@ -4905,6 +4952,12 @@ var dart = [
     },
     call$1: function(error) {
       return this.call$2(error, null);
+    }
+  },
+  _Future__chainForeignFuture_closure1: {
+    "^": "Closure:0;target_2,e_3,s_4",
+    call$0: function() {
+      this.target_2._completeError$2(this.e_3, this.s_4);
     }
   },
   _Future__asyncComplete_closure: {
@@ -5116,7 +5169,7 @@ var dart = [
     },
     $signature: function() {
       return H.computeSignature(function(T) {
-        return {func: "dynamic__T", args: [T]};
+        return {func: "", args: [T]};
       }, this.this_1, "Stream");
     }
   },
@@ -5168,7 +5221,7 @@ var dart = [
     },
     $signature: function() {
       return H.computeSignature(function(T) {
-        return {func: "dynamic__T", args: [T]};
+        return {func: "", args: [T]};
       }, this.this_0, "Stream");
     }
   },
@@ -5187,7 +5240,7 @@ var dart = [
     },
     $signature: function() {
       return H.computeSignature(function(T) {
-        return {func: "dynamic__T", args: [T]};
+        return {func: "", args: [T]};
       }, this.this_1, "Stream");
     }
   },
@@ -5218,7 +5271,7 @@ var dart = [
     "^": "Object;"
   },
   _BufferingStreamSubscription: {
-    "^": "Object;_zone<",
+    "^": "Object;_zone<,_state?",
     pause$1: function(_, resumeSignal) {
       var t1 = this._state;
       if ((t1 & 8) !== 0)
@@ -5479,7 +5532,7 @@ var dart = [
     }
   },
   _PendingEvents: {
-    "^": "Object;",
+    "^": "Object;_state?",
     schedule$1: function(dispatch) {
       var t1 = this._state;
       if (t1 === 1)
@@ -5605,7 +5658,7 @@ var dart = [
       this._stream._handleData$2(data, this);
     }, "call$1", "get$_handleData", 2, 0, function() {
       return H.computeSignature(function(S, T) {
-        return {func: "void__S", void: true, args: [S]};
+        return {func: "", void: true, args: [S]};
       }, this.$receiver, "_ForwardingStreamSubscription");
     }],
     _handleError$2: [function(error, stackTrace) {
@@ -5935,7 +5988,7 @@ var dart = [
     var result, t1;
     result = P.LinkedHashSet_LinkedHashSet(null, null, null, $E);
     for (t1 = J.get$iterator$ax(elements); t1.moveNext$0();)
-      result.add$1(0, t1.__internal$_current);
+      result.add$1(0, t1.get$current());
     return result;
   },
   Maps_mapToString: function(m) {
@@ -5983,7 +6036,7 @@ var dart = [
     "^": "_HashSetBase;_collection$_length,_collection$_strings,_collection$_nums,_collection$_rest,_collection$_first,_collection$_last,_collection$_modifications",
     get$iterator: function(_) {
       var t1 = new P.LinkedHashSetIterator(this, this._collection$_modifications, null, null);
-      t1._cell = this._collection$_first;
+      t1._collection$_cell = this._collection$_first;
       return t1;
     },
     get$length: function(_) {
@@ -6199,7 +6252,7 @@ var dart = [
     "^": "Object;_collection$_element<,_collection$_next,_collection$_previous<"
   },
   LinkedHashSetIterator: {
-    "^": "Object;_set,_collection$_modifications,_cell,_collection$_current",
+    "^": "Object;_set,_collection$_modifications,_collection$_cell,_collection$_current",
     get$current: function() {
       return this._collection$_current;
     },
@@ -6208,13 +6261,13 @@ var dart = [
       if (this._collection$_modifications !== t1._collection$_modifications)
         throw H.wrapException(P.ConcurrentModificationError$(t1));
       else {
-        t1 = this._cell;
+        t1 = this._collection$_cell;
         if (t1 == null) {
           this._collection$_current = null;
           return false;
         } else {
           this._collection$_current = t1._collection$_element;
-          this._cell = t1._collection$_next;
+          this._collection$_cell = t1._collection$_next;
           return true;
         }
       }
@@ -6689,12 +6742,12 @@ var dart = [
     return object.toJson$0();
   }, "call$1", "_defaultToEncodable$closure", 2, 0, 32],
   _JsonMap: {
-    "^": "Object;_original,_processed,_data",
+    "^": "Object;_original,_processed,_convert$_data",
     $index: function(_, key) {
       var t1, result;
       t1 = this._processed;
       if (t1 == null)
-        return this._data.$index(0, key);
+        return this._convert$_data.$index(0, key);
       else if (typeof key !== "string")
         return;
       else {
@@ -6705,7 +6758,7 @@ var dart = [
     get$length: function(_) {
       var t1;
       if (this._processed == null) {
-        t1 = this._data;
+        t1 = this._convert$_data;
         t1 = t1.get$length(t1);
       } else
         t1 = this._computeKeys$0().length;
@@ -6714,7 +6767,7 @@ var dart = [
     get$isEmpty: function(_) {
       var t1;
       if (this._processed == null) {
-        t1 = this._data;
+        t1 = this._convert$_data;
         t1 = t1.get$length(t1);
       } else
         t1 = this._computeKeys$0().length;
@@ -6722,13 +6775,13 @@ var dart = [
     },
     get$keys: function() {
       if (this._processed == null)
-        return this._data.get$keys();
+        return this._convert$_data.get$keys();
       return new P._JsonMapKeyIterable(this);
     },
     get$values: function(_) {
       var t1;
       if (this._processed == null) {
-        t1 = this._data;
+        t1 = this._convert$_data;
         return t1.get$values(t1);
       }
       return H.MappedIterable_MappedIterable(this._computeKeys$0(), new P._JsonMap_values_closure(this), null, null);
@@ -6736,7 +6789,7 @@ var dart = [
     $indexSet: function(_, key, value) {
       var processed, original;
       if (this._processed == null)
-        this._data.$indexSet(0, key, value);
+        this._convert$_data.$indexSet(0, key, value);
       else if (this.containsKey$1(key)) {
         processed = this._processed;
         processed[key] = value;
@@ -6748,7 +6801,7 @@ var dart = [
     },
     containsKey$1: function(key) {
       if (this._processed == null)
-        return this._data.containsKey$1(key);
+        return this._convert$_data.containsKey$1(key);
       if (typeof key !== "string")
         return false;
       return Object.prototype.hasOwnProperty.call(this._original, key);
@@ -6764,7 +6817,7 @@ var dart = [
     forEach$1: function(_, f) {
       var keys, i, key, value;
       if (this._processed == null)
-        return this._data.forEach$1(0, f);
+        return this._convert$_data.forEach$1(0, f);
       keys = this._computeKeys$0();
       for (i = 0; i < keys.length; ++i) {
         key = keys[i];
@@ -6774,7 +6827,7 @@ var dart = [
           this._processed[key] = value;
         }
         f.call$2(key, value);
-        if (keys !== this._data)
+        if (keys !== this._convert$_data)
           throw H.wrapException(P.ConcurrentModificationError$(this));
       }
     },
@@ -6782,17 +6835,17 @@ var dart = [
       return P.Maps_mapToString(this);
     },
     _computeKeys$0: function() {
-      var keys = this._data;
+      var keys = this._convert$_data;
       if (keys == null) {
         keys = Object.keys(this._original);
-        this._data = keys;
+        this._convert$_data = keys;
       }
       return keys;
     },
     _upgrade$0: function() {
       var result, keys, i, t1, key;
       if (this._processed == null)
-        return this._data;
+        return this._convert$_data;
       result = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
       keys = this._computeKeys$0();
       for (i = 0; t1 = keys.length, i < t1; ++i) {
@@ -6805,7 +6858,7 @@ var dart = [
         C.JSArray_methods.set$length(keys, 0);
       this._processed = null;
       this._original = null;
-      this._data = result;
+      this._convert$_data = result;
       return result;
     },
     _process$1: function(key) {
@@ -6829,7 +6882,7 @@ var dart = [
     get$length: function(_) {
       var t1 = this._parent;
       if (t1._processed == null) {
-        t1 = t1._data;
+        t1 = t1._convert$_data;
         t1 = t1.get$length(t1);
       } else
         t1 = t1._computeKeys$0().length;
@@ -6854,7 +6907,7 @@ var dart = [
         t1 = t1.get$iterator(t1);
       } else {
         t1 = t1._computeKeys$0();
-        t1 = new H.ListIterator(t1, t1.length, 0, null);
+        t1 = new J.ArrayIterator(t1, t1.length, 0, null);
       }
       return t1;
     },
@@ -7421,12 +7474,12 @@ var dart = [
     list = [];
     if (t1)
       for (; it.moveNext$0();)
-        list.push(it.__internal$_current);
+        list.push(it.get$current());
     else
       for (i = start; i < end; ++i) {
         if (!it.moveNext$0())
           throw H.wrapException(P.RangeError$range(end, start, i, null, null));
-        list.push(it.__internal$_current);
+        list.push(it.get$current());
       }
     return H.Primitives_stringFromCharCodes(list);
   },
@@ -7713,17 +7766,15 @@ var dart = [
       }
       return explanation;
     },
-    static: {RangeError$: function(message) {
-        return new P.RangeError(null, null, false, null, null, message);
-      }, RangeError$value: function(value, $name, message) {
+    static: {RangeError$value: function(value, $name, message) {
         return new P.RangeError(null, null, true, value, $name, "Value not in range");
       }, RangeError$range: function(invalidValue, minValue, maxValue, $name, message) {
         return new P.RangeError(minValue, maxValue, true, invalidValue, $name, "Invalid value");
       }, RangeError_checkValidRange: function(start, end, $length, startName, endName, message) {
-        if (start < 0 || start > $length)
+        if (0 > start || start > $length)
           throw H.wrapException(P.RangeError$range(start, 0, $length, "start", message));
         if (end != null) {
-          if (end < start || end > $length)
+          if (start > end || end > $length)
             throw H.wrapException(P.RangeError$range(end, start, $length, "end", message));
           return end;
         }
@@ -8106,6 +8157,10 @@ var dart = [
       if (t1 == null)
         return P.Uri__defaultPort(this.scheme);
       return t1;
+    },
+    get$query: function(_) {
+      var t1 = this._query;
+      return t1 == null ? "" : t1;
     },
     toString$0: function(_) {
       var t1, t2, t3, t4;
@@ -8988,6 +9043,9 @@ var dart = [
 }],
 ["dart.dom.html", "dart:html", , W, {
   "^": "",
+  window: function() {
+    return window;
+  },
   Element_Element$html: function(html, treeSanitizer, validator) {
     var fragment, t1;
     fragment = J.createFragment$3$treeSanitizer$validator$x(document.body, html, treeSanitizer, validator);
@@ -9203,7 +9261,7 @@ var dart = [
       return fragment;
     }, function($receiver, html, treeSanitizer) {
       return this.createFragment$3$treeSanitizer$validator($receiver, html, treeSanitizer, null);
-    }, "createFragment$2$treeSanitizer", null, null, "get$createFragment", 2, 5, null, 37, 37],
+    }, "createFragment$2$treeSanitizer", null, null, "get$createFragment", 2, 5, null, 0, 0],
     set$innerHtml: function(receiver, html) {
       this.setInnerHtml$1(receiver, html);
     },
@@ -9295,8 +9353,8 @@ var dart = [
       if (headersString == null)
         return headers;
       headersList = headersString.split("\r\n");
-      for (t1 = new H.ListIterator(headersList, headersList.length, 0, null); t1.moveNext$0();) {
-        header = t1.__internal$_current;
+      for (t1 = new J.ArrayIterator(headersList, headersList.length, 0, null); t1.moveNext$0();) {
+        header = t1.__interceptors$_current;
         t2 = J.getInterceptor$asx(header);
         if (t2.get$isEmpty(header) === true)
           continue;
@@ -9315,11 +9373,11 @@ var dart = [
     open$5$async$password$user: function(receiver, method, url, async, password, user) {
       return receiver.open(method, url, async, user, password);
     },
-    open$3$async: function($receiver, method, url, async) {
-      return $receiver.open(method, url, async);
-    },
     open$2: function($receiver, method, url) {
       return $receiver.open(method, url);
+    },
+    open$3$async: function($receiver, method, url, async) {
+      return $receiver.open(method, url, async);
     },
     send$1: function(receiver, data) {
       return receiver.send(data);
@@ -9688,6 +9746,9 @@ var dart = [
     open$2: function($receiver, url, $name) {
       return this.open$3($receiver, url, $name, null);
     },
+    get$location: function(receiver) {
+      return receiver.location;
+    },
     postMessage$3: function(receiver, message, targetOrigin, transfer) {
       receiver.postMessage(P._convertDartToNative_PrepareForStructuredClone(message), targetOrigin);
       return;
@@ -9822,8 +9883,8 @@ var dart = [
     "^": "Object;",
     forEach$1: function(_, f) {
       var t1, key;
-      for (t1 = this.get$keys(), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        key = t1.__internal$_current;
+      for (t1 = this.get$keys(), t1 = new J.ArrayIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
+        key = t1.__interceptors$_current;
         f.call$2(key, this.$index(0, key));
       }
     },
@@ -9966,10 +10027,10 @@ var dart = [
       var t1, t2;
       t1 = $.get$_Html5NodeValidator__attributeValidators();
       if (t1.get$isEmpty(t1)) {
-        for (t2 = new H.ListIterator(C.List_1GN, 261, 0, null); t2.moveNext$0();)
-          t1.$indexSet(0, t2.__internal$_current, W._Html5NodeValidator__standardAttributeValidator$closure());
-        for (t2 = new H.ListIterator(C.List_yrN, 12, 0, null); t2.moveNext$0();)
-          t1.$indexSet(0, t2.__internal$_current, W._Html5NodeValidator__uriAttributeValidator$closure());
+        for (t2 = new J.ArrayIterator(C.List_1GN, 261, 0, null); t2.moveNext$0();)
+          t1.$indexSet(0, t2.__interceptors$_current, W._Html5NodeValidator__standardAttributeValidator$closure());
+        for (t2 = new J.ArrayIterator(C.List_yrN, 12, 0, null); t2.moveNext$0();)
+          t1.$indexSet(0, t2.__interceptors$_current, W._Html5NodeValidator__uriAttributeValidator$closure());
       }
     },
     $isNodeValidator: 1,
@@ -10768,7 +10829,7 @@ var dart = [
       t1.convert_0 = convert;
       headers = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
       headers.putIfAbsent$2("Accept", new T.GitHub_getJSON_closure());
-      return this.request$4$headers$params(0, "GET", path, headers, params).then$1(new T.GitHub_getJSON_closure0(t1, this, statusCode, fail));
+      return this.request$6$fail$headers$params$statusCode(0, "GET", path, fail, headers, params, statusCode).then$1(new T.GitHub_getJSON_closure0(t1));
     },
     getJSON$3$convert$statusCode: function(path, convert, statusCode) {
       return this.getJSON$6$convert$fail$headers$params$statusCode(path, convert, null, null, null, statusCode);
@@ -10787,7 +10848,8 @@ var dart = [
             throw H.wrapException(T.InvalidJSON$(this, msg));
           else if (t1.$eq(msg, "Body should be a JSON Hash"))
             throw H.wrapException(T.InvalidJSON$(this, msg));
-          break;
+          else
+            throw H.wrapException(T.BadRequest$(this, "Not Found"));
         case 422:
           json = response.asJSON$0();
           t1 = J.getInterceptor$asx(json);
@@ -10821,7 +10883,7 @@ var dart = [
       }
       throw H.wrapException(new T.UnknownError("Unknown Error", null, this, null));
     },
-    request$5$body$headers$params: function(_, method, path, body, headers, params) {
+    request$7$body$fail$headers$params$statusCode: function(_, method, path, body, fail, headers, params, statusCode) {
       var t1;
       if (headers == null)
         headers = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
@@ -10835,13 +10897,13 @@ var dart = [
       if (method === "PUT" && body == null)
         headers.putIfAbsent$2("Content-Length", new T.GitHub_request_closure1());
       t1 = C.JSString_methods.startsWith$1(path, "http://") || C.JSString_methods.startsWith$1(path, "https://") ? path : this.endpoint + path;
-      return J.request$1$x(this.client, new T.Request(t1.charCodeAt(0) == 0 ? t1 : t1, method, body, headers));
+      return J.request$1$x(this.client, new T.Request(t1.charCodeAt(0) == 0 ? t1 : t1, method, body, headers)).then$1(new T.GitHub_request_closure2(this, statusCode, fail));
     },
-    request$4$headers$params: function($receiver, method, path, headers, params) {
-      return this.request$5$body$headers$params($receiver, method, path, null, headers, params);
+    request$6$fail$headers$params$statusCode: function($receiver, method, path, fail, headers, params, statusCode) {
+      return this.request$7$body$fail$headers$params$statusCode($receiver, method, path, null, fail, headers, params, statusCode);
     },
     request$3$body: function($receiver, method, path, body) {
-      return this.request$5$body$headers$params($receiver, method, path, body, null, null);
+      return this.request$7$body$fail$headers$params$statusCode($receiver, method, path, body, null, null, null, null);
     }
   },
   GitHub_getJSON_closure1: {
@@ -10857,10 +10919,8 @@ var dart = [
     }
   },
   GitHub_getJSON_closure0: {
-    "^": "Closure:2;box_0,this_1,statusCode_2,fail_3",
+    "^": "Closure:2;box_0",
     call$1: function(response) {
-      if (this.statusCode_2 !== J.get$statusCode$x(response))
-        this.this_1.handleStatusCode$1(response);
       return this.box_0.convert_0.call$1(C.JsonCodec_null_null.decode$1(J.get$body$x(response)));
     }
   },
@@ -10880,6 +10940,23 @@ var dart = [
     "^": "Closure:0;",
     call$0: function() {
       return "0";
+    }
+  },
+  GitHub_request_closure2: {
+    "^": "Closure:2;this_2,statusCode_3,fail_4",
+    call$1: function(response) {
+      var t1, t2;
+      t1 = this.statusCode_3;
+      if (t1 != null) {
+        t2 = J.get$statusCode$x(response);
+        t2 = t1 == null ? t2 != null : t1 !== t2;
+        t1 = t2;
+      } else
+        t1 = false;
+      if (t1)
+        this.this_2.handleStatusCode$1(response);
+      else
+        return response;
     }
   },
   MiscService: {
@@ -10912,14 +10989,14 @@ var dart = [
     }
   },
   LanguageBreakdown: {
-    "^": "Object;_common$_data",
+    "^": "Object;_data",
     get$info: function() {
-      return this._common$_data;
+      return this._data;
     },
     toList$0: function(_) {
       var out, t1, t2, key;
       out = [];
-      for (t1 = this._common$_data, t2 = J.get$iterator$ax(t1.get$keys()); t2.moveNext$0();) {
+      for (t1 = this._data, t2 = J.get$iterator$ax(t1.get$keys()); t2.moveNext$0();) {
         key = t2.get$current();
         out.push([key, t1.$index(0, key)]);
       }
@@ -10928,7 +11005,7 @@ var dart = [
     toString$0: function(_) {
       var buffer, t1;
       buffer = new P.StringBuffer("");
-      J.forEach$1$ax(this._common$_data, new T.LanguageBreakdown_toString_closure(buffer));
+      J.forEach$1$ax(this._data, new T.LanguageBreakdown_toString_closure(buffer));
       t1 = buffer._contents;
       return t1.charCodeAt(0) == 0 ? t1 : t1;
     }
@@ -10955,7 +11032,10 @@ var dart = [
     }
   },
   Authentication: {
-    "^": "Object;token,username,password,isAnonymous,isBasic,isToken"
+    "^": "Object;token,username,password,isAnonymous,isBasic,isToken",
+    static: {Authentication$anonymous: function() {
+        return new T.Authentication(null, null, null, true, false, false);
+      }}
   },
   GitHubError: {
     "^": "Object;",
@@ -10966,6 +11046,12 @@ var dart = [
   NotFound: {
     "^": "GitHubError;message,apiUrl,github,source"
   },
+  BadRequest: {
+    "^": "GitHubError;message,apiUrl,github,source",
+    static: {BadRequest$: function(github, msg) {
+        return new T.BadRequest(msg, null, github, null);
+      }}
+  },
   AccessForbidden: {
     "^": "GitHubError;message,apiUrl,github,source"
   },
@@ -10973,7 +11059,7 @@ var dart = [
     "^": "GitHubError;message,apiUrl,github,source"
   },
   InvalidJSON: {
-    "^": "GitHubError;message,apiUrl,github,source",
+    "^": "BadRequest;message,apiUrl,github,source",
     static: {InvalidJSON$: function(github, message) {
         return new T.InvalidJSON(message, null, github, null);
       }}
@@ -11008,7 +11094,7 @@ var dart = [
     columns = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
     C.JSArray_methods.forEach$1(data, new R.table_closure(columns));
     p = [];
-    for (t1 = new P.LinkedHashSetIterator(columns, columns._collection$_modifications, null, null), t1._cell = columns._collection$_first, fm = true; t1.moveNext$0();) {
+    for (t1 = new P.LinkedHashSetIterator(columns, columns._collection$_modifications, null, null), t1._collection$_cell = columns._collection$_first, fm = true; t1.moveNext$0();) {
       column = t1._collection$_current;
       if (fm) {
         buff._contents += "|";
@@ -11225,8 +11311,8 @@ var dart = [
           return copy;
         copy = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
         this.writeSlot_7.call$2(slot, copy);
-        for (t1 = Object.keys(e), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-          key = t1.__internal$_current;
+        for (t1 = Object.keys(e), t1 = new J.ArrayIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
+          key = t1.__interceptors$_current;
           copy.$indexSet(0, key, this.call$1(e[key]));
         }
         return copy;
@@ -11259,27 +11345,19 @@ var dart = [
     R.init("languages.dart", new M.main_closure());
   }, "call$0", "main$closure", 0, 0, 1],
   loadRepository: function() {
-    var t1, t2, user, token, reponame;
-    t1 = P.Uri_parse(window.location.href);
-    t2 = t1._queryParameters;
+    var t1, user, reponame, t2;
+    t1 = $.get$queryString()._map;
+    user = t1.containsKey$1("user") === true ? t1.$index(0, "user") : "dart-lang";
+    reponame = t1.containsKey$1("repo") === true ? t1.$index(0, "repo") : "bleeding_edge";
+    J.setInnerHtml$1$x(document.getElementById("name"), H.S(user) + "/" + H.S(reponame));
+    t1 = $.get$github();
+    t2 = t1._repositories;
     if (t2 == null) {
-      t2 = t1._query;
-      t2 = H.setRuntimeTypeInfo(new P.UnmodifiableMapView(P.Uri_splitQueryString(t2 == null ? "" : t2, C.Utf8Codec_false)), [null, null]);
-      t1._queryParameters = t2;
+      t2 = new T.RepositoriesService(t1);
+      t1._repositories = t2;
       t1 = t2;
     } else
       t1 = t2;
-    t1 = t1._map;
-    user = t1.containsKey$1("user") === true ? t1.$index(0, "user") : "dart-lang";
-    token = t1.containsKey$1("token") === true ? t1.$index(0, "token") : "5fdec2b77527eae85f188b7b2bfeeda170f26883";
-    reponame = t1.containsKey$1("repo") === true ? t1.$index(0, "repo") : "bleeding_edge";
-    J.setInnerHtml$1$x(document.getElementById("name"), H.S(user) + "/" + H.S(reponame));
-    t1 = $.GitHub_defaultClient.call$0();
-    t1 = new T.GitHub(new T.Authentication(token, null, null, false, false, true), "https://api.github.com", t1, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    $.github = t1;
-    t2 = new T.RepositoriesService(t1);
-    t1._repositories = t2;
-    t1 = t2;
     t1.listLanguages$1(new T.RepositorySlug(user, reponame)).then$1(new M.loadRepository_closure());
   },
   reloadTable: function(accuracy) {
@@ -11287,7 +11365,7 @@ var dart = [
     if ($.isReloadingTable)
       return;
     $.isReloadingTable = true;
-    t1 = $.github;
+    t1 = $.get$github();
     t2 = t1._misc;
     if (t2 == null) {
       t2 = new T.MiscService(t1);
@@ -11862,7 +11940,6 @@ $.Element__defaultSanitizer = null;
 $.GitHub_defaultClient = null;
 $.Device__isOpera = null;
 $.Device__isWebKit = null;
-$.github = null;
 $.$table = null;
 $.breakdown = null;
 $.isReloadingTable = false;
@@ -11932,6 +12009,25 @@ Isolate.$lazy($, "undefinedLiteralPropertyPattern", "TypeErrorDecoder_undefinedL
     }
   }());
 });
+Isolate.$lazy($, "queryString", "queryString", "get$queryString", function() {
+  var t1, t2;
+  t1 = P.Uri_parse(C.Window_methods.get$location(W.window()).href);
+  t2 = t1._queryParameters;
+  if (t2 == null) {
+    t2 = H.setRuntimeTypeInfo(new P.UnmodifiableMapView(P.Uri_splitQueryString(t1.get$query(t1), C.Utf8Codec_false)), [null, null]);
+    t1._queryParameters = t2;
+    t1 = t2;
+  } else
+    t1 = t2;
+  return t1;
+});
+Isolate.$lazy($, "github", "github", "get$github", function() {
+  var t1, t2;
+  M.initGitHub();
+  t1 = $.get$queryString().$index(0, "token") != null ? new T.Authentication($.get$queryString().$index(0, "token"), null, null, false, false, true) : T.Authentication$anonymous();
+  t2 = $.GitHub_defaultClient.call$0();
+  return new T.GitHub(t1, "https://api.github.com", t2, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+});
 Isolate.$lazy($, "scheduleImmediateClosure", "_AsyncRun_scheduleImmediateClosure", "get$_AsyncRun_scheduleImmediateClosure", function() {
   return P._AsyncRun__initializeScheduleImmediate();
 });
@@ -11945,44 +12041,45 @@ Isolate.$lazy($, "_attributeValidators", "_Html5NodeValidator__attributeValidato
   return P.LinkedHashMap_LinkedHashMap$_empty(null, null);
 });
 
-init.metadata = [{func: "args0"},
-{func: "void_", void: true},
-{func: "args1", args: [null]},
-{func: "dynamic__dynamic_String", args: [null, P.String]},
-{func: "dynamic__String", args: [P.String]},
-{func: "dynamic__void_", args: [{func: "void_", void: true}]},
-{func: "void__Object__StackTrace", void: true, args: [P.Object], opt: [P.StackTrace]},
-{func: "void__dynamic__StackTrace", void: true, args: [null], opt: [P.StackTrace]},
-{func: "dynamic__dynamic__dynamic", args: [null], opt: [null]},
-{func: "bool_", ret: P.bool},
-{func: "dynamic__dynamic_StackTrace", args: [null, P.StackTrace]},
-{func: "void__dynamic_StackTrace", void: true, args: [null, P.StackTrace]},
-{func: "args2", args: [null, null]},
-{func: "dynamic__String_dynamic", args: [P.String, null]},
-{func: "int__dynamic_int", ret: P.$int, args: [null, P.$int]},
-{func: "void__int_int", void: true, args: [P.$int, P.$int]},
-{func: "dynamic__Symbol_dynamic", args: [P.Symbol, null]},
-{func: "String__int", ret: P.String, args: [P.$int]},
-{func: "bool__int", ret: P.bool, args: [P.$int]},
-{func: "int__dynamic_dynamic", ret: P.$int, args: [null, null]},
-{func: "void__String", void: true, args: [P.String]},
-{func: "void__String__dynamic", void: true, args: [P.String], opt: [null]},
-{func: "int__int_int", ret: P.$int, args: [P.$int, P.$int]},
-{func: "dynamic__HttpRequest", args: [W.HttpRequest]},
-{func: "void__Node", void: true, args: [W.Node]},
-{func: "int__dynamic", ret: P.$int, args: [null]},
-{func: "dynamic__int", args: [P.$int]},
-{func: "dynamic__int_dynamic", args: [P.$int, null]},
-{func: "num_", ret: P.num},
-{func: "void__void_", void: true, args: [{func: "void_", void: true}]},
-{func: "void__dynamic", void: true, args: [null]},
-{func: "bool__dynamic_dynamic", ret: P.bool, args: [null, null]},
-{func: "Object__dynamic", ret: P.Object, args: [null]},
-{func: "int__Comparable_Comparable", ret: P.$int, args: [P.Comparable, P.Comparable]},
-{func: "bool__Object_Object", ret: P.bool, args: [P.Object, P.Object]},
-{func: "int__Object", ret: P.$int, args: [P.Object]},
-{func: "bool__Element_String_String__Html5NodeValidator", ret: P.bool, args: [W.Element, P.String, P.String, W._Html5NodeValidator]},
-,
+init.metadata = [,
+];
+init.types = [{func: ""},
+{func: "", void: true},
+{func: "", args: [,]},
+{func: "", args: [, P.String]},
+{func: "", args: [P.String]},
+{func: "", args: [{func: "", void: true}]},
+{func: "", void: true, args: [P.Object], opt: [P.StackTrace]},
+{func: "", void: true, args: [,], opt: [P.StackTrace]},
+{func: "", args: [,], opt: [,]},
+{func: "", ret: P.bool},
+{func: "", args: [, P.StackTrace]},
+{func: "", void: true, args: [, P.StackTrace]},
+{func: "", args: [,,]},
+{func: "", args: [P.String,,]},
+{func: "", ret: P.$int, args: [, P.$int]},
+{func: "", void: true, args: [P.$int, P.$int]},
+{func: "", args: [P.Symbol,,]},
+{func: "", ret: P.String, args: [P.$int]},
+{func: "", ret: P.bool, args: [P.$int]},
+{func: "", ret: P.$int, args: [,,]},
+{func: "", void: true, args: [P.String]},
+{func: "", void: true, args: [P.String], opt: [,]},
+{func: "", ret: P.$int, args: [P.$int, P.$int]},
+{func: "", args: [W.HttpRequest]},
+{func: "", void: true, args: [W.Node]},
+{func: "", ret: P.$int, args: [,]},
+{func: "", args: [P.$int]},
+{func: "", args: [P.$int,,]},
+{func: "", ret: P.num},
+{func: "", void: true, args: [{func: "", void: true}]},
+{func: "", void: true, args: [,]},
+{func: "", ret: P.bool, args: [,,]},
+{func: "", ret: P.Object, args: [,]},
+{func: "", ret: P.$int, args: [P.Comparable, P.Comparable]},
+{func: "", ret: P.bool, args: [P.Object, P.Object]},
+{func: "", ret: P.$int, args: [P.Object]},
+{func: "", ret: P.bool, args: [W.Element, P.String, P.String, W._Html5NodeValidator]},
 ];
 $ = null;
 Isolate = Isolate.$finishIsolateConstructor(Isolate);
@@ -11993,6 +12090,15 @@ function convertToFastObject(properties) {
   MyClass.prototype = properties;
   new MyClass();
   return properties;
+}
+;
+function convertToSlowObject(properties) {
+  properties.__MAGIC_SLOW_PROPERTY = 1;
+  delete properties.__MAGIC_SLOW_PROPERTY;
+  return properties;
+}
+;
+function markerFun() {
 }
 ;
 A = convertToFastObject(A);

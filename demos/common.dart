@@ -1,5 +1,7 @@
 import "dart:html";
 
+import "package:github/browser.dart";
+
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();
 
@@ -45,5 +47,16 @@ void init(String script, {void onReady()}) {
   });
 }
 
-Map<String, String> get queryString =>
-    Uri.parse(window.location.href).queryParameters;
+Map<String, String> queryString = Uri.parse(window.location.href).queryParameters;
+
+GitHub _createGitHub() {
+  initGitHub();
+  return new GitHub(
+    auth:
+    queryString["token"] != null ?
+    new Authentication.withToken(queryString["token"]) :
+    new Authentication.anonymous()
+  );
+}
+
+GitHub github = _createGitHub();

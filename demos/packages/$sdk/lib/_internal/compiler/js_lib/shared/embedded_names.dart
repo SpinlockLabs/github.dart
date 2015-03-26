@@ -44,6 +44,11 @@ const INITIALIZE_LOADED_HUNK = 'initializeLoadedHunk';
 const IS_HUNK_LOADED = 'isHunkLoaded';
 const IS_HUNK_INITIALIZED = 'isHunkInitialized';
 const DEFERRED_INITIALIZED = 'deferredInitialized';
+const PRECOMPILED = 'precompiled';
+
+/// A list of types used in the program e.g. for reflection or encoding of
+/// function types.
+const TYPES = 'types';
 
 /// Returns a function that creates a new Isolate (its static state).
 ///
@@ -75,5 +80,6 @@ enum JsGetName {
   CLASS_DESCRIPTOR_PROPERTY,
   REQUIRED_PARAMETER_PROPERTY,
   DEFAULT_VALUES_PROPERTY,
-  CALL_NAME_PROPERTY
+  CALL_NAME_PROPERTY,
+  DEFERRED_ACTION_PROPERTY
 }

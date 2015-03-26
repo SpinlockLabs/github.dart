@@ -56,8 +56,6 @@ class OrganizationsService extends Service {
 
   // TODO: Implement edit: https://developer.github.com/v3/orgs/#edit-an-organization
 
-  // TODO: Implement member service methods: https://developer.github.com/v3/orgs/members/
-
   /// Lists all of the teams for the specified organization.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
@@ -94,7 +92,11 @@ class OrganizationsService extends Service {
         "GET", "/teams/${teamId}/members", TeamMember.fromJSON);
   }
 
-  // TODO: Implement isTeamMember: https://developer.github.com/v3/orgs/teams/#get-team-member
+  Future<bool> getTeamMemberStatus(int teamId, String user) {
+    return _github.getJSON("/teams/${teamId}/memberships/${user}").then((json) {
+      return json["state"];
+    });
+  }
 
   /// Adds a user to the team.
   ///
@@ -138,9 +140,32 @@ class OrganizationsService extends Service {
     return completer.future;
   }
 
-  // TODO: Implement addTeamMembership: https://developer.github.com/v3/orgs/teams/#add-team-membership
+  /// Invites a user to the specified team.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
+  Future<TeamMembershipState> addTeamMembership(int teamId, String user) {
+    var completer = new Completer();
 
-  // TODO: Implement removeTeamMembership: https://developer.github.com/v3/orgs/teams/#remove-team-membership
+    _github
+      .request("POST", "/teams/${teamId}/memberships/${user}", statusCode: 200, fail: (http.Response response) {
+        if (response.statusCode == 404) {
+          completer.complete(new TeamMembershipState(null));
+        } else {
+          _github.handleStatusCode(response);
+        }
+      }).then((response) {
+        return new TeamMembershipState(response.asJSON()["state"]);
+      }).then(completer.complete);
+
+    return completer.future;
+  }
+
+  /// Removes a user from the specified team.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
+  Future removeTeamMembership(int teamId, String user) {
+    return _github.request("DELETE", "/teams/${teamId}/memberships/${user}", statusCode: 204);
+  }
 
   /// Lists the repositories that the specified team has access to.
   ///

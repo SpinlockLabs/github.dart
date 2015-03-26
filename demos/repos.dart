@@ -5,7 +5,6 @@ import "package:github/dates.dart";
 
 import "common.dart";
 
-GitHub github;
 DivElement $repos;
 List<Repository> repos;
 
@@ -21,8 +20,6 @@ Map<String, Comparator<Repository>> sorts = {
 void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
-  initGitHub();
-  github = createGitHubClient();
 
   $repos = querySelector("#repos");
 
@@ -89,14 +86,12 @@ void loadRepos([int compare(Repository a, Repository b)]) {
 
   var user = "DirectMyFile";
 
-  var params = queryString;
-
-  if (params.containsKey("user")) {
-    user = params['user'];
+  if (queryString.containsKey("user")) {
+    user = queryString['user'];
   }
 
-  if (params.containsKey("sort") && compare == null) {
-    var sorter = params['sort'];
+  if (queryString.containsKey("sort") && compare == null) {
+    var sorter = queryString['sort'];
     if (sorts.containsKey(sorter)) {
       compare = sorts[sorter];
     }
