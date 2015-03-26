@@ -69,8 +69,7 @@ class Issue {
       ..state = input['state']
       ..title = input['title']
       ..user = User.fromJSON(input['user'])
-      ..labels = labels.map((label) => IssueLabel.fromJSON(label))
-      .toList(growable: false)
+      ..labels = labels.map(IssueLabel.fromJSON).toList(growable: false)
       ..assignee = User.fromJSON(input['assignee'])
       ..milestone = Milestone.fromJSON(input['milestone'])
       ..commentsCount = input['comments']
