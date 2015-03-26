@@ -4,13 +4,10 @@ import "package:github/browser.dart";
 
 import "common.dart";
 
-GitHub github;
 DivElement $releases;
 
 void main() {
-  initGitHub();
   init("releases.dart", onReady: () {
-    github = new GitHub();
     $releases = querySelector("#releases");
     loadReleases();
   });

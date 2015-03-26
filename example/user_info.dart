@@ -6,7 +6,6 @@ import "common.dart";
 DivElement info;
 
 void main() {
-  initGitHub();
   init("user_info.dart", onReady: () {
     info = document.getElementById("info");
     loadUser();
@@ -25,7 +24,7 @@ void loadUser() {
       return;
     }
 
-    var github = createClient(token.value);
+    github = createClient(token.value);
 
     github.users.getCurrentUser().then((CurrentUser user) {
       info.children.clear();
