@@ -59,6 +59,9 @@ class Issue {
   static Issue fromJSON(input) {
     if (input == null) return null;
 
+    var labels = input['labels'];
+    if (labels == null) labels = [];
+
     return new Issue()
       ..url = input['url']
       ..htmlUrl = input['html_url']
@@ -66,8 +69,7 @@ class Issue {
       ..state = input['state']
       ..title = input['title']
       ..user = User.fromJSON(input['user'])
-      ..labels = input['labels']
-      .map((label) => IssueLabel.fromJSON(label))
+      ..labels = labels.map((label) => IssueLabel.fromJSON(label))
       .toList(growable: false)
       ..assignee = User.fromJSON(input['assignee'])
       ..milestone = Milestone.fromJSON(input['milestone'])
