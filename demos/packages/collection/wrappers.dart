@@ -43,10 +43,10 @@ abstract class _DelegatingIterableBase<E> implements Iterable<E> {
   E get first => _base.first;
 
   E firstWhere(bool test(E element), {E orElse()}) =>
-      _base.firstWhere(test, orElse: orElse);
+  _base.firstWhere(test, orElse: orElse);
 
   fold(initialValue, combine(previousValue, E element)) =>
-      _base.fold(initialValue, combine);
+  _base.fold(initialValue, combine);
 
   void forEach(void f(E element)) => _base.forEach(f);
 
@@ -61,7 +61,7 @@ abstract class _DelegatingIterableBase<E> implements Iterable<E> {
   E get last => _base.last;
 
   E lastWhere(bool test(E element), {E orElse()}) =>
-      _base.lastWhere(test, orElse: orElse);
+  _base.lastWhere(test, orElse: orElse);
 
   int get length => _base.length;
 
@@ -156,7 +156,7 @@ class DelegatingList<E> extends DelegatingIterable<E> implements List<E> {
   }
 
   int lastIndexOf(E element, [int start]) =>
-      _listBase.lastIndexOf(element, start);
+  _listBase.lastIndexOf(element, start);
 
   void set length(int newLength) {
     _listBase.length = newLength;
@@ -293,9 +293,13 @@ class DelegatingQueue<E> extends DelegatingIterable<E> implements Queue<E> {
 
   bool remove(Object object) => _baseQueue.remove(object);
 
-  void removeWhere(bool test(E element)) { _baseQueue.removeWhere(test); }
+  void removeWhere(bool test(E element)) {
+    _baseQueue.removeWhere(test);
+  }
 
-  void retainWhere(bool test(E element)) { _baseQueue.retainWhere(test); }
+  void retainWhere(bool test(E element)) {
+    _baseQueue.retainWhere(test);
+  }
 
   E removeFirst() => _baseQueue.removeFirst();
 
@@ -365,7 +369,7 @@ class DelegatingMap<K, V> implements Map<K, V> {
  * Note that [lookup] is not supported for this set.
  */
 class MapKeySet<E> extends _DelegatingIterableBase<E>
-    with UnmodifiableSetMixin<E> {
+with UnmodifiableSetMixin<E> {
   final Map<E, dynamic> _baseMap;
 
   MapKeySet(Map<E, dynamic> base) : _baseMap = base;
@@ -394,7 +398,7 @@ class MapKeySet<E> extends _DelegatingIterableBase<E>
    * may be different than the equality operation [this] uses.
    */
   Set<E> difference(Set<E> other) =>
-      where((element) => !other.contains(element)).toSet();
+  where((element) => !other.contains(element)).toSet();
 
   /**
    * Returns a new set which is the intersection between [this] and [other].
@@ -412,7 +416,7 @@ class MapKeySet<E> extends _DelegatingIterableBase<E>
    * [Map]s.
    */
   E lookup(E element) => throw new UnsupportedError(
-      "MapKeySet doesn't support lookup().");
+    "MapKeySet doesn't support lookup().");
 
   /**
    * Returns a new set which contains all the elements of [this] and [other].
@@ -423,12 +427,13 @@ class MapKeySet<E> extends _DelegatingIterableBase<E>
    * Note that the returned set will use the default equality operation, which
    * may be different than the equality operation [this] uses.
    */
-  Set<E> union(Set<E> other) => toSet()..addAll(other);
+  Set<E> union(Set<E> other) => toSet()
+    ..addAll(other);
 }
 
 /**
  * Creates a modifiable [Set] view of the values of a [Map].
- * 
+ *
  * The `Set` view assumes that the keys of the `Map` can be uniquely determined
  * from the values. The `keyForValue` function passed to the constructor finds
  * the key for a single value. The `keyForValue` function should be consistent
@@ -461,8 +466,8 @@ class MapValueSet<K, V> extends _DelegatingIterableBase<V> implements Set<V> {
    * the return values of [keyForValue].
    */
   MapValueSet(Map<K, V> base, K keyForValue(V value))
-      : _baseMap = base,
-        _keyForValue = keyForValue;
+  : _baseMap = base,
+  _keyForValue = keyForValue;
 
   Iterable<V> get _base => _baseMap.values;
 
@@ -505,7 +510,7 @@ class MapValueSet<K, V> extends _DelegatingIterableBase<V> implements Set<V> {
    * may be different than the equality operation [this] uses.
    */
   Set<V> difference(Set<V> other) =>
-      where((element) => !other.contains(element)).toSet();
+  where((element) => !other.contains(element)).toSet();
 
   /**
    * Returns a new set which is the intersection between [this] and [other].
@@ -555,7 +560,7 @@ class MapValueSet<K, V> extends _DelegatingIterableBase<V> implements Set<V> {
   }
 
   void retainWhere(bool test(V element)) =>
-      removeWhere((element) => !test(element));
+  removeWhere((element) => !test(element));
 
   /**
    * Returns a new set which contains all the elements of [this] and [other].
@@ -566,5 +571,6 @@ class MapValueSet<K, V> extends _DelegatingIterableBase<V> implements Set<V> {
    * Note that the returned set will use the default equality operation, which
    * may be different than the equality operation [this] uses.
    */
-  Set<V> union(Set<V> other) => toSet()..addAll(other);
+  Set<V> union(Set<V> other) => toSet()
+    ..addAll(other);
 }

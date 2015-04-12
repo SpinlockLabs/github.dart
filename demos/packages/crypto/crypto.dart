@@ -85,10 +85,10 @@ class CryptoUtils {
    */
   static String bytesToBase64(List<int> bytes,
                               {bool urlSafe : false,
-                               bool addLineSeparator : false}) {
+                              bool addLineSeparator : false}) {
     return _CryptoUtils.bytesToBase64(bytes,
-                                      urlSafe,
-                                      addLineSeparator);
+    urlSafe,
+    addLineSeparator);
   }
 
 

@@ -1,5 +1,27 @@
 part of github.common;
 
+/// Model class for the combined status of a repository.
+class CombinedRepositoryStatus {
+  String state;
+  String sha;
+  int totalCount;
+  List<RepositoryStatus> statuses;
+  Repository repository;
+
+  CombinedRepositoryStatus();
+
+  static CombinedRepositoryStatus fromJSON(input) {
+    if (input == null) return null;
+
+    return new CombinedRepositoryStatus()
+      ..state = input["state"]
+      ..sha = input["sha"]
+      ..totalCount = input["total_count"]
+      ..statuses = input["statuses"].map((it) => RepositoryStatus.fromJSON(it)).toList()
+      ..repository = Repository.fromJSON(input["repository"]);
+  }
+}
+
 /// Model class for the status of a repository at a particular reference.
 class RepositoryStatus {
   DateTime createdAt;

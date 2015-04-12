@@ -119,8 +119,30 @@ class RepositoriesService extends Service {
     return controller.stream;
   }
 
-
-  // TODO: Implement editRepository: https://developer.github.com/v3/repos/#edit
+  /// Edit a Repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#edit
+  Future<Repository> editRepository(RepositorySlug repo, {
+    String name,
+    String description,
+    String homepage,
+    bool private,
+    bool hasIssues,
+    bool hasWiki,
+    bool hasDownloads
+  }) {
+    var data = createNonNullMap({
+      "name": name,
+      "description": description,
+      "homepage": homepage,
+      "private": private,
+      "has_issues": hasIssues,
+      "has_wiki": hasWiki,
+      "has_downloads": hasDownloads,
+      "default_branch": "defaultBranch"
+    });
+    return _github.postJSON("/repos/${repo.fullName}", body: data, statusCode: 200);
+  }
 
   /// Deletes a repository.
   ///
@@ -287,9 +309,43 @@ class RepositoriesService extends Service {
     });
   }
 
-  // TODO: Implement updateFile: https://developer.github.com/v3/repos/contents/#update-a-file
-  // TODO: Implement deleteFile: https://developer.github.com/v3/repos/contents/#delete-a-file
-  // TODO: Implement getArchiveLink: https://developer.github.com/v3/repos/contents/#get-archive-link
+  /// Updates the specified file.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#update-a-file
+  Future<ContentCreation> updateFile(RepositorySlug slug, String path, String message, String content, String sha, {String branch}) {
+    var map = createNonNullMap({
+      "message": message,
+      "content": content,
+      "sha": sha,
+      "branch": branch
+    });
+
+    return _github.postJSON("/repos/${slug.fullName}/contents/${path}", body: map, statusCode: 200, convert: ContentCreation.fromJSON);
+  }
+
+  /// Deletes the specified file.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#delete-a-file
+  Future<ContentCreation> deleteFile(RepositorySlug slug, String path, String message, String sha, String branch) {
+    var map = createNonNullMap({
+      "message": message,
+      "sha": sha,
+      "branch": branch
+    });
+
+    return _github.request("DELETE", "/repos/${slug.fullName}/contents/${path}", body: map, statusCode: 200).then((response) {
+      return ContentCreation.fromJSON(response.asJSON());
+    });
+  }
+
+  /// Gets an archive link for the specified repository and reference.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
+  Future<String> getArchiveLink(RepositorySlug slug, String ref, {String format: "tarball"}) {
+    return _github.request("GET", "/repos/${slug.fullName}/${format}/${ref}", statusCode: 302).then((response) {
+      return response.headers["Location"];
+    });
+  }
 
   /// Lists the forks of the specified repository.
   ///
@@ -483,5 +539,10 @@ class RepositoriesService extends Service {
         body: request.toJSON(), convert: RepositoryStatus.fromJSON);
   }
 
-  // TODO: Implement getCombinedStatus: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
+  /// Gets a Combined Status for the specified repository and ref.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
+  Future<CombinedRepositoryStatus> getCombinedStatus(RepositorySlug slug, String ref) {
+    return _github.getJSON("/repos/${slug.fullName}/commits/${ref}/status", convert: CombinedRepositoryStatus.fromJSON, statusCode: 200);
+  }
 }

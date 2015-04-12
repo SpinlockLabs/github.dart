@@ -62,6 +62,7 @@ Run "$executableName help <command>" for more information about a command.''';
 
   /// An unmodifiable view of all top-level commands defined for this runner.
   Map<String, Command> get commands => new UnmodifiableMapView(_commands);
+
   final _commands = new Map<String, Command>();
 
   /// The top-level argument parser.
@@ -73,7 +74,7 @@ Run "$executableName help <command>" for more information about a command.''';
 
   CommandRunner(this.executableName, this.description) {
     argParser.addFlag('help',
-        abbr: 'h', negatable: false, help: 'Print this usage information.');
+    abbr: 'h', negatable: false, help: 'Print this usage information.');
     addCommand(new HelpCommand());
   }
 
@@ -85,11 +86,12 @@ Run "$executableName help <command>" for more information about a command.''';
 
   /// Throws a [UsageException] with [message].
   void usageException(String message) =>
-      throw new UsageException(message, _usageWithoutDescription);
+  throw new UsageException(message, _usageWithoutDescription);
 
   /// Adds [Command] as a top-level command to this runner.
   void addCommand(Command command) {
-    var names = [command.name]..addAll(command.aliases);
+    var names = [command.name]
+      ..addAll(command.aliases);
     for (var name in names) {
       _commands[name] = command;
       argParser.addCommand(name, command.argParser);
@@ -102,7 +104,7 @@ Run "$executableName help <command>" for more information about a command.''';
   /// This always returns a [Future] in case the command is asynchronous. The
   /// [Future] will throw a [UsageError] if [args] was invalid.
   Future run(Iterable<String> args) =>
-      new Future.sync(() => runCommand(parse(args)));
+  new Future.sync(() => runCommand(parse(args)));
 
   /// Parses [args] and returns the result, converting a [FormatException] to a
   /// [UsageException].
@@ -147,11 +149,11 @@ Run "$executableName help <command>" for more information about a command.''';
           } else {
             if (command == null) {
               usageException(
-                  'Could not find a command named "${argResults.rest[0]}".');
+                'Could not find a command named "${argResults.rest[0]}".');
             }
 
             command.usageException('Could not find a subcommand named '
-                '"${argResults.rest[0]}" for "$commandString".');
+            '"${argResults.rest[0]}" for "$commandString".');
           }
         }
 
@@ -172,7 +174,7 @@ Run "$executableName help <command>" for more information about a command.''';
       // Make sure there aren't unexpected arguments.
       if (!command.takesArguments && argResults.rest.isNotEmpty) {
         command.usageException(
-            'Command "${argResults.name}" does not take any arguments.');
+          'Command "${argResults.name}" does not take any arguments.');
       }
 
       return command.run();
@@ -206,8 +208,8 @@ abstract class Command {
 
     var invocation = parents.reversed.join(" ");
     return _subcommands.isNotEmpty
-        ? "$invocation <subcommand> [arguments]"
-        : "$invocation [arguments]";
+    ? "$invocation <subcommand> [arguments]"
+    : "$invocation [arguments]";
   }
 
   /// The command's parent command, if this is a subcommand.
@@ -215,6 +217,7 @@ abstract class Command {
   /// This will be `null` until [Command.addSubcommmand] has been called with
   /// this command.
   Command get parent => _parent;
+
   Command _parent;
 
   /// The command runner for this command.
@@ -225,18 +228,21 @@ abstract class Command {
     if (parent == null) return _runner;
     return parent.runner;
   }
+
   CommandRunner _runner;
 
   /// The parsed global argument results.
   ///
   /// This will be `null` until just before [Command.run] is called.
   ArgResults get globalResults => _globalResults;
+
   ArgResults _globalResults;
 
   /// The parsed argument results for this command.
   ///
   /// This will be `null` until just before [Command.run] is called.
   ArgResults get argResults => _argResults;
+
   ArgResults _argResults;
 
   /// The argument parser for this command.
@@ -283,6 +289,7 @@ abstract class Command {
 
   /// An unmodifiable view of all sublevel commands of this command.
   Map<String, Command> get subcommands => new UnmodifiableMapView(_subcommands);
+
   final _subcommands = new Map<String, Command>();
 
   /// Whether or not this command should be hidden from help listings.
@@ -320,7 +327,7 @@ abstract class Command {
 
   Command() {
     argParser.addFlag('help',
-        abbr: 'h', negatable: false, help: 'Print this usage information.');
+    abbr: 'h', negatable: false, help: 'Print this usage information.');
   }
 
   /// Runs this command.
@@ -333,7 +340,8 @@ abstract class Command {
 
   /// Adds [Command] as a subcommand of this.
   void addSubcommand(Command command) {
-    var names = [command.name]..addAll(command.aliases);
+    var names = [command.name]
+      ..addAll(command.aliases);
     for (var name in names) {
       _subcommands[name] = command;
       argParser.addCommand(name, command.argParser);
@@ -349,7 +357,7 @@ abstract class Command {
 
   /// Throws a [UsageException] with [message].
   void usageException(String message) =>
-      throw new UsageException(message, _usageWithoutDescription);
+  throw new UsageException(message, _usageWithoutDescription);
 }
 
 /// Returns a string representation of [commands] fit for use in a usage string.
@@ -357,25 +365,26 @@ abstract class Command {
 /// [isSubcommand] indicates whether the commands should be called "commands" or
 /// "subcommands".
 String _getCommandUsage(Map<String, Command> commands,
-    {bool isSubcommand: false}) {
+                        {bool isSubcommand: false}) {
   // Don't include aliases.
   var names =
-      commands.keys.where((name) => !commands[name].aliases.contains(name));
+  commands.keys.where((name) => !commands[name].aliases.contains(name));
 
   // Filter out hidden ones, unless they are all hidden.
   var visible = names.where((name) => !commands[name].hidden);
   if (visible.isNotEmpty) names = visible;
 
   // Show the commands alphabetically.
-  names = names.toList()..sort();
+  names = names.toList()
+    ..sort();
   var length = names.map((name) => name.length).reduce(math.max);
 
   var buffer =
-      new StringBuffer('Available ${isSubcommand ? "sub" : ""}commands:');
+  new StringBuffer('Available ${isSubcommand ? "sub" : ""}commands:');
   for (var name in names) {
     buffer.writeln();
     buffer.write('  ${padRight(name, length)}   '
-        '${commands[name].description.split("\n").first}');
+    '${commands[name].description.split("\n").first}');
   }
 
   return buffer.toString();

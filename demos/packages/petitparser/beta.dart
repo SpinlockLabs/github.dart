@@ -53,7 +53,7 @@ abstract class CompositeParser2 extends CompositeParser {
         return ref(name);
       } else if (mirror.isSetter) {
         return def(name.substring(0, name.length - 1),
-            mirror.positionalArguments.first);
+        mirror.positionalArguments.first);
       } else if (mirror.isMethod && mirror.positionalArguments.length == 1) {
         var argument = mirror.positionalArguments.first;
         if (argument is Parser) {

@@ -75,13 +75,16 @@ class GistsService extends Service {
     return _github.postJSON("/gists", statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
+  /// Deletes the specified Gist.
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#delete-a-gist
   Future<bool> deleteGist(String id) {
     return _github.request("DELETE", "/gists/${id}").then((response) {
       return response.statusCode == 204;
     });
   }
 
-  /// Edits a Gist
+  /// Edits a Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
   Future<Gist> editGist(Map<String, String> files, {String description, bool public: false}) {
@@ -109,10 +112,43 @@ class GistsService extends Service {
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
-  // TODO: Implement starGist: https://developer.github.com/v3/gists/#star-a-gist
-  // TODO: Implement unstarGist: https://developer.github.com/v3/gists/#unstar-a-gist
-  // TODO: Implement isStarredGist: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
-  // TODO: Implement forkGist: https://developer.github.com/v3/gists/#fork-a-gist
+
+  /// Star the specified Gist.
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#star-a-gist
+  Future<bool> starGist(String id) {
+    return _github.request("POST", "/gists/${id}/star").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// Unstar the specified Gist.
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#star-a-gist
+  Future<bool> unstarGist(String id) {
+    return _github.request("DELETE", "/gists/${id}/star").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// Checks if the specified Gist is starred.
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
+  Future<bool> isGistStarred(String id) {
+    return _github.request("GET", "/gists/${id}/star").then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// Forks the specified Gist.
+  ///
+  /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
+  Future<Gist> forkGist(String id) {
+    return _github.request("POST", "/gists/${id}/forks", statusCode: 201).then((response) {
+      return Gist.fromJSON(response.asJSON());
+    });
+  }
+
   // TODO: Implement listGistForks: https://developer.github.com/v3/gists/#list-gist-forks
 
   /// Lists all comments for a gist.

@@ -57,7 +57,7 @@ class _Parse extends Matcher {
       return false;
     }
     if (position >= 0 &&
-        !equals(position).matches(result.position, matchState)) {
+    !equals(position).matches(result.position, matchState)) {
       addStateInfo(matchState, {'property': 'position', 'result': result});
       return false;
     }
@@ -69,15 +69,15 @@ class _Parse extends Matcher {
   }
 
   Description describeMismatch(
-      item, Description mismatchDescription, Map matchState, bool verbose) {
+    item, Description mismatchDescription, Map matchState, bool verbose) {
     mismatchDescription
-        .add('has parse result ')
-        .add('"${matchState['result']}"');
+    .add('has parse result ')
+    .add('"${matchState['result']}"');
     if (matchState['property'] == 'value') {
       mismatchDescription.add(' which parse result ');
       var subDescription = new StringDescription();
       matcher.describeMismatch(matchState['result'].value, subDescription,
-          matchState['state'], verbose);
+      matchState['state'], verbose);
       if (subDescription.length > 0) {
         mismatchDescription.add(subDescription.toString());
       } else {
@@ -87,10 +87,10 @@ class _Parse extends Matcher {
       return mismatchDescription;
     } else if (matchState['property'] == 'position') {
       mismatchDescription
-          .add(' that consumes input to ')
-          .add(matchState['result'].position.toString())
-          .add(' instead of ')
-          .add(position.toString());
+      .add(' that consumes input to ')
+      .add(matchState['result'].position.toString())
+      .add(' instead of ')
+      .add(position.toString());
       return mismatchDescription;
     }
     throw new Exception('Internal matcher error');
