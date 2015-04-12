@@ -84,6 +84,8 @@ class PullRequest extends PullRequestInformation {
   @ApiName("merge_commit_sha")
   String mergeCommitSha;
 
+  Repository repository;
+
   /// If the pull request was merged
   bool merged;
 
@@ -117,6 +119,7 @@ class PullRequest extends PullRequestInformation {
     PullRequest pr = PullRequestInformation.fromJSON(input, new PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
+    pr.repository = Repository.fromJSON(input['repository']);
     pr.mergedBy = User.fromJSON(input['merged_by']);
     pr.mergeCommitSha = input['merge_commit_sha'];
     pr.commentsCount = input['comments'];
