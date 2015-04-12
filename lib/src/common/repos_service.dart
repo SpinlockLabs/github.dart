@@ -337,7 +337,7 @@ class RepositoriesService extends Service {
       return ContentCreation.fromJSON(response.asJSON());
     });
   }
-  
+
   /// Gets an archive link for the specified repository and reference.
   ///
   /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
