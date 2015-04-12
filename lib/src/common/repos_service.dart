@@ -309,9 +309,35 @@ class RepositoriesService extends Service {
     });
   }
 
-  // TODO: Implement updateFile: https://developer.github.com/v3/repos/contents/#update-a-file
-  // TODO: Implement deleteFile: https://developer.github.com/v3/repos/contents/#delete-a-file
+  /// Updates the specified file.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#update-a-file
+  Future<ContentCreation> updateFile(RepositorySlug slug, String path, String message, String content, String sha, {String branch}) {
+    var map = createNonNullMap({
+      "message": message,
+      "content": content,
+      "sha": sha,
+      "branch": branch
+    });
 
+    return _github.postJSON("/repos/${slug.fullName}/contents/${path}", body: map, statusCode: 200, convert: ContentCreation.fromJSON);
+  }
+
+  /// Deletes the specified file.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#delete-a-file
+  Future<ContentCreation> deleteFile(RepositorySlug slug, String path, String message, String sha, String branch) {
+    var map = createNonNullMap({
+      "message": message,
+      "sha": sha,
+      "branch": branch
+    });
+
+    return _github.request("DELETE", "/repos/${slug.fullName}/contents/${path}", body: map, statusCode: 200).then((response) {
+      return ContentCreation.fromJSON(response.asJSON());
+    });
+  }
+  
   /// Gets an archive link for the specified repository and reference.
   ///
   /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
