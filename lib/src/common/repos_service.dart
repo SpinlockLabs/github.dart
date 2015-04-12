@@ -504,6 +504,11 @@ class RepositoriesService extends Service {
     return _github.postJSON("/repos/${slug.fullName}/statuses/${ref}",
         body: request.toJSON(), convert: RepositoryStatus.fromJSON);
   }
-
-  // TODO: Implement getCombinedStatus: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
+  
+  /// Gets a Combined Status for the specified repository and ref.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
+  Future<CombinedRepositoryStatus> getCombinedStatus(RepositorySlug slug, String ref) {
+    return _github.getJSON("/repos/${slug.fullName}/commits/${ref}/status", convert: CombinedRepositoryStatus.fromJSON, statusCode: 200);
+  }
 }
