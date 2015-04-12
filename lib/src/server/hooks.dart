@@ -123,6 +123,7 @@ class IssueEvent extends HookEvent {
   IssueLabel label;
   Issue issue;
   User sender;
+  Repository repository;
 
   static IssueEvent fromJSON(Map<String, dynamic> json) {
     return new IssueEvent()
@@ -130,6 +131,7 @@ class IssueEvent extends HookEvent {
       ..assignee = User.fromJSON(json["assignee"])
       ..label = IssueLabel.fromJSON(json["label"])
       ..issue = Issue.fromJSON(json["issue"])
+      ..repository = Repository.fromJSON(json["repository"])
       ..sender = User.fromJSON(json["sender"]);
   }
 }
@@ -139,11 +141,13 @@ class PullRequestEvent extends HookEvent {
   int number;
   PullRequest pullRequest;
   User sender;
+  Repository repository;
 
   static PullRequestEvent fromJSON(Map<String, dynamic> json) {
     return new PullRequestEvent()
       ..action = json["action"]
       ..number = json["number"]
+      ..repository = Repository.fromJSON(json["repository"])
       ..pullRequest = PullRequest.fromJSON(json["pull_request"])
       ..sender = User.fromJSON(json["sender"]);
   }
