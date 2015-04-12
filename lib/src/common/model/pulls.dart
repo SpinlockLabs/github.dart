@@ -109,6 +109,9 @@ class PullRequest extends PullRequestInformation {
   /// Number of changed files
   int changedFilesCount;
 
+  /// Pull Request ID
+  int id;
+
   PullRequest() : super(true);
 
   static PullRequest fromJSON(input) {
@@ -117,6 +120,7 @@ class PullRequest extends PullRequestInformation {
     PullRequest pr = PullRequestInformation.fromJSON(input, new PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
+    pr.id = input['id'];
     pr.mergedBy = User.fromJSON(input['merged_by']);
     pr.mergeCommitSha = input['merge_commit_sha'];
     pr.commentsCount = input['comments'];
