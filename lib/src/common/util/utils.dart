@@ -124,15 +124,15 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
 int parseFancyNumber(String input) {
   input = input.trim();
   if (input.contains(",")) input = input.replaceAll(",", "");
-  
+
   var multipliers = {
     "h": 100,
     "k": 1000,
-    "ht": 100000, 
+    "ht": 100000,
     "m": 1000000
   };
   int value;
-  
+
   if (!multipliers.keys.any((m) => input.endsWith(m))) {
     value = int.parse(input);
   } else {
@@ -140,8 +140,18 @@ int parseFancyNumber(String input) {
     input = input.substring(0, input.length - m.length);
     value = num.parse(input) * multipliers[m];
   }
-  
+
   return value;
+}
+
+Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
+  var map = {};
+  for (var key in input.keys) {
+    if (input[key] != null) {
+      map[key] = input[key];
+    }
+  }
+  return map;
 }
 
 RepositorySlug slugFromAPIUrl(String url) {

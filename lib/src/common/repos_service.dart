@@ -119,8 +119,30 @@ class RepositoriesService extends Service {
     return controller.stream;
   }
 
-
-  // TODO: Implement editRepository: https://developer.github.com/v3/repos/#edit
+  /// Edit a Repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#edit
+  Future<Repository> editRepository(RepositorySlug repo, {
+    String name,
+    String description,
+    String homepage,
+    bool private,
+    bool hasIssues,
+    bool hasWiki,
+    bool hasDownloads
+  }) {
+    var data = createNonNullMap({
+      "name": name,
+      "description": description,
+      "homepage": homepage,
+      "private": private,
+      "has_issues": hasIssues,
+      "has_wiki": hasWiki,
+      "has_downloads": hasDownloads,
+      "default_branch": "defaultBranch"
+    });
+    return _github.postJSON("/repos/${repo.fullName}", body: data, statusCode: 200);
+  }
 
   /// Deletes a repository.
   ///
