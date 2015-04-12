@@ -311,7 +311,15 @@ class RepositoriesService extends Service {
 
   // TODO: Implement updateFile: https://developer.github.com/v3/repos/contents/#update-a-file
   // TODO: Implement deleteFile: https://developer.github.com/v3/repos/contents/#delete-a-file
-  // TODO: Implement getArchiveLink: https://developer.github.com/v3/repos/contents/#get-archive-link
+
+  /// Gets an archive link for the specified repository and reference.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
+  Future<String> getArchiveLink(RepositorySlug slug, String ref, {String format: "tarball"}) {
+    return _github.request("GET", "/repos/${slug.fullName}/${format}/${ref}", statusCode: 302).then((response) {
+      return response.headers["Location"];
+    });
+  }
 
   /// Lists the forks of the specified repository.
   ///
@@ -504,7 +512,7 @@ class RepositoriesService extends Service {
     return _github.postJSON("/repos/${slug.fullName}/statuses/${ref}",
         body: request.toJSON(), convert: RepositoryStatus.fromJSON);
   }
-  
+
   /// Gets a Combined Status for the specified repository and ref.
   ///
   /// API docs: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
