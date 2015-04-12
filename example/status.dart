@@ -11,8 +11,6 @@ sync() async {
       "Origin": window.location.origin
     });
 
-
-
     var text = request.responseText;
     var json = JSON.decode(text);
 
@@ -20,5 +18,4 @@ sync() async {
       ..appendText(json["status"])
       ..classes.add("status-${json["status"]}");
   }
-
 }
