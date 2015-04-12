@@ -65,11 +65,56 @@ class UsersService extends Service {
   Stream<UserEmail> listEmails() => new PaginationHelper(_github).objects(
       "GET", "/user/emails", UserEmail.fromJSON);
 
-  // TODO: Implement addEmails: https://developer.github.com/v3/users/emails/#add-email-addresses
+  /// Add Emails
+  ///
+  /// API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
+  Stream<UserEmail> addEmails(List<String> emails) => new PaginationHelper(_github).objects(
+    "POST",
+    "/user/emails",
+    UserEmail.fromJSON,
+    statusCode: 201,
+    body: JSON.encode(emails)
+  );
 
-  // TODO: Implement deleteEmails: https://developer.github.com/v3/users/emails/#delete-email-addresses
+  /// Delete Emails
+  ///
+  /// API docs: https://developer.github.com/v3/users/emails/#delete-email-addresses
+  Future<bool> deleteEmails(List<String> emails) => _github.request("DELETE", "/user/emails", body: JSON.encode(emails), statusCode: 204)
+    .then((x) => x.statusCode == 204);
 
-  // TODO: Implement follower methods: https://developer.github.com/v3/users/followers/
+  /// List user followers.
+  ///
+  /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
+  Stream<User> listUserFollowers(String user) => new PaginationHelper(_github).objects("GET", "/users/${user}/followers", User.fromJSON, statusCode: 200);
+
+  /// Check if the current user is following the specified user.
+  Future<bool> isFollowingUser(String user) => _github.request("GET", "/user/following/${user}").then((response) {
+    return response.statusCode == 204;
+  });
+
+  /// Check if the specified user is following target.
+  Future<bool> isUserFollowing(String user, String target) => _github.request("GET", "/users/${user}/following/${target}").then((x) {
+    return x.statusCode == 204;
+  });
+
+  /// Follows a user.
+  Future<bool> followUser(String user) {
+    return _github.request("POST", "/user/following/${user}", statusCode: 204).then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// Unfollows a user.
+  Future<bool> unfollowUser(String user) {
+    return _github.request("DELETE", "/user/following/${user}", statusCode: 204).then((response) {
+      return response.statusCode == 204;
+    });
+  }
+
+  /// List current user followers.
+  ///
+  /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
+  Stream<User> listCurrentUserFollowers() => new PaginationHelper(_github).objects("GET", "/user/followers", User.fromJSON, statusCode: 200);
 
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
   /// the public keys for the authenticated user are fetched.
@@ -93,5 +138,4 @@ class UsersService extends Service {
 
   // TODO: Implement updatePublicKey: https://developer.github.com/v3/users/keys/#update-a-public-key
   // TODO: Implement deletePublicKey: https://developer.github.com/v3/users/keys/#delete-a-public-key
-
 }
