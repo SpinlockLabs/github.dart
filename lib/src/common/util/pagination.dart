@@ -125,8 +125,11 @@ class PaginationHelper<T> {
 
   Stream<T> objects(String method, String path, JSONConverter converter,
       {int pages, bool reverse: false, int start, Map<String, String> headers,
-      Map<String, dynamic> params, String body, int statusCode: 200}) {
+      Map<String, dynamic> params, String body, int statusCode: 200, String preview}) {
     if (headers == null) headers = {};
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
     return fetchStreamed(method, path,
         pages: pages,

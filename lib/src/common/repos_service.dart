@@ -333,7 +333,7 @@ class RepositoriesService extends Service {
       "branch": branch
     });
 
-    return _github.request("DELETE", "/repos/${slug.fullName}/contents/${path}", body: map, statusCode: 200).then((response) {
+    return _github.request("DELETE", "/repos/${slug.fullName}/contents/${path}", body: JSON.encode(map), statusCode: 200).then((response) {
       return ContentCreation.fromJSON(response.asJSON());
     });
   }

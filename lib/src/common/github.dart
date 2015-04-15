@@ -196,8 +196,12 @@ class GitHub {
    */
   Future<dynamic> getJSON(String path, {int statusCode,
       void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert}) {
+      Map<String, String> params, JSONConverter convert, String preview}) {
     if (headers == null) headers = {};
+    
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (convert == null) {
       convert = (input) => input;
@@ -236,8 +240,12 @@ class GitHub {
    */
   Future<dynamic> postJSON(String path, {int statusCode,
       void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert, body}) {
+      Map<String, String> params, JSONConverter convert, body, String preview}) {
     if (headers == null) headers = {};
+
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (convert == null) {
       convert = (input) => input;
@@ -310,8 +318,12 @@ class GitHub {
   Future<http.Response> request(String method, String path,
       {Map<String, String> headers, Map<String, dynamic> params, String body,
         int statusCode,
-        void fail(http.Response response)}) {
+        void fail(http.Response response), String preview}) {
     if (headers == null) headers = {};
+    
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");

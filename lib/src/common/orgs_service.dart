@@ -215,4 +215,51 @@ class OrganizationsService extends Service {
     return new PaginationHelper(_github).objects(
         "GET", "/user/teams", Team.fromJSON);
   }
+  
+  /// Lists the hooks for the specified organization.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
+  Stream<Hook> listHooks(String org) {
+    return new PaginationHelper(_github).objects("GET",
+        "/orgs/${org}/hooks",
+        (input) => Hook.fromJSON(org, input),
+        preview: "application/vnd.github.sersi-preview+json");
+  }
+
+  /// Fetches a single hook by [id].
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
+  Future<Hook> getHook(String org, int id) {
+    return _github.getJSON("/orgs/${org}/hooks/${id}",
+        convert: (i) => Hook.fromJSON(org, i),
+        preview: "application/vnd.github.sersi-preview+json");
+  }
+
+  /// Creates an organization hook based on the specified [hook].
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
+  Future<Hook> createHook(String org, CreateHook hook) {
+    return _github.postJSON("/orgs/${org}/hooks",
+        convert: (i) => Hook.fromJSON(org, i),
+        body: hook.toJSON(),
+        preview: "application/vnd.github.sersi-preview+json");
+  }
+
+  // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
+  
+  /// Pings the organization hook.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/hooks/#ping-a-hook
+  Future<bool> pingHook(String org, int id) {
+    return _github
+        .request("POST", "/orgs/${org}/hooks/${id}/pings", preview: "application/vnd.github.sersi-preview+json")
+        .then((response) => response.statusCode == 204);
+  }
+
+  /// Deletes the specified hook.
+  Future<bool> deleteHook(String org, int id) {
+    return _github.request("DELETE", "/orgs/${org}/hooks/${id}", preview: "application/vnd.github.sersi-preview+json").then((response) {
+      return response.statusCode == 204;
+    });
+  }
 }
