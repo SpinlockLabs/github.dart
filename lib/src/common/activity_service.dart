@@ -14,6 +14,33 @@ class ActivityService extends Service {
     return new PaginationHelper(_github).objects(
         "GET", "/events", Event.fromJSON, pages: pages);
   }
+  
+  /// Lists public events for a network of repositories.
+  ///
+  /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-a-network-of-repositories
+  Stream<Event> listRepositoryNetworkEvents(RepositorySlug slug, {int pages: 2}) {
+    return new PaginationHelper(_github).objects(
+        "GET", "/networks/${slug.fullName}/events", Event.fromJSON, pages: pages);
+  }
+
+  /// Returns an [EventPoller] for repository network events.
+  ///
+  /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-a-network-of-repositories
+  EventPoller pollRepositoryNetworkEvents(RepositorySlug slug) => new EventPoller(_github, "/networks/${slug.fullName}/events");
+
+  /// Returns an [EventPoller] for repository issue events.
+  ///
+  /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
+  EventPoller pollRepositoryIssueEvents(RepositorySlug slug) =>
+      new EventPoller(_github, "/repos/${slug.fullName}/issues/events");
+
+  /// Lists repository issue events.
+  ///
+  /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
+  Stream<Event> listRepositoryIssueEvents(RepositorySlug slug, {int pages}) {
+    return new PaginationHelper(_github).objects(
+        "GET", "/repos/${slug.fullName}/issues/events", Event.fromJSON, pages: pages);
+  }
 
   /// Returns an [EventPoller] for public events.
   ///
@@ -33,10 +60,6 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   EventPoller pollRepositoryEvents(RepositorySlug slug) =>
       new EventPoller(_github, "/repos/${slug.fullName}/events");
-
-  // TODO: Implement listIssueEventsForRepository: https://developer.github.com/v3/activity/events/#list-issue-events-for-a-repository
-
-  // TODO: Implement listEventsForRepoNetwork: https://developer.github.com/v3/activity/events/#list-public-events-for-a-network-of-repositories
 
   /// Lists public events for an organization.
   ///
@@ -66,13 +89,19 @@ class ActivityService extends Service {
 
   /// Lists the events performed by a user.
   ///
-  /// API docs https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
+  /// API docs: https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
   Stream<Event> listEventsPerformedByUser(String username, {int pages}) {
     return new PaginationHelper(_github).objects(
         "GET", "/users/${username}/events", Event.fromJSON, pages: pages);
   }
-
-  // TODO: Implement listPublicEventsPerformedByUser: https://developer.github.com/v3/activity/events/#list-public-events-performed-by-a-user
+  
+  /// Lists the public events performed by a user.
+  ///
+  /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-performed-by-a-user
+  Stream<Event> listPublicEventsPerformedByUser(String username, {int pages}) {
+    return new PaginationHelper(_github).objects(
+        "GET", "/users/${username}/events/public", Event.fromJSON, pages: pages);
+  }
 
   /// Returns an [EventPoller] for the user's organization dashboard.
   ///
@@ -240,8 +269,30 @@ class ActivityService extends Service {
         statusCode: StatusCodes.OK, convert: RepositorySubscription.fromJSON);
   }
 
-  // TODO: Implement setRepositorySubscription: https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-  // TODO: Implement deleteRepositorySubscription: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
+  /// Sets the Repository Subscription Status
+  ///
+  /// API docs: https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
+  Future<RepositorySubscription> setRepositorySubscription(RepositorySlug slug, {bool subscribed, bool ignored}) {
+    var map = createNonNullMap({
+      "subscribed": subscribed,
+      "ignored": ignored
+    });
+    
+    return _github.postJSON("/repos/${slug.fullName}/subscription",
+        statusCode: StatusCodes.OK, convert: RepositorySubscription.fromJSON, body: map);
+  }
+  
+  /// Deletes a Repository Subscription
+  ///
+  /// API docs: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
+  Future deleteRepositorySubscription(RepositorySlug slug) {
+    return _github
+        .request("DELETE", "/repos/${slug.fullName}/subscription",
+            headers: {"Content-Length": 0})
+        .then((response) {
+      return null;
+    });
+  }
 }
 
 class EventPoller {
