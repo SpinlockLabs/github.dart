@@ -3,9 +3,8 @@ import "package:github/server.dart";
 import "package:quiver/async.dart";
 
 void main() {
-  var github = createGitHubClient(
-      auth: new Authentication.withToken(
-          "5fdec2b77527eae85f188b7b2bfeeda170f26883"));
+  var github = createGitHubClient();
+
   github.organizations.get("DirectMyFile").then((organization) {
     return github.organizations.listTeams(organization.name).toList();
   }).then((teams) {

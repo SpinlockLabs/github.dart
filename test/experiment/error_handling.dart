@@ -6,13 +6,11 @@ import 'dart:io';
 import 'dart:convert';
 
 void main() {
-  initGitHub();
+  var github = createGitHubClient();
   var response = new MockResponse(JSON.encode({
     "message": "Invalid Entity",
     "errors": [{"resource": "Issue", "field": "body", "code": "not_found"}]
   }), {}, 422);
-
-  var github = new GitHub();
 
   try {
     github.handleStatusCode(response);
