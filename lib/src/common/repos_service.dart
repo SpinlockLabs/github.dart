@@ -63,7 +63,7 @@ class RepositoriesService extends Service {
         .listen((http.Response response) {
       var list = JSON.decode(response.body);
       var repos = new List.from(
-          list.map((it) => Repository.fromJSON(_github, it)));
+          list.map((it) => Repository.fromJSON(it)));
       for (var repo in repos) controller.add(repo);
     });
 
