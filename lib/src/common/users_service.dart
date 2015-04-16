@@ -13,6 +13,31 @@ class UsersService extends Service {
   Future<User> getUser(String name) =>
       _github.getJSON("/users/${name}", convert: User.fromJSON);
 
+  /// Updates the Current User.
+  ///
+  /// API docs: https://developer.github.com/v3/users/#update-the-authenticated-user
+  Future<CurrentUser> editCurrentUser({
+    String name,
+    String email,
+    String blog,
+    String company,
+    String location,
+    bool hireable,
+    String bio
+  }) {
+    var map = createNonNullMap({
+      "name": name,
+      "email": email,
+      "blog": blog,
+      "company": company,
+      "location": location,
+      "hireable": hireable,
+      "bio": bio
+    });
+    
+    return _github.postJSON("/user", body: map, statusCode: 200, convert: CurrentUser.fromJSON);
+  }
+
   /// Fetches a list of users specified by [names].
   Stream<User> getUsers(List<String> names, {int pages}) {
     var controller = new StreamController();
@@ -56,8 +81,10 @@ class UsersService extends Service {
   /// Lists all users.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-all-users
-  Stream<User> listUsers({int pages}) => new PaginationHelper(_github).objects(
-      "GET", "/users", User.fromJSON, pages: pages);
+  Stream<User> listUsers({int pages, int since}) => new PaginationHelper(_github).objects(
+      "GET", "/users", User.fromJSON, pages: pages, params: {
+        "since": since
+      });
 
   /// Lists all email addresses for the currently authenticated user.
   ///
