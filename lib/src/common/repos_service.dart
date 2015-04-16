@@ -514,10 +514,39 @@ class RepositoriesService extends Service {
     return completer.future;
   }
 
-  // TODO: Implement listCommitActivity: https://developer.github.com/v3/repos/statistics/#commit-activity
-  // TODO: Implement listCodeFrequency: https://developer.github.com/v3/repos/statistics/#code-frequency
-  // TODO: Implement listParticipation: https://developer.github.com/v3/repos/statistics/#participation
-  // TODO: Implement listPunchCard: https://developer.github.com/v3/repos/statistics/#punch-card
+  /// Fetches commit counts for the past year.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statistics/#commit-activity
+  Stream<YearCommitCountWeek> listCommitActivity(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/stats/commit_activity",
+        YearCommitCountWeek.fromJSON);
+  }
+  
+  /// Fetches weekly addition and deletion counts.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statistics/#code-frequency
+  Stream<WeeklyChangesCount> listCodeFrequency(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/stats/code_frequency",
+        WeeklyChangesCount.fromJSON);
+  }
+  
+  /// Fetches Participation Breakdowns.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statistics/#participation
+  Future<ContributorParticipation> getParticipation(RepositorySlug slug) {
+    return _github.getJSON("/repos/${slug.fullName}/stats/participation", statusCode: 200, convert: ContributorParticipation.fromJSON);
+  }
+  
+  /// Fetches Punchcard.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/statistics/#punch-card
+  Stream<PunchcardEntry> listPunchcard(RepositorySlug slug) {
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/stats/punchcard",
+        PunchcardEntry.fromJSON);
+  }
 
   /// Lists the statuses of a repository at the specified reference.
   /// The [ref] can be a SHA, a branch name, or a tag name.
