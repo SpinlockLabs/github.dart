@@ -54,7 +54,28 @@ class OrganizationsService extends Service {
     return controller.stream;
   }
 
-  // TODO: Implement edit: https://developer.github.com/v3/orgs/#edit-an-organization
+  /// Edits an Organization
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/#edit-an-organization
+  Future<Organization> edit(String org, {
+    String billingEmail,
+    String company,
+    String email,
+    String location,
+    String name,
+    String description
+  }) {
+    var map = createNonNullMap({
+      "billing_email": billingEmail,
+      "company": company,
+      "email": email,
+      "location": location,
+      "name": name,
+      "description": description
+    });
+    
+    return _github.postJSON("/orgs/${org}", statusCode: 200, convert: Organization.fromJSON, body: map);
+  }
 
   /// Lists all of the teams for the specified organization.
   ///
@@ -72,9 +93,33 @@ class OrganizationsService extends Service {
         convert: Organization.fromJSON, statusCode: 200);
   }
 
-  // TODO: Implement createTeam: https://developer.github.com/v3/orgs/teams/#create-team
-  // TODO: Implement editTeam: https://developer.github.com/v3/orgs/teams/#edit-team
-
+  /// Creates a Team.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/teams/#create-team
+  Future<Team> createTeam(String org, String name, {String description, List<String> repos, String permission}) {
+    var map = createNonNullMap({
+      "name": name,
+      "description": description,
+      "repo_names": repos,
+      "permission": permission
+    });
+    
+    return _github.postJSON("/orgs/${org}/teams", statusCode: 201, convert: Team.fromJSON, body: map);
+  }
+  
+  /// Edits a Team.
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/teams/#edit-team
+  Future<Team> editTeam(int teamId, String name, {String description, String permission}) {
+    var map = createNonNullMap({
+      "name": name,
+      "description": description,
+      "permission": permission
+    });
+    
+    return _github.postJSON("/teams/${teamId}", statusCode: 200, convert: Team.fromJSON, body: map);
+  }
+  
   /// Deletes the team specified by the [teamId]
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
@@ -101,6 +146,7 @@ class OrganizationsService extends Service {
   /// Adds a user to the team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#add-team-member
+  @deprecated
   Future<bool> addTeamMember(int teamId, String user) {
     return _github
         .request("PUT", "/teams/${teamId}/members/${user}")
@@ -112,6 +158,7 @@ class OrganizationsService extends Service {
   /// Removes a user from the team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#remove-team-member
+  @deprecated
   Future<bool> removeMember(int teamId, String user) {
     return _github
         .request("DELETE", "/teams/${teamId}/members/${user}")
