@@ -4,9 +4,9 @@ typedef http.Client ClientCreator();
 
 /**
  * The Main GitHub Client
- * 
+ *
  * ## Example
- * 
+ *
  *      var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
  *      // Use the Client
  */
@@ -49,7 +49,7 @@ class GitHub {
 
   /**
    * Creates a new [GitHub] instance.
-   * 
+   *
    * [fetcher] is the HTTP Transporter to use
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
@@ -176,27 +176,28 @@ class GitHub {
 
   /**
    * Handles Get Requests that respond with JSON
-   * 
+   *
    * [path] can either be a path like '/repos' or a full url.
-   * 
-   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   *
+   * [statusCode] is the expected status code. If it is null, it is ignored.
    * If the status code that the response returns is not the status code you provide
    * then the [fail] function will be called with the HTTP Response.
    * If you don't throw an error or break out somehow, it will go into some error checking
    * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
    * for errors, it throws an Unknown Error.
-   * 
+   *
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * 
+   *
    * [params] are query string parameters.
-   * 
+   *
    * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
    */
   Future<dynamic> getJSON(String path, {int statusCode,
       void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert, String preview}) {
+      Map<String, String> params, JSONConverter convert,
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -209,35 +210,38 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("GET", path,
-        headers: headers,
-        params: params,
-        statusCode: statusCode,
-        fail: fail).then((response) {
-      return convert(JSON.decode(response.body));
-    });
+    var response = await request("GET", path,
+        headers: headers, params: params, statusCode: statusCode, fail: fail);
+
+    var json = JSON.decode(response.body);
+
+    if (convert == null) {
+      return json;
+    }
+
+    return convert(json);
   }
 
   /**
    * Handles Post Requests that respond with JSON
-   * 
+   *
    * [path] can either be a path like '/repos' or a full url.
-   * 
-   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   *
+   * [statusCode] is the expected status code. If it is null, it is ignored.
    * If the status code that the response returns is not the status code you provide
    * then the [fail] function will be called with the HTTP Response.
    * If you don't throw an error or break out somehow, it will go into some error checking
    * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
    * for errors, it throws an Unknown Error.
-   * 
+   *
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * 
+   *
    * [params] are query string parameters.
-   * 
+   *
    * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
-   * 
+   *
    * [body] is the data to send to the server.
    */
   Future<dynamic> postJSON(String path, {int statusCode,
@@ -313,7 +317,7 @@ class GitHub {
 
   /**
    * Handles Authenticated Requests in an easy to understand way.
-   * 
+   *
    * [method] is the HTTP method.
    * [path] can either be a path like '/repos' or a full url.
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
@@ -353,6 +357,9 @@ class GitHub {
       url.write(queryString);
     } else {
       url.write(endpoint);
+      if (!path.startsWith('/')) {
+        url.write('/');
+      }
       url.write(path);
       url.write(queryString);
     }
