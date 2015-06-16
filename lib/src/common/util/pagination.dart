@@ -7,8 +7,8 @@ class PaginationHelper<T> {
   PaginationHelper(this.github);
 
   Stream<http.Response> fetchStreamed(String method, String path, {int pages,
-      bool reverse: false, int start, Map<String, String> headers,
-      Map<String, dynamic> params, String body, int statusCode: 200}) {
+      int start, Map<String, String> headers, Map<String, dynamic> params,
+      String body, int statusCode: 200}) {
     if (headers == null) headers = {};
     var controller = new StreamController.broadcast();
 
@@ -39,7 +39,7 @@ class PaginationHelper<T> {
 
       var info = parseLinkHeader(response.headers['link']);
 
-      if (!info.containsKey(reverse ? "prev" : "next")) {
+      if (!info.containsKey("next")) {
         controller.close();
         return;
       }
@@ -49,22 +49,13 @@ class PaginationHelper<T> {
         return;
       }
 
-      var nextUrl = reverse ? info['prev'] : info['next'];
+      var nextUrl = info['next'];
 
       actualFetch(nextUrl).then(handleResponse);
     }
 
     actualFetch(path, true).then((response) {
-      if (count == 0 && reverse) {
-        var info = parseLinkHeader(response.headers['link']);
-        if (!info.containsKey("last")) {
-          controller.close();
-          return;
-        }
-        actualFetch(info['last'], true);
-      } else {
-        handleResponse(response);
-      }
+      handleResponse(response);
     }).catchError((e, s) {
       controller.addError(e, s);
       controller.close();
@@ -74,7 +65,7 @@ class PaginationHelper<T> {
   }
 
   Stream<T> objects(String method, String path, JSONConverter converter,
-      {int pages, bool reverse: false, int start, Map<String, String> headers,
+      {int pages, int start, Map<String, String> headers,
       Map<String, dynamic> params, String body, int statusCode: 200,
       String preview}) {
     if (headers == null) headers = {};
@@ -85,7 +76,6 @@ class PaginationHelper<T> {
     return fetchStreamed(method, path,
         pages: pages,
         start: start,
-        reverse: reverse,
         headers: headers,
         params: params,
         body: body,
