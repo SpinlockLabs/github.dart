@@ -125,6 +125,8 @@ class Repository {
 
   /// Gets the Repository Slug (Full Name).
   RepositorySlug slug() => new RepositorySlug(owner.login, name);
+
+  String toString() => 'Repository: ${owner.login}/$name';
 }
 
 /// Repository Clone Urls
@@ -178,6 +180,8 @@ class Tag {
       ..tarUrl = input['tarball_url']
       ..zipUrl = input['zipball_url'];
   }
+
+  String toString() => 'Tag: $name';
 }
 
 class CommitInfo {
