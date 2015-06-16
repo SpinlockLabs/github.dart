@@ -46,7 +46,6 @@ class PaginationHelper<T> {
 
       actualFetch(nextUrl).then(handleResponse);
     }
-    ;
 
     actualFetch(path).then(handleResponse).catchError((e, s) {
       completer.completeError(e, s);
@@ -102,7 +101,6 @@ class PaginationHelper<T> {
 
       actualFetch(nextUrl).then(handleResponse);
     }
-    ;
 
     actualFetch(path, true).then((response) {
       if (count == 0 && reverse) {
