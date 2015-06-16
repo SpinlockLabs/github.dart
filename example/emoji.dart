@@ -1,6 +1,5 @@
 import "dart:html";
 
-import "package:github/browser.dart";
 import "common.dart";
 
 DivElement $emoji;
