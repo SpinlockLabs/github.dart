@@ -1,3 +1,4 @@
+#!/usr/bin/env dart
 library hop_runner;
 
 import 'dart:async';
