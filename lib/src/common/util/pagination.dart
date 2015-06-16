@@ -21,7 +21,6 @@ class PaginationHelper<T> {
 
     var count = 0;
 
-
     handleResponse(http.Response response) {
       count++;
       responses.add(response);
@@ -46,7 +45,8 @@ class PaginationHelper<T> {
       var nextUrl = info['next'];
 
       actualFetch(nextUrl).then(handleResponse);
-    };
+    }
+    ;
 
     actualFetch(path).then(handleResponse).catchError((e, s) {
       completer.completeError(e, s);
@@ -70,7 +70,6 @@ class PaginationHelper<T> {
       } else if (!first) {
         p = null;
       }
-
 
       return github.request(method, realPath,
           headers: headers, params: p, body: body, statusCode: statusCode);
@@ -102,7 +101,8 @@ class PaginationHelper<T> {
       var nextUrl = reverse ? info['prev'] : info['next'];
 
       actualFetch(nextUrl).then(handleResponse);
-    };
+    }
+    ;
 
     actualFetch(path, true).then((response) {
       if (count == 0 && reverse) {
@@ -125,7 +125,8 @@ class PaginationHelper<T> {
 
   Stream<T> objects(String method, String path, JSONConverter converter,
       {int pages, bool reverse: false, int start, Map<String, String> headers,
-      Map<String, dynamic> params, String body, int statusCode: 200, String preview}) {
+      Map<String, dynamic> params, String body, int statusCode: 200,
+      String preview}) {
     if (headers == null) headers = {};
     if (preview != null) {
       headers["Accept"] = preview;
@@ -139,8 +140,8 @@ class PaginationHelper<T> {
         params: params,
         body: body,
         statusCode: statusCode).expand((response) {
-          var json = response.asJSON();
-          return (json as List).map(converter).toList(growable:false);
-        });
+      var json = response.asJSON();
+      return (json as List).map(converter).toList(growable: false);
+    });
   }
 }

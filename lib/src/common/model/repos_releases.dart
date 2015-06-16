@@ -70,8 +70,8 @@ class Release {
       ..draft = input['draft']
       ..prerelease = input['prelease']
       ..author = input['author']
-      ..assets = new List.from(
-          input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
+      ..assets =
+      new List.from(input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
       ..name = input['name']
       ..createdAt = parseDateTime(input['created_at'])
       ..publishedAt = parseDateTime(input['published_at']);

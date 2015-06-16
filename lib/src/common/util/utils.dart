@@ -125,12 +125,7 @@ int parseFancyNumber(String input) {
   input = input.trim();
   if (input.contains(",")) input = input.replaceAll(",", "");
 
-  var multipliers = {
-    "h": 100,
-    "k": 1000,
-    "ht": 100000,
-    "m": 1000000
-  };
+  var multipliers = {"h": 100, "k": 1000, "ht": 100000, "m": 1000000};
   int value;
 
   if (!multipliers.keys.any((m) => input.endsWith(m))) {

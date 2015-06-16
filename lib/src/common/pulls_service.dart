@@ -104,10 +104,10 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
   Stream<PullRequestComment> listComments(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/pulls/comments", PullRequestComment.fromJSON);
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/pulls/comments", PullRequestComment.fromJSON);
   }
-  
+
   /// Creates a new pull request comment.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment

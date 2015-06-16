@@ -41,8 +41,8 @@ class MiscService extends Service {
       {String mode: "markdown", String context}) {
     return _github
         .request("POST", "/markdown",
-            body: JSON.encode(
-                {"text": input, "mode": mode, "context": context}))
+            body: JSON
+                .encode({"text": input, "mode": mode, "context": context}))
         .then((response) {
       return response.body;
     });

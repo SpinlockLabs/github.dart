@@ -36,8 +36,8 @@ void loadOrganization() {
           h.classes.add("box");
           h.classes.add("user");
           h.style.textAlign = "center";
-          h.append(new ImageElement(
-              src: member.avatarUrl, width: 64, height: 64)
+          h.append(
+              new ImageElement(src: member.avatarUrl, width: 64, height: 64)
             ..classes.add("avatar"));
           h.append(new AnchorElement(href: member.htmlUrl)
             ..append(new ParagraphElement()..text = member.login));

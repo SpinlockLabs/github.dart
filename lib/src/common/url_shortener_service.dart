@@ -18,8 +18,9 @@ class UrlShortenerService extends Service {
       params['code'] = code;
     }
 
-    return _github.request("POST", "http://git.io/", params: params).then(
-        (response) {
+    return _github
+        .request("POST", "http://git.io/", params: params)
+        .then((response) {
       if (response.statusCode != StatusCodes.CREATED) {
         throw new GitHubError(_github, "Failed to create shortened url!");
       }

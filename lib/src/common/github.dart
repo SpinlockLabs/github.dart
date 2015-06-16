@@ -198,7 +198,7 @@ class GitHub {
       void fail(http.Response response), Map<String, String> headers,
       Map<String, String> params, JSONConverter convert, String preview}) {
     if (headers == null) headers = {};
-    
+
     if (preview != null) {
       headers["Accept"] = preview;
     }
@@ -209,9 +209,11 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("GET", path, headers: headers, params: params,
-        statusCode: statusCode, fail: fail).then(
-        (response) {
+    return request("GET", path,
+        headers: headers,
+        params: params,
+        statusCode: statusCode,
+        fail: fail).then((response) {
       return convert(JSON.decode(response.body));
     });
   }
@@ -240,7 +242,8 @@ class GitHub {
    */
   Future<dynamic> postJSON(String path, {int statusCode,
       void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert, body, String preview}) {
+      Map<String, String> params, JSONConverter convert, body,
+      String preview}) {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -253,9 +256,12 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("POST", path, headers: headers, params: params, body: body,
-        statusCode: statusCode, fail: fail)
-        .then((response) {
+    return request("POST", path,
+        headers: headers,
+        params: params,
+        body: body,
+        statusCode: statusCode,
+        fail: fail).then((response) {
       return convert(JSON.decode(response.body));
     });
   }
@@ -277,8 +283,7 @@ class GitHub {
           throw new InvalidJSON(this, msg);
         } else if (msg == "Body should be a JSON Hash") {
           throw new InvalidJSON(this, msg);
-        }
-        else throw new BadRequest(this);
+        } else throw new BadRequest(this);
         break;
       case 422:
         var json = response.asJSON();
@@ -317,10 +322,9 @@ class GitHub {
    */
   Future<http.Response> request(String method, String path,
       {Map<String, String> headers, Map<String, dynamic> params, String body,
-        int statusCode,
-        void fail(http.Response response), String preview}) {
+      int statusCode, void fail(http.Response response), String preview}) {
     if (headers == null) headers = {};
-    
+
     if (preview != null) {
       headers["Accept"] = preview;
     }
@@ -353,14 +357,15 @@ class GitHub {
       url.write(queryString);
     }
 
-    return client.request(new http.Request(url.toString(),
-        method: method, headers: headers, body: body)).then((response) {
+    return client
+        .request(new http.Request(url.toString(),
+            method: method, headers: headers, body: body))
+        .then((response) {
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
         return null;
-      }
-      else return response;
+      } else return response;
     });
   }
 

@@ -51,10 +51,9 @@ class GistsService extends Service {
   /// Creates a Gist
   ///
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
-  Future<Gist> createGist(Map<String, String> files, {String description, bool public: false}) {
-    var map = {
-      "files": {}
-    };
+  Future<Gist> createGist(Map<String, String> files,
+      {String description, bool public: false}) {
+    var map = {"files": {}};
 
     if (description != null) {
       map["description"] = description;
@@ -65,14 +64,13 @@ class GistsService extends Service {
     var f = {};
 
     for (var key in files.keys) {
-      f[key] = {
-        "content": files[key]
-      };
+      f[key] = {"content": files[key]};
     }
 
     map["files"] = f;
 
-    return _github.postJSON("/gists", statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
+    return _github.postJSON("/gists",
+        statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
   /// Deletes the specified Gist.
@@ -87,10 +85,9 @@ class GistsService extends Service {
   /// Edits a Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
-  Future<Gist> editGist(Map<String, String> files, {String description, bool public: false}) {
-    var map = {
-      "files": {}
-    };
+  Future<Gist> editGist(Map<String, String> files,
+      {String description, bool public: false}) {
+    var map = {"files": {}};
 
     if (description != null) {
       map["description"] = description;
@@ -101,14 +98,13 @@ class GistsService extends Service {
     var f = {};
 
     for (var key in files.keys) {
-      f[key] = files[key] == null ? null : {
-        "content": files[key]
-      };
+      f[key] = files[key] == null ? null : {"content": files[key]};
     }
 
     map["files"] = f;
 
-    return _github.postJSON("/gists", statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
+    return _github.postJSON("/gists",
+        statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
@@ -144,7 +140,9 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
   Future<Gist> forkGist(String id) {
-    return _github.request("POST", "/gists/${id}/forks", statusCode: 201).then((response) {
+    return _github
+        .request("POST", "/gists/${id}/forks", statusCode: 201)
+        .then((response) {
       return Gist.fromJSON(response.asJSON());
     });
   }

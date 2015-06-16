@@ -22,13 +22,15 @@ GitHub github = _makeGitHubClient();
 
 GitHub _makeGitHubClient() {
   GitHub g;
-  
+
   if (Platform.environment.containsKey("GITHUB_TOKEN")) {
-    g = createGitHubClient(auth: new Authentication.withToken(Platform.environment["GITHUB_TOKEN"]));
+    g = createGitHubClient(
+        auth: new Authentication.withToken(
+            Platform.environment["GITHUB_TOKEN"]));
   } else {
     g = createGitHubClient();
   }
-  
+
   return g;
 }
 
