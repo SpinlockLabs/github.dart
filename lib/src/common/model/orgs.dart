@@ -234,4 +234,3 @@ class TeamRepositoryPermissions {
       ..pull = input['pull'];
   }
 }
-

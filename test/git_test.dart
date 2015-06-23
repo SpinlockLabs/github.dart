@@ -32,8 +32,9 @@ main() {
   group('getBlob()', () {
     test('constructs correct path', () {
       git.getBlob(repo, 'sh');
-      github.getLogs(callsTo('getJSON', '/repos/o/n/git/blobs/sh')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('getJSON', '/repos/o/n/git/blobs/sh'))
+          .verify(happenedOnce);
     });
   });
 
@@ -42,8 +43,9 @@ main() {
       CreateGitBlob blob = new CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
-      github.getLogs(callsTo('postJSON', '/repos/o/n/git/blobs')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('postJSON', '/repos/o/n/git/blobs'))
+          .verify(happenedOnce);
     });
 
     test('creates valid JSON body', () {
@@ -65,8 +67,9 @@ main() {
     test('constructs correct path', () {
       git.getCommit(repo, 'sh');
 
-      github.getLogs(callsTo('getJSON', '/repos/o/n/git/commits/sh')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('getJSON', '/repos/o/n/git/commits/sh'))
+          .verify(happenedOnce);
     });
   });
 
@@ -75,8 +78,9 @@ main() {
       CreateGitCommit commit = new CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
-      github.getLogs(callsTo('postJSON', '/repos/o/n/git/commits')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('postJSON', '/repos/o/n/git/commits'))
+          .verify(happenedOnce);
     });
 
     test('creates valid JSON body', () {
@@ -114,8 +118,9 @@ main() {
     test('constructs correct path', () {
       git.getReference(repo, 'heads/b');
 
-      github.getLogs(callsTo('getJSON', '/repos/o/n/git/refs/heads/b')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('getJSON', '/repos/o/n/git/refs/heads/b'))
+          .verify(happenedOnce);
     });
   });
 
@@ -123,8 +128,9 @@ main() {
     test('constructs correct path', () {
       git.createReference(repo, 'refs/heads/b', 'someSHA');
 
-      github.getLogs(callsTo('postJSON', '/repos/o/n/git/refs')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('postJSON', '/repos/o/n/git/refs'))
+          .verify(happenedOnce);
     });
 
     test('creates valid JSON body', () {
@@ -143,8 +149,9 @@ main() {
     test('constructs correct path', () {
       // given
       http.Response res = new http.Response('{}', null, null);
-      github.when(callsTo('request', anything, anything)).alwaysReturn(
-          new Future.value(res));
+      github
+          .when(callsTo('request', anything, anything))
+          .alwaysReturn(new Future.value(res));
 
       // when
       git.editReference(repo, 'heads/b', 'someSHA');
@@ -158,8 +165,9 @@ main() {
     test('creates valid JSON body', () {
       // given
       http.Response res = new http.Response('{}', null, null);
-      github.when(callsTo('request', anything, anything)).alwaysReturn(
-          new Future.value(res));
+      github
+          .when(callsTo('request', anything, anything))
+          .alwaysReturn(new Future.value(res));
 
       // when
       git.editReference(repo, 'heads/b', 'someSHA', force: true);
@@ -179,8 +187,9 @@ main() {
     test('constructs correct path', () {
       // given
       http.Response res = new http.Response('{}', null, null);
-      github.when(callsTo('request', anything, anything)).alwaysReturn(
-          new Future.value(res));
+      github
+          .when(callsTo('request', anything, anything))
+          .alwaysReturn(new Future.value(res));
 
       // when
       git.deleteReference(repo, 'heads/b');
@@ -199,8 +208,9 @@ main() {
     test('constructs correct path', () {
       git.getTag(repo, 'someSHA');
 
-      github.getLogs(callsTo('getJSON', '/repos/o/n/git/tags/someSHA')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('getJSON', '/repos/o/n/git/tags/someSHA'))
+          .verify(happenedOnce);
     });
   });
 
@@ -209,8 +219,9 @@ main() {
       git.createTag(repo, new CreateGitTag('v0.0.1', 'a message', 'someSHA',
           'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now())));
 
-      github.getLogs(callsTo('postJSON', '/repos/o/n/git/tags')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('postJSON', '/repos/o/n/git/tags'))
+          .verify(happenedOnce);
     });
 
     test('creates valid JSON body', () {
@@ -238,8 +249,9 @@ main() {
     test('constructs correct path', () {
       git.getTree(repo, 'sh');
 
-      github.getLogs(callsTo('getJSON', '/repos/o/n/git/trees/sh')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('getJSON', '/repos/o/n/git/trees/sh'))
+          .verify(happenedOnce);
     });
   });
 
@@ -257,8 +269,9 @@ main() {
     test('constructs correct path', () {
       git.createTree(repo, new CreateGitTree([]));
 
-      github.getLogs(callsTo('postJSON', '/repos/o/n/git/trees')).verify(
-          happenedOnce);
+      github
+          .getLogs(callsTo('postJSON', '/repos/o/n/git/trees'))
+          .verify(happenedOnce);
     });
 
     test('with sha creates valid JSON body', () {

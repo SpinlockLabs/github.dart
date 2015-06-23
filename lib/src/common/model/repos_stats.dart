@@ -72,16 +72,16 @@ class ContributorParticipation {
 class YearCommitCountWeek {
   /// Commit Counts for each day (starting with Sunday)
   List<int> days;
-  
+
   /// Total Commit Count
   int total;
-  
+
   /// Timestamp for Beginning of Week
   int timestamp;
-  
+
   static YearCommitCountWeek fromJSON(input) {
     if (input == null) return null;
-    
+
     var c = new YearCommitCountWeek();
     c.days = input["days"];
     c.total = input["total"];
@@ -94,13 +94,13 @@ class YearCommitCountWeek {
 class WeeklyChangesCount {
   /// Timestamp for Beginning of Week
   int timestamp;
-  
+
   /// Number of Additions
   int additions;
-  
+
   /// Number of Deletions
   int deletions;
-  
+
   static WeeklyChangesCount fromJSON(input) {
     if (input == null) return null;
     var c = new WeeklyChangesCount();
@@ -115,13 +115,13 @@ class WeeklyChangesCount {
 class PunchcardEntry {
   /// Weekday (With 0 as Sunday and 6 as Saturday)
   int weekday;
-  
+
   /// Hour of Day
   int hour;
-  
+
   /// Number of Commits
   int commits;
-  
+
   static PunchcardEntry fromJSON(input) {
     if (input == null) return null;
     var c = new PunchcardEntry();

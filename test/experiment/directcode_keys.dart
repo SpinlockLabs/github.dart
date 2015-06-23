@@ -15,9 +15,7 @@ void main() {
     return group.future;
   }).then((mems) {
     return mems.reduce((value, e) {
-      return new Set()
-        ..addAll(value)
-        ..addAll(e);
+      return new Set()..addAll(value)..addAll(e);
     });
   }).then((members) {
     var group = new FutureGroup();

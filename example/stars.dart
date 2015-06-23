@@ -39,7 +39,7 @@ void loadStars() {
       ..append(new ParagraphElement()..text = stargazer.login));
     $stars.append(h);
   }).onDone(() {
-    querySelector("#total").appendText(
-        querySelectorAll(".user").length.toString() + " stars");
+    querySelector("#total")
+        .appendText(querySelectorAll(".user").length.toString() + " stars");
   });
 }

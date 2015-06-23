@@ -21,7 +21,8 @@ class HookMiddleware {
     }
 
     request.transform(UTF8.decoder).join().then((content) {
-      _eventController.add(new HookEvent.fromJSON(request.headers.value("X-GitHub-Event"), JSON.decode(content)));
+      _eventController.add(new HookEvent.fromJSON(
+          request.headers.value("X-GitHub-Event"), JSON.decode(content)));
       request.response
         ..write(JSON.encode({"handled": _eventController.hasListener}))
         ..close();

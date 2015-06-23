@@ -1,3 +1,4 @@
+#!/usr/bin/env dart
 library hop_runner;
 
 import 'dart:async';
@@ -21,8 +22,8 @@ void main(List<String> args) {
       createAnalyzerTask(getvar("analyzer.files").map(parse_config_value)));
   addTask("version", createVersionTask());
   addTask("publish", createProcessTask("pub",
-      args: ["publish", "-f"],
-      description: "Publishes a New Version"), dependencies: ["version"]);
+          args: ["publish", "-f"], description: "Publishes a New Version"),
+      dependencies: ["version"]);
   addTask("bench", createBenchTask());
   addTask("test", createProcessTask("dart",
       args: ["--checked", getvar("test.file")],

@@ -38,8 +38,9 @@ class OAuth2Flow {
   OAuth2Flow(this.clientId, this.clientSecret, {String redirectUri,
       this.scopes: const [], this.state, this.github,
       this.baseUrl: "https://github.com/login/oauth"})
-      : this.redirectUri = redirectUri == null ? null :
-      _checkRedirectUri(redirectUri);
+      : this.redirectUri = redirectUri == null
+          ? null
+          : _checkRedirectUri(redirectUri);
 
   static String _checkRedirectUri(String uri) {
     return uri.contains("?") ? uri.substring(0, uri.indexOf("?")) : uri;

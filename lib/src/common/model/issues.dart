@@ -182,6 +182,8 @@ class IssueLabel {
       ..name = input['name']
       ..color = input['color'];
   }
+
+  String toString() => 'IssueLabel: $name';
 }
 
 /// Model class for a milestone.

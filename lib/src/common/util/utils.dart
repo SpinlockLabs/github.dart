@@ -84,6 +84,7 @@ void putValue(String name, dynamic value, Map<String, dynamic> map) {
   }
 }
 
+//TODO(kevmoo): use regex here.
 Map<String, String> parseLinkHeader(String input) {
   var out = {};
   var parts = input.split(", ");
@@ -125,12 +126,7 @@ int parseFancyNumber(String input) {
   input = input.trim();
   if (input.contains(",")) input = input.replaceAll(",", "");
 
-  var multipliers = {
-    "h": 100,
-    "k": 1000,
-    "ht": 100000,
-    "m": 1000000
-  };
+  var multipliers = {"h": 100, "k": 1000, "ht": 100000, "m": 1000000};
   int value;
 
   if (!multipliers.keys.any((m) => input.endsWith(m))) {
@@ -144,6 +140,7 @@ int parseFancyNumber(String input) {
   return value;
 }
 
+//TODO(kevmoo) Hide this. Should not be visible.
 Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
   var map = {};
   for (var key in input.keys) {

@@ -33,8 +33,9 @@ void loadRepository() {
 
   document.getElementById("name").setInnerHtml("${user}/${reponame}");
 
-  github.repositories.listLanguages(new RepositorySlug(user, reponame)).then(
-      (b) {
+  github.repositories
+      .listLanguages(new RepositorySlug(user, reponame))
+      .then((b) {
     breakdown = b;
     reloadTable();
   });
