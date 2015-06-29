@@ -11,7 +11,11 @@ class PaginationHelper<T> {
       int statusCode: 200}) async* {
     int count = 0;
 
-    params = new Map.from(params);
+    if (params == null) {
+      params = {};
+    } else {
+      params = new Map.from(params);
+    }
     assert(!params.containsKey('page'));
 
     do {
