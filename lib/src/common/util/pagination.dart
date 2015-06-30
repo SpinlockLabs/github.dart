@@ -30,7 +30,13 @@ class PaginationHelper<T> {
         break;
       }
 
-      var info = parseLinkHeader(response.headers['link']);
+      var link = response.headers['link'];
+
+      if (link == null) {
+        break;
+      }
+
+      var info = parseLinkHeader(link);
       if (info == null) {
         break;
       }
