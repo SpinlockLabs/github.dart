@@ -85,23 +85,21 @@ class GistsService extends Service {
   /// Edits a Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
-  Future<Gist> editGist(String id, Map<String, String> files,
-      {String description, bool public: false}) {
-    var map = {"files": {}};
+  Future<Gist> editGist(String id, {String description, Map<String, String> files
+  }) {
+    var map = {};
 
     if (description != null) {
       map["description"] = description;
     }
 
-    map["public"] = public;
-
-    var f = {};
-
-    for (var key in files.keys) {
-      f[key] = files[key] == null ? null : {"content": files[key]};
+    if (files != null) {
+      var f = {};
+      for (var key in files.keys) {
+        f[key] = files[key] == null ? null : {"content": files[key]};
+      }
+      map["files"] = f;
     }
-
-    map["files"] = f;
 
     return _github.postJSON("/gists/${id}",
         statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
