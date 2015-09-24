@@ -57,7 +57,8 @@ class RateLimitHit extends GitHubError {
 
 /// An Unknown Error
 class UnknownError extends GitHubError {
-  UnknownError(GitHub github) : super(github, "Unknown Error");
+  UnknownError(GitHub github, [String message])
+      : super(github, message != null ? message : "Unknown Error");
 }
 
 /// GitHub Client was not authenticated
