@@ -11,7 +11,6 @@ typedef http.Client ClientCreator();
  *      // Use the Client
  */
 class GitHub {
-
   /**
    * Default Client Creator
    */
@@ -54,7 +53,9 @@ class GitHub {
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
    */
-  GitHub({Authentication auth, this.endpoint: "https://api.github.com",
+  GitHub(
+      {Authentication auth,
+      this.endpoint: "https://api.github.com",
       http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
         this.client = client == null ? defaultClient() : client;
@@ -194,9 +195,12 @@ class GitHub {
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
    */
-  Future<dynamic> getJSON(String path, {int statusCode,
-      void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert,
+  Future<dynamic> getJSON(String path,
+      {int statusCode,
+      void fail(http.Response response),
+      Map<String, String> headers,
+      Map<String, String> params,
+      JSONConverter convert,
       String preview}) async {
     if (headers == null) headers = {};
 
@@ -244,9 +248,13 @@ class GitHub {
    *
    * [body] is the data to send to the server.
    */
-  Future<dynamic> postJSON(String path, {int statusCode,
-      void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert, body,
+  Future<dynamic> postJSON(String path,
+      {int statusCode,
+      void fail(http.Response response),
+      Map<String, String> headers,
+      Map<String, String> params,
+      JSONConverter convert,
+      body,
       String preview}) {
     if (headers == null) headers = {};
 
@@ -274,6 +282,13 @@ class GitHub {
    * Internal method to handle status codes
    */
   void handleStatusCode(http.Response response) {
+    String message;
+    List<String> errors;
+    if (response.headers['content-type'].contains('application/json')) {
+      var json = response.asJSON();
+      message = json['message'];
+      errors = json['errors'];
+    }
     switch (response.statusCode) {
       case 404:
         throw new NotFound(this, "Requested Resource was Not Found");
@@ -281,23 +296,16 @@ class GitHub {
       case 401:
         throw new AccessForbidden(this);
       case 400:
-        var json = response.asJSON();
-        String msg = json['message'];
-        if (msg == "Problems parsing JSON") {
-          throw new InvalidJSON(this, msg);
-        } else if (msg == "Body should be a JSON Hash") {
-          throw new InvalidJSON(this, msg);
+        if (message == "Problems parsing JSON") {
+          throw new InvalidJSON(this, message);
+        } else if (message == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, message);
         } else throw new BadRequest(this);
         break;
       case 422:
-        var json = response.asJSON();
-        String msg = json['message'];
-        var errors = json['errors'];
-
         var buff = new StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: ${msg}");
-
+        buff.writeln("  Message: ${message}");
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -312,7 +320,7 @@ class GitHub {
         }
         throw new ValidationFailed(this, buff.toString());
     }
-    throw new UnknownError(this);
+    throw new UnknownError(this, message);
   }
 
   /**
@@ -325,8 +333,12 @@ class GitHub {
    * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path,
-      {Map<String, String> headers, Map<String, dynamic> params, String body,
-      int statusCode, void fail(http.Response response), String preview}) {
+      {Map<String, String> headers,
+      Map<String, dynamic> params,
+      String body,
+      int statusCode,
+      void fail(http.Response response),
+      String preview}) {
     if (headers == null) headers = {};
 
     if (preview != null) {
