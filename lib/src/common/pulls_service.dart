@@ -52,13 +52,15 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
   Stream<RepositoryCommit> listCommits(RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects("GET",
+    return new PaginationHelper(_github).objects(
+        "GET",
         '/repos/${slug.fullName}/pulls/${number}/commits',
         RepositoryCommit.fromJSON);
   }
 
   Stream<RepositoryCommit> listFiles(RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects("GET",
+    return new PaginationHelper(_github).objects(
+        "GET",
         '/repos/${slug.fullName}/pulls/${number}/files',
         PullRequestFile.fromJSON);
   }
@@ -95,7 +97,8 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
   Stream<PullRequestComment> listCommentsByPullRequest(
       RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects("GET",
+    return new PaginationHelper(_github).objects(
+        "GET",
         "/repos/${slug.fullName}/pulls/${number}/comments",
         PullRequestComment.fromJSON);
   }

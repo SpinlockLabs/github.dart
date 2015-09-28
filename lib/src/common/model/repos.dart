@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a repository.
 class Repository {
-
   /// Repository Name
   String name;
 
@@ -131,7 +130,6 @@ class Repository {
 
 /// Repository Clone Urls
 class CloneUrls {
-
   /// Git Protocol
   ///
   /// git://github.com/user/repo.git
@@ -190,7 +188,6 @@ class CommitInfo {
 
 /// User Information
 class UserInformation {
-
   /// Owner Username
   String login;
 
@@ -218,7 +215,6 @@ class UserInformation {
 
 /// A Repository Slug
 class RepositorySlug {
-
   /// Repository Owner
   final String owner;
 
@@ -251,7 +247,6 @@ class RepositorySlug {
 
 /// Model class for a new repository to be created.
 class CreateRepository {
-
   /// Repository Name
   final String name;
 
@@ -314,7 +309,6 @@ class CreateRepository {
 
 /// Model class for a branch.
 class Branch {
-
   /// The name of the branch.
   String name;
 

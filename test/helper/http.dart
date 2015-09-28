@@ -10,7 +10,8 @@ class MockHTTPClient extends http.Client {
   @override
   Future<http.Response> request(http.Request request) {
     var creator = responses.keys.firstWhere(
-        (it) => it.allMatches(request.url).isNotEmpty, orElse: () => null);
+        (it) => it.allMatches(request.url).isNotEmpty,
+        orElse: () => null);
     if (creator == null) {
       throw new Exception("No Response Configured");
     }

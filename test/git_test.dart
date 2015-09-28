@@ -216,8 +216,10 @@ main() {
 
   group('createTag()', () {
     test('constructs correct path', () {
-      git.createTag(repo, new CreateGitTag('v0.0.1', 'a message', 'someSHA',
-          'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now())));
+      git.createTag(
+          repo,
+          new CreateGitTag('v0.0.1', 'a message', 'someSHA', 'commit',
+              new GitCommitUser('aName', 'aEmail', new DateTime.now())));
 
       github
           .getLogs(callsTo('postJSON', '/repos/o/n/git/tags'))
@@ -225,8 +227,10 @@ main() {
     });
 
     test('creates valid JSON body', () {
-      git.createTag(repo, new CreateGitTag('v0.0.1', 'a message', 'someSHA',
-          'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now())));
+      git.createTag(
+          repo,
+          new CreateGitTag('v0.0.1', 'a message', 'someSHA', 'commit',
+              new GitCommitUser('aName', 'aEmail', new DateTime.now())));
 
       LogEntryNamedArgs entry = github.getLogs().first;
       Map body = JSON.decode(entry.namedArgs[#body]);

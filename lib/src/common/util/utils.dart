@@ -2,7 +2,6 @@ part of github.common;
 
 /// Marks something as not being ready or complete.
 class NotReadyYet {
-
   /// Informational Message
   final String message;
 
@@ -21,7 +20,6 @@ class ApiName {
 
 /// Specifies that something should be only used when the specified condition is met.
 class OnlyWhen {
-
   /// Condition
   final String condition;
 

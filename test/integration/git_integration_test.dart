@@ -36,8 +36,10 @@ main() {
     }).then((fetchedBlob) {
       expect(base64ToUtf8(fetchedBlob.content), equals('bbb'));
       expect(fetchedBlob.encoding, equals('base64'));
-      expect(fetchedBlob.url, equals(
-          'https://api.github.com/repos/${slug.fullName}/git/blobs/${createdBlobSha}'));
+      expect(
+          fetchedBlob.url,
+          equals(
+              'https://api.github.com/repos/${slug.fullName}/git/blobs/${createdBlobSha}'));
       expect(fetchedBlob.sha, equals(createdBlobSha));
       expect(fetchedBlob.size, equals(3));
     });
@@ -116,8 +118,8 @@ main() {
       expect(fetchedTag.object.sha, equals(createdCommitSha));
     }).then((_) {
       // Create a reference for the tag.
-      return github.git.createReference(
-          slug, 'refs/tags/v0.0.1', createdTagSha);
+      return github.git
+          .createReference(slug, 'refs/tags/v0.0.1', createdTagSha);
     });
   });
 }

@@ -11,7 +11,8 @@ main() {
         () {
       expectSlug(
           slugFromAPIUrl("https://api.github.com/repos/DirectMyFile/irc.dart"),
-          "DirectMyFile", "irc.dart");
+          "DirectMyFile",
+          "irc.dart");
     });
   });
 }

@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a contributor's statistics for a repository.
 class ContributorStatistics {
-
   /// The Author
   User author;
 
@@ -19,14 +18,13 @@ class ContributorStatistics {
       ..author = User.fromJSON(input['author'])
       ..total = input['total']
       ..weeks =
-      input['weeks'].map((it) => ContributorWeekStatistics.fromJSON(it));
+          input['weeks'].map((it) => ContributorWeekStatistics.fromJSON(it));
   }
 }
 
 /// Model class to represent the number of additions, deletions and commits
 /// a contributor made in a given week.
 class ContributorWeekStatistics {
-
   /// Beginning of the Week (As a Unix Timestamp)
   String start;
 
@@ -52,7 +50,6 @@ class ContributorWeekStatistics {
 
 /// Model class for contributor participation.
 class ContributorParticipation {
-
   /// Commit Counts for All Users
   List<int> all;
 

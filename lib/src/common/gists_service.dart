@@ -11,8 +11,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/users/${username}/gists", Gist.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/users/${username}/gists", Gist.fromJSON);
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -20,24 +20,24 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/gists", Gist.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/gists", Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's public gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/gists/public", Gist.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/gists/public", Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's starred gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/gists/starred", Gist.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/gists/starred", Gist.fromJSON);
   }
 
   /// Fetches a Gist by the specified [id].
@@ -85,8 +85,8 @@ class GistsService extends Service {
   /// Edits a Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
-  Future<Gist> editGist(String id, {String description, Map<String, String> files
-  }) {
+  Future<Gist> editGist(String id,
+      {String description, Map<String, String> files}) {
     var map = {};
 
     if (description != null) {
@@ -151,8 +151,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/gists/${gistId}/comments", GistComment.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/gists/${gistId}/comments", GistComment.fromJSON);
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment

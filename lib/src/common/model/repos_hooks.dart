@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a repository hook.
 class Hook {
-
   /// Events to Subscribe to
   List<String> events;
 
@@ -49,7 +48,6 @@ class Hook {
 
 /// Model class for a new hook to be created.
 class CreateHook {
-
   /// Hook Name
   final String name;
 

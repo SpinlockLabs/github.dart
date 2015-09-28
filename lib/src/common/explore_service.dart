@@ -54,7 +54,8 @@ class ExploreService extends Service {
       var title = doc.querySelector(".collection-header").text;
       var lastUpdated = parseDateTime(doc
           .querySelector(".meta-info.last-updated")
-          .querySelector("time").attributes['datetime']);
+          .querySelector("time")
+          .attributes['datetime']);
       var page = doc.querySelector(".collection-page");
 
       var description = page.querySelector(".collection-description");

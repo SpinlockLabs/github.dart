@@ -11,7 +11,7 @@ GitHub createMockGitHub() {
 /// TODO: Remove this when [Issue 21133](https://code.google.com/p/dart/issues/detail?id=21133)
 /// is resolved.
 class MockWithNamedArgs extends Mock {
-/// The named arguments of the last method invocation.
+  /// The named arguments of the last method invocation.
   Map<Symbol, dynamic> _lastNamedArgs;
 
   MockWithNamedArgs() {
@@ -27,12 +27,12 @@ class MockWithNamedArgs extends Mock {
 
 /// A [LogEntry] that keeps track of named arguments for method calls.
 class LogEntryNamedArgs extends LogEntry {
-/// The named arguments.
+  /// The named arguments.
   final Map<Symbol, dynamic> namedArgs;
 
-  LogEntryNamedArgs(LogEntry logEntry, this.namedArgs) : super(
-          logEntry.mockName, logEntry.methodName, logEntry.args,
-          logEntry.action);
+  LogEntryNamedArgs(LogEntry logEntry, this.namedArgs)
+      : super(logEntry.mockName, logEntry.methodName, logEntry.args,
+            logEntry.action);
 }
 
 /// A [LogEntryList] that keeps track of named arguments for method calls.
