@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a Gitignore Template.
 class GitignoreTemplate {
-
   /// Template Name
   String name;
 
@@ -20,7 +19,6 @@ class GitignoreTemplate {
 
 /// Model class for GitHub Rate Limit Information.
 class RateLimit {
-
   /// Maximum number of requests
   final int limit;
 

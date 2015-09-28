@@ -4,7 +4,6 @@ part of github.browser;
  * Browser-Specific Helpers
  */
 class GitHubBrowserHelper {
-
   /**
    * Renders Markdown in HTML using the GitHub API
    * 

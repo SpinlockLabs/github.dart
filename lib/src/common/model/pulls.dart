@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a Pull Request.
 class PullRequestInformation {
-
   /// If this is a complete pull request
   final bool isCompletePullRequest;
 
@@ -152,7 +151,6 @@ class PullRequestMerge {
 
 /// Model class for a Pull Request Head.
 class PullRequestHead {
-
   /// Label
   String label;
 
@@ -183,7 +181,6 @@ class PullRequestHead {
 
 /// Model class for a pull request to be created.
 class CreatePullRequest {
-
   /// Pull Request Title
   final String title;
 

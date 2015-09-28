@@ -12,8 +12,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listAll() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/issues", Issue.fromJSON);
   }
 
   /// List all issues across owned and member repositories for the authenticated
@@ -21,16 +21,16 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByUser() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/user/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/user/issues", Issue.fromJSON);
   }
 
   /// List all issues for a given organization for the authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByOrg(String org) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${org}/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/orgs/${org}/issues", Issue.fromJSON);
   }
 
   /// Lists the issues for the specified repository.
@@ -80,8 +80,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
   Stream<User> listAssignees(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
   }
 
   /// Checks if a user is an assignee for the specified repository.
@@ -98,7 +98,8 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
   Stream<IssueComment> listCommentsByIssue(
       RepositorySlug slug, int issueNumber) {
-    return new PaginationHelper(_github).objects('GET',
+    return new PaginationHelper(_github).objects(
+        'GET',
         '/repos/${slug.fullName}/issues/${issueNumber}/comments',
         IssueComment.fromJSON);
   }
@@ -149,8 +150,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabels(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
   }
 
   /// Fetches a single label.
@@ -193,7 +194,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabelsByIssue(RepositorySlug slug, int issueNumber) {
-    return new PaginationHelper(_github).objects("GET",
+    return new PaginationHelper(_github).objects(
+        "GET",
         "/repos/${slug.fullName}/issues/${issueNumber}/labels",
         IssueLabel.fromJSON);
   }

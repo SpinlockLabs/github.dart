@@ -66,8 +66,8 @@ class GitService extends Service {
       path += '/$type';
     }
 
-    return new PaginationHelper(_github).objects(
-        'GET', path, GitReference.fromJSON);
+    return new PaginationHelper(_github)
+        .objects('GET', path, GitReference.fromJSON);
   }
 
   /// Creates a new reference in a repository.
@@ -88,7 +88,8 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#update-a-reference
   Future<GitReference> editReference(
-      RepositorySlug slug, String ref, String sha, {bool force: false}) {
+      RepositorySlug slug, String ref, String sha,
+      {bool force: false}) {
     String body = JSON.encode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
     var headers = {'content-length': body.length.toString()};

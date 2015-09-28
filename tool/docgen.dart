@@ -1,8 +1,12 @@
 part of hop_runner;
 
-Task createDocGenTask(String path, {compile: false,
-    Iterable<String> excludes: null, include_sdk: true, include_deps: false,
-    out_dir: "docs", verbose: false}) {
+Task createDocGenTask(String path,
+    {compile: false,
+    Iterable<String> excludes: null,
+    include_sdk: true,
+    include_deps: false,
+    out_dir: "docs",
+    verbose: false}) {
   return new Task((TaskContext context) {
     var args = [];
 

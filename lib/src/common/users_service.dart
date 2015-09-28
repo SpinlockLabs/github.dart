@@ -16,8 +16,14 @@ class UsersService extends Service {
   /// Updates the Current User.
   ///
   /// API docs: https://developer.github.com/v3/users/#update-the-authenticated-user
-  Future<CurrentUser> editCurrentUser({String name, String email, String blog,
-      String company, String location, bool hireable, String bio}) {
+  Future<CurrentUser> editCurrentUser(
+      {String name,
+      String email,
+      String blog,
+      String company,
+      String location,
+      bool hireable,
+      String bio}) {
     var map = createNonNullMap({
       "name": name,
       "email": email,
@@ -57,8 +63,8 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-the-authenticated-user
   Future<CurrentUser> getCurrentUser() {
-    return _github.getJSON("/user",
-        statusCode: StatusCodes.OK, fail: (http.Response response) {
+    return _github.getJSON("/user", statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
       if (response.statusCode == StatusCodes.FORBIDDEN) {
         throw new AccessForbidden(_github);
       }
@@ -82,8 +88,8 @@ class UsersService extends Service {
   /// Lists all email addresses for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
-  Stream<UserEmail> listEmails() => new PaginationHelper(_github).objects(
-      "GET", "/user/emails", UserEmail.fromJSON);
+  Stream<UserEmail> listEmails() => new PaginationHelper(_github)
+      .objects("GET", "/user/emails", UserEmail.fromJSON);
 
   /// Add Emails
   ///
@@ -109,18 +115,16 @@ class UsersService extends Service {
           statusCode: 200);
 
   /// Check if the current user is following the specified user.
-  Future<bool> isFollowingUser(String user) => _github
-      .request("GET", "/user/following/${user}")
-      .then((response) {
-    return response.statusCode == 204;
-  });
+  Future<bool> isFollowingUser(String user) =>
+      _github.request("GET", "/user/following/${user}").then((response) {
+        return response.statusCode == 204;
+      });
 
   /// Check if the specified user is following target.
-  Future<bool> isUserFollowing(String user, String target) => _github
-      .request("GET", "/users/${user}/following/${target}")
-      .then((x) {
-    return x.statusCode == 204;
-  });
+  Future<bool> isUserFollowing(String user, String target) =>
+      _github.request("GET", "/users/${user}/following/${target}").then((x) {
+        return x.statusCode == 204;
+      });
 
   /// Follows a user.
   Future<bool> followUser(String user) {
@@ -153,8 +157,8 @@ class UsersService extends Service {
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
     var path = userLogin == null ? "/user/keys" : "/users/${userLogin}/keys";
-    return new PaginationHelper(_github).objects(
-        "GET", path, PublicKey.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", path, PublicKey.fromJSON);
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key

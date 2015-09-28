@@ -18,7 +18,7 @@ class CombinedRepositoryStatus {
       ..sha = input["sha"]
       ..totalCount = input["total_count"]
       ..statuses =
-      input["statuses"].map((it) => RepositoryStatus.fromJSON(it)).toList()
+          input["statuses"].map((it) => RepositoryStatus.fromJSON(it)).toList()
       ..repository = Repository.fromJSON(input["repository"]);
   }
 }

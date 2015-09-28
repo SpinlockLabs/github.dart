@@ -6,8 +6,11 @@ class PaginationHelper<T> {
 
   PaginationHelper(this.github);
 
-  Stream<http.Response> fetchStreamed(String method, String path, {int pages,
-      Map<String, String> headers, Map<String, dynamic> params, String body,
+  Stream<http.Response> fetchStreamed(String method, String path,
+      {int pages,
+      Map<String, String> headers,
+      Map<String, dynamic> params,
+      String body,
       int statusCode: 200}) async* {
     int count = 0;
 
@@ -55,8 +58,12 @@ class PaginationHelper<T> {
   }
 
   Stream<T> objects(String method, String path, JSONConverter converter,
-      {int pages, Map<String, String> headers, Map<String, dynamic> params,
-      String body, int statusCode: 200, String preview}) async* {
+      {int pages,
+      Map<String, String> headers,
+      Map<String, dynamic> params,
+      String body,
+      int statusCode: 200,
+      String preview}) async* {
     if (headers == null) headers = {};
     if (preview != null) {
       headers["Accept"] = preview;

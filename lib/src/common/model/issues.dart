@@ -188,7 +188,6 @@ class IssueLabel {
 
 /// Model class for a milestone.
 class Milestone {
-
   /// Milestone Number
   int number;
 

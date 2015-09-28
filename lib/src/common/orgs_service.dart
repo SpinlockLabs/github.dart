@@ -17,8 +17,8 @@ class OrganizationsService extends Service {
     if (userName == null) {
       requestPath = "/user/orgs";
     }
-    return new PaginationHelper(_github).objects(
-        "GET", requestPath, Organization.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", requestPath, Organization.fromJSON);
   }
 
   /// Fetches the organization specified by [name].
@@ -27,8 +27,7 @@ class OrganizationsService extends Service {
   Future<Organization> get(String name) {
     return _github.getJSON("/orgs/${name}",
         convert: Organization.fromJSON,
-        statusCode: StatusCodes.OK,
-        fail: (http.Response response) {
+        statusCode: StatusCodes.OK, fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new OrganizationNotFound(_github, name);
       }
@@ -57,8 +56,13 @@ class OrganizationsService extends Service {
   /// Edits an Organization
   ///
   /// API docs: https://developer.github.com/v3/orgs/#edit-an-organization
-  Future<Organization> edit(String org, {String billingEmail, String company,
-      String email, String location, String name, String description}) {
+  Future<Organization> edit(String org,
+      {String billingEmail,
+      String company,
+      String email,
+      String location,
+      String name,
+      String description}) {
     var map = createNonNullMap({
       "billing_email": billingEmail,
       "company": company,
@@ -76,8 +80,8 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
   Stream<Team> listTeams(String orgName) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${orgName}/teams", Team.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/orgs/${orgName}/teams", Team.fromJSON);
   }
 
   /// Gets the team specified by the [teamId].
@@ -129,8 +133,8 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-members
   Stream<TeamMember> listTeamMembers(int teamId) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/teams/${teamId}/members", TeamMember.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/teams/${teamId}/members", TeamMember.fromJSON);
   }
 
   Future<bool> getTeamMemberStatus(int teamId, String user) {
@@ -169,9 +173,8 @@ class OrganizationsService extends Service {
   Future<TeamMembershipState> getTeamMembership(int teamId, String user) {
     var completer = new Completer();
 
-    _github
-        .getJSON("/teams/${teamId}/memberships/${user}",
-            statusCode: 200, fail: (http.Response response) {
+    _github.getJSON("/teams/${teamId}/memberships/${user}", statusCode: 200,
+            fail: (http.Response response) {
       if (response.statusCode == 404) {
         completer.complete(new TeamMembershipState(null));
       } else {
@@ -189,9 +192,8 @@ class OrganizationsService extends Service {
   Future<TeamMembershipState> addTeamMembership(int teamId, String user) {
     var completer = new Completer();
 
-    _github
-        .request("POST", "/teams/${teamId}/memberships/${user}",
-            statusCode: 200, fail: (http.Response response) {
+    _github.request("POST", "/teams/${teamId}/memberships/${user}",
+        statusCode: 200, fail: (http.Response response) {
       if (response.statusCode == 404) {
         completer.complete(new TeamMembershipState(null));
       } else {
@@ -216,8 +218,8 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
   Stream<Repository> listTeamRepositories(int teamId) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/teams/${teamId}/repos", Repository.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/teams/${teamId}/repos", Repository.fromJSON);
   }
 
   /// Checks if a team manages the specified repository.
@@ -257,8 +259,8 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-user-teams
   Stream<Team> listUserTeams() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/user/teams", Team.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/user/teams", Team.fromJSON);
   }
 
   /// Lists the hooks for the specified organization.

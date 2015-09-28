@@ -2,7 +2,6 @@ part of github.common;
 
 /// GitHub Pages Information
 class RepositoryPages {
-
   /// Pages CNAME
   String cname;
 

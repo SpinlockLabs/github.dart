@@ -6,7 +6,6 @@ part of github.common;
 /// information is in two places, but contain different details about them:
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
 class RepositoryCommit {
-
   /// API url.
   String url;
 
@@ -68,7 +67,6 @@ class RepositoryCommit {
 
 /// Model class for commit statistics.
 class CommitStats {
-
   /// Number of Additions.
   int additions;
 

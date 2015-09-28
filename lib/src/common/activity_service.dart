@@ -11,8 +11,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events
   Stream<Event> listPublicEvents({int pages: 2}) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/events", Event.fromJSON, pages: pages);
+    return new PaginationHelper(_github)
+        .objects("GET", "/events", Event.fromJSON, pages: pages);
   }
 
   /// Lists public events for a network of repositories.
@@ -56,7 +56,8 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   Stream<Event> listRepositoryEvents(RepositorySlug slug, {int pages}) {
     return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/events", Event.fromJSON, pages: pages);
+        "GET", "/repos/${slug.fullName}/events", Event.fromJSON,
+        pages: pages);
   }
 
   /// Returns an [EventPoller] for repository events.
@@ -69,8 +70,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
   Stream<Event> listEventsForOrganization(String name, {int pages}) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${name}/events", Event.fromJSON, pages: pages);
+    return new PaginationHelper(_github)
+        .objects("GET", "/orgs/${name}/events", Event.fromJSON, pages: pages);
   }
 
   /// Returns an [EventPoller] for public events for an organization.
@@ -96,7 +97,8 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
   Stream<Event> listEventsPerformedByUser(String username, {int pages}) {
     return new PaginationHelper(_github).objects(
-        "GET", "/users/${username}/events", Event.fromJSON, pages: pages);
+        "GET", "/users/${username}/events", Event.fromJSON,
+        pages: pages);
   }
 
   /// Lists the public events performed by a user.
@@ -186,24 +188,24 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
   Stream<User> listStargazers(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/stargazers", User.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/stargazers", User.fromJSON);
   }
 
   /// Lists all the repos starred by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
   Stream<Repository> listStarredByUser(String user) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/users/${user}/starred", Repository.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/users/${user}/starred", Repository.fromJSON);
   }
 
   /// Lists all the repos by the current user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
   Stream<Repository> listStarred() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/user/starred", Repository.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/user/starred", Repository.fromJSON);
   }
 
   /// Checks if the currently authenticated user has starred the specified repository.
@@ -221,10 +223,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#star-a-repository
   Future star(RepositorySlug slug) {
-    return _github
-        .request("PUT", "/user/starred/${slug.fullName}",
-            headers: {"Content-Length": 0})
-        .then((response) {
+    return _github.request("PUT", "/user/starred/${slug.fullName}",
+        headers: {"Content-Length": 0}).then((response) {
       return null;
     });
   }
@@ -233,10 +233,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#unstar-a-repository
   Future unstar(RepositorySlug slug) {
-    return _github
-        .request("DELETE", "/user/starred/${slug.fullName}",
-            headers: {"Content-Length": 0})
-        .then((response) {
+    return _github.request("DELETE", "/user/starred/${slug.fullName}",
+        headers: {"Content-Length": 0}).then((response) {
       return null;
     });
   }
@@ -245,24 +243,24 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-watchers
   Stream<User> listWatchers(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/subscribers", User.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/subscribers", User.fromJSON);
   }
 
   /// Lists the repositories the specified user is watching.
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
   Stream<Repository> listWatchedByUser(String user) {
-    return new PaginationHelper(_github).objects(
-        "GET", '/users/${user}/subscriptions', Repository.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", '/users/${user}/subscriptions', Repository.fromJSON);
   }
 
   /// Lists the repositories the current user is watching.
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
   Stream<Repository> listWatched() {
-    return new PaginationHelper(_github).objects(
-        "GET", '/user/subscriptions', Repository.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", '/user/subscriptions', Repository.fromJSON);
   }
 
   /// Fetches repository subscription information.
@@ -291,10 +289,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
   Future deleteRepositorySubscription(RepositorySlug slug) {
-    return _github
-        .request("DELETE", "/repos/${slug.fullName}/subscription",
-            headers: {"Content-Length": 0})
-        .then((response) {
+    return _github.request("DELETE", "/repos/${slug.fullName}/subscription",
+        headers: {"Content-Length": 0}).then((response) {
       return null;
     });
   }

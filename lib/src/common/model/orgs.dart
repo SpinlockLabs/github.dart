@@ -93,7 +93,6 @@ class OrganizationMembership {
 
 /// Model class for a GitHub team.
 class Team {
-
   /// Team Name
   String name;
 
@@ -139,7 +138,6 @@ class TeamMembershipState {
 
 /// Model class for a team member.
 class TeamMember {
-
   /// Member Username
   String login;
 
@@ -177,7 +175,6 @@ class TeamMember {
 
 /// Model class for a team repository.
 class TeamRepository extends Repository {
-
   /// Repository Permissions.
   TeamRepositoryPermissions permissions;
 
@@ -215,7 +212,6 @@ class TeamRepository extends Repository {
 
 /// Model class for team repository permissions.
 class TeamRepositoryPermissions {
-
   /// Administrative Access
   bool admin;
 
