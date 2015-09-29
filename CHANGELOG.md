@@ -1,6 +1,7 @@
 ## v2.3.0
 
 - Moved `CHANGELOG` content back to repo.
+- Added `rateLimitLimit`, `rateLimitRemaining` and `rateLimitReset` to `GitHub`.
 
 ## v2.1.0
 
