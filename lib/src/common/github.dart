@@ -11,6 +11,10 @@ typedef http.Client ClientCreator();
  *      // Use the Client
  */
 class GitHub {
+  static const _ratelimitLimitHeader = 'x-ratelimit-limit';
+  static const _ratelimitResetHeader = 'x-ratelimit-reset';
+  static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
+
   /**
    * Default Client Creator
    */
@@ -45,6 +49,33 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
+
+  /// The maximum number of requests that the consumer is permitted to make per
+  /// hour.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  int get rateLimitLimit => _rateLimitLimit;
+
+  /// The number of requests remaining in the current rate limit window.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  int get rateLimitRemaining => _rateLimitRemaining;
+
+  /// The time at which the current rate limit window resets.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  DateTime get rateLimitReset => _rateLimitReset == null
+      ? null
+      : new DateTime.fromMillisecondsSinceEpoch(_rateLimitReset * 1000,
+          isUtc: true);
+
+  int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
 
   /**
    * Creates a new [GitHub] instance.
@@ -380,6 +411,7 @@ class GitHub {
         .request(new http.Request(url.toString(),
             method: method, headers: headers, body: body))
         .then((response) {
+      _updateRateLimit(response.headers);
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
@@ -400,5 +432,13 @@ class GitHub {
 
     // Closes the HTTP Client
     client.close();
+  }
+
+  void _updateRateLimit(Map<String, String> headers) {
+    if (headers.containsKey(_ratelimitLimitHeader)) {
+      _rateLimitLimit = int.parse(headers[_ratelimitLimitHeader]);
+      _rateLimitRemaining = int.parse(headers[_ratelimitRemainingHeader]);
+      _rateLimitReset = int.parse(headers[_ratelimitResetHeader]);
+    }
   }
 }
