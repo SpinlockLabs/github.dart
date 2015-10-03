@@ -38,10 +38,33 @@ class IssuesService extends Service {
   /// TODO: Implement more optional parameters.
   ///
   /// API docs:https://developer.github.com/v3/issues/#list-issues-for-a-repository
-  Stream<Issue> listByRepo(RepositorySlug slug, {String state: "open"}) {
+  Stream<Issue> listByRepo(RepositorySlug slug,
+      {String state, String direction, String sort, DateTime since}) {
+    var params = <String, String>{};
+    if (state != null) {
+      // should be `open`, `closed` or `all`
+      params['state'] = state;
+    }
+
+    if (direction != null) {
+      // should be `desc` or `asc`
+      params['direction'] = direction;
+    }
+
+    if (sort != null) {
+      // should be `created`, `updated`, `comments`
+      params['sort'] = sort;
+    }
+
+    if (since != null) {
+      // Only issues updated at or after this time are returned.
+      // This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+      params['since'] = since.toUtc().toIso8601String();
+    }
+
     return new PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/issues", Issue.fromJSON,
-        params: {"state": state});
+        params: params);
   }
 
   /// Edit an issue.
