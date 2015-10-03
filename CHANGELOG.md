@@ -2,6 +2,7 @@
 
 - Moved `CHANGELOG` content back to repo.
 - Added `rateLimitLimit`, `rateLimitRemaining` and `rateLimitReset` to `GitHub`.
+- Added `id` to `Issue`
 
 ## v2.1.0
 
