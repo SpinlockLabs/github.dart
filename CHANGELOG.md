@@ -2,6 +2,9 @@
 
 - Moved `CHANGELOG` content back to repo.
 - Added `rateLimitLimit`, `rateLimitRemaining` and `rateLimitReset` to `GitHub`.
+- Added `id` to `Issue`
+- Added `direction`, `sort` and `since` optional arguments to 
+  `IssueService.listByRepo`.
 
 ## v2.1.0
 
