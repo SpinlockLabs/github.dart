@@ -268,8 +268,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
   Stream<Hook> listHooks(String org) {
     return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${org}/hooks", (input) => Hook.fromJSON(org, input),
-        preview: "application/vnd.github.sersi-preview+json");
+        "GET", "/orgs/${org}/hooks", (input) => Hook.fromJSON(org, input));
   }
 
   /// Fetches a single hook by [id].
@@ -277,8 +276,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
   Future<Hook> getHook(String org, int id) {
     return _github.getJSON("/orgs/${org}/hooks/${id}",
-        convert: (i) => Hook.fromJSON(org, i),
-        preview: "application/vnd.github.sersi-preview+json");
+        convert: (i) => Hook.fromJSON(org, i));
   }
 
   /// Creates an organization hook based on the specified [hook].
@@ -287,8 +285,7 @@ class OrganizationsService extends Service {
   Future<Hook> createHook(String org, CreateHook hook) {
     return _github.postJSON("/orgs/${org}/hooks",
         convert: (i) => Hook.fromJSON(org, i),
-        body: hook.toJSON(),
-        preview: "application/vnd.github.sersi-preview+json");
+        body: hook.toJSON());
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
@@ -298,16 +295,14 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#ping-a-hook
   Future<bool> pingHook(String org, int id) {
     return _github
-        .request("POST", "/orgs/${org}/hooks/${id}/pings",
-            preview: "application/vnd.github.sersi-preview+json")
+        .request("POST", "/orgs/${org}/hooks/${id}/pings")
         .then((response) => response.statusCode == 204);
   }
 
   /// Deletes the specified hook.
   Future<bool> deleteHook(String org, int id) {
     return _github
-        .request("DELETE", "/orgs/${org}/hooks/${id}",
-            preview: "application/vnd.github.sersi-preview+json")
+        .request("DELETE", "/orgs/${org}/hooks/${id}")
         .then((response) {
       return response.statusCode == 204;
     });

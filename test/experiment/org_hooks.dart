@@ -1,7 +1,7 @@
 import "../helper.dart";
 
 main() async {
-  var org = "DirectMyFile";
+  var org = "IOT-DSA";
 
   var hooks = await github.organizations.listHooks(org).toList();
 
