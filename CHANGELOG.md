@@ -1,3 +1,8 @@
+## v2.3.1
+
+- Cache base64 decoded `text` property in `GitHubFile`
+- Fix Bug in EventPoller
+
 ## v2.3.0
 
 - Moved `CHANGELOG` content back to repo.
