@@ -5,7 +5,8 @@ void main() {
 
   github.repositories
       .getReadme(new RepositorySlug("DirectMyFile", "github.dart"))
-      .then((file) => github.misc.renderMarkdown(file.content))
+      .then((file) => github.misc.renderMarkdown(file.text))
       .then((html) => print(html))
       .then((_) => github.dispose());
 }
+

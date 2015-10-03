@@ -36,8 +36,14 @@ class GitHubFile {
   Links links;
 
   /// Text Content
-  String get text =>
-      new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
+  String get text {
+    if (_text == null) {
+      _text = new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
+    }
+    return _text;
+  }
+
+  String _text;
 
   /// Source Repository
   RepositorySlug sourceRepository;
