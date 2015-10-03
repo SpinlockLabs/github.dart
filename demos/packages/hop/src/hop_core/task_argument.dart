@@ -29,8 +29,8 @@ class TaskArgument {
       requireArgumentNotNull(arg, argName);
 
       if (finishRequired && arg.required) {
-        throw new DetailedArgumentError(argName,
-            'required arguments must all be at the beginning');
+        throw new DetailedArgumentError(
+            argName, 'required arguments must all be at the beginning');
       }
 
       if (!arg.required) {
@@ -38,8 +38,8 @@ class TaskArgument {
       }
 
       if (arg.multiple && i != (list.length - 1)) {
-        throw new DetailedArgumentError(argName,
-            'only the last argument can be multiple');
+        throw new DetailedArgumentError(
+            argName, 'only the last argument can be multiple');
       }
 
       for (final other in list.take(i)) {

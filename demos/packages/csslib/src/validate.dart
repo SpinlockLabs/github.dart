@@ -40,9 +40,9 @@ class Validate {
       // Perfect just one element id returns matches of -1.
       return -1;
     } else if (selector.isCombinatorDescendant()) {
-        String tooMany = selector.simpleSelector.toString();
-        throw new CssSelectorException(
-            'Use of Id selector must be singleton starting at $tooMany');
+      String tooMany = selector.simpleSelector.toString();
+      throw new CssSelectorException(
+          'Use of Id selector must be singleton starting at $tooMany');
     } else {
       String error = selector.simpleSelector.toString();
       throw new CssSelectorException(
@@ -53,9 +53,9 @@ class Validate {
   // Validate the @{css expression} only .class and #elementId are valid inside
   // of @{...}.
   static template(List<Selector> selectors) {
-    var errorSelector;                  // signal which selector didn't match.
-    bool found = false;                 // signal if a selector is matched.
-    int matches = 0;                    // < 0 IdSelectors, > 0 ClassSelector
+    var errorSelector; // signal which selector didn't match.
+    bool found = false; // signal if a selector is matched.
+    int matches = 0; // < 0 IdSelectors, > 0 ClassSelector
 
     // At most one selector group (any number of simple selector sequences).
     assert(selectors.length <= 1);
@@ -73,20 +73,19 @@ class Validate {
             for (final className in classes) {
               if (selector.simpleSelector.name == className) {
                 matches = _classNameCheck(selector, matches);
-                found = true;              // .class found.
+                found = true; // .class found.
                 break;
               }
               for (final className2 in classes) {
                 print(className2);
               }
             }
-
           } else {
             // Don't check any class name that is prefixed with an underscore.
             // However, signal as found and bump up matches; it's a valid class
             // name.
             matches = _classNameCheck(selector, matches);
-            found = true;                 // ._class are always okay.
+            found = true; // ._class are always okay.
           }
         } else if (simpleSelector is IdSelector) {
           // Any element id starting with an underscore is a private element id
@@ -95,7 +94,7 @@ class Validate {
             for (final id in ids) {
               if (simpleSelector.name == id) {
                 matches = _elementIdCheck(selector, matches);
-                found = true;             // #id found.
+                found = true; // #id found.
                 break;
               }
             }
@@ -103,7 +102,7 @@ class Validate {
             // Don't check any element ID that is prefixed with an underscore.
             // Signal as found and bump up matches; it's a valid element ID.
             matches = _elementIdCheck(selector, matches);
-            found = true;                 // #_id are always okay
+            found = true; // #_id are always okay
           }
         } else {
           String badSelector = simpleSelector.toString();
@@ -124,4 +123,3 @@ class Validate {
         selector.simpleSelectorSequences.length);
   }
 }
-

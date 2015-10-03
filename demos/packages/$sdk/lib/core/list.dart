@@ -122,6 +122,17 @@ abstract class List<E> implements Iterable<E>, EfficientLength {
   }
 
   /**
+   * Creates an unmodifiable list containing all [elements].
+   *
+   * The [Iterator] of [elements] provides the order of the elements.
+   *
+   * An unmodifiable list cannot have its length or elements changed.
+   * If the elements are themselves immutable, then the resulting list
+   * is also immutable.
+   */
+  external factory List.unmodifiable(Iterable elements);
+
+  /**
    * Returns the object at the given [index] in the list
    * or throws a [RangeError] if [index] is out of bounds.
    */
@@ -175,7 +186,7 @@ abstract class List<E> implements Iterable<E>, EfficientLength {
    * Sorts this list according to the order specified by the [compare] function.
    *
    * The [compare] function must act as a [Comparator].
-
+   *
    *     List<String> numbers = ['one', 'two', 'three', 'four'];
    *     // Sort from shortest to longest.
    *     numbers.sort((x, y) => x.length.compareTo(y.length));
@@ -186,7 +197,7 @@ abstract class List<E> implements Iterable<E>, EfficientLength {
    *
    *     List<int> nums = [13, 2, -11];
    *     nums.sort();
-         nums.join(', '); // '-11, 2, 13'
+   *     nums.join(', '); // '-11, 2, 13'
    */
   void sort([int compare(E a, E b)]);
 

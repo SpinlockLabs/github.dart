@@ -2,6 +2,8 @@ part of github.common;
 
 /// Model class for an issue on the tracker.
 class Issue {
+  int id;
+
   /// The api url.
   String url;
 
@@ -63,6 +65,7 @@ class Issue {
     if (labels == null) labels = [];
 
     return new Issue()
+      ..id = input['id']
       ..url = input['url']
       ..htmlUrl = input['html_url']
       ..number = input['number']
@@ -182,11 +185,12 @@ class IssueLabel {
       ..name = input['name']
       ..color = input['color'];
   }
+
+  String toString() => 'IssueLabel: $name';
 }
 
 /// Model class for a milestone.
 class Milestone {
-
   /// Milestone Number
   int number;
 

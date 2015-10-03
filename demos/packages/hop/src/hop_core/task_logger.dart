@@ -3,7 +3,6 @@ part of hop.core;
 /// Allows logging of [Task] activities, spawning sub-loggers, and failing the
 /// current [Task];
 abstract class TaskLogger {
-
   TaskLogger getSubLogger(String name);
 
   // level 300

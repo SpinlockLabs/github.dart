@@ -29,7 +29,6 @@ abstract class _StyleProperty {
   String get cssExpression;
 }
 
-
 /**
  * Base interface for Color, HSL and RGB.
  */
@@ -46,7 +45,6 @@ abstract class ColorBase {
    */
   int get argbValue;
 }
-
 
 /**
  * General purpse Color class.  Represent a color as an ARGB value that can be
@@ -68,8 +66,7 @@ class Color implements _StyleProperty, ColorBase {
    * Color.gold, where ff is red intensity, d7 is green intensity, and 00 is
    * blue intensity.
    */
-  Color(int rgb, [num alpha]) :
-    this._argb = Color._rgbToArgbString(rgb, alpha);
+  Color(int rgb, [num alpha]) : this._argb = Color._rgbToArgbString(rgb, alpha);
 
   /**
    * RGB takes three values. The [red], [green], and [blue] parameters are
@@ -81,18 +78,16 @@ class Color implements _StyleProperty, ColorBase {
    * internally be mapped to an int between '0' and '255' like the other color
    * components.
    */
-  Color.createRgba(int red, int green, int blue, [num alpha]) :
-      this._argb = Color.convertToHexString(Color._clamp(red, 0, 255),
-          Color._clamp(green, 0, 255),
-          Color._clamp(blue, 0, 255),
+  Color.createRgba(int red, int green, int blue, [num alpha])
+      : this._argb = Color.convertToHexString(Color._clamp(red, 0, 255),
+          Color._clamp(green, 0, 255), Color._clamp(blue, 0, 255),
           alpha != null ? Color._clamp(alpha, 0, 1) : alpha);
 
   /**
    * Creates a new color from a CSS color string. For more information, see
    * <https://developer.mozilla.org/en/CSS/color>.
    */
-  Color.css(String color) :
-      this._argb = Color._convertCssToArgb(color);
+  Color.css(String color) : this._argb = Color._convertCssToArgb(color);
 
   // TODO(jmesserly): I found the use of percents a bit suprising.
   /**
@@ -109,8 +104,8 @@ class Color implements _StyleProperty, ColorBase {
    * foreground).
    */
   Color.createHsla(num hueDegree, num saturationPercent, num lightnessPercent,
-      [num alpha]) :
-          this._argb = new Hsla(Color._clamp(hueDegree, 0, 360) / 360,
+      [num alpha])
+      : this._argb = new Hsla(Color._clamp(hueDegree, 0, 360) / 360,
           Color._clamp(saturationPercent, 0, 100) / 100,
           Color._clamp(lightnessPercent, 0, 100) / 100,
           alpha != null ? Color._clamp(alpha, 0, 1) : alpha).toHexArgbString();
@@ -130,10 +125,9 @@ class Color implements _StyleProperty, ColorBase {
    *                completely transparent foreground and 1 is a completely
    *                opaque foreground.
    */
-  Color.hslaRaw(num hue, num saturation, num lightness, [num alpha]) :
-    this._argb = new Hsla(Color._clamp(hue, 0, 1),
-          Color._clamp(saturation, 0, 1),
-          Color._clamp(lightness, 0, 1),
+  Color.hslaRaw(num hue, num saturation, num lightness, [num alpha])
+      : this._argb = new Hsla(Color._clamp(hue, 0, 1),
+          Color._clamp(saturation, 0, 1), Color._clamp(lightness, 0, 1),
           alpha != null ? Color._clamp(alpha, 0, 1) : alpha).toHexArgbString();
 
   /**
@@ -151,7 +145,7 @@ class Color implements _StyleProperty, ColorBase {
   //              create the CSS from the normalized value.
   String get cssExpression {
     if (_argb.length == 6) {
-      return "#$_argb";         // RGB only, no alpha blending.
+      return "#$_argb"; // RGB only, no alpha blending.
     } else {
       num alpha = Color.hexToInt(_argb.substring(0, 2));
       String a = (alpha / 255).toStringAsPrecision(2);
@@ -246,7 +240,7 @@ class Color implements _StyleProperty, ColorBase {
     String color = value.trim().replaceAll("\\s", "");
     if (color[0] == '#') {
       String v = color.substring(1);
-      Color.hexToInt(v);              // Valid hexadecimal, throws if not.
+      Color.hexToInt(v); // Valid hexadecimal, throws if not.
       return v;
     } else if (color.length > 0 && color[color.length - 1] == ')') {
       int type;
@@ -266,7 +260,7 @@ class Color implements _StyleProperty, ColorBase {
         throw new UnsupportedError('CSS property not implemented');
       }
 
-      color = color.substring(0, color.length - 1);     // Strip close paren.
+      color = color.substring(0, color.length - 1); // Strip close paren.
 
       var args = <num>[];
       List<String> params = color.split(",");
@@ -281,8 +275,7 @@ class Color implements _StyleProperty, ColorBase {
         case _hslCss:
           return new Hsla(args[0], args[1], args[2]).toHexArgbString();
         case _hslaCss:
-          return new Hsla(args[0], args[1], args[2],
-              args[3]).toHexArgbString();
+          return new Hsla(args[0], args[1], args[2], args[3]).toHexArgbString();
         default:
           // Type not defined UnsupportedOperationException should have thrown.
           assert(true);
@@ -297,8 +290,9 @@ class Color implements _StyleProperty, ColorBase {
     String rHex = Color._numAs2DigitHex(Color._clamp(r, 0, 255));
     String gHex = Color._numAs2DigitHex(Color._clamp(g, 0, 255));
     String bHex = Color._numAs2DigitHex(Color._clamp(b, 0, 255));
-    String aHex = (a != null) ?
-        Color._numAs2DigitHex((Color._clamp(a, 0, 1) * 255).round()) : "";
+    String aHex = (a != null)
+        ? Color._numAs2DigitHex((Color._clamp(a, 0, 1) * 255).round())
+        : "";
 
     // TODO(terry) 15.toRadixString(16) return 'F' on Dartium not f as in JS.
     //             bug: <http://code.google.com/p/dart/issues/detail?id=2670>
@@ -361,7 +355,7 @@ class Color implements _StyleProperty, ColorBase {
       Color._clamp(((1 - delta) * v + (delta * 255)).round(), 0, 255);
 
   // Predefined CSS colors see <http://www.w3.org/TR/css3-color/>
-  static final Color transparent = const Color.hex("00ffffff");  // Alpha 0.0
+  static final Color transparent = const Color.hex("00ffffff"); // Alpha 0.0
   static final Color aliceBlue = const Color.hex("0f08ff");
   static final Color antiqueWhite = const Color.hex("0faebd7");
   static final Color aqua = const Color.hex("00ffff");
@@ -511,7 +505,6 @@ class Color implements _StyleProperty, ColorBase {
   static final Color yellowGreen = const Color.hex("9acd32");
 }
 
-
 /**
  * Rgba class for users that want to interact with a color as a RGBA value.
  */
@@ -523,22 +516,22 @@ class Rgba implements _StyleProperty, ColorBase {
   final int b;
   final num a;
 
-  Rgba(int red, int green, int blue, [num alpha]) :
-    this.r = Color._clamp(red, 0, 255),
-    this.g = Color._clamp(green, 0, 255),
-    this.b = Color._clamp(blue, 0, 255),
-    this.a = (alpha != null) ? Color._clamp(alpha, 0, 1) : alpha;
+  Rgba(int red, int green, int blue, [num alpha])
+      : this.r = Color._clamp(red, 0, 255),
+        this.g = Color._clamp(green, 0, 255),
+        this.b = Color._clamp(blue, 0, 255),
+        this.a = (alpha != null) ? Color._clamp(alpha, 0, 1) : alpha;
 
   factory Rgba.fromString(String hexValue) =>
-    new Color.css("#${Color._convertCssToArgb(hexValue)}").rgba;
+      new Color.css("#${Color._convertCssToArgb(hexValue)}").rgba;
 
   factory Rgba.fromColor(Color color) => color.rgba;
 
   factory Rgba.fromArgbValue(num value) {
-    return new Rgba(((value.toInt() & 0xff000000) >> 0x18),  /* a */
-      ((value.toInt() & 0xff0000) >> 0x10),                  /* r */
-      ((value.toInt() & 0xff00) >> 8),                       /* g */
-      ((value.toInt() & 0xff)));                             /* b */
+    return new Rgba(((value.toInt() & 0xff000000) >> 0x18), /* a */
+        ((value.toInt() & 0xff0000) >> 0x10), /* r */
+        ((value.toInt() & 0xff00) >> 8), /* g */
+        ((value.toInt() & 0xff))); /* b */
   }
 
   factory Rgba.fromHsla(Hsla hsla) {
@@ -569,9 +562,9 @@ class Rgba implements _StyleProperty, ColorBase {
       }
       num var1 = 2 * l - var2;
 
-      r = (255 * Rgba._hueToRGB(var1, var2, h + (1/3))).round().toInt();
+      r = (255 * Rgba._hueToRGB(var1, var2, h + (1 / 3))).round().toInt();
       g = (255 * Rgba._hueToRGB(var1, var2, h)).round().toInt();
-      b = (255 * Rgba._hueToRGB(var1, var2, h - (1/3))).round().toInt();
+      b = (255 * Rgba._hueToRGB(var1, var2, h - (1 / 3))).round().toInt();
     }
 
     return new Rgba(r, g, b, a);
@@ -621,6 +614,7 @@ class Rgba implements _StyleProperty, ColorBase {
     value += (r << 0x10);
     value += (g << 0x08);
     value += b;
+    return value;
   }
 
   Color get color => new Color.createRgba(r, g, b, a);
@@ -632,7 +626,6 @@ class Rgba implements _StyleProperty, ColorBase {
   int get hashCode => toHexArgbString().hashCode;
 }
 
-
 /**
  * Hsl class support to interact with a color as a hsl with hue, saturation, and
  * lightness with optional alpha blending.  The hue is a ratio of 360 degrees
@@ -640,10 +633,10 @@ class Rgba implements _StyleProperty, ColorBase {
  * (1 == 100%) and alpha is a 0..1 fraction.
  */
 class Hsla implements _StyleProperty, ColorBase {
-  final num _h;             // Value from 0..1
-  final num _s;             // Value from 0..1
-  final num _l;             // Value from 0..1
-  final num _a;             // Value from 0..1
+  final num _h; // Value from 0..1
+  final num _s; // Value from 0..1
+  final num _l; // Value from 0..1
+  final num _a; // Value from 0..1
 
   /**
    * [hue] is a 0..1 fraction of 360 degrees (360 == 0).
@@ -651,11 +644,11 @@ class Hsla implements _StyleProperty, ColorBase {
    * [lightness] is a 0..1 fraction (100% == 1).
    * [alpha] is a 0..1 fraction, alpha blending between 0..1, 1 == 100% opaque.
    */
-  Hsla(num hue, num saturation, num lightness, [num alpha]) :
-    this._h = (hue == 1) ? 0 : Color._clamp(hue, 0, 1),
-    this._s = Color._clamp(saturation, 0, 1),
-    this._l = Color._clamp(lightness, 0, 1),
-    this._a = (alpha != null) ? Color._clamp(alpha, 0, 1) : alpha;
+  Hsla(num hue, num saturation, num lightness, [num alpha])
+      : this._h = (hue == 1) ? 0 : Color._clamp(hue, 0, 1),
+        this._s = Color._clamp(saturation, 0, 1),
+        this._l = Color._clamp(lightness, 0, 1),
+        this._a = (alpha != null) ? Color._clamp(alpha, 0, 1) : alpha;
 
   factory Hsla.fromString(String hexValue) {
     Rgba rgba = new Color.css("#${Color._convertCssToArgb(hexValue)}").rgba;
@@ -682,7 +675,7 @@ class Hsla implements _StyleProperty, ColorBase {
   }
 
   factory Hsla.fromRgba(Rgba rgba) =>
-    _createFromRgba(rgba.r, rgba.g, rgba.b, rgba.a);
+      _createFromRgba(rgba.r, rgba.g, rgba.b, rgba.a);
 
   static Hsla _createFromRgba(num r, num g, num b, num a) {
     // Convert RGB to hsl.
@@ -701,7 +694,7 @@ class Hsla implements _StyleProperty, ColorBase {
     num maxRgb = math.max(r, math.max(g, b));
     l = (maxRgb + minRgb) / 2;
     if (l <= 0) {
-      return new Hsla(0, 0, l);   // Black;
+      return new Hsla(0, 0, l); // Black;
     }
 
     num vm = maxRgb - minRgb;
@@ -709,7 +702,7 @@ class Hsla implements _StyleProperty, ColorBase {
     if (s > 0) {
       s /= (l < 0.5) ? (maxRgb + minRgb) : (2 - maxRgb - minRgb);
     } else {
-      return new Hsla(0, 0, l);   // White
+      return new Hsla(0, 0, l); // White
     }
 
     num r2, g2, b2;
@@ -765,9 +758,9 @@ class Hsla implements _StyleProperty, ColorBase {
 
   bool operator ==(other) => Color.equal(this, other);
 
-  String get cssExpression => (_a == null) ?
-      "hsl($hueDegrees,$saturationPercentage,$lightnessPercentage)" :
-      "hsla($hueDegrees,$saturationPercentage,$lightnessPercentage,$_a)";
+  String get cssExpression => (_a == null)
+      ? "hsl($hueDegrees,$saturationPercentage,$lightnessPercentage)"
+      : "hsla($hueDegrees,$saturationPercentage,$lightnessPercentage,$_a)";
 
   String toHexArgbString() => new Rgba.fromHsla(this).toHexArgbString();
 
@@ -785,7 +778,6 @@ class Hsla implements _StyleProperty, ColorBase {
   int get hashCode => toHexArgbString().hashCode;
 }
 
-
 /** X,Y position. */
 class PointXY implements _StyleProperty {
   final num x, y;
@@ -795,7 +787,6 @@ class PointXY implements _StyleProperty {
     // TODO(terry): TBD
   }
 }
-
 
 // TODO(terry): Implement style and color.
 /**
@@ -810,21 +801,24 @@ class Border implements _StyleProperty {
   const Border([this.top, this.left, this.bottom, this.right]);
 
   // TODO(terry): Consider using Size or width and height.
-  Border.uniform(num amount) :
-      top = amount, left = amount, bottom = amount, right = amount;
+  Border.uniform(num amount)
+      : top = amount,
+        left = amount,
+        bottom = amount,
+        right = amount;
 
   int get width => left + right;
   int get height => top + bottom;
 
   String get cssExpression {
-    return (top == left && bottom == right && top == right) ? "${left}px" :
-      "${top != null ? '$top' : '0'}px ${
+    return (top == left && bottom == right && top == right)
+        ? "${left}px"
+        : "${top != null ? '$top' : '0'}px ${
       right != null ? '$right' : '0'}px ${
       bottom != null ? '$bottom' : '0'}px ${
       left != null ? '$left' : '0'}px";
   }
 }
-
 
 /** Font style constants. */
 class FontStyle {
@@ -842,7 +836,6 @@ class FontStyle {
   static const String oblique = "oblique";
 }
 
-
 /** Font variant constants. */
 class FontVariant {
   /** Font style [normal] default. */
@@ -850,7 +843,6 @@ class FontVariant {
   /** Font variant [smallCaps]. */
   static const String smallCaps = "small-caps";
 }
-
 
 /** Font weight constants values 100, 200, 300, 400, 500, 600, 700, 800, 900. */
 class FontWeight {
@@ -870,7 +862,6 @@ class FontWeight {
   static const int wt900 = 900;
 }
 
-
 /** Generic font family names. */
 class FontGeneric {
   /** Generic family sans-serif font (w/o serifs). */
@@ -884,7 +875,6 @@ class FontGeneric {
   /** Generic family decorative font. */
   static const String fantasy = "fantasy";
 }
-
 
 /**
  * List of most common font families across different platforms.  Use the
@@ -945,7 +935,7 @@ class FontFamily {
 class LineHeight {
   final num height;
   final bool inPixels;
-  const LineHeight(this.height, {this.inPixels : true});
+  const LineHeight(this.height, {this.inPixels: true});
 }
 
 // TODO(terry): Support @font-face fule.
@@ -954,31 +944,41 @@ class LineHeight {
  */
 class Font implements _StyleProperty {
   /** Collection of most common sans-serif fonts in order. */
-  static const List<String> sansSerif = const [FontFamily.arial,
-                                               FontFamily.verdana,
-                                               FontFamily.geneva,
-                                               FontFamily.helvetica,
-                                               FontGeneric.sansSerif];
+  static const List<String> sansSerif = const [
+    FontFamily.arial,
+    FontFamily.verdana,
+    FontFamily.geneva,
+    FontFamily.helvetica,
+    FontGeneric.sansSerif
+  ];
 
   /** Collection of most common serif fonts in order. */
-  static const List<String> serif = const [FontFamily.georgia,
-                                           FontFamily.timesNewRoman,
-                                           FontFamily.times,
-                                           FontGeneric.serif];
+  static const List<String> serif = const [
+    FontFamily.georgia,
+    FontFamily.timesNewRoman,
+    FontFamily.times,
+    FontGeneric.serif
+  ];
   /** Collection of most common monospace fonts in order. */
-  static const List<String> monospace = const [FontFamily.courierNew,
-                                               FontFamily.courier,
-                                               FontGeneric.monospace];
+  static const List<String> monospace = const [
+    FontFamily.courierNew,
+    FontFamily.courier,
+    FontGeneric.monospace
+  ];
   /** Collection of most common cursive fonts in order. */
-  static const List<String> cursive = const [FontFamily.textile,
-                                             FontFamily.appleChancery,
-                                             FontFamily.zaphChancery,
-                                             FontGeneric.fantasy];
+  static const List<String> cursive = const [
+    FontFamily.textile,
+    FontFamily.appleChancery,
+    FontFamily.zaphChancery,
+    FontGeneric.fantasy
+  ];
   /** Collection of most common fantasy fonts in order. */
-  static const List<String> fantasy = const [FontFamily.comicSansMs,
-                                             FontFamily.impact,
-                                             FontFamily.webdings,
-                                             FontGeneric.fantasy];
+  static const List<String> fantasy = const [
+    FontFamily.comicSansMs,
+    FontFamily.impact,
+    FontFamily.webdings,
+    FontGeneric.fantasy
+  ];
 
   // TODO(terry): Should support the values xx-small, small, large, xx-large,
   //              etc. (mapped to a pixel sized font)?
@@ -1028,7 +1028,7 @@ class Font implements _StyleProperty {
    * pixels, if not specified it's 1.2 the font size.
    */
   const Font({this.size, this.family, this.weight, this.style, this.variant,
-              this.lineHeight});
+      this.lineHeight});
 
   /**
    * Merge the two fonts and return the result. See [Style.merge] for
@@ -1041,12 +1041,12 @@ class Font implements _StyleProperty {
   }
 
   Font._merge(Font a, Font b)
-    : size = _mergeVal(a.size, b.size),
-      family = _mergeVal(a.family, b.family),
-      weight = _mergeVal(a.weight, b.weight),
-      style = _mergeVal(a.style, b.style),
-      variant = _mergeVal(a.variant, b.variant),
-      lineHeight = _mergeVal(a.lineHeight, b.lineHeight);
+      : size = _mergeVal(a.size, b.size),
+        family = _mergeVal(a.family, b.family),
+        weight = _mergeVal(a.weight, b.weight),
+        style = _mergeVal(a.style, b.style),
+        variant = _mergeVal(a.variant, b.variant),
+        lineHeight = _mergeVal(a.lineHeight, b.lineHeight);
 
   /**
    * Shorthand CSS format for font is:
@@ -1069,9 +1069,12 @@ class Font implements _StyleProperty {
     return '${size}px $_fontsAsString';
   }
 
-  Font scale(num ratio) =>
-      new Font(size: size * ratio, family: family, weight: weight, style: style,
-          variant: variant);
+  Font scale(num ratio) => new Font(
+      size: size * ratio,
+      family: family,
+      weight: weight,
+      style: style,
+      variant: variant);
 
   /**
    * The lineHeight, provides an indirect means to specify the leading. The
@@ -1102,8 +1105,12 @@ class Font implements _StyleProperty {
   bool operator ==(other) {
     if (other is! Font) return false;
     Font o = other;
-    return o.size == size && o.family == family && o.weight == weight &&
-        o.lineHeight == lineHeight && o.style == style && o.variant == variant;
+    return o.size == size &&
+        o.family == family &&
+        o.weight == weight &&
+        o.lineHeight == lineHeight &&
+        o.style == style &&
+        o.variant == variant;
   }
 
   // TODO(terry): This is fragile should probably just iterate through the list
@@ -1152,14 +1159,17 @@ class BoxEdge {
    * <https://developer.mozilla.org/en/CSS/border-width>
    * <https://developer.mozilla.org/en/CSS/padding>.
    */
-   const BoxEdge.clockwiseFromTop(this.top, this.right, this.bottom, this.left);
+  const BoxEdge.clockwiseFromTop(this.top, this.right, this.bottom, this.left);
 
   /**
    * This is a helper to creates a box edge with the same [left], [top]
    * [right], and [bottom] widths.
    */
   const BoxEdge.uniform(num size)
-    : top = size, left = size, bottom = size, right = size;
+      : top = size,
+        left = size,
+        bottom = size,
+        right = size;
 
   /**
    * Takes a possibly null box edge, with possibly null metrics, and fills
@@ -1202,10 +1212,10 @@ class BoxEdge {
   }
 
   BoxEdge._merge(BoxEdge x, BoxEdge y)
-    : left = _mergeVal(x.left, y.left),
-      top = _mergeVal(x.top, y.top),
-      right = _mergeVal(x.right, y.right),
-      bottom = _mergeVal(x.bottom, y.bottom);
+      : left = _mergeVal(x.left, y.left),
+        top = _mergeVal(x.top, y.top),
+        right = _mergeVal(x.right, y.right),
+        bottom = _mergeVal(x.bottom, y.bottom);
 
   /**
    * The total size of the horizontal edges. Equal to [left] + [right], where

@@ -28,18 +28,16 @@ final _sharedConfig = new TaskRegistry();
 /// [helpTaskName] defines the name of the help task. If [helpTaskName]
 /// conflicts with an already defined task, an error is thrown. Setting this
 /// to `null` will disable help.
-void runHop(List<String> args, {
-    bool paranoid: true,
-    String helpTaskName: 'help',
-    Level printAtLogLevel: Level.INFO
-  }) {
+void runHop(List<String> args, {bool paranoid: true,
+    String helpTaskName: 'help', Level printAtLogLevel: Level.INFO}) {
   if (paranoid) {
     _paranoidHopCheck();
   }
-  Runner.runShell(args, _sharedConfig, helpTaskName, printAtLogLevel)
-    .then((RunResult rr) {
-      io.exit(rr.exitCode);
-    });
+  Runner
+      .runShell(args, _sharedConfig, helpTaskName, printAtLogLevel)
+      .then((RunResult rr) {
+    io.exit(rr.exitCode);
+  });
 }
 
 /// Adds a [Task] to Hop.
@@ -54,10 +52,9 @@ void runHop(List<String> args, {
 ///
 /// If [description] is provided and [task] is a [Task], then [task] will be
 /// cloned and [description] will override the default description.
-Task addTask(String name, dynamic task, {String description,
-  List<String> dependencies}) =>
-      _sharedConfig.addTask(name, task, description: description,
-          dependencies: dependencies);
+Task addTask(String name, dynamic task,
+    {String description, List<String> dependencies}) => _sharedConfig.addTask(
+        name, task, description: description, dependencies: dependencies);
 
 /// Creates a [Task] which runs multiple tasks.
 ///
@@ -67,9 +64,9 @@ Task addTask(String name, dynamic task, {String description,
 /// when this task is run.
 ///
 /// [description] provides information when help is displayed for the task.
-Task addChainedTask(String name, Iterable<String> existingTaskNames, {
-  String description}) => _sharedConfig.addChainedTask(name, existingTaskNames,
-      description: description);
+Task addChainedTask(String name, Iterable<String> existingTaskNames,
+    {String description}) => _sharedConfig.addChainedTask(
+        name, existingTaskNames, description: description);
 
 void _paranoidHopCheck() {
   var currentDir = path.current;
@@ -80,8 +77,7 @@ void _paranoidHopCheck() {
       'pubspec.yaml is not in the working directory "$currentDir". '
       'Hop expects to run from a project root directory. '
       'When running from the Editor, change the working directory in '
-      'Run -> Manage Launches.'
-      );
+      'Run -> Manage Launches.');
 
   var runningScript = io.Platform.script.toFilePath();
 

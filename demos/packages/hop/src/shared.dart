@@ -21,8 +21,8 @@ class TaskUsageException implements Exception {
   final Object sourceError;
   final StackTrace sourceStack;
 
-  TaskUsageException(this.message, [Object this.sourceError,
-                                    StackTrace this.sourceStack]) {
+  TaskUsageException(this.message,
+      [Object this.sourceError, StackTrace this.sourceStack]) {
     assert(message != null);
   }
 
@@ -48,7 +48,6 @@ void validateTaskName(String name) {
 
 // TODO: move this to bot?
 int lastIndexWhere(Iterable source, bool predicate(dynamic element)) {
-
   var foundIndex = -1;
   var currentIndex = 0;
   for (var e in source) {
@@ -61,5 +60,5 @@ int lastIndexWhere(Iterable source, bool predicate(dynamic element)) {
 }
 
 class DisposedError extends StateError {
-  DisposedError(): super('Invalid operation on disposed object');
+  DisposedError() : super('Invalid operation on disposed object');
 }

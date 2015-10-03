@@ -9,3 +9,4 @@ export "src/location.dart";
 export "src/span.dart";
 export "src/span_exception.dart";
 export "src/span_mixin.dart";
+export "src/span_with_context.dart";

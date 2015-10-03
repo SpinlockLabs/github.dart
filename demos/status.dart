@@ -7,9 +7,9 @@ main() async {
 
 sync() async {
   {
-    var request  = await HttpRequest.request("https://status.github.com/api/status.json", requestHeaders: {
-      "Origin": window.location.origin
-    });
+    var request = await HttpRequest.request(
+        "https://status.github.com/api/status.json",
+        requestHeaders: {"Origin": window.location.origin});
 
     var text = request.responseText;
     var json = JSON.decode(text);

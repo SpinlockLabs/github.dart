@@ -40,12 +40,12 @@ class Context {
           "allowed.");
     }
 
-    return new Context._(style, current);
+    return new Context._(style as InternalStyle, current);
   }
 
   /// Create a [Context] to be used internally within path.
   Context._internal()
-      : style = Style.platform,
+      : style = Style.platform as InternalStyle,
         _current = null;
 
   Context._(this.style, this._current);
@@ -197,7 +197,16 @@ class Context {
   ///
   String join(String part1, [String part2, String part3, String part4,
       String part5, String part6, String part7, String part8]) {
-    var parts = [part1, part2, part3, part4, part5, part6, part7, part8];
+    var parts = <String>[
+      part1,
+      part2,
+      part3,
+      part4,
+      part5,
+      part6,
+      part7,
+      part8
+    ];
     _validateArgList("join", parts);
     return joinAll(parts.where((part) => part != null));
   }

@@ -4,8 +4,32 @@ part of xml;
  * A builder to create XML trees with code.
  */
 class XmlBuilder {
+
+  /**
+   * If [optimizeNamespaces] is true, the builder will perform some
+   * namespace optimization.
+   *
+   * This means that
+   *  - namespaces that are defined in an element but are never used in this
+   *    element or its children will not be included in the document;
+   *  - namespaces that are defined in an element but are already defined in
+   *    one of the ancestors of the element will not be included again.
+   */
+  final bool optimizeNamespaces;
+
+  /**
+   * The current node stack of this builder.
+   */
   final List<_XmlNodeBuilder> _stack =
       new List.from([new _XmlDocumentBuilder()]);
+
+  /**
+   * Construct a new [XmlBuilder].
+   *
+   * For the meaning of the [optimizeNamespaces] parameter, read the
+   * documentation of the [optimizeNamespaces] property.
+   */
+  XmlBuilder({this.optimizeNamespaces: false});
 
   /**
    * Adds a [XmlText] node with the provided [text].
@@ -106,6 +130,19 @@ class XmlBuilder {
       _insert(nest);
     }
     element.name = _buildName(name, namespace);
+    if (optimizeNamespaces) {
+      // remove unused namespaces
+      //    the reason we first add them and then remove them again is
+      //    to keep the order in which they have been added
+      element.namespaces.forEach((uri, meta) {
+        if (!meta.used) {
+          var name = meta.name;
+          var attribute = element.attributes
+              .firstWhere((attribute) => attribute.name == name);
+          element.attributes.remove(attribute);
+        }
+      });
+    }
     _stack.removeLast();
     _stack.last.children.add(element.build());
   }
@@ -138,15 +175,19 @@ class XmlBuilder {
     if (prefix == _XMLNS || prefix == _XML) {
       throw new ArgumentError('The "$prefix" prefix cannot be bound.');
     }
-    if (_stack.last.namespaces.containsValue(prefix)) {
+    if (optimizeNamespaces && _stack.any(
+        (builder) => builder.namespaces.containsKey(uri) &&
+                     builder.namespaces[uri].prefix == prefix)) {
+      // namespace prefix already correctly specified in an ancestor
+      return;
+    }
+    if (_stack.last.namespaces.values.any((meta) => meta.prefix == prefix)) {
       throw new ArgumentError(
           'The "$prefix" prefix conflicts with existing binding.');
     }
-    var name = prefix == null || prefix.isEmpty
-        ? new XmlName(_XMLNS)
-        : new XmlName(prefix, _XMLNS);
-    _stack.last.attributes.add(new XmlAttribute(name, uri));
-    _stack.last.namespaces[uri] = prefix;
+    _NamespaceData meta = new _NamespaceData(prefix, false);
+    _stack.last.attributes.add(new XmlAttribute(meta.name, uri));
+    _stack.last.namespaces[uri] = meta;
   }
 
   /**
@@ -156,13 +197,17 @@ class XmlBuilder {
 
   // Internal method to build a name.
   XmlName _buildName(String name, String uri) {
-    return uri == null || uri.isEmpty
-        ? new XmlName.fromString(name)
-        : new XmlName(name, _lookup(uri));
+    if (uri != null && !uri.isEmpty) {
+      var meta = _lookup(uri);
+      meta.used = true;
+      return new XmlName(name, meta.prefix);
+    } else {
+      return new XmlName.fromString(name);
+    }
   }
 
   // Internal method to lookup an namespace prefix.
-  String _lookup(String uri) {
+  _NamespaceData _lookup(String uri) {
     var builder = _stack.lastWhere(
         (builder) => builder.namespaces.containsKey(uri),
         orElse: () => throw new ArgumentError('Undefined namespace: $uri'));
@@ -181,8 +226,19 @@ class XmlBuilder {
   }
 }
 
+class _NamespaceData {
+  final String prefix;
+  bool used;
+
+  _NamespaceData(String this.prefix, [bool this.used = false]);
+
+  XmlName get name => prefix == null || prefix.isEmpty
+      ? new XmlName(_XMLNS)
+      : new XmlName(prefix, _XMLNS);
+}
+
 abstract class _XmlNodeBuilder {
-  Map<String, String> get namespaces;
+  Map<String, _NamespaceData> get namespaces;
   List<XmlAttribute> get attributes;
   List<XmlNode> get children;
   XmlNode build();
@@ -190,7 +246,7 @@ abstract class _XmlNodeBuilder {
 
 class _XmlDocumentBuilder extends _XmlNodeBuilder {
   @override
-  final Map<String, String> namespaces = const {_XML_URI: _XML};
+  final Map<String, _NamespaceData> namespaces = {_XML_URI: _XML_DATA};
 
   @override
   List<XmlAttribute> get attributes {
@@ -207,7 +263,7 @@ class _XmlDocumentBuilder extends _XmlNodeBuilder {
 
 class _XmlElementBuilder extends _XmlNodeBuilder {
   @override
-  final Map<String, String> namespaces = new Map();
+  final Map<String, _NamespaceData> namespaces = new Map();
 
   @override
   final List<XmlAttribute> attributes = new List();

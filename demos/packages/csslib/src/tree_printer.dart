@@ -17,7 +17,9 @@ String treeToDebugString(StyleSheet styleSheet, [bool useSpan = false]) {
 class _TreePrinter extends Visitor {
   final TreeOutput output;
   final bool useSpan;
-  _TreePrinter(this.output, this.useSpan) { output.printer = this; }
+  _TreePrinter(this.output, this.useSpan) {
+    output.printer = this;
+  }
 
   void visitTree(StyleSheet tree) => visitStylesheet(tree);
 
@@ -244,8 +246,8 @@ class _TreePrinter extends Visitor {
   void visitSelector(Selector node) {
     heading('Selector', node);
     output.depth++;
-    output.writeNodeList('simpleSelectorsSequences',
-        node.simpleSelectorSequences);
+    output.writeNodeList(
+        'simpleSelectorsSequences', node.simpleSelectorSequences);
     output.depth--;
   }
 
@@ -370,7 +372,7 @@ class _TreePrinter extends Visitor {
     output.depth++;
     output.writeValue('value', node.text);
     output.depth--;
- }
+  }
 
   void visitHexColorTerm(HexColorTerm node) {
     heading('HexColorTerm', node);
@@ -388,8 +390,6 @@ class _TreePrinter extends Visitor {
   }
 
   void visitUnitTerm(UnitTerm node) {
-    String unitValue;
-
     output.depth++;
     output.writeValue('value', node.text);
     output.writeValue('unit', node.unitToString());

@@ -14,13 +14,13 @@
 
 /**
  * Basic reflection in Dart,
- * with support for introspection and dynamic evaluation.
+ * with support for introspection and dynamic invocation.
  *
  * *Introspection* is that subset of reflection by which a running
  * program can examine its own structure. For example, a function
  * that prints out the names of all the members of an arbitrary object.
  *
- * *Dynamic evaluation* refers the ability to evaluate code that
+ * *Dynamic invocation* refers the ability to evaluate code that
  * has not been literally specified at compile time, such as calling a method
  * whose name is provided as an argument (because it is looked up
  * in a database, or provided interactively by the user).
@@ -55,6 +55,8 @@
  */
 library dart.mirrors;
 
+import 'dart:async' show Future;
+
 /**
  * A [MirrorSystem] is the main interface used to reflect on a set of
  * associated libraries.
@@ -69,8 +71,10 @@ library dart.mirrors;
  */
 abstract class MirrorSystem {
   /**
-   * Returns an immutable map from URIs to mirrors for all
-   * libraries known to this mirror system.
+   * Returns an immutable map from URIs to mirrors for all libraries known
+   * to this mirror system. For a runtime mirror system, only libraries which
+   * are currently loaded are included, and repeated calls of this method may
+   * return different maps as libraries are loaded.
    */
   Map<Uri, LibraryMirror> get libraries;
 
@@ -367,7 +371,7 @@ abstract class ObjectMirror implements Mirror {
    * of *o* (if *o* is a class or library) or the private members of the
    * class of *o* (otherwise).
    * If the invocation returns a result *r*, this method returns
-   * the result of calling [reflect](*r*).
+   * the result of calling [reflect]\(*r*\).
    * If the invocation causes a compilation error
    * the effect is the same as if a non-reflective compilation error
    * had been encountered.
@@ -408,7 +412,7 @@ abstract class ObjectMirror implements Mirror {
    * mirror on a closure corresponding to that method.
    *
    * If the invocation returns a result *r*, this method returns
-   * the result of calling [reflect](*r*).
+   * the result of calling [reflect]\(*r*\).
    * If the invocation causes a compilation error
    * the effect is the same as if a non-reflective compilation error
    * had been encountered.
@@ -433,7 +437,7 @@ abstract class ObjectMirror implements Mirror {
    * of *o* (if *o* is a class or library) or the private members of the
    * class of *o* (otherwise).
    * If the invocation returns a result *r*, this method returns
-   * the result of calling [reflect]([value]).
+   * the result of calling [reflect]\([value]\).
    * If the invocation causes a compilation error
    * the effect is the same as if a non-reflective compilation error
    * had been encountered.
@@ -442,6 +446,23 @@ abstract class ObjectMirror implements Mirror {
    */
   /* TODO(turnidge): Handle ambiguous names.*/
   InstanceMirror setField(Symbol fieldName, Object value);
+
+  /**
+   * Perform [invocation] on [reflectee].
+   * Equivalent to
+   *
+   *     if (invocation.isGetter) {
+   *       return this.getField(invocation.memberName).reflectee;
+   *     } else if (invocation.isSetter) {
+   *       return this.setField(invocation.memberName,
+   *                            invocation.positionArguments[0]).reflectee;
+   *     } else {
+   *       return this.invoke(invocation.memberName,
+   *                          invocation.positionalArguments,
+   *                          invocation.namedArguments).reflectee;
+   *     }
+   */
+  delegate(Invocation invocation);
 }
 
 /**
@@ -495,23 +516,13 @@ abstract class InstanceMirror implements ObjectMirror {
    * by [other] are identical.
    */
   bool operator == (other);
-
-  /**
-   * Perform [invocation] on [reflectee].
-   * Equivalent to
-   *
-   * this.invoke(invocation.memberName,
-   *             invocation.positionalArguments,
-   *             invocation.namedArguments);
-   */
-  delegate(Invocation invocation);
 }
 
 /**
  * A [ClosureMirror] reflects a closure.
  *
- * A [ClosureMirror] provides access to its captured variables and
- * provides the ability to execute its reflectee.
+ * A [ClosureMirror] provides the ability to execute its reflectee and
+ * introspect its function.
  */
 abstract class ClosureMirror implements InstanceMirror {
   /**
@@ -545,7 +556,7 @@ abstract class ClosureMirror implements InstanceMirror {
    * Then this method will perform the method invocation
    *  *f(a1, ..., an, k1: v1, ..., km: vm)*
    * If the invocation returns a result *r*, this method returns
-   * the result of calling [reflect](*r*).
+   * the result of calling [reflect]\(*r*\).
    * If the invocation causes a compilation error
    * the effect is the same as if a non-reflective compilation error
    * had been encountered.
@@ -612,7 +623,8 @@ abstract class LibraryDependencyMirror implements Mirror {
   /// [targetLibrary].
   LibraryMirror get sourceLibrary;
 
-  /// Returns the library mirror of the library that is imported or exported.
+  /// Returns the library mirror of the library that is imported or exported,
+  /// or null if the library is not loaded.
   LibraryMirror get targetLibrary;
 
   /// Returns the prefix if this is a prefixed import and `null` otherwise.
@@ -626,6 +638,11 @@ abstract class LibraryDependencyMirror implements Mirror {
   SourceLocation get location;
 
   List<InstanceMirror> get metadata;
+
+  /// Returns a future that completes with a library mirror on the library being
+  /// imported or exported when it is loaded, and initiates a load of that
+  /// library if it is not loaded.
+  Future<LibraryMirror> loadLibrary();
 }
 
 /// A mirror on a show/hide combinator declared on a library dependency.
@@ -820,7 +837,7 @@ abstract class ClassMirror implements TypeMirror, ObjectMirror {
    * of *c*.
    * In either case:
    * If the expression evaluates to a result *r*, this method returns
-   * the result of calling [reflect](*r*).
+   * the result of calling [reflect]\(*r*\).
    * If evaluating the expression causes a compilation error
    * the effect is the same as if a non-reflective compilation error
    * had been encountered.
@@ -1186,7 +1203,7 @@ class Comment {
  *
  * Example usage:
  *
- *     @MirrorsUsed(symbols: 'foo', override: '*')
+ *     @MirrorsUsed(symbols: 'foo')
  *     import 'dart:mirrors';
  *
  *     class Foo {
@@ -1199,12 +1216,25 @@ class Comment {
  *       new Foo().foo(); // Prints "foo".
  *       new Foo().bar(); // Might print an arbitrary (mangled) name, "bar".
  *     }
+ *
+ * For a detailed description of the parameters to the [MirrorsUsed] constructor
+ * see the comments for [symbols], [targets], [metaTargets] and [override].
+ *
+ * An import of `dart:mirrors` may have multiple [MirrorsUsed] annotations. This
+ * is particularly helpful to specify overrides for specific libraries. For 
+ * example:
+ *
+ *     @MirrorsUsed(targets: 'foo.Bar', override: 'foo')
+ *     @MirrorsUsed(targets: 'Bar')
+ *     import 'dart:mirrors';
+ *
+ * will ensure that the target `Bar` from the current library and from library
+ * `foo` is available for reflection. See also [override].
  */
-// TODO(ahe): Remove ", override: '*'" when it isn't necessary anymore.
 class MirrorsUsed {
   // Note: the fields of this class are untyped.  This is because the most
-  // convenient way to specify to specify symbols today is using a single
-  // string. In some cases, a const list of classes might be convenient. Some
+  // convenient way to specify symbols today is using a single string. In 
+  // some cases, a const list of classes might be convenient. Some
   // might prefer to use a const list of symbols.
 
   /**
@@ -1218,19 +1248,29 @@ class MirrorsUsed {
    *
    * The following text is non-normative:
    *
-   * Specifying this option turns off the following warnings emitted by
+   * Dart2js currently supports the following formats to specify symbols:
+   *
+   * * A constant [List] of [String] constants representing symbol names, 
+   *   e.g., `const ['foo', 'bar']`.
+   * * A single [String] constant whose value is a comma-separated list of
+   *   symbol names, e.g., `"foo, bar"`.
+   *
+   * Specifying the `symbols` field turns off the following warnings emitted by
    * dart2js:
    *
    * * Using "MirrorSystem.getName" may result in larger output.
-   * * Using "new #{name}" may result in larger output.
+   * * Using "new Symbol" may result in larger output.
    *
-   * Use symbols = "*" to turn off the warnings mentioned above.
+   * For example, if you're using [noSuchMethod] to interact with a database,
+   * extract all the possible column names and include them in this list.
+   * Similarly, if you're using [noSuchMethod] to interact with another
+   * language (JavaScript, for example) extract all the identifiers from the
+   * API you use and include them in this list.
    *
-   * For example, if using [noSuchMethod] to interact with a database, extract
-   * all the possible column names and include them in this list.  Similarly,
-   * if using [noSuchMethod] to interact with another language (JavaScript, for
-   * example) extract all the identifiers from API used and include them in
-   * this list.
+   * Note that specifying a symbol only ensures that the symbol will be
+   * available under that name at runtime. It does not mark targets with
+   * that name as available for reflection. See [targets] and [metaTargets]
+   * for that purpose.
    */
   final symbols;
 
@@ -1243,16 +1283,97 @@ class MirrorsUsed {
    * The following text is non-normative:
    *
    * For now, there is no formal description of what a reflective target is.
-   * Informally, it is a list of things that are expected to have fully
-   * functional mirrors.
+   * Informally, a target is a library, a class, a method or a field.
+   *
+   * Dart2js currently supports the following formats to specify targets:
+   *
+   * * A constant [List] containing [String] constants representing (qualified)
+   *   names of targets and Dart types.
+   * * A single [String] constant whose value is a comma-separated list of
+   *   (qualified) names.
+   * * A single Dart type.
+   *
+   * A (qualified) name is resolved to a target as follows:
+   *
+   * 1. If the qualified name matches a library name, the matching library is
+   *    the target.
+   * 2. Else, find the longest prefix of the name such that the prefix ends
+   *    just before a `.` and is a library name. 
+   * 3. Use that library as current scope. If no matching prefix was found, use
+   *    the current library, i.e., the library where the [MirrorsUsed] 
+   *    annotation was placed.
+   * 4. Split the remaining suffix (the entire name if no library name was
+   *    found in step 3) into a list of [String] using `.` as a 
+   *    separator.
+   * 5. Select all targets in the current scope whose name matches a [String] 
+   *    from the list.
+   *
+   * For example:
+   *
+   *     library my.library.one;
+   *
+   *     class A {
+   *       var aField;
+   *     }
+   *
+   *     library main;
+   *
+   *     @MirrorsUsed(targets: "my.library.one.A.aField")
+   *     import "dart:mirrors";
+   *
+   * The [MirrorsUsed] annotation specifies `A` and `aField` from library 
+   * `my.library.one` as targets. This will mark the class `A` as a reflective
+   * target. The target specification for `aField` has no effect, as there is
+   * no target in `my.library.one` with that name. 
+   * 
+   * Note that everything within a target also is available for reflection.
+   * So, if a library is specified as target, all classes in that library
+   * become targets for reflection. Likewise, if a class is a target, all
+   * its methods and fields become targets for reflection. As a consequence,
+   * `aField` in the above example is also a reflective target.
+   *
    */
   final targets;
 
   /**
    * A list of classes that when used as metadata indicates a reflective
-   * target.
+   * target. See also [targets].
    *
-   * See [targets].
+   * The following text is non-normative:
+   *
+   * The format for specifying the list of classes is the same as used for
+   * specifying [targets]. However, as a library cannot be used as a metadata
+   * annotation in Dart, adding a library to the list of [metaTargets] has no
+   * effect. In particular, adding a library to [metaTargets] does not make
+   * the library's classes valid metadata annotations to enable reflection.
+   *
+   * If an instance of a class specified in [metaTargets] is used as 
+   * metadata annotation on a library, class, field or method, that library,
+   * class, field or  method is added to the set of targets for reflection. 
+   *
+   * Example usage:
+   *
+   *     library example;
+   *     @MirrorsUsed(metaTargets: "example.Reflectable")
+   *     import "dart:mirrors";
+   *
+   *     class Reflectable {
+   *       const Reflectable();
+   *     }
+   *
+   *     class Foo {
+   *       @Reflectable()
+   *       reflectableMethod() { ... }
+   *
+   *       nonReflectableMethod() { ... }
+   *     }
+   *
+   * In the above example. `reflectableMethod` is marked as reflectable by
+   * using the `Reflectable` class, which in turn is specified in the 
+   * [metaTargets] annotation.
+   *
+   * The method `nonReflectableMethod` lacks a metadata annotation and thus 
+   * will not be reflectable at runtime.
    */
   final metaTargets;
 
@@ -1261,10 +1382,58 @@ class MirrorsUsed {
    *
    * When used as metadata on an import of "dart:mirrors", this metadata does
    * not apply to the library in which the annotation is used, but instead
-   * applies to the other libraries (all libraries if "*" is used).
+   * applies to the other libraries (all libraries if "*" is used). 
+   *
+   * The following text is non-normative:
+   *
+   * Dart2js currently supports the following formats to specify libraries:
+   *
+   * * A constant [List] containing [String] constants representing names of
+   *   libraries.
+   * * A single [String] constant whose value is a comma-separated list of
+   *   library names.
+   * 
+   * Conceptually, a [MirrorsUsed] annotation with [override] has the same 
+   * effect as placing the annotation directly on the import of `dart:mirrors`
+   * in each of the referenced libraries. Thus, if the library had no 
+   * [MirrorsUsed] annotation before, its unconditional import of 
+   * `dart:mirrors` is overridden by an annotated import.
+   * 
+   * Note that, like multiple explicit [MirrorsUsed] annotations, using
+   * override on a library with an existing [MirrorsUsed] annotation is
+   * additive. That is, the overall set of reflective targets is the union
+   * of the reflective targets that arise from the original and the
+   * overriding [MirrorsUsed] annotations. 
+   *
+   * The use of [override] is only meaningful for libraries that have an 
+   * import of `dart:mirrors` without annotation because otherwise it would
+   * work exactly the same way without the [override] parameter.
+   *
+   * While the annotation will apply to the given target libraries, the
+   * [symbols], [targets] and [metaTargets] are still evaluated in the 
+   * scope of the annotation. Thus, to select a target from library `foo`,
+   * a qualified name has to be used or, if the target is visible in the
+   * current scope, its type may be referenced.
+   * 
+   * For example, the following code marks all targets in the library `foo`
+   * as reflectable that have a metadata annotation using the `Reflectable` 
+   * class from the same library.
+   *
+   *     @MirrorsUsed(metaTargets: "foo.Reflectable", override: "foo")
+   *
+   * However, the following code would require the use of the `Reflectable`
+   * class from the current library, instead.
+   *
+   *     @MirrorsUsed(metaTargets: "Reflectable", override: "foo")
+   *
    */
   final override;
 
+  /**
+   * See the documentation for [MirrorsUsed.symbols], [MirrorsUsed.targets], 
+   * [MirrorsUsed.metaTargets] and [MirrorsUsed.override] for documentation 
+   * of the parameters.
+   */
   const MirrorsUsed(
       {this.symbols, this.targets, this.metaTargets, this.override});
 }

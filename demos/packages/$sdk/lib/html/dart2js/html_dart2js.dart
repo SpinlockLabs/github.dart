@@ -2611,14 +2611,23 @@ class Comment extends CharacterData {
 class CompositionEvent extends UIEvent {
   factory CompositionEvent(String type,
       {bool canBubble: false, bool cancelable: false, Window view,
-      String data}) {
+      String data, String locale}) {
     if (view == null) {
       view = window;
     }
     var e = document._createEvent("CompositionEvent");
-    e._initCompositionEvent(type, canBubble, cancelable, view, data);
+
+    if (Device.isFirefox) {
+      // Firefox requires the locale parameter that isn't supported elsewhere.
+      JS('void', '#.initCompositionEvent(#, #, #, #, #, #)',
+          e, type, canBubble, cancelable, view, data, locale);
+    } else {
+      e._initCompositionEvent(type, canBubble, cancelable, view, data);
+    }
+
     return e;
   }
+
   // To suppress missing implicit constructor warnings.
   factory CompositionEvent._() { throw new UnsupportedError("Not supported"); }
 
@@ -3356,6 +3365,7 @@ class CssStyleDeclaration  extends Interceptor with
   bool _supportsProperty(String propertyName) {
     return JS('bool', '# in #', propertyName, this);
   }
+
 
   @DomName('CSSStyleDeclaration.setProperty')
   void setProperty(String propertyName, String value, [String priority]) {
@@ -9300,8 +9310,8 @@ class Document extends Node
 
   @DomName('Document.getElementsByName')
   @DocsEditable()
-  @Returns('NodeList')
-  @Creates('NodeList')
+  @Creates('NodeList|HtmlCollection')
+  @Returns('NodeList|HtmlCollection')
   List<Node> getElementsByName(String elementName) native;
 
   @DomName('Document.getElementsByTagName')
@@ -9900,7 +9910,6 @@ class DocumentFragment extends Node implements ParentNode {
     new _FrozenElementList._wrap(_querySelectorAll(selectors));
 
 
-
   String get innerHtml {
     final e = new Element.tag("div");
     e.append(this.clone(true));
@@ -9932,8 +9941,10 @@ class DocumentFragment extends Node implements ParentNode {
    * Parses the specified text as HTML and adds the resulting node after the
    * last child of this document fragment.
    */
-  void appendHtml(String text) {
-    this.append(new DocumentFragment.html(text));
+  void appendHtml(String text, {NodeValidator validator,
+      NodeTreeSanitizer, treeSanitizer}) {
+    this.append(new DocumentFragment.html(text, validator: validator,
+        treeSanitizer: treeSanitizer));
   }
 
   /** 
@@ -12610,8 +12621,10 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
    * Parses the specified text as HTML and adds the resulting node after the
    * last child of this element.
    */
-  void appendHtml(String text) {
-    this.insertAdjacentHtml('beforeend', text);
+  void appendHtml(String text, {NodeValidator validator,
+      NodeTreeSanitizer treeSanitizer}) {
+    this.insertAdjacentHtml('beforeend', text, validator: validator,
+        treeSanitizer: treeSanitizer);
   }
 
   /**
@@ -12814,18 +12827,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
       const _CustomEventStreamProvider<WheelEvent>(
         Element._determineMouseWheelEventType);
 
-  static String _determineMouseWheelEventType(EventTarget e) {
-    if (JS('bool', '#.onwheel !== undefined', e)) {
-      // W3C spec, and should be IE9+, but IE has a bug exposing onwheel.
-      return 'wheel';
-    } else if (JS('bool', '#.onmousewheel !== undefined', e)) {
-      // Chrome & IE
-      return 'mousewheel';
-    } else {
-      // Firefox
-      return 'DOMMouseScroll';
-    }
-  }
+  static String _determineMouseWheelEventType(EventTarget e) => 'wheel';
 
   /**
    * Static factory designed to expose `transitionend` events to event
@@ -12867,6 +12869,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
 
   @JSName('insertAdjacentText')
   void _insertAdjacentText(String where, String text) native;
+  
 
   /**
    * Parses text as an HTML fragment and inserts it into the DOM at the
@@ -12890,13 +12893,16 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
    * * [insertAdjacentText]
    * * [insertAdjacentElement]
    */
-  void insertAdjacentHtml(String where, String html) {
-    if (JS('bool', '!!#.insertAdjacentHTML', this)) {
-      _insertAdjacentHtml(where, html);
-    } else {
-      _insertAdjacentNode(where, new DocumentFragment.html(html));
-    }
+  void insertAdjacentHtml(String where, String html, {NodeValidator validator,
+      NodeTreeSanitizer treeSanitizer}) {
+      if (treeSanitizer is _TrustedHtmlTreeSanitizer) {
+        _insertAdjacentHtml(where, html);
+      } else {
+        _insertAdjacentNode(where, createFragment(html,
+            validator: validator, treeSanitizer: treeSanitizer));
+      }
   }
+
 
   @JSName('insertAdjacentHTML')
   void _insertAdjacentHtml(String where, String text) native;
@@ -13175,10 +13181,11 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
     if (_parseDocument == null) {
       _parseDocument = document.implementation.createHtmlDocument('');
       _parseRange = _parseDocument.createRange();
-
-      // Workaround for Chrome bug 229142- URIs are not resolved in new doc.
-      var base = _parseDocument.createElement('base');
-      base.href = document.baseUri;
+	
+      // Workaround for Safari bug. Was also previously Chrome bug 229142
+      // - URIs are not resolved in new doc.	
+      var base = _parseDocument.createElement('base');	
+      base.href = document.baseUri;	
       _parseDocument.head.append(base);
     }
     var contextElement;
@@ -13189,7 +13196,8 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
       _parseDocument.body.append(contextElement);
     }
     var fragment;
-    if (Range.supportsCreateContextualFragment) {
+    if (Range.supportsCreateContextualFragment &&
+        _canBeUsedToCreateContextualFragment) {
       _parseRange.selectNodeContents(contextElement);
       fragment = _parseRange.createContextualFragment(html);
     } else {
@@ -13210,6 +13218,24 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
 
     return fragment;
   }
+
+  /** Test if createContextualFragment is supported for this element type */
+  bool get _canBeUsedToCreateContextualFragment =>
+      !_cannotBeUsedToCreateContextualFragment;
+
+  /** Test if createContextualFragment is NOT supported for this element type */
+  bool get _cannotBeUsedToCreateContextualFragment =>
+      _tagsForWhichCreateContextualFragmentIsNotSupported.contains(tagName);
+
+  /**
+   * A hard-coded list of the tag names for which createContextualFragment
+   * isn't supported.
+   */
+  static const _tagsForWhichCreateContextualFragmentIsNotSupported =
+      const ['HEAD', 'AREA',
+      'BASE', 'BASEFONT', 'BR', 'COL', 'COLGROUP', 'EMBED', 'FRAME', 'FRAMESET',
+      'HR', 'IMAGE', 'IMG', 'INPUT', 'ISINDEX', 'LINK', 'META', 'PARAM',
+      'SOURCE', 'STYLE', 'TITLE', 'WBR'];
 
   /**
    * Parses the HTML fragment and sets it as the contents of this element.
@@ -13245,8 +13271,12 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
   void setInnerHtml(String html,
     {NodeValidator validator, NodeTreeSanitizer treeSanitizer}) {
     text = null;
-    append(createFragment(
-        html, validator: validator, treeSanitizer: treeSanitizer));
+    if (treeSanitizer is _TrustedHtmlTreeSanitizer) {
+      _innerHtml = html;
+    } else {
+      append(createFragment(
+          html, validator: validator, treeSanitizer: treeSanitizer));
+    }
   }
   String get innerHtml => _innerHtml;
 
@@ -13262,7 +13292,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
    *
    * Those attributes are: attributes, lastChild, children, previousNode and tagName.
    */
-  bool get _hasCorruptedAttributes {
+  static bool _hasCorruptedAttributes(Element element) {
      return JS('bool', r'''
        (function(element) {
          if (!(element.attributes instanceof NamedNodeMap)) {
@@ -13280,7 +13310,7 @@ abstract class Element extends Node implements GlobalEventHandlers, ParentNode, 
 	   }
 	 }
 	 return false;
-          })(#)''', this);
+          })(#)''', element);
   }
 
   @DomName('Element.offsetHeight')
@@ -18402,9 +18432,17 @@ class HttpRequest extends HttpRequestEventTarget {
     }
 
     xhr.onLoad.listen((e) {
-      // Note: file:// URIs have status of 0.
-      if ((xhr.status >= 200 && xhr.status < 300) ||
-          xhr.status == 0 || xhr.status == 304) {
+      var accepted = xhr.status >= 200 && xhr.status < 300;
+      var fileUri = xhr.status == 0; // file:// URIs have status of 0.
+      var notModified = xhr.status == 304;
+      // Redirect status is specified up to 307, but others have been used in
+      // practice. Notably Google Drive uses 308 Resume Incomplete for
+      // resumable uploads, and it's also been used as a redirect. The
+      // redirect case will be handled by the browser before it gets to us,
+      // so if we see it we should pass it through to the user.
+      var unknownRedirect = xhr.status > 307 && xhr.status < 400;
+      
+      if (accepted || fileUri || notModified || unknownRedirect) {
         completer.complete(xhr);
       } else {
         completer.completeError(e);
@@ -23720,6 +23758,22 @@ class Node extends EventTarget {
     String value = nodeValue;  // Fetch DOM Node property once.
     return value == null ? super.toString() : value;
   }
+
+  /**
+   * A list of this node's children.
+   *
+   * ## Other resources
+   *
+   * * [Node.childNodes]
+   * (https://developer.mozilla.org/en-US/docs/Web/API/Node.childNodes)
+   * from MDN.
+   */
+  @DomName('Node.childNodes')
+  @DocsEditable()
+  @Returns('NodeList')
+  @Creates('NodeList')
+  final List<Node> childNodes;
+
   // To suppress missing implicit constructor warnings.
   factory Node._() { throw new UnsupportedError("Not supported"); }
 
@@ -23775,21 +23829,6 @@ class Node extends EventTarget {
   @DomName('Node.baseURI')
   @DocsEditable()
   final String baseUri;
-
-  /**
-   * A list of this node's children.
-   *
-   * ## Other resources
-   *
-   * * [Node.childNodes]
-   * (https://developer.mozilla.org/en-US/docs/Web/API/Node.childNodes)
-   * from MDN.
-   */
-  @DomName('Node.childNodes')
-  @DocsEditable()
-  @Returns('NodeList')
-  @Creates('NodeList')
-  final List<Node> childNodes;
 
   /**
    * The first child of this node.
@@ -31558,78 +31597,45 @@ class WebSocket extends EventTarget {
 
 
 @DomName('WheelEvent')
-@Native("WheelEvent,MouseWheelEvent,MouseScrollEvent")
+@Native("WheelEvent")
 class WheelEvent extends MouseEvent {
 
   factory WheelEvent(String type,
-      {Window view, int deltaX: 0, int deltaY: 0,
+      {Window view, num deltaX: 0, num deltaY: 0, num deltaZ: 0,
+      int deltaMode: 0,
       int detail: 0, int screenX: 0, int screenY: 0, int clientX: 0,
       int clientY: 0, int button: 0, bool canBubble: true,
       bool cancelable: true, bool ctrlKey: false, bool altKey: false,
       bool shiftKey: false, bool metaKey: false, EventTarget relatedTarget}) {
+
+    var options = {
+      'view': view,
+      'deltaMode': deltaMode,
+      'deltaX': deltaX,
+      'deltaY': deltaY,
+      'deltaZ': deltaZ,
+      'detail': detail,
+      'screenX': screenX,
+      'screenY': screenY,
+      'clientX': clientX,
+      'clientY': clientY,
+      'button': button,
+      'bubbles': canBubble,
+      'cancelable': cancelable,
+      'ctrlKey': ctrlKey,
+      'altKey': altKey,
+      'shiftKey': shiftKey,
+      'metaKey': metaKey,
+      'relatedTarget': relatedTarget,
+    };
+
     if (view == null) {
       view = window;
     }
-    var eventType = 'WheelEvent';
-    if (Device.isFirefox) {
-      eventType = 'MouseScrollEvents';
-    }
-    final event = document._createEvent(eventType);
-    // If polyfilling, then flip these because we'll flip them back to match
-    // the W3C standard:
-    // http://dev.w3.org/2006/webapi/DOM-Level-3-Events/html/DOM3-Events.html#events-WheelEvent-deltaY
-    if (JS('bool', '#.deltaY === undefined', event)) {
-      deltaX = -deltaX;
-      deltaY = -deltaY;
-    }
-    if (event._hasInitWheelEvent) {
-      var modifiers = [];
-      if (ctrlKey) {
-        modifiers.push('Control');
-      }
-      if (altKey) {
-        modifiers.push('Alt');
-      }
-      if (shiftKey) {
-        modifiers.push('Shift');
-      }
-      if (metaKey) {
-        modifiers.push('Meta');
-      }
-      event._initWheelEvent(type, canBubble, cancelable, view, detail, screenX,
-          screenY, clientX, clientY, button, relatedTarget, modifiers.join(' '),
-          deltaX, deltaY, 0, 0);
-    } else if (event._hasInitMouseScrollEvent) {
-      var axis = 0;
-      var detail = 0;
-      if (deltaX != 0 && deltaY != 0) {
-        throw new UnsupportedError(
-            'Cannot modify deltaX and deltaY simultaneously');
-      }
-      if (deltaY != 0) {
-        detail = deltaY;
-        axis = JS('int', 'MouseScrollEvent.VERTICAL_AXIS');
-      } else if (deltaX != 0) {
-        detail = deltaX;
-        axis = JS('int', 'MouseScrollEvent.HORIZONTAL_AXIS');
-      }
-      event._initMouseScrollEvent(type, canBubble, cancelable, view, detail,
-          screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey,
-          metaKey, button, relatedTarget, axis);
-    } else {
-      // Chrome does an auto-convert to pixels.
-      deltaY = deltaY ~/ 120;
+    
+    return JS('WheelEvent', 'new WheelEvent(#, #)',
+        type, convertDartToNative_Dictionary(options));
 
-      event._initMouseEvent(type, canBubble, cancelable, view, detail,
-          screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey,
-          metaKey, button, relatedTarget);
-      JS('void', '#.initWebKitWheelEvent(#, #, #, #, #, #, #, #, #, #, #)',
-          event, deltaX, deltaY,
-          view, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey,
-          metaKey);
-    }
-
-    return event;
   }
 
   // To suppress missing implicit constructor warnings.
@@ -31650,18 +31656,15 @@ class WheelEvent extends MouseEvent {
   @JSName('deltaX')
   @DomName('WheelEvent.deltaX')
   @DocsEditable()
-  @Experimental() // untriaged
   final double _deltaX;
 
   @JSName('deltaY')
   @DomName('WheelEvent.deltaY')
   @DocsEditable()
-  @Experimental() // untriaged
   final double _deltaY;
 
   @DomName('WheelEvent.deltaZ')
   @DocsEditable()
-  @Experimental() // untriaged
   final double deltaZ;
 
 
@@ -31678,24 +31681,6 @@ class WheelEvent extends MouseEvent {
     if (JS('bool', '#.deltaY !== undefined', this)) {
       // W3C WheelEvent
       return this._deltaY;
-    } else if (JS('bool', '#.wheelDelta !== undefined', this)) {
-      // Chrome and IE
-      return -this._wheelDelta;
-    } else if (JS('bool', '#.detail !== undefined', this)) {
-      // Firefox
-
-      // Handle DOMMouseScroll case where it uses detail and the axis to
-      // differentiate.
-      if (JS('bool', '#.axis == MouseScrollEvent.VERTICAL_AXIS', this)) {
-        var detail = this._detail;
-        // Firefox is normally the number of lines to scale (normally 3)
-        // so multiply it by 40 to get pixels to move, matching IE & WebKit.
-        if (detail.abs() < 100) {
-          return -detail * 40;
-        }
-        return -detail;
-      }
-      return 0;
     }
     throw new UnsupportedError(
         'deltaY is not supported');
@@ -31714,26 +31699,6 @@ class WheelEvent extends MouseEvent {
     if (JS('bool', '#.deltaX !== undefined', this)) {
       // W3C WheelEvent
       return this._deltaX;
-    } else if (JS('bool', '#.wheelDeltaX !== undefined', this)) {
-      // Chrome
-      return -this._wheelDeltaX;
-    } else if (JS('bool', '#.detail !== undefined', this)) {
-      // Firefox and IE.
-      // IE will have detail set but will not set axis.
-
-      // Handle DOMMouseScroll case where it uses detail and the axis to
-      // differentiate.
-      if (JS('bool', '#.axis !== undefined && '
-        '#.axis == MouseScrollEvent.HORIZONTAL_AXIS', this, this)) {
-        var detail = this._detail;
-        // Firefox is normally the number of lines to scale (normally 3)
-        // so multiply it by 40 to get pixels to move, matching IE & WebKit.
-        if (detail < 100) {
-          return -detail * 40;
-        }
-        return -detail;
-      }
-      return 0;
     }
     throw new UnsupportedError(
         'deltaX is not supported');
@@ -36383,6 +36348,10 @@ abstract class CssClassSet implements Set<String> {
    * operation.
    *
    * If this corresponds to many elements, `null` is always returned.
+   *
+   * [value] must be a valid 'token' representing a single class, i.e. a
+   * non-empty string containing no whitespace.  To toggle multiple classes, use
+   * [toggleAll].
    */
   bool toggle(String value, [bool shouldAdd]);
 
@@ -36397,19 +36366,26 @@ abstract class CssClassSet implements Set<String> {
    *
    * This is the Dart equivalent of jQuery's
    * [hasClass](http://api.jquery.com/hasClass/).
+   *
+   * [value] must be a valid 'token' representing a single class, i.e. a
+   * non-empty string containing no whitespace.
    */
   bool contains(String value);
 
   /**
    * Add the class [value] to element.
    *
-   * This is the Dart equivalent of jQuery's
+   * [add] and [addAll] are the Dart equivalent of jQuery's
    * [addClass](http://api.jquery.com/addClass/).
    *
-   * If this corresponds to one element. Returns true if [value] was added to
-   * the set, otherwise false.
+   * If this CssClassSet corresponds to one element. Returns true if [value] was
+   * added to the set, otherwise false.
    *
    * If this corresponds to many elements, `null` is always returned.
+   *
+   * [value] must be a valid 'token' representing a single class, i.e. a
+   * non-empty string containing no whitespace.  To add multiple classes use
+   * [addAll].
    */
   bool add(String value);
 
@@ -36417,24 +36393,34 @@ abstract class CssClassSet implements Set<String> {
    * Remove the class [value] from element, and return true on successful
    * removal.
    *
-   * This is the Dart equivalent of jQuery's
+   * [remove] and [removeAll] are the Dart equivalent of jQuery's
    * [removeClass](http://api.jquery.com/removeClass/).
+   *
+   * [value] must be a valid 'token' representing a single class, i.e. a
+   * non-empty string containing no whitespace.  To remove multiple classes, use
+   * [removeAll].
    */
   bool remove(Object value);
 
   /**
    * Add all classes specified in [iterable] to element.
    *
-   * This is the Dart equivalent of jQuery's
+   * [add] and [addAll] are the Dart equivalent of jQuery's
    * [addClass](http://api.jquery.com/addClass/).
+   *
+   * Each element of [iterable] must be a valid 'token' representing a single
+   * class, i.e. a non-empty string containing no whitespace.
    */
   void addAll(Iterable<String> iterable);
 
   /**
    * Remove all classes specified in [iterable] from element.
    *
-   * This is the Dart equivalent of jQuery's
+   * [remove] and [removeAll] are the Dart equivalent of jQuery's
    * [removeClass](http://api.jquery.com/removeClass/).
+   *
+   * Each element of [iterable] must be a valid 'token' representing a single
+   * class, i.e. a non-empty string containing no whitespace.
    */
   void removeAll(Iterable<String> iterable);
 
@@ -36447,6 +36433,9 @@ abstract class CssClassSet implements Set<String> {
    * If [shouldAdd] is true, then we always add all the classes in [iterable]
    * element. If [shouldAdd] is false then we always remove all the classes in
    * [iterable] from the element.
+   *
+   * Each element of [iterable] must be a valid 'token' representing a single
+   * class, i.e. a non-empty string containing no whitespace.
    */
   void toggleAll(Iterable<String> iterable, [bool shouldAdd]);
 }
@@ -36812,7 +36801,7 @@ class _ElementCssClassSet extends CssClassSetImpl {
     _element.className = '';
   }
 
-  bool contains(String value) {
+  bool contains(Object value) {
     return _contains(_element, value);
   }
 
@@ -36848,22 +36837,21 @@ class _ElementCssClassSet extends CssClassSetImpl {
     _removeWhere(_element, test, false);
   }
 
-  static bool _contains(Element _element, String value) {
-    return _classListContains(_classListOf(_element), value);
+  static bool _contains(Element _element, Object value) {
+    return value is String && _classListContains(_classListOf(_element), value);
   }
 
   static bool _add(Element _element, String value) {
     DomTokenList list = _classListOf(_element);
-    // Compute returned result independently of action upon the set. One day we
-    // will be able to optimize it way if unused.
-    bool added = !_classListContains(list, value);
+    // Compute returned result independently of action upon the set.
+    bool added = !_classListContainsBeforeAddOrRemove(list, value);
     _classListAdd(list, value);
     return added;
   }
 
   static bool _remove(Element _element, String value) {
     DomTokenList list = _classListOf(_element);
-    bool removed = _classListContains(list, value);
+    bool removed = _classListContainsBeforeAddOrRemove(list, value);
     _classListRemove(list, value);
     return removed;
   }
@@ -36937,7 +36925,17 @@ class _ElementCssClassSet extends CssClassSetImpl {
       JS('returns:JSUInt31;effects:none;depends:all;', '#.length', list);
 
   static bool _classListContains(DomTokenList list, String value) =>
-      JS('returns:bool;effects:none;depends:all;',
+      JS('returns:bool;effects:none;depends:all',
+          '#.contains(#)', list, value);
+
+  static bool _classListContainsBeforeAddOrRemove(
+      DomTokenList list, String value) =>
+      // 'throws:never' is a lie, since 'contains' will throw on an illegal
+      // token.  However, we always call this function immediately prior to
+      // add/remove/toggle with the same token.  Often the result of 'contains'
+      // is unused and the lie makes it possible for the 'contains' instruction
+      // to be removed.
+      JS('returns:bool;effects:none;depends:all;throws:null(1)',
           '#.contains(#)', list, value);
 
   static void _classListAdd(DomTokenList list, String value) {
@@ -39471,17 +39469,17 @@ class NodeValidatorBuilder implements NodeValidator {
 }
 
 class _SimpleNodeValidator implements NodeValidator {
-  final Set<String> allowedElements;
-  final Set<String> allowedAttributes;
-  final Set<String> allowedUriAttributes;
+  final Set<String> allowedElements = new Set<String>();
+  final Set<String> allowedAttributes = new Set<String>();
+  final Set<String> allowedUriAttributes = new Set<String>();
   final UriPolicy uriPolicy;
 
   factory _SimpleNodeValidator.allowNavigation(UriPolicy uriPolicy) {
     return new _SimpleNodeValidator(uriPolicy,
-      allowedElements: [
+      allowedElements: const [
         'A',
         'FORM'],
-      allowedAttributes: [
+      allowedAttributes: const [
         'A::accesskey',
         'A::coords',
         'A::hreflang',
@@ -39498,7 +39496,7 @@ class _SimpleNodeValidator implements NodeValidator {
         'FORM::novalidate',
         'FORM::target',
       ],
-      allowedUriAttributes: [
+      allowedUriAttributes: const [
         'A::href',
         'FORM::action',
       ]);
@@ -39506,10 +39504,10 @@ class _SimpleNodeValidator implements NodeValidator {
 
   factory _SimpleNodeValidator.allowImages(UriPolicy uriPolicy) {
     return new _SimpleNodeValidator(uriPolicy,
-      allowedElements: [
+      allowedElements: const [
         'IMG'
       ],
-      allowedAttributes: [
+      allowedAttributes: const [
         'IMG::align',
         'IMG::alt',
         'IMG::border',
@@ -39521,14 +39519,14 @@ class _SimpleNodeValidator implements NodeValidator {
         'IMG::vspace',
         'IMG::width',
       ],
-      allowedUriAttributes: [
+      allowedUriAttributes: const [
         'IMG::src',
       ]);
   }
 
   factory _SimpleNodeValidator.allowTextElements() {
     return new _SimpleNodeValidator(null,
-      allowedElements: [
+      allowedElements: const [
         'B',
         'BLOCKQUOTE',
         'BR',
@@ -39556,13 +39554,18 @@ class _SimpleNodeValidator implements NodeValidator {
    */
   _SimpleNodeValidator(this.uriPolicy,
       {Iterable<String> allowedElements, Iterable<String> allowedAttributes,
-      Iterable<String> allowedUriAttributes}):
-      this.allowedElements = allowedElements != null ?
-          new Set.from(allowedElements) : new Set(),
-      this.allowedAttributes = allowedAttributes != null ?
-          new Set.from(allowedAttributes) : new Set(),
-      this.allowedUriAttributes = allowedUriAttributes != null ?
-          new Set.from(allowedUriAttributes) : new Set();
+        Iterable<String> allowedUriAttributes}) {
+    this.allowedElements.addAll(allowedElements ?? const []);
+    allowedAttributes = allowedAttributes ?? const [];
+    allowedUriAttributes = allowedUriAttributes ?? const [];
+    var legalAttributes = allowedAttributes.where(
+        (x) => !_Html5NodeValidator._uriAttributes.contains(x));
+    var extraUriAttributes = allowedAttributes.where(
+        (x) => _Html5NodeValidator._uriAttributes.contains(x));
+    this.allowedAttributes.addAll(legalAttributes);
+    this.allowedUriAttributes.addAll(allowedUriAttributes);
+    this.allowedUriAttributes.addAll(extraUriAttributes);
+  }
 
   bool allowsElement(Element element) {
     return allowedElements.contains(element.tagName);
@@ -40723,8 +40726,26 @@ abstract class NodeTreeSanitizer {
    * will mark the entire tree as unsafe.
    */
   void sanitizeTree(Node node);
+
+  /**
+   * A sanitizer for trees that we trust. It does no validation and allows
+   * any elements. It is also more efficient, since it can pass the text
+   * directly through to the underlying APIs without creating a document 
+   * fragment to be sanitized.
+   */
+  static const trusted = const _TrustedHtmlTreeSanitizer();
 }
 
+/**
+ * A sanitizer for trees that we trust. It does no validation and allows
+ * any elements.
+ */
+class _TrustedHtmlTreeSanitizer implements NodeTreeSanitizer {
+  const _TrustedHtmlTreeSanitizer();
+
+  sanitizeTree(Node node) {}
+}
+  
 /**
  * Defines the policy for what types of uris are allowed for particular
  * attribute values.
@@ -40816,60 +40837,99 @@ class _ValidatingTreeSanitizer implements NodeTreeSanitizer {
 
   /// Aggressively try to remove node.
   void _removeNode(Node node, Node parent) {
-    // If we have the parent, it's presumably already passed more sanitization or
-    // is the fragment, so ask it to remove the child. And if that fails try to
-    // set the outer html.
+    // If we have the parent, it's presumably already passed more sanitization
+    // or is the fragment, so ask it to remove the child. And if that fails
+    // try to set the outer html.
     if (parent == null) {
       node.remove();
     } else {
       parent._removeChild(node);
     }
   }
-  
+
+  /// Sanitize the element, assuming we can't trust anything about it.
+  void _sanitizeUntrustedElement(Element element, Node parent) {
+    // If the _hasCorruptedAttributes does not successfully return false,
+    // then we consider it corrupted and remove.
+    // TODO(alanknight): This is a workaround because on Firefox
+    // embed/object
+    // tags typeof is "function", not "object". We don't recognize them, and
+    // can't call methods. This does mean that you can't explicitly allow an
+    // embed tag. The only thing that will let it through is a null
+    // sanitizer that doesn't traverse the tree at all. But sanitizing while
+    // allowing embeds seems quite unlikely.
+    var corrupted = true;
+    var attrs;
+    var isAttr;
+    try {
+      // If getting/indexing attributes throws, count that as corrupt.
+      attrs = element.attributes;
+      isAttr = attrs['is'];
+      corrupted = Element._hasCorruptedAttributes(element);
+    } catch(e) {}
+     var elementText = 'element unprintable';
+    try {
+      elementText = element.toString();
+    } catch(e) {}
+    var elementTagName = 'element tag unavailable';
+    try {
+      elementTagName = element.tagName;
+    } catch(e) {}
+    _sanitizeElement(element, parent, corrupted, elementText, elementTagName,
+        attrs, isAttr);
+  }
+
+  /// Having done basic sanity checking on the element, and computed the
+  /// important attributes we want to check, remove it if it's not valid
+  /// or not allowed, either as a whole or particular attributes.
+  void _sanitizeElement(Element element, Node parent, bool corrupted,
+      String text, String tag, Map attrs, String isAttr) {
+    if (false != corrupted) {
+      window.console.warn(
+          'Removing element due to corrupted attributes on <$text>');
+       _removeNode(element, parent);
+       return;
+    }
+    if (!validator.allowsElement(element)) {
+      window.console.warn(
+          'Removing disallowed element <$tag>');
+      _removeNode(element, parent);
+      return;
+    }
+
+    if (isAttr != null) {
+      if (!validator.allowsAttribute(element, 'is', isAttr)) {
+        window.console.warn('Removing disallowed type extension '
+            '<$tag is="$isAttr">');
+        _removeNode(element, parent);
+        return;
+      }
+    }
+
+    // TODO(blois): Need to be able to get all attributes, irrespective of
+    // XMLNS.
+    var keys = attrs.keys.toList();
+    for (var i = attrs.length - 1; i >= 0; --i) {
+      var name = keys[i];
+      if (!validator.allowsAttribute(element, name.toLowerCase(),
+          attrs[name])) {
+        window.console.warn('Removing disallowed attribute '
+            '<$tag $name="${attrs[name]}">');
+        attrs.remove(name);
+      }
+    }
+
+    if (element is TemplateElement) {
+      TemplateElement template = element;
+      sanitizeTree(template.content);
+     }
+  }
+
+  /// Sanitize the node and its children recursively.
   void sanitizeNode(Node node, Node parent) {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
-        Element element = node;
-        if (element._hasCorruptedAttributes) {
-          window.console.warn('Removing element due to corrupted attributes on <${element}>');
-          _removeNode(node, parent);
-          break;
-        }
-        var attrs = element.attributes;
-        if (!validator.allowsElement(element)) {
-          window.console.warn(
-              'Removing disallowed element <${element.tagName}>');
-          _removeNode(node, parent);
-          break;
-        }
-
-        var isAttr = attrs['is'];
-        if (isAttr != null) {
-          if (!validator.allowsAttribute(element, 'is', isAttr)) {
-            window.console.warn('Removing disallowed type extension '
-                '<${element.tagName} is="$isAttr">');
-            _removeNode(node, parent);
-            break;
-          }
-        }
-
-        // TODO(blois): Need to be able to get all attributes, irrespective of
-        // XMLNS.
-        var keys = attrs.keys.toList();
-        for (var i = attrs.length - 1; i >= 0; --i) {
-          var name = keys[i];
-          if (!validator.allowsAttribute(element, name.toLowerCase(),
-              attrs[name])) {
-            window.console.warn('Removing disallowed attribute '
-                '<${element.tagName} $name="${attrs[name]}">');
-            attrs.remove(name);
-          }
-        }
-
-        if (element is TemplateElement) {
-          TemplateElement template = element;
-          sanitizeTree(template.content);
-        }
+        _sanitizeUntrustedElement(node, parent);
         break;
       case Node.COMMENT_NODE:
       case Node.DOCUMENT_FRAGMENT_NODE:

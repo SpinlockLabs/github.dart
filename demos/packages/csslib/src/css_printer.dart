@@ -272,7 +272,6 @@ class CssPrinter extends Visitor {
     }
   }
 
-
   void visitSelectorGroup(SelectorGroup node) {
     var selectors = node.selectors;
     var selectorsLength = selectors.length;

@@ -40,8 +40,8 @@ class LineScanner extends StringScanner {
     super.position = newPosition;
 
     if (newPosition > oldPosition) {
-      var newlines = "\n".allMatches(string.substring(oldPosition, newPosition))
-          .toList();
+      var newlines =
+          "\n".allMatches(string.substring(oldPosition, newPosition)).toList();
       _line += newlines.length;
       if (newlines.isEmpty) {
         _column += newPosition - oldPosition;
@@ -49,8 +49,8 @@ class LineScanner extends StringScanner {
         _column = newPosition - newlines.last.end;
       }
     } else {
-      var newlines = "\n".allMatches(string.substring(newPosition, oldPosition))
-          .toList();
+      var newlines =
+          "\n".allMatches(string.substring(newPosition, oldPosition)).toList();
       _line -= newlines.length;
       if (newlines.isEmpty) {
         _column -= oldPosition - newPosition;
@@ -75,7 +75,6 @@ class LineScanner extends StringScanner {
   }
 
   bool scan(Pattern pattern) {
-    var oldPosition = position;
     if (!super.scan(pattern)) return false;
 
     var newlines = "\n".allMatches(lastMatch[0]).toList();

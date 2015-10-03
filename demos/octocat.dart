@@ -2,8 +2,6 @@ import "dart:html";
 
 import "dart:math" show Random;
 
-import "package:github/browser.dart";
-
 import "common.dart";
 
 DivElement $octocat;

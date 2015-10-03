@@ -671,7 +671,6 @@ class Parser {
 
     var versionDirective;
     var tagDirectives = [];
-    var reservedDirectives = [];
     while (token.type == TokenType.VERSION_DIRECTIVE ||
            token.type == TokenType.TAG_DIRECTIVE) {
       if (token is VersionDirectiveToken) {

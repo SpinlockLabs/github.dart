@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a Pull Request.
 class PullRequestInformation {
-
   /// If this is a complete pull request
   final bool isCompletePullRequest;
 
@@ -109,6 +108,9 @@ class PullRequest extends PullRequestInformation {
   /// Number of changed files
   int changedFilesCount;
 
+  /// Pull Request ID
+  int id;
+
   PullRequest() : super(true);
 
   static PullRequest fromJSON(input) {
@@ -117,6 +119,7 @@ class PullRequest extends PullRequestInformation {
     PullRequest pr = PullRequestInformation.fromJSON(input, new PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
+    pr.id = input['id'];
     pr.mergedBy = User.fromJSON(input['merged_by']);
     pr.mergeCommitSha = input['merge_commit_sha'];
     pr.commentsCount = input['comments'];
@@ -148,7 +151,6 @@ class PullRequestMerge {
 
 /// Model class for a Pull Request Head.
 class PullRequestHead {
-
   /// Label
   String label;
 
@@ -179,7 +181,6 @@ class PullRequestHead {
 
 /// Model class for a pull request to be created.
 class CreatePullRequest {
-
   /// Pull Request Title
   final String title;
 

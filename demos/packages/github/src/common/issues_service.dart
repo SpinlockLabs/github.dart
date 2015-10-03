@@ -12,8 +12,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listAll() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/issues", Issue.fromJSON);
   }
 
   /// List all issues across owned and member repositories for the authenticated
@@ -21,16 +21,16 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByUser() {
-    return new PaginationHelper(_github).objects(
-        "GET", "/user/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/user/issues", Issue.fromJSON);
   }
 
   /// List all issues for a given organization for the authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByOrg(String org) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${org}/issues", Issue.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/orgs/${org}/issues", Issue.fromJSON);
   }
 
   /// Lists the issues for the specified repository.
@@ -38,10 +38,33 @@ class IssuesService extends Service {
   /// TODO: Implement more optional parameters.
   ///
   /// API docs:https://developer.github.com/v3/issues/#list-issues-for-a-repository
-  Stream<Issue> listByRepo(RepositorySlug slug, {String state: "open"}) {
+  Stream<Issue> listByRepo(RepositorySlug slug,
+      {String state, String direction, String sort, DateTime since}) {
+    var params = <String, String>{};
+    if (state != null) {
+      // should be `open`, `closed` or `all`
+      params['state'] = state;
+    }
+
+    if (direction != null) {
+      // should be `desc` or `asc`
+      params['direction'] = direction;
+    }
+
+    if (sort != null) {
+      // should be `created`, `updated`, `comments`
+      params['sort'] = sort;
+    }
+
+    if (since != null) {
+      // Only issues updated at or after this time are returned.
+      // This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
+      params['since'] = since.toUtc().toIso8601String();
+    }
+
     return new PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/issues", Issue.fromJSON,
-        params: {"state": state});
+        params: params);
   }
 
   /// Edit an issue.
@@ -80,8 +103,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
   Stream<User> listAssignees(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
   }
 
   /// Checks if a user is an assignee for the specified repository.
@@ -98,7 +121,8 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
   Stream<IssueComment> listCommentsByIssue(
       RepositorySlug slug, int issueNumber) {
-    return new PaginationHelper(_github).objects('GET',
+    return new PaginationHelper(_github).objects(
+        'GET',
         '/repos/${slug.fullName}/issues/${issueNumber}/comments',
         IssueComment.fromJSON);
   }
@@ -149,8 +173,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabels(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/labels", IssueLabel.fromJSON);
   }
 
   /// Fetches a single label.
@@ -193,7 +217,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabelsByIssue(RepositorySlug slug, int issueNumber) {
-    return new PaginationHelper(_github).objects("GET",
+    return new PaginationHelper(_github).objects(
+        "GET",
         "/repos/${slug.fullName}/issues/${issueNumber}/labels",
         IssueLabel.fromJSON);
   }

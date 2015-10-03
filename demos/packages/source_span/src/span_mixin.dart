@@ -4,10 +4,12 @@
 
 library source_span.span_mixin;
 
+import 'dart:math' as math;
 import 'package:path/path.dart' as p;
 
 import 'colors.dart' as colors;
 import 'span.dart';
+import 'span_with_context.dart';
 import 'utils.dart';
 
 /// A mixin for easily implementing [SourceSpan].
@@ -49,18 +51,48 @@ abstract class SourceSpanMixin implements SourceSpan {
     if (color == true) color = colors.RED;
     if (color == false) color = null;
 
+    var line = start.line;
+    var column = start.column;
+
     var buffer = new StringBuffer();
-    buffer.write('line ${start.line + 1}, column ${start.column + 1}');
+    buffer.write('line ${line + 1}, column ${column + 1}');
     if (sourceUrl != null) buffer.write(' of ${p.prettyUri(sourceUrl)}');
     buffer.write(': $message');
-    if (length == 0) return buffer.toString();
 
+    if (length == 0 && this is! SourceSpanWithContext) return buffer.toString();
     buffer.write("\n");
-    var textLine = text.split("\n").first;
+
+    var textLine;
+    if (this is SourceSpanWithContext) {
+      var context = (this as SourceSpanWithContext).context;
+      var lineStart = findLineStart(context, text, column);
+      if (lineStart != null && lineStart > 0) {
+        buffer.write(context.substring(0, lineStart));
+        context = context.substring(lineStart);
+      }
+      var endIndex = context.indexOf('\n');
+      textLine = endIndex == -1 ? context : context.substring(0, endIndex + 1);
+      column = math.min(column, textLine.length - 1);
+    } else {
+      textLine = text.split("\n").first;
+      column = 0;
+    }
+
+    var toColumn =
+        math.min(column + end.offset - start.offset, textLine.length);
+    if (color != null) {
+      buffer.write(textLine.substring(0, column));
+      buffer.write(color);
+      buffer.write(textLine.substring(column, toColumn));
+      buffer.write(colors.NONE);
+      buffer.write(textLine.substring(toColumn));
+    } else {
+      buffer.write(textLine);
+    }
+    if (!textLine.endsWith('\n')) buffer.write('\n');
+    buffer.write(' ' * column);
     if (color != null) buffer.write(color);
-    buffer.write(textLine);
-    buffer.write("\n");
-    buffer.write('^' * textLine.length);
+    buffer.write('^' * math.max(toColumn - column, 1));
     if (color != null) buffer.write(colors.NONE);
     return buffer.toString();
   }

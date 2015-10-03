@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a repository.
 class Repository {
-
   /// Repository Name
   String name;
 
@@ -125,11 +124,12 @@ class Repository {
 
   /// Gets the Repository Slug (Full Name).
   RepositorySlug slug() => new RepositorySlug(owner.login, name);
+
+  String toString() => 'Repository: ${owner.login}/$name';
 }
 
 /// Repository Clone Urls
 class CloneUrls {
-
   /// Git Protocol
   ///
   /// git://github.com/user/repo.git
@@ -178,6 +178,8 @@ class Tag {
       ..tarUrl = input['tarball_url']
       ..zipUrl = input['zipball_url'];
   }
+
+  String toString() => 'Tag: $name';
 }
 
 class CommitInfo {
@@ -186,7 +188,6 @@ class CommitInfo {
 
 /// User Information
 class UserInformation {
-
   /// Owner Username
   String login;
 
@@ -214,7 +215,6 @@ class UserInformation {
 
 /// A Repository Slug
 class RepositorySlug {
-
   /// Repository Owner
   final String owner;
 
@@ -247,7 +247,6 @@ class RepositorySlug {
 
 /// Model class for a new repository to be created.
 class CreateRepository {
-
   /// Repository Name
   final String name;
 
@@ -310,7 +309,6 @@ class CreateRepository {
 
 /// Model class for a branch.
 class Branch {
-
   /// The name of the branch.
   String name;
 

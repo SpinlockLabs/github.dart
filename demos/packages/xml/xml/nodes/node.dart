@@ -17,15 +17,6 @@ abstract class XmlNode extends Object
   List<XmlNode> get children => [];
 
   /**
-   * Return an iterable over the sub-tree below this node.
-   *
-   * This method is deprecated and will soon be removed, instead use the
-   * more descriptive [descendants] iterator.
-   */
-  @deprecated
-  Iterable<XmlNode> get iterable => descendants;
-
-  /**
    * Return an iterable of the nodes preceding the opening tag of this node
    * in document order.
    */

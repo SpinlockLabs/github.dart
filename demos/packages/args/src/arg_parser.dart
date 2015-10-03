@@ -23,6 +23,10 @@ class ArgParser {
   /// The commands that have been defined for this parser.
   final Map<String, ArgParser> commands;
 
+  /// A list of the [Option]s in [options] intermingled with [String]
+  /// separators.
+  final _optionsAndSeparators = [];
+
   /// Whether or not this parser parses options that appear after non-option
   /// arguments.
   final bool allowTrailingOptions;
@@ -77,18 +81,25 @@ class ArgParser {
   ///
   /// * There is already an option with name [name].
   /// * There is already an option using abbreviation [abbr].
+  /// * [splitCommas] is passed but [allowMultiple] is `false`.
   void addOption(String name, {String abbr, String help, String valueHelp,
       List<String> allowed, Map<String, String> allowedHelp, String defaultsTo,
-      void callback(value), bool allowMultiple: false, bool hide: false}) {
+      void callback(value), bool allowMultiple: false, bool splitCommas,
+      bool hide: false}) {
+    if (!allowMultiple && splitCommas != null) {
+      throw new ArgumentError(
+          'splitCommas may not be set if allowMultiple is false.');
+    }
+
     _addOption(name, abbr, help, valueHelp, allowed, allowedHelp, defaultsTo,
         callback, allowMultiple ? OptionType.MULTIPLE : OptionType.SINGLE,
-        hide: hide);
+        splitCommas: splitCommas, hide: hide);
   }
 
   void _addOption(String name, String abbr, String help, String valueHelp,
       List<String> allowed, Map<String, String> allowedHelp, defaultsTo,
       void callback(value), OptionType type,
-      {bool negatable: false, bool hide: false}) {
+      {bool negatable: false, bool splitCommas, bool hide: false}) {
     // Make sure the name isn't in use.
     if (_options.containsKey(name)) {
       throw new ArgumentError('Duplicate option "$name".');
@@ -103,9 +114,19 @@ class ArgParser {
       }
     }
 
-    _options[name] = newOption(name, abbr, help, valueHelp, allowed,
+    var option = newOption(name, abbr, help, valueHelp, allowed,
         allowedHelp, defaultsTo, callback, type,
-        negatable: negatable, hide: hide);
+        negatable: negatable, splitCommas: splitCommas, hide: hide);
+    _options[name] = option;
+    _optionsAndSeparators.add(option);
+  }
+
+  /// Adds a separator line to the usage.
+  ///
+  /// In the usage text for the parser, this will appear between any options
+  /// added before this call and ones added after it.
+  void addSeparator(String text) {
+    _optionsAndSeparators.add(text);
   }
 
   /// Parses [args], a list of command-line arguments, matches them against the
@@ -117,12 +138,12 @@ class ArgParser {
   ///
   /// This is basically the help text shown on the command line.
   @Deprecated("Replaced with get usage. getUsage() will be removed in args 1.0")
-  String getUsage() => new Usage(this).generate();
+  String getUsage() => usage;
 
   /// Generates a string displaying usage information for the defined options.
   ///
   /// This is basically the help text shown on the command line.
-  String get usage => new Usage(this).generate();
+  String get usage => new Usage(_optionsAndSeparators).generate();
 
   /// Get the default value for an option. Useful after parsing to test if the
   /// user specified something other than the default.

@@ -15,8 +15,7 @@ class Tokenizer extends TokenizerBase {
   /** CDATA keyword. */
   final List CDATA_NAME = 'CDATA'.codeUnits;
 
-  Tokenizer(SourceFile file, String text, bool skipWhitespace,
-      [int index = 0])
+  Tokenizer(SourceFile file, String text, bool skipWhitespace, [int index = 0])
       : super(file, text, skipWhitespace, index);
 
   Token next({unicodeRange: false}) {
@@ -41,15 +40,15 @@ class Tokenizer extends TokenizerBase {
 
           _startIndex = _index;
           ch = _nextChar();
-          Token ident = finishIdentifier();
+          finishIdentifier();
 
           // Is it a directive?
-          int tokId = TokenKind.matchDirectives(_text, _startIndex,
-              _index - _startIndex);
+          int tokId = TokenKind.matchDirectives(
+              _text, _startIndex, _index - _startIndex);
           if (tokId == -1) {
             // No, is it a margin directive?
-            tokId = TokenKind.matchMarginDirectives(_text, _startIndex,
-                _index - _startIndex);
+            tokId = TokenKind.matchMarginDirectives(
+                _text, _startIndex, _index - _startIndex);
           }
 
           if (tokId != -1) {
@@ -63,7 +62,7 @@ class Tokenizer extends TokenizerBase {
         }
         return _finishToken(TokenKind.AT);
       case TokenChar.DOT:
-        int start = _startIndex;             // Start where the dot started.
+        int start = _startIndex; // Start where the dot started.
         if (maybeEatDigit()) {
           // looks like a number dot followed by digit(s).
           Token number = finishNumber();
@@ -116,19 +115,19 @@ class Tokenizer extends TokenizerBase {
         return _finishToken(TokenKind.GREATER);
       case TokenChar.TILDE:
         if (_maybeEatChar(TokenChar.EQUALS)) {
-          return _finishToken(TokenKind.INCLUDES);          // ~=
+          return _finishToken(TokenKind.INCLUDES); // ~=
         }
         return _finishToken(TokenKind.TILDE);
       case TokenChar.ASTERISK:
         if (_maybeEatChar(TokenChar.EQUALS)) {
-          return _finishToken(TokenKind.SUBSTRING_MATCH);   // *=
+          return _finishToken(TokenKind.SUBSTRING_MATCH); // *=
         }
         return _finishToken(TokenKind.ASTERISK);
       case TokenChar.AMPERSAND:
         return _finishToken(TokenKind.AMPERSAND);
       case TokenChar.NAMESPACE:
         if (_maybeEatChar(TokenChar.EQUALS)) {
-          return _finishToken(TokenKind.DASH_MATCH);      // |=
+          return _finishToken(TokenKind.DASH_MATCH); // |=
         }
         return _finishToken(TokenKind.NAMESPACE);
       case TokenChar.COLON:
@@ -146,7 +145,7 @@ class Tokenizer extends TokenizerBase {
       case TokenChar.SLASH:
         if (_maybeEatChar(TokenChar.ASTERISK)) return finishMultiLineComment();
         return _finishToken(TokenKind.SLASH);
-      case  TokenChar.LESS:      // <!--
+      case TokenChar.LESS: // <!--
         if (_maybeEatChar(TokenChar.BANG)) {
           if (_maybeEatChar(TokenChar.MINUS) &&
               _maybeEatChar(TokenChar.MINUS)) {
@@ -167,12 +166,12 @@ class Tokenizer extends TokenizerBase {
         return _finishToken(TokenKind.EQUALS);
       case TokenChar.CARET:
         if (_maybeEatChar(TokenChar.EQUALS)) {
-          return _finishToken(TokenKind.PREFIX_MATCH);    // ^=
+          return _finishToken(TokenKind.PREFIX_MATCH); // ^=
         }
         return _finishToken(TokenKind.CARET);
       case TokenChar.DOLLAR:
         if (_maybeEatChar(TokenChar.EQUALS)) {
-          return _finishToken(TokenKind.SUFFIX_MATCH);    // $=
+          return _finishToken(TokenKind.SUFFIX_MATCH); // $=
         }
         return _finishToken(TokenKind.DOLLAR);
       case TokenChar.BANG:
@@ -207,8 +206,8 @@ class Tokenizer extends TokenizerBase {
             (_peekChar() == UNICODE_PLUS)) {
           // Unicode range: U+uNumber[-U+uNumber]
           //   uNumber = 0..10FFFF
-          _nextChar();                                // Skip +
-          _startIndex = _index;                       // Starts at the number
+          _nextChar(); // Skip +
+          _startIndex = _index; // Starts at the number
           return _finishToken(TokenKind.UNICODE_RANGE);
         } else if (varDef(ch)) {
           return _finishToken(TokenKind.VAR_DEFINITION);
@@ -224,13 +223,17 @@ class Tokenizer extends TokenizerBase {
   }
 
   bool varDef(int ch) {
-    return ch == 'v'.codeUnitAt(0) && _maybeEatChar('a'.codeUnitAt(0)) &&
-        _maybeEatChar('r'.codeUnitAt(0)) && _maybeEatChar('-'.codeUnitAt(0));
+    return ch == 'v'.codeUnitAt(0) &&
+        _maybeEatChar('a'.codeUnitAt(0)) &&
+        _maybeEatChar('r'.codeUnitAt(0)) &&
+        _maybeEatChar('-'.codeUnitAt(0));
   }
 
   bool varUsage(int ch) {
-    return ch == 'v'.codeUnitAt(0) && _maybeEatChar('a'.codeUnitAt(0)) &&
-        _maybeEatChar('r'.codeUnitAt(0)) && (_peekChar() == '-'.codeUnitAt(0));
+    return ch == 'v'.codeUnitAt(0) &&
+        _maybeEatChar('a'.codeUnitAt(0)) &&
+        _maybeEatChar('r'.codeUnitAt(0)) &&
+        (_peekChar() == '-'.codeUnitAt(0));
   }
 
   Token _errorToken([String message = null]) {
@@ -246,8 +249,9 @@ class Tokenizer extends TokenizerBase {
       tokId = TokenKind.matchUnits(_text, _startIndex, _index - _startIndex);
     }
     if (tokId == -1) {
-      tokId = (_text.substring(_startIndex, _index) == '!important') ?
-          TokenKind.IMPORTANT : -1;
+      tokId = (_text.substring(_startIndex, _index) == '!important')
+          ? TokenKind.IMPORTANT
+          : -1;
     }
 
     return tokId >= 0 ? tokId : TokenKind.IDENTIFIER;
@@ -256,7 +260,6 @@ class Tokenizer extends TokenizerBase {
   Token finishIdentifier() {
     // If we encounter an escape sequence, remember it so we can post-process
     // to unescape.
-    bool hasEscapedChars = false;
     var chars = [];
 
     // backup so we can start with the first character
@@ -270,7 +273,7 @@ class Tokenizer extends TokenizerBase {
       // if followed by hexadecimal digits, create the appropriate character.
       // otherwise, include the character in the identifier and don't treat it
       // specially.
-      if (ch == 92/*\*/) {
+      if (ch == 92 /*\*/) {
         int startHex = ++_index;
         eatHexDigits(startHex + 6);
         if (_index != startHex) {
@@ -282,8 +285,10 @@ class Tokenizer extends TokenizerBase {
           // if we stopped the hex because of a whitespace char, skip it
           ch = _text.codeUnitAt(_index);
           if (_index - startHex != 6 &&
-              (ch == TokenChar.SPACE || ch == TokenChar.TAB ||
-              ch == TokenChar.RETURN || ch == TokenChar.NEWLINE)) {
+              (ch == TokenChar.SPACE ||
+                  ch == TokenChar.TAB ||
+                  ch == TokenChar.RETURN ||
+                  ch == TokenChar.NEWLINE)) {
             _index++;
           }
         } else {
@@ -291,9 +296,10 @@ class Tokenizer extends TokenizerBase {
           if (_index == _text.length) break;
           chars.add(_text.codeUnitAt(_index++));
         }
-      } else if (_index < validateFrom || (inSelectorExpression
-          ? TokenizerHelpers.isIdentifierPartExpr(ch)
-          : TokenizerHelpers.isIdentifierPart(ch))) {
+      } else if (_index < validateFrom ||
+          (inSelectorExpression
+              ? TokenizerHelpers.isIdentifierPartExpr(ch)
+              : TokenizerHelpers.isIdentifierPart(ch))) {
         chars.add(ch);
         _index++;
       } else {
@@ -311,7 +317,7 @@ class Tokenizer extends TokenizerBase {
   Token finishNumber() {
     eatDigits();
 
-    if (_peekChar() == 46/*.*/) {
+    if (_peekChar() == 46 /*.*/) {
       // Handle the case of 1.toString().
       _nextChar();
       if (TokenizerHelpers.isDigit(_peekChar())) {
@@ -326,8 +332,8 @@ class Tokenizer extends TokenizerBase {
   }
 
   bool maybeEatDigit() {
-    if (_index < _text.length
-        && TokenizerHelpers.isDigit(_text.codeUnitAt(_index))) {
+    if (_index < _text.length &&
+        TokenizerHelpers.isDigit(_text.codeUnitAt(_index))) {
       _index += 1;
       return true;
     }
@@ -342,17 +348,17 @@ class Tokenizer extends TokenizerBase {
   void eatHexDigits(int end) {
     end = math.min(end, _text.length);
     while (_index < end) {
-     if (TokenizerHelpers.isHexDigit(_text.codeUnitAt(_index))) {
-       _index += 1;
-     } else {
-       return;
-     }
+      if (TokenizerHelpers.isHexDigit(_text.codeUnitAt(_index))) {
+        _index += 1;
+      } else {
+        return;
+      }
     }
   }
 
   bool maybeEatHexDigit() {
-    if (_index < _text.length
-        && TokenizerHelpers.isHexDigit(_text.codeUnitAt(_index))) {
+    if (_index < _text.length &&
+        TokenizerHelpers.isHexDigit(_text.codeUnitAt(_index))) {
       _index += 1;
       return true;
     }
@@ -360,8 +366,7 @@ class Tokenizer extends TokenizerBase {
   }
 
   bool maybeEatQuestionMark() {
-    if (_index < _text.length &&
-        _text.codeUnitAt(_index) == QUESTION_MARK) {
+    if (_index < _text.length && _text.codeUnitAt(_index) == QUESTION_MARK) {
       _index += 1;
       return true;
     }
@@ -370,11 +375,11 @@ class Tokenizer extends TokenizerBase {
 
   void eatQuestionMarks() {
     while (_index < _text.length) {
-     if (_text.codeUnitAt(_index) == QUESTION_MARK) {
-       _index += 1;
-     } else {
-       return;
-     }
+      if (_text.codeUnitAt(_index) == QUESTION_MARK) {
+        _index += 1;
+      } else {
+        return;
+      }
     }
   }
 
@@ -388,8 +393,8 @@ class Tokenizer extends TokenizerBase {
       int ch = _nextChar();
       if (ch == 0) {
         return _finishToken(TokenKind.INCOMPLETE_COMMENT);
-      } else if (ch == 42/*'*'*/) {
-        if (_maybeEatChar(47/*'/'*/)) {
+      } else if (ch == 42 /*'*'*/) {
+        if (_maybeEatChar(47 /*'/'*/)) {
           if (_skipWhitespace) {
             return next();
           } else {
@@ -411,7 +416,6 @@ class Tokenizer extends TokenizerBase {
     }
     return _errorToken();
   }
-
 }
 
 /** Static helper methods. */
@@ -421,12 +425,13 @@ class TokenizerHelpers {
   }
 
   static bool isDigit(int c) {
-    return (c >= 48/*0*/ && c <= 57/*9*/);
+    return (c >= 48 /*0*/ && c <= 57 /*9*/);
   }
 
   static bool isHexDigit(int c) {
-    return (isDigit(c) || (c >= 97/*a*/ && c <= 102/*f*/)
-        || (c >= 65/*A*/ && c <= 70/*F*/));
+    return (isDigit(c) ||
+        (c >= 97 /*a*/ && c <= 102 /*f*/) ||
+        (c >= 65 /*A*/ && c <= 70 /*F*/));
   }
 
   static bool isIdentifierPart(int c) {
@@ -435,12 +440,13 @@ class TokenizerHelpers {
 
   /** Pseudo function expressions identifiers can't have a minus sign. */
   static bool isIdentifierStartExpr(int c) {
-    return ((c >= 97/*a*/ && c <= 122/*z*/) || (c >= 65/*A*/ && c <= 90/*Z*/) ||
+    return ((c >= 97 /*a*/ && c <= 122 /*z*/) ||
+        (c >= 65 /*A*/ && c <= 90 /*Z*/) ||
         // Note: Unicode 10646 chars U+00A0 or higher are allowed, see:
         // http://www.w3.org/TR/CSS21/syndata.html#value-def-identifier
         // http://www.w3.org/TR/CSS21/syndata.html#characters
         // Also, escaped character should be allowed.
-        c == 95/*_*/ || c >= 0xA0 || c == 92/*\*/);
+        c == 95 /*_*/ || c >= 0xA0 || c == 92 /*\*/);
   }
 
   /** Pseudo function expressions identifiers can't have a minus sign. */

@@ -1289,8 +1289,24 @@ class _HttpClientConnection {
                 "Unexpected response (unsolicited response without request).",
                 uri: _currentUri);
           }
-          _nextResponseCompleter.complete(incoming);
-          _nextResponseCompleter = null;
+
+          // Check for status code '100 Continue'. In that case just
+          // consume that response as the final response will follow
+          // it. There is currently no API for the client to wait for
+          // the '100 Continue' response.
+          if (incoming.statusCode == 100) {
+            incoming.drain().then((_) {
+              _subscription.resume();
+            }).catchError((error, [StackTrace stackTrace]) {
+              _nextResponseCompleter.completeError(
+                  new HttpException(error.message, uri: _currentUri),
+                  stackTrace);
+              _nextResponseCompleter = null;
+            });
+          } else {
+            _nextResponseCompleter.complete(incoming);
+            _nextResponseCompleter = null;
+          }
         },
         onError: (error, [StackTrace stackTrace]) {
           if (_nextResponseCompleter != null) {
@@ -1883,7 +1899,11 @@ class _HttpClient implements HttpClient {
           // On error, continue with next proxy.
           .catchError(connect);
     }
-    return connect(new HttpException("No proxies given"));
+    // Make sure we go through the event loop before taking a
+    // connection from the pool. For long-running synchronous code the
+    // server might have closed the connection, so this lowers the
+    // probability of getting a connection that was already closed.
+    return new Future(() => connect(new HttpException("No proxies given")));
   }
 
   _SiteCredentials _findCredentials(Uri url, [_AuthenticationScheme scheme]) {

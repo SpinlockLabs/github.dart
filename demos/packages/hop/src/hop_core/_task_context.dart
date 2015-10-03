@@ -5,8 +5,8 @@ class _TaskContext extends _LoggerChild with TaskLogger implements TaskContext {
   final ArgResults arguments;
   final Map<String, dynamic> extendedArgs;
 
-  _TaskContext(TaskRuntime parent, this.arguments, this.extendedArgs) :
-    super(parent, const []) {
+  _TaskContext(TaskRuntime parent, this.arguments, this.extendedArgs)
+      : super(parent, const []) {
     assert(arguments != null);
     assert(extendedArgs != null);
   }

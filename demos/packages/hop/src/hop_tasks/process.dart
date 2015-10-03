@@ -14,16 +14,17 @@ import 'package:hop/hop_core.dart';
 ///
 /// [description] is the description of the task. This is displayed next to the
 /// task's name in the help.
-Task createProcessTask(String command, {List<String> args: null, String description}) {
-  return new Task((ctx) => startProcess(ctx, command, args), description: description);
+Task createProcessTask(String command,
+    {List<String> args: null, String description}) {
+  return new Task((ctx) => startProcess(ctx, command, args),
+      description: description);
 }
 
 // TODO: document that start does an 'interactive' process
 //       stderr and stdout are piped to context, etc
 //       This aligns with io.Process.start
 Future startProcess(TaskLogger logger, String command,
-    [List<String> args = null]) {
-
+    [List<String> args = null]) async {
   requireArgumentNotNull(logger, 'ctx');
   requireArgumentNotNull(command, 'command');
   if (args == null) {
@@ -32,33 +33,28 @@ Future startProcess(TaskLogger logger, String command,
 
   logger.fine("Starting process:");
   logger.fine("$command ${args.join(' ')}");
-  return Process.start(command, args)
-      .then((process) {
-        return pipeProcess(process,
-            stdOutWriter: logger.info,
-            stdErrWriter: logger.severe);
-      })
-      .then((int exitCode) {
-        if(exitCode != 0) {
-          throw new ProcessException(command, args, '', exitCode);
-        }
-      });
+  var process = await Process.start(command, args);
+
+  var exitCode = await pipeProcess(process,
+      stdOutWriter: logger.info, stdErrWriter: logger.severe);
+
+  if (exitCode != 0) {
+    throw new ProcessException(command, args, '', exitCode);
+  }
 }
 
-Future<int> pipeProcess(Process process, {Action1<String>
-    stdOutWriter, Action1<String> stdErrWriter}) {
-
+Future<int> pipeProcess(Process process,
+    {Action1<String> stdOutWriter, Action1<String> stdErrWriter}) async {
   var futures = [process.exitCode];
 
   futures.add(process.stdout.forEach((data) => _stdListen(data, stdOutWriter)));
 
   futures.add(process.stderr.forEach((data) => _stdListen(data, stdErrWriter)));
 
-  return Future.wait(futures).then((List values) {
-    assert(values.length == futures.length);
-    assert(values[0] != null);
-    return values[0] as int;
-  });
+  var values = await Future.wait(futures);
+  assert(values.length == futures.length);
+  assert(values[0] != null);
+  return values[0] as int;
 }
 
 void _stdListen(List<int> data, void writer(String input)) {

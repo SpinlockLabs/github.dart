@@ -31,11 +31,7 @@ class _XmlFollowingIterator extends Iterator<XmlNode> {
         following.addAll(parent.children);
       } else {
         var children_index = parent.children.indexOf(child);
-        if (children_index != -1) {
-          following.addAll(parent.children.sublist(children_index + 1));
-        } else {
-          throw new StateError('Internal error');
-        }
+        following.addAll(parent.children.sublist(children_index + 1));
       }
     }
     todo.addAll(following.reversed);

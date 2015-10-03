@@ -63,8 +63,6 @@ class Isolate {
   static const int IMMEDIATE = 0;
   /** Argument to `ping` and `kill`: Ask for action before the next event. */
   static const int BEFORE_NEXT_EVENT = 1;
-  /** Argument to `ping` and `kill`: Ask for action after normal events. */
-  static const int AS_EVENT = 2;
 
   /**
    * Control port used to send control messages to the isolate.
@@ -146,17 +144,27 @@ class Isolate {
    * If the [paused] parameter is set to `true`,
    * the isolate will start up in a paused state,
    * as if by an initial call of `isolate.pause(isolate.pauseCapability)`.
-   * This allows setting up error or exit listeners on the isolate
-   * before it starts running.
    * To resume the isolate, call `isolate.resume(isolate.pauseCapability)`.
    *
-   * WARNING: The `pause` parameter is not implemented on all platforms yet.
+   * If the [errorAreFatal], [onExit] and/or [onError] parameters are provided,
+   * the isolate will act as if, respectively, [setErrorsFatal],
+   * [addOnExitListener] and [addErrorListener] were called with the
+   * corresponding parameter and was processed before the isolate starts
+   * running.
+   *
+   * You can also call the [setErrorsFatal], [addOnExitListener] and
+   * [addErrorListener] methods on the returned isolate, but unless the
+   * isolate was started as [paused], it may already have terminated
+   * before those methods can complete.
    *
    * Returns a future that will complete with an [Isolate] instance if the
    * spawning succeeded. It will complete with an error otherwise.
    */
   external static Future<Isolate> spawn(void entryPoint(message), var message,
-                                        { bool paused: false });
+                                        { bool paused: false,
+                                          bool errorsAreFatal,
+                                          SendPort onExit,
+                                          SendPort onError });
 
   /**
    * Creates and spawns an isolate that runs the code from the library with
@@ -165,7 +173,8 @@ class Isolate {
    * The isolate starts executing the top-level `main` function of the library
    * with the given URI.
    *
-   * The target `main` must be a subtype of one of these three signatures:
+   * The target `main` must be callable with zero, one or two arguments.
+   * Examples:
    *
    * * `main()`
    * * `main(args)`
@@ -173,6 +182,35 @@ class Isolate {
    *
    * When present, the parameter `args` is set to the provided [args] list.
    * When present, the parameter `message` is set to the initial [message].
+   *
+   * If the [paused] parameter is set to `true`,
+   * the isolate will start up in a paused state,
+   * as if by an initial call of `isolate.pause(isolate.pauseCapability)`.
+   * To resume the isolate, call `isolate.resume(isolate.pauseCapability)`.
+   *
+   * If the [errorAreFatal], [onExit] and/or [onError] parameters are provided,
+   * the isolate will act as if, respectively, [setErrorsFatal],
+   * [addOnExitListener] and [addErrorListener] were called with the
+   * corresponding parameter and was processed before the isolate starts
+   * running.
+   *
+   * You can also call the [setErrorsFatal], [addOnExitListener] and
+   * [addErrorListener] methods on the returned isolate, but unless the
+   * isolate was started as [paused], it may already have terminated
+   * before those methods can complete.
+   *
+   * If the [checked] parameter is set to `true` or `false`,
+   * the new isolate will run code in checked mode,
+   * respectively in production mode, if possible.
+   * If the parameter is omitted, the new isolate will inherit the
+   * value from the current isolate.
+   *
+   * It may not always be possible to honor the `checked` parameter.
+   * If the isolate code was pre-compiled, it may not be possible to change
+   * the checked mode setting dynamically.
+   * In that case, the `checked` parameter is ignored.
+   *
+   * WARNING: The [checked] parameter is not implemented on all platforms yet.
    *
    * If the [packageRoot] parameter is provided, it is used to find the location
    * of packages imports in the spawned isolate.
@@ -189,15 +227,6 @@ class Isolate {
    * WARNING: The [packageRoot] parameter is not implemented on all
    * platforms yet.
    *
-   * If the [paused] parameter is set to `true`,
-   * the isolate will start up in a paused state,
-   * as if by an initial call of `isolate.pause(isolate.pauseCapability)`.
-   * This allows setting up error or exit listeners on the isolate
-   * before it starts running.
-   * To resume the isolate, call `isolate.resume(isolate.pauseCapability)`.
-   *
-   * WARNING: The `pause` parameter is not implemented on all platforms yet.
-   *
    * Returns a future that will complete with an [Isolate] instance if the
    * spawning succeeded. It will complete with an error otherwise.
    */
@@ -206,12 +235,14 @@ class Isolate {
       List<String> args,
       var message,
       {bool paused: false,
-       Uri packageRoot});
+       bool checked,
+       Uri packageRoot,
+       bool errorsAreFatal,
+       SendPort onExit,
+       SendPort onError});
 
   /**
    * Requests the isolate to pause.
-   *
-   * WARNING: This method is experimental and not handled on every platform yet.
    *
    * The isolate should stop handling events by pausing its event queue.
    * The request will eventually make the isolate stop doing anything.
@@ -245,8 +276,6 @@ class Isolate {
   /**
    * Resumes a paused isolate.
    *
-   * WARNING: This method is experimental and not handled on every platform yet.
-   *
    * Sends a message to an isolate requesting that it ends a pause
    * that was requested using the [resumeCapability].
    *
@@ -259,25 +288,34 @@ class Isolate {
   external void resume(Capability resumeCapability);
 
   /**
-   * Asks the isolate to send a message on [responsePort] when it terminates.
+   * Asks the isolate to send [response] on [responsePort] when it terminates.
    *
-   * WARNING: This method is experimental and not handled on every platform yet.
-   *
-   * The isolate will send a `null` message on [responsePort] as the last
+   * The isolate will send a `response` message on `responsePort` as the last
    * thing before it terminates. It will run no further code after the message
    * has been sent.
    *
+   * Adding the same port more than once will only cause it to receive one
+   * message, using the last response value that was added.
+   *
    * If the isolate is already dead, no message will be sent.
+   * If `response` cannot be sent to the isolate, then the request is ignored.
+   * It is recommended to only use simple values that can be sent to all
+   * isolates, like `null`, booleans, numbers or strings.
+   *
+   * Since isolates run concurrently, it's possible for it to exit before the
+   * exit listener is established, and in that case no response will be
+   * sent on [responsePort].
+   * To avoid this, either use the corresponding parameter to the spawn
+   * function, or start the isolate paused, add the listener and
+   * then resume the isolate.
    */
   /* TODO(lrn): Can we do better? Can the system recognize this message and
    * send a reply if the receiving isolate is dead?
    */
-  external void addOnExitListener(SendPort responsePort);
+  external void addOnExitListener(SendPort responsePort, {Object response});
 
   /**
    * Stop listening on exit messages from the isolate.
-   *
-   * WARNING: This method is experimental and not handled on every platform yet.
    *
    * If a call has previously been made to [addOnExitListener] with the same
    * send-port, this will unregister the port, and it will no longer receive
@@ -290,26 +328,27 @@ class Isolate {
   /**
    * Set whether uncaught errors will terminate the isolate.
    *
-   * WARNING: This method is experimental and not handled on every platform yet.
-   *
    * If errors are fatal, any uncaught error will terminate the isolate
    * event loop and shut down the isolate.
    *
    * This call requires the [terminateCapability] for the isolate.
    * If the capability is not correct, no change is made.
+   *
+   * Since isolates run concurrently, it's possible for it to exit due to an
+   * error before errors are set non-fatal.
+   * To avoid this, either use the corresponding parameter to the spawn
+   * function, or start the isolate paused, set errors non-fatal and
+   * then resume the isolate.
    */
   external void setErrorsFatal(bool errorsAreFatal);
 
   /**
    * Requests the isolate to shut down.
    *
-   * WARNING: This method is experimental and not handled on every platform yet.
-   *
    * The isolate is requested to terminate itself.
    * The [priority] argument specifies when this must happen.
    *
-   * The [priority] must be one of [IMMEDIATE], [BEFORE_NEXT_EVENT] or
-   * [AS_EVENT].
+   * The [priority] must be one of [IMMEDIATE] or [BEFORE_NEXT_EVENT].
    * The shutdown is performed at different times depending on the priority:
    *
    * * `IMMEDIATE`: The the isolate shuts down as soon as possible.
@@ -323,65 +362,55 @@ class Isolate {
    *     control returns to the event loop of the receiving isolate,
    *     after the current event, and any already scheduled control events,
    *     are completed.
-   * * `AS_EVENT`: The shutdown does not happen until all prevously sent
-   *     non-control messages from the current isolate to the receiving isolate
-   *     have been processed.
-   *     The kill operation effectively puts the shutdown into the normal event
-   *     queue after previously sent messages, and it is affected by any control
-   *     messages that affect normal events, including `pause`.
-   *     This can be used to wait for a another event to be processed.
    */
-  external void kill([int priority = BEFORE_NEXT_EVENT]);
+  external void kill({int priority: BEFORE_NEXT_EVENT});
 
   /**
-   * Request that the isolate send a response on the [responsePort].
+   * Request that the isolate send [response] on the [responsePort].
    *
-   * WARNING: This method is experimental and not handled on every platform yet.
+   * If the isolate is alive, it will eventually send `response`
+   * (defaulting to `null`) on the response port.
    *
-   * If the isolate is alive, it will eventually send a `null` response on
-   * the response port.
-   *
-   * The [pingType] must be one of [IMMEDIATE], [BEFORE_NEXT_EVENT] or
-   * [AS_EVENT].
+   * The [priority] must be one of [IMMEDIATE] or [BEFORE_NEXT_EVENT].
    * The response is sent at different times depending on the ping type:
    *
    * * `IMMEDIATE`: The the isolate responds as soon as it receives the
    *     control message. This is after any previous control message
-   *     from the same isolate has been received.
+   *     from the same isolate has been received, but may be during
+   *     execution of another event.
    * * `BEFORE_NEXT_EVENT`: The response is scheduled for the next time
    *     control returns to the event loop of the receiving isolate,
    *     after the current event, and any already scheduled control events,
    *     are completed.
-   * * `AS_EVENT`: The response is not sent until all prevously sent
-   *     non-control messages from the current isolate to the receiving isolate
-   *     have been processed.
-   *     The ping effectively puts the response into the normal event queue
-   *     after previously sent messages, and it is affected by any control
-   *     messages that affect normal events, including `pause`.
-   *     This can be used to wait for a another event to be processed.
+   *
+   * If `response` cannot be sent to the isolate, then the request is ignored.
+   * It is recommended to only use simple values that can be sent to all
+   * isolates, like `null`, booleans, numbers or strings.
    */
-  external void ping(SendPort responsePort, [int pingType = IMMEDIATE]);
+  external void ping(SendPort responsePort, {Object response,
+                                             int priority: IMMEDIATE});
 
   /**
    * Requests that uncaught errors of the isolate are sent back to [port].
-   *
-   * WARNING: This method is experimental and not handled on every platform yet.
    *
    * The errors are sent back as two elements lists.
    * The first element is a `String` representation of the error, usually
    * created by calling `toString` on the error.
    * The second element is a `String` representation of an accompanying
    * stack trace, or `null` if no stack trace was provided.
+   * To convert this back to a [StackTrace] object, use [StackTrace.fromString].
    *
    * Listening using the same port more than once does nothing. It will only
    * get each error once.
+   *
+   * Since isolates run concurrently, it's possible for it to exit before the
+   * error listener is established. To avoid this, start the isolate paused,
+   * add the listener and then resume the isolate.
    */
   external void addErrorListener(SendPort port);
 
   /**
    * Stop listening for uncaught errors through [port].
-   *
-   * WARNING: This method is experimental and not handled on every platform yet.
    *
    * The `port` should be a port that is listening for errors through
    * [addErrorListener]. This call requests that the isolate stops sending
@@ -607,12 +636,6 @@ class RemoteError implements Error {
   final StackTrace stackTrace;
   RemoteError(String description, String stackDescription)
       : _description = description,
-        stackTrace = new _RemoteStackTrace(stackDescription);
+        stackTrace = new StackTrace.fromString(stackDescription);
   String toString() => _description;
-}
-
-class _RemoteStackTrace implements StackTrace {
-  String _trace;
-  _RemoteStackTrace(this._trace);
-  String toString() => _trace;
 }

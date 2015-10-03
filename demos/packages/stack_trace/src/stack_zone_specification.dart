@@ -172,12 +172,6 @@ class StackZoneSpecification {
   /// necessary.
   AsyncError errorCallback(Zone self, ZoneDelegate parent, Zone zone,
       Object error, StackTrace stackTrace) {
-    var asyncError = parent.errorCallback(zone, error, stackTrace);
-    if (asyncError != null) {
-      error = asyncError.error;
-      stackTrace = asyncError.stackTrace;
-    }
-
     // Go up two levels to get through [_CustomZone.errorCallback].
     if (stackTrace == null) {
       stackTrace = _createNode(2).toChain();
@@ -185,7 +179,8 @@ class StackZoneSpecification {
       if (_chains[stackTrace] == null) _chains[stackTrace] = _createNode(2);
     }
 
-    return new AsyncError(error, stackTrace);
+    var asyncError = parent.errorCallback(zone, error, stackTrace);
+    return asyncError == null ? new AsyncError(error, stackTrace) : asyncError;
   }
 
   /// Creates a [_Node] with the current stack trace and linked to

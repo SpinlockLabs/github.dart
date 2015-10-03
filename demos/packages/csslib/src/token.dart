@@ -61,6 +61,5 @@ class ErrorToken extends Token {
 class IdentifierToken extends Token {
   final String text;
 
-  IdentifierToken(this.text, int kind, FileSpan span)
-      : super(kind, span);
+  IdentifierToken(this.text, int kind, FileSpan span) : super(kind, span);
 }

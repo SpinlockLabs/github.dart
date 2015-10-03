@@ -27,9 +27,9 @@ Task _getHelpTask(_HelpArgs helpArgs) {
       }
     }
   },
-  description: 'Print help information about available tasks',
-  argParser: _helpParserConfig(helpArgs.registry.tasks.keys),
-  extendedArgs: [new TaskArgument('task-name')]);
+      description: 'Print help information about available tasks',
+      argParser: _helpParserConfig(helpArgs.registry.tasks.keys),
+      extendedArgs: [new TaskArgument('task-name')]);
 }
 
 ArgParser _helpParserConfig(Iterable<String> taskNames) {
@@ -42,13 +42,16 @@ ArgParser _helpParserConfig(Iterable<String> taskNames) {
   return parser;
 }
 
-void _printHelpForTask(_Printer printer, TaskRegistry config, String taskName, ArgParser hopArgParser) {
+void _printHelpForTask(_Printer printer, TaskRegistry config, String taskName,
+    ArgParser hopArgParser) {
   final task = config.tasks[taskName];
   assert(task != null);
 
   final usage = task.getUsage();
 
-  printer(_getUsage(showOptions: !usage.isEmpty, taskName: taskName,
+  printer(_getUsage(
+      showOptions: !usage.isEmpty,
+      taskName: taskName,
       extendedArgsUsage: task.getExtendedArgsUsage()));
   printer('');
   if (!task.description.isEmpty) {
@@ -66,7 +69,6 @@ void _printHelpForTask(_Printer printer, TaskRegistry config, String taskName, A
 }
 
 void _printHelp(_Printer printer, TaskRegistry registry, ArgParser parser) {
-
   printer(_getUsage());
   printer('');
   printer(_getTitle('Tasks'));
@@ -77,16 +79,19 @@ void _printHelp(_Printer printer, TaskRegistry registry, ArgParser parser) {
 
   final helpName = registry._helpTaskName;
   if (helpName != null) {
-    printer("See '$_HOP_CMD_NAME $helpName <task>' for more information on a specific command.");
+    printer(
+        "See '$_HOP_CMD_NAME $helpName <task>' for more information on a specific command.");
   }
 }
 
-String _getUsage({bool showOptions: true, String taskName: '<task>', String extendedArgsUsage: '[--] [<task-args>]'}) {
+String _getUsage({bool showOptions: true, String taskName: '<task>',
+    String extendedArgsUsage: '[--] [<task-args>]'}) {
   final optionsString = (taskName == '<task>') ? 'task' : taskName;
 
   final taskOptions = showOptions ? '[<$optionsString-options>] ' : '';
 
-  return 'usage: $_HOP_CMD_NAME [<hop-options>] $taskName $taskOptions$extendedArgsUsage'.trim();
+  return 'usage: $_HOP_CMD_NAME [<hop-options>] $taskName $taskOptions$extendedArgsUsage'
+      .trim();
 }
 
 void _printHopArgsHelp(_Printer printer, ArgParser hopArgParser) {
@@ -96,7 +101,8 @@ void _printHopArgsHelp(_Printer printer, ArgParser hopArgParser) {
 }
 
 String _indent(String input) {
-  return Util.splitLines(input)
+  return Util
+      .splitLines(input)
       .map((String line) => '  ' + line)
       .map(_trimTrailingWhitespace)
       .join(('\n'));
@@ -113,18 +119,19 @@ ShellString _getTitle(String input) {
   assert(input != null);
   assert(input.trim() == input);
   assert(!input.endsWith(':'));
-  return new ShellString.withAlt(input.toUpperCase(), AnsiColor.BOLD, '$input:');
+  return new ShellString.withAlt(
+      input.toUpperCase(), AnsiColor.BOLD, '$input:');
 }
 
 void _printTaskTable(_Printer printer, TaskRegistry config) {
   config._requireFrozen();
   final columns = [
-                   new ColumnDefinition('name', (name) => '  ' + name),
-                   new ColumnDefinition('description', (name) {
-                     final task = config.tasks[name];
-                     return task.description;
-                   })
-                   ];
+    new ColumnDefinition('name', (name) => '  ' + name),
+    new ColumnDefinition('description', (name) {
+      final task = config.tasks[name];
+      return task.description;
+    })
+  ];
   final rows = Console.getTable(config.tasks.keys, columns);
   for (final r in rows) {
     printer('  ' + r);

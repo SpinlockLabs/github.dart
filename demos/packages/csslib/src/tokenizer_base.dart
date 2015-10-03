@@ -12,11 +12,11 @@ class TokenizerState {
   final bool inSelectorExpression;
   final bool inSelector;
 
-  TokenizerState(TokenizerBase base) :
-      index = base._index,
-      startIndex = base._startIndex,
-      inSelectorExpression = base.inSelectorExpression,
-      inSelector = base.inSelector;
+  TokenizerState(TokenizerBase base)
+      : index = base._index,
+        startIndex = base._startIndex,
+        inSelectorExpression = base.inSelectorExpression,
+        inSelector = base.inSelector;
 }
 
 /**
@@ -54,9 +54,6 @@ abstract class TokenizerBase {
 
   int _index = 0;
   int _startIndex = 0;
-
-  static const String _CDATA_START = '<![CDATA[';
-  static const String _CDATA_END = ']]>';
 
   TokenizerBase(this._file, this._text, this._skipWhitespace,
       [this._index = 0]);
@@ -104,14 +101,6 @@ abstract class TokenizerBase {
     }
   }
 
-  String _tokenText() {
-    if (_index < _text.length) {
-      return _text.substring(_startIndex, _index);
-    } else {
-      return _text.substring(_startIndex, _text.length);
-    }
-  }
-
   Token _finishToken(int kind) {
     return new Token(kind, _file.span(_startIndex, _index));
   }
@@ -141,7 +130,6 @@ abstract class TokenizerBase {
           return _finishToken(TokenKind.WHITESPACE);
         }
       }
-
     }
     return _finishToken(TokenKind.END_OF_FILE);
   }
@@ -181,11 +169,11 @@ abstract class TokenizerBase {
   }
 
   static int _hexDigit(int c) {
-    if(c >= 48/*0*/ && c <= 57/*9*/) {
+    if (c >= 48 /*0*/ && c <= 57 /*9*/) {
       return c - 48;
-    } else if (c >= 97/*a*/ && c <= 102/*f*/) {
+    } else if (c >= 97 /*a*/ && c <= 102 /*f*/) {
       return c - 87;
-    } else if (c >= 65/*A*/ && c <= 70/*F*/) {
+    } else if (c >= 65 /*A*/ && c <= 70 /*F*/) {
       return c - 55;
     } else {
       return -1;
@@ -241,7 +229,7 @@ abstract class TokenizerBase {
   }
 
   Token finishNumberExtra(int kind) {
-    if (_maybeEatChar(101/*e*/) || _maybeEatChar(69/*E*/)) {
+    if (_maybeEatChar(101 /*e*/) || _maybeEatChar(69 /*E*/)) {
       kind = TokenKind.DOUBLE;
       _maybeEatChar(TokenKind.MINUS);
       _maybeEatChar(TokenKind.PLUS);
@@ -276,8 +264,8 @@ abstract class TokenizerBase {
     } else {
       s = _text.substring(_startIndex + 2, _index - 1);
     }
-    return new LiteralToken(TokenKind.STRING,
-        _file.span(_startIndex, _index), s);
+    return new LiteralToken(
+        TokenKind.STRING, _file.span(_startIndex, _index), s);
   }
 
   Token finishMultilineString(int quote) {
@@ -305,14 +293,6 @@ abstract class TokenizerBase {
         buf.add(ch);
       }
     }
-  }
-
-  Token _finishOpenBrace() {
-    return _finishToken(TokenKind.LBRACE);
-  }
-
-  Token _finishCloseBrace() {
-    return _finishToken(TokenKind.RBRACE);
   }
 
   Token finishString(int quote) {
@@ -382,22 +362,22 @@ abstract class TokenizerBase {
     final ch = _nextChar();
     int hexValue;
     switch (ch) {
-      case 110/*n*/:
+      case 110 /*n*/ :
         return TokenChar.NEWLINE;
-      case 114/*r*/:
+      case 114 /*r*/ :
         return TokenChar.RETURN;
-      case 102/*f*/:
+      case 102 /*f*/ :
         return TokenChar.FF;
-      case 98/*b*/:
+      case 98 /*b*/ :
         return TokenChar.BACKSPACE;
-      case 116/*t*/:
+      case 116 /*t*/ :
         return TokenChar.TAB;
-      case 118/*v*/:
+      case 118 /*v*/ :
         return TokenChar.FF;
-      case 120/*x*/:
+      case 120 /*x*/ :
         hexValue = readHex(2);
         break;
-      case 117/*u*/:
+      case 117 /*u*/ :
         if (_maybeEatChar(TokenChar.LBRACE)) {
           hexValue = readHex();
           if (!_maybeEatChar(TokenChar.RBRACE)) {
@@ -407,7 +387,8 @@ abstract class TokenizerBase {
           hexValue = readHex(4);
         }
         break;
-      default: return ch;
+      default:
+        return ch;
     }
 
     if (hexValue == -1) return -1;
@@ -417,7 +398,7 @@ abstract class TokenizerBase {
     // are not legal Unicode values.
     if (hexValue < 0xD800 || hexValue > 0xDFFF && hexValue <= 0xFFFF) {
       return hexValue;
-    } else if (hexValue <= 0x10FFFF){
+    } else if (hexValue <= 0x10FFFF) {
       messages.error('unicode values greater than 2 bytes not implemented yet',
           _file.span(_startIndex, _startIndex + 1));
       return -1;

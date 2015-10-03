@@ -1,6 +1,5 @@
 library hop_tasks.compiler;
 
-
 import 'dart:async';
 import 'dart:io';
 import 'package:bot/bot.dart';
@@ -9,7 +8,6 @@ import 'package:hop/src/tasks_shared.dart';
 import 'package:hop/src/hop_tasks/process.dart';
 
 class CompilerTargetType {
-
   static const JS = const CompilerTargetType._('js', 'Javascript');
   static const DART = const CompilerTargetType._('dart', 'Dart');
 
@@ -29,12 +27,12 @@ class CompilerTargetType {
 ///
 /// [outputType] must be one of type [CompilerTargetType].
 Task createDartCompilerTask(dynamic delayedRootList, {String singleOutput,
-  String packageRoot, bool minify: false, bool liveTypeAnalysis: true,
-  bool throwOnError: false, bool verbose: true, bool suppressWarnings: false,
-  CompilerTargetType outputType: CompilerTargetType.JS,
-  String outputMapper(String source), bool checked: false}) {
-
-  requireArgument(outputType == CompilerTargetType.JS || outputType == CompilerTargetType.DART, 'outputType');
+    String packageRoot, bool minify: false, bool liveTypeAnalysis: true,
+    bool throwOnError: false, bool verbose: true, bool suppressWarnings: false,
+    CompilerTargetType outputType: CompilerTargetType.JS,
+    String outputMapper(String source), bool checked: false}) {
+  requireArgument(outputType == CompilerTargetType.JS ||
+      outputType == CompilerTargetType.DART, 'outputType');
 
   if (singleOutput != null && outputMapper != null) {
     throw new ArgumentError(
@@ -42,36 +40,32 @@ Task createDartCompilerTask(dynamic delayedRootList, {String singleOutput,
   }
 
   return new Task((TaskContext context) {
+    return getDelayedResult(delayedRootList).then((List<String> inputs) {
+      if (inputs.length > 1 && singleOutput != null) {
+        assert(outputMapper == null);
+        context.fail('Cannot specify a single output when more than one '
+            'input is provided.');
+      }
 
-    return getDelayedResult(delayedRootList)
-        .then((List<String> inputs) {
+      if (outputMapper == null) {
+        if (singleOutput != null) {
+          outputMapper = (String input) => singleOutput;
+        } else if (outputType == CompilerTargetType.JS) {
+          outputMapper = _dart2jsOutputMapper;
+        } else {
+          assert(outputType == CompilerTargetType.DART);
+          outputMapper = _dart2DartOutputMapper;
+        }
+      }
 
-          if(inputs.length > 1 && singleOutput != null) {
-            assert(outputMapper == null);
-            context.fail('Cannot specify a single output when more than one '
-                'input is provided.');
-          }
+      return Future.forEach(inputs, (path) {
+        String output = outputMapper(path);
 
-          if(outputMapper == null) {
-            if(singleOutput != null) {
-              outputMapper = (String input) => singleOutput;
-            } else if (outputType == CompilerTargetType.JS) {
-              outputMapper = _dart2jsOutputMapper;
-            } else {
-              assert(outputType == CompilerTargetType.DART);
-              outputMapper = _dart2DartOutputMapper;
-            }
-          }
-
-          return Future.forEach(inputs, (path) {
-
-            String output = outputMapper(path);
-
-            return _dart2js(context, path,
-                output, packageRoot, minify, liveTypeAnalysis,
-                throwOnError, verbose, suppressWarnings, outputType, checked);
-          });
-        });
+        return _dart2js(context, path, output, packageRoot, minify,
+            liveTypeAnalysis, throwOnError, verbose, suppressWarnings,
+            outputType, checked);
+      });
+    });
   }, description: 'Run Dart-to-${outputType.friendlyName} compiler');
 }
 
@@ -85,11 +79,9 @@ String _dart2DartOutputMapper(String input) {
   }
 }
 
-Future _dart2js(TaskContext ctx, String file,
-    String output, String packageRoot, bool minify, bool liveTypeAnalysis,
-    bool throwOnError, bool verbose, bool suppressWarnings,
-    CompilerTargetType outputType, bool checked) {
-
+Future _dart2js(TaskContext ctx, String file, String output, String packageRoot,
+    bool minify, bool liveTypeAnalysis, bool throwOnError, bool verbose,
+    bool suppressWarnings, CompilerTargetType outputType, bool checked) {
   requireArgumentNotNullOrEmpty(output, 'output');
 
   if (output == file) {
@@ -100,10 +92,12 @@ Future _dart2js(TaskContext ctx, String file,
   final packageDir = new Directory('packages');
   assert(packageDir.existsSync());
 
-  final args = ["--package-root=${packageDir.path}",
-                "--output-type=${outputType.fileExt}",
-                "--out=$output",
-                file];
+  final args = [
+    "--package-root=${packageDir.path}",
+    "--output-type=${outputType.fileExt}",
+    "--out=$output",
+    file
+  ];
 
   if (verbose) {
     args.add('--verbose');

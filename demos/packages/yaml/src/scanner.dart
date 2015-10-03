@@ -653,7 +653,7 @@ class Scanner {
     if (_inBlockContext) {
       if (!_simpleKeyAllowed) {
         throw new YamlException(
-            "Block sequence entries are not allowed in this context.",
+            "Block sequence entries are not allowed here.",
             _scanner.emptySpan);
       }
 
@@ -676,7 +676,7 @@ class Scanner {
   void _fetchKey() {
     if (_inBlockContext) {
       if (!_simpleKeyAllowed) {
-        throw new YamlException("Mapping keys are not allowed in this context.",
+        throw new YamlException("Mapping keys are not allowed here.",
             _scanner.emptySpan);
       }
 
@@ -714,13 +714,14 @@ class Scanner {
       // A simple key cannot follow another simple key.
       _simpleKeyAllowed = false;
     } else if (_inBlockContext) {
-      // If we're here, we've found the ':' indicator following a complex key.
-
       if (!_simpleKeyAllowed) {
         throw new YamlException(
-            "Mapping values are not allowed in this context.",
+            "Mapping values are not allowed here. Did you miss a colon "
+                "earlier?",
             _scanner.emptySpan);
       }
+
+      // If we're here, we've found the ':' indicator following a complex key.
 
       _rollIndent(
           _scanner.column,

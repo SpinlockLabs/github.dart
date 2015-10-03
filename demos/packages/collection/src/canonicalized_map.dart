@@ -35,7 +35,7 @@ class CanonicalizedMap<C, K, V> implements Map<K, V> {
    * methods that take arbitrary objects. It can be used to filter out keys that
    * can't be canonicalized.
    */
-  CanonicalizedMap(C canonicalize(K key), {bool isValidKey(K key)})
+  CanonicalizedMap(C canonicalize(K key), {bool isValidKey(Object key)})
       : _canonicalize = canonicalize,
         _isValidKeyFn = isValidKey;
 
@@ -51,7 +51,7 @@ class CanonicalizedMap<C, K, V> implements Map<K, V> {
    * can't be canonicalized.
    */
   CanonicalizedMap.from(Map<K, V> other, C canonicalize(K key),
-          {bool isValidKey(K key)})
+                        {bool isValidKey(Object key)})
       : _canonicalize = canonicalize,
         _isValidKeyFn = isValidKey {
     addAll(other);

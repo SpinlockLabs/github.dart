@@ -4,7 +4,7 @@
 
 library mock.log_entry;
 
-import 'package:matcher/matcher.dart';
+import 'package:unittest/unittest.dart';
 
 import 'action.dart';
 import 'util.dart';

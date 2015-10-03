@@ -29,7 +29,7 @@ abstract class TreeNode {
 
 /** The base type for expressions. */
 abstract class Expression extends TreeNode {
-  Expression(SourceSpan span): super(span);
+  Expression(SourceSpan span) : super(span);
 }
 
 /** Simple class to provide a textual dump of trees for debugging. */
@@ -39,7 +39,7 @@ class TreeOutput {
   VisitorBase printer;
 
   void write(String s) {
-    for (int i=0; i < depth; i++) {
+    for (int i = 0; i < depth; i++) {
       buf.write(' ');
     }
     buf.write(s);

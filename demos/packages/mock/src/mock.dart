@@ -4,11 +4,9 @@
 
 library mock.mock;
 
-// TOOD(kevmoo): just use `Map`
-import 'dart:collection' show LinkedHashMap;
 import 'dart:mirrors';
 
-import 'package:matcher/matcher.dart';
+import 'package:unittest/unittest.dart';
 
 import 'action.dart';
 import 'behavior.dart';
@@ -25,7 +23,7 @@ class Mock {
   final String name;
 
   /** The set of [Behavior]s supported. */
-  final LinkedHashMap<String, Behavior> _behaviors;
+  final Map<CallMatcher, Behavior> _behaviors;
 
   /** How to handle unknown method calls - swallow or throw. */
   final bool _throwIfNoBehavior;
@@ -51,9 +49,12 @@ class Mock {
    * Default constructor. Unknown method calls are allowed and logged,
    * the mock has no name, and has its own log.
    */
-  Mock() :
-    _throwIfNoBehavior = false, log = null, name = null, _realObject = null,
-    _behaviors = new LinkedHashMap<String,Behavior>() {
+  Mock()
+      : _throwIfNoBehavior = false,
+        log = null,
+        name = null,
+        _realObject = null,
+        _behaviors = new Map<CallMatcher, Behavior>() {
     logging = true;
   }
 
@@ -65,12 +66,11 @@ class Mock {
    * If [enableLogging] is false, no logging will be done initially (whether
    * or not a [log] is supplied), but [logging] can be set to true later.
    */
-  Mock.custom({this.name,
-               this.log,
-               throwIfNoBehavior: false,
-               enableLogging: true})
-      : _throwIfNoBehavior = throwIfNoBehavior, _realObject = null,
-        _behaviors = new LinkedHashMap<String,Behavior>() {
+  Mock.custom(
+      {this.name, this.log, throwIfNoBehavior: false, enableLogging: true})
+      : _throwIfNoBehavior = throwIfNoBehavior,
+        _realObject = null,
+        _behaviors = new Map<CallMatcher, Behavior>() {
     if (log != null && name == null) {
       throw new Exception("Mocks with shared logs must have a name.");
     }
@@ -100,13 +100,12 @@ class Mock {
    *     mock.when(callsTo(...)).alwaysReturn(...);
    */
   Behavior when(CallMatcher logFilter) {
-    String key = logFilter.toString();
-    if (!_behaviors.containsKey(key)) {
+    if (!_behaviors.containsKey(logFilter)) {
       Behavior b = new Behavior(logFilter);
-      _behaviors[key] = b;
+      _behaviors[logFilter] = b;
       return b;
     } else {
-      return _behaviors[key];
+      return _behaviors[logFilter];
     }
   }
 
@@ -142,8 +141,7 @@ class Mock {
     }
     bool matchedMethodName = false;
     Map matchState = {};
-    for (String k in _behaviors.keys) {
-      Behavior b = _behaviors[k];
+    for (var b in _behaviors.values) {
       if (b.matcher.nameFilter.matches(method, matchState)) {
         matchedMethodName = true;
       }

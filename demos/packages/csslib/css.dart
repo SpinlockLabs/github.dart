@@ -39,16 +39,16 @@ void _compile(String inputPath, bool verbose) {
     var file = new SourceFile(contents, url: path.toUri(inputPath));
 
     // Parse the CSS.
-    var tree = _time('Parse $filename',
-        () => new Parser(file, contents).parse(), verbose);
+    var tree = _time(
+        'Parse $filename', () => new Parser(file, contents).parse(), verbose);
 
-    _time('Analyzer $filename',
-        () => new Analyzer([tree], messages), verbose).run();
+    _time('Analyzer $filename', () => new Analyzer([tree], messages), verbose)
+        .run();
 
     // Emit the processed CSS.
     var emitter = new CssPrinter();
-    _time('Codegen $filename',
-        () => emitter.visitTree(tree, pretty: true), verbose);
+    _time('Codegen $filename', () => emitter.visitTree(tree, pretty: true),
+        verbose);
 
     // Write the contents to a file.
     var outPath = path.join(path.dirname(inputPath), '_$filename');
@@ -76,6 +76,8 @@ void _printMessage(String message, int duration) {
   buf.write(' -- ');
   if (duration < 10) buf.write(' ');
   if (duration < 100) buf.write(' ');
-  buf..write(duration)..write(' ms');
+  buf
+    ..write(duration)
+    ..write(' ms');
   print(buf.toString());
 }

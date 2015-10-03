@@ -107,8 +107,8 @@ class StringScanner {
         if (!_slashAutoEscape) source = source.replaceAll("/", "\\/");
         name = "/$source/";
       } else {
-        name = pattern.toString()
-            .replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+        name =
+            pattern.toString().replaceAll("\\", "\\\\").replaceAll('"', '\\"');
         name = '"$name"';
       }
     }

@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a user.
 class User {
-
   /// User's Username
   String login;
 
@@ -98,7 +97,6 @@ class User {
 
 /// The Currently Authenticated User
 class CurrentUser extends User {
-
   /// Number of Private Repositories
   @ApiName("total_private_repos")
   int privateReposCount;
@@ -146,7 +144,6 @@ class CurrentUser extends User {
  * A Users GitHub Plan
  */
 class UserPlan {
-
   /**
    * Plan Name
    */

@@ -39,7 +39,7 @@ part of dart.io;
  *       Map<String, String> envVars = Platform.environment;
  *       print(envVars['PATH']);
  *     }
- * 
+ *
  * ## Determine the OS
  *
  * You can get the name of the operating system as a string with the
@@ -53,16 +53,16 @@ part of dart.io;
  *       String os = Platform.operatingSystem;
  *       // Or, use a predicate getter.
  *       if (Platform.isMacOS) {
- *         Print('is a Mac'); 
+ *         print('is a Mac');
  *       } else {
- *        print('is not a Mac');
+ *         print('is not a Mac');
  *       }
  *     }
  *
  * ## Other resources
  *
  * [Dart by Example](https://www.dartlang.org/dart-by-example/#dart-io-and-command-line-apps)
- * provides additional task-oriented code samples that show how to use 
+ * provides additional task-oriented code samples that show how to use
  * various API from the [dart:io] library.
  */
 class Platform {
@@ -131,10 +131,23 @@ class Platform {
    * Returns the path of the executable used to run the script in this
    * isolate.
    *
-   * If the execution environment does not support [executable] an empty
-   * string is returned.
+   * The path returned is the literal path used to run the script. This
+   * path might be relative or just be a name from which the executable
+   * was found by searching the `PATH`.
+   *
+   * To get the absolute path to the resolved executable use
+   * [resolvedExecutable].
    */
   static String get executable => _Platform.executable;
+
+  /**
+   * Returns the path of the executable used to run the script in this
+   * isolate after it has been resolved by the OS.
+   *
+   * This is the absolute path, with all symlinks resolved, to the
+   * executable used to run the script.
+   */
+  static String get resolvedExecutable => _Platform.resolvedExecutable;
 
   /**
    * Returns the absolute URI of the script being run in this

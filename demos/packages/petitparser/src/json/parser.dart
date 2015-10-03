@@ -4,13 +4,14 @@ part of json;
  * JSON parser.
  */
 class JsonParser extends GrammarParser {
-  JsonParser() : super(new JsonParserDefinition());
+  JsonParser() : super(const JsonParserDefinition());
 }
 
 /**
  * JSON parser definition.
  */
 class JsonParserDefinition extends JsonGrammarDefinition {
+  const JsonParserDefinition();
 
   array() => super.array().map((each) => each[1] != null ? each[1] : new List());
   object() => super.object().map((each) {
@@ -38,7 +39,7 @@ class JsonParserDefinition extends JsonGrammarDefinition {
   });
 
   stringPrimitive() => super.stringPrimitive().map((each) => each[1].join());
-  characterEscape() => super.characterEscape().map((each) => _escapeTable[each[1]]);
+  characterEscape() => super.characterEscape().map((each) => JSON_ESCAPE_CHARS[each[1]]);
   characterOctal() => super.characterOctal().map((each) {
     throw new UnsupportedError('Octal characters not supported yet');
   });

@@ -47,8 +47,8 @@ class ParsedPath {
     if (root != null) path = path.substring(root.length);
 
     // Split the parts on path separators.
-    var parts = [];
-    var separators = [];
+    var parts = <String>[];
+    var separators = <String>[];
 
     var start = 0;
 
@@ -102,7 +102,7 @@ class ParsedPath {
   void normalize() {
     // Handle '.', '..', and empty parts.
     var leadingDoubles = 0;
-    var newParts = [];
+    var newParts = <String>[];
     for (var part in parts) {
       if (part == '.' || part == '') {
         // Do nothing. Ignore it.
@@ -130,7 +130,7 @@ class ParsedPath {
     }
 
     // Canonicalize separators.
-    var newSeparators = new List.generate(
+    var newSeparators = new List<String>.generate(
         newParts.length, (_) => style.separator, growable: true);
     newSeparators.insert(0, isAbsolute &&
         newParts.length > 0 &&

@@ -141,10 +141,6 @@ abstract class _BaseMultimap<K, V, C extends Iterable<V>>
     implements Multimap<K, V> {
   final Map<K, Iterable<V>> _map = new HashMap();
 
-  // TODO(jacobr): for the following 6 methods we would prefer to specify that
-  // iterable is the union type of Set<V> and List<V> but Dart does not
-  // support union types and Set and List lack a common interface containing
-  // add, addAll, clear, and remove (dartbug/4938).
   Iterable<V> _create();
   void _add(C iterable, V value);
   void _addAll(C iterable, Iterable<V> value);
@@ -443,22 +439,22 @@ class _WrappedIterable<K, V, C extends Iterable<V>> implements Iterable<V> {
     return _delegate.singleWhere(test);
   }
 
-  C skip(int n) {
+  Iterable<V> skip(int n) {
     _syncDelegate();
     return _delegate.skip(n);
   }
 
-  C skipWhile(bool test(V value)) {
+  Iterable<V> skipWhile(bool test(V value)) {
     _syncDelegate();
     return _delegate.skipWhile(test);
   }
 
-  C take(int n) {
+  Iterable<V> take(int n) {
     _syncDelegate();
     return _delegate.take(n);
   }
 
-  C takeWhile(bool test(V value)) {
+  Iterable<V> takeWhile(bool test(V value)) {
     _syncDelegate();
     return _delegate.takeWhile(test);
   }
@@ -478,7 +474,7 @@ class _WrappedIterable<K, V, C extends Iterable<V>> implements Iterable<V> {
     return _delegate.toString();
   }
 
-  C where(bool test(V element)) {
+  Iterable<V> where(bool test(V element)) {
     _syncDelegate();
     return _delegate.where(test);
   }
@@ -526,7 +522,7 @@ class _WrappedList<K, V> extends _WrappedIterable<K, V, List<V>>
     _delegate.fillRange(start, end, fillValue);
   }
 
-  List<V> getRange(int start, int end) {
+  Iterable<V> getRange(int start, int end) {
     _syncDelegate();
     return _delegate.getRange(start, end);
   }

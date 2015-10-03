@@ -32,9 +32,8 @@ class TaskRegistry {
   ///
   /// If [description] is provided and [task] is an instance of [Task], then
   /// [task] will be cloned and given the provided [description].
-  Task addTask(String name, dynamic task, {String description,
-    List<String> dependencies} ) {
-
+  Task addTask(String name, dynamic task,
+      {String description, List<String> dependencies}) {
     require(!isFrozen, "Cannot add a task. Frozen.");
     validateTaskName(name);
     requireArgument(!_tasks.containsKey(name), 'task',
@@ -44,15 +43,13 @@ class TaskRegistry {
 
     if (dependencies == null) dependencies = [];
 
-    var list = $(dependencies)
-        .map((String subName) {
-          var task = _tasks[subName];
-          require(task != null, 'The task "$subName" has not be registered');
-          return task;
-        });
+    var list = $(dependencies).map((String subName) {
+      var task = _tasks[subName];
+      require(task != null, 'The task "$subName" has not be registered');
+      return task;
+    });
 
-    var set = new LinkedHashSet<Task>.identity()
-        ..addAll(list);
+    var set = new LinkedHashSet<Task>.identity()..addAll(list);
 
     if (task is Task) {
       task = task.clone(description: description);
@@ -92,14 +89,13 @@ class TaskRegistry {
   }
 
   Task addChainedTask(String name, Iterable<String> existingTaskNames,
-                             {String description}) {
-
+      {String description}) {
     if (description == null) {
       description = 'Chained Task: ' + existingTaskNames.join(', ');
     }
 
-    return addTask(name, _noopTask, description: description,
-        dependencies: existingTaskNames);
+    return addTask(name, _noopTask,
+        description: description, dependencies: existingTaskNames);
   }
 
   HashMap<Task, List<Task>> _getDependencyMap(String taskName) {

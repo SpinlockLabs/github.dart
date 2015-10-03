@@ -195,6 +195,9 @@ class Frame {
     }
   }
 
+  /// Parses a string representation of a JavaScriptCore stack trace.
+  factory Frame.parseJSCore(String frame) => new Frame.parseV8(frame);
+
   /// Parses a string representation of an IE stack frame.
   ///
   /// IE10+ frames look just like V8 frames. Prior to IE10, stack traces can't

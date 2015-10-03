@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a release.
 class Release {
-
   /// Url to this Release
   @ApiName("html_url")
   String htmlUrl;
@@ -70,8 +69,8 @@ class Release {
       ..draft = input['draft']
       ..prerelease = input['prelease']
       ..author = input['author']
-      ..assets = new List.from(
-          input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
+      ..assets =
+          new List.from(input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
       ..name = input['name']
       ..createdAt = parseDateTime(input['created_at'])
       ..publishedAt = parseDateTime(input['published_at']);
@@ -80,7 +79,6 @@ class Release {
 
 /// Model class for a release asset.
 class ReleaseAsset {
-
   /// Url to download the asset.
   @ApiName("browser_download_url")
   String browserDownloadUrl;
@@ -135,7 +133,6 @@ class ReleaseAsset {
 
 /// Model class for a new release to be created.
 class CreateRelease {
-
   /// Tag Name to Base off of
   final String tagName;
 

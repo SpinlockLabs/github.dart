@@ -4799,7 +4799,7 @@ class SvgElement extends Element implements GlobalEventHandlers {
 
   CssClassSet get classes => new _AttributeClassSet(this);
 
-  List<Element> get children => new FilteredElementList<Element>(this);
+  List<Element> get children => new FilteredElementList(this);
 
   void set children(List<Element> value) {
     final children = this.children;
@@ -4858,11 +4858,12 @@ class SvgElement extends Element implements GlobalEventHandlers {
   }
 
   @DomName('Element.insertAdjacentHTML')
-  void insertAdjacentHtml(String where, String text) {
+  void insertAdjacentHtml(String where, String text, {NodeValidator validator,
+      NodeTreeSanitizer treeSanitizer}) {
     throw new UnsupportedError("Cannot invoke insertAdjacentHtml on SVG.");
   }
 
-  @DomName('Element.insertAdjacentHTML')
+  @DomName('Element.insertAdjacentElement')
   Element insertAdjacentElement(String where, Element element) {
     throw new UnsupportedError("Cannot invoke insertAdjacentElement on SVG.");
   }

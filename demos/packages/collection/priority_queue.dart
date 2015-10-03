@@ -169,7 +169,7 @@ class HeapPriorityQueue<E> implements PriorityQueue<E> {
    * If [comparison] is omitted, it defaults to [Comparable.compare].
    */
   HeapPriorityQueue([int comparison(E e1, E e2)])
-  : comparison = (comparison != null) ? comparison : Comparable.compare;
+      : comparison = (comparison != null) ? comparison : Comparable.compare;
 
   void add(E element) {
     _add(element);
@@ -235,8 +235,7 @@ class HeapPriorityQueue<E> implements PriorityQueue<E> {
   }
 
   List<E> toList() {
-    List<E> list = new List<E>()
-      ..length = _length;
+    List<E> list = new List<E>()..length = _length;
     list.setRange(0, _length, _queue);
     list.sort(comparison);
     return list;
@@ -307,10 +306,8 @@ class HeapPriorityQueue<E> implements PriorityQueue<E> {
         }
         // Then go to the right sibling of the left-child.
         position += 1;
-      } while (position > _length);
-      // Happens if last element is a left child.
-    } while (position != 1);
-    // At root again. Happens for right-most element.
+      } while (position > _length);  // Happens if last element is a left child.
+    } while (position != 1);  // At root again. Happens for right-most element.
     return -1;
   }
 

@@ -4,7 +4,7 @@
 
 library mock.result_set_matcher;
 
-import 'package:matcher/matcher.dart';
+import 'package:unittest/unittest.dart';
 
 import 'action.dart';
 import 'log_entry.dart';

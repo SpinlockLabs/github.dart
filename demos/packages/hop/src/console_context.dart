@@ -34,7 +34,7 @@ class ConsoleContext extends TaskRuntime {
     ArgResults args;
     try {
       args = tryArgsCompletion(mainArgs, parser);
-    } on FormatException catch (ex, stack) {
+    } on FormatException catch (ex) {
       print('There was a problem parsing the provided arguments.');
       print(ex.message);
       print(parser.usage);
@@ -42,9 +42,8 @@ class ConsoleContext extends TaskRuntime {
     }
     final ctx = new ConsoleContext._(args);
 
-    Runner.runTask(ctx, task)
-      .then((RunResult rr) {
-        io.exit(rr.exitCode);
-      });
+    Runner.runTask(ctx, task).then((RunResult rr) {
+      io.exit(rr.exitCode);
+    });
   }
 }

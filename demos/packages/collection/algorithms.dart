@@ -111,8 +111,8 @@ void _reverse(List list, int start, int end) {
  */
 void insertionSort(List list,
                    { int compare(a, b),
-                   int start: 0,
-                   int end: null }) {
+                     int start: 0,
+                     int end: null }) {
   // If the same method could have both positional and named optional
   // parameters, this should be (list, [start, end], {compare}).
   if (end == null) end = list.length;
@@ -187,9 +187,9 @@ void mergeSort(List list, {int start: 0, int end: null, int compare(a, b)}) {
   int firstTarget = end - firstLength;
   _mergeSort(list, compare, start, middle, list, firstTarget);
   _merge(compare,
-  list, firstTarget, end,
-  scratchSpace, 0, secondLength,
-  list, start);
+         list, firstTarget, end,
+         scratchSpace, 0, secondLength,
+         list, start);
 }
 
 /**
@@ -216,7 +216,7 @@ void _movingInsertionSort(List list, int compare(a, b), int start, int end,
       }
     }
     target.setRange(min + 1, targetOffset + i + 1,
-    target, min);
+                    target, min);
     target[min] = element;
   }
 }
@@ -244,15 +244,15 @@ void _mergeSort(List list, int compare(a, b), int start, int end,
   int targetMiddle = targetOffset + firstLength;
   // Sort the second half into the end of the target area.
   _mergeSort(list, compare, middle, end,
-  target, targetMiddle);
+             target, targetMiddle);
   // Sort the first half into the end of the source area.
   _mergeSort(list, compare, start, middle,
-  list, middle);
+             list, middle);
   // Merge the two parts into the target area.
   _merge(compare,
-  list, middle, middle + firstLength,
-  target, targetMiddle, targetMiddle + secondLength,
-  target, targetOffset);
+         list, middle, middle + firstLength,
+         target, targetMiddle, targetMiddle + secondLength,
+         target, targetOffset);
 }
 
 /**
@@ -279,8 +279,7 @@ void _merge(int compare(a, b),
   while (true) {
     if (compare(firstElement, secondElement) <= 0) {
       target[targetOffset++] = firstElement;
-      if (cursor1 == firstEnd) break;
-      // Flushing second list after loop.
+      if (cursor1 == firstEnd) break;  // Flushing second list after loop.
       firstElement = firstList[cursor1++];
     } else {
       target[targetOffset++] = secondElement;
@@ -291,12 +290,12 @@ void _merge(int compare(a, b),
       // Second list empties first. Flushing first list here.
       target[targetOffset++] = firstElement;
       target.setRange(targetOffset, targetOffset + (firstEnd - cursor1),
-      firstList, cursor1);
+          firstList, cursor1);
       return;
     }
   }
   // First list empties first. Reached by break above.
   target[targetOffset++] = secondElement;
   target.setRange(targetOffset, targetOffset + (secondEnd - cursor2),
-  secondList, cursor2);
+      secondList, cursor2);
 }

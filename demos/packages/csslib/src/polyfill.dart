@@ -41,19 +41,18 @@ class PolyFill {
   void processVarDefinitions(List<StyleSheet> includes) {
     for (var include in includes) {
       _allVarDefinitions = (new _VarDefinitionsIncludes(_allVarDefinitions)
-          ..visitTree(include)).varDefs;
+        ..visitTree(include)).varDefs;
     }
   }
 
   void processVars(StyleSheet styleSheet) {
     // Build list of all var definitions.
-    var mainStyleSheetVarDefs =
-        (new _VarDefAndUsage(this._messages, _allVarDefinitions)
-        ..visitTree(styleSheet)).varDefs;
+    var mainStyleSheetVarDefs = (new _VarDefAndUsage(
+        this._messages, _allVarDefinitions)..visitTree(styleSheet)).varDefs;
 
     // Resolve all definitions to a non-VarUsage (terminal expression).
     mainStyleSheetVarDefs.forEach((key, value) {
-      for (Expression expr in (value.expression as Expressions).expressions) {
+      for (var _ in (value.expression as Expressions).expressions) {
         mainStyleSheetVarDefs[key] =
             _findTerminalVarDefinition(_allVarDefinitions, value);
       }
@@ -75,7 +74,7 @@ class _VarDefinitionsIncludes extends Visitor {
     // Replace with latest variable definition.
     varDefs[node.definedName] = node;
     super.visitVarDefinition(node);
- }
+  }
 
   void visitVarDefinitionDirective(VarDefinitionDirective node) {
     visitVarDefinition(node.def);
@@ -110,7 +109,7 @@ class _VarDefAndUsage extends Visitor {
     super.visitVarDefinition(node);
 
     currVarDefinition = null;
- }
+  }
 
   void visitVarDefinitionDirective(VarDefinitionDirective node) {
     visitVarDefinition(node.def);
@@ -149,7 +148,7 @@ class _VarDefAndUsage extends Visitor {
         terminalDefaults.addAll(resolveUsageTerminal(defaultValue));
       }
       expressions.replaceRange(index, index + 1, terminalDefaults);
-    } else if (node.defaultValues.isNotEmpty){
+    } else if (node.defaultValues.isNotEmpty) {
       // No VarDefinition but default value is a terminal expression; use it.
       expressions.replaceRange(index, index + 1, node.defaultValues);
     } else {
@@ -199,8 +198,7 @@ class _VarDefAndUsage extends Visitor {
     return result;
   }
 
-  _resolveVarUsage(List<Expression> expressions, int index,
-                   VarDefinition def) {
+  _resolveVarUsage(List<Expression> expressions, int index, VarDefinition def) {
     var defExpressions = (def.expression as Expressions).expressions;
     expressions.replaceRange(index, index + 1, defExpressions);
   }
@@ -224,8 +222,8 @@ class _RemoveVarDefinitions extends Visitor {
 }
 
 /** Find terminal definition (non VarUsage implies real CSS value). */
-VarDefinition _findTerminalVarDefinition(Map<String, VarDefinition> varDefs,
-    VarDefinition varDef) {
+VarDefinition _findTerminalVarDefinition(
+    Map<String, VarDefinition> varDefs, VarDefinition varDef) {
   var expressions = varDef.expression as Expressions;
   for (var expr in expressions.expressions) {
     if (expr is VarUsage) {

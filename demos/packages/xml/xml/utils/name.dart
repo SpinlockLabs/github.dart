@@ -5,6 +5,7 @@ const _SEPARATOR = ':';
 
 // xml namespace declarations
 const _XML = 'xml';
+final _XML_DATA = new _NamespaceData(_XML, true);
 const _XML_URI = 'http://www.w3.org/XML/1998/namespace';
 const _XMLNS = 'xmlns';
 

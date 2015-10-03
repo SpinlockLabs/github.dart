@@ -2,7 +2,6 @@ part of github.common;
 
 /// Model class for a file on GitHub.
 class GitHubFile {
-
   /// Type of File
   String type;
 
@@ -63,7 +62,6 @@ class GitHubFile {
 
 /// File links.
 class Links {
-
   /// Git Link
   @ApiName("git")
   String git;

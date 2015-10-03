@@ -54,13 +54,13 @@ export 'src/path_exception.dart';
 export 'src/style.dart';
 
 /// A default context for manipulating POSIX paths.
-final posix = new Context(style: Style.posix);
+final Context posix = new Context(style: Style.posix);
 
 /// A default context for manipulating Windows paths.
-final windows = new Context(style: Style.windows);
+final Context windows = new Context(style: Style.windows);
 
 /// A default context for manipulating URLs.
-final url = new Context(style: Style.url);
+final Context url = new Context(style: Style.url);
 
 /// The system path context.
 ///

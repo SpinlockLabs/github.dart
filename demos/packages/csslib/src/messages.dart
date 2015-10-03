@@ -47,14 +47,17 @@ class Message {
   final bool useColors;
 
   Message(this.level, this.message, {SourceSpan span, bool useColors: false})
-      : this.span = span, this.useColors = useColors;
+      : this.span = span,
+        this.useColors = useColors;
 
   String toString() {
     var output = new StringBuffer();
     bool colors = useColors && _ERROR_COLORS.containsKey(level);
     var levelColor = colors ? _ERROR_COLORS[level] : null;
     if (colors) output.write(levelColor);
-    output..write(_ERROR_LABEL[level])..write(' ');
+    output
+      ..write(_ERROR_LABEL[level])
+      ..write(' ');
     if (colors) output.write(NO_COLOR);
 
     if (span == null) {
@@ -87,8 +90,8 @@ class Messages {
 
   /** Report a compile-time CSS error. */
   void error(String message, SourceSpan span) {
-    var msg = new Message(Level.SEVERE, message, span: span,
-        useColors: options.useColors);
+    var msg = new Message(Level.SEVERE, message,
+        span: span, useColors: options.useColors);
 
     messages.add(msg);
 
@@ -100,8 +103,8 @@ class Messages {
     if (options.warningsAsErrors) {
       error(message, span);
     } else {
-      var msg = new Message(Level.WARNING, message, span: span,
-          useColors: options.useColors);
+      var msg = new Message(Level.WARNING, message,
+          span: span, useColors: options.useColors);
 
       messages.add(msg);
     }
@@ -109,8 +112,8 @@ class Messages {
 
   /** Report and informational message about what the compiler is doing. */
   void info(String message, SourceSpan span) {
-    var msg = new Message(Level.INFO, message, span: span,
-        useColors: options.useColors);
+    var msg = new Message(Level.INFO, message,
+        span: span, useColors: options.useColors);
 
     messages.add(msg);
 
@@ -120,8 +123,8 @@ class Messages {
   /** Merge [newMessages] to this message lsit. */
   void mergeMessages(Messages newMessages) {
     messages.addAll(newMessages.messages);
-    newMessages.messages.where((message) =>
-        message.level.value == Level.SEVERE || options.verbose)
-        .forEach((message) { printHandler(message); });
+    newMessages.messages
+        .where((message) => message.level == Level.SEVERE || options.verbose)
+        .forEach(printHandler);
   }
 }

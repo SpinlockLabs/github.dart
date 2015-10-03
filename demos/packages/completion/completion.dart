@@ -8,7 +8,7 @@ import 'package:bot/bot.dart';
 import 'package:logging/logging.dart' as logging;
 import 'package:path/path.dart' as p;
 
-/// The string 'completion' used to denote that arguments proivded to an app are
+/// The string 'completion' used to denote that arguments provided to an app are
 /// for command completion.
 ///
 /// The expected arg format is: completion -- {process name} {rest of current
@@ -17,18 +17,26 @@ const String COMPLETION_COMMAND_NAME = 'completion';
 
 const _COMP_POINT_VAR = 'COMP_POINT';
 
-typedef List<String> ArgCompleter(List<String> args, String compLine,
-    int compPoint);
+typedef List<String> ArgCompleter(
+    List<String> args, String compLine, int compPoint);
 
 void tryCompletion(List<String> args, ArgCompleter completer) {
-  var scriptName = p.basename(Platform.script.toFilePath());
+  String scriptName;
+  try {
+    scriptName = p.basename(Platform.script.toFilePath());
+  } on UnsupportedError catch (e, stack) {
+    _log(e);
+    _log(stack);
+    return;
+  }
+
   if (scriptName.isEmpty) {
     // should have a script name...weird...
     return;
   }
 
   _log('Checking for completion on script:\t$scriptName');
-  if(args.length >= 3 &&
+  if (args.length >= 3 &&
       args[0] == COMPLETION_COMMAND_NAME &&
       args[1] == '--') {
     try {
@@ -122,8 +130,8 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
     return parser.commands.keys.toList();
   }
 
-  final alignedArgsOptions = providedArgs
-      .map((arg) => _getOptionForArg(parser, arg)).toList();
+  final alignedArgsOptions =
+      providedArgs.map((arg) => _getOptionForArg(parser, arg)).toList();
 
   /*
    * NOTE: nuanced behavior
@@ -144,9 +152,8 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
       .toSet();
   sublog('defined options: ${optionsDefinedInArgs.map((o) => o.name).toSet()}');
 
-  var parserOptionCompletions =
-      new UnmodifiableListView(
-          _getParserOptionCompletions(parser, optionsDefinedInArgs).toList());
+  var parserOptionCompletions = new UnmodifiableListView(
+      _getParserOptionCompletions(parser, optionsDefinedInArgs).toList());
 
   /*
    * KNOWN: at least one item in providedArgs last and first are now safe
@@ -186,12 +193,11 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
      * 2) there's whitespace at the end of compLine
      */
 
-    if(!subCommandArgs.isEmpty || compLine.endsWith(' ')) {
-      return getArgsCompletions(subCommandParser, subCommandArgs, compLine,
-          compPoint);
+    if (!subCommandArgs.isEmpty || compLine.endsWith(' ')) {
+      return getArgsCompletions(
+          subCommandParser, subCommandArgs, compLine, compPoint);
     }
   }
-
 
   final removedItems = providedArgs.sublist(validSubSet.length);
   assert(removedItems.length + validSubSet.length == providedArgs.length);
@@ -205,7 +211,6 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
    * try to match it against available options
    */
   if (removedItems.length == 1 && removedItems.single.startsWith('--')) {
-
     final removedItem = removedItems.single;
 
     if (compLine.endsWith(' ')) {
@@ -219,8 +224,6 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
 
         return option.allowed.toList();
       }
-
-
     } else {
       sublog('completing the name of options starting with "$removedItem"');
 
@@ -237,9 +240,7 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
   if (providedArgs.length >= 2) {
     final option = alignedArgsOptions[providedArgs.length - 2];
     if (option != null) {
-
       if (option.allowed != null && !option.allowed.isEmpty) {
-
         assert(!option.isFlag);
         sublog('completing option "${option.name}"');
 
@@ -248,7 +249,7 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
         return option.allowed
             .where((String v) => v.startsWith(optionValue))
             .toList();
-      } else if(!option.isFlag){
+      } else if (!option.isFlag) {
         sublog("not providing completions. Wating for option value");
         return [];
       }
@@ -260,7 +261,6 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
    * do command completion
    */
   if (removedItems.isEmpty && lastArg == '') {
-
     sublog('doing command completion');
 
     return parser.commands.keys.toList();
@@ -306,7 +306,6 @@ Option _getOptionForArg(ArgParser parser, String arg) {
 
   // could be a full arg name
   if (arg.startsWith('--')) {
-
     final nameOption = arg.substring(2);
     final option = parser.options[nameOption];
     if (option != null) {
@@ -334,10 +333,10 @@ Option _getOptionForArg(ArgParser parser, String arg) {
   return null;
 }
 
-Iterable<String> _getParserOptionCompletions(ArgParser parser,
-    Set<Option> existingOptions) {
-  assert(existingOptions.every((option) =>
-      parser.options.containsValue(option)));
+Iterable<String> _getParserOptionCompletions(
+    ArgParser parser, Set<Option> existingOptions) {
+  assert(
+      existingOptions.every((option) => parser.options.containsValue(option)));
 
   return parser.options.values
       .where((opt) =>
@@ -345,8 +344,8 @@ Iterable<String> _getParserOptionCompletions(ArgParser parser,
       .expand(_getArgsOptionCompletions);
 }
 
-Tuple<List<String>, ArgResults> _getValidSubset(ArgParser parser,
-    List<String> providedArgs) {
+Tuple<List<String>, ArgResults> _getValidSubset(
+    ArgParser parser, List<String> providedArgs) {
 
   /* start with all of the args, loop through parsing them,
    * removing one every time
@@ -361,7 +360,7 @@ Tuple<List<String>, ArgResults> _getValidSubset(ArgParser parser,
     try {
       subsetResult = parser.parse(validSubSet);
       break;
-    } on FormatException catch (ex, stack) {
+    } on FormatException catch (_) {
       //_log('tried to parse subset $validSubSet');
       //_log('error:\t$ex');
       // I guess that won't parse

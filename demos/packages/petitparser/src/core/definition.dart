@@ -45,6 +45,7 @@ part of petitparser;
  *     }
   */
 abstract class GrammarDefinition {
+  const GrammarDefinition();
 
   /**
    * The starting production of this definition.
@@ -57,14 +58,9 @@ abstract class GrammarDefinition {
    * The optional arguments parametrize the called production.
    */
   Parser ref(Function function, [arg1, arg2, arg3, arg4, arg5, arg6]) {
-    var arguments = [
-      arg1,
-      arg2,
-      arg3,
-      arg4,
-      arg5,
-      arg6
-    ].takeWhile((each) => each != null).toList(growable: false);
+    var arguments = [arg1, arg2, arg3, arg4, arg5, arg6]
+        .takeWhile((each) => each != null)
+        .toList(growable: false);
     return new _Reference(function, arguments);
   }
 
@@ -173,6 +169,5 @@ class _Reference extends Parser {
   Parser copy() => throw new UnsupportedError('References cannot be copied.');
 
   @override
-  Result parseOn(Context context) =>
-      throw new UnsupportedError('References cannot be parsed.');
+  Result parseOn(Context context) => throw new UnsupportedError('References cannot be parsed.');
 }

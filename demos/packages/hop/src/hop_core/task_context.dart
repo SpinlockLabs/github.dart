@@ -4,7 +4,6 @@ part of hop.core;
 ///
 /// Contains the parsed [ArgResults] parsed from the user.
 abstract class TaskContext implements TaskLogger {
-
   ArgResults get arguments;
   Map<String, dynamic> get extendedArgs;
 

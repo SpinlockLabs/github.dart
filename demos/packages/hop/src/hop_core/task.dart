@@ -6,13 +6,15 @@ class _TaskWithParser extends Task {
   final ArgParser argParser;
 
   _TaskWithParser(dynamic taskDefinition(TaskContext ctx), String description,
-    List<TaskArgument> extendedArgs, this.argParser) :
-      super._impl(taskDefinition, description, extendedArgs);
+      List<TaskArgument> extendedArgs, this.argParser)
+      : super._impl(taskDefinition, description, extendedArgs);
 
   Task clone({String description}) {
     if (description == null) description = this.description;
 
-    return new Task(_exec, description: description, argParser: argParser,
+    return new Task(_exec,
+        description: description,
+        argParser: argParser,
         extendedArgs: _extendedArgs);
   }
 }
@@ -25,34 +27,33 @@ abstract class Task {
   ArgParser get argParser;
 
   factory Task(dynamic taskDefinition(TaskContext ctx), {String description,
-    List<TaskArgument> extendedArgs, ArgParser argParser}) {
-
-    return new _TaskWithParser(taskDefinition, description, extendedArgs,
-        argParser);
+      List<TaskArgument> extendedArgs, ArgParser argParser}) {
+    return new _TaskWithParser(
+        taskDefinition, description, extendedArgs, argParser);
   }
 
   Task._impl(dynamic taskDefinition(TaskContext ctx), String description,
-    List<TaskArgument> extendedArgs) :
-      this._exec = taskDefinition,
-      this.description = (description == null) ? '' : description,
-      this._extendedArgs = (extendedArgs == null) ? const [] :
-        TaskArgument.validateArgs(extendedArgs) {
+      List<TaskArgument> extendedArgs)
+      : this._exec = taskDefinition,
+        this.description = (description == null) ? '' : description,
+        this._extendedArgs = (extendedArgs == null)
+            ? const []
+            : TaskArgument.validateArgs(extendedArgs) {
     requireArgumentNotNull(_exec, '_exec');
   }
 
   String getUsage() => argParser.usage;
 
-  String getExtendedArgsUsage() =>
-    _extendedArgs.map((TaskArgument arg) {
-      var value = '<${arg.name}>';
-      if(arg.multiple) {
-        value = value + '...';
-      }
-      if(!arg.required) {
-        value = '[$value]';
-      }
-      return value;
-    }).join(' ');
+  String getExtendedArgsUsage() => _extendedArgs.map((TaskArgument arg) {
+    var value = '<${arg.name}>';
+    if (arg.multiple) {
+      value = value + '...';
+    }
+    if (!arg.required) {
+      value = '[$value]';
+    }
+    return value;
+  }).join(' ');
 
   Future run(TaskRuntime runtime) {
     requireArgumentNotNull(runtime, 'runtime');
@@ -87,15 +88,15 @@ abstract class Task {
 
     var actual = argResultsRest.length;
 
-    if(_extendedArgs.isNotEmpty) {
+    if (_extendedArgs.isNotEmpty) {
       if (!_extendedArgs.last.multiple &&
-        argResultsRest.length > _extendedArgs.length) {
+          argResultsRest.length > _extendedArgs.length) {
         var expected = _extendedArgs.length;
         throw new FormatException(
             'Expected $expected argument(s); received $actual');
       } else {
-        var lastRequiredIndex = lastIndexWhere(_extendedArgs, (arg) =>
-            arg.required);
+        var lastRequiredIndex =
+            lastIndexWhere(_extendedArgs, (arg) => arg.required);
         if (argResultsRest.length <= lastRequiredIndex) {
           var expected = lastRequiredIndex + 1;
           throw new FormatException(
@@ -112,7 +113,6 @@ abstract class Task {
       var arg = _extendedArgs[i];
 
       var result = null;
-
 
       if (arg.multiple) {
         assert(i == _extendedArgs.length - 1); // better be the last arg

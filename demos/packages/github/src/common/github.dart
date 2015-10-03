@@ -4,13 +4,16 @@ typedef http.Client ClientCreator();
 
 /**
  * The Main GitHub Client
- * 
+ *
  * ## Example
- * 
+ *
  *      var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
  *      // Use the Client
  */
 class GitHub {
+  static const _ratelimitLimitHeader = 'x-ratelimit-limit';
+  static const _ratelimitResetHeader = 'x-ratelimit-reset';
+  static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
   /**
    * Default Client Creator
@@ -47,14 +50,43 @@ class GitHub {
   UrlShortenerService _urlShortener;
   UsersService _users;
 
+  /// The maximum number of requests that the consumer is permitted to make per
+  /// hour.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  int get rateLimitLimit => _rateLimitLimit;
+
+  /// The number of requests remaining in the current rate limit window.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  int get rateLimitRemaining => _rateLimitRemaining;
+
+  /// The time at which the current rate limit window resets.
+  ///
+  /// Updated with every request.
+  ///
+  /// Will be `null` if no requests have been made yet.
+  DateTime get rateLimitReset => _rateLimitReset == null
+      ? null
+      : new DateTime.fromMillisecondsSinceEpoch(_rateLimitReset * 1000,
+          isUtc: true);
+
+  int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
+
   /**
    * Creates a new [GitHub] instance.
-   * 
+   *
    * [fetcher] is the HTTP Transporter to use
    * [endpoint] is the api endpoint to use
    * [auth] is the authentication information
    */
-  GitHub({Authentication auth, this.endpoint: "https://api.github.com",
+  GitHub(
+      {Authentication auth,
+      this.endpoint: "https://api.github.com",
       http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
         this.client = client == null ? defaultClient() : client;
@@ -176,28 +208,36 @@ class GitHub {
 
   /**
    * Handles Get Requests that respond with JSON
-   * 
+   *
    * [path] can either be a path like '/repos' or a full url.
-   * 
-   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   *
+   * [statusCode] is the expected status code. If it is null, it is ignored.
    * If the status code that the response returns is not the status code you provide
    * then the [fail] function will be called with the HTTP Response.
    * If you don't throw an error or break out somehow, it will go into some error checking
    * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
    * for errors, it throws an Unknown Error.
-   * 
+   *
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * 
+   *
    * [params] are query string parameters.
-   * 
+   *
    * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
    */
-  Future<dynamic> getJSON(String path, {int statusCode,
-      void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert}) {
+  Future<dynamic> getJSON(String path,
+      {int statusCode,
+      void fail(http.Response response),
+      Map<String, String> headers,
+      Map<String, String> params,
+      JSONConverter convert,
+      String preview}) async {
     if (headers == null) headers = {};
+
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (convert == null) {
       convert = (input) => input;
@@ -205,39 +245,53 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("GET", path, headers: headers, params: params,
-        statusCode: statusCode, fail: fail).then(
-        (response) {
-      return convert(JSON.decode(response.body));
-    });
+    var response = await request("GET", path,
+        headers: headers, params: params, statusCode: statusCode, fail: fail);
+
+    var json = JSON.decode(response.body);
+
+    if (convert == null) {
+      return json;
+    }
+
+    return convert(json);
   }
 
   /**
    * Handles Post Requests that respond with JSON
-   * 
+   *
    * [path] can either be a path like '/repos' or a full url.
-   * 
-   * [statusCode] is the expected status code. If it is null, it is ignored. 
+   *
+   * [statusCode] is the expected status code. If it is null, it is ignored.
    * If the status code that the response returns is not the status code you provide
    * then the [fail] function will be called with the HTTP Response.
    * If you don't throw an error or break out somehow, it will go into some error checking
    * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
    * for errors, it throws an Unknown Error.
-   * 
+   *
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * 
+   *
    * [params] are query string parameters.
-   * 
+   *
    * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
    * The future will pass the object returned from this function to the then method.
    * The default [convert] function returns the input object.
-   * 
+   *
    * [body] is the data to send to the server.
    */
-  Future<dynamic> postJSON(String path, {int statusCode,
-      void fail(http.Response response), Map<String, String> headers,
-      Map<String, String> params, JSONConverter convert, body}) {
+  Future<dynamic> postJSON(String path,
+      {int statusCode,
+      void fail(http.Response response),
+      Map<String, String> headers,
+      Map<String, String> params,
+      JSONConverter convert,
+      body,
+      String preview}) {
     if (headers == null) headers = {};
+
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (convert == null) {
       convert = (input) => input;
@@ -245,9 +299,12 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("POST", path, headers: headers, params: params, body: body,
-        statusCode: statusCode, fail: fail)
-        .then((response) {
+    return request("POST", path,
+        headers: headers,
+        params: params,
+        body: body,
+        statusCode: statusCode,
+        fail: fail).then((response) {
       return convert(JSON.decode(response.body));
     });
   }
@@ -256,6 +313,13 @@ class GitHub {
    * Internal method to handle status codes
    */
   void handleStatusCode(http.Response response) {
+    String message;
+    List<String> errors;
+    if (response.headers['content-type'].contains('application/json')) {
+      var json = response.asJSON();
+      message = json['message'];
+      errors = json['errors'];
+    }
     switch (response.statusCode) {
       case 404:
         throw new NotFound(this, "Requested Resource was Not Found");
@@ -263,24 +327,16 @@ class GitHub {
       case 401:
         throw new AccessForbidden(this);
       case 400:
-        var json = response.asJSON();
-        String msg = json['message'];
-        if (msg == "Problems parsing JSON") {
-          throw new InvalidJSON(this, msg);
-        } else if (msg == "Body should be a JSON Hash") {
-          throw new InvalidJSON(this, msg);
-        }
-        else throw new BadRequest(this);
+        if (message == "Problems parsing JSON") {
+          throw new InvalidJSON(this, message);
+        } else if (message == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, message);
+        } else throw new BadRequest(this);
         break;
       case 422:
-        var json = response.asJSON();
-        String msg = json['message'];
-        var errors = json['errors'];
-
         var buff = new StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: ${msg}");
-
+        buff.writeln("  Message: ${message}");
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -295,12 +351,12 @@ class GitHub {
         }
         throw new ValidationFailed(this, buff.toString());
     }
-    throw new UnknownError(this);
+    throw new UnknownError(this, message);
   }
 
   /**
    * Handles Authenticated Requests in an easy to understand way.
-   * 
+   *
    * [method] is the HTTP method.
    * [path] can either be a path like '/repos' or a full url.
    * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
@@ -308,10 +364,17 @@ class GitHub {
    * [body] is the body content of requests that take content.
    */
   Future<http.Response> request(String method, String path,
-      {Map<String, String> headers, Map<String, dynamic> params, String body,
-        int statusCode,
-        void fail(http.Response response)}) {
+      {Map<String, String> headers,
+      Map<String, dynamic> params,
+      String body,
+      int statusCode,
+      void fail(http.Response response),
+      String preview}) {
     if (headers == null) headers = {};
+
+    if (preview != null) {
+      headers["Accept"] = preview;
+    }
 
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
@@ -337,18 +400,23 @@ class GitHub {
       url.write(queryString);
     } else {
       url.write(endpoint);
+      if (!path.startsWith('/')) {
+        url.write('/');
+      }
       url.write(path);
       url.write(queryString);
     }
 
-    return client.request(new http.Request(url.toString(),
-        method: method, headers: headers, body: body)).then((response) {
+    return client
+        .request(new http.Request(url.toString(),
+            method: method, headers: headers, body: body))
+        .then((response) {
+      _updateRateLimit(response.headers);
       if (statusCode != null && statusCode != response.statusCode) {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
         return null;
-      }
-      else return response;
+      } else return response;
     });
   }
 
@@ -364,5 +432,13 @@ class GitHub {
 
     // Closes the HTTP Client
     client.close();
+  }
+
+  void _updateRateLimit(Map<String, String> headers) {
+    if (headers.containsKey(_ratelimitLimitHeader)) {
+      _rateLimitLimit = int.parse(headers[_ratelimitLimitHeader]);
+      _rateLimitRemaining = int.parse(headers[_ratelimitRemainingHeader]);
+      _rateLimitReset = int.parse(headers[_ratelimitResetHeader]);
+    }
   }
 }

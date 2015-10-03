@@ -4,7 +4,7 @@
 
 library mock.times_matcher;
 
-import 'package:matcher/matcher.dart';
+import 'package:unittest/unittest.dart';
 
 /**
  * [_TimesMatcher]s are used to make assertions about the number of

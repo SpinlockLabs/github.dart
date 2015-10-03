@@ -22,9 +22,8 @@ import "dart:collection" show IterableBase;
  */
 class IterableZip extends IterableBase<List> {
   final Iterable<Iterable> _iterables;
-
   IterableZip(Iterable<Iterable> iterables)
-  : this._iterables = iterables;
+      : this._iterables = iterables;
 
   /**
    * Returns an iterator that combines values of the iterables' iterators
@@ -40,9 +39,7 @@ class IterableZip extends IterableBase<List> {
 class _IteratorZip implements Iterator<List> {
   final List<Iterator> _iterators;
   List _current;
-
   _IteratorZip(List iterators) : _iterators = iterators;
-
   bool moveNext() {
     if (_iterators.isEmpty) return false;
     for (int i = 0; i < _iterators.length; i++) {

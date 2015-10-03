@@ -22,8 +22,8 @@ import '../args.dart';
 class Usage {
   static const NUM_COLUMNS = 3; // Abbreviation, long name, help.
 
-  /// The parser this is generating usage for.
-  final ArgParser args;
+  /// A list of the [Option]s intermingled with [String] separators.
+  final List optionsAndSeparators;
 
   /// The working buffer for the generated usage text.
   StringBuffer buffer;
@@ -53,7 +53,7 @@ class Usage {
   /// content.
   int newlinesNeeded = 0;
 
-  Usage(this.args);
+  Usage(this.optionsAndSeparators);
 
   /// Generates a string displaying usage information for the defined options.
   /// This is basically the help text shown on the command line.
@@ -62,8 +62,17 @@ class Usage {
 
     calculateColumnWidths();
 
-    args.options.forEach((name, option) {
-      if (option.hide) return;
+    for (var optionOrSeparator in optionsAndSeparators) {
+      if (optionOrSeparator is String) {
+        // Ensure that there's always a blank line before a separator.
+        if (buffer.isNotEmpty) buffer.write("\n\n");
+        buffer.write(optionOrSeparator);
+        newlinesNeeded = 1;
+        continue;
+      }
+
+      var option = optionOrSeparator as Option;
+      if (option.hide) continue;
 
       write(0, getAbbreviation(option));
       write(1, getLongOption(option));
@@ -94,7 +103,7 @@ class Usage {
       // blank line after it. This gives space where it's useful while still
       // keeping simple one-line options clumped together.
       if (numHelpLines > 1) newline();
-    });
+    }
 
     return buffer.toString();
   }
@@ -127,8 +136,9 @@ class Usage {
   void calculateColumnWidths() {
     int abbr = 0;
     int title = 0;
-    args.options.forEach((name, option) {
-      if (option.hide) return;
+    for (var option in optionsAndSeparators) {
+      if (option is! Option) continue;
+      if (option.hide) continue;
 
       // Make room in the first column if there are abbreviations.
       abbr = max(abbr, getAbbreviation(option).length);
@@ -142,7 +152,7 @@ class Usage {
           title = max(title, getAllowedTitle(allowed).length);
         }
       }
-    });
+    }
 
     // Leave a gutter between the columns.
     title += 4;

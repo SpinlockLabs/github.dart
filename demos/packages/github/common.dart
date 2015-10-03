@@ -9,8 +9,8 @@ import 'dart:async';
 import 'dart:convert' show JSON, UTF8;
 import 'package:crypto/crypto.dart' show CryptoUtils;
 
-import "package:html5lib/parser.dart" as htmlParser;
-import "package:html5lib/dom.dart" as html;
+import "package:html/parser.dart" as htmlParser;
+import "package:html/dom.dart" as html;
 
 import "package:quiver/async.dart" show FutureGroup;
 

@@ -4,7 +4,7 @@
 
 library mock.util;
 
-import 'package:matcher/matcher.dart';
+import 'package:unittest/unittest.dart';
 
 /** Utility function for optionally qualified method names */
 String qualifiedName(owner, String method) {

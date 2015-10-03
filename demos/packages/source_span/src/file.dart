@@ -13,6 +13,7 @@ import 'colors.dart' as colors;
 import 'location.dart';
 import 'span.dart';
 import 'span_mixin.dart';
+import 'span_with_context.dart';
 import 'utils.dart';
 
 // Constants to determine end-of-lines.
@@ -183,7 +184,7 @@ class FileLocation extends SourceLocation {
 /// [FileSpan.union] will return a [FileSpan] if possible.
 ///
 /// A [FileSpan] can be created using [SourceFile.span].
-class FileSpan extends SourceSpanMixin {
+class FileSpan extends SourceSpanMixin implements SourceSpanWithContext {
   /// The [file] that [this] belongs to.
   final SourceFile file;
 
@@ -204,6 +205,8 @@ class FileSpan extends SourceSpanMixin {
   FileLocation get start => new FileLocation._(file, _start);
   FileLocation get end => new FileLocation._(file, _end);
   String get text => file.getText(_start, _end);
+  String get context => file.getText(file.getOffset(start.line),
+      end.line == file.lines - 1 ? null : file.getOffset(end.line + 1));
 
   FileSpan._(this.file, this._start, this._end) {
     if (_end < _start) {
@@ -260,42 +263,5 @@ class FileSpan extends SourceSpanMixin {
     var start = math.min(this._start, other._start);
     var end = math.max(this._end, other._end);
     return new FileSpan._(file, start, end);
-  }
-
-  String message(String message, {color}) {
-    if (color == true) color = colors.RED;
-    if (color == false) color = null;
-
-    var line = start.line;
-    var column = start.column;
-
-    var buffer = new StringBuffer();
-    buffer.write('line ${start.line + 1}, column ${start.column + 1}');
-    if (sourceUrl != null) buffer.write(' of ${p.prettyUri(sourceUrl)}');
-    buffer.write(': $message\n');
-
-    var textLine = file.getText(file.getOffset(line),
-        line == file.lines - 1 ? null : file.getOffset(line + 1));
-
-    column = math.min(column, textLine.length - 1);
-    var toColumn =
-        math.min(column + end.offset - start.offset, textLine.length);
-
-    if (color != null) {
-      buffer.write(textLine.substring(0, column));
-      buffer.write(color);
-      buffer.write(textLine.substring(column, toColumn));
-      buffer.write(colors.NONE);
-      buffer.write(textLine.substring(toColumn));
-    } else {
-      buffer.write(textLine);
-    }
-    if (!textLine.endsWith('\n')) buffer.write('\n');
-
-    buffer.write(' ' * column);
-    if (color != null) buffer.write(color);
-    buffer.write('^' * math.max(toColumn - column, 1));
-    if (color != null) buffer.write(colors.NONE);
-    return buffer.toString();
   }
 }

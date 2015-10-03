@@ -29,10 +29,10 @@ class CharacterParser extends Parser {
 
   @override
   bool hasEqualProperties(Parser other) {
-    return other is CharacterParser &&
-        super.hasEqualProperties(other) &&
-        _predicate == other._predicate &&
-        _message == other._message;
+    return other is CharacterParser
+        && super.hasEqualProperties(other)
+        && _predicate == other._predicate
+        && _message == other._message;
   }
 }
 
@@ -88,8 +88,7 @@ CharacterPredicate _optimizedRanges(Iterable<_RangeCharPredicate> ranges) {
     } else {
       var lastRange = mergedRanges.last;
       if (lastRange.stop + 1 >= thisRange.start) {
-        var characterRange =
-            new _RangeCharPredicate(lastRange.start, thisRange.stop);
+        var characterRange = new _RangeCharPredicate(lastRange.start, thisRange.stop);
         mergedRanges[mergedRanges.length - 1] = characterRange;
       } else {
         mergedRanges.add(thisRange);

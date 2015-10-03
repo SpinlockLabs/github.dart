@@ -126,15 +126,15 @@ class Visitor implements VisitorBase {
     _visitNodeList(ss.topLevels);
   }
 
-  void visitNoOp(NoOp node) { }
+  void visitNoOp(NoOp node) {}
 
-  void visitTopLevelProduction(TopLevelProduction node) { }
+  void visitTopLevelProduction(TopLevelProduction node) {}
 
-  void visitDirective(Directive node) { }
+  void visitDirective(Directive node) {}
 
-  void visitCssComment(CssComment node) { }
+  void visitCssComment(CssComment node) {}
 
-  void visitCommentDefinition(CommentDefinition node) { }
+  void visitCommentDefinition(CommentDefinition node) {}
 
   void visitMediaExpression(MediaExpression node) {
     visitExpressions(node.exprs);
@@ -171,7 +171,7 @@ class Visitor implements VisitorBase {
     }
   }
 
-  void visitCharsetDirective(CharsetDirective node) { }
+  void visitCharsetDirective(CharsetDirective node) {}
 
   void visitImportDirective(ImportDirective node) {
     for (var mediaQuery in node.mediaQueries) {
@@ -197,7 +197,7 @@ class Visitor implements VisitorBase {
     _visitNodeList(node.rulesets);
   }
 
-  void visitNamespaceDirective(NamespaceDirective node) { }
+  void visitNamespaceDirective(NamespaceDirective node) {}
 
   void visitVarDefinitionDirective(VarDefinitionDirective node) {
     visitVarDefinition(node.def);
@@ -207,7 +207,7 @@ class Visitor implements VisitorBase {
     _visitNodeList(node.rulesets);
   }
 
-  void visitMixinDefinition(MixinDefinition node) { }
+  void visitMixinDefinition(MixinDefinition node) {}
 
   void visitMixinDeclarationDirective(MixinDeclarationDirective node) {
     visitDeclarationGroup(node.declarations);
@@ -303,15 +303,15 @@ class Visitor implements VisitorBase {
     _visitNodeList(node.expressions);
   }
 
-  void visitUnicodeRangeTerm(UnicodeRangeTerm node) { }
+  void visitUnicodeRangeTerm(UnicodeRangeTerm node) {}
 
-  void visitLiteralTerm(LiteralTerm node) { }
+  void visitLiteralTerm(LiteralTerm node) {}
 
-  void visitHexColorTerm(HexColorTerm node) { }
+  void visitHexColorTerm(HexColorTerm node) {}
 
-  void visitNumberTerm(NumberTerm node) { }
+  void visitNumberTerm(NumberTerm node) {}
 
-  void visitUnitTerm(UnitTerm node) { }
+  void visitUnitTerm(UnitTerm node) {}
 
   void visitLengthTerm(LengthTerm node) {
     visitUnitTerm(node);
@@ -380,15 +380,15 @@ class Visitor implements VisitorBase {
     visitNumberTerm(node);
   }
 
-  void visitIE8Term(IE8Term node) { }
+  void visitIE8Term(IE8Term node) {}
 
-  void visitOperatorSlash(OperatorSlash node) { }
+  void visitOperatorSlash(OperatorSlash node) {}
 
-  void visitOperatorComma(OperatorComma node) { }
+  void visitOperatorComma(OperatorComma node) {}
 
-  void visitOperatorPlus(OperatorPlus node) { }
+  void visitOperatorPlus(OperatorPlus node) {}
 
-  void visitOperatorMinus(OperatorMinus node) { }
+  void visitOperatorMinus(OperatorMinus node) {}
 
   void visitVarUsage(VarUsage node) {
     _visitNodeList(node.defaultValues);
@@ -408,15 +408,15 @@ class Visitor implements VisitorBase {
     throw UnimplementedError;
   }
 
-  void visitIdentifier(Identifier node) { }
+  void visitIdentifier(Identifier node) {}
 
-  void visitWildcard(Wildcard node) { }
+  void visitWildcard(Wildcard node) {}
 
-  void visitThisOperator(ThisOperator node) { }
+  void visitThisOperator(ThisOperator node) {}
 
-  void visitNegation(Negation node) { }
+  void visitNegation(Negation node) {}
 
-  void visitDartStyleExpression(DartStyleExpression node) { }
+  void visitDartStyleExpression(DartStyleExpression node) {}
 
   void visitFontExpression(FontExpression node) {
     // TODO(terry): TBD

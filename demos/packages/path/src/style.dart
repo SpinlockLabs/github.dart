@@ -13,14 +13,14 @@ import 'style/windows.dart';
 abstract class Style {
   /// POSIX-style paths use "/" (forward slash) as separators. Absolute paths
   /// start with "/". Used by UNIX, Linux, Mac OS X, and others.
-  static final posix = new PosixStyle();
+  static final Style posix = new PosixStyle();
 
   /// Windows paths use "\" (backslash) as separators. Absolute paths start with
   /// a drive letter followed by a colon (example, "C:") or two backslashes
   /// ("\\") for UNC paths.
   // TODO(rnystrom): The UNC root prefix should include the drive name too, not
   // just the "\\".
-  static final windows = new WindowsStyle();
+  static final Style windows = new WindowsStyle();
 
   /// URLs aren't filesystem paths, but they're supported to make it easier to
   /// manipulate URL paths in the browser.
@@ -28,13 +28,13 @@ abstract class Style {
   /// URLs use "/" (forward slash) as separators. Absolute paths either start
   /// with a protocol and optional hostname (e.g. `http://dartlang.org`,
   /// `file://`) or with "/".
-  static final url = new UrlStyle();
+  static final Style url = new UrlStyle();
 
   /// The style of the host platform.
   ///
   /// When running on the command line, this will be [windows] or [posix] based
   /// on the host operating system. On a browser, this will be [url].
-  static final platform = _getPlatformStyle();
+  static final Style platform = _getPlatformStyle();
 
   /// Gets the type of the host platform.
   static Style _getPlatformStyle() {

@@ -10,13 +10,20 @@ part of dart.io;
 class FileMode {
   /// The mode for opening a file only for reading.
   static const READ = const FileMode._internal(0);
-  /// The mode for opening a file for reading and writing. The file is
+  /// Mode for opening a file for reading and writing. The file is
   /// overwritten if it already exists. The file is created if it does not
   /// already exist.
   static const WRITE = const FileMode._internal(1);
-  /// The mode for opening a file for reading and writing to the
+  /// Mode for opening a file for reading and writing to the
   /// end of it. The file is created if it does not already exist.
   static const APPEND = const FileMode._internal(2);
+  /// Mode for opening a file for writing *only*. The file is
+  /// overwritten if it already exists. The file is created if it does not
+  /// already exist.
+  static const WRITE_ONLY = const FileMode._internal(3);
+  /// Mode for opening a file for writing *only* to the
+  /// end of it. The file is created if it does not already exist.
+  static const WRITE_ONLY_APPEND = const FileMode._internal(4);
   final int _mode;
 
   const FileMode._internal(this._mode);
@@ -31,6 +38,13 @@ const WRITE = FileMode.WRITE;
 /// The mode for opening a file for reading and writing to the
 /// end of it. The file is created if it does not already exist.
 const APPEND = FileMode.APPEND;
+/// Mode for opening a file for writing *only*. The file is
+/// overwritten if it already exists. The file is created if it does not
+/// already exist.
+const WRITE_ONLY = FileMode.WRITE_ONLY;
+/// Mode for opening a file for writing *only* to the
+/// end of it. The file is created if it does not already exist.
+const WRITE_ONLY_APPEND = FileMode.WRITE_ONLY_APPEND;
 
 
 /// Type of lock when requesting a lock on a file.
@@ -98,7 +112,7 @@ enum FileLock {
  * You might want to use a stream to read large files,
  * to manipulate the data with tranformers,
  * or for compatibility with another API, such as [WebSocket]s.
- * 
+ *
  *     import 'dart:io';
  *     import 'dart:convert';
  *     import 'dart:async';
@@ -136,7 +150,7 @@ enum FileLock {
  * Be sure to close the file with the [close] method.
  *
  *     import 'dart:io';
- *    
+ *
  *     void main() {
  *       var file = new File('file.txt');
  *       var sink = file.openWrite();
@@ -158,7 +172,7 @@ enum FileLock {
  *
  *     main() {
  *       final file = new File('file.txt');
- *     
+ *
  *       file.length().then((len) {
  *         print(len);
  *       });
@@ -170,7 +184,7 @@ enum FileLock {
  * ## Other resources
  *
  * * [Dart by Example](https://www.dartlang.org/dart-by-example/#files-directories-and-symlinks)
- * provides additional task-oriented code samples that show how to use 
+ * provides additional task-oriented code samples that show how to use
  * various API from the Directory class and the related [File] class.
  *
  * * [I/O for Command-Line Apps](https://www.dartlang.org/docs/dart-up-and-running/contents/ch03.html#ch03-dartio---file-and-socket-io-for-command-line-apps)
@@ -182,7 +196,7 @@ enum FileLock {
  * about files and directories.
 
  */
-abstract class File extends FileSystemEntity {
+abstract class File implements FileSystemEntity {
   /**
    * Creates a [File] object.
    *
@@ -573,7 +587,7 @@ abstract class RandomAccessFile {
    *
    * Returns a [:Future<int>:] that completes with the number of bytes read.
    */
-  Future<int> readInto(List<int> buffer, [int start, int end]);
+  Future<int> readInto(List<int> buffer, [int start = 0, int end]);
 
   /**
    * Synchronously reads into an existing List<int> from the file. If [start] is
@@ -584,7 +598,7 @@ abstract class RandomAccessFile {
    *
    * Throws a [FileSystemException] if the operation fails.
    */
-  int readIntoSync(List<int> buffer, [int start, int end]);
+  int readIntoSync(List<int> buffer, [int start = 0, int end]);
 
   /**
    * Writes a single byte to the file. Returns a
@@ -609,7 +623,8 @@ abstract class RandomAccessFile {
    * Returns a [:Future<RandomAccessFile>:] that completes with this
    * [RandomAccessFile] when the write completes.
    */
-  Future<RandomAccessFile> writeFrom(List<int> buffer, [int start, int end]);
+  Future<RandomAccessFile> writeFrom(
+      List<int> buffer, [int start = 0, int end]);
 
   /**
    * Synchronously writes from a [List<int>] to the file. It will read the
@@ -619,7 +634,7 @@ abstract class RandomAccessFile {
    *
    * Throws a [FileSystemException] if the operation fails.
    */
-  void writeFromSync(List<int> buffer, [int start, int end]);
+  void writeFromSync(List<int> buffer, [int start = 0, int end]);
 
   /**
    * Writes a string to the file using the given [Encoding]. Returns a

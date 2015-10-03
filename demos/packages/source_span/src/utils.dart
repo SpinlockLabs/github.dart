@@ -37,3 +37,20 @@ int binarySearch(List list, bool matches(item)) {
   return max;
 }
 
+/// Finds a line in [context] containing [text] at the specified [column].
+///
+/// Returns the index in [context] where that line begins, or null if none
+/// exists.
+int findLineStart(String context, String text, int column) {
+  var isEmpty = text == '';
+  var index = context.indexOf(text);
+  while (index != -1) {
+    var lineStart = context.lastIndexOf('\n', index) + 1;
+    var textColumn = index - lineStart;
+    if (column == textColumn || (isEmpty && column == textColumn + 1)) {
+      return lineStart;
+    }
+    index = context.indexOf(text, index + 1);
+  }
+  return null;
+}

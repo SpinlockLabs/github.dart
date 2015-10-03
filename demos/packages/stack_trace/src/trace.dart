@@ -115,6 +115,7 @@ class Trace implements StackTrace {
     try {
       if (trace.isEmpty) return new Trace(<Frame>[]);
       if (trace.contains(_v8Trace)) return new Trace.parseV8(trace);
+      if (trace.startsWith("\tat ")) return new Trace.parseJSCore(trace);
       if (trace.contains(_firefoxSafariTrace)) {
         return new Trace.parseFirefox(trace);
       }
@@ -133,10 +134,21 @@ class Trace implements StackTrace {
 
   /// Parses a string representation of a Dart VM stack trace.
   Trace.parseVM(String trace)
-      : this(trace.trim().split("\n").
-            // TODO(nweiz): remove this when issue 15920 is fixed.
-            where((line) => line.isNotEmpty).
-            map((line) => new Frame.parseVM(line)));
+      : this(_parseVM(trace));
+
+  static List<Frame> _parseVM(String trace) {
+    var lines = trace.trim().split("\n");
+    var frames = lines.take(lines.length - 1)
+        .map((line) => new Frame.parseVM(line))
+        .toList();
+
+    // TODO(nweiz): Remove this when issue 23614 is fixed.
+    if (!lines.last.endsWith(".da")) {
+      frames.add(new Frame.parseVM(lines.last));
+    }
+
+    return frames;
+  }
 
   /// Parses a string representation of a Chrome/V8 stack trace.
   Trace.parseV8(String trace)
@@ -146,6 +158,12 @@ class Trace implements StackTrace {
           // Unfortunately, that's impossible to detect.
           .skipWhile((line) => !line.startsWith(_v8TraceLine))
           .map((line) => new Frame.parseV8(line)));
+
+  /// Parses a string representation of a JavaScriptCore stack trace.
+  Trace.parseJSCore(String trace)
+      : this(trace.split("\n")
+            .where((line) => line != "\tat ")
+            .map((line) => new Frame.parseV8(line)));
 
   /// Parses a string representation of an Internet Explorer stack trace.
   ///
@@ -181,10 +199,12 @@ class Trace implements StackTrace {
   /// This also parses string representations of [Chain]s. They parse to the
   /// same trace that [Chain.toTrace] would return.
   Trace.parseFriendly(String trace)
-      : this(trace.trim().split("\n")
-          // Filter out asynchronous gaps from [Chain]s.
-          .where((line) => !line.startsWith('====='))
-          .map((line) => new Frame.parseFriendly(line)));
+      : this(trace.isEmpty
+            ? []
+            : trace.trim().split("\n")
+                // Filter out asynchronous gaps from [Chain]s.
+                .where((line) => !line.startsWith('====='))
+                .map((line) => new Frame.parseFriendly(line)));
 
   /// Returns a new [Trace] comprised of [frames].
   Trace(Iterable<Frame> frames)
@@ -202,7 +222,8 @@ class Trace implements StackTrace {
   /// This is accomplished by folding together multiple stack frames from the
   /// core library or from this package, as in [foldFrames]. Remaining core
   /// library frames have their libraries, "-patch" suffixes, and line numbers
-  /// removed.
+  /// removed. If the outermost frame of the stack trace is a core library
+  /// frame, it's removed entirely.
   ///
   /// For custom folding, see [foldFrames].
   Trace get terse => foldFrames((_) => false, terse: true);
@@ -216,8 +237,8 @@ class Trace implements StackTrace {
   /// code and code that's called by user code.
   ///
   /// If [terse] is true, this will also fold together frames from the core
-  /// library or from this package, and simplify core library frames as in
-  /// [Trace.terse].
+  /// library or from this package, simplify core library frames, and
+  /// potentially remove the outermost frame as in [Trace.terse].
   Trace foldFrames(bool predicate(Frame frame), {bool terse: false}) {
     if (terse) {
       var oldPredicate = predicate;
@@ -251,10 +272,11 @@ class Trace implements StackTrace {
 
     if (terse) {
       newFrames = newFrames.map((frame) {
-        if (!frame.isCore) return frame;
+        if (!predicate(frame)) return frame;
         var library = frame.library.replaceAll(_terseRegExp, '');
         return new Frame(Uri.parse(library), null, null, frame.member);
       }).toList();
+      if (newFrames.length > 1 && newFrames.first.isCore) newFrames.removeAt(0);
     }
 
     return new Trace(newFrames.reversed);
