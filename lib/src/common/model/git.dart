@@ -120,7 +120,7 @@ class CreateGitCommit {
 }
 
 /// Model class for an author or committer of a commit. The [GitCommitUser] may
-/// not corresponsd to a GitHub [User].
+/// not correspond to a GitHub [User].
 class GitCommitUser {
   final String name;
   final String email;
@@ -176,7 +176,7 @@ class GitTree {
   }
 }
 
-/// Model class for the contentents of a tree structure. [GitTreeEntry] can
+/// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
 class GitTreeEntry {

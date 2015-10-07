@@ -243,7 +243,7 @@ class Milestone {
   }
 }
 
-/// Model class for a new milstone to be created.
+/// Model class for a new milestone to be created.
 class CreateMilestone {
   final String title;
 
