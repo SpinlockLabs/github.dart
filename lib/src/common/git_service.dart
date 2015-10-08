@@ -57,7 +57,7 @@ class GitService extends Service {
   ///
   /// This will return all references on the system, including things like notes
   /// and stashes if they exist on the server. A sub-namespace can be requested
-  /// by specifying a [type], the most common beeing "heads" and "tags".
+  /// by specifying a [type], the most common being "heads" and "tags".
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#get-all-references
   Stream<GitReference> listReferences(RepositorySlug slug, {String type}) {

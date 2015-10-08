@@ -191,6 +191,9 @@ class IssueLabel {
 
 /// Model class for a milestone.
 class Milestone {
+  /// Unique Identifier for Milestone
+  int id;
+
   /// Milestone Number
   int number;
 
@@ -230,6 +233,7 @@ class Milestone {
     if (input == null) return null;
 
     return new Milestone()
+      ..id = input['id']
       ..number = input['number']
       ..state = input['state']
       ..title = input['title']
@@ -243,7 +247,7 @@ class Milestone {
   }
 }
 
-/// Model class for a new milstone to be created.
+/// Model class for a new milestone to be created.
 class CreateMilestone {
   final String title;
 

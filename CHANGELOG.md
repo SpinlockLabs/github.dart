@@ -2,6 +2,7 @@
 
 - Cache base64 decoded `text` property in `GitHubFile`
 - Fix Bug in EventPoller
+- Added `id` to `Milestone`
 
 ## v2.3.0
 
