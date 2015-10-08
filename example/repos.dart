@@ -72,7 +72,7 @@ void updateRepos(List<Repository> repos,
           <b>Size</b>: ${repo.size} bytes
           <p></p>
         </div>
-      """);
+      """, treeSanitizer: NodeTreeSanitizer.trusted);
   }
 }
 

@@ -38,10 +38,12 @@ DateTime parseDateTime(String input) {
 /// Converts the [date] to GitHub's ISO-8601 format:
 ///
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
-String dateToGithubIso8601(DateTime date) {
+String dateToGitHubIso8601(DateTime date) {
   // Regex removes the milliseconds.
-  return date.toUtc().toIso8601String().replaceAll(new RegExp(r'\.\d*'), '');
+  return date.toUtc().toIso8601String().replaceAll(_GITHUB_DATE_REMOVE, '');
 }
+
+final RegExp _GITHUB_DATE_REMOVE = new RegExp(r'\.\d*');
 
 String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();

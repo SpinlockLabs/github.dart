@@ -23,11 +23,11 @@ void loadReleases() {
       <div class="repo box" id="release-${release.id}">
         <h1>${release.name}</h1>
       </div>
-      """);
+      """, treeSanitizer: NodeTreeSanitizer.trusted);
       var rel = $releases.querySelector("#release-${release.id}");
       void append(String key, value) {
         if (value == null) return;
-        rel.appendHtml("<br/><b>${key}</b>: ${value}");
+        rel.appendHtml("<br/><b>${key}</b>: ${value}", treeSanitizer: NodeTreeSanitizer.trusted);
       }
       append("Tag", '<a href=${release.htmlUrl}>${release.tagName}</a>');
       append("Download",

@@ -258,7 +258,7 @@ class CreateMilestone {
     putValue("title", title, map);
     putValue("state", state, map);
     putValue(description, description, map);
-    putValue("due_on", dateToGithubIso8601(dueOn), map);
+    putValue("due_on", dateToGitHubIso8601(dueOn), map);
     return JSON.encode(map);
   }
 }

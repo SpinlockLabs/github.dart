@@ -140,7 +140,7 @@ class GitCommitUser {
 
     putValue('name', name, map);
     putValue('email', email, map);
-    putValue('date', dateToGithubIso8601(date), map);
+    putValue('date', dateToGitHubIso8601(date), map);
 
     return map;
   }

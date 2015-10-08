@@ -24,6 +24,6 @@ void loadCat() {
     $octocat.appendHtml("""
     <h2>${cat.name}</h2>
     <a class="center" href="${cat.url}"><img src="${cat.image}"></img></a>
-    """);
+    """, treeSanitizer: NodeTreeSanitizer.trusted);
   });
 }
