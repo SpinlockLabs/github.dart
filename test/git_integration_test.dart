@@ -1,31 +1,45 @@
 library github.test.integration.git_integration_test;
 
-import 'package:unittest/unittest.dart';
+import 'package:github/server.dart';
 
-import 'config/config.dart';
-
-// Subject Under Test: git_service.dart.
-import 'package:github/common.dart';
+import 'package:test/test.dart';
 
 main() {
-  var firstCommitSha;
-  var firstCommitTreeSha;
+  String firstCommitSha;
+  String firstCommitTreeSha;
 
-  var createdBlobSha;
-  var createdTreeSha;
-  var createdCommitSha;
-  var createdTagSha;
+  String createdTreeSha;
+  String createdCommitSha;
+
+
+  GitHub github;
+  RepositorySlug slug;
+
+  setUpAll(() {
+    var authToken = '<some token>';
+    var repoOwner = '<some user/org>';
+    var repoName = '<some repo>';
+
+    github = createGitHubClient(auth: new Authentication.withToken(authToken));
+    slug = new RepositorySlug(repoOwner, repoName);
+  });
+
+  tearDownAll(() {
+    github.dispose();
+  });
 
   // Test definitions.
   test('get last commit of master', () {
     return github.repositories.getBranch(slug, 'master').then((branch) {
       firstCommitSha = branch.commit.sha;
-      firstCommitTreeSha = branch.commit.commit.tree.sha;
+      firstCommitTreeSha = branch.commit.tree.sha;
     });
   });
 
   test('create and get a new blob', () {
     CreateGitBlob newBlob = new CreateGitBlob('bbb', 'utf-8');
+
+    var createdBlobSha;
 
     // createBlob()
     return github.git.createBlob(slug, newBlob).then((createdBlob) {
@@ -101,6 +115,8 @@ main() {
   });
 
   test('create and get a new tag', () {
+    String createdTagSha;
+
     var newTag = new CreateGitTag('v0.0.1', 'Version 0.0.1', createdCommitSha,
         'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now()));
 

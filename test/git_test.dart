@@ -1,14 +1,14 @@
 library github.test.git_test;
 
-import 'dart:convert' show JSON;
 import 'dart:async';
-import 'package:unittest/unittest.dart';
-import 'package:mock/mock.dart';
-import 'helper.dart';
-import 'package:github/http.dart' as http;
+import 'dart:convert' show JSON;
 
-// Subject Under Test: git_service.dart.
 import 'package:github/common.dart';
+import 'package:github/http.dart' as http;
+import 'package:mock/mock.dart';
+import 'package:test/test.dart';
+
+import 'helper.dart';
 
 class MockGitHub extends MockWithNamedArgs implements GitHub {
   // This removes the compiler warning.
