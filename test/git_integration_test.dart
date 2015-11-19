@@ -11,7 +11,6 @@ main() {
   String createdTreeSha;
   String createdCommitSha;
 
-
   GitHub github;
   RepositorySlug slug;
 
@@ -103,21 +102,25 @@ main() {
   });
 
   test('create and get a new reference (branch)', () {
+    var branchName = _randomGitName();
+
     return github.git
-        .createReference(slug, 'refs/heads/my-branch', createdCommitSha)
+        .createReference(slug, 'refs/heads/$branchName', createdCommitSha)
         .then((createdRef) {
-      return github.git.getReference(slug, 'heads/my-branch');
+      return github.git.getReference(slug, 'heads/$branchName');
     }).then((fetchedRef) {
-      expect(fetchedRef.ref, equals('refs/heads/my-branch'));
+      expect(fetchedRef.ref, equals('refs/heads/$branchName'));
       expect(fetchedRef.object.type, equals('commit'));
       expect(fetchedRef.object.sha, equals(createdCommitSha));
     });
   });
 
   test('create and get a new tag', () {
+    var tagName = 'v${_randomGitName()}';
+
     String createdTagSha;
 
-    var newTag = new CreateGitTag('v0.0.1', 'Version 0.0.1', createdCommitSha,
+    var newTag = new CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
         'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now()));
 
     // createTag()
@@ -127,7 +130,7 @@ main() {
       // getTag()
       return github.git.getTag(slug, createdTagSha);
     }).then((fetchedTag) {
-      expect(fetchedTag.tag, equals('v0.0.1'));
+      expect(fetchedTag.tag, equals(tagName));
       expect(fetchedTag.sha, equals(createdTagSha));
       expect(fetchedTag.message, equals('Version 0.0.1'));
       expect(fetchedTag.tagger.name, equals('aName'));
@@ -135,7 +138,13 @@ main() {
     }).then((_) {
       // Create a reference for the tag.
       return github.git
-          .createReference(slug, 'refs/tags/v0.0.1', createdTagSha);
+          .createReference(slug, 'refs/tags/$tagName', createdTagSha);
     });
   });
+}
+
+String _randomGitName() {
+  var now = new DateTime.now().toIso8601String().replaceAll(':', '_');
+
+  return now.toString();
 }
