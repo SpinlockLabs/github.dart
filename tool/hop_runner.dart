@@ -8,18 +8,12 @@ import 'package:hop/hop.dart';
 import 'package:hop/hop_tasks.dart' hide createAnalyzerTask;
 import 'package:yaml/yaml.dart';
 
-part 'docgen.dart';
-part 'utils.dart';
 part 'version.dart';
 part 'analyze.dart';
 part 'config.dart';
 
 void main(List<String> args) {
   init();
-  addTask(
-      "docs",
-      createDocGenTask(".",
-          out_dir: parse_config_value(getvar("docs.output"))));
   addTask("analyze",
       createAnalyzerTask(getvar("analyzer.files").map(parse_config_value)));
   addTask("version", createVersionTask());
