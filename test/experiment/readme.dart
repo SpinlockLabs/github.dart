@@ -9,4 +9,3 @@ void main() {
       .then((html) => print(html))
       .then((_) => github.dispose());
 }
-

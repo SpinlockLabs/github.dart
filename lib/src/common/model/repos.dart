@@ -174,7 +174,7 @@ class Tag {
 
     return new Tag()
       ..name = input['name']
-      ..commit = (new CommitInfo()..sha = input['commit']['sha'])
+      ..commit = CommitInfo.fromJson(input['commit'])
       ..tarUrl = input['tarball_url']
       ..zipUrl = input['zipball_url'];
   }
@@ -184,6 +184,17 @@ class Tag {
 
 class CommitInfo {
   String sha;
+  GitTree tree;
+
+  static CommitInfo fromJson(input) {
+    if (input == null) {
+      return null;
+    }
+
+    return new CommitInfo()
+      ..sha = input['sha']
+      ..tree = GitTree.fromJSON(input['commit']['tree']);
+  }
 }
 
 /// User Information
@@ -318,11 +329,9 @@ class Branch {
   static Branch fromJSON(input) {
     if (input == null) return null;
 
-    var branch = new Branch()..name = input['name'];
-
-    if (input['commit'] != null) {
-      branch.commit = new CommitInfo()..sha = input['commit']['sha'];
-    }
+    var branch = new Branch()
+      ..name = input['name']
+      ..commit = CommitInfo.fromJson(input['commit']);
 
     return branch;
   }

@@ -45,7 +45,8 @@ void loadUsers() {
       buff.writeln("Followers: ${user.followersCount}");
 
       h.append(new ParagraphElement()
-        ..appendHtml(buff.toString().replaceAll("\n", "<br/>"), treeSanitizer: NodeTreeSanitizer.trusted));
+        ..appendHtml(buff.toString().replaceAll("\n", "<br/>"),
+            treeSanitizer: NodeTreeSanitizer.trusted));
 
       m.append(h);
 

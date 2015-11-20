@@ -284,8 +284,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
   Future<Hook> createHook(String org, CreateHook hook) {
     return _github.postJSON("/orgs/${org}/hooks",
-        convert: (i) => Hook.fromJSON(org, i),
-        body: hook.toJSON());
+        convert: (i) => Hook.fromJSON(org, i), body: hook.toJSON());
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
