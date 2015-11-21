@@ -90,12 +90,17 @@ class IssuesService extends Service {
   /// Create an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/#create-an-issue
-  Future<Issue> create(RepositorySlug slug, IssueRequest issue) {
-    return _github
-        .request("POST", '/repos/${slug.fullName}/issues', body: issue.toJSON())
-        .then((response) {
-      return Issue.fromJSON(JSON.decode(response.body));
-    });
+  Future<Issue> create(RepositorySlug slug, IssueRequest issue) async {
+    var response = await _github.request(
+        "POST", '/repos/${slug.fullName}/issues',
+        body: issue.toJSON());
+
+    if (StatusCodes.isClientError(response.statusCode)) {
+      //TODO: throw a more friendly error – better this than silent failure
+      throw new GitHubError(_github, response.body);
+    }
+
+    return Issue.fromJSON(JSON.decode(response.body));
   }
 
   /// Lists all available assignees (owners and collaborators) to which issues
