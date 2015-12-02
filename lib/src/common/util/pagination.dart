@@ -57,7 +57,7 @@ class PaginationHelper<T> {
     } while (true);
   }
 
-  Stream<T> objects(String method, String path, JSONConverter converter,
+  Stream jsonObjects(String method, String path,
       {int pages,
       Map<String, String> headers,
       Map<String, dynamic> params,
@@ -76,11 +76,27 @@ class PaginationHelper<T> {
         params: params,
         body: body,
         statusCode: statusCode)) {
-      var json = response.asJSON();
+      var json = response.asJSON() as List;
 
-      for (var item in (json as List).map(converter)) {
+      for (var item in json) {
         yield item;
       }
     }
+  }
+
+  Stream<T> objects(String method, String path, JSONConverter<T> converter,
+      {int pages,
+      Map<String, String> headers,
+      Map<String, dynamic> params,
+      String body,
+      int statusCode: 200,
+      String preview}) {
+    return jsonObjects(method, path,
+        pages: pages,
+        headers: headers,
+        params: params,
+        body: body,
+        statusCode: statusCode,
+        preview: preview).map(converter);
   }
 }

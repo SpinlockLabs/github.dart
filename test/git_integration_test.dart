@@ -126,6 +126,29 @@ main() {
     // Create a reference for the tag.
     await github.git.createReference(slug, 'refs/tags/$tagName', createdTagSha);
   });
+
+  group('create and query issues', () {
+    test('query issues', () async {
+      var issues = await github.issues.listByRepo(slug).toList();
+
+      var count = issues.length;
+
+      var issueRequest = new IssueRequest()
+        ..title = 'new issue - ${_randomGitName()}';
+
+      await github.issues.create(slug, issueRequest);
+
+      issues = await github.issues
+          .listByRepo(slug, sort: 'updated', direction: 'desc')
+          .toList();
+
+      expect(issues, hasLength(count + 1));
+
+      var issue = issues.first;
+
+      expect(issue.title, issueRequest.title);
+    });
+  });
 }
 
 String _randomGitName() {
