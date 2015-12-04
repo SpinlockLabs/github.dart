@@ -39,8 +39,17 @@ class IssuesService extends Service {
   ///
   /// API docs:https://developer.github.com/v3/issues/#list-issues-for-a-repository
   Stream<Issue> listByRepo(RepositorySlug slug,
-      {String state, String direction, String sort, DateTime since}) {
+      {String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage}) {
     var params = <String, String>{};
+
+    if (perPage != null) {
+      params['per_page'] = perPage.toString();
+    }
+
     if (state != null) {
       // should be `open`, `closed` or `all`
       params['state'] = state;
