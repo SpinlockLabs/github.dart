@@ -4,6 +4,10 @@
 
 library stack_trace.src.utils;
 
+/// The line used in the string representation of stack chains to represent
+/// the gap between traces.
+const chainGap = '===== asynchronous gap ===========================\n';
+
 /// Returns [string] with enough spaces added to the end to make it [length]
 /// characters long.
 String padRight(String string, int length) {

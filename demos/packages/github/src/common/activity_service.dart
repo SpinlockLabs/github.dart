@@ -334,7 +334,7 @@ class EventPoller {
         for (var item in json) {
           var event = Event.fromJSON(item);
 
-          if (event.createdAt.toUtc().isBefore(after)) {
+          if (after == null ? false : event.createdAt.toUtc().isBefore(after)) {
             continue;
           }
 

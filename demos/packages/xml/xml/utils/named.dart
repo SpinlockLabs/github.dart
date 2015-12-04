@@ -1,24 +1,17 @@
 part of xml;
 
-/**
- * A named XML node, such as an [XmlElement] or [XmlAttribute].
- */
+/// A named XML node, such as an [XmlElement] or [XmlAttribute].
 abstract class XmlNamed {
 
-  /**
-   * Return the name of the node.
-   */
+  /// Return the name of the node.
   XmlName get name;
+
 }
 
-/**
- * Internal function type to match named elements.
- */
+/// Internal function type to match named elements.
 typedef bool _XmlNamedMatcher(XmlNamed named);
 
-/**
- * Internal factory to create element matchers.
- */
+/// Internal factory to create element matchers.
 _XmlNamedMatcher _createMatcher(String name, String namespace) {
   if (name == null) {
     throw new ArgumentError('Illegal name matcher.');

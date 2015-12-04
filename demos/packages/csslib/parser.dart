@@ -64,7 +64,7 @@ StyleSheet compile(input, {List<Message> errors, PreprocessorOptions options,
   analyze([tree], errors: errors, options: options);
 
   if (polyfill) {
-    var processCss = new PolyFill(messages, true);
+    var processCss = new PolyFill(messages);
     processCss.process(tree, includes: includes);
   }
 
@@ -430,6 +430,7 @@ class _Parser {
     if (unaryOp != -1 || type != null || exprs.length > 0) {
       return new MediaQuery(unaryOp, type, exprs, _makeSpan(start));
     }
+    return null;
   }
 
   MediaExpression processMediaExpression([bool andOperator = false]) {
@@ -453,9 +454,9 @@ class _Parser {
         }
       } else if (isChecked) {
         _warning("Missing media feature in media expression", _makeSpan(start));
-        return null;
       }
     }
+    return null;
   }
 
   /**
@@ -798,7 +799,6 @@ class _Parser {
     _eat(TokenKind.LBRACE);
 
     List<TreeNode> productions = [];
-    List<TreeNode> declarations = [];
     var mixinDirective;
 
     var start = _peekToken.span;
@@ -984,6 +984,7 @@ class _Parser {
       return new RuleSet(
           selectorGroup, processDeclarations(), selectorGroup.span);
     }
+    return null;
   }
 
   /**
@@ -1191,6 +1192,7 @@ class _Parser {
     if (selectors.length > 0) {
       return new SelectorGroup(selectors, _makeSpan(start));
     }
+    return null;
   }
 
   /**
@@ -1602,6 +1604,7 @@ class _Parser {
 
       return new AttributeSelector(attrName, op, value, _makeSpan(start));
     }
+    return null;
   }
 
   //  Declaration grammar:
@@ -1763,6 +1766,7 @@ class _Parser {
     if (styleType != null) {
       return buildDartStyleNode(styleType, exprs, dartStyles);
     }
+    return null;
   }
 
   FontExpression _mergeFontStyles(FontExpression fontExpr, List dartStyles) {
@@ -1910,10 +1914,8 @@ class _Parser {
           return processOneNumber(exprs, styleType);
         }
         break;
-      default:
-        // Don't handle it.
-        return null;
     }
+    return null;
   }
 
   // TODO(terry): Look at handling width of thin, thick, etc. any none numbers
@@ -1956,6 +1958,7 @@ class _Parser {
           return new PaddingExpression(exprs.span, bottom: value);
       }
     }
+    return null;
   }
 
   /**
@@ -2185,6 +2188,8 @@ class _Parser {
         var nameValue = identifier(); // Snarf up the ident we'll remap, maybe.
 
         if (!ieFilter && _maybeEat(TokenKind.LPAREN)) {
+          var calc = processCalc(nameValue);
+          if (calc != null) return calc;
           // FUNCTION
           return processFunction(nameValue);
         }
@@ -2363,8 +2368,8 @@ class _Parser {
 
     // Note: disable skipping whitespace tokens inside a string.
     // TODO(jmesserly): the layering here feels wrong.
-    var skipWhitespace = tokenizer._skipWhitespace;
-    tokenizer._skipWhitespace = false;
+    var inString = tokenizer._inString;
+    tokenizer._inString = false;
 
     switch (_peek()) {
       case TokenKind.SINGLE_QUOTE:
@@ -2396,7 +2401,7 @@ class _Parser {
       stringValue.write(_next().text);
     }
 
-    tokenizer._skipWhitespace = skipWhitespace;
+    tokenizer._inString = inString;
 
     // All characters between quotes is the string.
     if (stopToken != TokenKind.RPAREN) {
@@ -2439,6 +2444,64 @@ class _Parser {
     }
   }
 
+  //  TODO(terry): Hack to gobble up the calc expression as a string looking
+  //               for the matching RPAREN the expression is not parsed into the
+  //               AST.
+  //
+  //  grammar should be:
+  //
+  //    <calc()> = calc( <calc-sum> )
+  //    <calc-sum> = <calc-product> [ [ '+' | '-' ] <calc-product> ]*
+  //    <calc-product> = <calc-value> [ '*' <calc-value> | '/' <number> ]*
+  //    <calc-value> = <number> | <dimension> | <percentage> | ( <calc-sum> )
+  //
+  String processCalcExpression() {
+    var inString = tokenizer._inString;
+    tokenizer._inString = false;
+
+    // Gobble up everything until we hit our stop token.
+    var stringValue = new StringBuffer();
+    var left = 1;
+    var matchingParens = false;
+    while (_peek() != TokenKind.END_OF_FILE && !matchingParens) {
+      var token = _peek();
+      if (token == TokenKind.LPAREN)
+        left++;
+      else if (token == TokenKind.RPAREN)
+        left--;
+
+      matchingParens = left == 0;
+      if (!matchingParens) stringValue.write(_next().text);
+    }
+
+    if (!matchingParens) {
+      _error("problem parsing function expected ), ", _peekToken.span);
+    }
+
+    tokenizer._inString = inString;
+
+    return stringValue.toString();
+  }
+
+  CalcTerm processCalc(Identifier func) {
+    var start = _peekToken.span;
+
+    var name = func.name;
+    if (name == 'calc') {
+      // TODO(terry): Implement expression parsing properly.
+      String expression = processCalcExpression();
+      var calcExpr = new LiteralTerm(expression, expression, _makeSpan(start));
+
+      if (!_maybeEat(TokenKind.RPAREN)) {
+        _error("problem parsing function expected ), ", _peekToken.span);
+      }
+
+      return new CalcTerm(name, name, calcExpr, _makeSpan(start));
+    }
+
+    return null;
+  }
+
   //  Function grammar:
   //
   //  function:     IDENT '(' expr ')'
@@ -2463,9 +2526,6 @@ class _Parser {
         }
 
         return new UriTerm(urlParam, _makeSpan(start));
-      case 'calc':
-        // TODO(terry): Implement expression handling...
-        break;
       case 'var':
         // TODO(terry): Consider handling var in IE specific filter/progid.  This
         //              will require parsing entire IE specific syntax e.g.,

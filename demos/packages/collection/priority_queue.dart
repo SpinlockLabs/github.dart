@@ -275,7 +275,7 @@ class HeapPriorityQueue<E> implements PriorityQueue<E> {
    */
   int _locate(E object) {
     if (_length == 0) return -1;
-    // Count positions from one instad of zero. This gives the numbers
+    // Count positions from one instead of zero. This gives the numbers
     // some nice properties. For example, all right children are odd,
     // their left sibling is even, and the parent is found by shifting
     // right by one.

@@ -1,11 +1,9 @@
-part of lisp;
+part of petitparser.lisp;
 
-/**
- * The native functions.
- */
+/// The native functions.
 class Natives {
 
-  /** Imports the native functions into the [environment]. */
+  /// Imports the native functions into the [environment].
   static Environment import(Environment environment) {
 
     // basic functions
@@ -61,17 +59,17 @@ class Natives {
     }
   }
 
-  static _lambda(Environment lambda_env, lambda_args) {
-    return (Environment env, args) {
-      var inner = lambda_env.create();
-      var names = lambda_args.head;
-      var values = evalArguments(env, args);
+  static _lambda(Environment lambdaEnv, lambdaArgs) {
+    return (Environment evalEnv, evalArgs) {
+      var inner = lambdaEnv.create();
+      var names = lambdaArgs.head;
+      var values = evalArguments(evalEnv, evalArgs);
       while (names != null && values != null) {
         inner.define(names.head, values.head);
         names = names.tail;
         values = values.tail;
       }
-      return evalList(inner, lambda_args.tail);
+      return evalList(inner, lambdaArgs.tail);
     };
   }
 

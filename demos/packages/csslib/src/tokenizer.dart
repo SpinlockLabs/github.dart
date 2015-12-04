@@ -273,7 +273,7 @@ class Tokenizer extends TokenizerBase {
       // if followed by hexadecimal digits, create the appropriate character.
       // otherwise, include the character in the identifier and don't treat it
       // specially.
-      if (ch == 92 /*\*/) {
+      if (ch == 92 /*\*/ && _inString) {
         int startHex = ++_index;
         eatHexDigits(startHex + 6);
         if (_index != startHex) {
@@ -395,7 +395,7 @@ class Tokenizer extends TokenizerBase {
         return _finishToken(TokenKind.INCOMPLETE_COMMENT);
       } else if (ch == 42 /*'*'*/) {
         if (_maybeEatChar(47 /*'/'*/)) {
-          if (_skipWhitespace) {
+          if (_inString) {
             return next();
           } else {
             return _finishToken(TokenKind.COMMENT);
@@ -405,7 +405,7 @@ class Tokenizer extends TokenizerBase {
         /* Check if close part of Comment Definition --> (CDC). */
         if (_maybeEatChar(TokenChar.MINUS)) {
           if (_maybeEatChar(TokenChar.GREATER)) {
-            if (_skipWhitespace) {
+            if (_inString) {
               return next();
             } else {
               return _finishToken(TokenKind.HTML_COMMENT);

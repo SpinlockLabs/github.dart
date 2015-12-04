@@ -303,7 +303,6 @@ List<String> getArgsCompletions(ArgParser parser, List<String> providedArgs,
 }
 
 Option _getOptionForArg(ArgParser parser, String arg) {
-
   // could be a full arg name
   if (arg.startsWith('--')) {
     final nameOption = arg.substring(2);
@@ -346,7 +345,6 @@ Iterable<String> _getParserOptionCompletions(
 
 Tuple<List<String>, ArgResults> _getValidSubset(
     ArgParser parser, List<String> providedArgs) {
-
   /* start with all of the args, loop through parsing them,
    * removing one every time
    *

@@ -1,13 +1,9 @@
 part of xml;
 
-/**
- * XML text node.
- */
+/// XML text node.
 class XmlText extends XmlData {
 
-  /**
-   * Create a text node with `text`.
-   */
+  /// Create a text node with `text`.
   XmlText(String text) : super(text);
 
   @override
@@ -15,4 +11,5 @@ class XmlText extends XmlData {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitText(this);
+
 }

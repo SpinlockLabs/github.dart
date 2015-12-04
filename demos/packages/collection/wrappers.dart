@@ -6,18 +6,18 @@
  * Delegating wrappers for [Iterable], [List], [Set], [Queue] and [Map].
  *
  * Also adds unmodifiable views for `Set` and `Map`, and a fixed length
- * view for `List`. The unmodifable list view from `dart:collection` is exported
- * as well, just for completeness.
+ * view for `List`. The unmodifiable list view from `dart:collection` is
+ * exported as well, just for completeness.
  */
 library dart.pkg.collection.wrappers;
 
 import "dart:collection";
 import "dart:math" show Random;
 
-export "dart:collection" show UnmodifiableListView;
+import "src/unmodifiable_wrappers.dart";
 
 export "src/canonicalized_map.dart";
-part "src/unmodifiable_wrappers.dart";
+export "src/unmodifiable_wrappers.dart";
 
 /**
  * A base class for delegating iterables.
@@ -234,7 +234,7 @@ class DelegatingSet<E> extends DelegatingIterable<E> implements Set<E> {
 
   Set<E> intersection(Set<Object> other) => _setBase.intersection(other);
 
-  E lookup(E element) => _setBase.lookup(element);
+  E lookup(Object element) => _setBase.lookup(element);
 
   bool remove(Object value) => _setBase.remove(value);
 
@@ -518,7 +518,7 @@ class MapValueSet<K, V> extends _DelegatingIterableBase<V> implements Set<V> {
    */
   Set<V> intersection(Set<Object> other) => where(other.contains).toSet();
 
-  V lookup(V element) => _baseMap[_keyForValue(element)];
+  V lookup(Object element) => _baseMap[_keyForValue(element)];
 
   bool remove(Object value) {
     if (value != null && value is! V) return false;

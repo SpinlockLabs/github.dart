@@ -4,16 +4,17 @@
 
 library frame;
 
-
 import 'package:path/path.dart' as path;
 
 import 'trace.dart';
+import 'unparsed_frame.dart';
 
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart:42:21)
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart:42)
 // #1      Foo._bar (file:///home/nweiz/code/stuff.dart)
 final _vmFrame = new RegExp(r'^#\d+\s+(\S.*) \((.+?)((?::\d+){0,2})\)$');
 
+//     at Object.stringify (native)
 //     at VW.call$0 (http://pub.dartlang.org/stuff.dart.js:560:28)
 //     at VW.call$0 (eval as fn
 //         (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28)
@@ -22,7 +23,7 @@ final _v8Frame = new RegExp(
     r'^\s*at (?:(\S.*?)(?: \[as [^\]]+\])? \((.*)\)|(.*))$');
 
 // http://pub.dartlang.org/stuff.dart.js:560:28
-final _v8UrlLocation = new RegExp(r'^(.*):(\d+):(\d+)$');
+final _v8UrlLocation = new RegExp(r'^(.*):(\d+):(\d+)|native$');
 
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28), efn:3:28
 // eval as function (http://pub.dartlang.org/stuff.dart.js:560:28)
@@ -94,8 +95,11 @@ class Frame {
   /// comes from.
   ///
   /// This will usually be the string form of [uri], but a relative URI will be
-  /// used if possible.
-  String get library => path.prettyUri(uri);
+  /// used if possible. Data URIs will be truncated.
+  String get library {
+    if (uri.scheme == 'data') return "data:...";
+    return path.prettyUri(uri);
+  }
 
   /// Returns the name of the package this stack frame comes from, or `null` if
   /// this stack frame doesn't come from a `package:` URL.
@@ -126,7 +130,7 @@ class Frame {
   }
 
   /// Parses a string representation of a Dart VM stack frame.
-  factory Frame.parseVM(String frame) {
+  factory Frame.parseVM(String frame) => _catchFormatException(frame, () {
     // The VM sometimes folds multiple stack frames together and replaces them
     // with "...".
     if (frame == '...') {
@@ -134,9 +138,7 @@ class Frame {
     }
 
     var match = _vmFrame.firstMatch(frame);
-    if (match == null) {
-      throw new FormatException("Couldn't parse VM stack trace line '$frame'.");
-    }
+    if (match == null) return new UnparsedFrame(frame);
 
     // Get the pieces out of the regexp match. Function, URI and line should
     // always be found. The column is optional.
@@ -149,14 +151,12 @@ class Frame {
     var line = lineAndColumn.length > 1 ? int.parse(lineAndColumn[1]) : null;
     var column = lineAndColumn.length > 2 ? int.parse(lineAndColumn[2]) : null;
     return new Frame(uri, line, column, member);
-  }
+  });
 
   /// Parses a string representation of a Chrome/V8 stack frame.
-  factory Frame.parseV8(String frame) {
+  factory Frame.parseV8(String frame) => _catchFormatException(frame, () {
     var match = _v8Frame.firstMatch(frame);
-    if (match == null) {
-      throw new FormatException("Couldn't parse V8 stack trace line '$frame'.");
-    }
+    if (match == null) return new UnparsedFrame(frame);
 
     // v8 location strings can be arbitrarily-nested, since it adds a layer of
     // nesting for each eval performed on that line.
@@ -167,11 +167,12 @@ class Frame {
         evalMatch = _v8EvalLocation.firstMatch(location);
       }
 
-      var urlMatch = _v8UrlLocation.firstMatch(location);
-      if (urlMatch == null) {
-        throw new FormatException(
-            "Couldn't parse V8 stack trace line '$frame'.");
+      if (location == 'native') {
+        return new Frame(Uri.parse('native'), null, null, member);
       }
+
+      var urlMatch = _v8UrlLocation.firstMatch(location);
+      if (urlMatch == null) return new UnparsedFrame(frame);
 
       return new Frame(
           _uriOrPathToUri(urlMatch[1]),
@@ -193,7 +194,7 @@ class Frame {
       // functions.
       return parseLocation(match[3], "<fn>");
     }
-  }
+  });
 
   /// Parses a string representation of a JavaScriptCore stack trace.
   factory Frame.parseJSCore(String frame) => new Frame.parseV8(frame);
@@ -205,12 +206,9 @@ class Frame {
   factory Frame.parseIE(String frame) => new Frame.parseV8(frame);
 
   /// Parses a string representation of a Firefox stack frame.
-  factory Frame.parseFirefox(String frame) {
+  factory Frame.parseFirefox(String frame) => _catchFormatException(frame, () {
     var match = _firefoxSafariFrame.firstMatch(frame);
-    if (match == null) {
-      throw new FormatException(
-          "Couldn't parse Firefox/Safari stack trace line '$frame'.");
-    }
+    if (match == null) return new UnparsedFrame(frame);
 
     // Normally this is a URI, but in a jsshell trace it can be a path.
     var uri = _uriOrPathToUri(match[3]);
@@ -233,7 +231,7 @@ class Frame {
     var column = match[5] == null || match[5] == '' ?
         null : int.parse(match[5]);
     return new Frame(uri, line, column, member);
-  }
+  });
 
   /// Parses a string representation of a Safari 6.0 stack frame.
   @Deprecated("Use Frame.parseSafari instead.")
@@ -247,7 +245,7 @@ class Frame {
   factory Frame.parseSafari(String frame) => new Frame.parseFirefox(frame);
 
   /// Parses this package's string representation of a stack frame.
-  factory Frame.parseFriendly(String frame) {
+  factory Frame.parseFriendly(String frame) => _catchFormatException(frame, () {
     var match = _friendlyFrame.firstMatch(frame);
     if (match == null) {
       throw new FormatException(
@@ -264,7 +262,7 @@ class Frame {
     var line = match[2] == null ? null : int.parse(match[2]);
     var column = match[3] == null ? null : int.parse(match[3]);
     return new Frame(uri, line, column, match[4]);
-  }
+  });
 
   /// A regular expression matching an absolute URI.
   static final _uriRegExp = new RegExp(r'^[a-zA-Z][-+.a-zA-Z\d]*://');
@@ -288,6 +286,18 @@ class Frame {
     // handle it gracefully.
     if (uriOrPath.contains('\\')) return path.windows.toUri(uriOrPath);
     return Uri.parse(uriOrPath);
+  }
+
+  /// Runs [body] and returns its result.
+  ///
+  /// If [body] throws a [FormatException], returns an [UnparsedFrame] with
+  /// [text] instead.
+  static Frame _catchFormatException(String text, Frame body()) {
+    try {
+      return body();
+    } on FormatException catch (_) {
+      return new UnparsedFrame(text);
+    }
   }
 
   Frame(this.uri, this.line, this.column, this.member);

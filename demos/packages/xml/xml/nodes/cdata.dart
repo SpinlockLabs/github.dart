@@ -1,13 +1,9 @@
 part of xml;
 
-/**
- * XML CDATA node.
- */
+/// XML CDATA node.
 class XmlCDATA extends XmlData {
 
-  /**
-   * Create a CDATA section with `text`.
-   */
+  /// Create a CDATA section with `text`.
   XmlCDATA(String text) : super(text);
 
   @override
@@ -15,4 +11,5 @@ class XmlCDATA extends XmlData {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitCDATA(this);
+
 }

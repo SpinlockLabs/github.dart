@@ -9,6 +9,8 @@
 library crypto;
 
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:convert';
 
 part 'src/crypto_utils.dart';
 part 'src/hash_utils.dart';
@@ -16,6 +18,7 @@ part 'src/hmac.dart';
 part 'src/md5.dart';
 part 'src/sha1.dart';
 part 'src/sha256.dart';
+part 'src/base64.dart';
 
 /**
  * Interface for cryptographic hash functions.

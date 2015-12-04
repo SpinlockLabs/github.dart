@@ -11,26 +11,39 @@ class IssuesService extends Service {
   /// including owned repositories, member repositories, and organization repositories
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
-  Stream<Issue> listAll() {
-    return new PaginationHelper(_github)
-        .objects("GET", "/issues", Issue.fromJSON);
+  Stream<Issue> listAll(
+      {String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage}) {
+    return _listIssues("/issues", state, direction, sort, since, perPage);
   }
 
   /// List all issues across owned and member repositories for the authenticated
   /// user.
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
-  Stream<Issue> listByUser() {
-    return new PaginationHelper(_github)
-        .objects("GET", "/user/issues", Issue.fromJSON);
+  Stream<Issue> listByUser(
+      {String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage}) {
+    return _listIssues("/user/issues", state, direction, sort, since, perPage);
   }
 
   /// List all issues for a given organization for the authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
-  Stream<Issue> listByOrg(String org) {
-    return new PaginationHelper(_github)
-        .objects("GET", "/orgs/${org}/issues", Issue.fromJSON);
+  Stream<Issue> listByOrg(String org,
+      {String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage}) {
+    return _listIssues(
+        "/orgs/${org}/issues", state, direction, sort, since, perPage);
   }
 
   /// Lists the issues for the specified repository.
@@ -39,8 +52,23 @@ class IssuesService extends Service {
   ///
   /// API docs:https://developer.github.com/v3/issues/#list-issues-for-a-repository
   Stream<Issue> listByRepo(RepositorySlug slug,
-      {String state, String direction, String sort, DateTime since}) {
+      {String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage}) {
+    return _listIssues("/repos/${slug.fullName}/issues", state, direction, sort,
+        since, perPage);
+  }
+
+  Stream<Issue> _listIssues(String pathSegment, String state, String direction,
+      String sort, DateTime since, int perPage) {
     var params = <String, String>{};
+
+    if (perPage != null) {
+      params['per_page'] = perPage.toString();
+    }
+
     if (state != null) {
       // should be `open`, `closed` or `all`
       params['state'] = state;
@@ -62,9 +90,8 @@ class IssuesService extends Service {
       params['since'] = since.toUtc().toIso8601String();
     }
 
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/issues", Issue.fromJSON,
-        params: params);
+    return new PaginationHelper(_github)
+        .objects("GET", pathSegment, Issue.fromJSON, params: params);
   }
 
   /// Edit an issue.
@@ -90,12 +117,17 @@ class IssuesService extends Service {
   /// Create an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/#create-an-issue
-  Future<Issue> create(RepositorySlug slug, IssueRequest issue) {
-    return _github
-        .request("POST", '/repos/${slug.fullName}/issues', body: issue.toJSON())
-        .then((response) {
-      return Issue.fromJSON(JSON.decode(response.body));
-    });
+  Future<Issue> create(RepositorySlug slug, IssueRequest issue) async {
+    var response = await _github.request(
+        "POST", '/repos/${slug.fullName}/issues',
+        body: issue.toJSON());
+
+    if (StatusCodes.isClientError(response.statusCode)) {
+      //TODO: throw a more friendly error – better this than silent failure
+      throw new GitHubError(_github, response.body);
+    }
+
+    return Issue.fromJSON(JSON.decode(response.body));
   }
 
   /// Lists all available assignees (owners and collaborators) to which issues

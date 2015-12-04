@@ -51,7 +51,7 @@ void reloadTable({int accuracy: 4}) {
   isReloadingTable = true;
 
   github.misc.renderMarkdown(generateMarkdown(accuracy)).then((html) {
-    $table.innerHtml = html;
+    $table.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
   });
 }

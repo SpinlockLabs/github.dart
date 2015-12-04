@@ -78,7 +78,7 @@ class TreeBuilder {
 
   Node headPointer;
 
-  Node formPointer;
+  Element formPointer;
 
   /// Switch the function used to insert an element from the
   /// normal one to the misnested table one and back again

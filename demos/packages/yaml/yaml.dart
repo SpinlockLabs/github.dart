@@ -53,7 +53,7 @@ YamlDocument loadYamlDocument(String yaml, {sourceUrl}) {
   var document = loader.load();
   if (document == null) {
     return new YamlDocument.internal(
-        new YamlScalar.internal(null, loader.span, ScalarStyle.ANY),
+        new YamlScalar.internalWithSpan(null, loader.span),
         loader.span, null, const []);
   }
 
@@ -81,15 +81,17 @@ YamlDocument loadYamlDocument(String yaml, {sourceUrl}) {
 YamlList loadYamlStream(String yaml, {sourceUrl}) {
   var loader = new Loader(yaml, sourceUrl: sourceUrl);
 
-  var documents = [];
+  var documents = <YamlDocument>[];
   var document = loader.load();
   while (document != null) {
     documents.add(document);
     document = loader.load();
   }
 
+  // TODO(jmesserly): the type on the `document` parameter is a workaround for:
+  // https://github.com/dart-lang/dev_compiler/issues/203
   return new YamlList.internal(
-      documents.map((document) => document.contents).toList(),
+      documents.map((YamlDocument document) => document.contents).toList(),
       loader.span,
       CollectionStyle.ANY);
 }
@@ -101,7 +103,7 @@ YamlList loadYamlStream(String yaml, {sourceUrl}) {
 List<YamlDocument> loadYamlDocuments(String yaml, {sourceUrl}) {
   var loader = new Loader(yaml, sourceUrl: sourceUrl);
 
-  var documents = [];
+  var documents = <YamlDocument>[];
   var document = loader.load();
   while (document != null) {
     documents.add(document);

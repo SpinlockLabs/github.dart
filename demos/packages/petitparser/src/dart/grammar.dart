@@ -1,17 +1,11 @@
-part of dart;
+part of petitparser.dart;
 
-/**
- * Dart grammar.
- */
+/// Dart grammar.
 class DartGrammar extends GrammarParser {
   DartGrammar() : super(new DartGrammarDefinition());
 }
 
-/**
- * Dart grammar definition.
- *
- * Adapted from [https://code.google.com/p/dart/source/browse/branches/bleeding_edge/dart/language/grammar/Dart.g].
- */
+/// Dart grammar definition.
 class DartGrammarDefinition extends GrammarDefinition {
 
   Parser token(input) {
@@ -23,7 +17,7 @@ class DartGrammarDefinition extends GrammarDefinition {
     if (input is! Parser && input is TrimmingParser) {
       throw new StateError('Invalid token parser: $input');
     }
-    return input.token().trim(ref(HIDDEN));
+    return input.token().trim(ref(HIDDEN_STUFF));
   }
 
 
@@ -146,8 +140,8 @@ class DartGrammarDefinition extends GrammarDefinition {
       | ref(functionDeclaration) & ref(initializers).optional()
       | ref(namedConstructorDeclaration) & ref(initializers).optional();
 
-// An abstract method/operator, a field, or const constructor (which
-// all should be followed by a semicolon).
+  // An abstract method/operator, a field, or const constructor (which
+  // all should be followed by a semicolon).
   declaration() =>
         ref(constantConstructorDeclaration) & (ref(redirection) | ref(initializers)).optional()
       | ref(functionDeclaration) & ref(redirection)
@@ -245,8 +239,8 @@ class DartGrammarDefinition extends GrammarDefinition {
       | ref(token, '+=')
       | ref(token, '-=')
       | ref(token, '<<=')
-      | ref(token, '>') & ref(token, '>') & ref(token, '>') & ref(token, '=')
-      | ref(token, '>') & ref(token, '>') & ref(token, '=')
+      | ref(token, '>>>=')
+      | ref(token, '>>=')
       | ref(token, '&=')
       | ref(token, '^=')
       | ref(token, '|=');
@@ -261,20 +255,20 @@ class DartGrammarDefinition extends GrammarDefinition {
 
   shiftOperator() =>
         ref(token, '<<')
-      | ref(token, '>') & ref(token, '>') & ref(token, '>')
-      | ref(token, '>') & ref(token, '>');
+      | ref(token, '>>>')
+      | ref(token, '>>');
 
   relationalOperator() =>
-        ref(token, '>') & ref(token, '=')
+        ref(token, '>=')
       | ref(token, '>')
       | ref(token, '<=')
       | ref(token, '<');
 
   equalityOperator() =>
-        ref(token, '==')
-      | ref(token, '!=')
-      | ref(token, '===')
-      | ref(token, '!==');
+        ref(token, '===')
+      | ref(token, '!==')
+      | ref(token, '==')
+      | ref(token, '!=');
 
   bitwiseOperator() =>
         ref(token, '&')
@@ -327,26 +321,7 @@ class DartGrammarDefinition extends GrammarDefinition {
       | ref(type) & ref(identifier)
       ;
 
-  identifier() => ref(token, ref(IDENTIFIER)
-      | ref(ABSTRACT)
-      | ref(ASSERT)
-      | ref(CLASS)
-      | ref(EXTENDS)
-      | ref(FACTORY)
-      | ref(GET)
-      | ref(IMPLEMENTS)
-      | ref(IMPORT)
-      | ref(INTERFACE)
-      | ref(IS)
-      | ref(LIBRARY)
-      | ref(NATIVE)
-      | ref(NEGATE)
-      | ref(OPERATOR)
-      | ref(SET)
-      | ref(SOURCE)
-      | ref(STATIC)
-      | ref(TYPEDEF)
-      );
+  identifier() => ref(token, ref(IDENTIFIER));
 
   qualified() =>
         ref(identifier) & (ref(token, '.') & ref(identifier)).optional()

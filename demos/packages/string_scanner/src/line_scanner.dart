@@ -4,7 +4,14 @@
 
 library string_scanner.line_scanner;
 
+import 'package:charcode/ascii.dart';
+
 import 'string_scanner.dart';
+
+// Note that much of this code is duplicated in eager_span_scanner.dart.
+
+/// A regular expression matching newlines across platforms.
+final _newlineRegExp = new RegExp(r"\r\n?|\n");
 
 /// A subclass of [StringScanner] that tracks line and column information.
 class LineScanner extends StringScanner {
@@ -24,6 +31,10 @@ class LineScanner extends StringScanner {
   LineScannerState get state =>
       new LineScannerState._(this, position, line, column);
 
+  /// Whether the current position is between a CR character and an LF
+  /// charactet.
+  bool get _betweenCRLF => peekChar(-1) == $cr && peekChar() == $lf;
+
   set state(LineScannerState state) {
     if (!identical(state._scanner, this)) {
       throw new ArgumentError("The given LineScannerState was not returned by "
@@ -40,8 +51,7 @@ class LineScanner extends StringScanner {
     super.position = newPosition;
 
     if (newPosition > oldPosition) {
-      var newlines =
-          "\n".allMatches(string.substring(oldPosition, newPosition)).toList();
+      var newlines = _newlinesIn(string.substring(oldPosition, newPosition));
       _line += newlines.length;
       if (newlines.isEmpty) {
         _column += newPosition - oldPosition;
@@ -49,13 +59,15 @@ class LineScanner extends StringScanner {
         _column = newPosition - newlines.last.end;
       }
     } else {
-      var newlines =
-          "\n".allMatches(string.substring(newPosition, oldPosition)).toList();
+      var newlines = _newlinesIn(string.substring(newPosition, oldPosition));
+      if (_betweenCRLF) newlines.removeLast();
+
       _line -= newlines.length;
       if (newlines.isEmpty) {
         _column -= oldPosition - newPosition;
       } else {
-        _column = newPosition - string.lastIndexOf("\n", newPosition) - 1;
+        _column = newPosition -
+            string.lastIndexOf(_newlineRegExp, newPosition) - 1;
       }
     }
   }
@@ -65,7 +77,7 @@ class LineScanner extends StringScanner {
 
   int readChar() {
     var char = super.readChar();
-    if (char == 0xA) {
+    if (char == $lf || (char == $cr && peekChar() != $lf)) {
       _line += 1;
       _column = 0;
     } else {
@@ -77,7 +89,7 @@ class LineScanner extends StringScanner {
   bool scan(Pattern pattern) {
     if (!super.scan(pattern)) return false;
 
-    var newlines = "\n".allMatches(lastMatch[0]).toList();
+    var newlines = _newlinesIn(lastMatch[0]);
     _line += newlines.length;
     if (newlines.isEmpty) {
       _column += lastMatch[0].length;
@@ -86,6 +98,14 @@ class LineScanner extends StringScanner {
     }
 
     return true;
+  }
+
+  /// Returns a list of [Match]es describing all the newlines in [text], which
+  /// is assumed to end at [position].
+  List<Match> _newlinesIn(String text) {
+    var newlines = _newlineRegExp.allMatches(text).toList();
+    if (_betweenCRLF) newlines.removeLast();
+    return newlines;
   }
 }
 

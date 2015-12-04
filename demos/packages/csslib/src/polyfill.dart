@@ -10,7 +10,6 @@ part of csslib.parser;
  */
 class PolyFill {
   final Messages _messages;
-  final bool _warningsAsErrors;
   Map<String, VarDefinition> _allVarDefinitions =
       new Map<String, VarDefinition>();
 
@@ -21,7 +20,7 @@ class PolyFill {
    * CSS pseudo-elements 'name::custom-element' is mapped to the manged name
    * associated with the pseudo-element key.
    */
-  PolyFill(this._messages, this._warningsAsErrors);
+  PolyFill(this._messages);
 
   /**
    * Run the analyzer on every file that is a style sheet or any component that
@@ -227,7 +226,7 @@ VarDefinition _findTerminalVarDefinition(
   var expressions = varDef.expression as Expressions;
   for (var expr in expressions.expressions) {
     if (expr is VarUsage) {
-      var usageName = (expr as VarUsage).name;
+      var usageName = expr.name;
       var foundDef = varDefs[usageName];
 
       // If foundDef is unknown check if defaultValues; if it exist then resolve
@@ -236,7 +235,7 @@ VarDefinition _findTerminalVarDefinition(
         // We're either a VarUsage or terminal definition if in varDefs;
         // either way replace VarUsage with it's default value because the
         // VarDefinition isn't found.
-        var defaultValues = (expr as VarUsage).defaultValues;
+        var defaultValues = expr.defaultValues;
         var replaceExprs = expressions.expressions;
         assert(replaceExprs.length == 1);
         replaceExprs.replaceRange(0, 1, defaultValues);

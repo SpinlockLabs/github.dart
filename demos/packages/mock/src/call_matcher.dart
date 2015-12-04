@@ -4,7 +4,7 @@
 
 library mock.call_matcher;
 
-import 'package:unittest/unittest.dart';
+import 'package:matcher/matcher.dart';
 
 import 'util.dart';
 

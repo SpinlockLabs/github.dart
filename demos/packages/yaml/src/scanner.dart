@@ -292,7 +292,7 @@ class Scanner {
   ///
   /// [sourceUrl] can be a String or a [Uri].
   Scanner(String source, {sourceUrl})
-      : _scanner = new SpanScanner(source, sourceUrl: sourceUrl);
+      : _scanner = new SpanScanner.eager(source, sourceUrl: sourceUrl);
 
   /// Consumes and returns the next token.
   Token scan() {
@@ -443,7 +443,8 @@ class Scanner {
           var token = _tokens.last;
           if (token.type == TokenType.FLOW_SEQUENCE_END ||
               token.type == TokenType.FLOW_MAPPING_END ||
-              (token.type == TokenType.SCALAR && token.style.isQuoted)) {
+              (token.type == TokenType.SCALAR &&
+                  (token as ScalarToken).style.isQuoted)) {
             _fetchValue();
             return;
           }
@@ -485,7 +486,7 @@ class Scanner {
       // everything but multiline simple keys in a block context.
       if (!_inBlockContext) continue;
 
-      if (key.location.line == _scanner.line) continue;
+      if (key.line == _scanner.line) continue;
 
       if (key.required) {
         throw new YamlException("Expected ':'.", _scanner.emptySpan);
@@ -513,6 +514,8 @@ class Scanner {
     _removeSimpleKey();
     _simpleKeys[_simpleKeys.length - 1] = new _SimpleKey(
         _tokensParsed + _tokens.length,
+        _scanner.line,
+        _scanner.column,
         _scanner.location,
         required: required);
   }
@@ -660,7 +663,7 @@ class Scanner {
       _rollIndent(
           _scanner.column,
           TokenType.BLOCK_SEQUENCE_START,
-          _scanner.emptySpan.start);
+          _scanner.location);
     } else {
       // It is an error for the '-' indicator to occur in the flow context, but
       // we let the Parser detect and report it because it's able to point to
@@ -683,7 +686,7 @@ class Scanner {
       _rollIndent(
           _scanner.column,
           TokenType.BLOCK_MAPPING_START,
-          _scanner.emptySpan.start);
+          _scanner.location);
     }
 
     // Simple keys are allowed after `?` in a block context.
@@ -703,7 +706,7 @@ class Scanner {
       // In the block context, we may need to add the
       // [TokenType.BLOCK_MAPPING_START] token.
       _rollIndent(
-          simpleKey.location.column,
+          simpleKey.column,
           TokenType.BLOCK_MAPPING_START,
           simpleKey.location,
           tokenNumber: simpleKey.tokenNumber);
@@ -1639,10 +1642,23 @@ class _SimpleKey {
   /// no longer on the current line.
   final SourceLocation location;
 
+  /// The line on which the key appears.
+  ///
+  /// We could get this from [location], but that requires a binary search
+  /// whereas this is O(1).
+  final int line;
+
+  /// The column on which the key appears.
+  ///
+  /// We could get this from [location], but that requires a binary search
+  /// whereas this is O(1).
+  final int column;
+
   /// Whether this key must exist for the document to be scanned.
   final bool required;
 
-  _SimpleKey(this.tokenNumber, this.location, {bool required})
+  _SimpleKey(this.tokenNumber, this.line, this.column, this.location,
+          {bool required})
       : required = required;
 }
 

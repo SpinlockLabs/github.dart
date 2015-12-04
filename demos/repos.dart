@@ -54,7 +54,8 @@ void updateRepos(List<Repository> repos,
   document.querySelector("#repos").children.clear();
   repos.sort(compare);
   for (var repo in repos) {
-    $repos.appendHtml("""
+    $repos.appendHtml(
+        """
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.htmlUrl}">${repo.name}</a></h2>
@@ -72,7 +73,8 @@ void updateRepos(List<Repository> repos,
           <b>Size</b>: ${repo.size} bytes
           <p></p>
         </div>
-      """);
+      """,
+        treeSanitizer: NodeTreeSanitizer.trusted);
   }
 }
 

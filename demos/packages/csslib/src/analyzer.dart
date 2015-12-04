@@ -463,8 +463,8 @@ class TopLevelIncludes extends Visitor {
       } else if (currDef is MixinRulesetDirective && _anyRulesets(currDef)) {
         // currDef is MixinRulesetDirective
         MixinRulesetDirective mixinRuleset = currDef;
-        int index = mixinRuleset.rulesets.indexOf(node as dynamic);
-        mixinRuleset.rulesets.replaceRange(index, index + 1, [new NoOp()]);
+        int index = mixinRuleset.rulesets.indexOf(node);
+        mixinRuleset.rulesets.removeAt(index);
         _messages.warning(
             'Using declaration mixin ${node.name} as top-level mixin',
             node.span);
@@ -472,13 +472,12 @@ class TopLevelIncludes extends Visitor {
     } else {
       if (currDef is MixinRulesetDirective) {
         MixinRulesetDirective rulesetDirect = currDef as MixinRulesetDirective;
-        var index = 0;
-        rulesetDirect.rulesets.forEach((entry) {
+        rulesetDirect.rulesets.removeWhere((entry) {
           if (entry == node) {
-            rulesetDirect.rulesets.replaceRange(index, index + 1, [new NoOp()]);
             _messages.warning('Undefined mixin ${node.name}', node.span);
+            return true;
           }
-          index++;
+          return false;
         });
       }
     }

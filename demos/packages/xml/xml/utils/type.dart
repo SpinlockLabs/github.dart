@@ -1,9 +1,8 @@
 part of xml;
 
-/**
- * Enum of the different XML Node types.
- */
+/// Enum of the different XML Node types.
 class XmlNodeType {
+
   static const ELEMENT = const XmlNodeType._('ELEMENT');
   static const ATTRIBUTE = const XmlNodeType._('ATTRIBUTE');
   static const TEXT = const XmlNodeType._('TEXT');
@@ -11,6 +10,7 @@ class XmlNodeType {
   static const PROCESSING = const XmlNodeType._('PROCESSING');
   static const COMMENT = const XmlNodeType._('COMMENT');
   static const DOCUMENT = const XmlNodeType._('DOCUMENT');
+  static const DOCUMENT_FRAGMENT = const XmlNodeType._('DOCUMENT_FRAGMENT');
   static const DOCUMENT_TYPE = const XmlNodeType._('DOCUMENT_TYPE');
 
   final String _type;
@@ -19,4 +19,5 @@ class XmlNodeType {
 
   @override
   String toString() => 'XmlNodeType.$_type';
+
 }

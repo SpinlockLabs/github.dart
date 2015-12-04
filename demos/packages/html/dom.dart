@@ -442,6 +442,12 @@ class Element extends Node with _ParentNode, _ElementAndDocument {
   /// of this element.
   final String localName;
 
+  // TODO(jmesserly): consider using an Expando for this, and put it in
+  // dom_parsing. Need to check the performance affect.
+  /// The source span of the end tag this element, if it was created by the
+  /// [HtmlParser]. May be `null` if does not have an implicit end tag.
+  FileSpan endSourceSpan;
+
   Element._(this.localName, [this.namespaceUri]) : super._();
 
   Element.tag(this.localName)

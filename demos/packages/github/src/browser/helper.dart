@@ -29,7 +29,7 @@ class GitHubBrowserHelper {
         e.hidden = false;
         e.setAttribute("rendered", "");
         e.classes.add("markdown-body");
-        e.innerHtml = html;
+        e.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
       });
     }
   }

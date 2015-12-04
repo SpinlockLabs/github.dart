@@ -79,16 +79,35 @@ Style get style => context.style;
 /// In the browser, this means the current URL, without the last file segment.
 String get current {
   var uri = Uri.base;
+
+  // Converting the base URI to a file path is pretty slow, and the base URI
+  // rarely changes in practice, so we cache the result here.
+  if (uri == _currentUriBase) return _current;
+  _currentUriBase = uri;
+
   if (Style.platform == Style.url) {
-    return uri.resolve('.').toString();
+    _current = uri.resolve('.').toString();
+    return _current;
   } else {
     var path = uri.toFilePath();
     // Remove trailing '/' or '\'.
-    int lastIndex = path.length - 1;
+    var lastIndex = path.length - 1;
     assert(path[lastIndex] == '/' || path[lastIndex] == '\\');
-    return path.substring(0, lastIndex);
+    _current = path.substring(0, lastIndex);
+    return _current;
   }
 }
+
+/// The last value returned by [Uri.base].
+///
+/// This is used to cache the current working directory.
+Uri _currentUriBase;
+
+/// The last known value of the current working directory.
+///
+/// This is cached because [current] is called frequently but rarely actually
+/// changes.
+String _current;
 
 /// Gets the path separator for the current platform. This is `\` on Windows
 /// and `/` on other platforms (including the browser).

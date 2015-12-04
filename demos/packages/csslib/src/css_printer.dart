@@ -38,6 +38,12 @@ class CssPrinter extends Visitor {
   //              flag for obfuscation.
   bool get _isTesting => !prettyPrint;
 
+  void visitCalcTerm(CalcTerm node) {
+    emit('${node.text}(');
+    node.expr.visit(this);
+    emit(')');
+  }
+
   void visitCssComment(CssComment node) {
     emit('/* ${node.comment} */');
   }

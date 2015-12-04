@@ -6,6 +6,7 @@ library string_scanner.span_scanner;
 
 import 'package:source_span/source_span.dart';
 
+import 'eager_span_scanner.dart';
 import 'exception.dart';
 import 'line_scanner.dart';
 import 'string_scanner.dart';
@@ -55,6 +56,20 @@ class SpanScanner extends StringScanner implements LineScanner {
   SpanScanner(String string, {sourceUrl, int position})
       : _sourceFile = new SourceFile(string, url: sourceUrl),
         super(string, sourceUrl: sourceUrl, position: position);
+
+  /// Creates a new [SpanScanner] that eagerly computes line and column numbers.
+  ///
+  /// In general [new SpanScanner] will be more efficient, since it avoids extra
+  /// computation on every scan. However, eager scanning can be useful for
+  /// situations where the normal course of parsing frequently involves
+  /// accessing the current line and column numbers.
+  ///
+  /// Note that *only* the `line` and `column` fields on the `SpanScanner`
+  /// itself and its `LineScannerState` are eagerly computed. To limit their
+  /// memory footprint, returned spans and locations will still lazily compute
+  /// their line and column numbers.
+  factory SpanScanner.eager(String string, {sourceUrl, int position}) =
+      EagerSpanScanner;
 
   /// Creates a [FileSpan] representing the source range between [startState]
   /// and the current position.

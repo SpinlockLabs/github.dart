@@ -4,7 +4,7 @@
 
 library mock.log_entry_list;
 
-import 'package:unittest/unittest.dart';
+import 'package:matcher/matcher.dart';
 
 import 'call_matcher.dart';
 import 'log_entry.dart';
@@ -97,11 +97,7 @@ class LogEntryList {
 
   /** Apply a unit test [Matcher] to the [LogEntryList]. */
   LogEntryList verify(Matcher matcher) {
-    if (_mockFailureHandler == null) {
-      _mockFailureHandler =
-          new _MockFailureHandler(getOrCreateExpectFailureHandler());
-    }
-    expect(logs, matcher, reason: filter, failureHandler: _mockFailureHandler);
+    _expect(logs, matcher, reason: filter);
     return this;
   }
 
@@ -120,10 +116,6 @@ class LogEntryList {
    * do this check.
    */
   bool stepwiseValidate(StepValidator validator, [String reason = '']) {
-    if (_mockFailureHandler == null) {
-      _mockFailureHandler =
-          new _MockFailureHandler(getOrCreateExpectFailureHandler());
-    }
     var i = 0;
     while (i < logs.length) {
       var n = validator(logs, i);
@@ -131,8 +123,8 @@ class LogEntryList {
         if (reason.length > 0) {
           reason = ': $reason';
         }
-        _mockFailureHandler.fail("Stepwise validation failed at $filter "
-                                 "position $i$reason");
+        throw new LogEntryListFailure(
+            "Stepwise validation failed at $filter position $i$reason");
         return false;
       } else {
         i += n;
@@ -527,24 +519,32 @@ class LogEntryList {
           distance, includeKeys);
 }
 
-_MockFailureHandler _mockFailureHandler = null;
+/// An exception thrown when an assertion in [LogEntryList] fails.
+class LogEntryListFailure {
+  final String message;
+  LogEntryListFailure(this.message);
 
-/**
- * The failure handler for the [expect()] calls that occur in [verify()]
- * methods in the mock objects. This calls the real failure handler used
- * by the unit test library after formatting the error message with
- * the custom formatter.
- */
-class _MockFailureHandler implements FailureHandler {
-  FailureHandler proxy;
-  _MockFailureHandler(this.proxy);
-  void fail(String reason) {
-    proxy.fail(reason);
+  String toString() => message;
+}
+
+/// Emulates the behavior of `expect` from the `test` package.
+///
+/// Throws `LogEntryListFailure` on failure.
+void _expect(actual, matcher, {String reason, bool verbose: false}) {
+  matcher = wrapMatcher(matcher);
+  var doesMatch;
+  var matchState = {};
+  try {
+    doesMatch = matcher.matches(actual, matchState);
+  } catch (e, trace) {
+    doesMatch = false;
+    if (reason == null) {
+      reason = '$e at $trace';
+    }
   }
-  void failMatch(actual, Matcher matcher, String reason,
-                 Map matchState, bool verbose) {
-    proxy.fail(_mockingErrorFormatter(actual, matcher, reason,
-        matchState, verbose));
+  if (!doesMatch) {
+    throw new LogEntryListFailure(
+        _mockingErrorFormatter(actual, matcher, reason, matchState, verbose));
   }
 }
 
@@ -554,11 +554,13 @@ class _MockFailureHandler implements FailureHandler {
  * it is instead a [signature] describing the method signature filter
  * that was used to select the logs that were verified.
  */
-String _mockingErrorFormatter(actual, Matcher matcher, String signature,
-                              Map matchState, bool verbose) {
+String _mockingErrorFormatter(
+    actual, Matcher matcher, String signature, Map matchState, bool verbose) {
   var description = new StringDescription();
-  description.add('Expected ${signature} ').addDescriptionOf(matcher).
-      add('\n     but: ');
+  description
+      .add('Expected ${signature} ')
+      .addDescriptionOf(matcher)
+      .add('\n     but: ');
   matcher.describeMismatch(actual, description, matchState, verbose).add('.');
   return description.toString();
 }

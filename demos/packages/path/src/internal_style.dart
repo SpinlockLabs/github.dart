@@ -57,8 +57,14 @@ abstract class InternalStyle extends Style {
   String pathFromUri(Uri uri);
 
   /// Returns the URI that represents the relative path made of [parts].
-  Uri relativePathToUri(String path) =>
-      new Uri(pathSegments: context.split(path));
+  Uri relativePathToUri(String path) {
+    var segments = context.split(path);
+
+    // Ensure that a trailing slash in the path produces a trailing slash in the
+    // URL.
+    if (isSeparator(path.codeUnitAt(path.length - 1))) segments.add('');
+    return new Uri(pathSegments: segments);
+  }
 
   /// Returns the URI that represents [path], which is assumed to be absolute.
   Uri absolutePathToUri(String path);

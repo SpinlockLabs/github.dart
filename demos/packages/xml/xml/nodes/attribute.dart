@@ -1,20 +1,15 @@
 part of xml;
 
-/**
- * XML attribute node.
- */
+/// XML attribute node.
 class XmlAttribute extends XmlNode implements XmlNamed {
+
   @override
   final XmlName name;
 
-  /**
-   * Return the value of the attribute.
-   */
+  /// Return the value of the attribute.
   final String value;
 
-  /**
-   * Create an attribute with `name` and `value`.
-   */
+  /// Create an attribute with `name` and `value`.
   XmlAttribute(this.name, this.value) {
     assert(this.name._parent == null);
     this.name._parent = this;
@@ -25,4 +20,5 @@ class XmlAttribute extends XmlNode implements XmlNamed {
 
   @override
   accept(XmlVisitor visitor) => visitor.visitAttribute(this);
+
 }

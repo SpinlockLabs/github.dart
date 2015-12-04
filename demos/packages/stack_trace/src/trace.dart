@@ -10,10 +10,11 @@ import 'dart:math' as math;
 import 'chain.dart';
 import 'frame.dart';
 import 'lazy_trace.dart';
+import 'unparsed_frame.dart';
 import 'utils.dart';
 import 'vm_trace.dart';
 
-final _terseRegExp = new RegExp(r"(-patch)?(/.*)?$");
+final _terseRegExp = new RegExp(r"(-patch)?([/\\].*)?$");
 
 /// A RegExp to match V8's stack traces.
 ///
@@ -110,15 +111,17 @@ class Trace implements StackTrace {
   /// Parses a string representation of a stack trace.
   ///
   /// [trace] should be formatted in the same way as a Dart VM or browser stack
-  /// trace.
+  /// trace. If it's formatted as a stack chain, this will return the equivalent
+  /// of [Chain.toTrace].
   factory Trace.parse(String trace) {
     try {
       if (trace.isEmpty) return new Trace(<Frame>[]);
       if (trace.contains(_v8Trace)) return new Trace.parseV8(trace);
-      if (trace.startsWith("\tat ")) return new Trace.parseJSCore(trace);
+      if (trace.contains("\tat ")) return new Trace.parseJSCore(trace);
       if (trace.contains(_firefoxSafariTrace)) {
         return new Trace.parseFirefox(trace);
       }
+      if (trace.contains(chainGap)) return new Chain.parse(trace).toTrace();
       if (trace.contains(_friendlyTrace)) {
         return new Trace.parseFriendly(trace);
       }
@@ -262,7 +265,7 @@ class Trace implements StackTrace {
 
     var newFrames = [];
     for (var frame in frames.reversed) {
-      if (!predicate(frame)) {
+      if (frame is UnparsedFrame || !predicate(frame)) {
         newFrames.add(frame);
       } else if (newFrames.isEmpty || !predicate(newFrames.last)) {
         newFrames.add(new Frame(
@@ -272,7 +275,7 @@ class Trace implements StackTrace {
 
     if (terse) {
       newFrames = newFrames.map((frame) {
-        if (!predicate(frame)) return frame;
+        if (frame is UnparsedFrame || !predicate(frame)) return frame;
         var library = frame.library.replaceAll(_terseRegExp, '');
         return new Frame(Uri.parse(library), null, null, frame.member);
       }).toList();
@@ -290,6 +293,7 @@ class Trace implements StackTrace {
 
     // Print out the stack trace nicely formatted.
     return frames.map((frame) {
+      if (frame is UnparsedFrame) return "$frame\n";
       return '${padRight(frame.location, longest)}  ${frame.member}\n';
     }).join();
   }

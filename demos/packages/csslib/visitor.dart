@@ -13,99 +13,100 @@ part 'src/tree_base.dart';
 part 'src/tree_printer.dart';
 
 abstract class VisitorBase {
-  void visitCssComment(CssComment node);
-  void visitCommentDefinition(CommentDefinition node);
-  void visitStyleSheet(StyleSheet node);
-  void visitNoOp(NoOp node);
-  void visitTopLevelProduction(TopLevelProduction node);
-  void visitDirective(Directive node);
-  void visitMediaExpression(MediaExpression node);
-  void visitMediaQuery(MediaQuery node);
-  void visitMediaDirective(MediaDirective node);
-  void visitHostDirective(HostDirective node);
-  void visitPageDirective(PageDirective node);
-  void visitCharsetDirective(CharsetDirective node);
-  void visitImportDirective(ImportDirective node);
-  void visitKeyFrameDirective(KeyFrameDirective node);
-  void visitKeyFrameBlock(KeyFrameBlock node);
-  void visitFontFaceDirective(FontFaceDirective node);
-  void visitStyletDirective(StyletDirective node);
-  void visitNamespaceDirective(NamespaceDirective node);
-  void visitVarDefinitionDirective(VarDefinitionDirective node);
-  void visitMixinDefinition(MixinDefinition node);
-  void visitMixinRulesetDirective(MixinRulesetDirective node);
-  void visitMixinDeclarationDirective(MixinDeclarationDirective node);
-  void visitIncludeDirective(IncludeDirective node);
-  void visitContentDirective(ContentDirective node);
+  visitCalcTerm(CalcTerm node);
+  visitCssComment(CssComment node);
+  visitCommentDefinition(CommentDefinition node);
+  visitStyleSheet(StyleSheet node);
+  visitNoOp(NoOp node);
+  visitTopLevelProduction(TopLevelProduction node);
+  visitDirective(Directive node);
+  visitMediaExpression(MediaExpression node);
+  visitMediaQuery(MediaQuery node);
+  visitMediaDirective(MediaDirective node);
+  visitHostDirective(HostDirective node);
+  visitPageDirective(PageDirective node);
+  visitCharsetDirective(CharsetDirective node);
+  visitImportDirective(ImportDirective node);
+  visitKeyFrameDirective(KeyFrameDirective node);
+  visitKeyFrameBlock(KeyFrameBlock node);
+  visitFontFaceDirective(FontFaceDirective node);
+  visitStyletDirective(StyletDirective node);
+  visitNamespaceDirective(NamespaceDirective node);
+  visitVarDefinitionDirective(VarDefinitionDirective node);
+  visitMixinDefinition(MixinDefinition node);
+  visitMixinRulesetDirective(MixinRulesetDirective node);
+  visitMixinDeclarationDirective(MixinDeclarationDirective node);
+  visitIncludeDirective(IncludeDirective node);
+  visitContentDirective(ContentDirective node);
 
-  void visitRuleSet(RuleSet node);
-  void visitDeclarationGroup(DeclarationGroup node);
-  void visitMarginGroup(MarginGroup node);
-  void visitDeclaration(Declaration node);
-  void visitVarDefinition(VarDefinition node);
-  void visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node);
-  void visitExtendDeclaration(ExtendDeclaration node);
-  void visitSelectorGroup(SelectorGroup node);
-  void visitSelector(Selector node);
-  void visitSimpleSelectorSequence(SimpleSelectorSequence node);
-  void visitSimpleSelector(SimpleSelector node);
-  void visitElementSelector(ElementSelector node);
-  void visitNamespaceSelector(NamespaceSelector node);
-  void visitAttributeSelector(AttributeSelector node);
-  void visitIdSelector(IdSelector node);
-  void visitClassSelector(ClassSelector node);
-  void visitPseudoClassSelector(PseudoClassSelector node);
-  void visitPseudoElementSelector(PseudoElementSelector node);
-  void visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node);
-  void visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node);
-  void visitNegationSelector(NegationSelector node);
-  void visitSelectorExpression(SelectorExpression node);
+  visitRuleSet(RuleSet node);
+  visitDeclarationGroup(DeclarationGroup node);
+  visitMarginGroup(MarginGroup node);
+  visitDeclaration(Declaration node);
+  visitVarDefinition(VarDefinition node);
+  visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node);
+  visitExtendDeclaration(ExtendDeclaration node);
+  visitSelectorGroup(SelectorGroup node);
+  visitSelector(Selector node);
+  visitSimpleSelectorSequence(SimpleSelectorSequence node);
+  visitSimpleSelector(SimpleSelector node);
+  visitElementSelector(ElementSelector node);
+  visitNamespaceSelector(NamespaceSelector node);
+  visitAttributeSelector(AttributeSelector node);
+  visitIdSelector(IdSelector node);
+  visitClassSelector(ClassSelector node);
+  visitPseudoClassSelector(PseudoClassSelector node);
+  visitPseudoElementSelector(PseudoElementSelector node);
+  visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node);
+  visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node);
+  visitNegationSelector(NegationSelector node);
+  visitSelectorExpression(SelectorExpression node);
 
-  void visitUnicodeRangeTerm(UnicodeRangeTerm node);
-  void visitLiteralTerm(LiteralTerm node);
-  void visitHexColorTerm(HexColorTerm node);
-  void visitNumberTerm(NumberTerm node);
-  void visitUnitTerm(UnitTerm node);
-  void visitLengthTerm(LengthTerm node);
-  void visitPercentageTerm(PercentageTerm node);
-  void visitEmTerm(EmTerm node);
-  void visitExTerm(ExTerm node);
-  void visitAngleTerm(AngleTerm node);
-  void visitTimeTerm(TimeTerm node);
-  void visitFreqTerm(FreqTerm node);
-  void visitFractionTerm(FractionTerm node);
-  void visitUriTerm(UriTerm node);
-  void visitResolutionTerm(ResolutionTerm node);
-  void visitChTerm(ChTerm node);
-  void visitRemTerm(RemTerm node);
-  void visitViewportTerm(ViewportTerm node);
-  void visitFunctionTerm(FunctionTerm node);
-  void visitGroupTerm(GroupTerm node);
-  void visitItemTerm(ItemTerm node);
-  void visitIE8Term(IE8Term node);
-  void visitOperatorSlash(OperatorSlash node);
-  void visitOperatorComma(OperatorComma node);
-  void visitOperatorPlus(OperatorPlus node);
-  void visitOperatorMinus(OperatorMinus node);
-  void visitVarUsage(VarUsage node);
+  visitUnicodeRangeTerm(UnicodeRangeTerm node);
+  visitLiteralTerm(LiteralTerm node);
+  visitHexColorTerm(HexColorTerm node);
+  visitNumberTerm(NumberTerm node);
+  visitUnitTerm(UnitTerm node);
+  visitLengthTerm(LengthTerm node);
+  visitPercentageTerm(PercentageTerm node);
+  visitEmTerm(EmTerm node);
+  visitExTerm(ExTerm node);
+  visitAngleTerm(AngleTerm node);
+  visitTimeTerm(TimeTerm node);
+  visitFreqTerm(FreqTerm node);
+  visitFractionTerm(FractionTerm node);
+  visitUriTerm(UriTerm node);
+  visitResolutionTerm(ResolutionTerm node);
+  visitChTerm(ChTerm node);
+  visitRemTerm(RemTerm node);
+  visitViewportTerm(ViewportTerm node);
+  visitFunctionTerm(FunctionTerm node);
+  visitGroupTerm(GroupTerm node);
+  visitItemTerm(ItemTerm node);
+  visitIE8Term(IE8Term node);
+  visitOperatorSlash(OperatorSlash node);
+  visitOperatorComma(OperatorComma node);
+  visitOperatorPlus(OperatorPlus node);
+  visitOperatorMinus(OperatorMinus node);
+  visitVarUsage(VarUsage node);
 
-  void visitExpressions(Expressions node);
-  void visitBinaryExpression(BinaryExpression node);
-  void visitUnaryExpression(UnaryExpression node);
+  visitExpressions(Expressions node);
+  visitBinaryExpression(BinaryExpression node);
+  visitUnaryExpression(UnaryExpression node);
 
-  void visitIdentifier(Identifier node);
-  void visitWildcard(Wildcard node);
-  void visitThisOperator(ThisOperator node);
-  void visitNegation(Negation node);
+  visitIdentifier(Identifier node);
+  visitWildcard(Wildcard node);
+  visitThisOperator(ThisOperator node);
+  visitNegation(Negation node);
 
-  void visitDartStyleExpression(DartStyleExpression node);
-  void visitFontExpression(FontExpression node);
-  void visitBoxExpression(BoxExpression node);
-  void visitMarginExpression(MarginExpression node);
-  void visitBorderExpression(BorderExpression node);
-  void visitHeightExpression(HeightExpression node);
-  void visitPaddingExpression(PaddingExpression node);
-  void visitWidthExpression(WidthExpression node);
+  visitDartStyleExpression(DartStyleExpression node);
+  visitFontExpression(FontExpression node);
+  visitBoxExpression(BoxExpression node);
+  visitMarginExpression(MarginExpression node);
+  visitBorderExpression(BorderExpression node);
+  visitHeightExpression(HeightExpression node);
+  visitPaddingExpression(PaddingExpression node);
+  visitWidthExpression(WidthExpression node);
 }
 
 /** Base vistor class for the style sheet AST. */
@@ -120,33 +121,38 @@ class Visitor implements VisitorBase {
     }
   }
 
-  void visitTree(StyleSheet tree) => visitStyleSheet(tree);
+  visitTree(StyleSheet tree) => visitStyleSheet(tree);
 
-  void visitStyleSheet(StyleSheet ss) {
+  visitStyleSheet(StyleSheet ss) {
     _visitNodeList(ss.topLevels);
   }
 
-  void visitNoOp(NoOp node) {}
+  visitNoOp(NoOp node) {}
 
-  void visitTopLevelProduction(TopLevelProduction node) {}
+  visitTopLevelProduction(TopLevelProduction node) {}
 
-  void visitDirective(Directive node) {}
+  visitDirective(Directive node) {}
 
-  void visitCssComment(CssComment node) {}
+  visitCalcTerm(CalcTerm node) {
+    visitLiteralTerm(node);
+    visitLiteralTerm(node.expr);
+  }
 
-  void visitCommentDefinition(CommentDefinition node) {}
+  visitCssComment(CssComment node) {}
 
-  void visitMediaExpression(MediaExpression node) {
+  visitCommentDefinition(CommentDefinition node) {}
+
+  visitMediaExpression(MediaExpression node) {
     visitExpressions(node.exprs);
   }
 
-  void visitMediaQuery(MediaQuery node) {
+  visitMediaQuery(MediaQuery node) {
     for (var mediaExpr in node.expressions) {
       visitMediaExpression(mediaExpr);
     }
   }
 
-  void visitMediaDirective(MediaDirective node) {
+  visitMediaDirective(MediaDirective node) {
     for (var mediaQuery in node.mediaQueries) {
       visitMediaQuery(mediaQuery);
     }
@@ -155,13 +161,13 @@ class Visitor implements VisitorBase {
     }
   }
 
-  void visitHostDirective(HostDirective node) {
+  visitHostDirective(HostDirective node) {
     for (var ruleset in node.rulesets) {
       visitRuleSet(ruleset);
     }
   }
 
-  void visitPageDirective(PageDirective node) {
+  visitPageDirective(PageDirective node) {
     for (var declGroup in node._declsMargin) {
       if (declGroup is MarginGroup) {
         visitMarginGroup(declGroup);
@@ -171,285 +177,285 @@ class Visitor implements VisitorBase {
     }
   }
 
-  void visitCharsetDirective(CharsetDirective node) {}
+  visitCharsetDirective(CharsetDirective node) {}
 
-  void visitImportDirective(ImportDirective node) {
+  visitImportDirective(ImportDirective node) {
     for (var mediaQuery in node.mediaQueries) {
       visitMediaQuery(mediaQuery);
     }
   }
 
-  void visitKeyFrameDirective(KeyFrameDirective node) {
+  visitKeyFrameDirective(KeyFrameDirective node) {
     visitIdentifier(node.name);
     _visitNodeList(node._blocks);
   }
 
-  void visitKeyFrameBlock(KeyFrameBlock node) {
+  visitKeyFrameBlock(KeyFrameBlock node) {
     visitExpressions(node._blockSelectors);
     visitDeclarationGroup(node._declarations);
   }
 
-  void visitFontFaceDirective(FontFaceDirective node) {
+  visitFontFaceDirective(FontFaceDirective node) {
     visitDeclarationGroup(node._declarations);
   }
 
-  void visitStyletDirective(StyletDirective node) {
+  visitStyletDirective(StyletDirective node) {
     _visitNodeList(node.rulesets);
   }
 
-  void visitNamespaceDirective(NamespaceDirective node) {}
+  visitNamespaceDirective(NamespaceDirective node) {}
 
-  void visitVarDefinitionDirective(VarDefinitionDirective node) {
+  visitVarDefinitionDirective(VarDefinitionDirective node) {
     visitVarDefinition(node.def);
   }
 
-  void visitMixinRulesetDirective(MixinRulesetDirective node) {
+  visitMixinRulesetDirective(MixinRulesetDirective node) {
     _visitNodeList(node.rulesets);
   }
 
-  void visitMixinDefinition(MixinDefinition node) {}
+  visitMixinDefinition(MixinDefinition node) {}
 
-  void visitMixinDeclarationDirective(MixinDeclarationDirective node) {
+  visitMixinDeclarationDirective(MixinDeclarationDirective node) {
     visitDeclarationGroup(node.declarations);
   }
 
-  void visitIncludeDirective(IncludeDirective node) {
+  visitIncludeDirective(IncludeDirective node) {
     for (var index = 0; index < node.args.length; index++) {
       var param = node.args[index];
       _visitNodeList(param);
     }
   }
 
-  void visitContentDirective(ContentDirective node) {
+  visitContentDirective(ContentDirective node) {
     // TODO(terry): TBD
   }
 
-  void visitRuleSet(RuleSet node) {
+  visitRuleSet(RuleSet node) {
     visitSelectorGroup(node._selectorGroup);
     visitDeclarationGroup(node._declarationGroup);
   }
 
-  void visitDeclarationGroup(DeclarationGroup node) {
+  visitDeclarationGroup(DeclarationGroup node) {
     _visitNodeList(node.declarations);
   }
 
-  void visitMarginGroup(MarginGroup node) => visitDeclarationGroup(node);
+  visitMarginGroup(MarginGroup node) => visitDeclarationGroup(node);
 
-  void visitDeclaration(Declaration node) {
+  visitDeclaration(Declaration node) {
     visitIdentifier(node._property);
     if (node._expression != null) node._expression.visit(this);
   }
 
-  void visitVarDefinition(VarDefinition node) {
+  visitVarDefinition(VarDefinition node) {
     visitIdentifier(node._property);
     if (node._expression != null) node._expression.visit(this);
   }
 
-  void visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node) {
+  visitIncludeMixinAtDeclaration(IncludeMixinAtDeclaration node) {
     visitIncludeDirective(node.include);
   }
 
-  void visitExtendDeclaration(ExtendDeclaration node) {
+  visitExtendDeclaration(ExtendDeclaration node) {
     _visitNodeList(node.selectors);
   }
 
-  void visitSelectorGroup(SelectorGroup node) {
+  visitSelectorGroup(SelectorGroup node) {
     _visitNodeList(node.selectors);
   }
 
-  void visitSelector(Selector node) {
+  visitSelector(Selector node) {
     _visitNodeList(node.simpleSelectorSequences);
   }
 
-  void visitSimpleSelectorSequence(SimpleSelectorSequence node) {
+  visitSimpleSelectorSequence(SimpleSelectorSequence node) {
     node.simpleSelector.visit(this);
   }
 
-  void visitSimpleSelector(SimpleSelector node) => node._name.visit(this);
+  visitSimpleSelector(SimpleSelector node) => node._name.visit(this);
 
-  void visitNamespaceSelector(NamespaceSelector node) {
+  visitNamespaceSelector(NamespaceSelector node) {
     if (node._namespace != null) node._namespace.visit(this);
     if (node.nameAsSimpleSelector != null) {
       node.nameAsSimpleSelector.visit(this);
     }
   }
 
-  void visitElementSelector(ElementSelector node) => visitSimpleSelector(node);
+  visitElementSelector(ElementSelector node) => visitSimpleSelector(node);
 
-  void visitAttributeSelector(AttributeSelector node) {
+  visitAttributeSelector(AttributeSelector node) {
     visitSimpleSelector(node);
   }
 
-  void visitIdSelector(IdSelector node) => visitSimpleSelector(node);
+  visitIdSelector(IdSelector node) => visitSimpleSelector(node);
 
-  void visitClassSelector(ClassSelector node) => visitSimpleSelector(node);
+  visitClassSelector(ClassSelector node) => visitSimpleSelector(node);
 
-  void visitPseudoClassSelector(PseudoClassSelector node) =>
+  visitPseudoClassSelector(PseudoClassSelector node) =>
       visitSimpleSelector(node);
 
-  void visitPseudoElementSelector(PseudoElementSelector node) =>
+  visitPseudoElementSelector(PseudoElementSelector node) =>
       visitSimpleSelector(node);
 
-  void visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node) =>
+  visitPseudoClassFunctionSelector(PseudoClassFunctionSelector node) =>
       visitSimpleSelector(node);
 
-  void visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node) =>
+  visitPseudoElementFunctionSelector(PseudoElementFunctionSelector node) =>
       visitSimpleSelector(node);
 
-  void visitNegationSelector(NegationSelector node) =>
+  visitNegationSelector(NegationSelector node) =>
       visitSimpleSelector(node);
 
-  void visitSelectorExpression(SelectorExpression node) {
+  visitSelectorExpression(SelectorExpression node) {
     _visitNodeList(node.expressions);
   }
 
-  void visitUnicodeRangeTerm(UnicodeRangeTerm node) {}
+  visitUnicodeRangeTerm(UnicodeRangeTerm node) {}
 
-  void visitLiteralTerm(LiteralTerm node) {}
+  visitLiteralTerm(LiteralTerm node) {}
 
-  void visitHexColorTerm(HexColorTerm node) {}
+  visitHexColorTerm(HexColorTerm node) {}
 
-  void visitNumberTerm(NumberTerm node) {}
+  visitNumberTerm(NumberTerm node) {}
 
-  void visitUnitTerm(UnitTerm node) {}
+  visitUnitTerm(UnitTerm node) {}
 
-  void visitLengthTerm(LengthTerm node) {
+  visitLengthTerm(LengthTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitPercentageTerm(PercentageTerm node) {
+  visitPercentageTerm(PercentageTerm node) {
     visitLiteralTerm(node);
   }
 
-  void visitEmTerm(EmTerm node) {
+  visitEmTerm(EmTerm node) {
     visitLiteralTerm(node);
   }
 
-  void visitExTerm(ExTerm node) {
+  visitExTerm(ExTerm node) {
     visitLiteralTerm(node);
   }
 
-  void visitAngleTerm(AngleTerm node) {
+  visitAngleTerm(AngleTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitTimeTerm(TimeTerm node) {
+  visitTimeTerm(TimeTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitFreqTerm(FreqTerm node) {
+  visitFreqTerm(FreqTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitFractionTerm(FractionTerm node) {
+  visitFractionTerm(FractionTerm node) {
     visitLiteralTerm(node);
   }
 
-  void visitUriTerm(UriTerm node) {
+  visitUriTerm(UriTerm node) {
     visitLiteralTerm(node);
   }
 
-  void visitResolutionTerm(ResolutionTerm node) {
+  visitResolutionTerm(ResolutionTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitChTerm(ChTerm node) {
+  visitChTerm(ChTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitRemTerm(RemTerm node) {
+  visitRemTerm(RemTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitViewportTerm(ViewportTerm node) {
+  visitViewportTerm(ViewportTerm node) {
     visitUnitTerm(node);
   }
 
-  void visitFunctionTerm(FunctionTerm node) {
+  visitFunctionTerm(FunctionTerm node) {
     visitLiteralTerm(node);
     visitExpressions(node._params);
   }
 
-  void visitGroupTerm(GroupTerm node) {
+  visitGroupTerm(GroupTerm node) {
     for (var term in node._terms) {
       term.visit(this);
     }
   }
 
-  void visitItemTerm(ItemTerm node) {
+  visitItemTerm(ItemTerm node) {
     visitNumberTerm(node);
   }
 
-  void visitIE8Term(IE8Term node) {}
+  visitIE8Term(IE8Term node) {}
 
-  void visitOperatorSlash(OperatorSlash node) {}
+  visitOperatorSlash(OperatorSlash node) {}
 
-  void visitOperatorComma(OperatorComma node) {}
+  visitOperatorComma(OperatorComma node) {}
 
-  void visitOperatorPlus(OperatorPlus node) {}
+  visitOperatorPlus(OperatorPlus node) {}
 
-  void visitOperatorMinus(OperatorMinus node) {}
+  visitOperatorMinus(OperatorMinus node) {}
 
-  void visitVarUsage(VarUsage node) {
+  visitVarUsage(VarUsage node) {
     _visitNodeList(node.defaultValues);
   }
 
-  void visitExpressions(Expressions node) {
+  visitExpressions(Expressions node) {
     _visitNodeList(node.expressions);
   }
 
-  void visitBinaryExpression(BinaryExpression node) {
+  visitBinaryExpression(BinaryExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitUnaryExpression(UnaryExpression node) {
+  visitUnaryExpression(UnaryExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitIdentifier(Identifier node) {}
+  visitIdentifier(Identifier node) {}
 
-  void visitWildcard(Wildcard node) {}
+  visitWildcard(Wildcard node) {}
 
-  void visitThisOperator(ThisOperator node) {}
+  visitThisOperator(ThisOperator node) {}
 
-  void visitNegation(Negation node) {}
+  visitNegation(Negation node) {}
 
-  void visitDartStyleExpression(DartStyleExpression node) {}
+  visitDartStyleExpression(DartStyleExpression node) {}
 
-  void visitFontExpression(FontExpression node) {
+  visitFontExpression(FontExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitBoxExpression(BoxExpression node) {
+  visitBoxExpression(BoxExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitMarginExpression(MarginExpression node) {
+  visitMarginExpression(MarginExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitBorderExpression(BorderExpression node) {
+  visitBorderExpression(BorderExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitHeightExpression(HeightExpression node) {
+  visitHeightExpression(HeightExpression node) {
     // TODO(terry): TB
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitPaddingExpression(PaddingExpression node) {
+  visitPaddingExpression(PaddingExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 
-  void visitWidthExpression(WidthExpression node) {
+  visitWidthExpression(WidthExpression node) {
     // TODO(terry): TBD
-    throw UnimplementedError;
+    throw new UnimplementedError();
   }
 }

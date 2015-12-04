@@ -11,7 +11,11 @@
  * The [List] wrapper prevents changes to the length of the wrapped list,
  * but allows changes to the contents.
  */
-part of dart.pkg.collection.wrappers;
+library collection.unmodifiable_wrappers;
+
+import '../wrappers.dart';
+
+export "dart:collection" show UnmodifiableListView, UnmodifiableMapView;
 
 /**
  * A fixed-length list.
@@ -193,20 +197,6 @@ abstract class UnmodifiableSetMixin<E> implements Set<E> {
 }
 
 /**
- * An unmodifiable map.
- *
- * An UnmodifiableMapView contains a [Map] object and ensures
- * that it does not change.
- * Methods that would change the map,
- * such as [addAll] and [remove], throw an [UnsupportedError].
- * Permitted operations defer to the wrapped map.
- */
-class UnmodifiableMapView<K, V> extends DelegatingMap<K, V>
-                                with UnmodifiableMapMixin<K, V> {
-  UnmodifiableMapView(Map<K, V> baseMap) : super(baseMap);
-}
-
-/**
  * Mixin class that implements a throwing version of all map operations that
  * change the Map.
  */
@@ -237,7 +227,7 @@ abstract class UnmodifiableMapMixin<K, V> implements Map<K, V> {
    * Throws an [UnsupportedError];
    * operations that change the map are disallowed.
    */
-  V remove(K key) => _throw();
+  V remove(Object key) => _throw();
 
   /**
    * Throws an [UnsupportedError];

@@ -1,7 +1,5 @@
-/**
- * This package contains some simple debugging tools.
- */
-library debug;
+/// This package contains some simple debugging tools.
+library petitparser.debug;
 
 import 'package:petitparser/petitparser.dart';
 import 'package:petitparser/reflection.dart';

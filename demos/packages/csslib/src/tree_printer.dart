@@ -46,6 +46,13 @@ class _TreePrinter extends Visitor {
     heading('Directive', node);
   }
 
+  void visitCalcTerm(CalcTerm node) {
+    heading('CalcTerm', node);
+    output.depth++;
+    super.visitCalcTerm(node);
+    output.depth--;
+  }
+
   void visitCssComment(CssComment node) {
     heading('Comment', node);
     output.depth++;

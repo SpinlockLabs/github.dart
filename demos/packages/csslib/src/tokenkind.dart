@@ -192,7 +192,7 @@ class TokenKind {
   static const int PSEUDO_CLASS_NAME = 705; // :pseudoClass
   static const int NEGATION = 706; // NOT
 
-  static const List<Map<int, String>> _DIRECTIVES = const [
+  static const List<Map<String, dynamic>> _DIRECTIVES = const [
     const {'type': TokenKind.DIRECTIVE_IMPORT, 'value': 'import'},
     const {'type': TokenKind.DIRECTIVE_MEDIA, 'value': 'media'},
     const {'type': TokenKind.DIRECTIVE_PAGE, 'value': 'page'},
@@ -218,13 +218,13 @@ class TokenKind {
     const {'type': TokenKind.DIRECTIVE_EXTEND, 'value': 'extend'},
   ];
 
-  static const List<Map<int, String>> MEDIA_OPERATORS = const [
+  static const List<Map<String, dynamic>> MEDIA_OPERATORS = const [
     const {'type': TokenKind.MEDIA_OP_ONLY, 'value': 'only'},
     const {'type': TokenKind.MEDIA_OP_NOT, 'value': 'not'},
     const {'type': TokenKind.MEDIA_OP_AND, 'value': 'and'},
   ];
 
-  static const List<Map<int, String>> MARGIN_DIRECTIVES = const [
+  static const List<Map<String, dynamic>> MARGIN_DIRECTIVES = const [
     const {
       'type': TokenKind.MARGIN_DIRECTIVE_TOPLEFTCORNER,
       'value': 'top-left-corner'

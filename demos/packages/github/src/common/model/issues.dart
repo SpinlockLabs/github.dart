@@ -191,6 +191,9 @@ class IssueLabel {
 
 /// Model class for a milestone.
 class Milestone {
+  /// Unique Identifier for Milestone
+  int id;
+
   /// Milestone Number
   int number;
 
@@ -230,6 +233,7 @@ class Milestone {
     if (input == null) return null;
 
     return new Milestone()
+      ..id = input['id']
       ..number = input['number']
       ..state = input['state']
       ..title = input['title']
@@ -243,7 +247,7 @@ class Milestone {
   }
 }
 
-/// Model class for a new milstone to be created.
+/// Model class for a new milestone to be created.
 class CreateMilestone {
   final String title;
 
@@ -258,7 +262,7 @@ class CreateMilestone {
     putValue("title", title, map);
     putValue("state", state, map);
     putValue(description, description, map);
-    putValue("due_on", dateToGithubIso8601(dueOn), map);
+    putValue("due_on", dateToGitHubIso8601(dueOn), map);
     return JSON.encode(map);
   }
 }

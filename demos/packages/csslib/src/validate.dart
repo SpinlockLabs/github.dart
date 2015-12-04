@@ -53,7 +53,6 @@ class Validate {
   // Validate the @{css expression} only .class and #elementId are valid inside
   // of @{...}.
   static template(List<Selector> selectors) {
-    var errorSelector; // signal which selector didn't match.
     bool found = false; // signal if a selector is matched.
     int matches = 0; // < 0 IdSelectors, > 0 ClassSelector
 

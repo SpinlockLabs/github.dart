@@ -4,6 +4,7 @@
 
 library path.context;
 
+import 'characters.dart' as chars;
 import 'internal_style.dart';
 import 'style.dart';
 import 'parsed_path.dart';
@@ -73,6 +74,15 @@ class Context {
   /// If [current] isn't absolute, this won't return an absolute path.
   String absolute(String part1, [String part2, String part3, String part4,
       String part5, String part6, String part7]) {
+    _validateArgList(
+        "absolute", [part1, part2, part3, part4, part5, part6, part7]);
+
+    // If there's a single absolute path, just return it. This is a lot faster
+    // for the common case of `p.absolute(path)`.
+    if (part2 == null && isAbsolute(part1) && !isRootRelative(part1)) {
+      return part1;
+    }
+
     return join(current, part1, part2, part3, part4, part5, part6, part7);
   }
 
@@ -295,9 +305,77 @@ class Context {
   ///
   ///     context.normalize('path/./to/..//file.text'); // -> 'path/file.txt'
   String normalize(String path) {
+    if (!_needsNormalization(path)) return path;
+
     var parsed = _parse(path);
     parsed.normalize();
     return parsed.toString();
+  }
+
+  /// Returns whether [path] needs to be normalized.
+  bool _needsNormalization(String path) {
+    var start = 0;
+    var codeUnits = path.codeUnits;
+    var previousPrevious;
+    var previous;
+
+    // Skip past the root before we start looking for snippets that need
+    // normalization. We want to normalize "//", but not when it's part of
+    // "http://".
+    var root = style.rootLength(path);
+    if (root != 0) {
+      start = root;
+      previous = chars.SLASH;
+
+      // On Windows, the root still needs to be normalized if it contains a
+      // forward slash.
+      if (style == Style.windows) {
+        for (var i = 0; i < root; i++) {
+          if (codeUnits[i] == chars.SLASH) return true;
+        }
+      }
+    }
+
+    for (var i = start; i < codeUnits.length; i++) {
+      var codeUnit = codeUnits[i];
+      if (style.isSeparator(codeUnit)) {
+        // Forward slashes in Windows paths are normalized to backslashes.
+        if (style == Style.windows && codeUnit == chars.SLASH) return true;
+
+        // Multiple separators are normalized to single separators.
+        if (previous != null && style.isSeparator(previous)) return true;
+
+        // Single dots and double dots are normalized to directory traversals.
+        //
+        // This can return false positives for ".../", but that's unlikely
+        // enough that it's probably not going to cause performance issues.
+        if (previous == chars.PERIOD &&
+            (previousPrevious == null ||
+             previousPrevious == chars.PERIOD ||
+             style.isSeparator(previousPrevious))) {
+          return true;
+        }
+      }
+
+      previousPrevious = previous;
+      previous = codeUnit;
+    }
+
+    // Empty paths are normalized to ".".
+    if (previous == null) return true;
+
+    // Trailing separators are removed.
+    if (style.isSeparator(previous)) return true;
+
+    // Single dots and double dots are normalized to directory traversals.
+    if (previous == chars.PERIOD &&
+        (previousPrevious == null ||
+         previousPrevious == chars.SLASH ||
+         previousPrevious == chars.PERIOD)) {
+      return true;
+    }
+
+    return false;
   }
 
   /// Attempts to convert [path] to an equivalent relative path relative to
@@ -333,13 +411,10 @@ class Context {
   /// "/", no path can be determined. In this case, a [PathException] will be
   /// thrown.
   String relative(String path, {String from}) {
-    // Avoid calling [current] since it is slow and calling join() when
-    // [from] is absolute does nothing.
-    if (from == null) {
-      from = current;
-    } else if (this.isRelative(from) || this.isRootRelative(from)) {
-      from = this.join(current, from);
-    }
+    // Avoid expensive computation if the path is already relative.
+    if (from == null && this.isRelative(path)) return this.normalize(path);
+
+    from = from == null ? current : absolute(from);
 
     // We can't determine the path from a relative path to an absolute path.
     if (this.isRelative(from) && this.isAbsolute(path)) {
@@ -425,6 +500,31 @@ class Context {
   ///     path.isWithin('/root/path', '/root/other'); // -> false
   ///     path.isWithin('/root/path', '/root/path'); // -> false
   bool isWithin(String parent, String child) {
+    // Make both paths the same level of relative. We're only able to do the
+    // quick comparison if both paths are in the same format, and making a path
+    // absolute is faster than making it relative.
+    var parentIsAbsolute = isAbsolute(parent);
+    var childIsAbsolute = isAbsolute(child);
+    if (parentIsAbsolute && !childIsAbsolute) {
+      child = absolute(child);
+      if (style.isRootRelative(parent)) parent = absolute(parent);
+    } else if (childIsAbsolute && !parentIsAbsolute) {
+      parent = absolute(parent);
+      if (style.isRootRelative(child)) child = absolute(child);
+    } else if (childIsAbsolute && parentIsAbsolute) {
+      var childIsRootRelative = style.isRootRelative(child);
+      var parentIsRootRelative = style.isRootRelative(parent);
+
+      if (childIsRootRelative && !parentIsRootRelative) {
+        child = absolute(child);
+      } else if (parentIsRootRelative && !childIsRootRelative) {
+        parent = absolute(parent);
+      }
+    }
+
+    var fastResult = _isWithinFast(parent, child);
+    if (fastResult != null) return fastResult;
+
     var relative;
     try {
       relative = this.relative(child, from: parent);
@@ -438,6 +538,259 @@ class Context {
     return this.isRelative(relative) &&
         parts.first != '..' &&
         parts.first != '.';
+  }
+
+  /// An optimized implementation of [isWithin] that doesn't handle a few
+  /// complex cases.
+  bool _isWithinFast(String parent, String child) {
+    // Normally we just bail when we see "." path components, but we can handle
+    // a single dot easily enough.
+    if (parent == '.') parent = '';
+
+    var parentRootLength = style.rootLength(parent);
+    var childRootLength = style.rootLength(child);
+
+    // If the roots aren't the same length, we know both paths are absolute or
+    // both are root-relative, and thus that the roots are meaningfully
+    // different.
+    //
+    //     isWithin("C:/bar", "//foo/bar/baz") //=> false
+    //     isWithin("http://example.com/", "http://google.com/bar") //=> false
+    if (parentRootLength != childRootLength) return false;
+
+    var parentCodeUnits = parent.codeUnits;
+    var childCodeUnits = child.codeUnits;
+
+    // Make sure that the roots are textually the same as well.
+    //
+    //     isWithin("C:/bar", "D:/bar/baz") //=> false
+    //     isWithin("http://example.com/", "http://example.org/bar") //=> false
+    for (var i = 0; i < parentRootLength; i++) {
+      var parentCodeUnit = parentCodeUnits[i];
+      var childCodeUnit = childCodeUnits[i];
+      if (parentCodeUnit == childCodeUnit) continue;
+
+      // If both code units are separators, that's fine too.
+      //
+      //     isWithin("C:/", r"C:\foo") //=> true
+      if (!style.isSeparator(parentCodeUnit) ||
+          !style.isSeparator(childCodeUnit)) {
+        return false;
+      }
+    }
+
+    // Start by considering the last code unit as a separator, since
+    // semantically we're starting at a new path component even if we're
+    // comparing relative paths.
+    var lastCodeUnit = chars.SLASH;
+
+    // Iterate through both paths as long as they're semantically identical.
+    var parentIndex = parentRootLength;
+    var childIndex = childRootLength;
+    while (parentIndex < parent.length && childIndex < child.length) {
+      var parentCodeUnit = parentCodeUnits[parentIndex];
+      var childCodeUnit = childCodeUnits[childIndex];
+      if (parentCodeUnit == childCodeUnit) {
+        lastCodeUnit = parentCodeUnit;
+        parentIndex++;
+        childIndex++;
+        continue;
+      }
+
+      // Different separators are considered identical.
+      var parentIsSeparator = style.isSeparator(parentCodeUnit);
+      var childIsSeparator = style.isSeparator(childCodeUnit);
+      if (parentIsSeparator && childIsSeparator) {
+        lastCodeUnit = parentCodeUnit;
+        parentIndex++;
+        childIndex++;
+        continue;
+      }
+
+      // Ignore multiple separators in a row.
+      if (parentIsSeparator && style.isSeparator(lastCodeUnit)) {
+        parentIndex++;
+        continue;
+      } else if (childIsSeparator && style.isSeparator(lastCodeUnit)) {
+        childIndex++;
+        continue;
+      }
+
+      if (parentCodeUnit == chars.PERIOD) {
+        // If a dot comes after a separator, it may be a directory traversal
+        // operator. To check that, we need to know if it's followed by either
+        // "/" or "./". Otherwise, it's just a normal non-matching character.
+        //
+        //     isWithin("foo/./bar", "foo/bar/baz") //=> true
+        //     isWithin("foo/bar/../baz", "foo/bar/.foo") //=> false
+        if (style.isSeparator(lastCodeUnit)) {
+          parentIndex++;
+
+          // We've hit "/." at the end of the parent path, which we can ignore,
+          // since the paths were equivalent up to this point.
+          if (parentIndex == parent.length) break;
+          parentCodeUnit = parentCodeUnits[parentIndex];
+
+          // We've hit "/./", which we can ignore.
+          if (style.isSeparator(parentCodeUnit)) {
+            parentIndex++;
+            continue;
+          }
+
+          // We've hit "/..", which may be a directory traversal operator that
+          // we can't handle on the fast track.
+          if (parentCodeUnit == chars.PERIOD) {
+            parentIndex++;
+            if (parentIndex == parent.length ||
+                style.isSeparator(parentCodeUnits[parentIndex])) {
+              return null;
+            }
+          }
+        }
+
+        // If this isn't a directory traversal, fall through so we hit the
+        // normal handling for mismatched paths.
+      }
+
+      // This is the same logic as above, but for the child path instead of the
+      // parent.
+      if (childCodeUnit == chars.PERIOD) {
+        if (style.isSeparator(lastCodeUnit)) {
+          childIndex++;
+          if (childIndex == child.length) break;
+          childCodeUnit = childCodeUnits[childIndex];
+
+          if (style.isSeparator(childCodeUnit)) {
+            childIndex++;
+            continue;
+          }
+
+          if (childCodeUnit == chars.PERIOD) {
+            childIndex++;
+            if (childIndex == child.length ||
+                style.isSeparator(childCodeUnits[childIndex])) {
+              return null;
+            }
+          }
+        }
+      }
+
+      // If we're here, we've hit two non-matching, non-significant characters.
+      // As long as the remainders of the two paths don't have any unresolved
+      // ".." components, we can be confident that [child] is not within
+      // [parent].
+      var childDirection = _pathDirection(childCodeUnits, childIndex);
+      if (childDirection != _PathDirection.belowRoot) return null;
+      var parentDirection = _pathDirection(parentCodeUnits, parentIndex);
+      if (parentDirection != _PathDirection.belowRoot) return null;
+
+      return false;
+    }
+
+    // If the child is shorter than the parent, it's probably not within the
+    // parent. The only exception is if the parent has some weird ".." stuff
+    // going on, in which case we do the slow check.
+    //
+    //     isWithin("foo/bar/baz", "foo/bar") //=> false
+    //     isWithin("foo/bar/baz/../..", "foo/bar") //=> true
+    if (childIndex == child.length) {
+      var direction = _pathDirection(parentCodeUnits, parentIndex);
+      return direction == _PathDirection.aboveRoot ? null : false;
+    }
+
+    // We've reached the end of the parent path, which means it's time to make a
+    // decision. Before we do, though, we'll check the rest of the child to see
+    // what that tells us.
+    var direction = _pathDirection(childCodeUnits, childIndex);
+
+    // If there are no more components in the child, then it's the same as
+    // the parent, not within it.
+    //
+    //     isWithin("foo/bar", "foo/bar") //=> false
+    //     isWithin("foo/bar", "foo/bar//") //=> false
+    if (direction == _PathDirection.atRoot) return false;
+
+    // If there are unresolved ".." components in the child, no decision we make
+    // will be valid. We'll abort and do the slow check instead.
+    //
+    //     isWithin("foo/bar", "foo/bar/..") //=> false
+    //     isWithin("foo/bar", "foo/bar/baz/bang/../../..") //=> false
+    //     isWithin("foo/bar", "foo/bar/baz/bang/../../../bar/baz") //=> true
+    if (direction == _PathDirection.aboveRoot) return null;
+
+    // The child is within the parent if and only if we're on a separator
+    // boundary.
+    //
+    //     isWithin("foo/bar", "foo/bar/baz") //=> true
+    //     isWithin("foo/bar/", "foo/bar/baz") //=> true
+    //     isWithin("foo/bar", "foo/barbaz") //=> false
+    return style.isSeparator(childCodeUnits[childIndex]) ||
+        style.isSeparator(lastCodeUnit);
+  }
+
+  // Returns a [_PathDirection] describing the path represented by [codeUnits]
+  // after [index].
+  //
+  // This ignores leading separators.
+  //
+  //     pathDirection("foo") //=> below root
+  //     pathDirection("foo/bar/../baz") //=> below root
+  //     pathDirection("//foo/bar/baz") //=> below root
+  //     pathDirection("/") //=> at root
+  //     pathDirection("foo/..") //=> at root
+  //     pathDirection("foo/../baz") //=> reaches root
+  //     pathDirection("foo/../..") //=> above root
+  //     pathDirection("foo/../../foo/bar/baz") //=> above root
+  _PathDirection _pathDirection(List<int> codeUnits, int index) {
+    var depth = 0;
+    var reachedRoot = false;
+    var i = index;
+    while (i < codeUnits.length) {
+      // Ignore initial separators or doubled separators.
+      while (i < codeUnits.length && style.isSeparator(codeUnits[i])) {
+        i++;
+      }
+
+      // If we're at the end, stop.
+      if (i == codeUnits.length) break;
+
+      // Move through the path component to the next separator.
+      var start = i;
+      while (i < codeUnits.length && !style.isSeparator(codeUnits[i])) {
+        i++;
+      }
+
+      // See if the path component is ".", "..", or a name.
+      if (i - start == 1 && codeUnits[start] == chars.PERIOD) {
+        // Don't change the depth.
+      } else if (i - start == 2 &&
+          codeUnits[start] == chars.PERIOD &&
+          codeUnits[start + 1] == chars.PERIOD) {
+        // ".." backs out a directory.
+        depth--;
+
+        // If we work back beyond the root, stop.
+        if (depth < 0) break;
+
+        // Record that we reached the root so we don't return
+        // [_PathDirection.belowRoot].
+        if (depth == 0) reachedRoot = true;
+      } else {
+        // Step inside a directory.
+        depth++;
+      }
+
+      // If we're at the end, stop.
+      if (i == codeUnits.length) break;
+
+      // Move past the separator.
+      i++;
+    }
+
+    if (depth < 0) return _PathDirection.aboveRoot;
+    if (depth == 0) return _PathDirection.atRoot;
+    if (reachedRoot) return _PathDirection.reachesRoot;
+    return _PathDirection.belowRoot;
   }
 
   /// Removes a trailing extension from the last part of [path].
@@ -571,4 +924,31 @@ _validateArgList(String method, List<String> args) {
     message.write("): part ${i - 1} was null, but part $i was not.");
     throw new ArgumentError(message.toString());
   }
+}
+
+/// An enum of possible return values for [Context._pathDirection].
+class _PathDirection {
+  /// The path contains enough ".." components that at some point it reaches
+  /// above its original root.
+  ///
+  /// Note that this applies even if the path ends beneath its original root. It
+  /// takes precendence over any other return values that may apple.
+  static const aboveRoot = const _PathDirection("above root");
+
+  /// The path contains enough ".." components that it ends at its original
+  /// root.
+  static const atRoot = const _PathDirection("at root");
+
+  /// The path contains enough ".." components that at some point it reaches its
+  /// original root, but it ends beneath that root.
+  static const reachesRoot = const _PathDirection("reaches root");
+
+  /// The path never reaches to or above its original root.
+  static const belowRoot = const _PathDirection("below root");
+
+  final String name;
+
+  const _PathDirection(this.name);
+
+  String toString() => name;
 }

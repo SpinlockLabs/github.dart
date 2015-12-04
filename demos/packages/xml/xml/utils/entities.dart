@@ -18,9 +18,7 @@ final _ENTITY = char('&')
   return _ENTITY_TO_CHAR[value];
 }))).seq(char(';')).pick(1);
 
-/**
- * Optimized parser to read character data.
- */
+/// Optimized parser to read character data.
 class _XmlCharacterDataParser extends Parser {
   final String _stopper;
   final int _stopperCode;
@@ -340,9 +338,7 @@ final Map<String, String> _ENTITY_TO_CHAR = const {
   'zwnj': '\u200C'
 };
 
-/**
- * Encode a string to be serialized as an XML text node.
- */
+/// Encode a string to be serialized as an XML text node.
 String _encodeXmlText(String input) {
   return input.replaceAllMapped(_TEXT_PATTERN, (match) {
     // only & and < need to be encoded in text
@@ -352,9 +348,7 @@ String _encodeXmlText(String input) {
 
 final Pattern _TEXT_PATTERN = new RegExp(r'[&<]');
 
-/**
- * Encode a string to be serialized as an XML attribute value.
- */
+/// Encode a string to be serialized as an XML attribute value.
 String _encodeXmlAttributeValue(String input) {
   // only " needs to be encoded in attribute value
   return input.replaceAll('"', '&quot;');

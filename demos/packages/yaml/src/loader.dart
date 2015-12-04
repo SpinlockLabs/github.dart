@@ -4,6 +4,7 @@
 
 library yaml.loader;
 
+import 'package:charcode/ascii.dart';
 import 'package:source_span/source_span.dart';
 
 import 'equality.dart';
@@ -62,7 +63,7 @@ class Loader {
   YamlDocument _loadDocument(DocumentStartEvent firstEvent) {
     var contents = _loadNode(_parser.parse());
 
-    var lastEvent = _parser.parse();
+    var lastEvent = _parser.parse() as DocumentEndEvent;
     assert(lastEvent.type == EventType.DOCUMENT_END);
 
     return new YamlDocument.internal(
@@ -108,15 +109,11 @@ class Loader {
   YamlNode _loadScalar(ScalarEvent scalar) {
     var node;
     if (scalar.tag == "!") {
-      node = _parseString(scalar);
+      node = new YamlScalar.internal(scalar.value, scalar);
     } else if (scalar.tag != null) {
       node = _parseByTag(scalar);
     } else {
-      node = _parseNull(scalar);
-      if (node == null) node = _parseBool(scalar);
-      if (node == null) node = _parseInt(scalar);
-      if (node == null) node = _parseFloat(scalar);
-      if (node == null) node = _parseString(scalar);
+      node = _parseScalar(scalar);
     }
 
     _registerAnchor(scalar.anchor, node);
@@ -130,7 +127,7 @@ class Loader {
       throw new YamlException("Invalid tag for sequence.", firstEvent.span);
     }
 
-    var children = [];
+    var children = <YamlNode>[];
     var node = new YamlList.internal(
         children, firstEvent.span, firstEvent.style);
     _registerAnchor(firstEvent.anchor, node);
@@ -172,86 +169,191 @@ class Loader {
   /// Parses a scalar according to its tag name.
   YamlScalar _parseByTag(ScalarEvent scalar) {
     switch (scalar.tag) {
-      case "tag:yaml.org,2002:null": return _parseNull(scalar);
-      case "tag:yaml.org,2002:bool": return _parseBool(scalar);
-      case "tag:yaml.org,2002:int": return _parseInt(scalar);
-      case "tag:yaml.org,2002:float": return _parseFloat(scalar);
-      case "tag:yaml.org,2002:str": return _parseString(scalar);
+      case "tag:yaml.org,2002:null":
+        var result = _parseNull(scalar);
+        if (result != null) return result;
+        throw new YamlException("Invalid null scalar.", scalar.span);
+      case "tag:yaml.org,2002:bool":
+        var result = _parseBool(scalar);
+        if (result != null) return result;
+        throw new YamlException("Invalid bool scalar.", scalar.span);
+      case "tag:yaml.org,2002:int":
+        var result = _parseNumber(scalar, allowFloat: false);
+        if (result != null) return result;
+        throw new YamlException("Invalid int scalar.", scalar.span);
+      case "tag:yaml.org,2002:float":
+        var result = _parseNumber(scalar, allowInt: false);
+        if (result != null) return result;
+        throw new YamlException("Invalid float scalar.", scalar.span);
+      case "tag:yaml.org,2002:str":
+        return new YamlScalar.internal(scalar.value, scalar);
+      default:
+        throw new YamlException('Undefined tag: ${scalar.tag}.', scalar.span);
     }
-    throw new YamlException('Undefined tag: ${scalar.tag}.', scalar.span);
   }
 
-  /// Parses a null scalar.
+  /// Parses [scalar], which may be one of several types.
+  YamlScalar _parseScalar(ScalarEvent scalar) =>
+      _tryParseScalar(scalar) ?? new YamlScalar.internal(scalar.value, scalar);
+
+  /// Tries to parse [scalar].
+  ///
+  /// If parsing fails, this returns `null`, indicating that the scalar should
+  /// be parsed as a string.
+  YamlScalar _tryParseScalar(ScalarEvent scalar) {
+    // Quickly check for the empty string, which means null.
+    var length = scalar.value.length;
+    if (length == 0) return new YamlScalar.internal(null, scalar);
+
+    // Dispatch on the first character.
+    var firstChar = scalar.value.codeUnitAt(0);
+    switch (firstChar) {
+      case $dot:
+      case $plus:
+      case $minus:
+        return _parseNumber(scalar);
+      case $n:
+      case $N:
+        return length == 4 ? _parseNull(scalar) : null;
+      case $t:
+      case $T:
+        return length == 4 ? _parseBool(scalar) : null;
+      case $f:
+      case $F:
+        return length == 5 ? _parseBool(scalar) : null;
+      case $tilde:
+        return length == 1 ? new YamlScalar.internal(null, scalar) : null;
+      default:
+        if (firstChar >= $0 && firstChar <= $9) return _parseNumber(scalar);
+        return null;
+    }
+  }
+
+  /// Parse a null scalar.
+  ///
+  /// Returns a Dart `null` if parsing fails.
   YamlScalar _parseNull(ScalarEvent scalar) {
-    // TODO(nweiz): stop using regexps.
-    // TODO(nweiz): add ScalarStyle and implicit metadata to the scalars.
-    if (new RegExp(r"^(null|Null|NULL|~|)$").hasMatch(scalar.value)) {
-      return new YamlScalar.internal(null, scalar.span, scalar.style);
-    } else {
-      return null;
+    switch (scalar.value) {
+      case "":
+      case "null":
+      case "Null":
+      case "NULL":
+      case "~":
+        return new YamlScalar.internal(null, scalar);
+      default:
+        return null;
     }
   }
 
-  /// Parses a boolean scalar.
+  /// Parse a boolean scalar.
+  ///
+  /// Returns `null` if parsing fails.
   YamlScalar _parseBool(ScalarEvent scalar) {
-    var match = new RegExp(r"^(?:(true|True|TRUE)|(false|False|FALSE))$").
-        firstMatch(scalar.value);
-    if (match == null) return null;
-    return new YamlScalar.internal(
-        match.group(1) != null, scalar.span, scalar.style);
+    switch (scalar.value) {
+      case "true":
+      case "True":
+      case "TRUE":
+        return new YamlScalar.internal(true, scalar);
+      case "false":
+      case "False":
+      case "FALSE":
+        return new YamlScalar.internal(false, scalar);
+      default:
+        return null;
+    }
   }
 
-  /// Parses an integer scalar.
-  YamlScalar _parseInt(ScalarEvent scalar) {
-    var match = new RegExp(r"^[-+]?[0-9]+$").firstMatch(scalar.value);
-    if (match != null) {
-      return new YamlScalar.internal(
-          int.parse(match.group(0)), scalar.span, scalar.style);
+  /// Parses a numeric scalar.
+  ///
+  /// Returns `null` if parsing fails.
+  YamlNode _parseNumber(ScalarEvent scalar, {bool allowInt: true,
+      bool allowFloat: true}) {
+    var value = _parseNumberValue(scalar.value,
+        allowInt: allowInt, allowFloat: allowFloat);
+    return value == null ? null : new YamlScalar.internal(value, scalar);
+  }
+
+  /// Parses the value of a number.
+  ///
+  /// Returns the number if it's parsed successfully, or `null` if it's not.
+  num _parseNumberValue(String contents, {bool allowInt: true,
+      bool allowFloat: true}) {
+    assert(allowInt || allowFloat);
+
+    var firstChar = contents.codeUnitAt(0);
+    var length = contents.length;
+
+    // Quick check for single digit integers.
+    if (allowInt && length == 1) {
+      var value = firstChar - $0;
+      return value >= 0 && value <= 9 ? value : null;
     }
 
-    match = new RegExp(r"^0o([0-7]+)$").firstMatch(scalar.value);
-    if (match != null) {
-      var n = int.parse(match.group(1), radix: 8);
-      return new YamlScalar.internal(n, scalar.span, scalar.style);
+    var secondChar = contents.codeUnitAt(1);
+
+    // Hexadecimal or octal integers.
+    if (allowInt && firstChar == $0) {
+      // int.parse supports 0x natively.
+      if (secondChar == $x) return int.parse(contents, onError: (_) => null);
+
+      if (secondChar == $o) {
+        var afterRadix = contents.substring(2);
+        return int.parse(afterRadix, radix: 8, onError: (_) => null);
+      }
     }
 
-    match = new RegExp(r"^0x[0-9a-fA-F]+$").firstMatch(scalar.value);
-    if (match != null) {
-      return new YamlScalar.internal(
-          int.parse(match.group(0)), scalar.span, scalar.style);
+    // Int or float starting with a digit or a +/- sign.
+    if ((firstChar >= $0 && firstChar <= $9) ||
+        ((firstChar == $plus || firstChar == $minus) &&
+            secondChar >= $0 && secondChar <= $9)) {
+      // Try to parse an int or, failing that, a double.
+      var result = null;
+      if (allowInt) {
+        // Pass "radix: 10" explicitly to ensure that "-0x10", which is valid
+        // Dart but invalid YAML, doesn't get parsed.
+        result = int.parse(contents, radix: 10, onError: (_) => null);
+      }
+
+      if (allowFloat) result ??= double.parse(contents, (_) => null);
+      return result;
+    }
+
+    if (!allowFloat) return null;
+
+    // Now the only possibility is to parse a float starting with a dot or a
+    // sign and a dot, or the signed/unsigned infinity values and not-a-numbers.
+    if ((firstChar == $dot && secondChar >= $0 && secondChar <= $9) ||
+        (firstChar == $minus || firstChar == $plus) && secondChar == $dot) {
+      // Starting with a . and a number or a sign followed by a dot.
+      if (length == 5) {
+        switch (contents) {
+          case "+.inf":
+          case "+.Inf":
+          case "+.INF":
+            return double.INFINITY;
+          case "-.inf":
+          case "-.Inf":
+          case "-.INF":
+            return -double.INFINITY;
+        }
+      }
+
+      return double.parse(contents, (_) => null);
+    }
+
+    if (length == 4 && firstChar == $dot) {
+      switch (contents) {
+        case ".inf":
+        case ".Inf":
+        case ".INF":
+          return double.INFINITY;
+        case ".nan":
+        case ".NaN":
+        case ".NAN":
+          return double.NAN;
+      }
     }
 
     return null;
   }
-
-  /// Parses a floating-point scalar.
-  YamlScalar _parseFloat(ScalarEvent scalar) {
-    var match = new RegExp(
-          r"^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$").
-        firstMatch(scalar.value);
-    if (match != null) {
-      // YAML allows floats of the form "0.", but Dart does not. Fix up those
-      // floats by removing the trailing dot.
-      var matchStr = match.group(0).replaceAll(new RegExp(r"\.$"), "");
-      return new YamlScalar.internal(
-          double.parse(matchStr), scalar.span, scalar.style);
-    }
-
-    match = new RegExp(r"^([+-]?)\.(inf|Inf|INF)$").firstMatch(scalar.value);
-    if (match != null) {
-      var value = match.group(1) == "-" ? -double.INFINITY : double.INFINITY;
-      return new YamlScalar.internal(value, scalar.span, scalar.style);
-    }
-
-    match = new RegExp(r"^\.(nan|NaN|NAN)$").firstMatch(scalar.value);
-    if (match != null) {
-      return new YamlScalar.internal(double.NAN, scalar.span, scalar.style);
-    }
-
-    return null;
-  }
-
-  /// Parses a string scalar.
-  YamlScalar _parseString(ScalarEvent scalar) =>
-      new YamlScalar.internal(scalar.value, scalar.span, scalar.style);
 }

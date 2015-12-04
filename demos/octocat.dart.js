@@ -539,6 +539,8 @@
       }
       interceptor = H.lookupAndCacheInterceptor(object);
       if (interceptor == null) {
+        if (typeof object == "function")
+          return C.JavaScriptFunction_methods;
         proto = Object.getPrototypeOf(object);
         if (proto == null || proto === Object.prototype)
           return C.PlainJavaScriptObject_methods;
@@ -584,18 +586,25 @@
     },
     JavaScriptObject: {
       "^": "Interceptor;",
-      get$hashCode: function(_) {
+      get$hashCode: function(receiver) {
         return 0;
       },
+      toString$0: ["super$JavaScriptObject$toString", function(receiver) {
+        return String(receiver);
+      }],
       $isJSObject: 1
     },
     PlainJavaScriptObject: {
       "^": "JavaScriptObject;"
     },
     UnknownJavaScriptObject: {
+      "^": "JavaScriptObject;"
+    },
+    JavaScriptFunction: {
       "^": "JavaScriptObject;",
       toString$0: function(receiver) {
-        return String(receiver);
+        var dartClosure = receiver[$.$get$DART_CLOSURE_PROPERTY_NAME()];
+        return dartClosure == null ? this.super$JavaScriptObject$toString(receiver) : J.toString$0$(dartClosure);
       }
     },
     JSArray: {
@@ -613,7 +622,7 @@
         receiver.push(value);
       }, "call$1", "get$add", 2, 0, function() {
         return H.computeSignature(function(E) {
-          return {func: 1, void: true, args: [E]};
+          return {func: 1, v: true, args: [E]};
         }, this.$receiver, "JSArray");
       }],
       removeAt$1: function(receiver, index) {
@@ -645,7 +654,7 @@
       removeLast$0: function(receiver) {
         this.checkGrowable$1(receiver, "removeLast");
         if (receiver.length === 0)
-          throw H.wrapException(P.RangeError$value(-1, null, null));
+          throw H.wrapException(H.diagnoseIndexError(receiver, -1));
         return receiver.pop();
       },
       remove$1: function(receiver, element) {
@@ -685,7 +694,7 @@
       join$1: function(receiver, separator) {
         var t1, list, i, t2;
         t1 = receiver.length;
-        list = Array(t1);
+        list = new Array(t1);
         list.fixed$length = Array;
         for (i = 0; i < receiver.length; ++i) {
           t2 = H.S(receiver[i]);
@@ -719,14 +728,14 @@
         if (typeof start !== "number" || Math.floor(start) !== start)
           throw H.wrapException(H.argumentErrorValue(start));
         if (start < 0 || start > receiver.length)
-          throw H.wrapException(P.RangeError$range(start, 0, receiver.length, null, null));
+          throw H.wrapException(P.RangeError$range(start, 0, receiver.length, "start", null));
         if (end == null)
           end = receiver.length;
         else {
           if (typeof end !== "number" || Math.floor(end) !== end)
             throw H.wrapException(H.argumentErrorValue(end));
           if (end < start || end > receiver.length)
-            throw H.wrapException(P.RangeError$range(end, start, receiver.length, null, null));
+            throw H.wrapException(P.RangeError$range(end, start, receiver.length, "end", null));
         }
         if (start === end)
           return H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(receiver, 0)]);
@@ -826,15 +835,7 @@
         return P.IterableBase_iterableToFullString(receiver, "[", "]");
       },
       toList$1$growable: function(receiver, growable) {
-        var t1;
-        if (growable)
-          t1 = H.setRuntimeTypeInfo(receiver.slice(), [H.getTypeArgumentByIndex(receiver, 0)]);
-        else {
-          t1 = H.setRuntimeTypeInfo(receiver.slice(), [H.getTypeArgumentByIndex(receiver, 0)]);
-          t1.fixed$length = Array;
-          t1 = t1;
-        }
-        return t1;
+        return H.setRuntimeTypeInfo(receiver.slice(), [H.getTypeArgumentByIndex(receiver, 0)]);
       },
       toList$0: function($receiver) {
         return this.toList$1$growable($receiver, true);
@@ -878,8 +879,10 @@
       $isEfficientLength: 1,
       static: {JSArray_JSArray$fixed: function($length, $E) {
           var t1;
-          if (typeof $length !== "number" || Math.floor($length) !== $length || $length < 0)
-            throw H.wrapException(P.ArgumentError$("Length must be a non-negative integer: " + H.S($length)));
+          if (typeof $length !== "number" || Math.floor($length) !== $length)
+            throw H.wrapException(P.ArgumentError$value($length, "length", "is not an integer"));
+          if ($length < 0 || $length > 4294967295)
+            throw H.wrapException(P.RangeError$range($length, 0, 4294967295, "length", null));
           t1 = H.setRuntimeTypeInfo(new Array($length), [$E]);
           t1.fixed$length = Array;
           return t1;
@@ -898,7 +901,7 @@
         t1 = this.__interceptors$_iterable;
         $length = t1.length;
         if (this.__interceptors$_length !== $length)
-          throw H.wrapException(new P.ConcurrentModificationError(t1));
+          throw H.wrapException(H.throwConcurrentModificationError(t1));
         t2 = this.__interceptors$_index;
         if (t2 >= $length) {
           this.__interceptors$_current = null;
@@ -1006,8 +1009,6 @@
         return receiver - other;
       },
       $mul: function(receiver, other) {
-        if (typeof other !== "number")
-          throw H.wrapException(H.argumentErrorValue(other));
         return receiver * other;
       },
       $tdiv: function(receiver, other) {
@@ -1094,7 +1095,7 @@
         H.checkInt(start);
         if (start > string.length)
           throw H.wrapException(P.RangeError$range(start, 0, string.length, null, null));
-        return H.allMatchesInStringUnchecked(receiver, string, start);
+        return new H._StringAllMatchesIterable(string, receiver, start);
       },
       allMatches$1: function($receiver, string) {
         return this.allMatches$2($receiver, string, 0);
@@ -1379,14 +1380,9 @@
         init.globalState.topEventLoop.run$0();
       return result;
     },
-    leaveJsAsync: function() {
-      --init.globalState.topEventLoop._activeJsAsyncCount;
-    },
     startRootIsolate: function(entry, args) {
       var t1, t2, t3, t4, t5, rootContext;
       t1 = {};
-      t1._captured_args_0 = args;
-      args = args;
       t1._captured_args_0 = args;
       if (args == null) {
         args = [];
@@ -1402,15 +1398,16 @@
       t4 = self.Worker;
       t5 = t3 && !!self.postMessage;
       t2.isWorker = t5;
-      if (!t5)
+      t5 = !t5;
+      if (t5)
         t4 = t4 != null && $.$get$IsolateNatives_thisScript() != null;
       else
         t4 = true;
       t2.supportsWorkers = t4;
-      t2.fromCommandLine = t3 && !t5;
+      t2.fromCommandLine = t3 && t5;
       t2.topEventLoop = new H._EventLoop(P.ListQueue$(null, H._IsolateEvent), 0);
-      t2.isolates = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H._IsolateContext);
-      t2.managers = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, null);
+      t2.isolates = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [P.$int, H._IsolateContext]);
+      t2.managers = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [P.$int, null]);
       if (t2.isWorker === true) {
         t3 = new H._MainManagerStub();
         t2.mainManager = t3;
@@ -1431,7 +1428,7 @@
       if (init.globalState.isWorker === true)
         return;
       t2 = init.globalState.nextIsolateId++;
-      t3 = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H.RawReceivePortImpl);
+      t3 = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [P.$int, H.RawReceivePortImpl]);
       t4 = P.LinkedHashSet_LinkedHashSet(null, null, null, P.$int);
       t5 = new H.RawReceivePortImpl(0, null, false);
       rootContext = new H._IsolateContext(t2, t3, t4, init.createNewIsolate(), t5, new H.CapabilityImpl(H.random64()), new H.CapabilityImpl(H.random64()), false, false, [], P.LinkedHashSet_LinkedHashSet(null, null, null, null), null, null, false, true, P.LinkedHashSet_LinkedHashSet(null, null, null, null));
@@ -1497,7 +1494,7 @@
           startPaused = t1.$index(msg, "startPaused");
           replyTo = new H._Deserializer(true, []).deserialize$1(t1.$index(msg, "replyTo"));
           t1 = init.globalState.nextIsolateId++;
-          t2 = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H.RawReceivePortImpl);
+          t2 = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [P.$int, H.RawReceivePortImpl]);
           t3 = P.LinkedHashSet_LinkedHashSet(null, null, null, P.$int);
           t4 = new H.RawReceivePortImpl(0, null, false);
           context = new H._IsolateContext(t1, t2, t3, init.createNewIsolate(), t4, new H.CapabilityImpl(H.random64()), new H.CapabilityImpl(H.random64()), false, false, [], P.LinkedHashSet_LinkedHashSet(null, null, null, null), null, null, false, true, P.LinkedHashSet_LinkedHashSet(null, null, null, null));
@@ -1526,7 +1523,7 @@
           if (init.globalState.isWorker === true) {
             t1 = init.globalState.mainManager;
             t2 = P.LinkedHashMap__makeLiteral(["command", "print", "msg", msg]);
-            t2 = new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t2);
+            t2 = new H._Serializer(true, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(t2);
             t1.toString;
             self.postMessage(t2);
           } else
@@ -1541,7 +1538,7 @@
       if (init.globalState.isWorker === true) {
         t1 = init.globalState.mainManager;
         t2 = P.LinkedHashMap__makeLiteral(["command", "log", "msg", msg]);
-        t2 = new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t2);
+        t2 = new H._Serializer(true, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(t2);
         t1.toString;
         self.postMessage(t2);
       } else
@@ -1571,16 +1568,16 @@
         t2.call$0();
     },
     _clone: function(message) {
-      return new H._Deserializer(true, []).deserialize$1(new H._Serializer(false, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(message));
+      return new H._Deserializer(true, []).deserialize$1(new H._Serializer(false, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(message));
     },
     startRootIsolate_closure: {
-      "^": "Closure:2;__isolate_helper$_box_0,_captured_entry_1",
+      "^": "Closure:1;__isolate_helper$_box_0,_captured_entry_1",
       call$0: function() {
         this._captured_entry_1.call$1(this.__isolate_helper$_box_0._captured_args_0);
       }
     },
     startRootIsolate_closure0: {
-      "^": "Closure:2;__isolate_helper$_box_0,_captured_entry_2",
+      "^": "Closure:1;__isolate_helper$_box_0,_captured_entry_2",
       call$0: function() {
         this._captured_entry_2.call$2(this.__isolate_helper$_box_0._captured_args_0, null);
       }
@@ -1589,7 +1586,7 @@
       "^": "Object;nextIsolateId,currentManagerId,nextManagerId,currentContext,rootContext,topEventLoop,fromCommandLine,isWorker,supportsWorkers,isolates,mainManager,managers,entry",
       static: {_Manager__serializePrintMessage: function(object) {
           var t1 = P.LinkedHashMap__makeLiteral(["command", "print", "msg", object]);
-          return new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t1);
+          return new H._Serializer(true, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(t1);
         }}
     },
     _IsolateContext: {
@@ -1610,7 +1607,7 @@
         if (t1._collection$_length === 0) {
           for (t1 = this.delayedEvents; t2 = t1.length, t2 !== 0;) {
             if (0 >= t2)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             $event = t1.pop();
             t2 = init.globalState.topEventLoop.events;
             t3 = t2._head;
@@ -1718,11 +1715,11 @@
           }
           return;
         }
-        message = Array(2);
+        message = new Array(2);
         message.fixed$length = Array;
         message[0] = J.toString$0$(error);
         message[1] = stackTrace == null ? null : J.toString$0$(stackTrace);
-        for (t1 = H.setRuntimeTypeInfo(new P.LinkedHashSetIterator(t1, t1._collection$_modifications, null, null), [null]), t1._cell = t1._set._collection$_first; t1.moveNext$0();)
+        for (t1 = H.setRuntimeTypeInfo(new P.LinkedHashSetIterator(t1, t1._collection$_modifications, null, null), [null]), t1._collection$_cell = t1._set._collection$_first; t1.moveNext$0();)
           J.send$1$x(t1._collection$_current, message);
       },
       eval$1: function(code) {
@@ -1835,7 +1832,7 @@
           if (t2) {
             t1 = t1.mainManager;
             t2 = P.LinkedHashMap__makeLiteral(["command", "close"]);
-            t2 = new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t2);
+            t2 = new H._Serializer(true, H.setRuntimeTypeInfo(new P._LinkedIdentityHashMap(0, null, null, null, null, null, 0), [null, P.$int])).serialize$1(t2);
             t1.toString;
             self.postMessage(t2);
           }
@@ -1864,16 +1861,16 @@
             trace = H.getTraceFromException(exception);
             t1 = init.globalState.mainManager;
             t2 = P.LinkedHashMap__makeLiteral(["command", "error", "msg", H.S(e) + "\n" + H.S(trace)]);
-            t2 = new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t2);
+            t2 = new H._Serializer(true, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(t2);
             t1.toString;
             self.postMessage(t2);
           }
       }
     },
     _EventLoop__runHelper_next: {
-      "^": "Closure:3;__isolate_helper$_captured_this_0",
+      "^": "Closure:3;_captured_this_0",
       call$0: function() {
-        if (!this.__isolate_helper$_captured_this_0.runIteration$0())
+        if (!this._captured_this_0.runIteration$0())
           return;
         P.Timer_Timer(C.Duration_0, this);
       }
@@ -1896,7 +1893,7 @@
       "^": "Object;"
     },
     IsolateNatives__processWorkerMessage_closure: {
-      "^": "Closure:2;_captured_entryPoint_0,_captured_args_1,_captured_message_2,_captured_isSpawnUri_3,_captured_startPaused_4,_captured_replyTo_5",
+      "^": "Closure:1;_captured_entryPoint_0,_captured_args_1,_captured_message_2,_captured_isSpawnUri_3,_captured_startPaused_4,_captured_replyTo_5",
       call$0: function() {
         H.IsolateNatives__startIsolate(this._captured_entryPoint_0, this._captured_args_1, this._captured_message_2, this._captured_isSpawnUri_3, this._captured_startPaused_4, this._captured_replyTo_5);
       }
@@ -1989,9 +1986,9 @@
       }
     },
     _NativeJsSendPort_send_closure: {
-      "^": "Closure:2;__isolate_helper$_captured_this_0,_captured_msg_1",
+      "^": "Closure:1;_captured_this_0,_captured_msg_1",
       call$0: function() {
-        var t1 = this.__isolate_helper$_captured_this_0._receivePort;
+        var t1 = this._captured_this_0._receivePort;
         if (!t1.get$_isClosed())
           t1.__isolate_helper$_add$1(this._captured_msg_1);
       }
@@ -2001,7 +1998,7 @@
       send$1: function(_, message) {
         var t1, workerMessage, manager;
         t1 = P.LinkedHashMap__makeLiteral(["command", "message", "port", this, "msg", message]);
-        workerMessage = new H._Serializer(true, P.LinkedHashMap_LinkedHashMap$identity(null, P.$int)).serialize$1(t1);
+        workerMessage = new H._Serializer(true, P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6(null, P.$int)).serialize$1(t1);
         if (init.globalState.isWorker === true) {
           init.globalState.mainManager.toString;
           self.postMessage(workerMessage);
@@ -2073,17 +2070,17 @@
         }}
     },
     TimerImpl_internalCallback: {
-      "^": "Closure:3;__isolate_helper$_captured_this_0,_captured_callback_1",
+      "^": "Closure:3;_captured_this_0,_captured_callback_1",
       call$0: function() {
-        this.__isolate_helper$_captured_this_0._handle = null;
+        this._captured_this_0._handle = null;
         this._captured_callback_1.call$0();
       }
     },
     TimerImpl_internalCallback0: {
-      "^": "Closure:3;__isolate_helper$_captured_this_2,_captured_callback_3",
+      "^": "Closure:3;_captured_this_2,_captured_callback_3",
       call$0: function() {
-        this.__isolate_helper$_captured_this_2._handle = null;
-        H.leaveJsAsync();
+        this._captured_this_2._handle = null;
+        --init.globalState.topEventLoop._activeJsAsyncCount;
         this._captured_callback_3.call$0();
       }
     },
@@ -2161,7 +2158,7 @@
         if (!(x instanceof P.Object))
           this.unsupported$1(x);
         return ["dart", init.classIdExtractor(x), this.serializeArrayInPlace$1(init.classFieldsExtractor(x))];
-      }, "call$1", "get$serialize", 2, 0, 1],
+      }, "call$1", "get$serialize", 2, 0, 2],
       unsupported$2: function(x, message) {
         throw H.wrapException(new P.UnsupportedError(H.S(message == null ? "Can't transmit:" : message) + " " + H.S(x)));
       },
@@ -2258,8 +2255,7 @@
               return H.ioore(x, 1);
             result = x[1];
             this.deserializedObjects.push(result);
-            t1 = this.deserializeArrayInPlace$1(result);
-            t1.$builtinTypeInfo = [null];
+            t1 = H.setRuntimeTypeInfo(this.deserializeArrayInPlace$1(result), [null]);
             t1.fixed$length = Array;
             return t1;
           case "extendable":
@@ -2267,9 +2263,7 @@
               return H.ioore(x, 1);
             result = x[1];
             this.deserializedObjects.push(result);
-            t1 = this.deserializeArrayInPlace$1(result);
-            t1.$builtinTypeInfo = [null];
-            return t1;
+            return H.setRuntimeTypeInfo(this.deserializeArrayInPlace$1(result), [null]);
           case "mutable":
             if (1 >= x.length)
               return H.ioore(x, 1);
@@ -2281,8 +2275,7 @@
               return H.ioore(x, 1);
             result = x[1];
             this.deserializedObjects.push(result);
-            t1 = this.deserializeArrayInPlace$1(result);
-            t1.$builtinTypeInfo = [null];
+            t1 = H.setRuntimeTypeInfo(this.deserializeArrayInPlace$1(result), [null]);
             t1.fixed$length = Array;
             return t1;
           case "map":
@@ -2322,7 +2315,7 @@
           default:
             throw H.wrapException("couldn't deserialize: " + H.S(x));
         }
-      }, "call$1", "get$deserialize", 2, 0, 1],
+      }, "call$1", "get$deserialize", 2, 0, 2],
       deserializeArrayInPlace$1: function(x) {
         var t1, i, t2;
         t1 = J.getInterceptor$asx(x);
@@ -2501,13 +2494,29 @@
       return result;
     },
     Primitives_objectTypeName: function(object) {
-      var $name, decompiled;
-      $name = C.JS_CONST_8ZY(J.getInterceptor(object));
-      if ($name === "Object") {
-        decompiled = String(object.constructor).match(/^\s*function\s*([\w$]*)\s*\(/)[1];
-        if (typeof decompiled === "string")
-          $name = /^\w+$/.test(decompiled) ? decompiled : $name;
+      var interceptor, interceptorConstructor, interceptorConstructorName, $name, dispatchName, objectConstructor, decompiledName;
+      interceptor = J.getInterceptor(object);
+      interceptorConstructor = interceptor.constructor;
+      if (typeof interceptorConstructor == "function") {
+        interceptorConstructorName = interceptorConstructor.name;
+        $name = typeof interceptorConstructorName === "string" ? interceptorConstructorName : null;
+      } else
+        $name = null;
+      if ($name == null || interceptor === C.Interceptor_methods || !!J.getInterceptor(object).$isUnknownJavaScriptObject) {
+        dispatchName = C.JS_CONST_8ZY(object);
+        if (dispatchName === "Object") {
+          objectConstructor = object.constructor;
+          if (typeof objectConstructor == "function") {
+            decompiledName = String(objectConstructor).match(/^\s*function\s*([\w$]*)\s*\(/)[1];
+            if (typeof decompiledName === "string" && /^\w+$/.test(decompiledName))
+              $name = decompiledName;
+          }
+          if ($name == null)
+            $name = dispatchName;
+        } else
+          $name = dispatchName;
       }
+      $name = $name;
       if ($name.length > 1 && C.JSString_methods.codeUnitAt$1($name, 0) === 36)
         $name = C.JSString_methods.substring$1($name, 1);
       return ($name + H.joinArguments(H.getRuntimeTypeInfo(object), 0, null)).replace(/[^<,> ]+/g, function(m) {
@@ -2519,7 +2528,7 @@
     },
     Primitives_dateNow: [function() {
       return Date.now();
-    }, "call$0", "_js_helper_Primitives_dateNow$closure", 0, 0, 33],
+    }, "call$0", "_js_helper_Primitives_dateNow$closure", 0, 0, 30],
     Primitives_initTicker: function() {
       var $window, performance;
       if ($.Primitives_timerFrequency != null)
@@ -2558,8 +2567,7 @@
     },
     Primitives_stringFromCodePoints: function(codePoints) {
       var a, t1, _i, i;
-      a = [];
-      a.$builtinTypeInfo = [P.$int];
+      a = H.setRuntimeTypeInfo([], [P.$int]);
       for (t1 = codePoints.length, _i = 0; _i < codePoints.length; codePoints.length === t1 || (0, H.throwConcurrentModificationError)(codePoints), ++_i) {
         i = codePoints[_i];
         if (typeof i !== "number" || Math.floor(i) !== i)
@@ -2655,6 +2663,19 @@
       if (t1)
         return P.IndexError$(index, indexable, "index", null, $length);
       return P.RangeError$value(index, "index", null);
+    },
+    diagnoseRangeError: function(start, end, $length) {
+      if (typeof start !== "number" || Math.floor(start) !== start)
+        return new P.ArgumentError(true, start, "start", null);
+      if (start < 0 || start > $length)
+        return new P.RangeError(0, $length, true, start, "start", "Invalid value");
+      if (end != null) {
+        if (typeof end !== "number" || Math.floor(end) !== end)
+          return new P.ArgumentError(true, end, "end", null);
+        if (end < start || end > $length)
+          return new P.RangeError(start, $length, true, end, "end", "Invalid value");
+      }
+      return new P.ArgumentError(true, end, "end", null);
     },
     argumentErrorValue: function(object) {
       return new P.ArgumentError(true, object, null, null);
@@ -3085,7 +3106,7 @@
     interceptedTypeCast: function(value, property) {
       var t1;
       if (value != null)
-        t1 = typeof value === "object" && J.getInterceptor(value)[property];
+        t1 = (typeof value === "object" || typeof value === "function") && J.getInterceptor(value)[property];
       else
         t1 = true;
       if (t1)
@@ -3105,8 +3126,7 @@
       return (Math.random() * 0x100000000 >>> 0) + (Math.random() * 0x100000000 >>> 0) * 4294967296;
     },
     setRuntimeTypeInfo: function(target, rti) {
-      if (target != null)
-        target.$builtinTypeInfo = rti;
+      target.$builtinTypeInfo = rti;
       return target;
     },
     getRuntimeTypeInfo: function(target) {
@@ -3162,11 +3182,13 @@
     },
     substitute: function(substitution, $arguments) {
       if (typeof substitution == "function") {
-        substitution = H.invokeOn(substitution, null, $arguments);
-        if (substitution == null || typeof substitution === "object" && substitution !== null && substitution.constructor === Array)
-          $arguments = substitution;
-        else if (typeof substitution == "function")
-          $arguments = H.invokeOn(substitution, null, $arguments);
+        substitution = substitution.apply(null, $arguments);
+        if (substitution == null)
+          return substitution;
+        if (typeof substitution === "object" && substitution !== null && substitution.constructor === Array)
+          return substitution;
+        if (typeof substitution == "function")
+          return substitution.apply(null, $arguments);
       }
       return $arguments;
     },
@@ -3191,7 +3213,7 @@
       return true;
     },
     computeSignature: function(signature, context, contextName) {
-      return H.invokeOn(signature, context, H.getRuntimeTypeArguments(context, contextName));
+      return signature.apply(context, H.getRuntimeTypeArguments(context, contextName));
     },
     isSubtype: function(s, t) {
       var t1, typeOfS, t2, typeOfT, substitution;
@@ -3267,10 +3289,10 @@
       var sReturnType, tReturnType, sParameterTypes, tParameterTypes, sOptionalParameterTypes, tOptionalParameterTypes, sParametersLen, tParametersLen, sOptionalParametersLen, tOptionalParametersLen, pos, t1, t2, tPos, sPos;
       if (!('func' in s))
         return false;
-      if ("void" in s) {
-        if (!("void" in t) && "ret" in t)
+      if ("v" in s) {
+        if (!("v" in t) && "ret" in t)
           return false;
-      } else if (!("void" in t)) {
+      } else if (!("v" in t)) {
         sReturnType = s.ret;
         tReturnType = t.ret;
         if (!(H.isSubtype(sReturnType, tReturnType) || H.isSubtype(tReturnType, sReturnType)))
@@ -3314,9 +3336,6 @@
         }
       }
       return H.areAssignableMaps(s.named, t.named);
-    },
-    invokeOn: function($function, receiver, $arguments) {
-      return $function.apply(receiver, $arguments);
     },
     toStringForNativeObject: function(obj) {
       var t1 = $.getTagFunction;
@@ -3465,24 +3484,6 @@
     applyHooksTransformer: function(transformer, hooks) {
       return transformer(hooks) || hooks;
     },
-    allMatchesInStringUnchecked: function(pattern, string, startIndex) {
-      var result, $length, patternLength, position, endIndex;
-      result = H.setRuntimeTypeInfo([], [P.Match]);
-      $length = string.length;
-      patternLength = pattern.length;
-      for (; true;) {
-        position = string.indexOf(pattern, startIndex);
-        if (position === -1)
-          break;
-        result.push(new H.StringMatch(position, string, pattern));
-        endIndex = position + patternLength;
-        if (endIndex === $length)
-          break;
-        else
-          startIndex = position === endIndex ? startIndex + 1 : endIndex;
-      }
-      return result;
-    },
     stringContainsUnchecked: function(receiver, other, startIndex) {
       var t1;
       if (typeof other === "string")
@@ -3492,8 +3493,10 @@
         if (!!t1.$isJSSyntaxRegExp) {
           t1 = C.JSString_methods.substring$1(receiver, startIndex);
           return other._nativeRegExp.test(H.checkString(t1));
-        } else
-          return J.get$isNotEmpty$asx(t1.allMatches$1(other, C.JSString_methods.substring$1(receiver, startIndex)));
+        } else {
+          t1 = t1.allMatches$1(other, C.JSString_methods.substring$1(receiver, startIndex));
+          return !t1.get$isEmpty(t1);
+        }
       }
     },
     stringReplaceAllUnchecked: function(receiver, pattern, replacement) {
@@ -3634,7 +3637,7 @@
         }}
     },
     Primitives_initTicker_closure: {
-      "^": "Closure:2;_captured_performance_0",
+      "^": "Closure:1;_captured_performance_0",
       call$0: function() {
         return C.JSNumber_methods.toInt$0(Math.floor(1000 * this._captured_performance_0.now()));
       }
@@ -3731,7 +3734,7 @@
       }
     },
     unwrapException_saveStackTrace: {
-      "^": "Closure:1;_captured_ex_0",
+      "^": "Closure:2;_captured_ex_0",
       call$1: function(error) {
         if (!!J.getInterceptor(error).$isError)
           if (error.$thrownJsError == null)
@@ -3754,31 +3757,31 @@
       }
     },
     invokeClosure_closure: {
-      "^": "Closure:2;_captured_closure_0",
+      "^": "Closure:1;_captured_closure_0",
       call$0: function() {
         return this._captured_closure_0.call$0();
       }
     },
     invokeClosure_closure0: {
-      "^": "Closure:2;_captured_closure_1,_captured_arg1_2",
+      "^": "Closure:1;_captured_closure_1,_captured_arg1_2",
       call$0: function() {
         return this._captured_closure_1.call$1(this._captured_arg1_2);
       }
     },
     invokeClosure_closure1: {
-      "^": "Closure:2;_captured_closure_3,_captured_arg1_4,_captured_arg2_5",
+      "^": "Closure:1;_captured_closure_3,_captured_arg1_4,_captured_arg2_5",
       call$0: function() {
         return this._captured_closure_3.call$2(this._captured_arg1_4, this._captured_arg2_5);
       }
     },
     invokeClosure_closure2: {
-      "^": "Closure:2;_captured_closure_6,_captured_arg1_7,_captured_arg2_8,_captured_arg3_9",
+      "^": "Closure:1;_captured_closure_6,_captured_arg1_7,_captured_arg2_8,_captured_arg3_9",
       call$0: function() {
         return this._captured_closure_6.call$3(this._captured_arg1_7, this._captured_arg2_8, this._captured_arg3_9);
       }
     },
     invokeClosure_closure3: {
-      "^": "Closure:2;_captured_closure_10,_captured_arg1_11,_captured_arg2_12,_captured_arg3_13,_captured_arg4_14",
+      "^": "Closure:1;_captured_closure_10,_captured_arg1_11,_captured_arg2_12,_captured_arg3_13,_captured_arg4_14",
       call$0: function() {
         return this._captured_closure_10.call$4(this._captured_arg1_11, this._captured_arg2_12, this._captured_arg3_13, this._captured_arg4_14);
       }
@@ -3808,7 +3811,7 @@
       }
     },
     BoundClosure: {
-      "^": "TearOffClosure;_self,__js_helper$_target,_receiver,__js_helper$_name",
+      "^": "TearOffClosure;_self,__js_helper$_target,_receiver,_name",
       $eq: function(_, other) {
         if (other == null)
           return false;
@@ -3834,7 +3837,7 @@
         var receiver = this._receiver;
         if (receiver == null)
           receiver = this._self;
-        return "Closure '" + H.S(this.__js_helper$_name) + "' of " + H.Primitives_objectToHumanReadableString(receiver);
+        return "Closure '" + H.S(this._name) + "' of " + H.Primitives_objectToHumanReadableString(receiver);
       },
       static: {BoundClosure_selfOf: function(closure) {
           return closure._self;
@@ -3900,7 +3903,7 @@
         t1 = this.returnType;
         t2 = J.getInterceptor(t1);
         if (!!t2.$isVoidRuntimeType)
-          result.void = true;
+          result.v = true;
         else if (!t2.$isDynamicRuntimeType)
           result.ret = t1.toRti$0();
         t1 = this.parameterTypes;
@@ -4002,12 +4005,12 @@
       }
     },
     JsLinkedHashMap: {
-      "^": "Object;__js_helper$_length,_strings,_nums,_rest,_first,_last,_modifications",
+      "^": "Object;_length,_strings,_nums,_rest,_first,_last,_modifications",
       get$length: function(_) {
-        return this.__js_helper$_length;
+        return this._length;
       },
       get$isEmpty: function(_) {
-        return this.__js_helper$_length === 0;
+        return this._length === 0;
       },
       get$isNotEmpty: function(_) {
         return !this.get$isEmpty(this);
@@ -4135,13 +4138,13 @@
         return cell.get$hashMapCellValue();
       },
       clear$0: function(_) {
-        if (this.__js_helper$_length > 0) {
+        if (this._length > 0) {
           this._last = null;
           this._first = null;
           this._rest = null;
           this._nums = null;
           this._strings = null;
-          this.__js_helper$_length = 0;
+          this._length = 0;
           this._modifications = this._modifications + 1 & 67108863;
         }
       },
@@ -4186,7 +4189,7 @@
           last._next = cell;
           this._last = cell;
         }
-        ++this.__js_helper$_length;
+        ++this._length;
         this._modifications = this._modifications + 1 & 67108863;
         return cell;
       },
@@ -4202,7 +4205,7 @@
           this._last = previous;
         else
           next._previous = previous;
-        --this.__js_helper$_length;
+        --this._length;
         this._modifications = this._modifications + 1 & 67108863;
       },
       internalComputeHashCode$1: function(key) {
@@ -4243,7 +4246,7 @@
       $isMap: 1
     },
     JsLinkedHashMap_values_closure: {
-      "^": "Closure:1;__js_helper$_captured_this_0",
+      "^": "Closure:2;__js_helper$_captured_this_0",
       call$1: function(each) {
         return this.__js_helper$_captured_this_0.$index(0, each);
       }
@@ -4254,17 +4257,17 @@
     LinkedHashMapKeyIterable: {
       "^": "Iterable;_map",
       get$length: function(_) {
-        return this._map.__js_helper$_length;
+        return this._map._length;
       },
       get$isEmpty: function(_) {
-        return this._map.__js_helper$_length === 0;
+        return this._map._length === 0;
       },
       get$iterator: function(_) {
         var t1, t2;
         t1 = this._map;
         t2 = new H.LinkedHashMapKeyIterator(t1, t1._modifications, null, null);
         t2.$builtinTypeInfo = this.$builtinTypeInfo;
-        t2.__js_helper$_cell = t1._first;
+        t2._cell = t1._first;
         return t2;
       },
       contains$1: function(_, element) {
@@ -4285,7 +4288,7 @@
       $isEfficientLength: 1
     },
     LinkedHashMapKeyIterator: {
-      "^": "Object;_map,_modifications,__js_helper$_cell,__js_helper$_current",
+      "^": "Object;_map,_modifications,_cell,__js_helper$_current",
       get$current: function() {
         return this.__js_helper$_current;
       },
@@ -4294,32 +4297,32 @@
         if (this._modifications !== t1._modifications)
           throw H.wrapException(new P.ConcurrentModificationError(t1));
         else {
-          t1 = this.__js_helper$_cell;
+          t1 = this._cell;
           if (t1 == null) {
             this.__js_helper$_current = null;
             return false;
           } else {
             this.__js_helper$_current = t1.hashMapCellKey;
-            this.__js_helper$_cell = t1._next;
+            this._cell = t1._next;
             return true;
           }
         }
       }
     },
     initHooks_closure: {
-      "^": "Closure:1;_captured_getTag_0",
+      "^": "Closure:2;_captured_getTag_0",
       call$1: function(o) {
         return this._captured_getTag_0(o);
       }
     },
     initHooks_closure0: {
-      "^": "Closure:34;_captured_getUnknownTag_1",
+      "^": "Closure:9;_captured_getUnknownTag_1",
       call$2: function(o, tag) {
         return this._captured_getUnknownTag_1(o, tag);
       }
     },
     initHooks_closure1: {
-      "^": "Closure:29;_captured_prototypeForTag_2",
+      "^": "Closure:10;_captured_prototypeForTag_2",
       call$1: function(tag) {
         return this._captured_prototypeForTag_2(tag);
       }
@@ -4364,7 +4367,7 @@
         match = regexp.exec(string);
         if (match == null)
           return;
-        return H._MatchImplementation$(this, match);
+        return new H._MatchImplementation(this, match);
       },
       _execAnchored$2: function(string, start) {
         var regexp, match, t1, t2;
@@ -4380,7 +4383,7 @@
         if (match[t2] != null)
           return;
         C.JSArray_methods.set$length(match, t2);
-        return H._MatchImplementation$(this, match);
+        return new H._MatchImplementation(this, match);
       },
       matchAsPrefix$2: function(_, string, start) {
         if (start < 0 || start > string.length)
@@ -4427,14 +4430,7 @@
         if (index >>> 0 !== index || index >= t1.length)
           return H.ioore(t1, index);
         return t1[index];
-      },
-      _MatchImplementation$2: function(pattern, _match) {
-      },
-      static: {_MatchImplementation$: function(pattern, _match) {
-          var t1 = new H._MatchImplementation(pattern, _match);
-          t1._MatchImplementation$2(pattern, _match);
-          return t1;
-        }}
+      }
     },
     _AllMatchesIterable: {
       "^": "IterableBase;_re,__js_helper$_string,__js_helper$_start",
@@ -4489,6 +4485,52 @@
         if (!J.$eq$(g, 0))
           H.throwExpression(P.RangeError$value(g, null, null));
         return this.pattern;
+      }
+    },
+    _StringAllMatchesIterable: {
+      "^": "Iterable;_input,_pattern,__js_helper$_index",
+      get$iterator: function(_) {
+        return new H._StringAllMatchesIterator(this._input, this._pattern, this.__js_helper$_index, null);
+      },
+      get$first: function(_) {
+        var t1, t2, index;
+        t1 = this._input;
+        t2 = this._pattern;
+        index = t1.indexOf(t2, this.__js_helper$_index);
+        if (index >= 0)
+          return new H.StringMatch(index, t1, t2);
+        throw H.wrapException(H.IterableElementError_noElement());
+      },
+      $asIterable: function() {
+        return [P.Match];
+      }
+    },
+    _StringAllMatchesIterator: {
+      "^": "Object;_input,_pattern,__js_helper$_index,__js_helper$_current",
+      moveNext$0: function() {
+        var t1, t2, t3, t4, t5, index, end;
+        t1 = this.__js_helper$_index;
+        t2 = this._pattern;
+        t3 = t2.length;
+        t4 = this._input;
+        t5 = t4.length;
+        if (t1 + t3 > t5) {
+          this.__js_helper$_current = null;
+          return false;
+        }
+        index = t4.indexOf(t2, t1);
+        if (index < 0) {
+          this.__js_helper$_index = t5 + 1;
+          this.__js_helper$_current = null;
+          return false;
+        }
+        end = index + t3;
+        this.__js_helper$_current = new H.StringMatch(index, t4, t2);
+        this.__js_helper$_index = end === this.__js_helper$_index ? end + 1 : end;
+        return true;
+      },
+      get$current: function() {
+        return this.__js_helper$_current;
       }
     }
   }], ["char_encodings", "package:html/src/char_encodings.dart",, G, {
@@ -4654,12 +4696,12 @@
       H.Primitives_initTicker();
       $.Stopwatch__frequency = $.Primitives_timerFrequency;
       t1 = H.setRuntimeTypeInfo(new W._EventStream(document, "readystatechange", false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure(onReady, new P.Stopwatch(null, null))), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure(onReady, new P.Stopwatch(null, null))), false), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
       t1 = J.get$onClick$x(document.querySelector("#view-source"));
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new R.init_closure0(script)), false), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
     },
     init_closure: {
-      "^": "Closure:1;_captured_onReady_1,_captured_stopwatch_2",
+      "^": "Closure:2;_captured_onReady_1,_captured_stopwatch_2",
       call$1: function($event) {
         var t1;
         if (document.readyState === "complete") {
@@ -4671,7 +4713,7 @@
       }
     },
     init_closure0: {
-      "^": "Closure:1;_captured_script_3",
+      "^": "Closure:2;_captured_script_3",
       call$1: function(_) {
         var t1, popup, t2, t3;
         t1 = {};
@@ -4692,7 +4734,7 @@
       }
     },
     init__closure: {
-      "^": "Closure:1;_common$_box_0,_captured_sendCode_5",
+      "^": "Closure:2;_common$_box_0,_captured_sendCode_5",
       call$1: function($event) {
         var t1;
         if (J.$eq$(J.$index$asx(J.get$data$x($event), "command"), "ready")) {
@@ -4704,7 +4746,7 @@
       }
     },
     init__closure0: {
-      "^": "Closure:1;_common$_box_0,_captured_sendCode_6",
+      "^": "Closure:2;_common$_box_0,_captured_sendCode_6",
       call$1: function(c) {
         var t1 = this._common$_box_0;
         t1._captured_code_0 = c;
@@ -4805,9 +4847,9 @@
       t2 = t1.get$length(text);
       if (typeof t2 !== "number")
         return H.iae(t2);
-      result = Array(t2);
-      result.fixed$length = Array;
-      result.$builtinTypeInfo = [P.$int];
+      t2 = new Array(t2);
+      t2.fixed$length = Array;
+      result = H.setRuntimeTypeInfo(t2, [P.$int]);
       t2 = result.length;
       i = 0;
       while (true) {
@@ -5051,7 +5093,7 @@
       "^": "Object;tokenizer,_baseUrl,file<,_previousToken,_peekToken",
       _parser$_next$1$unicodeRange: function(unicodeRange) {
         this._previousToken = this._peekToken;
-        this._peekToken = this.tokenizer.next$1$unicodeRange(unicodeRange);
+        this._peekToken = this.tokenizer.next$1$unicodeRange(false);
         return this._previousToken;
       },
       _parser$_next$0: function() {
@@ -5114,11 +5156,11 @@
         } while (this._maybeEat$1(19));
         if (selectors.length > 0)
           return new B.SelectorGroup(selectors, this._makeSpan$1(t1.span));
+        return;
       },
       processSelector$0: function() {
-        var simpleSequences, t1, t2, t3, combinatorType, thisOperator, t4, t5, span, simpleSel, result;
-        simpleSequences = [];
-        simpleSequences.$builtinTypeInfo = [B.SimpleSelectorSequence];
+        var simpleSequences, t1, t2, t3, combinatorType, thisOperator, t4, span, simpleSel, result;
+        simpleSequences = H.setRuntimeTypeInfo([], [B.SimpleSelectorSequence]);
         t1 = this._peekToken;
         for (; true;) {
           t2 = simpleSequences.length;
@@ -5156,18 +5198,10 @@
             t2 = this._previousToken;
             if (t2 != null) {
               t2 = t2.span;
-              t4 = t2.file;
-              t2 = t2._end;
-              new G.FileLocation(t4, null, t2, 0, t2).SourceLocation$4$column$line$sourceUrl(t2, null, null, null);
-              if (J.$gt$n(t2, t4._decodedChars.length))
-                H.throwExpression(P.RangeError$("Offset " + H.S(t2) + " must not be greater than the number of characters in the file, " + t4.get$length(t4) + "."));
+              t2 = G.FileLocation$_(t2.file, t2._end);
               t4 = this._peekToken.span;
-              t5 = t4.file;
-              t4 = t4._file$_start;
-              new G.FileLocation(t5, null, t4, 0, t4).SourceLocation$4$column$line$sourceUrl(t4, null, null, null);
-              if (J.$gt$n(t4, t5._decodedChars.length))
-                H.throwExpression(P.RangeError$("Offset " + H.S(t4) + " must not be greater than the number of characters in the file, " + t5.get$length(t5) + "."));
-              t2 = !J.$eq$(t2, t4);
+              t4 = !J.$eq$(t2.offset, G.FileLocation$_(t4.file, t4._file$_start).offset);
+              t2 = t4;
             } else
               t2 = false;
             if (t2)
@@ -5231,7 +5265,7 @@
           return new B.ElementSelector(first, this._makeSpan$1(start));
         else
           return this.simpleSelectorTail$0();
-      }, "call$0", "get$simpleSelector", 0, 0, 2],
+      }, "call$0", "get$simpleSelector", 0, 0, 1],
       _anyWhiteSpaceBeforePeekToken$1: function(kind) {
         var t1, t2;
         t1 = this._previousToken;
@@ -5248,7 +5282,7 @@
         return false;
       },
       simpleSelectorTail$0: function() {
-        var t1, start, hasWhiteSpace, id, attrName, op, value, result;
+        var t1, start, hasWhiteSpace, id;
         t1 = this._peekToken;
         start = t1.span;
         switch (t1.kind) {
@@ -5280,30 +5314,7 @@
           case 17:
             return this.processPseudoSelector$1(start);
           case 4:
-            if (this._maybeEat$1(4)) {
-              attrName = this.identifier$0();
-              op = this._peekToken.kind;
-              switch (op) {
-                case 28:
-                case 530:
-                case 531:
-                case 532:
-                case 533:
-                case 534:
-                  this._parser$_next$0();
-                  break;
-                default:
-                  op = 535;
-              }
-              if (!J.$eq$(op, 535))
-                value = J.$eq$(this._peekToken.kind, 511) ? this.identifier$0() : this.processQuotedString$1(false);
-              else
-                value = null;
-              this._eat$1(5);
-              result = new B.AttributeSelector(op, value, attrName, this._makeSpan$1(start));
-            } else
-              result = null;
-            return result;
+            return this.processAttribute$0();
           case 62:
             this._parser$_error$2("name must start with a alpha character, but found a number", start);
             this._parser$_next$0();
@@ -5394,6 +5405,33 @@
         }
         return new B.SelectorExpression(expressions, this._makeSpan$1(start));
       },
+      processAttribute$0: function() {
+        var t1, attrName, op, value;
+        t1 = this._peekToken;
+        if (this._maybeEat$1(4)) {
+          attrName = this.identifier$0();
+          op = this._peekToken.kind;
+          switch (op) {
+            case 28:
+            case 530:
+            case 531:
+            case 532:
+            case 533:
+            case 534:
+              this._parser$_next$0();
+              break;
+            default:
+              op = 535;
+          }
+          if (!J.$eq$(op, 535))
+            value = J.$eq$(this._peekToken.kind, 511) ? this.identifier$0() : this.processQuotedString$1(false);
+          else
+            value = null;
+          this._eat$1(5);
+          return new B.AttributeSelector(op, value, attrName, this._makeSpan$1(t1.span));
+        }
+        return;
+      },
       processDimension$3: function(t, value, span) {
         var unitType, term;
         unitType = this._peekToken.kind;
@@ -5483,12 +5521,12 @@
         return term;
       },
       processQuotedString$1: function(urlString) {
-        var t1, stopToken, t2, skipWhitespace, t3, $location, msg, stringValue;
+        var t1, stopToken, t2, inString, t3, $location, msg, stringValue;
         t1 = this._peekToken;
         stopToken = urlString ? 3 : -1;
         t2 = this.tokenizer;
-        skipWhitespace = t2._skipWhitespace;
-        t2._skipWhitespace = false;
+        inString = t2._inString;
+        t2._inString = false;
         t3 = t1.kind;
         switch (t3) {
           case 25:
@@ -5528,7 +5566,7 @@
           t1 = this._previousToken;
           stringValue._contents += t1.get$text(t1);
         }
-        t2._skipWhitespace = skipWhitespace;
+        t2._inString = inString;
         if (stopToken !== 3) {
           this._previousToken = this._peekToken;
           this._peekToken = t2.next$1$unicodeRange(false);
@@ -5537,17 +5575,13 @@
         return t1.charCodeAt(0) == 0 ? t1 : t1;
       },
       identifier$0: function() {
-        var tok, t1, t2;
+        var tok, t1;
         this._previousToken = this._peekToken;
         this._peekToken = this.tokenizer.next$1$unicodeRange(false);
         tok = this._previousToken;
         t1 = tok.kind;
         if (!J.$eq$(t1, 511) && !S.TokenKind_isKindIdentifier(t1)) {
-          if ($.messages.options.checked) {
-            t1 = "expected identifier, but found " + J.toString$0$(tok);
-            t2 = tok.span;
-            $.messages.warning$2(t1, t2);
-          }
+          $.messages.options;
           return new B.Identifier("", this._makeSpan$1(tok.span));
         }
         return new B.Identifier(tok.get$text(tok), this._makeSpan$1(tok.span));
@@ -5583,7 +5617,7 @@
       "^": "Token;text>,kind,span"
     },
     Tokenizer: {
-      "^": "TokenizerBase;UNICODE_U,UNICODE_LOWER_U,UNICODE_PLUS,QUESTION_MARK,CDATA_NAME,_file,_text,_skipWhitespace,inSelectorExpression,inSelector,_parser$_index,_startIndex",
+      "^": "TokenizerBase;UNICODE_U,UNICODE_LOWER_U,UNICODE_PLUS,QUESTION_MARK,CDATA_NAME,_file,_text,_inString,inSelectorExpression,inSelector,_parser$_index,_startIndex",
       next$1$unicodeRange: [function(unicodeRange) {
         var ch, t1, t2, peekCh, oldIndex, oldStartIndex, tokId, start, t3, tok, t4;
         this._startIndex = this._parser$_index;
@@ -5597,7 +5631,7 @@
           case 0:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(1, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(1, G._FileSpan$(this._file, t1, t2));
           case 64:
             peekCh = this._peekChar$0();
             if (S.TokenizerHelpers_isIdentifierStartExpr(peekCh) || peekCh === 45) {
@@ -5616,7 +5650,7 @@
               if (!J.$eq$(tokId, -1)) {
                 t1 = this._startIndex;
                 t2 = this._parser$_index;
-                return new S.Token(tokId, G.FileSpan$_(this._file, t1, t2));
+                return new S.Token(tokId, G._FileSpan$(this._file, t1, t2));
               } else {
                 this._startIndex = oldStartIndex;
                 this._parser$_index = oldIndex;
@@ -5624,7 +5658,7 @@
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(10, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(10, G._FileSpan$(this._file, t1, t2));
           case 46:
             start = this._startIndex;
             if (this.maybeEatDigit$0()) {
@@ -5632,129 +5666,129 @@
               if (J.$eq$(this.finishNumber$0().kind, 60)) {
                 this._startIndex = start;
                 t2 = this._parser$_index;
-                return new S.Token(62, G.FileSpan$_(t1, start, t2));
+                return new S.Token(62, G._FileSpan$(t1, start, t2));
               } else {
                 t2 = this._startIndex;
                 t3 = this._parser$_index;
-                return new S.Token(65, G.FileSpan$_(t1, t2, t3));
+                return new S.Token(65, G._FileSpan$(t1, t2, t3));
               }
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(8, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(8, G._FileSpan$(this._file, t1, t2));
           case 40:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(2, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(2, G._FileSpan$(this._file, t1, t2));
           case 41:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(3, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(3, G._FileSpan$(this._file, t1, t2));
           case 123:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(6, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(6, G._FileSpan$(this._file, t1, t2));
           case 125:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(7, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(7, G._FileSpan$(this._file, t1, t2));
           case 91:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(4, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(4, G._FileSpan$(this._file, t1, t2));
           case 93:
             if (this._maybeEatChar$1(93) && this._maybeEatChar$1(62))
               return this.next$0();
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(5, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(5, G._FileSpan$(this._file, t1, t2));
           case 35:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(11, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(11, G._FileSpan$(this._file, t1, t2));
           case 43:
             if (this.maybeEatDigit$0())
               return this.finishNumber$0();
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(12, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(12, G._FileSpan$(this._file, t1, t2));
           case 45:
             if (this.inSelectorExpression || unicodeRange) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(34, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(34, G._FileSpan$(this._file, t1, t2));
             } else if (this.maybeEatDigit$0())
               return this.finishNumber$0();
             else if (S.TokenizerHelpers_isIdentifierStartExpr(ch) || ch === 45)
               return this.finishIdentifier$0();
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(34, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(34, G._FileSpan$(this._file, t1, t2));
           case 62:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(13, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(13, G._FileSpan$(this._file, t1, t2));
           case 126:
             if (this._maybeEatChar$1(61)) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(530, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(530, G._FileSpan$(this._file, t1, t2));
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(14, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(14, G._FileSpan$(this._file, t1, t2));
           case 42:
             if (this._maybeEatChar$1(61)) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(534, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(534, G._FileSpan$(this._file, t1, t2));
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(15, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(15, G._FileSpan$(this._file, t1, t2));
           case 38:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(36, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(36, G._FileSpan$(this._file, t1, t2));
           case 124:
             if (this._maybeEatChar$1(61)) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(531, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(531, G._FileSpan$(this._file, t1, t2));
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(16, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(16, G._FileSpan$(this._file, t1, t2));
           case 58:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(17, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(17, G._FileSpan$(this._file, t1, t2));
           case 44:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(19, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(19, G._FileSpan$(this._file, t1, t2));
           case 59:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(9, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(9, G._FileSpan$(this._file, t1, t2));
           case 37:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(24, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(24, G._FileSpan$(this._file, t1, t2));
           case 39:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(25, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(25, G._FileSpan$(this._file, t1, t2));
           case 34:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(26, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(26, G._FileSpan$(this._file, t1, t2));
           case 47:
             if (this._maybeEatChar$1(42))
               return this.finishMultiLineComment$0();
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(27, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(27, G._FileSpan$(this._file, t1, t2));
           case 60:
             if (this._maybeEatChar$1(33))
               if (this._maybeEatChar$1(45) && this._maybeEatChar$1(45))
@@ -5770,29 +5804,29 @@
               }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(32, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(32, G._FileSpan$(this._file, t1, t2));
           case 61:
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(28, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(28, G._FileSpan$(this._file, t1, t2));
           case 94:
             if (this._maybeEatChar$1(61)) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(532, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(532, G._FileSpan$(this._file, t1, t2));
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(30, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(30, G._FileSpan$(this._file, t1, t2));
           case 36:
             if (this._maybeEatChar$1(61)) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(533, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(533, G._FileSpan$(this._file, t1, t2));
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(31, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(31, G._FileSpan$(this._file, t1, t2));
           case 33:
             tok = this.finishIdentifier$0();
             return tok;
@@ -5800,7 +5834,7 @@
             if (!this.inSelector && ch === 92) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(35, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(35, G._FileSpan$(this._file, t1, t2));
             }
             if (unicodeRange)
               if (this.maybeEatHexDigit$0()) {
@@ -5808,12 +5842,12 @@
                 t1 = this._file;
                 t2 = this._startIndex;
                 t3 = this._parser$_index;
-                t2 = G.FileSpan$_(t1, t2, t3);
+                t2 = G._FileSpan$(t1, t2, t3);
                 if (this.maybeEatQuestionMark$0()) {
                   this.eatQuestionMarks$0();
                   t3 = this._startIndex;
                   t4 = this._parser$_index;
-                  G.FileSpan$_(t1, t3, t4);
+                  G._FileSpan$(t1, t3, t4);
                 }
                 return new S.Token(61, t2);
               } else {
@@ -5822,28 +5856,28 @@
                   this.eatQuestionMarks$0();
                   t2 = this._startIndex;
                   t3 = this._parser$_index;
-                  return new S.Token(509, G.FileSpan$_(t1, t2, t3));
+                  return new S.Token(509, G._FileSpan$(t1, t2, t3));
                 } else {
                   t2 = this._startIndex;
                   t3 = this._parser$_index;
-                  return new S.Token(65, G.FileSpan$_(t1, t2, t3));
+                  return new S.Token(65, G._FileSpan$(t1, t2, t3));
                 }
               }
             else if ((ch === this.UNICODE_U || ch === this.UNICODE_LOWER_U) && this._peekChar$0() === this.UNICODE_PLUS) {
               this._nextChar$0();
               t1 = this._parser$_index;
               this._startIndex = t1;
-              return new S.Token(508, G.FileSpan$_(this._file, t1, t1));
+              return new S.Token(508, G._FileSpan$(this._file, t1, t1));
             } else {
               t1 = ch === 118;
               if (t1 && this._maybeEatChar$1(97) && this._maybeEatChar$1(114) && this._maybeEatChar$1(45)) {
                 t1 = this._startIndex;
                 t2 = this._parser$_index;
-                return new S.Token(400, G.FileSpan$_(this._file, t1, t2));
+                return new S.Token(400, G._FileSpan$(this._file, t1, t2));
               } else if (t1 && this._maybeEatChar$1(97) && this._maybeEatChar$1(114) && this._peekChar$0() === 45) {
                 t1 = this._startIndex;
                 t2 = this._parser$_index;
-                return new S.Token(401, G.FileSpan$_(this._file, t1, t2));
+                return new S.Token(401, G._FileSpan$(this._file, t1, t2));
               } else if (S.TokenizerHelpers_isIdentifierStartExpr(ch) || ch === 45)
                 return this.finishIdentifier$0();
               else if (ch >= 48 && ch <= 57)
@@ -5851,11 +5885,11 @@
             }
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(65, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(65, G._FileSpan$(this._file, t1, t2));
         }
       }, function() {
         return this.next$1$unicodeRange(false);
-      }, "next$0", "call$1$unicodeRange", "call$0", "get$next", 0, 3, 30, 1],
+      }, "next$0", "call$1$unicodeRange", "call$0", "get$next", 0, 3, 11, 1],
       finishIdentifier$0: function() {
         var chars, validateFrom, t1, t2, t3, ch, t4, span, text, tokId;
         chars = [];
@@ -5863,7 +5897,7 @@
         this._parser$_index = this._startIndex;
         for (t1 = this._text, t2 = t1.length; t3 = this._parser$_index, t3 < t2;) {
           ch = C.JSString_methods.codeUnitAt$1(t1, t3);
-          if (ch === 92) {
+          if (ch === 92 && this._inString) {
             t3 = ++this._parser$_index;
             this.eatHexDigits$1(t3 + 6);
             t4 = this._parser$_index;
@@ -6002,25 +6036,25 @@
           if (ch === 0) {
             t1 = this._startIndex;
             t2 = this._parser$_index;
-            return new S.Token(67, G.FileSpan$_(this._file, t1, t2));
+            return new S.Token(67, G._FileSpan$(this._file, t1, t2));
           } else if (ch === 42) {
             if (this._maybeEatChar$1(47))
-              if (this._skipWhitespace)
+              if (this._inString)
                 return this.next$0();
               else {
                 t1 = this._startIndex;
                 t2 = this._parser$_index;
-                return new S.Token(64, G.FileSpan$_(this._file, t1, t2));
+                return new S.Token(64, G._FileSpan$(this._file, t1, t2));
               }
           } else if (ch === 45)
             if (this._maybeEatChar$1(45))
               if (this._maybeEatChar$1(62))
-                if (this._skipWhitespace)
+                if (this._inString)
                   return this.next$0();
                 else {
                   t1 = this._startIndex;
                   t2 = this._parser$_index;
-                  return new S.Token(504, G.FileSpan$_(this._file, t1, t2));
+                  return new S.Token(504, G._FileSpan$(this._file, t1, t2));
                 }
         }
         return new S.Token(65, this._file.span$2(0, this._startIndex, this._parser$_index));
@@ -6069,18 +6103,18 @@
           if (ch === 32 || ch === 9 || ch === 13)
             ;
           else if (ch === 10) {
-            if (!this._skipWhitespace) {
+            if (!this._inString) {
               t1 = this._startIndex;
               t2 = this._parser$_index;
-              return new S.Token(63, G.FileSpan$_(this._file, t1, t2));
+              return new S.Token(63, G._FileSpan$(this._file, t1, t2));
             }
           } else {
             t1 = --this._parser$_index;
-            if (this._skipWhitespace)
+            if (this._inString)
               return this.next$0();
             else {
               t2 = this._startIndex;
-              return new S.Token(63, G.FileSpan$_(this._file, t2, t1));
+              return new S.Token(63, G._FileSpan$(this._file, t2, t1));
             }
           }
         }
@@ -6100,9 +6134,9 @@
   }], ["csslib.src.messages", "package:csslib/src/messages.dart",, S, {
     "^": "",
     closure0: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
-        var colorsMap = P.LinkedHashMap_LinkedHashMap(null, null, null, N.Level, P.String);
+        var colorsMap = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [N.Level, P.String]);
         colorsMap.$indexSet(0, C.Level_SEVERE_1000, "\u001b[31m");
         colorsMap.$indexSet(0, C.Level_WARNING_900, "\u001b[35m");
         colorsMap.$indexSet(0, C.Level_INFO_800, "\u001b[32m");
@@ -6110,9 +6144,9 @@
       }
     },
     closure: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
-        var labels = P.LinkedHashMap_LinkedHashMap(null, null, null, N.Level, P.String);
+        var labels = H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [N.Level, P.String]);
         labels.$indexSet(0, C.Level_SEVERE_1000, "error");
         labels.$indexSet(0, C.Level_WARNING_900, "warning");
         labels.$indexSet(0, C.Level_INFO_800, "info");
@@ -6144,13 +6178,9 @@
         var msg = new S.Message(C.Level_SEVERE_1000, message, span, this.options.useColors);
         this.messages.push(msg);
         this.printHandler$1(msg);
-      }, "call$2", "get$error", 4, 0, 37],
+      }, "call$2", "get$error", 4, 0, 12],
       warning$2: function(message, span) {
-        var t1 = this.options;
-        if (t1.warningsAsErrors)
-          this.error$2(0, message, span);
-        else
-          this.messages.push(new S.Message(C.Level_WARNING_900, message, span, t1.useColors));
+        this.messages.push(new S.Message(C.Level_WARNING_900, message, span, this.options.useColors));
       },
       printHandler$1: function(arg0) {
         return this.printHandler.call$1(arg0);
@@ -6290,6 +6320,7 @@
           case 535:
             return "";
         }
+        return;
       },
       valueToString$0: function() {
         var t1, t2;
@@ -6543,14 +6574,8 @@
     IterableElementError_noElement: function() {
       return new P.StateError("No element");
     },
-    IterableElementError_tooMany: function() {
-      return new P.StateError("Too many elements");
-    },
     IterableElementError_tooFew: function() {
       return new P.StateError("Too few elements");
-    },
-    Symbol_getName: function(symbol) {
-      return symbol.get$_name();
     },
     CodeUnits: {
       "^": "UnmodifiableListBase;_string",
@@ -6668,7 +6693,7 @@
           t1 = this.get$length(this);
           if (typeof t1 !== "number")
             return H.iae(t1);
-          result = H.setRuntimeTypeInfo(Array(t1), [H.getRuntimeTypeArgument(this, "ListIterable", 0)]);
+          result = H.setRuntimeTypeInfo(new Array(t1), [H.getRuntimeTypeArgument(this, "ListIterable", 0)]);
         }
         i = 0;
         while (true) {
@@ -6727,25 +6752,25 @@
       }
     },
     ListIterator: {
-      "^": "Object;_iterable,_length,_index,_current",
+      "^": "Object;_iterable,__internal$_length,_index,__internal$_current",
       get$current: function() {
-        return this._current;
+        return this.__internal$_current;
       },
       moveNext$0: function() {
         var t1, t2, $length, t3;
         t1 = this._iterable;
         t2 = J.getInterceptor$asx(t1);
         $length = t2.get$length(t1);
-        if (!J.$eq$(this._length, $length))
+        if (!J.$eq$(this.__internal$_length, $length))
           throw H.wrapException(new P.ConcurrentModificationError(t1));
         t3 = this._index;
         if (typeof $length !== "number")
           return H.iae($length);
         if (t3 >= $length) {
-          this._current = null;
+          this.__internal$_current = null;
           return false;
         }
-        this._current = t2.elementAt$1(t1, t3);
+        this.__internal$_current = t2.elementAt$1(t1, t3);
         ++this._index;
         return true;
       }
@@ -6786,18 +6811,18 @@
       $isEfficientLength: 1
     },
     MappedIterator: {
-      "^": "Iterator;_current,_iterator,_f",
+      "^": "Iterator;__internal$_current,_iterator,_f",
       moveNext$0: function() {
         var t1 = this._iterator;
         if (t1.moveNext$0()) {
-          this._current = this._f$1(t1.get$current());
+          this.__internal$_current = this._f$1(t1.get$current());
           return true;
         }
-        this._current = null;
+        this.__internal$_current = null;
         return false;
       },
       get$current: function() {
-        return this._current;
+        return this.__internal$_current;
       },
       _f$1: function(arg0) {
         return this._f.call$1(arg0);
@@ -6860,9 +6885,9 @@
       }
     },
     ExpandIterator: {
-      "^": "Object;_iterator,_f,_currentExpansion,_current",
+      "^": "Object;_iterator,_f,_currentExpansion,__internal$_current",
       get$current: function() {
-        return this._current;
+        return this.__internal$_current;
       },
       moveNext$0: function() {
         var t1, t2;
@@ -6870,7 +6895,7 @@
         if (t1 == null)
           return false;
         for (t2 = this._iterator; !t1.moveNext$0();) {
-          this._current = null;
+          this.__internal$_current = null;
           if (t2.moveNext$0()) {
             this._currentExpansion = null;
             t1 = J.get$iterator$ax(this._f$1(t2.get$current()));
@@ -6878,7 +6903,7 @@
           } else
             return false;
         }
-        this._current = this._currentExpansion.get$current();
+        this.__internal$_current = this._currentExpansion.get$current();
         return true;
       },
       _f$1: function(arg0) {
@@ -7221,14 +7246,11 @@
     Zone_current: function() {
       return $.Zone__current;
     },
-    Zone__enter: function(zone) {
-      var previous = $.Zone__current;
-      $.Zone__current = zone;
-      return previous;
-    },
     _rootHandleUncaughtError: function($self, $parent, zone, error, stackTrace) {
-      var entry, t1, t2;
-      entry = new P._AsyncCallbackEntry(new P._rootHandleUncaughtError_closure(error, stackTrace), C.C__RootZone, null);
+      var t1, entry, t2;
+      t1 = {};
+      t1._captured_error_0 = error;
+      entry = new P._AsyncCallbackEntry(new P._rootHandleUncaughtError_closure(t1, stackTrace), C.C__RootZone, null);
       t1 = $._nextCallback;
       if (t1 == null) {
         P._scheduleAsyncCallback(entry);
@@ -7248,11 +7270,16 @@
         }
       }
     },
+    _rethrow: function(error, stackTrace) {
+      throw H.wrapException(new P.AsyncError(error, stackTrace));
+    },
     _rootRun: function($self, $parent, zone, f) {
       var old, t1;
-      if ($.Zone__current === zone)
+      t1 = $.Zone__current;
+      if (t1 === zone)
         return f.call$0();
-      old = P.Zone__enter(zone);
+      $.Zone__current = zone;
+      old = t1;
       try {
         t1 = f.call$0();
         return t1;
@@ -7262,9 +7289,11 @@
     },
     _rootRunUnary: function($self, $parent, zone, f, arg) {
       var old, t1;
-      if ($.Zone__current === zone)
+      t1 = $.Zone__current;
+      if (t1 === zone)
         return f.call$1(arg);
-      old = P.Zone__enter(zone);
+      $.Zone__current = zone;
+      old = t1;
       try {
         t1 = f.call$1(arg);
         return t1;
@@ -7274,9 +7303,11 @@
     },
     _rootRunBinary: function($self, $parent, zone, f, arg1, arg2) {
       var old, t1;
-      if ($.Zone__current === zone)
+      t1 = $.Zone__current;
+      if (t1 === zone)
         return f.call$2(arg1, arg2);
-      old = P.Zone__enter(zone);
+      $.Zone__current = zone;
+      old = t1;
       try {
         t1 = f.call$2(arg1, arg2);
         return t1;
@@ -7293,10 +7324,10 @@
       P._scheduleAsyncCallback(new P._AsyncCallbackEntry(f, zone, null));
     },
     _AsyncRun__initializeScheduleImmediate_internalCallback: {
-      "^": "Closure:1;_box_0",
+      "^": "Closure:2;_box_0",
       call$1: function(_) {
         var t1, f;
-        H.leaveJsAsync();
+        --init.globalState.topEventLoop._activeJsAsyncCount;
         t1 = this._box_0;
         f = t1._captured_storedCallback_0;
         t1._captured_storedCallback_0 = null;
@@ -7304,7 +7335,7 @@
       }
     },
     _AsyncRun__initializeScheduleImmediate_closure: {
-      "^": "Closure:15;_box_0,_captured_div_1,_captured_span_2",
+      "^": "Closure:13;_box_0,_captured_div_1,_captured_span_2",
       call$1: function(callback) {
         var t1, t2;
         ++init.globalState.topEventLoop._activeJsAsyncCount;
@@ -7315,34 +7346,18 @@
       }
     },
     _AsyncRun__scheduleImmediateJsOverride_internalCallback: {
-      "^": "Closure:2;_captured_callback_0",
+      "^": "Closure:1;_captured_callback_0",
       call$0: function() {
-        H.leaveJsAsync();
+        --init.globalState.topEventLoop._activeJsAsyncCount;
         this._captured_callback_0.call$0();
       }
     },
     _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback: {
-      "^": "Closure:2;_captured_callback_0",
+      "^": "Closure:1;_captured_callback_0",
       call$0: function() {
-        H.leaveJsAsync();
+        --init.globalState.topEventLoop._activeJsAsyncCount;
         this._captured_callback_0.call$0();
       }
-    },
-    _UncaughtAsyncError: {
-      "^": "AsyncError;error,stackTrace",
-      toString$0: function(_) {
-        var result, t1;
-        result = "Uncaught Error: " + H.S(this.error);
-        t1 = this.stackTrace;
-        return t1 != null ? result + ("\nStack Trace:\n" + H.S(t1)) : result;
-      },
-      static: {_UncaughtAsyncError__getBestStackTrace: function(error, stackTrace) {
-          if (stackTrace != null)
-            return stackTrace;
-          if (!!J.getInterceptor(error).$isError)
-            return error.get$stackTrace();
-          return;
-        }}
     },
     Future: {
       "^": "Object;"
@@ -7357,7 +7372,7 @@
         this._completeError$2(error, stackTrace);
       }, function(error) {
         return this.completeError$2(error, null);
-      }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 19, 0]
+      }, "completeError$1", "call$2", "call$1", "get$completeError", 2, 2, 14, 0]
     },
     _AsyncCompleter: {
       "^": "_Completer;future",
@@ -7398,20 +7413,17 @@
         return this._state === 8;
       },
       set$_isChained: function(value) {
-        if (value)
-          this._state = 2;
-        else
-          this._state = 0;
+        this._state = 2;
       },
       then$2$onError: function(f, onError) {
-        var result, t1;
-        result = H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null), [null]);
-        t1 = result._zone;
-        if (t1 !== C.C__RootZone) {
-          t1.toString;
+        var currentZone, result;
+        currentZone = $.Zone__current;
+        if (currentZone !== C.C__RootZone) {
+          currentZone.toString;
           if (onError != null)
-            onError = P._registerErrorHandler(onError, t1);
+            onError = P._registerErrorHandler(onError, currentZone);
         }
+        result = H.setRuntimeTypeInfo(new P._Future(0, currentZone, null), [null]);
         this._addListener$1(new P._FutureListener(null, result, onError == null ? 1 : 3, f, onError));
         return result;
       },
@@ -7439,16 +7451,9 @@
       get$_error: function() {
         return this._resultOrListeners;
       },
-      _setValue$1: function(value) {
-        this._state = 4;
-        this._resultOrListeners = value;
-      },
-      _setErrorObject$1: function(error) {
-        this._state = 8;
-        this._resultOrListeners = error;
-      },
       _setError$2: function(error, stackTrace) {
-        this._setErrorObject$1(new P.AsyncError(error, stackTrace));
+        this._state = 8;
+        this._resultOrListeners = new P.AsyncError(error, stackTrace);
       },
       _addListener$1: function(listener) {
         var t1;
@@ -7481,22 +7486,25 @@
             P._Future__chainForeignFuture(value, this);
         else {
           listeners = this._removeListeners$0();
-          this._setValue$1(value);
+          this._state = 4;
+          this._resultOrListeners = value;
           P._Future__propagateToListeners(this, listeners);
         }
       },
       _completeWithValue$1: function(value) {
         var listeners = this._removeListeners$0();
-        this._setValue$1(value);
+        this._state = 4;
+        this._resultOrListeners = value;
         P._Future__propagateToListeners(this, listeners);
       },
       _completeError$2: [function(error, stackTrace) {
         var listeners = this._removeListeners$0();
-        this._setErrorObject$1(new P.AsyncError(error, stackTrace));
+        this._state = 8;
+        this._resultOrListeners = new P.AsyncError(error, stackTrace);
         P._Future__propagateToListeners(this, listeners);
       }, function(error) {
         return this._completeError$2(error, null);
-      }, "_completeError$1", "call$2", "call$1", "get$_completeError", 2, 2, 24, 0],
+      }, "_completeError$1", "call$2", "call$1", "get$_completeError", 2, 2, 15, 0],
       _asyncComplete$1: function(value) {
         var t1;
         if (value == null)
@@ -7659,19 +7667,19 @@
         }}
     },
     _Future__addListener_closure: {
-      "^": "Closure:2;_captured_this_0,_captured_listener_1",
+      "^": "Closure:1;_async$_captured_this_0,_captured_listener_1",
       call$0: function() {
-        P._Future__propagateToListeners(this._captured_this_0, this._captured_listener_1);
+        P._Future__propagateToListeners(this._async$_captured_this_0, this._captured_listener_1);
       }
     },
     _Future__chainForeignFuture_closure: {
-      "^": "Closure:1;_captured_target_0",
+      "^": "Closure:2;_captured_target_0",
       call$1: function(value) {
         this._captured_target_0._completeWithValue$1(value);
       }
     },
     _Future__chainForeignFuture_closure0: {
-      "^": "Closure:8;_captured_target_1",
+      "^": "Closure:7;_captured_target_1",
       call$2: function(error, stackTrace) {
         this._captured_target_1._completeError$2(error, stackTrace);
       },
@@ -7680,27 +7688,27 @@
       }
     },
     _Future__chainForeignFuture_closure1: {
-      "^": "Closure:2;_captured_target_2,_captured_e_3,_captured_s_4",
+      "^": "Closure:1;_captured_target_2,_captured_e_3,_captured_s_4",
       call$0: function() {
         this._captured_target_2._completeError$2(this._captured_e_3, this._captured_s_4);
       }
     },
     _Future__asyncComplete_closure: {
-      "^": "Closure:2;_captured_this_0,_captured_coreFuture_1",
+      "^": "Closure:1;_async$_captured_this_0,_captured_coreFuture_1",
       call$0: function() {
-        P._Future__chainCoreFuture(this._captured_coreFuture_1, this._captured_this_0);
+        P._Future__chainCoreFuture(this._captured_coreFuture_1, this._async$_captured_this_0);
       }
     },
     _Future__asyncComplete_closure0: {
-      "^": "Closure:2;_captured_this_2,_captured_value_3",
+      "^": "Closure:1;_async$_captured_this_2,_captured_value_3",
       call$0: function() {
-        this._captured_this_2._completeWithValue$1(this._captured_value_3);
+        this._async$_captured_this_2._completeWithValue$1(this._captured_value_3);
       }
     },
     _Future__asyncCompleteError_closure: {
-      "^": "Closure:2;_captured_this_0,_captured_error_1,_captured_stackTrace_2",
+      "^": "Closure:1;_async$_captured_this_0,_captured_error_1,_captured_stackTrace_2",
       call$0: function() {
-        this._captured_this_0._completeError$2(this._captured_error_1, this._captured_stackTrace_2);
+        this._async$_captured_this_0._completeError$2(this._captured_error_1, this._captured_stackTrace_2);
       }
     },
     _Future__propagateToListeners_handleValueCallback: {
@@ -7814,13 +7822,13 @@
       }
     },
     _Future__propagateToListeners_handleWhenCompleteCallback_closure: {
-      "^": "Closure:1;_box_2,_captured_result_11",
+      "^": "Closure:2;_box_2,_captured_result_11",
       call$1: function(ignored) {
         P._Future__propagateToListeners(this._box_2._captured_source_4, new P._FutureListener(null, this._captured_result_11, 0, null, null));
       }
     },
     _Future__propagateToListeners_handleWhenCompleteCallback_closure0: {
-      "^": "Closure:8;_box_0,_captured_result_12",
+      "^": "Closure:7;_box_0,_captured_result_12",
       call$2: function(error, stackTrace) {
         var t1, completeResult;
         t1 = this._box_0;
@@ -7924,20 +7932,20 @@
       }
     },
     Stream_contains__closure: {
-      "^": "Closure:2;_captured_needle_4,_captured_element_5",
+      "^": "Closure:1;_captured_needle_4,_captured_element_5",
       call$0: function() {
         return J.$eq$(this._captured_element_5, this._captured_needle_4);
       }
     },
     Stream_contains__closure0: {
-      "^": "Closure:13;_box_0,_captured_future_6",
+      "^": "Closure:16;_box_0,_captured_future_6",
       call$1: function(isMatch) {
         if (isMatch === true)
           P._cancelAndValue(this._box_0._captured_subscription_0, this._captured_future_6, true);
       }
     },
     Stream_contains_closure0: {
-      "^": "Closure:2;_captured_future_7",
+      "^": "Closure:1;_captured_future_7",
       call$0: function() {
         this._captured_future_7._complete$1(false);
       }
@@ -7954,59 +7962,59 @@
       }
     },
     Stream_forEach__closure: {
-      "^": "Closure:2;_captured_action_4,_captured_element_5",
+      "^": "Closure:1;_captured_action_4,_captured_element_5",
       call$0: function() {
         return this._captured_action_4.call$1(this._captured_element_5);
       }
     },
     Stream_forEach__closure0: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(_) {
       }
     },
     Stream_forEach_closure0: {
-      "^": "Closure:2;_captured_future_6",
+      "^": "Closure:1;_captured_future_6",
       call$0: function() {
         this._captured_future_6._complete$1(null);
       }
     },
     Stream_length_closure: {
-      "^": "Closure:1;_box_0",
+      "^": "Closure:2;_box_0",
       call$1: function(_) {
         ++this._box_0._captured_count_0;
       }
     },
     Stream_length_closure0: {
-      "^": "Closure:2;_box_0,_captured_future_1",
+      "^": "Closure:1;_box_0,_captured_future_1",
       call$0: function() {
         this._captured_future_1._complete$1(this._box_0._captured_count_0);
       }
     },
     Stream_isEmpty_closure: {
-      "^": "Closure:1;_box_0,_captured_future_1",
+      "^": "Closure:2;_box_0,_captured_future_1",
       call$1: function(_) {
         P._cancelAndValue(this._box_0._captured_subscription_0, this._captured_future_1, false);
       }
     },
     Stream_isEmpty_closure0: {
-      "^": "Closure:2;_captured_future_2",
+      "^": "Closure:1;_captured_future_2",
       call$0: function() {
         this._captured_future_2._complete$1(true);
       }
     },
     Stream_toList_closure: {
-      "^": "Closure;_captured_this_0,_async$_captured_result_1",
+      "^": "Closure;_async$_captured_this_0,_async$_captured_result_1",
       call$1: function(data) {
         this._async$_captured_result_1.push(data);
       },
       $signature: function() {
         return H.computeSignature(function(T) {
           return {func: 1, args: [T]};
-        }, this._captured_this_0, "Stream");
+        }, this._async$_captured_this_0, "Stream");
       }
     },
     Stream_toList_closure0: {
-      "^": "Closure:2;_captured_result_2,_captured_future_3",
+      "^": "Closure:1;_captured_result_2,_captured_future_3",
       call$0: function() {
         this._captured_future_3._complete$1(this._captured_result_2);
       }
@@ -8023,7 +8031,7 @@
       }
     },
     Stream_first_closure0: {
-      "^": "Closure:2;_captured_future_3",
+      "^": "Closure:1;_captured_future_3",
       call$0: function() {
         var e, s, t1, exception;
         try {
@@ -8051,7 +8059,7 @@
       }
     },
     Stream_last_closure0: {
-      "^": "Closure:2;_box_0,_captured_future_2",
+      "^": "Closure:1;_box_0,_captured_future_2",
       call$0: function() {
         var e, s, t1, exception;
         t1 = this._box_0;
@@ -8170,11 +8178,11 @@
           result = this._varData.cancel$0();
         this._varData = null;
         this._state = this._state & 4294967286 | 2;
-        t1 = this._onCancel;
+        t1 = this.onCancel;
         if (t1 != null)
           if (result == null)
             try {
-              result = this._onCancel$0();
+              result = this.onCancel$0();
             } catch (exception) {
               t1 = H.unwrapException(exception);
               e = t1;
@@ -8195,27 +8203,27 @@
       _recordPause$1: function(subscription) {
         if ((this._state & 8) !== 0)
           this._varData.pause$0(0);
-        P._runGuarded(this._onPause);
+        P._runGuarded(this.onPause);
       },
       _recordResume$1: function(subscription) {
         if ((this._state & 8) !== 0)
           this._varData.resume$0();
-        P._runGuarded(this._onResume);
+        P._runGuarded(this.onResume);
       },
-      _onCancel$0: function() {
-        return this._onCancel.call$0();
+      onCancel$0: function() {
+        return this.onCancel.call$0();
       }
     },
     _StreamController__subscribe_closure: {
-      "^": "Closure:2;_captured_this_0",
+      "^": "Closure:1;_async$_captured_this_0",
       call$0: function() {
-        P._runGuarded(this._captured_this_0._onListen);
+        P._runGuarded(this._async$_captured_this_0.onListen);
       }
     },
     _StreamController__recordCancel_complete: {
-      "^": "Closure:3;_captured_this_0",
+      "^": "Closure:3;_async$_captured_this_0",
       call$0: function() {
-        var t1 = this._captured_this_0._doneFuture;
+        var t1 = this._async$_captured_this_0._doneFuture;
         if (t1 != null && t1._state === 0)
           t1._asyncComplete$1(null);
       }
@@ -8239,10 +8247,10 @@
       }
     },
     _AsyncStreamController: {
-      "^": "_StreamController+_AsyncStreamControllerDispatch;_varData,_state,_doneFuture,_onListen,_onPause,_onResume,_onCancel"
+      "^": "_StreamController+_AsyncStreamControllerDispatch;_varData,_state,_doneFuture,onListen,onPause,onResume,onCancel"
     },
     _SyncStreamController: {
-      "^": "_StreamController+_SyncStreamControllerDispatch;_varData,_state,_doneFuture,_onListen,_onPause,_onResume,_onCancel"
+      "^": "_StreamController+_SyncStreamControllerDispatch;_varData,_state,_doneFuture,onListen,onPause,onResume,onCancel"
     },
     _ControllerStream: {
       "^": "_StreamImpl;_controller",
@@ -8492,10 +8500,10 @@
         }}
     },
     _BufferingStreamSubscription__sendError_sendError: {
-      "^": "Closure:3;_captured_this_0,_captured_error_1,_captured_stackTrace_2",
+      "^": "Closure:3;_async$_captured_this_0,_captured_error_1,_captured_stackTrace_2",
       call$0: function() {
         var t1, t2, t3, t4, t5, t6;
-        t1 = this._captured_this_0;
+        t1 = this._async$_captured_this_0;
         t2 = t1._state;
         if ((t2 & 8) !== 0 && (t2 & 16) === 0)
           return;
@@ -8514,10 +8522,10 @@
       }
     },
     _BufferingStreamSubscription__sendDone_sendDone: {
-      "^": "Closure:3;_captured_this_0",
+      "^": "Closure:3;_async$_captured_this_0",
       call$0: function() {
         var t1, t2;
-        t1 = this._captured_this_0;
+        t1 = this._async$_captured_this_0;
         t2 = t1._state;
         if ((t2 & 16) === 0)
           return;
@@ -8584,10 +8592,10 @@
       }
     },
     _PendingEvents_schedule_closure: {
-      "^": "Closure:2;_captured_this_0,_captured_dispatch_1",
+      "^": "Closure:1;_async$_captured_this_0,_captured_dispatch_1",
       call$0: function() {
         var t1, oldState;
-        t1 = this._captured_this_0;
+        t1 = this._async$_captured_this_0;
         oldState = t1._state;
         t1._state = 0;
         if (oldState === 3)
@@ -8621,19 +8629,19 @@
       }
     },
     _cancelAndError_closure: {
-      "^": "Closure:2;_captured_future_0,_captured_error_1,_captured_stackTrace_2",
+      "^": "Closure:1;_captured_future_0,_captured_error_1,_captured_stackTrace_2",
       call$0: function() {
         return this._captured_future_0._completeError$2(this._captured_error_1, this._captured_stackTrace_2);
       }
     },
     _cancelAndErrorClosure_closure: {
-      "^": "Closure:35;_captured_subscription_0,_captured_future_1",
+      "^": "Closure:17;_captured_subscription_0,_captured_future_1",
       call$2: function(error, stackTrace) {
         return P._cancelAndError(this._captured_subscription_0, this._captured_future_1, error, stackTrace);
       }
     },
     _cancelAndValue_closure: {
-      "^": "Closure:2;_captured_future_0,_captured_value_1",
+      "^": "Closure:1;_captured_future_0,_captured_value_1",
       call$0: function() {
         return this._captured_future_0._complete$1(this._captured_value_1);
       }
@@ -8684,7 +8692,7 @@
         var t1 = this._subscription;
         if (t1 != null) {
           this._subscription = null;
-          t1.cancel$0();
+          return t1.cancel$0();
         }
         return;
       },
@@ -8692,12 +8700,12 @@
         this._stream._handleData$2(data, this);
       }, "call$1", "get$_handleData", 2, 0, function() {
         return H.computeSignature(function(S, T) {
-          return {func: 1, void: true, args: [S]};
+          return {func: 1, v: true, args: [S]};
         }, this.$receiver, "_ForwardingStreamSubscription");
       }],
       _handleError$2: [function(error, stackTrace) {
         this._addError$2(error, stackTrace);
-      }, "call$2", "get$_handleError", 4, 0, 14],
+      }, "call$2", "get$_handleError", 4, 0, 18],
       _handleDone$0: [function() {
         this._close$0();
       }, "call$0", "get$_handleDone", 0, 0, 3],
@@ -8794,10 +8802,21 @@
       "^": "Object;"
     },
     _rootHandleUncaughtError_closure: {
-      "^": "Closure:2;_captured_error_0,_captured_stackTrace_1",
+      "^": "Closure:1;_box_0,_captured_stackTrace_1",
       call$0: function() {
-        var t1 = this._captured_error_0;
-        throw H.wrapException(new P._UncaughtAsyncError(t1, P._UncaughtAsyncError__getBestStackTrace(t1, this._captured_stackTrace_1)));
+        var t1, t2, error;
+        t1 = this._box_0;
+        t2 = t1._captured_error_0;
+        if (t2 == null) {
+          error = new P.NullThrownError();
+          t1._captured_error_0 = error;
+          t1 = error;
+        } else
+          t1 = t2;
+        t2 = this._captured_stackTrace_1;
+        if (t2 == null)
+          throw H.wrapException(t1);
+        P._rethrow(t1, t2);
       }
     },
     _RootZone: {
@@ -8860,10 +8879,7 @@
           return new P._RootZone_bindCallback_closure0(this, f);
       },
       bindUnaryCallback$2$runGuarded: function(f, runGuarded) {
-        if (runGuarded)
-          return new P._RootZone_bindUnaryCallback_closure(this, f);
-        else
-          return new P._RootZone_bindUnaryCallback_closure0(this, f);
+        return new P._RootZone_bindUnaryCallback_closure(this, f);
       },
       $index: function(_, key) {
         return;
@@ -8885,27 +8901,21 @@
       }
     },
     _RootZone_bindCallback_closure: {
-      "^": "Closure:2;_captured_this_0,_captured_f_1",
+      "^": "Closure:1;_async$_captured_this_0,_captured_f_1",
       call$0: function() {
-        return this._captured_this_0.runGuarded$1(this._captured_f_1);
+        return this._async$_captured_this_0.runGuarded$1(this._captured_f_1);
       }
     },
     _RootZone_bindCallback_closure0: {
-      "^": "Closure:2;_captured_this_2,_captured_f_3",
+      "^": "Closure:1;_async$_captured_this_2,_captured_f_3",
       call$0: function() {
-        return this._captured_this_2.run$1(this._captured_f_3);
+        return this._async$_captured_this_2.run$1(this._captured_f_3);
       }
     },
     _RootZone_bindUnaryCallback_closure: {
-      "^": "Closure:1;_captured_this_0,_captured_f_1",
+      "^": "Closure:2;_async$_captured_this_0,_captured_f_1",
       call$1: function(arg) {
-        return this._captured_this_0.runUnaryGuarded$2(this._captured_f_1, arg);
-      }
-    },
-    _RootZone_bindUnaryCallback_closure0: {
-      "^": "Closure:1;_captured_this_2,_captured_f_3",
-      call$1: function(arg) {
-        return this._captured_this_2.runUnary$2(this._captured_f_3, arg);
+        return this._async$_captured_this_0.runUnaryGuarded$2(this._captured_f_1, arg);
       }
     }
   }], ["dart.collection", "dart:collection",, P, {
@@ -8933,7 +8943,7 @@
         P._iterablePartsToStrings(iterable, parts);
       } finally {
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
       }
       t1 = P.StringBuffer__writeAll(leftDelimiter, parts, ", ") + rightDelimiter;
@@ -8951,7 +8961,7 @@
         t2._contents = P.StringBuffer__writeAll(t2.get$_contents(), iterable, ", ");
       } finally {
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
       }
       t1 = buffer;
@@ -8985,10 +8995,10 @@
         if (count <= 5)
           return;
         if (0 >= parts.length)
-          return H.ioore(parts, 0);
+          return H.ioore(parts, -1);
         ultimateString = parts.pop();
         if (0 >= parts.length)
-          return H.ioore(parts, 0);
+          return H.ioore(parts, -1);
         penultimateString = parts.pop();
       } else {
         penultimate = it.get$current();
@@ -9000,7 +9010,7 @@
           }
           ultimateString = H.S(penultimate);
           if (0 >= parts.length)
-            return H.ioore(parts, 0);
+            return H.ioore(parts, -1);
           penultimateString = parts.pop();
           $length += ultimateString.length + 2;
         } else {
@@ -9014,7 +9024,7 @@
                 if (!($length > 75 && count > 3))
                   break;
                 if (0 >= parts.length)
-                  return H.ioore(parts, 0);
+                  return H.ioore(parts, -1);
                 $length -= parts.pop().length + 2;
                 --count;
               }
@@ -9036,7 +9046,7 @@
         if (!($length > 80 && parts.length > 3))
           break;
         if (0 >= parts.length)
-          return H.ioore(parts, 0);
+          return H.ioore(parts, -1);
         $length -= parts.pop().length + 2;
         if (elision == null) {
           $length += 5;
@@ -9051,9 +9061,6 @@
     LinkedHashMap_LinkedHashMap: function(equals, hashCode, isValidKey, $K, $V) {
       return H.setRuntimeTypeInfo(new H.JsLinkedHashMap(0, null, null, null, null, null, 0), [$K, $V]);
     },
-    LinkedHashMap_LinkedHashMap$identity: function($K, $V) {
-      return P._LinkedIdentityHashMap__LinkedIdentityHashMap$es6($K, $V);
-    },
     LinkedHashMap_LinkedHashMap$from: function(other, $K, $V) {
       var result = P.LinkedHashMap_LinkedHashMap(null, null, null, $K, $V);
       J.forEach$1$ax(other, new P.LinkedHashMap_LinkedHashMap$from_closure(result));
@@ -9061,13 +9068,6 @@
     },
     LinkedHashSet_LinkedHashSet: function(equals, hashCode, isValidKey, $E) {
       return H.setRuntimeTypeInfo(new P._LinkedHashSet(0, null, null, null, null, null, 0), [$E]);
-    },
-    LinkedHashSet_LinkedHashSet$from: function(elements, $E) {
-      var result, t1, _i;
-      result = P.LinkedHashSet_LinkedHashSet(null, null, null, $E);
-      for (t1 = elements.length, _i = 0; _i < elements.length; elements.length === t1 || (0, H.throwConcurrentModificationError)(elements), ++_i)
-        result.add$1(0, elements[_i]);
-      return result;
     },
     Maps_mapToString: function(m) {
       var t1, result, t2;
@@ -9086,14 +9086,14 @@
       } finally {
         t1 = $.$get$_toStringVisiting();
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
       }
       t1 = result.get$_contents();
       return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
     _LinkedIdentityHashMap: {
-      "^": "JsLinkedHashMap;__js_helper$_length,_strings,_nums,_rest,_first,_last,_modifications",
+      "^": "JsLinkedHashMap;_length,_strings,_nums,_rest,_first,_last,_modifications",
       internalComputeHashCode$1: function(key) {
         return H.objectHashCode(key) & 0x3ffffff;
       },
@@ -9117,7 +9117,7 @@
       "^": "_HashSetBase;_collection$_length,_collection$_strings,_collection$_nums,_collection$_rest,_collection$_first,_collection$_last,_collection$_modifications",
       get$iterator: function(_) {
         var t1 = H.setRuntimeTypeInfo(new P.LinkedHashSetIterator(this, this._collection$_modifications, null, null), [null]);
-        t1._cell = t1._set._collection$_first;
+        t1._collection$_cell = t1._set._collection$_first;
         return t1;
       },
       get$length: function(_) {
@@ -9170,14 +9170,14 @@
         index = this._findBucketIndex$2(bucket, object);
         if (index < 0)
           return;
-        return J.$index$asx(bucket, index).get$_element();
+        return J.$index$asx(bucket, index).get$_collection$_element();
       },
       forEach$1: function(_, action) {
         var cell, modifications;
         cell = this._collection$_first;
         modifications = this._collection$_modifications;
         for (; cell != null;) {
-          action.call$1(cell._element);
+          action.call$1(cell._collection$_element);
           if (modifications !== this._collection$_modifications)
             throw H.wrapException(new P.ConcurrentModificationError(this));
           cell = cell._collection$_next;
@@ -9187,13 +9187,13 @@
         var t1 = this._collection$_first;
         if (t1 == null)
           throw H.wrapException(new P.StateError("No elements"));
-        return t1._element;
+        return t1._collection$_element;
       },
       get$last: function(_) {
         var t1 = this._collection$_last;
         if (t1 == null)
           throw H.wrapException(new P.StateError("No elements"));
-        return t1._element;
+        return t1._collection$_element;
       },
       add$1: function(_, element) {
         var strings, table, nums;
@@ -9326,7 +9326,7 @@
           return -1;
         $length = bucket.length;
         for (i = 0; i < $length; ++i)
-          if (J.$eq$(bucket[i].get$_element(), element))
+          if (J.$eq$(bucket[i].get$_collection$_element(), element))
             return i;
         return -1;
       },
@@ -9339,10 +9339,10 @@
         }}
     },
     LinkedHashSetCell: {
-      "^": "Object;_element<,_collection$_next,_collection$_previous<"
+      "^": "Object;_collection$_element<,_collection$_next,_collection$_previous<"
     },
     LinkedHashSetIterator: {
-      "^": "Object;_set,_collection$_modifications,_cell,_collection$_current",
+      "^": "Object;_set,_collection$_modifications,_collection$_cell,_collection$_current",
       get$current: function() {
         return this._collection$_current;
       },
@@ -9351,13 +9351,13 @@
         if (this._collection$_modifications !== t1._collection$_modifications)
           throw H.wrapException(new P.ConcurrentModificationError(t1));
         else {
-          t1 = this._cell;
+          t1 = this._collection$_cell;
           if (t1 == null) {
             this._collection$_current = null;
             return false;
           } else {
-            this._collection$_current = t1._element;
-            this._cell = t1._collection$_next;
+            this._collection$_current = t1._collection$_element;
+            this._collection$_cell = t1._collection$_next;
             return true;
           }
         }
@@ -9461,11 +9461,8 @@
       },
       toList$1$growable: function(receiver, growable) {
         var result, i, t1;
-        if (growable) {
-          result = H.setRuntimeTypeInfo([], [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
-          C.JSArray_methods.set$length(result, this.get$length(receiver));
-        } else
-          result = H.setRuntimeTypeInfo(Array(this.get$length(receiver)), [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
+        result = H.setRuntimeTypeInfo([], [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
+        C.JSArray_methods.set$length(result, this.get$length(receiver));
         for (i = 0; i < this.get$length(receiver); ++i) {
           t1 = this.$index(receiver, i);
           if (i >= result.length)
@@ -9483,12 +9480,13 @@
         this.$indexSet(receiver, t1, element);
       },
       addAll$1: function(receiver, iterable) {
-        var t1, element, t2;
-        for (t1 = J.get$iterator$ax(iterable); t1.moveNext$0();) {
+        var i, t1, element, i0;
+        i = this.get$length(receiver);
+        for (t1 = J.get$iterator$ax(iterable); t1.moveNext$0(); i = i0) {
           element = t1.get$current();
-          t2 = this.get$length(receiver);
-          this.set$length(receiver, t2 + 1);
-          this.$indexSet(receiver, t2, element);
+          i0 = i + 1;
+          this.set$length(receiver, i0);
+          this.$indexSet(receiver, i, element);
         }
       },
       remove$1: function(receiver, element) {
@@ -9775,7 +9773,7 @@
       },
       _grow$0: function() {
         var t1, newTable, t2, split;
-        t1 = Array(this._table.length * 2);
+        t1 = new Array(this._table.length * 2);
         t1.fixed$length = Array;
         newTable = H.setRuntimeTypeInfo(t1, [H.getTypeArgumentByIndex(this, 0)]);
         t1 = this._table;
@@ -9788,7 +9786,7 @@
         this._table = newTable;
       },
       ListQueue$1: function(initialCapacity, $E) {
-        var t1 = Array(8);
+        var t1 = new Array(8);
         t1.fixed$length = Array;
         this._table = H.setRuntimeTypeInfo(t1, [$E]);
       },
@@ -9830,11 +9828,6 @@
       },
       get$isNotEmpty: function(_) {
         return this.get$length(this) !== 0;
-      },
-      addAll$1: function(_, elements) {
-        var t1;
-        for (t1 = J.get$iterator$ax(elements); t1.moveNext$0();)
-          this.add$1(0, t1.get$current());
       },
       map$1: function(_, f) {
         return H.setRuntimeTypeInfo(new H.EfficientLengthMappedIterable(this, f), [H.getTypeArgumentByIndex(this, 0), null]);
@@ -9916,7 +9909,7 @@
         return "utf-8";
       },
       get$encoder: function() {
-        return new P.Utf8Encoder();
+        return C.C_Utf8Encoder;
       }
     },
     Utf8Encoder: {
@@ -10044,16 +10037,14 @@
     Utf8Decoder: {
       "^": "Converter;_allowMalformed",
       convert$3: function(codeUnits, start, end) {
-        var $length, buffer, t1, decoder;
+        var $length, buffer, decoder, t1;
         $length = J.get$length$asx(codeUnits);
         P.RangeError_checkValidRange(start, end, $length, null, null, null);
         buffer = new P.StringBuffer("");
-        t1 = this._allowMalformed;
-        decoder = new P._Utf8Decoder(t1, buffer, true, 0, 0, 0);
+        decoder = new P._Utf8Decoder(false, buffer, true, 0, 0, 0);
         decoder.convert$3(codeUnits, start, $length);
         if (decoder._expectedUnits > 0) {
-          if (!t1)
-            H.throwExpression(new P.FormatException("Unfinished UTF-8 octet sequence", null, null));
+          H.throwExpression(new P.FormatException("Unfinished UTF-8 octet sequence", null, null));
           buffer._contents += H.Primitives_stringFromCharCode(65533);
           decoder._convert$_value = 0;
           decoder._expectedUnits = 0;
@@ -10072,7 +10063,7 @@
     _Utf8Decoder: {
       "^": "Object;_allowMalformed,_stringSink,_isFirstCharacter,_convert$_value,_expectedUnits,_extraUnits",
       convert$3: function(codeUnits, startIndex, endIndex) {
-        var value, expectedUnits, extraUnits, t1, t2, t3, t4, t5, i, unit, t6, oneBytes, i0;
+        var value, expectedUnits, extraUnits, t1, t2, t3, t4, i, unit, t5, oneBytes, i0, i1, t6;
         value = this._convert$_value;
         expectedUnits = this._expectedUnits;
         extraUnits = this._extraUnits;
@@ -10082,48 +10073,35 @@
         t1 = new P._Utf8Decoder_convert_scanOneByteCharacters(endIndex);
         t2 = new P._Utf8Decoder_convert_addSingleBytes(this, codeUnits, startIndex, endIndex);
         $loop$0:
-          for (t3 = this._stringSink, t4 = !this._allowMalformed, t5 = J.getInterceptor$asx(codeUnits), i = startIndex; true; i = i0) {
+          for (t3 = J.getInterceptor$asx(codeUnits), t4 = this._stringSink, i = startIndex; true; i = i1) {
             $multibyte$2:
               if (expectedUnits > 0) {
                 do {
                   if (i === endIndex)
                     break $loop$0;
-                  unit = t5.$index(codeUnits, i);
+                  unit = t3.$index(codeUnits, i);
                   if (typeof unit !== "number")
                     return unit.$and();
-                  if ((unit & 192) !== 128) {
-                    if (t4)
-                      throw H.wrapException(new P.FormatException("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
-                    this._isFirstCharacter = false;
-                    t3._contents += H.Primitives_stringFromCharCode(65533);
-                    expectedUnits = 0;
-                    break $multibyte$2;
-                  } else {
+                  if ((unit & 192) !== 128)
+                    throw H.wrapException(new P.FormatException("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
+                  else {
                     value = (value << 6 | unit & 63) >>> 0;
                     --expectedUnits;
                     ++i;
                   }
                 } while (expectedUnits > 0);
-                t6 = extraUnits - 1;
-                if (t6 < 0 || t6 >= 4)
-                  return H.ioore(C.List_127_2047_65535_1114111, t6);
-                if (value <= C.List_127_2047_65535_1114111[t6]) {
-                  if (t4)
-                    throw H.wrapException(new P.FormatException("Overlong encoding of 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
-                  value = 65533;
-                  expectedUnits = 0;
-                  extraUnits = 0;
-                }
-                if (value > 1114111) {
-                  if (t4)
-                    throw H.wrapException(new P.FormatException("Character outside valid Unicode range: 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
-                  value = 65533;
-                }
+                t5 = extraUnits - 1;
+                if (t5 < 0 || t5 >= 4)
+                  return H.ioore(C.List_127_2047_65535_1114111, t5);
+                if (value <= C.List_127_2047_65535_1114111[t5])
+                  throw H.wrapException(new P.FormatException("Overlong encoding of 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
+                if (value > 1114111)
+                  throw H.wrapException(new P.FormatException("Character outside valid Unicode range: 0x" + C.JSInt_methods.toRadixString$1(value, 16), null, null));
                 if (!this._isFirstCharacter || value !== 65279)
-                  t3._contents += H.Primitives_stringFromCharCode(value);
+                  t4._contents += H.Primitives_stringFromCharCode(value);
                 this._isFirstCharacter = false;
               }
-            for (; i < endIndex; i = i0) {
+            for (t5 = i < endIndex; t5;) {
               oneBytes = t1.call$2(codeUnits, i);
               if (J.$gt$n(oneBytes, 0)) {
                 this._isFirstCharacter = false;
@@ -10133,16 +10111,14 @@
                 t2.call$2(i, i0);
                 if (i0 === endIndex)
                   break;
-                i = i0;
-              }
-              i0 = i + 1;
-              unit = t5.$index(codeUnits, i);
+              } else
+                i0 = i;
+              i1 = i0 + 1;
+              unit = t3.$index(codeUnits, i0);
               t6 = J.getInterceptor$n(unit);
-              if (t6.$lt(unit, 0)) {
-                if (t4)
-                  throw H.wrapException(new P.FormatException("Negative UTF-8 code unit: -0x" + J.toRadixString$1$n(t6.$negate(unit), 16), null, null));
-                t3._contents += H.Primitives_stringFromCharCode(65533);
-              } else {
+              if (t6.$lt(unit, 0))
+                throw H.wrapException(new P.FormatException("Negative UTF-8 code unit: -0x" + J.toRadixString$1$n(t6.$negate(unit), 16), null, null));
+              else {
                 if (typeof unit !== "number")
                   return unit.$and();
                 if ((unit & 224) === 192) {
@@ -10163,13 +10139,7 @@
                   extraUnits = 3;
                   continue $loop$0;
                 }
-                if (t4)
-                  throw H.wrapException(new P.FormatException("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
-                this._isFirstCharacter = false;
-                t3._contents += H.Primitives_stringFromCharCode(65533);
-                value = 65533;
-                expectedUnits = 0;
-                extraUnits = 0;
+                throw H.wrapException(new P.FormatException("Bad UTF-8 encoding 0x" + C.JSNumber_methods.toRadixString$1(unit, 16), null, null));
               }
             }
             break $loop$0;
@@ -10182,7 +10152,7 @@
       }
     },
     _Utf8Decoder_convert_scanOneByteCharacters: {
-      "^": "Closure:16;_captured_endIndex_0",
+      "^": "Closure:19;_captured_endIndex_0",
       call$2: function(units, from) {
         var to, t1, i, unit;
         to = this._captured_endIndex_0;
@@ -10197,16 +10167,13 @@
       }
     },
     _Utf8Decoder_convert_addSingleBytes: {
-      "^": "Closure:17;_captured_this_1,_captured_codeUnits_2,_captured_startIndex_3,_captured_endIndex_4",
+      "^": "Closure:20;_convert$_captured_this_1,_captured_codeUnits_2,_captured_startIndex_3,_captured_endIndex_4",
       call$2: function(from, to) {
-        this._captured_this_1._stringSink._contents += P.String_String$fromCharCodes(this._captured_codeUnits_2, from, to);
+        this._convert$_captured_this_1._stringSink._contents += P.String_String$fromCharCodes(this._captured_codeUnits_2, from, to);
       }
     }
   }], ["dart.core", "dart:core",, P, {
     "^": "",
-    _symbolToString: function(symbol) {
-      return H.Symbol_getName(symbol);
-    },
     String__stringFromIterable: function(charCodes, start, end) {
       var t1, it, i, list;
       if (start < 0)
@@ -10265,15 +10232,9 @@
       return list;
     },
     List_List$generate: function($length, generator, growable, $E) {
-      var result, t1, i;
-      if (growable) {
-        result = H.setRuntimeTypeInfo([], [$E]);
-        C.JSArray_methods.set$length(result, $length);
-      } else {
-        t1 = Array($length);
-        t1.fixed$length = Array;
-        result = H.setRuntimeTypeInfo(t1, [$E]);
-      }
+      var result, i, t1;
+      result = H.setRuntimeTypeInfo([], [$E]);
+      C.JSArray_methods.set$length(result, $length);
       for (i = 0; i < $length; ++i) {
         t1 = generator.call$1(i);
         if (i >= result.length)
@@ -10287,7 +10248,7 @@
       H.printString(line);
     },
     RegExp_RegExp: function(source, caseSensitive, multiLine) {
-      return new H.JSSyntaxRegExp(source, H.JSSyntaxRegExp_makeNative(source, multiLine, caseSensitive, false), null, null);
+      return new H.JSSyntaxRegExp(source, H.JSSyntaxRegExp_makeNative(source, false, true, false), null, null);
     },
     String_String$fromCharCodes: function(charCodes, start, end) {
       var len;
@@ -10303,13 +10264,6 @@
     _combineSurrogatePair: function(start, end) {
       return 65536 + ((start & 1023) << 10 >>> 0) + (end & 1023);
     },
-    NoSuchMethodError_toString_closure: {
-      "^": "Closure:18;_core$_box_0,_captured_sb_1",
-      call$2: function(key, value) {
-        this._captured_sb_1._contents += this._core$_box_0._captured_comma_0;
-        P._symbolToString(key);
-      }
-    },
     bool: {
       "^": "Object;"
     },
@@ -10321,7 +10275,7 @@
           return false;
         if (!(other instanceof P.DateTime))
           return false;
-        return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && this.isUtc === other.isUtc;
+        return this.millisecondsSinceEpoch === other.millisecondsSinceEpoch && true;
       },
       compareTo$1: function(_, other) {
         return C.JSInt_methods.compareTo$1(this.millisecondsSinceEpoch, other.get$millisecondsSinceEpoch());
@@ -10330,30 +10284,26 @@
         return this.millisecondsSinceEpoch;
       },
       toString$0: function(_) {
-        var t1, y, m, d, h, min, sec, ms;
-        t1 = this.isUtc;
-        y = P.DateTime__fourDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCFullYear() + 0 : H.Primitives_lazyAsJsDate(this).getFullYear() + 0);
-        m = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCMonth() + 1 : H.Primitives_lazyAsJsDate(this).getMonth() + 1);
-        d = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCDate() + 0 : H.Primitives_lazyAsJsDate(this).getDate() + 0);
-        h = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCHours() + 0 : H.Primitives_lazyAsJsDate(this).getHours() + 0);
-        min = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCMinutes() + 0 : H.Primitives_lazyAsJsDate(this).getMinutes() + 0);
-        sec = P.DateTime__twoDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCSeconds() + 0 : H.Primitives_lazyAsJsDate(this).getSeconds() + 0);
-        ms = P.DateTime__threeDigits(t1 ? H.Primitives_lazyAsJsDate(this).getUTCMilliseconds() + 0 : H.Primitives_lazyAsJsDate(this).getMilliseconds() + 0);
-        if (t1)
-          return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec + "." + ms + "Z";
-        else
-          return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec + "." + ms;
+        var y, m, d, h, min, sec, ms;
+        y = P.DateTime__fourDigits(H.Primitives_lazyAsJsDate(this).getUTCFullYear() + 0);
+        m = P.DateTime__twoDigits(H.Primitives_lazyAsJsDate(this).getUTCMonth() + 1);
+        d = P.DateTime__twoDigits(H.Primitives_lazyAsJsDate(this).getUTCDate() + 0);
+        h = P.DateTime__twoDigits(H.Primitives_lazyAsJsDate(this).getUTCHours() + 0);
+        min = P.DateTime__twoDigits(H.Primitives_lazyAsJsDate(this).getUTCMinutes() + 0);
+        sec = P.DateTime__twoDigits(H.Primitives_lazyAsJsDate(this).getUTCSeconds() + 0);
+        ms = P.DateTime__threeDigits(H.Primitives_lazyAsJsDate(this).getUTCMilliseconds() + 0);
+        return y + "-" + m + "-" + d + " " + h + ":" + min + ":" + sec + "." + ms + "Z";
       },
       add$1: function(_, duration) {
-        return P.DateTime$fromMillisecondsSinceEpoch(this.millisecondsSinceEpoch + duration.get$inMilliseconds(), this.isUtc);
+        return P.DateTime$fromMillisecondsSinceEpoch(this.millisecondsSinceEpoch + duration.get$inMilliseconds(), true);
       },
       DateTime$fromMillisecondsSinceEpoch$2$isUtc: function(millisecondsSinceEpoch, isUtc) {
         if (Math.abs(millisecondsSinceEpoch) > 864e13)
           throw H.wrapException(P.ArgumentError$(millisecondsSinceEpoch));
       },
       static: {DateTime$fromMillisecondsSinceEpoch: function(millisecondsSinceEpoch, isUtc) {
-          var t1 = new P.DateTime(millisecondsSinceEpoch, isUtc);
-          t1.DateTime$fromMillisecondsSinceEpoch$2$isUtc(millisecondsSinceEpoch, isUtc);
+          var t1 = new P.DateTime(millisecondsSinceEpoch, true);
+          t1.DateTime$fromMillisecondsSinceEpoch$2$isUtc(millisecondsSinceEpoch, true);
           return t1;
         }, DateTime__fourDigits: function(n) {
           var absN, sign;
@@ -10444,7 +10394,7 @@
       }
     },
     Duration_toString_sixDigits: {
-      "^": "Closure:9;",
+      "^": "Closure:8;",
       call$1: function(n) {
         if (n >= 100000)
           return "" + n;
@@ -10460,7 +10410,7 @@
       }
     },
     Duration_toString_twoDigits: {
-      "^": "Closure:9;",
+      "^": "Closure:8;",
       call$1: function(n) {
         if (n >= 10)
           return "" + n;
@@ -10573,9 +10523,12 @@
         return "RangeError";
       },
       get$_errorExplanation: function() {
-        P.Error_safeToString(this.indexable);
-        var explanation = ": index should be less than " + H.S(this.length);
-        return J.$lt$n(this.invalidValue, 0) ? ": index must not be negative" : explanation;
+        if (J.$lt$n(this.invalidValue, 0))
+          return ": index must not be negative";
+        var t1 = this.length;
+        if (J.$eq$(t1, 0))
+          return ": no indices are valid";
+        return ": index should be less than " + H.S(t1);
       },
       static: {IndexError$: function(invalidValue, indexable, $name, message, $length) {
           var t1 = $length != null ? $length : J.get$length$asx(indexable);
@@ -10838,16 +10791,6 @@
         while (it.moveNext$0());
         return result;
       },
-      get$single: function(_) {
-        var it, result;
-        it = this.get$iterator(this);
-        if (!it.moveNext$0())
-          throw H.wrapException(H.IterableElementError_noElement());
-        result = it.get$current();
-        if (it.moveNext$0())
-          throw H.wrapException(H.IterableElementError_tooMany());
-        return result;
-      },
       elementAt$1: function(_, index) {
         var t1, elementIndex, element;
         if (typeof index !== "number" || Math.floor(index) !== index)
@@ -10899,6 +10842,9 @@
       },
       toString$0: function(_) {
         return H.Primitives_objectToHumanReadableString(this);
+      },
+      toString: function() {
+        return this.toString$0(this);
       }
     },
     Match: {
@@ -11027,11 +10973,8 @@
           return string;
         }}
     },
-    Symbol: {
-      "^": "Object;"
-    },
     Uri: {
-      "^": "Object;_host,_port,_path,scheme,_userInfo,_query,_fragment,_pathSegments,_queryParameters",
+      "^": "Object;scheme,_userInfo,_host,_port,_path,_query,_fragment,_pathSegments,_queryParameters",
       get$host: function(_) {
         var t1 = this._host;
         if (t1 == null)
@@ -11057,7 +11000,7 @@
           pathToSplit = this._path;
           if (pathToSplit.length !== 0 && C.JSString_methods.codeUnitAt$1(pathToSplit, 0) === 47)
             pathToSplit = C.JSString_methods.substring$1(pathToSplit, 1);
-          t1 = H.setRuntimeTypeInfo(new P.UnmodifiableListView(pathToSplit === "" ? C.List_empty0 : H.setRuntimeTypeInfo(new H.MappedListIterable(pathToSplit.split("/"), P.core_Uri_decodeComponent$closure()), [null, null]).toList$1$growable(0, false)), [null]);
+          t1 = H.setRuntimeTypeInfo(new P.UnmodifiableListView(pathToSplit === "" ? C.List_empty : H.setRuntimeTypeInfo(new H.MappedListIterable(pathToSplit.split("/"), P.core_Uri_decodeComponent$closure()), [null, null]).toList$1$growable(0, false)), [null]);
           this._pathSegments = t1;
         }
         return t1;
@@ -11354,9 +11297,7 @@
               fragment = null;
             query = null;
           }
-          t2 = t1._captured_scheme_1;
-          t3 = t1._captured_userinfo_2;
-          return new P.Uri(t1._captured_host_3, t1._captured_port_4, path, t2, t3, query, fragment, null, null);
+          return new P.Uri(t1._captured_scheme_1, t1._captured_userinfo_2, t1._captured_host_3, t1._captured_port_4, path, query, fragment, null, null);
         }, Uri__fail: function(uri, index, message) {
           throw H.wrapException(new P.FormatException(message, uri, index));
         }, Uri_base: function() {
@@ -11365,7 +11306,7 @@
             return P.Uri_parse(uri, 0, null);
           throw H.wrapException(new P.UnsupportedError("'Uri.base' is not supported"));
         }, Uri__checkNonWindowsPathReservedCharacters: function(segments, argumentError) {
-          segments.forEach$1(segments, new P.Uri__checkNonWindowsPathReservedCharacters_closure(argumentError));
+          segments.forEach$1(segments, new P.Uri__checkNonWindowsPathReservedCharacters_closure(false));
         }, Uri__makePort: function(port, scheme) {
           if (port != null && port === P.Uri__defaultPort(scheme))
             return;
@@ -11614,7 +11555,7 @@
         }, Uri__escapeChar: function($char) {
           var codeUnits, flag, encodedBytes, t1, index, $byte, t2, t3;
           if ($char < 128) {
-            codeUnits = Array(3);
+            codeUnits = new Array(3);
             codeUnits.fixed$length = Array;
             codeUnits[0] = 37;
             codeUnits[1] = C.JSString_methods.codeUnitAt$1("0123456789ABCDEF", $char >>> 4);
@@ -11633,7 +11574,7 @@
               encodedBytes = 2;
             }
             t1 = 3 * encodedBytes;
-            codeUnits = Array(t1);
+            codeUnits = new Array(t1);
             codeUnits.fixed$length = Array;
             for (index = 0; --encodedBytes, encodedBytes >= 0; flag = 128) {
               $byte = C.JSInt_methods._shrReceiverPositive$1($char, 6 * encodedBytes) & 63 | flag;
@@ -11753,7 +11694,7 @@
               t3 = output.length;
               if (t3 !== 0) {
                 if (0 >= t3)
-                  return H.ioore(output, 0);
+                  return H.ioore(output, -1);
                 output.pop();
                 if (output.length === 0)
                   output.push("");
@@ -11779,7 +11720,7 @@
             if (".." === segment)
               if (output.length !== 0 && !J.$eq$(C.JSArray_methods.get$last(output), "..")) {
                 if (0 >= output.length)
-                  return H.ioore(output, 0);
+                  return H.ioore(output, -1);
                 output.pop();
                 appendSlash = true;
               } else {
@@ -11810,7 +11751,7 @@
           return C.JSArray_methods.join$1(output, "/");
         }, Uri_decodeComponent: [function(encodedComponent) {
           return P.Uri__uriDecode(encodedComponent, C.Utf8Codec_false, false);
-        }, "call$1", "core_Uri_decodeComponent$closure", 2, 0, 36], Uri_splitQueryString: function(query, encoding) {
+        }, "call$1", "core_Uri_decodeComponent$closure", 2, 0, 31], Uri_splitQueryString: function(query, encoding) {
           return C.JSArray_methods.fold$2(query.split("&"), P.LinkedHashMap__makeEmpty(), new P.Uri_splitQueryString_closure(encoding));
         }, Uri_parseIPv4Address: function(host) {
           var t1, bytes;
@@ -11894,8 +11835,7 @@
               error.call$1("an address with a wildcard must have less than 7 parts");
           } else if (J.get$length$asx(parts) !== 8)
             error.call$1("an address without a wildcard must contain exactly 8 parts");
-          bytes = Array(16);
-          bytes.$builtinTypeInfo = [P.$int];
+          bytes = H.setRuntimeTypeInfo(new Array(16), [P.$int]);
           i = 0;
           index = 0;
           while (true) {
@@ -12017,7 +11957,7 @@
               ++i;
             }
           }
-          return new P.Utf8Decoder(encoding._allowMalformed).convert$1(bytes);
+          return new P.Utf8Decoder(false).convert$1(bytes);
         }}
     },
     Uri_parse_parseAuth: {
@@ -12119,7 +12059,7 @@
       }
     },
     Uri__checkNonWindowsPathReservedCharacters_closure: {
-      "^": "Closure:1;_captured_argumentError_0",
+      "^": "Closure:2;_captured_argumentError_0",
       call$1: function(segment) {
         if (J.contains$1$asx(segment, "/") === true)
           if (this._captured_argumentError_0)
@@ -12129,7 +12069,7 @@
       }
     },
     Uri__makePath_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(s) {
         return P.Uri__uriEncode(C.List_qg40, s, C.Utf8Codec_false, false);
       }
@@ -12150,7 +12090,7 @@
       }
     },
     Uri_hashCode_combine: {
-      "^": "Closure:20;",
+      "^": "Closure:21;",
       call$2: function(part, current) {
         return current * 31 + J.get$hashCode$(part) & 1073741823;
       }
@@ -12162,7 +12102,7 @@
         t1 = J.getInterceptor$asx(element);
         index = t1.indexOf$1(element, "=");
         if (index === -1) {
-          if (element !== "")
+          if (!t1.$eq(element, ""))
             J.$indexSet$ax(map, P.Uri__uriDecode(element, this._captured_encoding_0, true), "");
         } else if (index !== 0) {
           key = t1.substring$2(element, 0, index);
@@ -12174,24 +12114,24 @@
       }
     },
     Uri_parseIPv4Address_error: {
-      "^": "Closure:21;",
+      "^": "Closure:22;",
       call$1: function(msg) {
         throw H.wrapException(new P.FormatException("Illegal IPv4 address, " + msg, null, null));
       }
     },
     Uri_parseIPv4Address_closure: {
-      "^": "Closure:1;_core$_captured_error_0",
+      "^": "Closure:2;_captured_error_0",
       call$1: function(byteString) {
         var $byte, t1;
         $byte = H.Primitives_parseInt(byteString, null, null);
         t1 = J.getInterceptor$n($byte);
         if (t1.$lt($byte, 0) || t1.$gt($byte, 255))
-          this._core$_captured_error_0.call$1("each part must be in the range of `0..255`");
+          this._captured_error_0.call$1("each part must be in the range of `0..255`");
         return $byte;
       }
     },
     Uri_parseIPv6Address_error: {
-      "^": "Closure:22;_captured_host_0",
+      "^": "Closure:23;_captured_host_0",
       call$2: function(msg, position) {
         throw H.wrapException(new P.FormatException("Illegal IPv6 address, " + msg, this._captured_host_0, position));
       },
@@ -12200,7 +12140,7 @@
       }
     },
     Uri_parseIPv6Address_parseHex: {
-      "^": "Closure:23;_captured_host_1,_captured_error_2",
+      "^": "Closure:24;_captured_host_1,_captured_error_2",
       call$2: function(start, end) {
         var value, t1;
         if (typeof start !== "number")
@@ -12226,15 +12166,6 @@
     window: function() {
       return window;
     },
-    Element_Element$html: function(html, treeSanitizer, validator) {
-      var t1, fragment;
-      t1 = document.body;
-      fragment = (t1 && C.BodyElement_methods).createFragment$3$treeSanitizer$validator(t1, html, treeSanitizer, validator);
-      fragment.toString;
-      t1 = new W._ChildNodeListLazy(fragment);
-      t1 = t1.where$1(t1, new W.Element_Element$html_closure());
-      return t1.get$single(t1);
-    },
     _ElementFactoryProvider_createElement_tag: function(tag, typeExtension) {
       return document.createElement(tag);
     },
@@ -12247,9 +12178,9 @@
       xhr = new XMLHttpRequest();
       C.HttpRequest_methods.open$3$async(xhr, "GET", url, true);
       t1 = H.setRuntimeTypeInfo(new W._EventStream(xhr, "load", false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new W.HttpRequest_request_closure(completer, xhr)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new W.HttpRequest_request_closure(completer, xhr)), false), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
       t1 = H.setRuntimeTypeInfo(new W._EventStream(xhr, "error", false), [null]);
-      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(completer.get$completeError()), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+      H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(completer.get$completeError()), false), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
       xhr.send();
       return completer.future;
     },
@@ -12282,15 +12213,15 @@
       return t1.bindUnaryCallback$2$runGuarded(callback, true);
     },
     HtmlElement: {
-      "^": "Element;",
+      "^": "Element0;",
       $isHtmlElement: 1,
-      $isElement: 1,
+      $isElement0: 1,
       $isNode: 1,
       $isObject: 1,
-      "%": "HTMLAppletElement|HTMLBRElement|HTMLCanvasElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLFontElement|HTMLFrameElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLImageElement|HTMLLabelElement|HTMLLegendElement|HTMLMarqueeElement|HTMLMenuElement|HTMLMenuItemElement|HTMLModElement|HTMLOptGroupElement|HTMLParagraphElement|HTMLPictureElement|HTMLPreElement|HTMLQuoteElement|HTMLScriptElement|HTMLShadowElement|HTMLSourceElement|HTMLSpanElement|HTMLStyleElement|HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableDataCellElement|HTMLTableHeaderCellElement|HTMLTitleElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
+      "%": "HTMLAppletElement|HTMLBRElement|HTMLBaseElement|HTMLCanvasElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLFontElement|HTMLFrameElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLImageElement|HTMLLabelElement|HTMLLegendElement|HTMLLinkElement|HTMLMarqueeElement|HTMLMenuElement|HTMLMenuItemElement|HTMLModElement|HTMLOptGroupElement|HTMLParagraphElement|HTMLPictureElement|HTMLPreElement|HTMLQuoteElement|HTMLScriptElement|HTMLShadowElement|HTMLSourceElement|HTMLSpanElement|HTMLStyleElement|HTMLTableCaptionElement|HTMLTableCellElement|HTMLTableDataCellElement|HTMLTableElement|HTMLTableHeaderCellElement|HTMLTableRowElement|HTMLTableSectionElement|HTMLTemplateElement|HTMLTitleElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
     },
     AnchorElement: {
-      "^": "HtmlElement;hostname=,href},port=,protocol=",
+      "^": "HtmlElement;",
       toString$0: function(receiver) {
         return String(receiver);
       },
@@ -12305,16 +12236,12 @@
       "%": "ApplicationCacheErrorEvent"
     },
     AreaElement: {
-      "^": "HtmlElement;hostname=,href},port=,protocol=",
+      "^": "HtmlElement;",
       toString$0: function(receiver) {
         return String(receiver);
       },
       $isInterceptor: 1,
       "%": "HTMLAreaElement"
-    },
-    BaseElement: {
-      "^": "HtmlElement;href}",
-      "%": "HTMLBaseElement"
     },
     Blob: {
       "^": "Interceptor;",
@@ -12325,12 +12252,11 @@
       "^": "Interceptor;",
       text$0: [function(receiver) {
         return receiver.text();
-      }, "call$0", "get$text", 0, 0, 31],
+      }, "call$0", "get$text", 0, 0, 25],
       "%": ";Body"
     },
     BodyElement: {
       "^": "HtmlElement;",
-      $isBodyElement: 1,
       $isEventTarget: 1,
       $isInterceptor: 1,
       "%": "HTMLBodyElement"
@@ -12486,12 +12412,12 @@
       "%": ";DOMTokenList"
     },
     _ChildrenElementList: {
-      "^": "ListBase;_html$_element<,_childElements",
+      "^": "ListBase;_element,_childElements",
       contains$1: function(_, element) {
         return J.contains$1$asx(this._childElements, element);
       },
       get$isEmpty: function(_) {
-        return this._html$_element.firstElementChild == null;
+        return this._element.firstElementChild == null;
       },
       get$length: function(_) {
         return this._childElements.length;
@@ -12506,13 +12432,13 @@
         var t1 = this._childElements;
         if (index >>> 0 !== index || index >= t1.length)
           return H.ioore(t1, index);
-        this._html$_element.replaceChild(value, t1[index]);
+        this._element.replaceChild(value, t1[index]);
       },
       set$length: function(_, newLength) {
         throw H.wrapException(new P.UnsupportedError("Cannot resize element lists"));
       },
       add$1: function(_, value) {
-        this._html$_element.appendChild(value);
+        this._element.appendChild(value);
         return value;
       },
       get$iterator: function(_) {
@@ -12521,7 +12447,7 @@
       },
       addAll$1: function(_, iterable) {
         var t1, t2;
-        for (t1 = J.get$iterator$ax(iterable instanceof W._ChildNodeListLazy ? P.List_List$from(iterable, true, null) : iterable), t2 = this._html$_element; t1.moveNext$0();)
+        for (t1 = J.get$iterator$ax(iterable instanceof W._ChildNodeListLazy ? P.List_List$from(iterable, true, null) : iterable), t2 = this._element; t1.moveNext$0();)
           t2.appendChild(t1.get$current());
       },
       setRange$4: function(_, start, end, iterable, skipCount) {
@@ -12529,8 +12455,8 @@
       },
       remove$1: function(_, object) {
         var t1;
-        if (!!J.getInterceptor(object).$isElement) {
-          t1 = this._html$_element;
+        if (!!J.getInterceptor(object).$isElement0) {
+          t1 = this._element;
           if (object.parentNode === t1) {
             t1.removeChild(object);
             return true;
@@ -12539,29 +12465,29 @@
         return false;
       },
       get$first: function(_) {
-        var result = this._html$_element.firstElementChild;
+        var result = this._element.firstElementChild;
         if (result == null)
           throw H.wrapException(new P.StateError("No elements"));
         return result;
       },
       get$last: function(_) {
-        var result = this._html$_element.lastElementChild;
+        var result = this._element.lastElementChild;
         if (result == null)
           throw H.wrapException(new P.StateError("No elements"));
         return result;
       },
       $asListBase: function() {
-        return [W.Element];
+        return [W.Element0];
       },
       $asObject_ListMixin: function() {
-        return [W.Element];
+        return [W.Element0];
       },
       $asList: function() {
-        return [W.Element];
+        return [W.Element0];
       }
     },
-    Element: {
-      "^": "Node;tagName=",
+    Element0: {
+      "^": "Node;",
       get$attributes: function(receiver) {
         return new W._ElementAttributeMap(receiver);
       },
@@ -12581,88 +12507,8 @@
         return receiver.localName;
       },
       insertAdjacentHtml$4$treeSanitizer$validator: function(receiver, where, html, treeSanitizer, validator) {
-        var t1, t2, first;
-        t1 = this.createFragment$3$treeSanitizer$validator(receiver, html, treeSanitizer, validator);
-        switch (where.toLowerCase()) {
-          case "beforebegin":
-            receiver.parentNode.insertBefore(t1, receiver);
-            break;
-          case "afterbegin":
-            if (receiver.childNodes.length > 0) {
-              t2 = receiver.childNodes;
-              if (0 >= t2.length)
-                return H.ioore(t2, 0);
-              first = t2[0];
-            } else
-              first = null;
-            receiver.insertBefore(t1, first);
-            break;
-          case "beforeend":
-            receiver.appendChild(t1);
-            break;
-          case "afterend":
-            receiver.parentNode.insertBefore(t1, receiver.nextSibling);
-            break;
-          default:
-            H.throwExpression(P.ArgumentError$("Invalid position " + where));
-        }
+        receiver.insertAdjacentHTML(where, html);
       },
-      createFragment$3$treeSanitizer$validator: ["super$Element$createFragment", function(receiver, html, treeSanitizer, validator) {
-        var t1, t2, base, contextElement, fragment;
-        if (treeSanitizer == null) {
-          t1 = $.Element__defaultValidator;
-          if (t1 == null) {
-            t1 = H.setRuntimeTypeInfo([], [W.NodeValidator]);
-            t2 = new W.NodeValidatorBuilder(t1);
-            t1.push(W._Html5NodeValidator$(null));
-            t1.push(W._TemplatingNodeValidator$());
-            $.Element__defaultValidator = t2;
-            validator = t2;
-          } else
-            validator = t1;
-          t1 = $.Element__defaultSanitizer;
-          if (t1 == null) {
-            t1 = new W._ValidatingTreeSanitizer(validator);
-            $.Element__defaultSanitizer = t1;
-            treeSanitizer = t1;
-          } else {
-            t1.validator = validator;
-            treeSanitizer = t1;
-          }
-        }
-        if ($.Element__parseDocument == null) {
-          t1 = document.implementation.createHTMLDocument("");
-          $.Element__parseDocument = t1;
-          $.Element__parseRange = t1.createRange();
-          base = $.Element__parseDocument.createElement("base", null);
-          J.set$href$x(base, document.baseURI);
-          $.Element__parseDocument.head.appendChild(base);
-        }
-        t1 = $.Element__parseDocument;
-        if (!!this.$isBodyElement)
-          contextElement = t1.body;
-        else {
-          contextElement = t1.createElement(receiver.tagName, null);
-          $.Element__parseDocument.body.appendChild(contextElement);
-        }
-        if ("createContextualFragment" in window.Range.prototype && !C.JSArray_methods.contains$1(C.List_ego, receiver.tagName)) {
-          $.Element__parseRange.selectNodeContents(contextElement);
-          fragment = $.Element__parseRange.createContextualFragment(html);
-        } else {
-          contextElement.innerHTML = html;
-          fragment = $.Element__parseDocument.createDocumentFragment();
-          for (; t1 = contextElement.firstChild, t1 != null;)
-            fragment.appendChild(t1);
-        }
-        t1 = $.Element__parseDocument.body;
-        if (contextElement == null ? t1 != null : contextElement !== t1)
-          J.remove$0$ax(contextElement);
-        treeSanitizer.sanitizeTree$1(fragment);
-        document.adoptNode(fragment);
-        return fragment;
-      }, function($receiver, html, treeSanitizer) {
-        return this.createFragment$3$treeSanitizer$validator($receiver, html, treeSanitizer, null);
-      }, "createFragment$2$treeSanitizer", null, null, "get$createFragment", 2, 5, null, 0, 0],
       get$innerHtml: function(receiver) {
         return receiver.innerHTML;
       },
@@ -12675,18 +12521,12 @@
       get$onClick: function(receiver) {
         return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
       },
-      $isElement: 1,
+      $isElement0: 1,
       $isNode: 1,
       $isObject: 1,
       $isInterceptor: 1,
       $isEventTarget: 1,
       "%": ";Element"
-    },
-    Element_Element$html_closure: {
-      "^": "Closure:1;",
-      call$1: function(e) {
-        return !!J.getInterceptor(e).$isElement;
-      }
     },
     EmbedElement: {
       "^": "HtmlElement;name%",
@@ -12711,13 +12551,13 @@
       },
       removeEventListener$3: function(receiver, type, listener, useCapture) {
         if (listener != null)
-          this._removeEventListener$3(receiver, type, listener, useCapture);
+          this._removeEventListener$3(receiver, type, listener, false);
       },
       _addEventListener$3: function(receiver, type, listener, useCapture) {
         return receiver.addEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
       },
       _removeEventListener$3: function(receiver, type, listener, useCapture) {
-        return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
+        return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), false);
       },
       $isEventTarget: 1,
       "%": "MediaStream;EventTarget"
@@ -12857,13 +12697,13 @@
       "%": "XMLHttpRequest"
     },
     HttpRequest_getString_closure: {
-      "^": "Closure:25;",
+      "^": "Closure:26;",
       call$1: function(xhr) {
         return J.get$responseText$x(xhr);
       }
     },
     HttpRequest_request_closure: {
-      "^": "Closure:1;_captured_completer_1,_captured_xhr_2",
+      "^": "Closure:2;_captured_completer_1,_captured_xhr_2",
       call$1: function(e) {
         var t1, t2, accepted, unknownRedirect, t3;
         t1 = this._captured_xhr_2;
@@ -12890,7 +12730,7 @@
     },
     InputElement: {
       "^": "HtmlElement;name%,value=",
-      $isElement: 1,
+      $isElement0: 1,
       $isInterceptor: 1,
       $isEventTarget: 1,
       $isNode: 1,
@@ -12903,10 +12743,6 @@
     LIElement: {
       "^": "HtmlElement;value=",
       "%": "HTMLLIElement"
-    },
-    LinkElement: {
-      "^": "HtmlElement;href}",
-      "%": "HTMLLinkElement"
     },
     Location: {
       "^": "Interceptor;",
@@ -12940,7 +12776,11 @@
     MessageEvent: {
       "^": "Event;",
       get$data: function(receiver) {
-        return P.convertNativeToDart_AcceptStructuredClone(receiver.data, true);
+        var t1, t2;
+        t1 = receiver.data;
+        t2 = new P._AcceptStructuredCloneDart2Js([], [], false);
+        t2.mustCopy = true;
+        return t2.walk$1(t1);
       },
       "%": "MessageEvent"
     },
@@ -12973,13 +12813,14 @@
     MouseEvent: {
       "^": "UIEvent;",
       get$offset: function(receiver) {
-        var target, point;
+        var t1, target, point;
         if (!!receiver.offsetX)
           return H.setRuntimeTypeInfo(new P.Point(receiver.offsetX, receiver.offsetY), [null]);
         else {
-          if (!J.getInterceptor(W._convertNativeToDart_EventTarget(receiver.target)).$isElement)
+          t1 = receiver.target;
+          if (!J.getInterceptor(W._convertNativeToDart_EventTarget(t1)).$isElement0)
             throw H.wrapException(new P.UnsupportedError("offsetX is only supported on elements"));
-          target = W._convertNativeToDart_EventTarget(receiver.target);
+          target = W._convertNativeToDart_EventTarget(t1);
           point = H.setRuntimeTypeInfo(new P.Point(receiver.clientX, receiver.clientY), [null]).$sub(0, J.get$topLeft$x(J.getBoundingClientRect$0$x(target)));
           return H.setRuntimeTypeInfo(new P.Point(J.toInt$0$n(point.x), J.toInt$0$n(point.y)), [null]);
         }
@@ -13011,16 +12852,6 @@
         if (result == null)
           throw H.wrapException(new P.StateError("No elements"));
         return result;
-      },
-      get$single: function(_) {
-        var t1, l;
-        t1 = this._this;
-        l = t1.childNodes.length;
-        if (l === 0)
-          throw H.wrapException(new P.StateError("No elements"));
-        if (l > 1)
-          throw H.wrapException(new P.StateError("More than one element"));
-        return t1.firstChild;
       },
       add$1: function(_, value) {
         this._this.appendChild(value);
@@ -13290,64 +13121,6 @@
       "^": "HtmlElement;span=",
       "%": "HTMLTableColElement"
     },
-    TableElement: {
-      "^": "HtmlElement;",
-      createFragment$3$treeSanitizer$validator: function(receiver, html, treeSanitizer, validator) {
-        var table, fragment;
-        if ("createContextualFragment" in window.Range.prototype)
-          return this.super$Element$createFragment(receiver, html, treeSanitizer, validator);
-        table = W.Element_Element$html("<table>" + html + "</table>", treeSanitizer, validator);
-        fragment = document.createDocumentFragment();
-        fragment.toString;
-        new W._ChildNodeListLazy(fragment).addAll$1(0, J.get$nodes$x(table));
-        return fragment;
-      },
-      "%": "HTMLTableElement"
-    },
-    TableRowElement: {
-      "^": "HtmlElement;",
-      createFragment$3$treeSanitizer$validator: function(receiver, html, treeSanitizer, validator) {
-        var fragment, t1, section, row;
-        if ("createContextualFragment" in window.Range.prototype)
-          return this.super$Element$createFragment(receiver, html, treeSanitizer, validator);
-        fragment = document.createDocumentFragment();
-        t1 = J.createFragment$3$treeSanitizer$validator$x(document.createElement("table", null), html, treeSanitizer, validator);
-        t1.toString;
-        t1 = new W._ChildNodeListLazy(t1);
-        section = t1.get$single(t1);
-        section.toString;
-        t1 = new W._ChildNodeListLazy(section);
-        row = t1.get$single(t1);
-        fragment.toString;
-        row.toString;
-        new W._ChildNodeListLazy(fragment).addAll$1(0, new W._ChildNodeListLazy(row));
-        return fragment;
-      },
-      "%": "HTMLTableRowElement"
-    },
-    TableSectionElement: {
-      "^": "HtmlElement;",
-      createFragment$3$treeSanitizer$validator: function(receiver, html, treeSanitizer, validator) {
-        var fragment, t1, section;
-        if ("createContextualFragment" in window.Range.prototype)
-          return this.super$Element$createFragment(receiver, html, treeSanitizer, validator);
-        fragment = document.createDocumentFragment();
-        t1 = J.createFragment$3$treeSanitizer$validator$x(document.createElement("table", null), html, treeSanitizer, validator);
-        t1.toString;
-        t1 = new W._ChildNodeListLazy(t1);
-        section = t1.get$single(t1);
-        fragment.toString;
-        section.toString;
-        new W._ChildNodeListLazy(fragment).addAll$1(0, new W._ChildNodeListLazy(section));
-        return fragment;
-      },
-      "%": "HTMLTableSectionElement"
-    },
-    TemplateElement: {
-      "^": "HtmlElement;",
-      $isTemplateElement: 1,
-      "%": "HTMLTemplateElement"
-    },
     TextAreaElement: {
       "^": "HtmlElement;name%,value=",
       "%": "HTMLTextAreaElement"
@@ -13376,7 +13149,7 @@
         return receiver.location;
       },
       postMessage$3: function(receiver, message, targetOrigin, transfer) {
-        receiver.postMessage(P._convertDartToNative_PrepareForStructuredClone(message), targetOrigin);
+        receiver.postMessage(new P._StructuredCloneDart2Js([], []).walk$1(message), targetOrigin);
         return;
       },
       postMessage$2: function($receiver, message, targetOrigin) {
@@ -13529,7 +13302,7 @@
       "%": "Request"
     },
     _AttributeMap: {
-      "^": "Object;_html$_element<",
+      "^": "Object;",
       putIfAbsent$2: function(key, ifAbsent) {
         if (this.containsKey$1(key) !== true)
           this.$indexSet(0, key, ifAbsent.call$0());
@@ -13544,7 +13317,7 @@
       },
       get$keys: function() {
         var attributes, keys, len, i;
-        attributes = this._html$_element.attributes;
+        attributes = this._element.attributes;
         keys = H.setRuntimeTypeInfo([], [P.String]);
         for (len = attributes.length, i = 0; i < len; ++i) {
           if (i >= attributes.length)
@@ -13569,19 +13342,19 @@
       }
     },
     _ElementAttributeMap: {
-      "^": "_AttributeMap;_html$_element",
+      "^": "_AttributeMap;_element",
       containsKey$1: function(key) {
-        return this._html$_element.hasAttribute(key);
+        return this._element.hasAttribute(key);
       },
       $index: function(_, key) {
-        return this._html$_element.getAttribute(key);
+        return this._element.getAttribute(key);
       },
       $indexSet: function(_, key, value) {
-        this._html$_element.setAttribute(key, value);
+        this._element.setAttribute(key, value);
       },
       remove$1: function(_, key) {
         var t1, value;
-        t1 = this._html$_element;
+        t1 = this._element;
         value = t1.getAttribute(key);
         t1.removeAttribute(key);
         return value;
@@ -13596,7 +13369,7 @@
     _EventStream: {
       "^": "Stream;_target,_eventType,_useCapture",
       listen$4$cancelOnError$onDone$onError: function(onData, cancelOnError, onDone, onError) {
-        var t1 = new W._EventStreamSubscription(0, this._target, this._eventType, W._wrapZone(onData), this._useCapture);
+        var t1 = new W._EventStreamSubscription(0, this._target, this._eventType, W._wrapZone(onData), false);
         t1.$builtinTypeInfo = this.$builtinTypeInfo;
         t1._tryResume$0();
         return t1;
@@ -13636,82 +13409,13 @@
       _tryResume$0: function() {
         var t1 = this._onData;
         if (t1 != null && this._pauseCount <= 0)
-          J.addEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
+          J.addEventListener$3$x(this._target, this._eventType, t1, false);
       },
       _unlisten$0: function() {
         var t1 = this._onData;
         if (t1 != null)
-          J.removeEventListener$3$x(this._target, this._eventType, t1, this._useCapture);
+          J.removeEventListener$3$x(this._target, this._eventType, t1, false);
       }
-    },
-    _Html5NodeValidator: {
-      "^": "Object;uriPolicy<",
-      allowsElement$1: function(element) {
-        return $.$get$_Html5NodeValidator__allowedElements().contains$1(0, J.get$tagName$x(element));
-      },
-      allowsAttribute$3: function(element, attributeName, value) {
-        var tagName, t1, validator;
-        tagName = J.get$tagName$x(element);
-        t1 = $.$get$_Html5NodeValidator__attributeValidators();
-        validator = t1.$index(0, H.S(tagName) + "::" + attributeName);
-        if (validator == null)
-          validator = t1.$index(0, "*::" + attributeName);
-        if (validator == null)
-          return false;
-        return validator.call$4(element, attributeName, value, this);
-      },
-      _Html5NodeValidator$1$uriPolicy: function(uriPolicy) {
-        var t1, _i;
-        t1 = $.$get$_Html5NodeValidator__attributeValidators();
-        if (t1.get$isEmpty(t1)) {
-          for (_i = 0; _i < 261; ++_i)
-            t1.$indexSet(0, C.List_1GN[_i], W.html__Html5NodeValidator__standardAttributeValidator$closure());
-          for (_i = 0; _i < 12; ++_i)
-            t1.$indexSet(0, C.List_yrN[_i], W.html__Html5NodeValidator__uriAttributeValidator$closure());
-        }
-      },
-      $isNodeValidator: 1,
-      static: {_Html5NodeValidator$: function(uriPolicy) {
-          var e, t1;
-          e = document.createElement("a", null);
-          t1 = new W._SameOriginUriPolicy(e, window.location);
-          t1 = new W._Html5NodeValidator(t1);
-          t1._Html5NodeValidator$1$uriPolicy(uriPolicy);
-          return t1;
-        }, _Html5NodeValidator__standardAttributeValidator: [function(element, attributeName, value, context) {
-          return true;
-        }, "call$4", "html__Html5NodeValidator__standardAttributeValidator$closure", 8, 0, 10], _Html5NodeValidator__uriAttributeValidator: [function(element, attributeName, value, context) {
-          var t1, t2, t3, t4, t5;
-          t1 = context.get$uriPolicy();
-          t2 = t1._hiddenAnchor;
-          t3 = J.getInterceptor$x(t2);
-          t3.set$href(t2, value);
-          t4 = t3.get$hostname(t2);
-          t1 = t1._loc;
-          t5 = t1.hostname;
-          if (t4 == null ? t5 == null : t4 === t5) {
-            t4 = t3.get$port(t2);
-            t5 = t1.port;
-            if (t4 == null ? t5 == null : t4 === t5) {
-              t4 = t3.get$protocol(t2);
-              t1 = t1.protocol;
-              t1 = t4 == null ? t1 == null : t4 === t1;
-            } else
-              t1 = false;
-          } else
-            t1 = false;
-          if (!t1)
-            if (t3.get$hostname(t2) === "")
-              if (t3.get$port(t2) === "")
-                t1 = t3.get$protocol(t2) === ":" || t3.get$protocol(t2) === "";
-              else
-                t1 = false;
-            else
-              t1 = false;
-          else
-            t1 = true;
-          return t1;
-        }, "call$4", "html__Html5NodeValidator__uriAttributeValidator$closure", 8, 0, 10]}
     },
     ImmutableListMixin: {
       "^": "Object;",
@@ -13734,149 +13438,29 @@
       $asList: null,
       $isEfficientLength: 1
     },
-    NodeValidatorBuilder: {
-      "^": "Object;_validators",
-      add$1: function(_, validator) {
-        this._validators.push(validator);
-      },
-      allowsElement$1: function(element) {
-        return C.JSArray_methods.any$1(this._validators, new W.NodeValidatorBuilder_allowsElement_closure(element));
-      },
-      allowsAttribute$3: function(element, attributeName, value) {
-        return C.JSArray_methods.any$1(this._validators, new W.NodeValidatorBuilder_allowsAttribute_closure(element, attributeName, value));
-      }
-    },
-    NodeValidatorBuilder_allowsElement_closure: {
-      "^": "Closure:1;_captured_element_0",
-      call$1: function(v) {
-        return v.allowsElement$1(this._captured_element_0);
-      }
-    },
-    NodeValidatorBuilder_allowsAttribute_closure: {
-      "^": "Closure:1;_captured_element_0,_captured_attributeName_1,_captured_value_2",
-      call$1: function(v) {
-        return v.allowsAttribute$3(this._captured_element_0, this._captured_attributeName_1, this._captured_value_2);
-      }
-    },
-    _SimpleNodeValidator: {
-      "^": "Object;uriPolicy<",
-      allowsElement$1: function(element) {
-        return this.allowedElements.contains$1(0, J.get$tagName$x(element));
-      },
-      allowsAttribute$3: ["super$_SimpleNodeValidator$allowsAttribute", function(element, attributeName, value) {
-        var tagName, t1;
-        tagName = J.get$tagName$x(element);
-        t1 = this.allowedUriAttributes;
-        if (t1.contains$1(0, H.S(tagName) + "::" + attributeName))
-          return this.uriPolicy.allowsUri$1(value);
-        else if (t1.contains$1(0, "*::" + attributeName))
-          return this.uriPolicy.allowsUri$1(value);
-        else {
-          t1 = this.allowedAttributes;
-          if (t1.contains$1(0, H.S(tagName) + "::" + attributeName))
-            return true;
-          else if (t1.contains$1(0, "*::" + attributeName))
-            return true;
-          else if (t1.contains$1(0, H.S(tagName) + "::*"))
-            return true;
-          else if (t1.contains$1(0, "*::*"))
-            return true;
-        }
-        return false;
-      }],
-      _SimpleNodeValidator$4$allowedAttributes$allowedElements$allowedUriAttributes: function(uriPolicy, allowedAttributes, allowedElements, allowedUriAttributes) {
-        var legalAttributes, extraUriAttributes, t1;
-        this.allowedElements.addAll$1(0, allowedElements);
-        legalAttributes = allowedAttributes.where$1(0, new W._SimpleNodeValidator_closure());
-        extraUriAttributes = allowedAttributes.where$1(0, new W._SimpleNodeValidator_closure0());
-        this.allowedAttributes.addAll$1(0, legalAttributes);
-        t1 = this.allowedUriAttributes;
-        t1.addAll$1(0, C.List_empty);
-        t1.addAll$1(0, extraUriAttributes);
-      }
-    },
-    _SimpleNodeValidator_closure: {
-      "^": "Closure:1;",
-      call$1: function(x) {
-        return !C.JSArray_methods.contains$1(C.List_yrN, x);
-      }
-    },
-    _SimpleNodeValidator_closure0: {
-      "^": "Closure:1;",
-      call$1: function(x) {
-        return C.JSArray_methods.contains$1(C.List_yrN, x);
-      }
-    },
-    _TemplatingNodeValidator: {
-      "^": "_SimpleNodeValidator;_templateAttrs,allowedElements,allowedAttributes,allowedUriAttributes,uriPolicy",
-      allowsAttribute$3: function(element, attributeName, value) {
-        if (this.super$_SimpleNodeValidator$allowsAttribute(element, attributeName, value))
-          return true;
-        if (attributeName === "template" && value === "")
-          return true;
-        if (J.get$attributes$x(element)._html$_element.getAttribute("template") === "")
-          return this._templateAttrs.contains$1(0, attributeName);
-        return false;
-      },
-      static: {_TemplatingNodeValidator$: function() {
-          var t1, t2, t3, t4;
-          t1 = H.setRuntimeTypeInfo(new H.MappedListIterable(C.List_wSV, new W._TemplatingNodeValidator_closure()), [null, null]);
-          t2 = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-          t3 = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-          t4 = P.LinkedHashSet_LinkedHashSet(null, null, null, P.String);
-          t4 = new W._TemplatingNodeValidator(P.LinkedHashSet_LinkedHashSet$from(C.List_wSV, P.String), t2, t3, t4, null);
-          t4._SimpleNodeValidator$4$allowedAttributes$allowedElements$allowedUriAttributes(null, t1, ["TEMPLATE"], null);
-          return t4;
-        }}
-    },
-    _TemplatingNodeValidator_closure: {
-      "^": "Closure:1;",
-      call$1: function(attr) {
-        return "TEMPLATE::" + H.S(attr);
-      }
-    },
-    _SvgNodeValidator: {
-      "^": "Object;",
-      allowsElement$1: function(element) {
-        var t1 = J.getInterceptor(element);
-        if (!!t1.$isScriptElement)
-          return false;
-        t1 = !!t1.$isSvgElement;
-        if (t1 && element.tagName === "foreignObject")
-          return false;
-        if (t1)
-          return true;
-        return false;
-      },
-      allowsAttribute$3: function(element, attributeName, value) {
-        if (attributeName === "is" || C.JSString_methods.startsWith$1(attributeName, "on"))
-          return false;
-        return this.allowsElement$1(element);
-      }
-    },
     FixedSizeListIterator: {
-      "^": "Object;_array,_html$_length,_position,_html$_current",
+      "^": "Object;_array,_html$_length,_position,_current",
       moveNext$0: function() {
         var nextPosition, t1;
         nextPosition = this._position + 1;
         t1 = this._html$_length;
         if (nextPosition < t1) {
-          this._html$_current = J.$index$asx(this._array, nextPosition);
+          this._current = J.$index$asx(this._array, nextPosition);
           this._position = nextPosition;
           return true;
         }
-        this._html$_current = null;
+        this._current = null;
         this._position = t1;
         return false;
       },
       get$current: function() {
-        return this._html$_current;
+        return this._current;
       }
     },
     _DOMWindowCrossFrame: {
       "^": "Object;_window",
       postMessage$3: function(_, message, targetOrigin, messagePorts) {
-        this._window.postMessage(P._convertDartToNative_PrepareForStructuredClone(message), targetOrigin);
+        this._window.postMessage(new P._StructuredCloneDart2Js([], []).walk$1(message), targetOrigin);
       },
       postMessage$2: function($receiver, message, targetOrigin) {
         return this.postMessage$3($receiver, message, targetOrigin, null);
@@ -13899,125 +13483,8 @@
     NodeValidator: {
       "^": "Object;"
     },
-    _SameOriginUriPolicy: {
-      "^": "Object;_hiddenAnchor,_loc"
-    },
-    _ValidatingTreeSanitizer: {
-      "^": "Object;validator",
-      sanitizeTree$1: function(node) {
-        new W._ValidatingTreeSanitizer_sanitizeTree_walk(this).call$2(node, null);
-      },
-      _removeNode$2: function(node, $parent) {
-        if ($parent == null)
-          J.remove$0$ax(node);
-        else
-          $parent.removeChild(node);
-      },
-      _sanitizeUntrustedElement$2: function(element, $parent) {
-        var corrupted, attrs, isAttr, elementText, elementTagName, exception;
-        corrupted = true;
-        attrs = null;
-        isAttr = null;
-        try {
-          attrs = J.get$attributes$x(element);
-          isAttr = attrs.get$_html$_element().getAttribute("is");
-          corrupted = function(element) {
-            if (!(element.attributes instanceof NamedNodeMap))
-              return true;
-            var childNodes = element.childNodes;
-            if (element.lastChild && element.lastChild !== childNodes[childNodes.length - 1])
-              return true;
-            if (element.children)
-              if (!(element.children instanceof HTMLCollection || element.children instanceof NodeList))
-                return true;
-            return false;
-          }(element);
-        } catch (exception) {
-          H.unwrapException(exception);
-        }
-        elementText = "element unprintable";
-        try {
-          elementText = J.toString$0$(element);
-        } catch (exception) {
-          H.unwrapException(exception);
-        }
-        elementTagName = "element tag unavailable";
-        try {
-          elementTagName = J.get$tagName$x(element);
-        } catch (exception) {
-          H.unwrapException(exception);
-        }
-        this._sanitizeElement$7(element, $parent, corrupted, elementText, elementTagName, attrs, isAttr);
-      },
-      _sanitizeElement$7: function(element, $parent, corrupted, text, tag, attrs, isAttr) {
-        var t1, keys, i, $name, t2;
-        if (corrupted) {
-          window;
-          t1 = "Removing element due to corrupted attributes on <" + text + ">";
-          if (typeof console != "undefined")
-            console.warn(t1);
-          this._removeNode$2(element, $parent);
-          return;
-        }
-        if (!this.validator.allowsElement$1(element)) {
-          window;
-          t1 = "Removing disallowed element <" + H.S(tag) + ">";
-          if (typeof console != "undefined")
-            console.warn(t1);
-          this._removeNode$2(element, $parent);
-          return;
-        }
-        if (isAttr != null)
-          if (!this.validator.allowsAttribute$3(element, "is", isAttr)) {
-            window;
-            t1 = "Removing disallowed type extension <" + H.S(tag) + " is=\"" + isAttr + "\">";
-            if (typeof console != "undefined")
-              console.warn(t1);
-            this._removeNode$2(element, $parent);
-            return;
-          }
-        t1 = attrs.get$keys();
-        keys = H.setRuntimeTypeInfo(t1.slice(), [H.getTypeArgumentByIndex(t1, 0)]);
-        for (i = attrs.get$keys().length - 1, t1 = attrs._html$_element; i >= 0; --i) {
-          if (i >= keys.length)
-            return H.ioore(keys, i);
-          $name = keys[i];
-          if (!this.validator.allowsAttribute$3(element, J.toLowerCase$0$s($name), t1.getAttribute($name))) {
-            window;
-            t2 = "Removing disallowed attribute <" + H.S(tag) + " " + $name + "=\"" + H.S(t1.getAttribute($name)) + "\">";
-            if (typeof console != "undefined")
-              console.warn(t2);
-            t1.getAttribute($name);
-            t1.removeAttribute($name);
-          }
-        }
-        if (!!J.getInterceptor(element).$isTemplateElement)
-          this.sanitizeTree$1(element.content);
-      }
-    },
-    _ValidatingTreeSanitizer_sanitizeTree_walk: {
-      "^": "Closure:26;_html$_captured_this_0",
-      call$2: function(node, $parent) {
-        var t1, child, nextChild;
-        t1 = this._html$_captured_this_0;
-        switch (node.nodeType) {
-          case 1:
-            t1._sanitizeUntrustedElement$2(node, $parent);
-            break;
-          case 8:
-          case 11:
-          case 3:
-          case 4:
-            break;
-          default:
-            t1._removeNode$2(node, $parent);
-        }
-        child = node.lastChild;
-        for (; child != null; child = nextChild) {
-          nextChild = child.previousSibling;
-          this.call$2(child, node);
-        }
-      }
+    _TrustedHtmlTreeSanitizer: {
+      "^": "Object;"
     }
   }], ["dart.dom.indexed_db", "dart:indexed_db",, P, {
     "^": ""
@@ -14168,14 +13635,13 @@
       "^": "GeometryElement;x=,y=",
       "%": "SVGRectElement"
     },
-    ScriptElement: {
+    ScriptElement0: {
       "^": "SvgElement;",
-      $isScriptElement: 1,
       $isInterceptor: 1,
       "%": "SVGScriptElement"
     },
     SvgElement: {
-      "^": "Element;",
+      "^": "Element0;",
       get$children: function(receiver) {
         return new P.FilteredElementList0(receiver, new W._ChildNodeListLazy(receiver));
       },
@@ -14187,32 +13653,12 @@
         J.addAll$1$ax(t1.get$children(container), J.get$children$x(cloned));
         return t1.get$innerHtml(container);
       },
-      createFragment$3$treeSanitizer$validator: function(receiver, svg, treeSanitizer, validator) {
-        var t1, html, fragment, svgFragment, root;
-        t1 = H.setRuntimeTypeInfo([], [W.NodeValidator]);
-        validator = new W.NodeValidatorBuilder(t1);
-        t1.push(W._Html5NodeValidator$(null));
-        t1.push(W._TemplatingNodeValidator$());
-        t1.push(new W._SvgNodeValidator());
-        treeSanitizer = new W._ValidatingTreeSanitizer(validator);
-        html = "<svg version=\"1.1\">" + svg + "</svg>";
-        t1 = document.body;
-        fragment = (t1 && C.BodyElement_methods).createFragment$2$treeSanitizer(t1, html, treeSanitizer);
-        svgFragment = document.createDocumentFragment();
-        fragment.toString;
-        t1 = new W._ChildNodeListLazy(fragment);
-        root = t1.get$single(t1);
-        for (; t1 = root.firstChild, t1 != null;)
-          svgFragment.appendChild(t1);
-        return svgFragment;
-      },
       insertAdjacentHtml$4$treeSanitizer$validator: function(receiver, where, text, treeSanitizer, validator) {
         throw H.wrapException(new P.UnsupportedError("Cannot invoke insertAdjacentHtml on SVG."));
       },
       get$onClick: function(receiver) {
         return H.setRuntimeTypeInfo(new W._ElementEventStreamImpl(receiver, "click", false), [null]);
       },
-      $isSvgElement: 1,
       $isEventTarget: 1,
       $isInterceptor: 1,
       "%": "SVGAltGlyphDefElement|SVGAltGlyphItemElement|SVGComponentTransferFunctionElement|SVGDescElement|SVGDiscardElement|SVGFEDistantLightElement|SVGFEFuncAElement|SVGFEFuncBElement|SVGFEFuncGElement|SVGFEFuncRElement|SVGFEMergeNodeElement|SVGFontElement|SVGFontFaceElement|SVGFontFaceFormatElement|SVGFontFaceNameElement|SVGFontFaceSrcElement|SVGFontFaceUriElement|SVGGlyphElement|SVGHKernElement|SVGMetadataElement|SVGMissingGlyphElement|SVGStopElement|SVGStyleElement|SVGTitleElement|SVGVKernElement;SVGElement"
@@ -14481,6 +13927,21 @@
     _ensureNativeList: function(list) {
       return list;
     },
+    _checkValidRange: function(start, end, $length) {
+      var t1;
+      if (!(start >>> 0 !== start))
+        if (end == null)
+          t1 = J.$gt$n(start, $length);
+        else
+          t1 = end >>> 0 !== end || J.$gt$n(start, end) || J.$gt$n(end, $length);
+      else
+        t1 = true;
+      if (t1)
+        throw H.wrapException(H.diagnoseRangeError(start, end, $length));
+      if (end == null)
+        return $length;
+      return end;
+    },
     NativeByteBuffer: {
       "^": "Interceptor;",
       $isNativeByteBuffer: 1,
@@ -14488,24 +13949,12 @@
     },
     NativeTypedData: {
       "^": "Interceptor;",
-      _invalidPosition$2: function(receiver, position, $length) {
-        if (typeof position !== "number" || Math.floor(position) !== position)
-          throw H.wrapException(P.ArgumentError$value(position, null, "Invalid list position"));
-        else
-          throw H.wrapException(P.RangeError$range(position, 0, $length, null, null));
+      _invalidPosition$3: function(receiver, position, $length, $name) {
+        throw H.wrapException(P.RangeError$range(position, 0, $length, $name, null));
       },
-      _checkPosition$2: function(receiver, position, $length) {
+      _checkPosition$3: function(receiver, position, $length, $name) {
         if (position >>> 0 !== position || position > $length)
-          this._invalidPosition$2(receiver, position, $length);
-      },
-      _checkSublistArguments$3: function(receiver, start, end, $length) {
-        this._checkPosition$2(receiver, start, $length);
-        if (end == null)
-          return $length;
-        this._checkPosition$2(receiver, end, $length);
-        if (J.$gt$n(start, end))
-          throw H.wrapException(P.RangeError$range(start, 0, end, null, null));
-        return end;
+          this._invalidPosition$3(receiver, position, $length, $name);
       },
       $isNativeTypedData: 1,
       "%": "DataView;ArrayBufferView;NativeTypedArray|NativeTypedArray_ListMixin|NativeTypedArray_ListMixin_FixedLengthListMixin|NativeTypedArrayOfDouble|NativeTypedArray_ListMixin0|NativeTypedArray_ListMixin_FixedLengthListMixin0|NativeTypedArrayOfInt"
@@ -14518,8 +13967,8 @@
       _setRangeFast$4: function(receiver, start, end, source, skipCount) {
         var targetLength, count, sourceLength;
         targetLength = receiver.length;
-        this._checkPosition$2(receiver, start, targetLength);
-        this._checkPosition$2(receiver, end, targetLength);
+        this._checkPosition$3(receiver, start, targetLength, "start");
+        this._checkPosition$3(receiver, end, targetLength, "end");
         if (start > end)
           throw H.wrapException(P.RangeError$range(start, 0, end, null, null));
         count = end - start;
@@ -14598,7 +14047,7 @@
     NativeFloat32List: {
       "^": "NativeTypedArrayOfDouble;",
       sublist$2: function(receiver, start, end) {
-        return new Float32Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Float32Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14610,7 +14059,7 @@
     NativeFloat64List: {
       "^": "NativeTypedArrayOfDouble;",
       sublist$2: function(receiver, start, end) {
-        return new Float64Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Float64Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14627,7 +14076,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Int16Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Int16Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14644,7 +14093,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Int32Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Int32Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14661,7 +14110,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Int8Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Int8Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14678,7 +14127,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Uint16Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Uint16Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14695,7 +14144,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Uint32Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Uint32Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14715,7 +14164,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Uint8ClampedArray(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Uint8ClampedArray(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isList: 1,
       $asList: function() {
@@ -14735,7 +14184,7 @@
         return receiver[index];
       },
       sublist$2: function(receiver, start, end) {
-        return new Uint8Array(receiver.subarray(start, this._checkSublistArguments$3(receiver, start, end, receiver.length)));
+        return new Uint8Array(receiver.subarray(start, H._checkValidRange(start, end, receiver.length)));
       },
       $isNativeUint8List: 1,
       $isList: 1,
@@ -14824,7 +14273,7 @@
       $isNode0: 1
     },
     Node0: {
-      "^": "Object;parentNode*,attributes>,nodes>,sourceSpan<",
+      "^": "Object;parentNode*,attributes>,nodes>,sourceSpan@",
       get$children: function(_) {
         var t1 = this._elements;
         if (t1 == null) {
@@ -14921,7 +14370,7 @@
           namespaceUri = null;
         t1 = P.LinkedHashMap_LinkedHashMap(null, null, null, null, null);
         t2 = new B.NodeList(null, H.setRuntimeTypeInfo([], [B.Node0]));
-        t1 = new B.Element0(namespaceUri, tag, null, t1, t2, null, null, null, null);
+        t1 = new B.Element(namespaceUri, tag, null, null, t1, t2, null, null, null, null);
         t2._parent = t1;
         return t1;
       }
@@ -15039,8 +14488,8 @@
         return t1;
       }
     },
-    Element0: {
-      "^": "Node__ParentNode__ElementAndDocument;namespaceUri>,localName>,parentNode,attributes,nodes,_elements,sourceSpan,_attributeSpans,_attributeValueSpans",
+    Element: {
+      "^": "Node__ParentNode__ElementAndDocument;namespaceUri>,localName>,endSourceSpan?,parentNode,attributes,nodes,_elements,sourceSpan,_attributeSpans,_attributeValueSpans",
       get$nodeType: function(_) {
         return 1;
       },
@@ -15053,7 +14502,7 @@
           if (i >>> 0 !== i || i >= t2)
             return H.ioore(t1, i);
           s = t1[i];
-          if (s instanceof B.Element0)
+          if (s instanceof B.Element)
             return s;
         }
         return;
@@ -15067,7 +14516,7 @@
           if (i >>> 0 !== i || i >= t2)
             return H.ioore(t1, i);
           s = t1[i];
-          if (s instanceof B.Element0)
+          if (s instanceof B.Element)
             return s;
         }
         return;
@@ -15123,7 +14572,7 @@
         var t1, t2, result;
         t1 = P.LinkedHashMap_LinkedHashMap(null, null, null, null, null);
         t2 = new B.NodeList(null, H.setRuntimeTypeInfo([], [B.Node0]));
-        result = new B.Element0(this.namespaceUri, this.localName, null, t1, t2, null, null, null, null);
+        result = new B.Element(this.namespaceUri, this.localName, null, null, t1, t2, null, null, null, null);
         t2._parent = result;
         result.attributes = P.LinkedHashMap_LinkedHashMap$from(this.attributes, null, null);
         return this._clone$2(result, deep);
@@ -15207,7 +14656,7 @@
         var list, t1, node, t2;
         list = this._flattenDocFragments$1(collection);
         for (t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(list), [H.getTypeArgumentByIndex(list, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
-          node = t1._current;
+          node = t1.__internal$_current;
           t2 = J.getInterceptor$ax(node);
           t2.remove$0(node);
           t2.set$parentNode(node, this._parent);
@@ -15255,7 +14704,7 @@
         var list, t1, node, t2;
         list = this._flattenDocFragments$1(collection);
         for (t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(list), [H.getTypeArgumentByIndex(list, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
-          node = t1._current;
+          node = t1.__internal$_current;
           t2 = J.getInterceptor$ax(node);
           t2.remove$0(node);
           t2.set$parentNode(node, this._parent);
@@ -15291,7 +14740,7 @@
       "^": "IterableBase_ListMixin;_dom$_node,_childNodes",
       get$_filtered: function() {
         var t1 = this._childNodes;
-        return P.List_List$from(H.setRuntimeTypeInfo(new H.WhereIterable(t1, new B.FilteredElementList__filtered_closure()), [H.getRuntimeTypeArgument(t1, "Iterable", 0)]), true, B.Element0);
+        return P.List_List$from(H.setRuntimeTypeInfo(new H.WhereIterable(t1, new B.FilteredElementList__filtered_closure()), [H.getRuntimeTypeArgument(t1, "Iterable", 0)]), true, B.Element);
       },
       forEach$1: function(_, f) {
         C.JSArray_methods.forEach$1(this.get$_filtered(), f);
@@ -15358,7 +14807,7 @@
       },
       remove$1: function(_, element) {
         var i, t1, indexElement;
-        if (!(element instanceof B.Element0))
+        if (!(element instanceof B.Element))
           return false;
         for (i = 0; i < this.get$_filtered().length; ++i) {
           t1 = this.get$_filtered();
@@ -15411,32 +14860,32 @@
       },
       $isList: 1,
       $asList: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $isEfficientLength: 1
     },
     IterableBase_ListMixin: {
       "^": "IterableBase+ListMixin;",
       $asIterableBase: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $asIterable: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $asList: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $isList: 1,
       $isEfficientLength: 1
     },
     FilteredElementList__filtered_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(n) {
-        return n instanceof B.Element0;
+        return n instanceof B.Element;
       }
     },
     FilteredElementList_removeRange_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(el) {
         return J.remove$0$ax(el);
       }
@@ -15525,7 +14974,7 @@
     writeTextNodeAsHtml: function(str, node) {
       var $parent, tag, t1;
       $parent = node.parentNode;
-      if ($parent instanceof B.Element0) {
+      if ($parent instanceof B.Element) {
         tag = $parent.localName;
         if (C.JSArray_methods.contains$1(C.List_yHT, tag) || J.$eq$(tag, "plaintext")) {
           t1 = J.toString$0$(node._data);
@@ -15762,7 +15211,8 @@
         return this.encoding;
       },
       handleComment$0: [function() {
-        return this.data.jumpTo$1("-->");
+        this.data.jumpTo$1("-->");
+        return true;
       }, "call$0", "get$handleComment", 0, 0, 0],
       handleMeta$0: [function() {
         var t1, attr, codec;
@@ -15791,11 +15241,13 @@
         return true;
       }, "call$0", "get$handleMeta", 0, 0, 0],
       handlePossibleStartTag$0: [function() {
-        return this.handlePossibleTag$1(false);
+        this.handlePossibleTag$1(false);
+        return true;
       }, "call$0", "get$handlePossibleStartTag", 0, 0, 0],
       handlePossibleEndTag$0: [function() {
         this.data.next$0();
-        return this.handlePossibleTag$1(true);
+        this.handlePossibleTag$1(true);
+        return true;
       }, "call$0", "get$handlePossibleEndTag", 0, 0, 0],
       handlePossibleTag$1: function(endTag) {
         var t1, attr;
@@ -15817,7 +15269,8 @@
         return true;
       },
       handleOther$0: [function() {
-        return this.data.jumpTo$1(">");
+        this.data.jumpTo$1(">");
+        return true;
       }, "call$0", "get$handleOther", 0, 0, 0],
       getAttribute$0: function(_) {
         var t1, c, attrName, attrValue, t2, c0;
@@ -15890,7 +15343,7 @@
       }
     },
     EncodingParser_getAttribute_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(x) {
         return J.$eq$(x, "/") || F.isWhitespace(x);
       }
@@ -15914,11 +15367,9 @@
             quoteMark = t3.$index(t2, t1.get$position(t1));
             t1.set$position(0, t1.get$position(t1) + 1);
             oldPosition = t1.get$position(t1);
-            if (t1.jumpTo$1(quoteMark)) {
-              t1 = t1.slice$2(0, oldPosition, t1.get$position(t1));
-              return t1;
-            } else
-              return;
+            t1.jumpTo$1(quoteMark);
+            t1 = t1.slice$2(0, oldPosition, t1.get$position(t1));
+            return t1;
           } else {
             oldPosition0 = t1.get$position(t1);
             try {
@@ -15958,20 +15409,20 @@
           req.setRequestHeader(header, t1.$index(0, header));
         }
         t1 = H.setRuntimeTypeInfo(new W._EventStream(req, "loadend", false), [null]);
-        H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new M._BrowserHttpClient_request_closure(req, completer)), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+        H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._target, t1._eventType, W._wrapZone(new M._BrowserHttpClient_request_closure(req, completer)), false), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
         req.send(request.body);
         return completer.future;
       }
     },
     _BrowserHttpClient_request_closure: {
-      "^": "Closure:1;_captured_req_0,_browser$_captured_completer_1",
+      "^": "Closure:2;_captured_req_0,_browser$_captured_completer_1",
       call$1: function($event) {
         var t1 = this._captured_req_0;
         this._browser$_captured_completer_1.complete$1(0, new T.Response(t1.responseText, C.HttpRequest_methods.get$responseHeaders(t1), t1.status));
       }
     },
     initGitHub_closure: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
         return new M._BrowserHttpClient();
       }
@@ -15984,15 +15435,13 @@
     MiscService: {
       "^": "Service;_github",
       listOctodex$1$cors: function(cors) {
-        var controller, t1;
-        controller = P.StreamController_StreamController(null, null, null, null, false, null);
-        t1 = cors ? "http://whateverorigin.org/get?url=" : "";
-        J.request$1$x(this._github.client, new T.Request(t1 + (cors ? P.Uri__uriEncode(C.List_KIf, "http://feeds.feedburner.com/Octocats.xml", C.Utf8Codec_false, false) : "http://feeds.feedburner.com/Octocats.xml"), "GET", null, C.Map_empty)).then$1(new T.MiscService_listOctodex_closure(controller));
+        var controller = P.StreamController_StreamController(null, null, null, null, false, null);
+        J.request$1$x(this._github.client, new T.Request("http://whateverorigin.org/get?url=" + P.Uri__uriEncode(C.List_KIf, "http://feeds.feedburner.com/Octocats.xml", C.Utf8Codec_false, false), "GET", null, C.Map_empty)).then$1(new T.MiscService_listOctodex_closure(controller));
         return H.setRuntimeTypeInfo(new P._ControllerStream(controller), [H.getTypeArgumentByIndex(controller, 0)]);
       }
     },
     MiscService_listOctodex_closure: {
-      "^": "Closure:1;_captured_controller_0",
+      "^": "Closure:2;_captured_controller_0",
       call$1: function(response) {
         var t1 = this._captured_controller_0;
         C.JSArray_methods.forEach$1(V.parse(J.get$body$x(response), null, false, null).querySelectorAll$1(0, "entry"), new T.MiscService_listOctodex__closure(t1));
@@ -16000,7 +15449,7 @@
       }
     },
     MiscService_listOctodex__closure: {
-      "^": "Closure:1;_captured_controller_1",
+      "^": "Closure:2;_captured_controller_1",
       call$1: function(entry) {
         var t1, $name, image, url, t2;
         t1 = J.getInterceptor$x(entry);
@@ -16068,7 +15517,7 @@
       get$iterator: function(_) {
         var t1 = this.readClasses$0();
         t1 = H.setRuntimeTypeInfo(new P.LinkedHashSetIterator(t1, t1._collection$_modifications, null, null), [null]);
-        t1._cell = t1._set._collection$_first;
+        t1._collection$_cell = t1._set._collection$_first;
         return t1;
       },
       forEach$1: function(_, f) {
@@ -16131,7 +15580,7 @@
       $isEfficientLength: 1
     },
     CssClassSetImpl_add_closure: {
-      "^": "Closure:1;_captured_value_0",
+      "^": "Closure:2;_captured_value_0",
       call$1: function(s) {
         return s.add$1(0, this._captured_value_0);
       }
@@ -16144,7 +15593,7 @@
       S._createMessages(errors, null);
       t1 = new P.Runes(selector);
       t2 = H.setRuntimeTypeInfo([0], [P.$int]);
-      file = new G.SourceFile(null, t2, new Uint32Array(H._ensureNativeList(t1.toList$0(0))));
+      file = new G.SourceFile(null, t2, new Uint32Array(H._ensureNativeList(t1.toList$0(0))), null);
       file.SourceFile$decoded$2$url(t1, null);
       t1 = new S.Tokenizer(85, 117, 43, 63, new H.CodeUnits("CDATA"), file, selector, true, false, false, 0, 0);
       t2 = new S._Parser(t1, null, file, null, null);
@@ -16158,13 +15607,10 @@
     SelectorEvaluator: {
       "^": "Visitor;_query$_element",
       querySelector$2: function(_, root, selector) {
-        var t1, t2, node, result;
-        t1 = root.get$nodes(root)._list;
-        t2 = new J.ArrayIterator(t1, t1.length, 0, null);
-        t2.$builtinTypeInfo = [H.getTypeArgumentByIndex(t1, 0)];
-        for (; t2.moveNext$0();) {
-          node = t2.__interceptors$_current;
-          if (!(node instanceof B.Element0))
+        var t1, node, result;
+        for (t1 = root.get$nodes(root)._list, t1 = H.setRuntimeTypeInfo(new J.ArrayIterator(t1, t1.length, 0, null), [H.getTypeArgumentByIndex(t1, 0)]); t1.moveNext$0();) {
+          node = t1.__interceptors$_current;
+          if (!(node instanceof B.Element))
             continue;
           this._query$_element = node;
           if (C.JSArray_methods.any$1(selector.selectors, this.get$visitSelector()))
@@ -16176,13 +15622,10 @@
         return;
       },
       querySelectorAll$3: function(_, root, selector, results) {
-        var t1, t2, node;
-        t1 = root.get$nodes(root)._list;
-        t2 = new J.ArrayIterator(t1, t1.length, 0, null);
-        t2.$builtinTypeInfo = [H.getTypeArgumentByIndex(t1, 0)];
-        for (; t2.moveNext$0();) {
-          node = t2.__interceptors$_current;
-          if (!(node instanceof B.Element0))
+        var t1, node;
+        for (t1 = root.get$nodes(root)._list, t1 = H.setRuntimeTypeInfo(new J.ArrayIterator(t1, t1.length, 0, null), [H.getTypeArgumentByIndex(t1, 0)]); t1.moveNext$0();) {
+          node = t1.__interceptors$_current;
+          if (!(node instanceof B.Element))
             continue;
           this._query$_element = node;
           if (C.JSArray_methods.any$1(selector.selectors, this.get$visitSelector()))
@@ -16197,13 +15640,13 @@
         var old, t1, result, combinator, s, t2;
         old = this._query$_element;
         for (t1 = selector.get$simpleSelectorSequences(), t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]), result = true, combinator = null; t1.moveNext$0();) {
-          s = t1._current;
+          s = t1.__internal$_current;
           if (combinator == null)
             result = s.get$simpleSelector().visit$1(this);
           else if (combinator === 514) {
             do {
               t2 = this._query$_element.parentNode;
-              t2 = t2 instanceof B.Element0 ? t2 : null;
+              t2 = t2 instanceof B.Element ? t2 : null;
               this._query$_element = t2;
             } while (t2 != null && s.get$simpleSelector().visit$1(this) !== true);
             if (this._query$_element == null)
@@ -16226,7 +15669,7 @@
               break;
             case 516:
               t2 = this._query$_element.parentNode;
-              this._query$_element = t2 instanceof B.Element0 ? t2 : null;
+              this._query$_element = t2 instanceof B.Element ? t2 : null;
               break;
             case 514:
             case 517:
@@ -16415,16 +15858,16 @@
             if (lang != null)
               return lang;
             node = node.parentNode;
-            node = node instanceof B.Element0 ? node : null;
+            node = node instanceof B.Element ? node : null;
           }
           return;
         }}
     },
     SelectorEvaluator_visitPseudoClassSelector_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(n) {
         var t1 = J.getInterceptor(n);
-        if (!t1.$isElement0)
+        if (!t1.$isElement)
           if (!!t1.$isText) {
             t1 = J.toString$0$(n._data);
             n._data = t1;
@@ -16437,10 +15880,10 @@
       }
     },
     SelectorEvaluator_visitPseudoClassSelector_closure0: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(n) {
         var t1 = J.getInterceptor(n);
-        if (!t1.$isElement0)
+        if (!t1.$isElement)
           if (!!t1.$isText) {
             t1 = J.toString$0$(n._data);
             n._data = t1;
@@ -16453,13 +15896,13 @@
       }
     },
     SelectorEvaluator_visitPseudoClassSelector__closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(r) {
         return !F.isWhitespaceCC(r);
       }
     },
     SelectorEvaluator_visitAttributeSelector_closure: {
-      "^": "Closure:1;_captured_select_0",
+      "^": "Closure:2;_captured_select_0",
       call$1: function(v) {
         var t1 = J.getInterceptor$asx(v);
         return t1.get$isNotEmpty(v) && t1.$eq(v, this._captured_select_0);
@@ -16467,16 +15910,10 @@
     }
   }], ["html_common", "dart:html_common",, P, {
     "^": "",
-    _convertDartToNative_PrepareForStructuredClone: function(value) {
-      var copies, copy;
-      copies = [];
-      copy = new P._convertDartToNative_PrepareForStructuredClone_walk(new P._convertDartToNative_PrepareForStructuredClone_findSlot([], copies), new P._convertDartToNative_PrepareForStructuredClone_readSlot(copies), new P._convertDartToNative_PrepareForStructuredClone_writeSlot(copies)).call$1(value);
-      new P._convertDartToNative_PrepareForStructuredClone_cleanupSlots().call$0();
-      return copy;
-    },
-    convertNativeToDart_AcceptStructuredClone: function(object, mustCopy) {
-      var copies = [];
-      return new P.convertNativeToDart_AcceptStructuredClone_walk(mustCopy, new P.convertNativeToDart_AcceptStructuredClone_findSlot([], copies), new P.convertNativeToDart_AcceptStructuredClone_readSlot(copies), new P.convertNativeToDart_AcceptStructuredClone_writeSlot(copies)).call$1(object);
+    convertNativePromiseToDartFuture: function(promise) {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null), [null])), [null]);
+      promise.then(H.convertDartClosureToJS(new P.convertNativePromiseToDartFuture_closure(completer), 1)).catch(H.convertDartClosureToJS(new P.convertNativePromiseToDartFuture_closure0(completer), 1));
+      return completer.future;
     },
     Device_isOpera: function() {
       var t1 = $.Device__isOpera;
@@ -16494,47 +15931,21 @@
       }
       return t1;
     },
-    _convertDartToNative_PrepareForStructuredClone_findSlot: {
-      "^": "Closure:11;_captured_values_1,_captured_copies_2",
-      call$1: function(value) {
+    _StructuredClone: {
+      "^": "Object;",
+      findSlot$1: function(value) {
         var t1, $length, i;
-        t1 = this._captured_values_1;
+        t1 = this.values;
         $length = t1.length;
         for (i = 0; i < $length; ++i)
           if (t1[i] === value)
             return i;
         t1.push(value);
-        this._captured_copies_2.push(null);
+        this.copies.push(null);
         return $length;
-      }
-    },
-    _convertDartToNative_PrepareForStructuredClone_readSlot: {
-      "^": "Closure:12;_captured_copies_3",
-      call$1: function(i) {
-        var t1 = this._captured_copies_3;
-        if (i >= t1.length)
-          return H.ioore(t1, i);
-        return t1[i];
-      }
-    },
-    _convertDartToNative_PrepareForStructuredClone_writeSlot: {
-      "^": "Closure:7;_captured_copies_4",
-      call$2: function(i, x) {
-        var t1 = this._captured_copies_4;
-        if (i >= t1.length)
-          return H.ioore(t1, i);
-        t1[i] = x;
-      }
-    },
-    _convertDartToNative_PrepareForStructuredClone_cleanupSlots: {
-      "^": "Closure:2;",
-      call$0: function() {
-      }
-    },
-    _convertDartToNative_PrepareForStructuredClone_walk: {
-      "^": "Closure:1;_captured_findSlot_5,_captured_readSlot_6,_captured_writeSlot_7",
-      call$1: function(e) {
-        var t1, t2, slot, copy, $length, i;
+      },
+      walk$1: function(e) {
+        var t1, t2, slot, t3, copy;
         t1 = {};
         if (e == null)
           return e;
@@ -16553,90 +15964,81 @@
           return e;
         if (!!t2.$isBlob)
           return e;
-        if (!!t2.$isNativeByteBuffer)
-          return e;
-        if (!!t2.$isNativeTypedData)
+        if (this.cloneNotRequired$1(e))
           return e;
         if (!!t2.$isMap) {
-          slot = this._captured_findSlot_5.call$1(e);
-          copy = this._captured_readSlot_6.call$1(slot);
+          slot = this.findSlot$1(e);
+          t3 = this.copies;
+          if (slot >= t3.length)
+            return H.ioore(t3, slot);
+          copy = t3[slot];
           t1._captured_copy_0 = copy;
           if (copy != null)
             return copy;
-          copy = {};
+          copy = this.newJsMap$0();
           t1._captured_copy_0 = copy;
-          this._captured_writeSlot_7.call$2(slot, copy);
-          t2.forEach$1(e, new P._convertDartToNative_PrepareForStructuredClone_walk_closure(t1, this));
+          if (slot >= t3.length)
+            return H.ioore(t3, slot);
+          t3[slot] = copy;
+          t2.forEach$1(e, new P._StructuredClone_walk_closure(t1, this));
           return t1._captured_copy_0;
         }
         if (!!t2.$isList) {
-          $length = t2.get$length(e);
-          slot = this._captured_findSlot_5.call$1(e);
-          copy = this._captured_readSlot_6.call$1(slot);
-          if (copy != null) {
-            if (true === copy) {
-              copy = new Array($length);
-              this._captured_writeSlot_7.call$2(slot, copy);
-            }
+          slot = this.findSlot$1(e);
+          t1 = this.copies;
+          if (slot >= t1.length)
+            return H.ioore(t1, slot);
+          copy = t1[slot];
+          if (copy != null)
             return copy;
-          }
-          copy = new Array($length);
-          this._captured_writeSlot_7.call$2(slot, copy);
-          for (i = 0; i < $length; ++i) {
-            t1 = this.call$1(t2.$index(e, i));
-            if (i >= copy.length)
-              return H.ioore(copy, i);
-            copy[i] = t1;
-          }
-          return copy;
+          return this.copyList$2(e, slot);
         }
         throw H.wrapException(new P.UnimplementedError("structured clone of other type"));
+      },
+      copyList$2: function(e, slot) {
+        var t1, $length, copy, t2, i;
+        t1 = J.getInterceptor$asx(e);
+        $length = t1.get$length(e);
+        copy = this.newJsList$1($length);
+        t2 = this.copies;
+        if (slot >= t2.length)
+          return H.ioore(t2, slot);
+        t2[slot] = copy;
+        for (i = 0; i < $length; ++i) {
+          t2 = this.walk$1(t1.$index(e, i));
+          if (i >= copy.length)
+            return H.ioore(copy, i);
+          copy[i] = t2;
+        }
+        return copy;
       }
     },
-    _convertDartToNative_PrepareForStructuredClone_walk_closure: {
-      "^": "Closure:4;_html_common$_box_0,_captured_walk_8",
+    _StructuredClone_walk_closure: {
+      "^": "Closure:4;_html_common$_box_0,_captured_this_1",
       call$2: function(key, value) {
-        this._html_common$_box_0._captured_copy_0[key] = this._captured_walk_8.call$1(value);
+        var t1 = this._captured_this_1;
+        t1.putIntoMap$3(this._html_common$_box_0._captured_copy_0, key, t1.walk$1(value));
       }
     },
-    convertNativeToDart_AcceptStructuredClone_findSlot: {
-      "^": "Closure:11;_captured_values_0,_captured_copies_1",
-      call$1: function(value) {
-        var t1, $length, i, t2;
-        t1 = this._captured_values_0;
+    _AcceptStructuredClone: {
+      "^": "Object;",
+      findSlot$1: function(value) {
+        var t1, $length, i;
+        t1 = this.values;
         $length = t1.length;
         for (i = 0; i < $length; ++i) {
-          t2 = t1[i];
-          if (t2 == null ? value == null : t2 === value)
+          if (i >= t1.length)
+            return H.ioore(t1, i);
+          if (this.identicalInJs$2(t1[i], value))
             return i;
         }
         t1.push(value);
-        this._captured_copies_1.push(null);
+        this.copies.push(null);
         return $length;
-      }
-    },
-    convertNativeToDart_AcceptStructuredClone_readSlot: {
-      "^": "Closure:12;_captured_copies_2",
-      call$1: function(i) {
-        var t1 = this._captured_copies_2;
-        if (i >= t1.length)
-          return H.ioore(t1, i);
-        return t1[i];
-      }
-    },
-    convertNativeToDart_AcceptStructuredClone_writeSlot: {
-      "^": "Closure:7;_captured_copies_3",
-      call$2: function(i, x) {
-        var t1 = this._captured_copies_3;
-        if (i >= t1.length)
-          return H.ioore(t1, i);
-        t1[i] = x;
-      }
-    },
-    convertNativeToDart_AcceptStructuredClone_walk: {
-      "^": "Closure:1;_captured_mustCopy_4,_captured_findSlot_5,_captured_readSlot_6,_captured_writeSlot_7",
-      call$1: function(e) {
-        var proto, slot, copy, t1, t2, _i, key, $length, i;
+      },
+      walk$1: function(e) {
+        var t1, proto, slot, t2, t3, copy, $length, i;
+        t1 = {};
         if (e == null)
           return e;
         if (typeof e === "boolean")
@@ -16649,38 +16051,104 @@
           return P.DateTime$fromMillisecondsSinceEpoch(e.getTime(), true);
         if (e instanceof RegExp)
           throw H.wrapException(new P.UnimplementedError("structured clone of RegExp"));
+        if (typeof Promise != "undefined" && e instanceof Promise)
+          return P.convertNativePromiseToDartFuture(e);
         proto = Object.getPrototypeOf(e);
         if (proto === Object.prototype || proto === null) {
-          slot = this._captured_findSlot_5.call$1(e);
-          copy = this._captured_readSlot_6.call$1(slot);
+          slot = this.findSlot$1(e);
+          t2 = this.copies;
+          t3 = t2.length;
+          if (slot >= t3)
+            return H.ioore(t2, slot);
+          copy = t2[slot];
+          t1._captured_copy_0 = copy;
           if (copy != null)
             return copy;
           copy = P.LinkedHashMap__makeEmpty();
-          this._captured_writeSlot_7.call$2(slot, copy);
-          for (t1 = Object.keys(e), t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
-            key = t1[_i];
-            copy.$indexSet(0, key, this.call$1(e[key]));
-          }
-          return copy;
+          t1._captured_copy_0 = copy;
+          if (slot >= t3)
+            return H.ioore(t2, slot);
+          t2[slot] = copy;
+          this.forEachJsField$2(e, new P._AcceptStructuredClone_walk_closure(t1, this));
+          return t1._captured_copy_0;
         }
         if (e instanceof Array) {
-          slot = this._captured_findSlot_5.call$1(e);
-          copy = this._captured_readSlot_6.call$1(slot);
+          slot = this.findSlot$1(e);
+          t1 = this.copies;
+          if (slot >= t1.length)
+            return H.ioore(t1, slot);
+          copy = t1[slot];
           if (copy != null)
             return copy;
-          t1 = J.getInterceptor$asx(e);
-          $length = t1.get$length(e);
-          copy = this._captured_mustCopy_4 ? new Array($length) : e;
-          this._captured_writeSlot_7.call$2(slot, copy);
+          t2 = J.getInterceptor$asx(e);
+          $length = t2.get$length(e);
+          copy = this.mustCopy ? this.newDartList$1($length) : e;
+          if (slot >= t1.length)
+            return H.ioore(t1, slot);
+          t1[slot] = copy;
           if (typeof $length !== "number")
             return H.iae($length);
-          t2 = J.getInterceptor$ax(copy);
+          t1 = J.getInterceptor$ax(copy);
           i = 0;
           for (; i < $length; ++i)
-            t2.$indexSet(copy, i, this.call$1(t1.$index(e, i)));
+            t1.$indexSet(copy, i, this.walk$1(t2.$index(e, i)));
           return copy;
         }
         return e;
+      }
+    },
+    _AcceptStructuredClone_walk_closure: {
+      "^": "Closure:4;_html_common$_box_0,_captured_this_1",
+      call$2: function(key, value) {
+        var t1, t2;
+        t1 = this._html_common$_box_0._captured_copy_0;
+        t2 = this._captured_this_1.walk$1(value);
+        J.$indexSet$ax(t1, key, t2);
+        return t2;
+      }
+    },
+    _StructuredCloneDart2Js: {
+      "^": "_StructuredClone;values,copies",
+      newJsMap$0: function() {
+        return {};
+      },
+      putIntoMap$3: function(map, key, value) {
+        return map[key] = value;
+      },
+      newJsList$1: function($length) {
+        return new Array($length);
+      },
+      cloneNotRequired$1: function(e) {
+        var t1 = J.getInterceptor(e);
+        return !!t1.$isNativeByteBuffer || !!t1.$isNativeTypedData;
+      }
+    },
+    _AcceptStructuredCloneDart2Js: {
+      "^": "_AcceptStructuredClone;values,copies,mustCopy",
+      newDartList$1: function($length) {
+        return new Array($length);
+      },
+      identicalInJs$2: function(a, b) {
+        return a == null ? b == null : a === b;
+      },
+      forEachJsField$2: function(object, action) {
+        var t1, t2, _i, key;
+        for (t1 = Object.keys(object), t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
+          key = t1[_i];
+          action.call$2(key, object[key]);
+        }
+      }
+    },
+    convertNativePromiseToDartFuture_closure: {
+      "^": "Closure:2;_captured_completer_0",
+      call$1: function(result) {
+        return this._captured_completer_0.complete$1(0, result);
+      }
+    },
+    convertNativePromiseToDartFuture_closure0: {
+      "^": "Closure:2;_html_common$_captured_completer_1",
+      call$1: function(result) {
+        return this._html_common$_captured_completer_1.completeError$1(result);
       }
     },
     FilteredElementList0: {
@@ -16689,7 +16157,7 @@
         return H.setRuntimeTypeInfo(new H.WhereIterable(this._html_common$_childNodes, new P.FilteredElementList__iterable_closure()), [null]);
       },
       forEach$1: function(_, f) {
-        C.JSArray_methods.forEach$1(P.List_List$from(this.get$_html_common$_iterable(), false, W.Element), f);
+        C.JSArray_methods.forEach$1(P.List_List$from(this.get$_html_common$_iterable(), false, W.Element0), f);
       },
       $indexSet: function(_, index, value) {
         J.replaceWith$1$x(this.get$_html_common$_iterable().elementAt$1(0, index), value);
@@ -16713,7 +16181,7 @@
           t2.appendChild(t1.get$current());
       },
       contains$1: function(_, needle) {
-        if (!J.getInterceptor(needle).$isElement)
+        if (!J.getInterceptor(needle).$isElement0)
           return false;
         return needle.parentNode === this._node;
       },
@@ -16727,7 +16195,7 @@
       },
       remove$1: function(_, element) {
         var t1 = J.getInterceptor(element);
-        if (!t1.$isElement)
+        if (!t1.$isElement0)
           return false;
         if (this.contains$1(0, element)) {
           t1.remove$0(element);
@@ -16743,27 +16211,27 @@
         return this.get$_html_common$_iterable().elementAt$1(0, index);
       },
       get$iterator: function(_) {
-        var t1 = P.List_List$from(this.get$_html_common$_iterable(), false, W.Element);
+        var t1 = P.List_List$from(this.get$_html_common$_iterable(), false, W.Element0);
         return H.setRuntimeTypeInfo(new J.ArrayIterator(t1, t1.length, 0, null), [H.getTypeArgumentByIndex(t1, 0)]);
       },
       $asListBase: function() {
-        return [W.Element];
+        return [W.Element0];
       },
       $asObject_ListMixin: function() {
-        return [W.Element];
+        return [W.Element0];
       },
       $asList: function() {
-        return [W.Element];
+        return [W.Element0];
       }
     },
     FilteredElementList__iterable_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(n) {
-        return !!J.getInterceptor(n).$isElement;
+        return !!J.getInterceptor(n).$isElement0;
       }
     },
     FilteredElementList_removeRange_closure0: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(el) {
         return J.remove$0$ax(el);
       }
@@ -16946,15 +16414,6 @@
       charsUntil$1: function(characters) {
         return this.charsUntil$2(characters, false);
       },
-      unget$1: function(ch) {
-        var t1;
-        if (ch != null) {
-          t1 = this._offset;
-          if (typeof t1 !== "number")
-            return t1.$sub();
-          this._offset = t1 - 1;
-        }
-      },
       HtmlInputStream$5: function(source, encoding, parseMeta, generateSpans, sourceUrl) {
         var t1;
         if (typeof source === "string") {
@@ -16975,7 +16434,7 @@
           t1 = this.detectBOM$0();
           this.charEncodingName = t1;
           this.charEncodingCertain = true;
-          if (t1 == null && parseMeta) {
+          if (t1 == null && true) {
             encoding = new N.EncodingParser(new N.EncodingBytes(P.String_String$fromCharCodes(N.slice(this._rawBytes, 0, 512), 0, null).toLowerCase(), -1), null).getEncoding$0();
             if (C.JSArray_methods.contains$1(C.List_utl, encoding))
               encoding = "utf-8";
@@ -16995,7 +16454,7 @@
       },
       static: {HtmlInputStream$: function(source, encoding, parseMeta, generateSpans, sourceUrl) {
           var t1 = new S.HtmlInputStream(S.codecName(encoding), true, generateSpans, sourceUrl, null, null, null, null, null, null, null);
-          t1.HtmlInputStream$5(source, encoding, parseMeta, generateSpans, sourceUrl);
+          t1.HtmlInputStream$5(source, encoding, true, generateSpans, sourceUrl);
           return t1;
         }}
     }
@@ -17124,14 +16583,14 @@
       t1.listOctodex$1$cors(true).toList$0(0).then$1(new L.loadCat_closure());
     },
     main_closure: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
         $.$octocat = document.querySelector("#octocat");
         L.loadCat();
       }
     },
     loadCat_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(cats) {
         var t1, index, cat;
         t1 = J.getInterceptor$asx(cats);
@@ -17140,7 +16599,7 @@
         cat = t1.$index(cats, index);
         t1 = J.getInterceptor$x(cat);
         P.print("Selected Octocat at " + H.S(index) + " (" + H.S(t1.get$name(cat)) + ")");
-        J.insertAdjacentHtml$4$treeSanitizer$validator$x($.$octocat, "beforeend", "    <h2>" + H.S(t1.get$name(cat)) + "</h2>\n    <a class=\"center\" href=\"" + H.S(t1.get$url(cat)) + "\"><img src=\"" + H.S(cat.get$image()) + "\"></img></a>\n    ", null, null);
+        J.insertAdjacentHtml$4$treeSanitizer$validator$x($.$octocat, "beforeend", "    <h2>" + H.S(t1.get$name(cat)) + "</h2>\n    <a class=\"center\" href=\"" + H.S(t1.get$url(cat)) + "\"><img src=\"" + H.S(cat.get$image()) + "\"></img></a>\n    ", C.C__TrustedHtmlTreeSanitizer, null);
       }
     }
   }, 1], ["parser", "package:html/parser.dart",, V, {
@@ -17148,13 +16607,13 @@
     parse: function(input, encoding, generateSpans, sourceUrl) {
       var t1, t2, t3, p;
       t1 = H.setRuntimeTypeInfo([], [V.ParseError]);
-      t2 = H.setRuntimeTypeInfo([], [B.Element0]);
-      t3 = H.setRuntimeTypeInfo([], [B.Element0]);
+      t2 = H.setRuntimeTypeInfo([], [B.Element]);
+      t3 = H.setRuntimeTypeInfo([], [B.Element]);
       t2 = new D.TreeBuilder("http://www.w3.org/1999/xhtml", null, t2, new D.ActiveFormattingElements(t3), null, null, null);
       t2.reset$0(0);
-      t3 = new Y.HtmlTokenizer(S.HtmlInputStream$(input, encoding, true, generateSpans, sourceUrl), true, true, generateSpans, false, null, P.ListQueue$(null, null), null, null, new P.StringBuffer(""), null, null, null, null, new P.StringBuffer(""), new P.StringBuffer(""));
+      t3 = new Y.HtmlTokenizer(S.HtmlInputStream$(input, encoding, true, false, sourceUrl), true, true, false, false, null, P.ListQueue$(null, null), null, null, new P.StringBuffer(""), null, null, null, null, new P.StringBuffer(""), new P.StringBuffer(""));
       t3.reset$0(0);
-      p = new V.HtmlParser(false, generateSpans, t3, t2, t1, null, false, "no quirks", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+      p = new V.HtmlParser(false, false, t3, t2, t1, null, false, "no quirks", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
       t3.parser = p;
       p._initialPhase = new V.InitialPhase(p, t2);
       p._beforeHtmlPhase = new V.BeforeHtmlPhase(p, t2);
@@ -17208,9 +16667,7 @@
         t1.formPointer = null;
         t1.insertFromTable = false;
         t2 = P.LinkedHashMap_LinkedHashMap(null, null, null, null, null);
-        t3 = [];
-        t3.$builtinTypeInfo = [B.Node0];
-        t3 = new B.NodeList(null, t3);
+        t3 = new B.NodeList(null, H.setRuntimeTypeInfo([], [B.Node0]));
         t2 = new B.Document(null, t2, t3, null, null, null, null);
         t3._parent = t2;
         t1.document = t2;
@@ -17246,9 +16703,7 @@
         t1 = t1.defaultNamespace;
         if (t3 == null ? t1 == null : t3 === t1)
           return false;
-        t1 = new N.Pair(t2.get$namespaceUri(node), t2.get$localName(node));
-        t1.$builtinTypeInfo = [null, null];
-        if (C.JSArray_methods.contains$1(C.List_cjm, t1)) {
+        if (C.JSArray_methods.contains$1(C.List_cjm, H.setRuntimeTypeInfo(new N.Pair(t2.get$namespaceUri(node), t2.get$localName(node)), [null, null]))) {
           t1 = J.getInterceptor(type);
           if (t1.$eq(type, 2)) {
             H.interceptedTypeCast(token, "$isStartTagToken");
@@ -17327,13 +16782,11 @@
         t2.toString;
         t1 = G.FileLocation$_(t2, pos);
         t2 = t1.offset;
-        return G.FileSpan$_(t1.file, t2, t2);
+        return G._FileSpan$(t1.file, t2, t2);
       },
       parseError$3: function(span, errorcode, datavars) {
-        var err = new V.ParseError(errorcode, !this.generateSpans && span == null ? this.get$_lastSpan() : span, datavars);
+        var err = new V.ParseError(errorcode, span == null ? this.get$_lastSpan() : span, datavars);
         this.errors.push(err);
-        if (this.strict)
-          throw H.wrapException(err);
       },
       parseError$2: function(span, errorcode) {
         return this.parseError$3(span, errorcode, C.Map_empty);
@@ -17366,7 +16819,7 @@
       resetInsertionMode$0: function() {
         var t1, t2, t3, node, t4, nodeName, last;
         for (t1 = this.tree, t2 = t1.openElements, t3 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t2), [H.getTypeArgumentByIndex(t2, 0)]), t3 = H.setRuntimeTypeInfo(new H.ListIterator(t3, t3.get$length(t3), 0, null), [H.getRuntimeTypeArgument(t3, "ListIterable", 0)]), t1 = t1.defaultNamespace; t3.moveNext$0();) {
-          node = t3._current;
+          node = t3.__internal$_current;
           t4 = J.getInterceptor$x(node);
           nodeName = t4.get$localName(node);
           if (0 >= t2.length)
@@ -17475,27 +16928,36 @@
         throw H.wrapException(new P.UnimplementedError(null));
       },
       startTagHtml$1: function(token) {
-        var t1 = this.parser;
+        var t1, t2, t3;
+        t1 = this.parser;
         if (!t1.firstStartTag && J.$eq$(J.get$name$x(token), "html"))
           t1.parseError$2(J.get$span$x(token), "non-html-root");
-        J.forEach$1$ax(J.get$data$x(token), new V.Phase_startTagHtml_closure(this));
+        t2 = this.tree.openElements;
+        if (0 >= t2.length)
+          return H.ioore(t2, 0);
+        t3 = J.getInterceptor$x(token);
+        t2[0].set$sourceSpan(t3.get$span(token));
+        J.forEach$1$ax(t3.get$data(token), new V.Phase_startTagHtml_closure(this));
         t1.firstStartTag = false;
         return;
       },
       processEndTag$1: function(token) {
         throw H.wrapException(new P.UnimplementedError(null));
       },
-      popOpenElementsUntil$1: function($name) {
-        var t1, node;
-        t1 = this.tree.openElements;
-        if (0 >= t1.length)
-          return H.ioore(t1, 0);
-        node = t1.pop();
+      popOpenElementsUntil$1: function(token) {
+        var t1, $name, t2, node;
+        t1 = J.getInterceptor$x(token);
+        $name = t1.get$name(token);
+        t2 = this.tree.openElements;
+        if (0 >= t2.length)
+          return H.ioore(t2, -1);
+        node = t2.pop();
         for (; !J.$eq$(J.get$localName$x(node), $name);) {
-          if (0 >= t1.length)
-            return H.ioore(t1, 0);
-          node = t1.pop();
+          if (0 >= t2.length)
+            return H.ioore(t2, -1);
+          node = t2.pop();
         }
+        node.set$endSourceSpan(t1.get$span(token));
       }
     },
     Phase_startTagHtml_closure: {
@@ -17508,7 +16970,7 @@
       }
     },
     Phase_startTagHtml__closure: {
-      "^": "Closure:2;_parser0$_captured_value_1",
+      "^": "Closure:1;_parser0$_captured_value_1",
       call$0: function() {
         return this._parser0$_captured_value_1;
       }
@@ -17737,7 +17199,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             token.set$selfClosingAcknowledged(true);
             return;
@@ -17746,7 +17208,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             token.set$selfClosingAcknowledged(true);
             attributes = token.data;
@@ -17797,8 +17259,8 @@
         t1 = this.parser;
         t2 = t1.tree.openElements;
         if (0 >= t2.length)
-          return H.ioore(t2, 0);
-        t2.pop();
+          return H.ioore(t2, -1);
+        t2.pop().set$endSourceSpan(J.get$span$x(token));
         t1.phase = t1._afterHeadPhase;
       }
     },
@@ -17869,7 +17331,7 @@
         t3.push(t2.headPointer);
         t1._inHeadPhase.processStartTag$1(token);
         for (t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t3), [H.getTypeArgumentByIndex(t3, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
-          node = t1._current;
+          node = t1.__internal$_current;
           if (J.$eq$(J.get$localName$x(node), "head")) {
             C.JSArray_methods.remove$1(t3, node);
             break;
@@ -17943,7 +17405,7 @@
             if (C.JSArray_methods.contains$1(C.List_8eb, J.get$localName$x(C.JSArray_methods.get$last(t3)))) {
               this.parser.parseError$3(t1.get$span(token), "unexpected-start-tag", P.LinkedHashMap__makeLiteral(["name", t1.get$name(token)]));
               if (0 >= t3.length)
-                return H.ioore(t3, 0);
+                return H.ioore(t3, -1);
               t3.pop();
             }
             t2.insertElement$1(token);
@@ -18060,7 +17522,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             token.set$selfClosingAcknowledged(true);
             return;
@@ -18078,7 +17540,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             token.set$selfClosingAcknowledged(true);
             this.parser.framesetOK = false;
@@ -18172,7 +17634,7 @@
             if (token.selfClosing) {
               t1 = t1.openElements;
               if (0 >= t1.length)
-                return H.ioore(t1, 0);
+                return H.ioore(t1, -1);
               t1.pop();
               token.selfClosingAcknowledged = true;
             }
@@ -18188,7 +17650,7 @@
             if (token.selfClosing) {
               t1 = t1.openElements;
               if (0 >= t1.length)
-                return H.ioore(t1, 0);
+                return H.ioore(t1, -1);
               t1.pop();
               token.selfClosingAcknowledged = true;
             }
@@ -18253,7 +17715,7 @@
             if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2.openElements)), t1.get$name(token)))
               this.parser.parseError$3(t1.get$span(token), "end-tag-too-early", P.LinkedHashMap__makeLiteral(["name", t1.get$name(token)]));
             if (inScope)
-              this.popOpenElementsUntil$1(t1.get$name(token));
+              this.popOpenElementsUntil$1(token);
             return;
           case "form":
             t2 = this.tree;
@@ -18267,6 +17729,7 @@
               if (!J.$eq$(C.JSArray_methods.get$last(t2), node))
                 this.parser.parseError$3(t1.get$span(token), "end-tag-too-early-ignored", P.LinkedHashMap__makeLiteral(["name", "form"]));
               C.JSArray_methods.remove$1(t2, node);
+              node.set$endSourceSpan(t1.get$span(token));
             }
             return;
           case "p":
@@ -18282,7 +17745,7 @@
               t2.generateImpliedEndTags$1(t1.get$name(token));
               if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2.openElements)), t1.get$name(token)))
                 this.parser.parseError$3(t1.get$span(token), "end-tag-too-early", P.LinkedHashMap__makeLiteral(["name", t1.get$name(token)]));
-              this.popOpenElementsUntil$1(t1.get$name(token));
+              this.popOpenElementsUntil$1(token);
             }
             return;
           case "h1":
@@ -18316,7 +17779,7 @@
             if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2.openElements)), t1.get$name(token)))
               this.parser.parseError$3(t1.get$span(token), "end-tag-too-early", P.LinkedHashMap__makeLiteral(["name", t1.get$name(token)]));
             if (t2.elementInScope$1(t1.get$name(token))) {
-              this.popOpenElementsUntil$1(t1.get$name(token));
+              this.popOpenElementsUntil$1(token);
               t2.clearActiveFormattingElements$0();
             }
             return;
@@ -18327,7 +17790,7 @@
             t1.insertElement$1(new T.StartTagToken(P.LinkedHashMap__makeEmpty(), null, false, null, "br", false, null));
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             return;
           default:
@@ -18364,7 +17827,7 @@
         element = C.JSArray_methods.get$last(t1.openElements);
         matchingElements = [];
         for (t1 = t1.activeFormattingElements, t2 = t1._list, t2 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t2), [H.getTypeArgumentByIndex(t2, 0)]), t2 = H.setRuntimeTypeInfo(new H.ListIterator(t2, t2.get$length(t2), 0, null), [H.getRuntimeTypeArgument(t2, "ListIterable", 0)]); t2.moveNext$0();) {
-          node = t2._current;
+          node = t2.__internal$_current;
           if (node == null)
             break;
           else if (this.isMatchingFormattingElement$2(node, element))
@@ -18377,7 +17840,7 @@
       processEOF$0: function() {
         var t1, node;
         for (t1 = this.tree.openElements, t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
-          node = t1._current;
+          node = t1.__internal$_current;
           switch (J.get$localName$x(node)) {
             case "dd":
             case "dt":
@@ -18482,7 +17945,7 @@
           }
           for (; !J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t3)), "html");) {
             if (0 >= t3.length)
-              return H.ioore(t3, 0);
+              return H.ioore(t3, -1);
             t3.pop();
           }
           t2.insertElement$1(token);
@@ -18496,12 +17959,12 @@
         t1.insertElement$1(token);
       },
       startTagListItem$1: function(token) {
-        var t1, stopNames, t2, t3, t4, node, t5, ns, t6;
+        var t1, stopNames, t2, t3, t4, node, t5, ns;
         t1 = this.parser;
         t1.framesetOK = false;
         stopNames = C.Map_q1wwi.$index(0, J.get$name$x(token));
         for (t2 = this.tree, t3 = t2.openElements, t3 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t3), [H.getTypeArgumentByIndex(t3, 0)]), t3 = H.setRuntimeTypeInfo(new H.ListIterator(t3, t3.get$length(t3), 0, null), [H.getRuntimeTypeArgument(t3, "ListIterable", 0)]), t4 = J.getInterceptor$asx(stopNames); t3.moveNext$0();) {
-          node = t3._current;
+          node = t3.__internal$_current;
           t5 = J.getInterceptor$x(node);
           if (t4.contains$1(stopNames, t5.get$localName(node))) {
             t1.phase.processEndTag$1(new T.EndTagToken(t5.get$localName(node), false, null));
@@ -18510,9 +17973,7 @@
           ns = t5.get$namespaceUri(node);
           if (ns == null)
             ns = "http://www.w3.org/1999/xhtml";
-          t6 = new N.Pair(ns, t5.get$localName(node));
-          t6.$builtinTypeInfo = [null, null];
-          if (C.JSArray_methods.contains$1(C.List_yTE, t6) && !C.JSArray_methods.contains$1(C.List_address_div_p, t5.get$localName(node)))
+          if (C.JSArray_methods.contains$1(C.List_yTE, H.setRuntimeTypeInfo(new N.Pair(ns, t5.get$localName(node)), [null, null])) && !C.JSArray_methods.contains$1(C.List_address_div_p, t5.get$localName(node)))
             break;
         }
         if (t2.elementInScope$2$variant("p", "button"))
@@ -18540,7 +18001,7 @@
         t1.insertElement$1(token);
         t1 = t1.openElements;
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
         token.set$selfClosingAcknowledged(true);
         this.parser.framesetOK = false;
@@ -18581,7 +18042,7 @@
           t1.generateImpliedEndTags$1("p");
           if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1.openElements)), "p"))
             this.parser.parseError$3(J.get$span$x(token), "unexpected-end-tag", P.LinkedHashMap__makeLiteral(["name", "p"]));
-          this.popOpenElementsUntil$1("p");
+          this.popOpenElementsUntil$1(token);
         }
       },
       endTagBody$1: function(token) {
@@ -18592,7 +18053,9 @@
           return;
         } else {
           t1 = t1.openElements;
-          if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "body"))
+          if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "body"))
+            C.JSArray_methods.get$last(t1).set$endSourceSpan(J.get$span$x(token));
+          else
             for (t1 = N.slice(t1, 2, null), t2 = t1.length, _i = 0; _i < t1.length; t1.length === t2 || (0, H.throwConcurrentModificationError)(t1), ++_i) {
               node = t1[_i];
               t3 = J.getInterceptor$x(node);
@@ -18643,13 +18106,14 @@
         for (_i = 0; _i < 6; ++_i)
           if (t1.elementInScope$1(C.List_8eb[_i])) {
             if (0 >= t2.length)
-              return H.ioore(t2, 0);
+              return H.ioore(t2, -1);
             node = t2.pop();
             for (; !C.JSArray_methods.contains$1(C.List_8eb, J.get$localName$x(node));) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               node = t2.pop();
             }
+            node.set$endSourceSpan(t3.get$span(token));
             break;
           }
       },
@@ -18687,9 +18151,7 @@
             ns = t9.get$namespaceUri(element);
             if (ns == null)
               ns = "http://www.w3.org/1999/xhtml";
-            t9 = new N.Pair(ns, t9.get$localName(element));
-            t9.$builtinTypeInfo = [null, null];
-            if (C.JSArray_methods.contains$1(C.List_yTE, t9)) {
+            if (C.JSArray_methods.contains$1(C.List_yTE, H.setRuntimeTypeInfo(new N.Pair(ns, t9.get$localName(element)), [null, null]))) {
               furthestBlock = element;
               break;
             }
@@ -18698,13 +18160,15 @@
           }
           if (furthestBlock == null) {
             if (0 >= t4.length)
-              return H.ioore(t4, 0);
+              return H.ioore(t4, -1);
             element = t4.pop();
             for (; !J.$eq$(element, formattingElement);) {
               if (0 >= t4.length)
-                return H.ioore(t4, 0);
+                return H.ioore(t4, -1);
               element = t4.pop();
             }
+            if (element != null)
+              element.set$endSourceSpan(t5.get$span(token));
             t2.remove$1(0, element);
             return;
           }
@@ -18773,7 +18237,7 @@
       endTagOther$1: function(token) {
         var t1, t2, t3, t4, node, t5, ns;
         for (t1 = this.tree, t2 = t1.openElements, t3 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t2), [H.getTypeArgumentByIndex(t2, 0)]), t3 = H.setRuntimeTypeInfo(new H.ListIterator(t3, t3.get$length(t3), 0, null), [H.getRuntimeTypeArgument(t3, "ListIterable", 0)]), t4 = J.getInterceptor$x(token); t3.moveNext$0();) {
-          node = t3._current;
+          node = t3.__internal$_current;
           t5 = J.getInterceptor$x(node);
           if (J.$eq$(t5.get$localName(node), t4.get$name(token))) {
             t1.generateImpliedEndTags$1(t4.get$name(token));
@@ -18781,18 +18245,17 @@
               this.parser.parseError$3(t4.get$span(token), "unexpected-end-tag", P.LinkedHashMap__makeLiteral(["name", t4.get$name(token)]));
             while (true) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               if (!!J.$eq$(t2.pop(), node))
                 break;
             }
+            node.set$endSourceSpan(t4.get$span(token));
             break;
           } else {
             ns = t5.get$namespaceUri(node);
             if (ns == null)
               ns = "http://www.w3.org/1999/xhtml";
-            t5 = new N.Pair(ns, t5.get$localName(node));
-            t5.$builtinTypeInfo = [null, null];
-            if (C.JSArray_methods.contains$1(C.List_yTE, t5)) {
+            if (C.JSArray_methods.contains$1(C.List_yTE, H.setRuntimeTypeInfo(new N.Pair(ns, t5.get$localName(node)), [null, null]))) {
               this.parser.parseError$3(t4.get$span(token), "unexpected-end-tag", P.LinkedHashMap__makeLiteral(["name", t4.get$name(token)]));
               break;
             }
@@ -18810,7 +18273,7 @@
       }
     },
     InBodyPhase_startTagBody__closure: {
-      "^": "Closure:2;_parser0$_captured_value_1",
+      "^": "Closure:1;_parser0$_captured_value_1",
       call$0: function() {
         return this._parser0$_captured_value_1;
       }
@@ -18824,7 +18287,7 @@
         if (J.$eq$(J.get$name$x(token), "script")) {
           t1 = this.tree.openElements;
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
+            return H.ioore(t1, -1);
           t1.pop();
           t1 = this.parser;
           t1.phase = t1.originalPhase;
@@ -18832,7 +18295,7 @@
         }
         t1 = this.tree.openElements;
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
         t1 = this.parser;
         t1.phase = t1.originalPhase;
@@ -18850,7 +18313,7 @@
         t2 = this.parser;
         t2.parseError$3(last.get$sourceSpan(), "expected-named-closing-tag-but-got-eof", P.LinkedHashMap__makeLiteral(["name", last.get$localName(last)]));
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         t1.pop();
         t2.phase = t2.originalPhase;
         return true;
@@ -18898,7 +18361,7 @@
               t1.insertElement$1(token);
               t1 = t1.openElements;
               if (0 >= t1.length)
-                return H.ioore(t1, 0);
+                return H.ioore(t1, -1);
               t1.pop();
             } else
               this.startTagOther$1(token);
@@ -18911,7 +18374,7 @@
               t2 = t1.openElements;
               t1.formPointer = C.JSArray_methods.get$last(t2);
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               t2.pop();
             }
             return;
@@ -18954,7 +18417,7 @@
           if (!(!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "table") && !J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "html")))
             break;
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
+            return H.ioore(t1, -1);
           t1.pop();
         }
       },
@@ -19026,12 +18489,12 @@
             this.parser.parseError$3(J.get$span$x(token), "end-tag-too-early-named", P.LinkedHashMap__makeLiteral(["gotName", "table", "expectedName", t2.get$localName(last)]));
           for (; !J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "table");) {
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
           }
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
-          t1.pop();
+            return H.ioore(t1, -1);
+          t1.pop().set$endSourceSpan(J.get$span$x(token));
           this.parser.resetInsertionMode$0();
         } else
           this.parser.parseError$2(J.get$span$x(token), "undefined-error");
@@ -19040,29 +18503,21 @@
     InTableTextPhase: {
       "^": "Phase;originalPhase,characterTokens,parser,tree",
       flushCharacters$0: function() {
-        var t1, data, t2, span, t3;
+        var t1, data, t2, t3;
         t1 = this.characterTokens;
         if (t1.length === 0)
           return;
         data = H.setRuntimeTypeInfo(new H.MappedListIterable(t1, new V.InTableTextPhase_flushCharacters_closure()), [null, null]).join$1(0, "");
-        t1 = this.parser;
-        if (t1.generateSpans) {
-          t2 = this.characterTokens;
-          if (0 >= t2.length)
-            return H.ioore(t2, 0);
-          span = J.expand$1$ax(J.get$span$x(t2[0]), J.get$span$x(C.JSArray_methods.get$last(this.characterTokens)));
-        } else
-          span = null;
         if (!N.allWhitespace(data)) {
-          t1 = t1._inTablePhase;
+          t1 = this.parser._inTablePhase;
           t2 = new T.CharactersToken(null, data, null);
-          t2.span = span;
+          t2.span = null;
           t3 = t1.tree;
           t3.insertFromTable = true;
           t1.parser._inBodyPhase.processCharacters$1(t2);
           t3.insertFromTable = false;
         } else if (data.length > 0)
-          this.tree.insertText$2(data, span);
+          this.tree.insertText$2(data, null);
         this.characterTokens = H.setRuntimeTypeInfo([], [T.StringToken]);
       },
       processComment$1: function(token) {
@@ -19097,7 +18552,7 @@
       }
     },
     InTableTextPhase_flushCharacters_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(t) {
         return J.get$data$x(t);
       }
@@ -19172,12 +18627,12 @@
             this.parser.parseError$3(J.get$span$x(token), "expected-one-end-tag-but-got-another", P.LinkedHashMap__makeLiteral(["gotName", "caption", "expectedName", J.get$localName$x(C.JSArray_methods.get$last(t2))]));
           for (; !J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "caption");) {
             if (0 >= t2.length)
-              return H.ioore(t2, 0);
+              return H.ioore(t2, -1);
             t2.pop();
           }
           if (0 >= t2.length)
-            return H.ioore(t2, 0);
-          t2.pop();
+            return H.ioore(t2, -1);
+          t2.pop().set$endSourceSpan(J.get$span$x(token));
           t1.clearActiveFormattingElements$0();
           t1 = this.parser;
           t1.phase = t1._inTablePhase;
@@ -19207,7 +18662,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             return;
           default:
@@ -19245,16 +18700,17 @@
         return ignoreEndTag ? null : token;
       },
       endTagColgroup$1: function(token) {
-        var t1, t2;
+        var t1, t2, t3;
         t1 = this.tree.openElements;
-        t2 = this.parser;
+        t2 = J.getInterceptor$x(token);
+        t3 = this.parser;
         if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "html"))
-          t2.parseError$2(J.get$span$x(token), "undefined-error");
+          t3.parseError$2(t2.get$span(token), "undefined-error");
         else {
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
-          t1.pop();
-          t2.phase = t2._inTablePhase;
+            return H.ioore(t1, -1);
+          t1.pop().set$endSourceSpan(t2.get$span(token));
+          t3.phase = t3._inTablePhase;
         }
       }
     },
@@ -19309,7 +18765,7 @@
       clearStackToTableBodyContext$0: function() {
         for (var t1 = this.tree.openElements; !C.JSArray_methods.contains$1(C.List_tbody_tfoot_thead_html, J.get$localName$x(C.JSArray_methods.get$last(t1)));) {
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
+            return H.ioore(t1, -1);
           t1.pop();
         }
         if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t1)), "html"))
@@ -19341,8 +18797,8 @@
           this.clearStackToTableBodyContext$0();
           t1 = t1.openElements;
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
-          t1.pop();
+            return H.ioore(t1, -1);
+          t1.pop().set$endSourceSpan(t2.get$span(token));
           t3.phase = t3._inTablePhase;
         } else
           t3.parseError$3(t2.get$span(token), "unexpected-end-tag-in-table-body", P.LinkedHashMap__makeLiteral(["name", t2.get$name(token)]));
@@ -19423,7 +18879,7 @@
             break;
           t1.parseError$3(last.get$sourceSpan(), "unexpected-implied-end-tag-in-table-row", P.LinkedHashMap__makeLiteral(["name", J.get$localName$x(C.JSArray_methods.get$last(t2))]));
           if (0 >= t2.length)
-            return H.ioore(t2, 0);
+            return H.ioore(t2, -1);
           t2.pop();
         }
       },
@@ -19438,18 +18894,19 @@
         return this.parser._inTablePhase.processCharacters$1(token);
       },
       endTagTr$1: function(token) {
-        var t1, t2;
+        var t1, t2, t3;
         t1 = this.tree;
-        t2 = this.parser;
+        t2 = J.getInterceptor$x(token);
+        t3 = this.parser;
         if (t1.elementInScope$2$variant("tr", "table")) {
           this.clearStackToTableRowContext$0();
           t1 = t1.openElements;
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
-          t1.pop();
-          t2.phase = t2._inTableBodyPhase;
+            return H.ioore(t1, -1);
+          t1.pop().set$endSourceSpan(t2.get$span(token));
+          t3.phase = t3._inTableBodyPhase;
         } else
-          t2.parseError$2(J.get$span$x(token), "undefined-error");
+          t3.parseError$2(t2.get$span(token), "undefined-error");
       },
       endTagTableRowGroup$1: function(token) {
         var t1 = J.getInterceptor$x(token);
@@ -19538,11 +18995,11 @@
           t3 = t1.openElements;
           if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t3)), t2.get$name(token))) {
             this.parser.parseError$3(t2.get$span(token), "unexpected-cell-end-tag", P.LinkedHashMap__makeLiteral(["name", t2.get$name(token)]));
-            this.popOpenElementsUntil$1(t2.get$name(token));
+            this.popOpenElementsUntil$1(token);
           } else {
             if (0 >= t3.length)
-              return H.ioore(t3, 0);
-            t3.pop();
+              return H.ioore(t3, -1);
+            t3.pop().set$endSourceSpan(t2.get$span(token));
           }
           t1.clearActiveFormattingElements$0();
           t1 = this.parser;
@@ -19573,7 +19030,7 @@
             t2 = t1.openElements;
             if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "option")) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               t2.pop();
             }
             t1.insertElement$1(token);
@@ -19583,12 +19040,12 @@
             t2 = t1.openElements;
             if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "option")) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               t2.pop();
             }
             if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "optgroup")) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               t2.pop();
             }
             t1.insertElement$1(token);
@@ -19616,8 +19073,8 @@
             t2 = this.tree.openElements;
             if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "option")) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
-              t2.pop();
+                return H.ioore(t2, -1);
+              t2.pop().set$endSourceSpan(t1.get$span(token));
             } else
               this.parser.parseError$3(t1.get$span(token), "unexpected-end-tag-in-select", P.LinkedHashMap__makeLiteral(["name", "option"]));
             return;
@@ -19634,13 +19091,13 @@
               t3 = false;
             if (t3) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
+                return H.ioore(t2, -1);
               t2.pop();
             }
             if (J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "optgroup")) {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
-              t2.pop();
+                return H.ioore(t2, -1);
+              t2.pop().set$endSourceSpan(t1.get$span(token));
             } else
               this.parser.parseError$3(t1.get$span(token), "unexpected-end-tag-in-select", P.LinkedHashMap__makeLiteral(["name", "optgroup"]));
             return;
@@ -19675,7 +19132,7 @@
       endTagSelect$1: function(token) {
         var t1 = this.parser;
         if (this.tree.elementInScope$2$variant("select", "select")) {
-          this.popOpenElementsUntil$1("select");
+          this.popOpenElementsUntil$1(token);
           t1.resetInsertionMode$0();
         } else
           t1.parseError$2(J.get$span$x(token), "undefined-error");
@@ -19774,9 +19231,7 @@
               if (!t4.isHTMLIntegrationPoint$1(C.JSArray_methods.get$last(t2))) {
                 t3 = C.JSArray_methods.get$last(t2);
                 t5 = J.getInterceptor$x(t3);
-                t3 = new N.Pair(t5.get$namespaceUri(t3), t5.get$localName(t3));
-                t3.$builtinTypeInfo = [null, null];
-                t3 = !C.JSArray_methods.contains$1(C.List_cjm, t3);
+                t3 = !C.JSArray_methods.contains$1(C.List_cjm, H.setRuntimeTypeInfo(new N.Pair(t5.get$namespaceUri(t3), t5.get$localName(t3)), [null, null]));
               } else
                 t3 = false;
             else
@@ -19784,7 +19239,7 @@
             if (!t3)
               break;
             if (0 >= t2.length)
-              return H.ioore(t2, 0);
+              return H.ioore(t2, -1);
             t2.pop();
           }
           return token;
@@ -19803,7 +19258,7 @@
           t1.insertElement$1(token);
           if (token.selfClosing) {
             if (0 >= t2.length)
-              return H.ioore(t2, 0);
+              return H.ioore(t2, -1);
             t2.pop();
             token.selfClosingAcknowledged = true;
           }
@@ -19811,14 +19266,16 @@
         }
       },
       processEndTag$1: function(token) {
-        var t1, t2, nodeIndex, node, t3, newToken, t4, t5;
+        var t1, t2, nodeIndex, node, t3, t4, t5, newToken;
         t1 = this.tree;
         t2 = t1.openElements;
         nodeIndex = t2.length - 1;
         node = C.JSArray_methods.get$last(t2);
-        t3 = J.getInterceptor$x(token);
-        if (!J.$eq$(J.get$localName$x(node), t3.get$name(token)))
-          this.parser.parseError$3(t3.get$span(token), "unexpected-end-tag", P.LinkedHashMap__makeLiteral(["name", t3.get$name(token)]));
+        t3 = F.asciiUpper2Lower(J.get$localName$x(node));
+        t4 = J.getInterceptor$x(token);
+        t5 = t4.get$name(token);
+        if (t3 == null ? t5 != null : t3 !== t5)
+          this.parser.parseError$3(t4.get$span(token), "unexpected-end-tag", P.LinkedHashMap__makeLiteral(["name", t4.get$name(token)]));
         t1 = t1.defaultNamespace;
         while (true) {
           if (!true) {
@@ -19826,9 +19283,9 @@
             break;
           }
           c$0: {
-            t4 = F.asciiUpper2Lower(J.get$localName$x(node));
-            t5 = t3.get$name(token);
-            if (t4 == null ? t5 == null : t4 === t5) {
+            t3 = F.asciiUpper2Lower(J.get$localName$x(node));
+            t5 = t4.get$name(token);
+            if (t3 == null ? t5 == null : t3 === t5) {
               t1 = this.parser;
               t3 = t1.phase;
               t4 = t1._inTableTextPhase;
@@ -19838,7 +19295,7 @@
               }
               while (true) {
                 if (0 >= t2.length)
-                  return H.ioore(t2, 0);
+                  return H.ioore(t2, -1);
                 if (!!J.$eq$(t2.pop(), node))
                   break;
               }
@@ -19849,8 +19306,8 @@
             if (nodeIndex < 0 || nodeIndex >= t2.length)
               return H.ioore(t2, nodeIndex);
             node = t2[nodeIndex];
-            t4 = J.get$namespaceUri$x(node);
-            if (t4 == null ? t1 != null : t4 !== t1)
+            t3 = J.get$namespaceUri$x(node);
+            if (t3 == null ? t1 != null : t3 !== t1)
               break c$0;
             else {
               newToken = this.parser.phase.processEndTag$1(token);
@@ -19876,11 +19333,8 @@
       processEndTag$1: function(token) {
         var t1, t2;
         t1 = J.getInterceptor$x(token);
-        if (J.$eq$(t1.get$name(token), "html")) {
-          t1 = this.parser;
-          t1.phase = t1._afterAfterBodyPhase;
-          return;
-        }
+        if (J.$eq$(t1.get$name(token), "html"))
+          return this.endTagHtml$1(token);
         t2 = this.parser;
         t2.parseError$3(t1.get$span(token), "unexpected-end-tag-after-body", P.LinkedHashMap__makeLiteral(["name", t1.get$name(token)]));
         t2.phase = t2._inBodyPhase;
@@ -19903,6 +19357,18 @@
         t1.parseError$2(J.get$span$x(token), "unexpected-char-after-body");
         t1.phase = t1._inBodyPhase;
         return token;
+      },
+      endTagHtml$1: function(token) {
+        var t1, node;
+        for (t1 = this.tree.openElements, t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
+          node = t1.__internal$_current;
+          if (J.$eq$(J.get$localName$x(node), "html")) {
+            node.set$endSourceSpan(J.get$span$x(token));
+            break;
+          }
+        }
+        t1 = this.parser;
+        t1.phase = t1._afterAfterBodyPhase;
       }
     },
     InFramesetPhase: {
@@ -19920,7 +19386,7 @@
             t1.insertElement$1(token);
             t1 = t1.openElements;
             if (0 >= t1.length)
-              return H.ioore(t1, 0);
+              return H.ioore(t1, -1);
             t1.pop();
             return;
           case "noframes":
@@ -19940,8 +19406,8 @@
               this.parser.parseError$2(t1.get$span(token), "unexpected-frameset-in-frameset-innerhtml");
             else {
               if (0 >= t2.length)
-                return H.ioore(t2, 0);
-              t2.pop();
+                return H.ioore(t2, -1);
+              t2.pop().set$endSourceSpan(t1.get$span(token));
             }
             if (!J.$eq$(J.get$localName$x(C.JSArray_methods.get$last(t2)), "frameset")) {
               t1 = this.parser;
@@ -20097,6 +19563,9 @@
     current: function() {
       var uri, t1, t2, targetScheme, targetUserInfo, targetHost, targetPort, targetPath, targetQuery, mergedPath, fragment, path;
       uri = P.Uri_base();
+      if (uri.$eq(0, $._currentUriBase))
+        return $._current;
+      $._currentUriBase = uri;
       t1 = $.$get$Style_platform();
       t2 = $.$get$Style_url();
       if (t1 == null ? t2 == null : t1 === t2) {
@@ -20167,20 +19636,24 @@
           ;
         else
           fragment = null;
-        return new P.Uri(targetHost, targetPort, targetPath, targetScheme, targetUserInfo, targetQuery, fragment, null, null).toString$0(0);
+        t1 = new P.Uri(targetScheme, targetUserInfo, targetHost, targetPort, targetPath, targetQuery, fragment, null, null).toString$0(0);
+        $._current = t1;
+        return t1;
       } else {
         path = uri.toFilePath$0();
-        return C.JSString_methods.substring$2(path, 0, path.length - 1);
+        t1 = C.JSString_methods.substring$2(path, 0, path.length - 1);
+        $._current = t1;
+        return t1;
       }
     }
   }], ["path.context", "package:path/src/context.dart",, F, {
     "^": "",
     _validateArgList: function(method, args) {
-      var i, numArgs, numArgs0, message, t1, t2;
-      for (i = 1; i < 8; ++i) {
+      var numArgs, i, numArgs0, message, t1, t2, t3, t4, t5;
+      for (numArgs = args.length, i = 1; i < numArgs; ++i) {
         if (args[i] == null || args[i - 1] != null)
           continue;
-        for (numArgs = 8; numArgs >= 1; numArgs = numArgs0) {
+        for (; numArgs >= 1; numArgs = numArgs0) {
           numArgs0 = numArgs - 1;
           if (args[numArgs0] != null)
             break;
@@ -20188,15 +19661,19 @@
         message = new P.StringBuffer("");
         t1 = method + "(";
         message._contents = t1;
-        t2 = new H.SubListIterable(args, 0, numArgs);
-        t2.$builtinTypeInfo = [H.getTypeArgumentByIndex(args, 0)];
-        if (numArgs < 0)
-          H.throwExpression(P.RangeError$range(numArgs, 0, null, "end", null));
-        if (0 > numArgs)
-          H.throwExpression(P.RangeError$range(0, 0, numArgs, "start", null));
-        t2 = new H.MappedListIterable(t2, new F._validateArgList_closure());
-        t2.$builtinTypeInfo = [null, null];
-        t1 += t2.join$1(0, ", ");
+        t2 = H.setRuntimeTypeInfo(new H.SubListIterable(args, 0, numArgs), [H.getTypeArgumentByIndex(args, 0)]);
+        t3 = t2.__internal$_start;
+        t4 = J.getInterceptor$n(t3);
+        if (t4.$lt(t3, 0))
+          H.throwExpression(P.RangeError$range(t3, 0, null, "start", null));
+        t5 = t2._endOrLength;
+        if (t5 != null) {
+          if (J.$lt$n(t5, 0))
+            H.throwExpression(P.RangeError$range(t5, 0, null, "end", null));
+          if (t4.$gt(t3, t5))
+            H.throwExpression(P.RangeError$range(t3, 0, t5, "start", null));
+        }
+        t1 += H.setRuntimeTypeInfo(new H.MappedListIterable(t2, new F._validateArgList_closure()), [null, null]).join$1(0, ", ");
         message._contents = t1;
         message._contents = t1 + ("): part " + (i - 1) + " was null, but part " + i + " was not.");
         throw H.wrapException(P.ArgumentError$(message.toString$0(0)));
@@ -20207,6 +19684,19 @@
       get$current: function() {
         var t1 = this._context$_current;
         return t1 != null ? t1 : B.current();
+      },
+      absolute$7: function(_, part1, part2, part3, part4, part5, part6, part7) {
+        var t1;
+        F._validateArgList("absolute", [part1, part2, part3, part4, part5, part6, part7]);
+        t1 = this.style;
+        t1 = t1.rootLength$1(part1) > 0 && !t1.isRootRelative$1(part1);
+        if (t1)
+          return part1;
+        t1 = this._context$_current;
+        return this.join$8(0, t1 != null ? t1 : B.current(), part1, part2, part3, part4, part5, part6, part7);
+      },
+      absolute$1: function($receiver, part1) {
+        return this.absolute$7($receiver, part1, null, null, null, null, null, null);
       },
       join$8: function(_, part1, part2, part3, part4, part5, part6, part7, part8) {
         var parts = H.setRuntimeTypeInfo([part1, part2, part3, part4, part5, part6, part7, part8], [P.String]);
@@ -20263,23 +19753,69 @@
         return parsed.parts;
       },
       normalize$1: function(path) {
-        var parsed = Q.ParsedPath_ParsedPath$parse(path, this.style);
+        var parsed;
+        if (!this._needsNormalization$1(path))
+          return path;
+        parsed = Q.ParsedPath_ParsedPath$parse(path, this.style);
         parsed.normalize$0();
         return parsed.toString$0(0);
       },
+      _needsNormalization$1: function(path) {
+        var codeUnits, t1, root, t2, i, start, previous, t3, previousPrevious, codeUnit, t4;
+        codeUnits = J.get$codeUnits$s(path);
+        t1 = this.style;
+        root = t1.rootLength$1(path);
+        if (root !== 0) {
+          if (t1 === $.$get$Style_windows())
+            for (t2 = codeUnits._string, i = 0; i < root; ++i)
+              if (C.JSString_methods.codeUnitAt$1(t2, i) === 47)
+                return true;
+          start = root;
+          previous = 47;
+        } else {
+          start = 0;
+          previous = null;
+        }
+        for (t2 = codeUnits._string, t3 = t2.length, i = start, previousPrevious = null; i < t3; ++i, previousPrevious = previous, previous = codeUnit) {
+          codeUnit = C.JSString_methods.codeUnitAt$1(t2, i);
+          if (t1.isSeparator$1(codeUnit)) {
+            if (t1 === $.$get$Style_windows() && codeUnit === 47)
+              return true;
+            if (previous != null && t1.isSeparator$1(previous))
+              return true;
+            if (previous === 46)
+              t4 = previousPrevious == null || previousPrevious === 46 || t1.isSeparator$1(previousPrevious);
+            else
+              t4 = false;
+            if (t4)
+              return true;
+          }
+        }
+        if (previous == null)
+          return true;
+        if (t1.isSeparator$1(previous))
+          return true;
+        if (previous === 46)
+          t1 = previousPrevious == null || previousPrevious === 47 || previousPrevious === 46;
+        else
+          t1 = false;
+        if (t1)
+          return true;
+        return false;
+      },
       relative$2$from: function(path, from) {
-        var t1, t2, fromParsed, pathParsed, t3;
-        from = this._context$_current;
-        from = from != null ? from : B.current();
+        var t1, fromParsed, pathParsed, t2, t3;
+        if (this.style.rootLength$1(path) <= 0)
+          return this.normalize$1(path);
+        t1 = this._context$_current;
+        from = t1 != null ? t1 : B.current();
         t1 = this.style;
         if (t1.rootLength$1(from) <= 0 && t1.rootLength$1(path) > 0)
           return this.normalize$1(path);
-        if (t1.rootLength$1(path) <= 0 || t1.isRootRelative$1(path)) {
-          t2 = this._context$_current;
-          path = this.join$8(0, t2 != null ? t2 : B.current(), path, null, null, null, null, null, null);
-        }
+        if (t1.rootLength$1(path) <= 0 || t1.isRootRelative$1(path))
+          path = this.absolute$1(0, path);
         if (t1.rootLength$1(path) <= 0 && t1.rootLength$1(from) > 0)
-          throw H.wrapException(new E.PathException("Unable to find a path to \"" + path + "\" from \"" + H.S(from) + "\"."));
+          throw H.wrapException(new E.PathException("Unable to find a path to \"" + H.S(path) + "\" from \"" + H.S(from) + "\"."));
         fromParsed = Q.ParsedPath_ParsedPath$parse(from, t1);
         fromParsed.normalize$0();
         pathParsed = Q.ParsedPath_ParsedPath$parse(path, t1);
@@ -20319,7 +19855,7 @@
         }
         t2 = fromParsed.parts;
         if (t2.length > 0 && J.$eq$(t2[0], ".."))
-          throw H.wrapException(new E.PathException("Unable to find a path to \"" + path + "\" from \"" + H.S(from) + "\"."));
+          throw H.wrapException(new E.PathException("Unable to find a path to \"" + H.S(path) + "\" from \"" + H.S(from) + "\"."));
         C.JSArray_methods.insertAll$2(pathParsed.parts, 0, P.List_List$filled(fromParsed.parts.length, "..", null));
         t2 = pathParsed.separators;
         if (0 >= t2.length)
@@ -20375,25 +19911,25 @@
       }
     },
     Context_join_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(part) {
         return part != null;
       }
     },
     Context_joinAll_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(part) {
         return !J.$eq$(part, "");
       }
     },
     Context_split_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(part) {
         return J.get$isEmpty$asx(part) !== true;
       }
     },
     _validateArgList_closure: {
-      "^": "Closure:1;",
+      "^": "Closure:2;",
       call$1: function(arg) {
         return arg == null ? "null" : "\"" + H.S(arg) + "\"";
       }
@@ -20519,7 +20055,7 @@
         }}
     },
     ParsedPath_normalize_closure: {
-      "^": "Closure:1;_parsed_path$_captured_this_0",
+      "^": "Closure:2;_parsed_path$_captured_this_0",
       call$1: function(_) {
         return this._parsed_path$_captured_this_0.style.get$separator();
       }
@@ -20558,7 +20094,7 @@
         host = "";
       t1 = host == null;
       path = P.Uri__makePath("a/b", 0, 3, null, scheme, !t1);
-      if (new P.Uri(host, port, scheme.length === 0 && t1 && !C.JSString_methods.startsWith$1(path, "/") ? P.Uri__normalizeRelativePath(path) : P.Uri__removeDotSegments(path), scheme, userInfo, query, fragment, null, null).toFilePath$0() === "a\\b")
+      if (new P.Uri(scheme, userInfo, host, port, scheme.length === 0 && t1 && !C.JSString_methods.startsWith$1(path, "/") ? P.Uri__normalizeRelativePath(path) : P.Uri__removeDotSegments(path), query, fragment, null, null).toFilePath$0() === "a\\b")
         return $.$get$Style_windows();
       return $.$get$Style_posix();
     },
@@ -20718,7 +20254,7 @@
   }], ["source_span.file", "package:source_span/src/file.dart",, G, {
     "^": "",
     SourceFile: {
-      "^": "Object;url>,_lineStarts,_decodedChars",
+      "^": "Object;url>,_lineStarts,_decodedChars,_cachedLine",
       get$length: function(_) {
         return this._decodedChars.length;
       },
@@ -20726,20 +20262,95 @@
         return this._lineStarts.length;
       },
       span$2: [function(_, start, end) {
-        return G.FileSpan$_(this, start, end == null ? this._decodedChars.length - 1 : end);
+        return G._FileSpan$(this, start, end == null ? this._decodedChars.length - 1 : end);
       }, function($receiver, start) {
         return this.span$2($receiver, start, null);
-      }, "span$1", "call$2", "call$1", "get$span", 2, 2, 32, 0],
+      }, "span$1", "call$2", "call$1", "get$span", 2, 2, 29, 0],
       getLine$1: function(offset) {
-        var t1 = J.getInterceptor$n(offset);
+        var t1, t2;
+        t1 = J.getInterceptor$n(offset);
         if (t1.$lt(offset, 0))
           throw H.wrapException(P.RangeError$("Offset may not be negative, was " + H.S(offset) + "."));
         else if (t1.$gt(offset, this._decodedChars.length))
           throw H.wrapException(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + this.get$length(this) + "."));
-        return D.binarySearch(this._lineStarts, new G.SourceFile_getLine_closure(offset)) - 1;
+        t2 = this._lineStarts;
+        if (t1.$lt(offset, C.JSArray_methods.get$first(t2)))
+          return -1;
+        if (t1.$ge(offset, C.JSArray_methods.get$last(t2)))
+          return t2.length - 1;
+        if (this._isNearCachedLine$1(offset))
+          return this._cachedLine;
+        t1 = this._binarySearch$1(offset) - 1;
+        this._cachedLine = t1;
+        return t1;
+      },
+      _isNearCachedLine$1: function(offset) {
+        var t1, t2, t3, t4;
+        t1 = this._cachedLine;
+        if (t1 == null)
+          return false;
+        t2 = this._lineStarts;
+        if (t1 >>> 0 !== t1 || t1 >= t2.length)
+          return H.ioore(t2, t1);
+        t3 = J.getInterceptor$n(offset);
+        if (t3.$lt(offset, t2[t1]))
+          return false;
+        t1 = this._cachedLine;
+        t4 = t2.length;
+        if (typeof t1 !== "number")
+          return t1.$ge();
+        if (t1 < t4 - 1) {
+          ++t1;
+          if (t1 < 0 || t1 >= t4)
+            return H.ioore(t2, t1);
+          t1 = t3.$lt(offset, t2[t1]);
+        } else
+          t1 = true;
+        if (t1)
+          return true;
+        t1 = this._cachedLine;
+        t4 = t2.length;
+        if (typeof t1 !== "number")
+          return t1.$ge();
+        if (t1 < t4 - 2) {
+          t1 += 2;
+          if (t1 < 0 || t1 >= t4)
+            return H.ioore(t2, t1);
+          t1 = t3.$lt(offset, t2[t1]);
+        } else
+          t1 = true;
+        if (t1) {
+          t1 = this._cachedLine;
+          if (typeof t1 !== "number")
+            return t1.$add();
+          this._cachedLine = t1 + 1;
+          return true;
+        }
+        return false;
+      },
+      _binarySearch$1: function(offset) {
+        var t1, t2, max, min, half, t3;
+        t1 = this._lineStarts;
+        t2 = t1.length;
+        max = t2 - 1;
+        for (min = 0; min < max;) {
+          half = min + C.JSInt_methods._tdivFast$1(max - min, 2);
+          if (half < 0 || half >= t2)
+            return H.ioore(t1, half);
+          t3 = t1[half];
+          if (typeof offset !== "number")
+            return H.iae(offset);
+          if (t3 > offset)
+            max = half;
+          else
+            min = half + 1;
+        }
+        return max;
       },
       getOffset$2: function(line, column) {
         var t1, t2, result, t3;
+        if (typeof line !== "number")
+          return line.$lt();
         if (line < 0)
           throw H.wrapException(P.RangeError$("Line may not be negative, was " + line + "."));
         else {
@@ -20782,22 +20393,13 @@
       },
       static: {SourceFile$decoded: function(decodedChars, url) {
           var t1 = H.setRuntimeTypeInfo([0], [P.$int]);
-          t1 = new G.SourceFile(url, t1, new Uint32Array(H._ensureNativeList(J.toList$0$ax(decodedChars))));
+          t1 = new G.SourceFile(url, t1, new Uint32Array(H._ensureNativeList(J.toList$0$ax(decodedChars))), null);
           t1.SourceFile$decoded$2$url(decodedChars, url);
           return t1;
         }}
     },
-    SourceFile_getLine_closure: {
-      "^": "Closure:1;_captured_offset_0",
-      call$1: function(o) {
-        var t1 = this._captured_offset_0;
-        if (typeof t1 !== "number")
-          return H.iae(t1);
-        return o > t1;
-      }
-    },
     FileLocation: {
-      "^": "SourceLocation;file<,sourceUrl,offset,line,column",
+      "^": "SourceLocationMixin;file<,offset>",
       get$sourceUrl: function() {
         return this.file.url;
       },
@@ -20815,7 +20417,7 @@
           H.throwExpression(P.RangeError$("Offset " + H.S(t2) + " must be not be greater than the number of characters in the file, " + t1.get$length(t1) + "."));
         line = t1.getLine$1(t2);
         t1 = t1._lineStarts;
-        if (line < 0 || line >= t1.length)
+        if (line >>> 0 !== line || line >= t1.length)
           return H.ioore(t1, line);
         lineStart = t1[line];
         if (typeof t2 !== "number")
@@ -20825,19 +20427,31 @@
         return t2 - lineStart;
       },
       FileLocation$_$2: function(file, offset) {
-        var t1 = this.file;
-        if (J.$gt$n(offset, t1._decodedChars.length))
-          throw H.wrapException(P.RangeError$("Offset " + H.S(offset) + " must not be greater than the number of characters in the file, " + t1.get$length(t1) + "."));
+        var t1, t2, t3;
+        t1 = this.offset;
+        t2 = J.getInterceptor$n(t1);
+        if (t2.$lt(t1, 0))
+          throw H.wrapException(P.RangeError$("Offset may not be negative, was " + H.S(t1) + "."));
+        else {
+          t3 = this.file;
+          if (t2.$gt(t1, t3._decodedChars.length))
+            throw H.wrapException(P.RangeError$("Offset " + H.S(t1) + " must not be greater than the number of characters in the file, " + t3.get$length(t3) + "."));
+        }
       },
+      $isSourceLocation: 1,
       static: {FileLocation$_: function(file, offset) {
-          var t1 = new G.FileLocation(file, null, offset, 0, offset);
-          t1.SourceLocation$4$column$line$sourceUrl(offset, null, null, null);
+          var t1 = new G.FileLocation(file, offset);
           t1.FileLocation$_$2(file, offset);
           return t1;
         }}
     },
     FileSpan: {
-      "^": "SourceSpanMixin;file<,_file$_start<,_end",
+      "^": "Object;",
+      $isSourceSpan: 1,
+      $isSourceSpanWithContext: 1
+    },
+    _FileSpan: {
+      "^": "SourceSpanMixin;file<,_file$_start,_end",
       get$sourceUrl: function() {
         return this.file.url;
       },
@@ -20864,39 +20478,51 @@
           t3 = null;
         else {
           t3 = G.FileLocation$_(t1, t3);
-          t3 = t1.getOffset$1(t3.file.getLine$1(t3.offset) + 1);
+          t3 = t3.file.getLine$1(t3.offset);
+          if (typeof t3 !== "number")
+            return t3.$add();
+          t3 = t1.getOffset$1(t3 + 1);
         }
         return P.String_String$fromCharCodes(C.NativeUint32List_methods.sublist$2(t1._decodedChars, t2, t3), 0, null);
       },
       compareTo$1: function(_, other) {
         var result;
-        if (!(other instanceof G.FileSpan))
+        if (!(other instanceof G._FileSpan))
           return this.super$SourceSpanMixin$compareTo(this, other);
         result = J.compareTo$1$ns(this._file$_start, other._file$_start);
         return J.$eq$(result, 0) ? J.compareTo$1$ns(this._end, other._end) : result;
       },
       $eq: function(_, other) {
+        var t1;
         if (other == null)
           return false;
-        if (!(other instanceof G.FileSpan))
+        t1 = J.getInterceptor(other);
+        if (!t1.$isFileSpan)
           return this.super$SourceSpanMixin$$eq(this, other);
+        if (!t1.$is_FileSpan)
+          return this.super$SourceSpanMixin$$eq(this, other) && J.$eq$(this.file.url, other.get$sourceUrl());
         return J.$eq$(this._file$_start, other._file$_start) && J.$eq$(this._end, other._end) && J.$eq$(this.file.url, other.file.url);
       },
       get$hashCode: function(_) {
-        var t1, t2;
-        t1 = J.get$hashCode$(this._file$_start);
-        t2 = J.get$hashCode$(this._end);
-        if (typeof t2 !== "number")
-          return H.iae(t2);
-        return J.$add$ns(J.$add$ns(t1, 5 * t2), 7 * J.get$hashCode$(this.file.url));
+        return Y.SourceSpanMixin.prototype.get$hashCode.call(this, this);
       },
       expand$1: function(_, other) {
-        var t1 = this.file;
+        var t1, t2, t3, t4, start;
+        t1 = this.file;
         if (!J.$eq$(t1.url, other.get$sourceUrl()))
           throw H.wrapException(P.ArgumentError$("Source URLs \"" + J.toString$0$(this.get$sourceUrl()) + "\" and  \"" + J.toString$0$(other.get$sourceUrl()) + "\" don't match."));
-        return G.FileSpan$_(t1, P.min(this._file$_start, other.get$_file$_start()), P.max(this._end, other._end));
+        t2 = this._file$_start;
+        t3 = this._end;
+        if (!!other.$is_FileSpan)
+          return G._FileSpan$(t1, P.min(t2, other._file$_start), P.max(t3, other._end));
+        else {
+          t4 = other.get$start(other);
+          start = P.min(t2, t4.get$offset(t4));
+          t4 = other.get$end();
+          return G._FileSpan$(t1, start, P.max(t3, t4.get$offset(t4)));
+        }
       },
-      FileSpan$_$3: function(file, _start, _end) {
+      _FileSpan$3: function(file, _start, _end) {
         var t1, t2, t3, t4;
         t1 = this._end;
         t2 = this._file$_start;
@@ -20911,18 +20537,24 @@
             throw H.wrapException(P.RangeError$("Start may not be negative, was " + H.S(t2) + "."));
         }
       },
-      $isSourceSpan: 1,
+      $isFileSpan: 1,
       $isSourceSpanWithContext: 1,
-      static: {FileSpan$_: function(file, _start, _end) {
-          var t1 = new G.FileSpan(file, _start, _end);
-          t1.FileSpan$_$3(file, _start, _end);
+      $isSourceSpan: 1,
+      static: {_FileSpan$: function(file, _start, _end) {
+          var t1 = new G._FileSpan(file, _start, _end);
+          t1._FileSpan$3(file, _start, _end);
           return t1;
         }}
     }
   }], ["source_span.location", "package:source_span/src/location.dart",, O, {
     "^": "",
     SourceLocation: {
-      "^": "Object;sourceUrl<,offset>,line<,column<",
+      "^": "Object;"
+    }
+  }], ["source_span.location_mixin", "package:source_span/src/location_mixin.dart",, N, {
+    "^": "",
+    SourceLocationMixin: {
+      "^": "Object;",
       compareTo$1: function(_, other) {
         if (!J.$eq$(this.get$sourceUrl(), other.get$sourceUrl()))
           throw H.wrapException(P.ArgumentError$("Source URLs \"" + J.toString$0$(this.get$sourceUrl()) + "\" and \"" + J.toString$0$(other.get$sourceUrl()) + "\" don't match."));
@@ -20931,7 +20563,7 @@
       $eq: function(_, other) {
         if (other == null)
           return false;
-        return other instanceof O.SourceLocation && J.$eq$(this.get$sourceUrl(), other.get$sourceUrl()) && J.$eq$(this.offset, other.offset);
+        return !!J.getInterceptor(other).$isSourceLocation && J.$eq$(this.get$sourceUrl(), other.get$sourceUrl()) && J.$eq$(this.offset, other.offset);
       },
       get$hashCode: function(_) {
         var t1, t2;
@@ -20942,24 +20574,22 @@
         return t1 + t2;
       },
       toString$0: function(_) {
-        var t1 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(this), null)) + ": " + H.S(this.offset) + " ";
-        return t1 + (H.S(this.get$sourceUrl() == null ? "unknown source" : this.get$sourceUrl()) + ":" + (this.get$line() + 1) + ":" + H.S(J.$add$ns(this.get$column(), 1))) + ">";
+        var t1, t2, t3;
+        t1 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(this), null)) + ": " + H.S(this.get$offset(this)) + " ";
+        t2 = H.S(this.get$sourceUrl() == null ? "unknown source" : this.get$sourceUrl()) + ":";
+        t3 = this.get$line();
+        if (typeof t3 !== "number")
+          return t3.$add();
+        return t1 + (t2 + (t3 + 1) + ":" + H.S(J.$add$ns(this.get$column(), 1))) + ">";
       },
-      SourceLocation$4$column$line$sourceUrl: function(offset, column, line, sourceUrl) {
-        if (J.$lt$n(this.offset, 0))
-          throw H.wrapException(P.RangeError$("Offset may not be negative, was " + H.S(offset) + "."));
-        else if (this.get$line() < 0)
-          throw H.wrapException(P.RangeError$("Line may not be negative, was " + H.S(line) + "."));
-        else if (J.$lt$n(this.get$column(), 0))
-          throw H.wrapException(P.RangeError$("Column may not be negative, was " + H.S(column) + "."));
-      }
+      $isSourceLocation: 1
     }
   }], ["source_span.span", "package:source_span/src/span.dart",, T, {
     "^": "",
     SourceSpan: {
       "^": "Object;"
     }
-  }], ["source_span.span_exception", "package:source_span/src/span_exception.dart",, R, {}], ["source_span.span_mixin", "package:source_span/src/span_mixin.dart",, Y, {
+  }], ["source_span.span_mixin", "package:source_span/src/span_mixin.dart",, Y, {
     "^": "",
     SourceSpanMixin: {
       "^": "Object;",
@@ -20967,7 +20597,11 @@
         return this.get$start(this).get$sourceUrl();
       },
       get$length: function(_) {
-        return J.$sub$n(this.get$end().offset, this.get$start(this).offset);
+        var t1, t2;
+        t1 = this.get$end();
+        t1 = t1.get$offset(t1);
+        t2 = this.get$start(this);
+        return J.$sub$n(t1, t2.get$offset(t2));
       },
       compareTo$1: ["super$SourceSpanMixin$compareTo", function(_, other) {
         var result = this.get$start(this).compareTo$1(0, J.get$start$x(other));
@@ -20981,10 +20615,12 @@
           color = null;
         line = this.get$start(this).get$line();
         column = this.get$start(this).get$column();
+        if (typeof line !== "number")
+          return line.$add();
         t1 = "line " + (line + 1) + ", column " + H.S(J.$add$ns(column, 1));
         if (this.get$sourceUrl() != null) {
           t2 = this.get$sourceUrl();
-          t2 = t1 + (" of " + $.$get$context().prettyUri$1(t2));
+          t2 = t1 + (" of " + H.S($.$get$context().prettyUri$1(t2)));
           t1 = t2;
         }
         t1 += ": " + H.S(message);
@@ -21005,10 +20641,12 @@
           textLine = C.JSArray_methods.get$first(this.get$text(this).split("\n"));
           column = 0;
         }
-        t2 = this.get$end().offset;
+        t2 = this.get$end();
+        t2 = t2.get$offset(t2);
         if (typeof t2 !== "number")
           return H.iae(t2);
-        t3 = this.get$start(this).offset;
+        t3 = this.get$start(this);
+        t3 = t3.get$offset(t3);
         if (typeof t3 !== "number")
           return H.iae(t3);
         t4 = J.getInterceptor$asx(textLine);
@@ -21047,39 +20685,27 @@
         return t2 + t1 + 31 * (t4 + t3);
       },
       toString$0: function(_) {
-        var t1, t2, t3;
+        var t1, t2, t3, t4, t5;
         t1 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(this), null)) + ": from ";
         t2 = this.get$start(this);
-        t3 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(t2), null)) + ": " + H.S(t2.offset) + " ";
-        t1 = t1 + (t3 + (H.S(t2.get$sourceUrl() == null ? "unknown source" : t2.get$sourceUrl()) + ":" + (t2.get$line() + 1) + ":" + H.S(J.$add$ns(t2.get$column(), 1))) + ">") + " to ";
-        t2 = this.get$end();
-        t3 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(t2), null)) + ": " + H.S(t2.offset) + " ";
-        return t1 + (t3 + (H.S(t2.get$sourceUrl() == null ? "unknown source" : t2.get$sourceUrl()) + ":" + (t2.get$line() + 1) + ":" + H.S(J.$add$ns(t2.get$column(), 1))) + ">") + " \"" + this.get$text(this) + "\">";
+        t3 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(t2), null)) + ": " + H.S(t2.get$offset(t2)) + " ";
+        t4 = H.S(t2.get$sourceUrl() == null ? "unknown source" : t2.get$sourceUrl()) + ":";
+        t5 = t2.get$line();
+        if (typeof t5 !== "number")
+          return t5.$add();
+        t2 = t1 + (t3 + (t4 + (t5 + 1) + ":" + H.S(J.$add$ns(t2.get$column(), 1))) + ">") + " to ";
+        t5 = this.get$end();
+        t4 = "<" + H.S(new H.TypeImpl(H.getRuntimeTypeString(t5), null)) + ": " + H.S(t5.get$offset(t5)) + " ";
+        t1 = H.S(t5.get$sourceUrl() == null ? "unknown source" : t5.get$sourceUrl()) + ":";
+        t3 = t5.get$line();
+        if (typeof t3 !== "number")
+          return t3.$add();
+        return t2 + (t4 + (t1 + (t3 + 1) + ":" + H.S(J.$add$ns(t5.get$column(), 1))) + ">") + " \"" + this.get$text(this) + "\">";
       },
       $isSourceSpan: 1
     }
   }], ["source_span.utils", "package:source_span/src/utils.dart",, D, {
     "^": "",
-    binarySearch: function(list, matches) {
-      var max, min, half;
-      if (list.length === 0)
-        return -1;
-      if (matches.call$1(C.JSArray_methods.get$first(list)) === true)
-        return 0;
-      if (matches.call$1(C.JSArray_methods.get$last(list)) !== true)
-        return list.length;
-      max = list.length - 1;
-      for (min = 0; min < max;) {
-        half = min + C.JSInt_methods._tdivFast$1(max - min, 2);
-        if (half < 0 || half >= list.length)
-          return H.ioore(list, half);
-        if (matches.call$1(list[half]) === true)
-          max = half;
-        else
-          min = half + 1;
-      }
-      return max;
-    },
     findLineStart: function(context, text, column) {
       var isEmpty, index, t1, lineStart, textColumn, t2;
       isEmpty = text === "";
@@ -21175,7 +20801,7 @@
   }], ["tokenizer", "package:html/src/tokenizer.dart",, Y, {
     "^": "",
     closure1: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
         var result, t1, k;
         result = P.LinkedHashMap__makeEmpty();
@@ -21187,7 +20813,7 @@
       }
     },
     _closure: {
-      "^": "Closure:2;",
+      "^": "Closure:1;",
       call$0: function() {
         return [];
       }
@@ -21290,7 +20916,7 @@
           t1 = t1.fileInfo;
           t2 = this._lastOffset;
           t1.toString;
-          token.span = G.FileSpan$_(t1, t2, offset == null ? t1._decodedChars.length - 1 : offset);
+          token.span = G._FileSpan$(t1, t2, offset == null ? t1._decodedChars.length - 1 : offset);
           if (!(token instanceof T.ParseErrorToken))
             this._lastOffset = offset;
         }
@@ -21342,7 +20968,12 @@
         }
         if (c !== ";") {
           this._addToken$1(new T.ParseErrorToken(null, null, "numeric-entity-without-semicolon", null));
-          t1.unget$1(c);
+          if (c != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
         }
         return $char;
       },
@@ -21372,7 +21003,12 @@
         if (t2) {
           if (0 >= charStack.length)
             return H.ioore(charStack, 0);
-          t1.unget$1(charStack[0]);
+          if (charStack[0] != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           output = "&";
         } else {
           if (0 >= charStack.length)
@@ -21389,13 +21025,23 @@
             else
               t2 = true;
             if (t2) {
-              t1.unget$1(C.JSArray_methods.get$last(charStack));
+              if (C.JSArray_methods.get$last(charStack) != null) {
+                t2 = t1._offset;
+                if (typeof t2 !== "number")
+                  return t2.$sub();
+                t1._offset = t2 - 1;
+              }
               output = this.consumeNumberEntity$1(hex);
             } else {
               this._addToken$1(new T.ParseErrorToken(null, null, "expected-numeric-entity", null));
               if (0 >= charStack.length)
-                return H.ioore(charStack, 0);
-              t1.unget$1(charStack.pop());
+                return H.ioore(charStack, -1);
+              if (charStack.pop() != null) {
+                t2 = t1._offset;
+                if (typeof t2 !== "number")
+                  return t2.$sub();
+                t1._offset = t2 - 1;
+              }
               output = "&" + C.JSArray_methods.join$0(charStack);
             }
           } else {
@@ -21404,7 +21050,7 @@
               return H.ioore(charStack, 0);
             filteredEntityList = J.$index$asx(t2, charStack[0]);
             if (filteredEntityList == null)
-              filteredEntityList = C.List_empty;
+              filteredEntityList = C.List_empty0;
             for (; C.JSArray_methods.get$last(charStack) != null;) {
               filteredEntityList = J.where$1$ax(filteredEntityList, new Y.HtmlTokenizer_consumeEntity_closure(C.JSArray_methods.join$0(charStack))).toList$0(0);
               if (J.get$length$asx(filteredEntityList) === 0)
@@ -21449,21 +21095,36 @@
                 t2 = false;
               if (t2) {
                 if (0 >= charStack.length)
-                  return H.ioore(charStack, 0);
-                t1.unget$1(charStack.pop());
+                  return H.ioore(charStack, -1);
+                if (charStack.pop() != null) {
+                  t2 = t1._offset;
+                  if (typeof t2 !== "number")
+                    return t2.$sub();
+                  t1._offset = t2 - 1;
+                }
                 output = "&" + C.JSArray_methods.join$0(charStack);
               } else {
                 output = C.Map_0uQj.$index(0, entityName);
                 if (0 >= charStack.length)
-                  return H.ioore(charStack, 0);
-                t1.unget$1(charStack.pop());
+                  return H.ioore(charStack, -1);
+                if (charStack.pop() != null) {
+                  t2 = t1._offset;
+                  if (typeof t2 !== "number")
+                    return t2.$sub();
+                  t1._offset = t2 - 1;
+                }
                 output = H.S(output) + J.join$0$ax(N.slice(charStack, entityLen, null));
               }
             } else {
               this._addToken$1(new T.ParseErrorToken(null, null, "expected-named-entity", null));
               if (0 >= charStack.length)
-                return H.ioore(charStack, 0);
-              t1.unget$1(charStack.pop());
+                return H.ioore(charStack, -1);
+              if (charStack.pop() != null) {
+                t2 = t1._offset;
+                if (typeof t2 !== "number")
+                  return t2.$sub();
+                t1._offset = t2 - 1;
+              }
               output = "&" + C.JSArray_methods.join$0(charStack);
             }
           }
@@ -21486,8 +21147,7 @@
         token = this.currentToken;
         t1 = J.getInterceptor(token);
         if (!!t1.$isTagToken) {
-          if (this.lowercaseElementName)
-            token.name = F.asciiUpper2Lower(token.name);
+          token.name = F.asciiUpper2Lower(token.name);
           if (!!t1.$isEndTagToken) {
             if (this._attributes != null)
               this._addToken$1(new T.ParseErrorToken(null, null, "attributes-in-end-tag", null));
@@ -21615,7 +21275,7 @@
         return true;
       }, "call$0", "get$plaintextState", 0, 0, 0],
       tagOpenState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "!")
@@ -21631,12 +21291,22 @@
           this.state = this.get$dataState();
         } else if (data === "?") {
           this._addToken$1(new T.ParseErrorToken(null, null, "expected-tag-name-but-got-question-mark", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$bogusCommentState();
         } else {
           this._addToken$1(new T.ParseErrorToken(null, null, "expected-tag-name", null));
           this._addToken$1(new T.CharactersToken(null, "<", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$dataState();
         }
         return true;
@@ -21658,7 +21328,10 @@
         } else {
           t2 = P.LinkedHashMap__makeLiteral(["data", data]);
           this._addToken$1(new T.ParseErrorToken(t2, null, "expected-closing-tag-but-got-char", null));
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$bogusCommentState();
         }
         return true;
@@ -21686,7 +21359,7 @@
         return true;
       }, "call$0", "get$tagNameState", 0, 0, 0],
       rcdataLessThanSignState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "/") {
@@ -21694,13 +21367,18 @@
           this.state = this.get$rcdataEndTagOpenState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "<", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$rcdataState();
         }
         return true;
       }, "call$0", "get$rcdataLessThanSignState", 0, 0, 0],
       rcdataEndTagOpenState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isLetter(data)) {
@@ -21708,7 +21386,12 @@
           this.state = this.get$rcdataEndTagNameState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "</", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$rcdataState();
         }
         return true;
@@ -21752,14 +21435,19 @@
             t2 = t2._contents;
             t2 = "</" + (t2.charCodeAt(0) == 0 ? t2 : t2);
             this._addToken$1(new T.CharactersToken(null, t2, null));
-            t1.unget$1(data);
+            if (data != null) {
+              t2 = t1._offset;
+              if (typeof t2 !== "number")
+                return t2.$sub();
+              t1._offset = t2 - 1;
+            }
             this.state = this.get$rcdataState();
           }
         }
         return true;
       }, "call$0", "get$rcdataEndTagNameState", 0, 0, 0],
       rawtextLessThanSignState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "/") {
@@ -21767,13 +21455,18 @@
           this.state = this.get$rawtextEndTagOpenState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "<", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$rawtextState();
         }
         return true;
       }, "call$0", "get$rawtextLessThanSignState", 0, 0, 0],
       rawtextEndTagOpenState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isLetter(data)) {
@@ -21781,7 +21474,12 @@
           this.state = this.get$rawtextEndTagNameState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "</", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$rawtextState();
         }
         return true;
@@ -21812,14 +21510,19 @@
             t2 = t2._contents;
             t2 = "</" + (t2.charCodeAt(0) == 0 ? t2 : t2);
             this._addToken$1(new T.CharactersToken(null, t2, null));
-            t1.unget$1(data);
+            if (data != null) {
+              t2 = t1._offset;
+              if (typeof t2 !== "number")
+                return t2.$sub();
+              t1._offset = t2 - 1;
+            }
             this.state = this.get$rawtextState();
           }
         }
         return true;
       }, "call$0", "get$rawtextEndTagNameState", 0, 0, 0],
       scriptDataLessThanSignState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "/") {
@@ -21830,13 +21533,18 @@
           this.state = this.get$scriptDataEscapeStartState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "<", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataState();
         }
         return true;
       }, "call$0", "get$scriptDataLessThanSignState", 0, 0, 0],
       scriptDataEndTagOpenState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isLetter(data)) {
@@ -21844,7 +21552,12 @@
           this.state = this.get$scriptDataEndTagNameState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "</", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataState();
         }
         return true;
@@ -21875,34 +21588,49 @@
             t2 = t2._contents;
             t2 = "</" + (t2.charCodeAt(0) == 0 ? t2 : t2);
             this._addToken$1(new T.CharactersToken(null, t2, null));
-            t1.unget$1(data);
+            if (data != null) {
+              t2 = t1._offset;
+              if (typeof t2 !== "number")
+                return t2.$sub();
+              t1._offset = t2 - 1;
+            }
             this.state = this.get$scriptDataState();
           }
         }
         return true;
       }, "call$0", "get$scriptDataEndTagNameState", 0, 0, 0],
       scriptDataEscapeStartState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "-") {
           this._addToken$1(new T.CharactersToken(null, "-", null));
           this.state = this.get$scriptDataEscapeStartDashState();
         } else {
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataState();
         }
         return true;
       }, "call$0", "get$scriptDataEscapeStartState", 0, 0, 0],
       scriptDataEscapeStartDashState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "-") {
           this._addToken$1(new T.CharactersToken(null, "-", null));
           this.state = this.get$scriptDataEscapedDashDashState();
         } else {
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataState();
         }
         return true;
@@ -21968,7 +21696,7 @@
         return true;
       }, "call$0", "get$scriptDataEscapedDashDashState", 0, 0, 0],
       scriptDataEscapedLessThanSignState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "/") {
@@ -21983,13 +21711,18 @@
           this.state = this.get$scriptDataDoubleEscapeStartState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "<", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataEscapedState();
         }
         return true;
       }, "call$0", "get$scriptDataEscapedLessThanSignState", 0, 0, 0],
       scriptDataEscapedEndTagOpenState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isLetter(data)) {
@@ -21999,7 +21732,12 @@
           this.state = this.get$scriptDataEscapedEndTagNameState();
         } else {
           this._addToken$1(new T.CharactersToken(null, "</", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataEscapedState();
         }
         return true;
@@ -22030,14 +21768,19 @@
             t2 = t2._contents;
             t2 = "</" + (t2.charCodeAt(0) == 0 ? t2 : t2);
             this._addToken$1(new T.CharactersToken(null, t2, null));
-            t1.unget$1(data);
+            if (data != null) {
+              t2 = t1._offset;
+              if (typeof t2 !== "number")
+                return t2.$sub();
+              t1._offset = t2 - 1;
+            }
             this.state = this.get$scriptDataEscapedState();
           }
         }
         return true;
       }, "call$0", "get$scriptDataEscapedEndTagNameState", 0, 0, 0],
       scriptDataDoubleEscapeStartState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data) || data === "/" || data === ">") {
@@ -22051,7 +21794,12 @@
           this._addToken$1(new T.CharactersToken(data == null ? new P.StringBuffer("") : null, data, null));
           this._tokenizer$_buffer._contents += H.S(data);
         } else {
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataEscapedState();
         }
         return true;
@@ -22119,7 +21867,7 @@
         return true;
       }, "call$0", "get$scriptDataDoubleEscapedDashDashState", 0, 0, 0],
       scriptDataDoubleEscapedLessThanSignState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === "/") {
@@ -22127,13 +21875,18 @@
           this._tokenizer$_buffer._contents = "";
           this.state = this.get$scriptDataDoubleEscapeEndState();
         } else {
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataDoubleEscapedState();
         }
         return true;
       }, "call$0", "get$scriptDataDoubleEscapedLessThanSignState", 0, 0, 0],
       scriptDataDoubleEscapeEndState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data) || data === "/" || data === ">") {
@@ -22147,7 +21900,12 @@
           this._addToken$1(new T.CharactersToken(data == null ? new P.StringBuffer("") : null, data, null));
           this._tokenizer$_buffer._contents += H.S(data);
         } else {
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$scriptDataDoubleEscapedState();
         }
         return true;
@@ -22228,8 +21986,7 @@
           this._markAttributeEnd$1(-1);
           t1 = this._attributeName._contents;
           attrName = t1.charCodeAt(0) == 0 ? t1 : t1;
-          if (this.lowercaseAttrName)
-            attrName = F.asciiUpper2Lower(attrName);
+          attrName = F.asciiUpper2Lower(attrName);
           t1 = this._attributes;
           (t1 && C.JSArray_methods).get$last(t1).name = attrName;
           t1 = this._attributeNames;
@@ -22278,7 +22035,7 @@
         return true;
       }, "call$0", "get$afterAttributeNameState", 0, 0, 0],
       beforeAttributeValueState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
@@ -22288,7 +22045,12 @@
           this.state = this.get$attributeValueDoubleQuotedState();
         } else if (data === "&") {
           this.state = this.get$attributeValueUnQuotedState();
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this._markAttributeValueStart$1(0);
         } else if (data === "'") {
           this._markAttributeValueStart$1(0);
@@ -22394,7 +22156,7 @@
         return true;
       }, "call$0", "get$attributeValueUnQuotedState", 0, 0, 0],
       afterAttributeValueState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
@@ -22405,17 +22167,19 @@
           this.state = this.get$selfClosingStartTagState();
         else if (data == null) {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-EOF-after-attribute-value", null));
-          t1.unget$1(data);
           this.state = this.get$dataState();
         } else {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-character-after-attribute-value", null));
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$beforeAttributeNameState();
         }
         return true;
       }, "call$0", "get$afterAttributeValueState", 0, 0, 0],
       selfClosingStartTagState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (data === ">") {
@@ -22423,11 +22187,13 @@
           this.emitCurrentToken$0();
         } else if (data == null) {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-EOF-after-solidus-in-tag", null));
-          t1.unget$1(data);
           this.state = this.get$dataState();
         } else {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-character-after-soldius-in-tag", null));
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$beforeAttributeNameState();
         }
         return true;
@@ -22652,7 +22418,7 @@
         return true;
       }, "call$0", "get$commentEndBangState", 0, 0, 0],
       doctypeState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
@@ -22664,7 +22430,10 @@
           this.state = this.get$dataState();
         } else {
           this._addToken$1(new T.ParseErrorToken(null, null, "need-space-after-doctype", null));
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$beforeDoctypeNameState();
         }
         return true;
@@ -22724,7 +22493,7 @@
         return true;
       }, "call$0", "get$doctypeNameState", 0, 0, 0],
       afterDoctypeNameState$0: [function() {
-        var t1, data, matched, _i, expected;
+        var t1, data, matched, _i, expected, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
@@ -22734,7 +22503,6 @@
           this.state = this.get$dataState();
         } else if (data == null) {
           this.currentToken.set$correct(false);
-          t1.unget$1(data);
           this._addToken$1(new T.ParseErrorToken(null, null, "eof-in-doctype", null));
           this._addToken$1(this.currentToken);
           this.state = this.get$dataState();
@@ -22778,7 +22546,12 @@
               return true;
             }
           }
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           t1 = P.LinkedHashMap__makeLiteral(["data", data]);
           this._addToken$1(new T.ParseErrorToken(t1, null, "expected-space-or-right-bracket-in-doctype", null));
           this.currentToken.set$correct(false);
@@ -22787,14 +22560,19 @@
         return true;
       }, "call$0", "get$afterDoctypeNameState", 0, 0, 0],
       afterDoctypePublicKeywordState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
           this.state = this.get$beforeDoctypePublicIdentifierState();
         else if (data === "'" || data === "\"") {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-char-in-doctype", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$beforeDoctypePublicIdentifierState();
         } else if (data == null) {
           this._addToken$1(new T.ParseErrorToken(null, null, "eof-in-doctype", null));
@@ -22802,7 +22580,10 @@
           this._addToken$1(this.currentToken);
           this.state = this.get$dataState();
         } else {
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$beforeDoctypePublicIdentifierState();
         }
         return true;
@@ -22937,14 +22718,19 @@
         return true;
       }, "call$0", "get$betweenDoctypePublicAndSystemIdentifiersState", 0, 0, 0],
       afterDoctypeSystemKeywordState$0: [function() {
-        var t1, data;
+        var t1, data, t2;
         t1 = this.stream;
         data = t1.char$0();
         if (F.isWhitespace(data))
           this.state = this.get$beforeDoctypeSystemIdentifierState();
         else if (data === "'" || data === "\"") {
           this._addToken$1(new T.ParseErrorToken(null, null, "unexpected-char-in-doctype", null));
-          t1.unget$1(data);
+          if (data != null) {
+            t2 = t1._offset;
+            if (typeof t2 !== "number")
+              return t2.$sub();
+            t1._offset = t2 - 1;
+          }
           this.state = this.get$beforeDoctypeSystemIdentifierState();
         } else if (data == null) {
           this._addToken$1(new T.ParseErrorToken(null, null, "eof-in-doctype", null));
@@ -22952,7 +22738,10 @@
           this._addToken$1(this.currentToken);
           this.state = this.get$dataState();
         } else {
-          t1.unget$1(data);
+          t2 = t1._offset;
+          if (typeof t2 !== "number")
+            return t2.$sub();
+          t1._offset = t2 - 1;
           this.state = this.get$beforeDoctypeSystemIdentifierState();
         }
         return true;
@@ -23053,14 +22842,11 @@
         return true;
       }, "call$0", "get$afterDoctypeSystemIdentifierState", 0, 0, 0],
       bogusDoctypeState$0: [function() {
-        var t1, data;
-        t1 = this.stream;
-        data = t1.char$0();
+        var data = this.stream.char$0();
         if (data === ">") {
           this._addToken$1(this.currentToken);
           this.state = this.get$dataState();
         } else if (data == null) {
-          t1.unget$1(data);
           this._addToken$1(this.currentToken);
           this.state = this.get$dataState();
         }
@@ -23083,13 +22869,13 @@
           else {
             if (ch === ">" && matchedEnd === 2) {
               if (0 >= data.length)
-                return H.ioore(data, 0);
+                return H.ioore(data, -1);
               data.pop();
               if (0 >= data.length)
-                return H.ioore(data, 0);
+                return H.ioore(data, -1);
               data.pop();
               if (0 >= data.length)
-                return H.ioore(data, 0);
+                return H.ioore(data, -1);
               data.pop();
               break;
             }
@@ -23108,13 +22894,13 @@
       }
     },
     HtmlTokenizer_consumeEntity_closure: {
-      "^": "Closure:1;_captured_name_0",
+      "^": "Closure:2;_captured_name_0",
       call$1: function(e) {
         return J.startsWith$1$s(e, this._captured_name_0);
       }
     },
     HtmlTokenizer_emitCurrentToken_closure: {
-      "^": "Closure:2;_captured_attr_0",
+      "^": "Closure:1;_captured_attr_0",
       call$0: function() {
         return J.get$value$x(this._captured_attr_0);
       }
@@ -23142,24 +22928,24 @@
     ActiveFormattingElements: {
       "^": "ListProxy;_list",
       add$1: function(_, node) {
-        var t1, t2, equalCount, element, t3, ns, t4, ns0, t5;
+        var t1, t2, equalCount, element, t3, ns, t4, t5, t6, t7;
         if (node != null)
           for (t1 = this._list, t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]), t2 = J.getInterceptor$x(node), equalCount = 0; t1.moveNext$0();) {
-            element = t1._current;
+            element = t1.__internal$_current;
             if (element == null)
               break;
             t3 = J.getInterceptor$x(element);
             ns = t3.get$namespaceUri(element);
             if (ns == null)
               ns = "http://www.w3.org/1999/xhtml";
-            t4 = t3.get$localName(element);
-            new N.Pair(ns, t4).$builtinTypeInfo = [null, null];
-            ns0 = t2.get$namespaceUri(node);
-            if (ns0 == null)
-              ns0 = "http://www.w3.org/1999/xhtml";
-            t5 = t2.get$localName(node);
-            new N.Pair(ns0, t5).$builtinTypeInfo = [null, null];
-            if ((ns0 == null ? ns == null : ns0 === ns) && J.$eq$(t5, t4) && D._mapEquals(t3.get$attributes(element), t2.get$attributes(node)))
+            t4 = H.setRuntimeTypeInfo(new N.Pair(ns, t3.get$localName(element)), [null, null]);
+            ns = t2.get$namespaceUri(node);
+            if (ns == null)
+              ns = "http://www.w3.org/1999/xhtml";
+            t5 = H.setRuntimeTypeInfo(new N.Pair(ns, t2.get$localName(node)), [null, null]);
+            t6 = t5.first;
+            t7 = t4.first;
+            if ((t6 == null ? t7 == null : t6 === t7) && J.$eq$(t5.second, t4.second) && D._mapEquals(t3.get$attributes(element), t2.get$attributes(node)))
               ++equalCount;
             if (equalCount === 3) {
               this.remove$1(0, element);
@@ -23169,16 +22955,16 @@
         this.super$ListProxy$add(this, node);
       },
       $asListProxy: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $asIterableBase: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $asIterable: function() {
-        return [B.Element0];
+        return [B.Element];
       },
       $asList: function() {
-        return [B.Element0];
+        return [B.Element];
       }
     },
     TreeBuilder: {
@@ -23197,7 +22983,7 @@
         this.document = t1;
       },
       elementInScope$2$variant: function(target, variant) {
-        var exactNode, listElements1, listElements2, invert, t1, t2, node, t3, ns, t4;
+        var exactNode, listElements1, listElements2, invert, t1, t2, node, t3, ns;
         exactNode = target instanceof B.Node0;
         if (variant != null)
           switch (variant) {
@@ -23213,12 +22999,12 @@
               break;
             case "table":
               listElements1 = C.List_wwd;
-              listElements2 = C.List_empty;
+              listElements2 = C.List_empty0;
               invert = false;
               break;
             case "select":
               listElements1 = C.List_sEs;
-              listElements2 = C.List_empty;
+              listElements2 = C.List_empty0;
               invert = true;
               break;
             default:
@@ -23226,11 +23012,11 @@
           }
         else {
           listElements1 = C.List_46y;
-          listElements2 = C.List_empty;
+          listElements2 = C.List_empty0;
           invert = false;
         }
         for (t1 = this.openElements, t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]), t2 = !exactNode; t1.moveNext$0();) {
-          node = t1._current;
+          node = t1.__internal$_current;
           if (!(t2 && J.$eq$(J.get$localName$x(node), target)))
             t3 = exactNode && J.$eq$(node, target);
           else
@@ -23242,15 +23028,11 @@
             ns = t3.get$namespaceUri(node);
             if (ns == null)
               ns = "http://www.w3.org/1999/xhtml";
-            t4 = new N.Pair(ns, t3.get$localName(node));
-            t4.$builtinTypeInfo = [null, null];
-            if (!C.JSArray_methods.contains$1(listElements1, t4)) {
+            if (!C.JSArray_methods.contains$1(listElements1, H.setRuntimeTypeInfo(new N.Pair(ns, t3.get$localName(node)), [null, null]))) {
               ns = t3.get$namespaceUri(node);
               if (ns == null)
                 ns = "http://www.w3.org/1999/xhtml";
-              t3 = new N.Pair(ns, t3.get$localName(node));
-              t3.$builtinTypeInfo = [null, null];
-              t3 = C.JSArray_methods.contains$1(listElements2, t3);
+              t3 = C.JSArray_methods.contains$1(listElements2, H.setRuntimeTypeInfo(new N.Pair(ns, t3.get$localName(node)), [null, null]));
             } else
               t3 = true;
             if (invert !== t3)
@@ -23309,21 +23091,21 @@
         var t1, entry, t2;
         t1 = this.activeFormattingElements._list;
         if (0 >= t1.length)
-          return H.ioore(t1, 0);
+          return H.ioore(t1, -1);
         entry = t1.pop();
         while (true) {
           t2 = t1.length;
           if (!(t2 > 0 && entry != null))
             break;
           if (0 >= t2)
-            return H.ioore(t1, 0);
+            return H.ioore(t1, -1);
           entry = t1.pop();
         }
       },
       elementInActiveFormattingElements$1: function($name) {
         var t1, item;
         for (t1 = this.activeFormattingElements._list, t1 = H.setRuntimeTypeInfo(new H.ReversedListIterable(t1), [H.getTypeArgumentByIndex(t1, 0)]), t1 = H.setRuntimeTypeInfo(new H.ListIterator(t1, t1.get$length(t1), 0, null), [H.getRuntimeTypeArgument(t1, "ListIterable", 0)]); t1.moveNext$0();) {
-          item = t1._current;
+          item = t1.__internal$_current;
           if (item == null)
             break;
           else if (J.$eq$(J.get$localName$x(item), $name))
@@ -23418,7 +23200,7 @@
             lastTable = null;
             break;
           }
-          elm = t2._current;
+          elm = t2.__internal$_current;
           if (J.$eq$(J.get$localName$x(elm), "table")) {
             lastTable = elm;
             break;
@@ -23450,7 +23232,7 @@
         $name = J.get$localName$x(C.JSArray_methods.get$last(t1));
         if (!J.$eq$($name, exclude) && C.JSArray_methods.contains$1(C.List_8oN, $name)) {
           if (0 >= t1.length)
-            return H.ioore(t1, 0);
+            return H.ioore(t1, -1);
           t1.pop();
           this.generateImpliedEndTags$1(exclude);
         }
@@ -23498,10 +23280,10 @@
       return new O.IterableUtf16Decoder(new O.decodeUtf16AsIterable_closure(bytes, offset, $length, replacementCodepoint), replacementCodepoint);
     },
     decodeUtf16beAsIterable: function(bytes, offset, $length, stripBom, replacementCodepoint) {
-      return new O.IterableUtf16Decoder(new O.decodeUtf16beAsIterable_closure(bytes, offset, $length, stripBom, replacementCodepoint), replacementCodepoint);
+      return new O.IterableUtf16Decoder(new O.decodeUtf16beAsIterable_closure(bytes, offset, $length, true, replacementCodepoint), replacementCodepoint);
     },
     decodeUtf16leAsIterable: function(bytes, offset, $length, stripBom, replacementCodepoint) {
-      return new O.IterableUtf16Decoder(new O.decodeUtf16leAsIterable_closure(bytes, offset, $length, stripBom, replacementCodepoint), replacementCodepoint);
+      return new O.IterableUtf16Decoder(new O.decodeUtf16leAsIterable_closure(bytes, offset, $length, true, replacementCodepoint), replacementCodepoint);
     },
     hasUtf16beBom: function(utf16EncodedBytes, offset, $length) {
       var end, t1;
@@ -23535,10 +23317,10 @@
       return new O.IterableUtf32Decoder(new O.decodeUtf32AsIterable_closure(bytes, offset, $length, replacementCodepoint));
     },
     decodeUtf32beAsIterable: function(bytes, offset, $length, stripBom, replacementCodepoint) {
-      return new O.IterableUtf32Decoder(new O.decodeUtf32beAsIterable_closure(bytes, offset, $length, stripBom, replacementCodepoint));
+      return new O.IterableUtf32Decoder(new O.decodeUtf32beAsIterable_closure(bytes, offset, $length, true, replacementCodepoint));
     },
     decodeUtf32leAsIterable: function(bytes, offset, $length, stripBom, replacementCodepoint) {
-      return new O.IterableUtf32Decoder(new O.decodeUtf32leAsIterable_closure(bytes, offset, $length, stripBom, replacementCodepoint));
+      return new O.IterableUtf32Decoder(new O.decodeUtf32leAsIterable_closure(bytes, offset, $length, true, replacementCodepoint));
     },
     hasUtf32beBom: function(utf32EncodedBytes, offset, $length) {
       var end, t1;
@@ -23569,19 +23351,19 @@
         return O.Utf32beBytesDecoder$(utf32EncodedBytes, offset, $length, false, replacementCodepoint);
     },
     decodeUtf16AsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_replacementCodepoint_3",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_replacementCodepoint_3",
       call$0: function() {
         return O.Utf16BytesToCodeUnitsDecoder_Utf16BytesToCodeUnitsDecoder(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_replacementCodepoint_3);
       }
     },
     decodeUtf16beAsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
       call$0: function() {
         return O.Utf16beBytesToCodeUnitsDecoder$(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_stripBom_3, this._captured_replacementCodepoint_4);
       }
     },
     decodeUtf16leAsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
       call$0: function() {
         return O.Utf16leBytesToCodeUnitsDecoder$(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_stripBom_3, this._captured_replacementCodepoint_4);
       }
@@ -23688,19 +23470,19 @@
         }}
     },
     decodeUtf32AsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_replacementCodepoint_3",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_replacementCodepoint_3",
       call$0: function() {
         return O.Utf32BytesDecoder_Utf32BytesDecoder(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_replacementCodepoint_3);
       }
     },
     decodeUtf32beAsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
       call$0: function() {
         return O.Utf32beBytesDecoder$(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_stripBom_3, this._captured_replacementCodepoint_4);
       }
     },
     decodeUtf32leAsIterable_closure: {
-      "^": "Closure:2;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
+      "^": "Closure:1;_captured_bytes_0,_captured_offset_1,_captured_length_2,_captured_stripBom_3,_captured_replacementCodepoint_4",
       call$0: function() {
         return O.Utf32leBytesDecoder$(this._captured_bytes_0, this._captured_offset_1, this._captured_length_2, this._captured_stripBom_3, this._captured_replacementCodepoint_4);
       }
@@ -24183,8 +23965,11 @@
       return J.JSBool.prototype;
     if (receiver.constructor == Array)
       return J.JSArray.prototype;
-    if (typeof receiver != "object")
+    if (typeof receiver != "object") {
+      if (typeof receiver == "function")
+        return J.JavaScriptFunction.prototype;
       return receiver;
+    }
     if (receiver instanceof P.Object)
       return receiver;
     return J.getNativeInterceptor(receiver);
@@ -24196,8 +23981,11 @@
       return receiver;
     if (receiver.constructor == Array)
       return J.JSArray.prototype;
-    if (typeof receiver != "object")
+    if (typeof receiver != "object") {
+      if (typeof receiver == "function")
+        return J.JavaScriptFunction.prototype;
       return receiver;
+    }
     if (receiver instanceof P.Object)
       return receiver;
     return J.getNativeInterceptor(receiver);
@@ -24207,8 +23995,11 @@
       return receiver;
     if (receiver.constructor == Array)
       return J.JSArray.prototype;
-    if (typeof receiver != "object")
+    if (typeof receiver != "object") {
+      if (typeof receiver == "function")
+        return J.JavaScriptFunction.prototype;
       return receiver;
+    }
     if (receiver instanceof P.Object)
       return receiver;
     return J.getNativeInterceptor(receiver);
@@ -24245,14 +24036,14 @@
   J.getInterceptor$x = function(receiver) {
     if (receiver == null)
       return receiver;
-    if (typeof receiver != "object")
+    if (typeof receiver != "object") {
+      if (typeof receiver == "function")
+        return J.JavaScriptFunction.prototype;
       return receiver;
+    }
     if (receiver instanceof P.Object)
       return receiver;
     return J.getNativeInterceptor(receiver);
-  };
-  J.set$href$x = function(receiver, value) {
-    return J.getInterceptor$x(receiver).set$href(receiver, value);
   };
   J.set$parentNode$x = function(receiver, value) {
     return J.getInterceptor$x(receiver).set$parentNode(receiver, value);
@@ -24265,6 +24056,9 @@
   };
   J.get$children$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$children(receiver);
+  };
+  J.get$codeUnits$s = function(receiver) {
+    return J.getInterceptor$s(receiver).get$codeUnits(receiver);
   };
   J.get$data$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$data(receiver);
@@ -24325,9 +24119,6 @@
   };
   J.get$start$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$start(receiver);
-  };
-  J.get$tagName$x = function(receiver) {
-    return J.getInterceptor$x(receiver).get$tagName(receiver);
   };
   J.get$text$x = function(receiver) {
     return J.getInterceptor$x(receiver).get$text(receiver);
@@ -24416,9 +24207,6 @@
   };
   J.contains$2$asx = function(receiver, a0, a1) {
     return J.getInterceptor$asx(receiver).contains$2(receiver, a0, a1);
-  };
-  J.createFragment$3$treeSanitizer$validator$x = function(receiver, a0, a1, a2) {
-    return J.getInterceptor$x(receiver).createFragment$3$treeSanitizer$validator(receiver, a0, a1, a2);
   };
   J.elementAt$1$ax = function(receiver, a0) {
     return J.getInterceptor$ax(receiver).elementAt$1(receiver, a0);
@@ -24532,14 +24320,15 @@
     return list;
   };
   var $ = Isolate.$isolateProperties;
-  C.BodyElement_methods = W.BodyElement.prototype;
   C.HttpRequest_methods = W.HttpRequest.prototype;
+  C.Interceptor_methods = J.Interceptor.prototype;
   C.JSArray_methods = J.JSArray.prototype;
   C.JSDouble_methods = J.JSDouble.prototype;
   C.JSInt_methods = J.JSInt.prototype;
   C.JSNull_methods = J.JSNull.prototype;
   C.JSNumber_methods = J.JSNumber.prototype;
   C.JSString_methods = J.JSString.prototype;
+  C.JavaScriptFunction_methods = J.JavaScriptFunction.prototype;
   C.NativeUint32List_methods = H.NativeUint32List.prototype;
   C.NativeUint8List_methods = H.NativeUint8List.prototype;
   C.NodeList_methods = W.NodeList0.prototype;
@@ -24549,9 +24338,11 @@
   C.C_DynamicRuntimeType = new H.DynamicRuntimeType();
   C.C_EmptyIterator = new H.EmptyIterator();
   C.C_OutOfMemoryError = new P.OutOfMemoryError();
+  C.C_Utf8Encoder = new P.Utf8Encoder();
   C.C__DelayedDone = new P._DelayedDone();
   C.C__JSRandom = new P._JSRandom();
   C.C__RootZone = new P._RootZone();
+  C.C__TrustedHtmlTreeSanitizer = new W._TrustedHtmlTreeSanitizer();
   C.Duration_0 = new P.Duration(0);
   C.JS_CONST_0 = function(hooks) {
   if (typeof dartExperimentalFixupGetTag != "function") return hooks;
@@ -24691,7 +24482,6 @@
   C.Level_SEVERE_1000 = new N.Level("SEVERE", 1000);
   C.Level_WARNING_900 = new N.Level("WARNING", 900);
   C.List_127_2047_65535_1114111 = H.setRuntimeTypeInfo(Isolate.makeConstantList([127, 2047, 65535, 1114111]), [P.$int]);
-  C.List_1GN = H.setRuntimeTypeInfo(Isolate.makeConstantList(["*::class", "*::dir", "*::draggable", "*::hidden", "*::id", "*::inert", "*::itemprop", "*::itemref", "*::itemscope", "*::lang", "*::spellcheck", "*::title", "*::translate", "A::accesskey", "A::coords", "A::hreflang", "A::name", "A::shape", "A::tabindex", "A::target", "A::type", "AREA::accesskey", "AREA::alt", "AREA::coords", "AREA::nohref", "AREA::shape", "AREA::tabindex", "AREA::target", "AUDIO::controls", "AUDIO::loop", "AUDIO::mediagroup", "AUDIO::muted", "AUDIO::preload", "BDO::dir", "BODY::alink", "BODY::bgcolor", "BODY::link", "BODY::text", "BODY::vlink", "BR::clear", "BUTTON::accesskey", "BUTTON::disabled", "BUTTON::name", "BUTTON::tabindex", "BUTTON::type", "BUTTON::value", "CANVAS::height", "CANVAS::width", "CAPTION::align", "COL::align", "COL::char", "COL::charoff", "COL::span", "COL::valign", "COL::width", "COLGROUP::align", "COLGROUP::char", "COLGROUP::charoff", "COLGROUP::span", "COLGROUP::valign", "COLGROUP::width", "COMMAND::checked", "COMMAND::command", "COMMAND::disabled", "COMMAND::label", "COMMAND::radiogroup", "COMMAND::type", "DATA::value", "DEL::datetime", "DETAILS::open", "DIR::compact", "DIV::align", "DL::compact", "FIELDSET::disabled", "FONT::color", "FONT::face", "FONT::size", "FORM::accept", "FORM::autocomplete", "FORM::enctype", "FORM::method", "FORM::name", "FORM::novalidate", "FORM::target", "FRAME::name", "H1::align", "H2::align", "H3::align", "H4::align", "H5::align", "H6::align", "HR::align", "HR::noshade", "HR::size", "HR::width", "HTML::version", "IFRAME::align", "IFRAME::frameborder", "IFRAME::height", "IFRAME::marginheight", "IFRAME::marginwidth", "IFRAME::width", "IMG::align", "IMG::alt", "IMG::border", "IMG::height", "IMG::hspace", "IMG::ismap", "IMG::name", "IMG::usemap", "IMG::vspace", "IMG::width", "INPUT::accept", "INPUT::accesskey", "INPUT::align", "INPUT::alt", "INPUT::autocomplete", "INPUT::checked", "INPUT::disabled", "INPUT::inputmode", "INPUT::ismap", "INPUT::list", "INPUT::max", "INPUT::maxlength", "INPUT::min", "INPUT::multiple", "INPUT::name", "INPUT::placeholder", "INPUT::readonly", "INPUT::required", "INPUT::size", "INPUT::step", "INPUT::tabindex", "INPUT::type", "INPUT::usemap", "INPUT::value", "INS::datetime", "KEYGEN::disabled", "KEYGEN::keytype", "KEYGEN::name", "LABEL::accesskey", "LABEL::for", "LEGEND::accesskey", "LEGEND::align", "LI::type", "LI::value", "LINK::sizes", "MAP::name", "MENU::compact", "MENU::label", "MENU::type", "METER::high", "METER::low", "METER::max", "METER::min", "METER::value", "OBJECT::typemustmatch", "OL::compact", "OL::reversed", "OL::start", "OL::type", "OPTGROUP::disabled", "OPTGROUP::label", "OPTION::disabled", "OPTION::label", "OPTION::selected", "OPTION::value", "OUTPUT::for", "OUTPUT::name", "P::align", "PRE::width", "PROGRESS::max", "PROGRESS::min", "PROGRESS::value", "SELECT::autocomplete", "SELECT::disabled", "SELECT::multiple", "SELECT::name", "SELECT::required", "SELECT::size", "SELECT::tabindex", "SOURCE::type", "TABLE::align", "TABLE::bgcolor", "TABLE::border", "TABLE::cellpadding", "TABLE::cellspacing", "TABLE::frame", "TABLE::rules", "TABLE::summary", "TABLE::width", "TBODY::align", "TBODY::char", "TBODY::charoff", "TBODY::valign", "TD::abbr", "TD::align", "TD::axis", "TD::bgcolor", "TD::char", "TD::charoff", "TD::colspan", "TD::headers", "TD::height", "TD::nowrap", "TD::rowspan", "TD::scope", "TD::valign", "TD::width", "TEXTAREA::accesskey", "TEXTAREA::autocomplete", "TEXTAREA::cols", "TEXTAREA::disabled", "TEXTAREA::inputmode", "TEXTAREA::name", "TEXTAREA::placeholder", "TEXTAREA::readonly", "TEXTAREA::required", "TEXTAREA::rows", "TEXTAREA::tabindex", "TEXTAREA::wrap", "TFOOT::align", "TFOOT::char", "TFOOT::charoff", "TFOOT::valign", "TH::abbr", "TH::align", "TH::axis", "TH::bgcolor", "TH::char", "TH::charoff", "TH::colspan", "TH::headers", "TH::height", "TH::nowrap", "TH::rowspan", "TH::scope", "TH::valign", "TH::width", "THEAD::align", "THEAD::char", "THEAD::charoff", "THEAD::valign", "TR::align", "TR::bgcolor", "TR::char", "TR::charoff", "TR::valign", "TRACK::default", "TRACK::kind", "TRACK::label", "TRACK::srclang", "UL::compact", "UL::type", "VIDEO::controls", "VIDEO::height", "VIDEO::loop", "VIDEO::mediagroup", "VIDEO::muted", "VIDEO::preload", "VIDEO::width"]), [P.String]);
   C.List_2Vk = Isolate.makeConstantList([0, 0, 32776, 33792, 1, 10240, 0, 0]);
   C.Pair_8Gl = new N.Pair("http://www.w3.org/1999/xhtml", "applet");
   C.Pair_EOZ = new N.Pair("http://www.w3.org/1999/xhtml", "caption");
@@ -24777,9 +24567,8 @@
   C.Map_puad7 = new H.ConstantStringMap(2, {type: 684, value: "right-middle"}, C.List_type_value);
   C.Map_pubLX = new H.ConstantStringMap(2, {type: 685, value: "right-bottom"}, C.List_type_value);
   C.List_d5v = Isolate.makeConstantList([C.Map_puYRd, C.Map_puQKY, C.Map_puikG, C.Map_pukOG, C.Map_pu2ax, C.Map_puAPm, C.Map_puV8I, C.Map_puiPR, C.Map_pu46y, C.Map_puIFE, C.Map_pug3y, C.Map_puKML, C.Map_puCRY, C.Map_pu4S8, C.Map_puad7, C.Map_pubLX]);
-  C.List_ego = Isolate.makeConstantList(["HEAD", "AREA", "BASE", "BASEFONT", "BR", "COL", "COLGROUP", "EMBED", "FRAME", "FRAMESET", "HR", "IMAGE", "IMG", "INPUT", "ISINDEX", "LINK", "META", "PARAM", "SOURCE", "STYLE", "TITLE", "WBR"]);
-  C.List_empty0 = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.String]);
-  C.List_empty = Isolate.makeConstantList([]);
+  C.List_empty0 = Isolate.makeConstantList([]);
+  C.List_empty = H.setRuntimeTypeInfo(Isolate.makeConstantList([]), [P.String]);
   C.List_gRj = Isolate.makeConstantList([0, 0, 32722, 12287, 65534, 34815, 65534, 18431]);
   C.List_hbB = Isolate.makeConstantList(["oO", "cC", "tT", "yY", "pP", "eE"]);
   C.List_ijq = Isolate.makeConstantList(["-//w3o//dtd w3 html strict 3.0//en//", "-/w3c/dtd html 4.0 transitional/en", "html"]);
@@ -24816,7 +24605,6 @@
   C.List_sEs = Isolate.makeConstantList([C.Pair_06w, C.Pair_wsa]);
   C.List_tbody_tfoot_thead_html = Isolate.makeConstantList(["tbody", "tfoot", "thead", "html"]);
   C.List_utl = Isolate.makeConstantList(["utf-16", "utf-16-be", "utf-16-le"]);
-  C.List_wSV = H.setRuntimeTypeInfo(Isolate.makeConstantList(["bind", "if", "ref", "repeat", "syntax"]), [P.String]);
   C.List_wwd = Isolate.makeConstantList([C.Pair_oWp, C.Pair_2jN]);
   C.List_yHT = Isolate.makeConstantList(["style", "script", "xmp", "iframe", "noembed", "noframes", "noscript"]);
   C.Pair_oS9 = new N.Pair("http://www.w3.org/1999/xhtml", "address");
@@ -24886,7 +24674,6 @@
   C.Pair_vEV = new N.Pair("http://www.w3.org/1999/xhtml", "wbr");
   C.Pair_qp8 = new N.Pair("http://www.w3.org/1999/xhtml", "xmp");
   C.List_yTE = Isolate.makeConstantList([C.Pair_oS9, C.Pair_8Gl, C.Pair_2Vk, C.Pair_zgw, C.Pair_VSP, C.Pair_dAW, C.Pair_MYA, C.Pair_NEK, C.Pair_lLQ, C.Pair_KPK, C.Pair_UgT, C.Pair_mhU, C.Pair_EOZ, C.Pair_nfu, C.Pair_43h, C.Pair_qh0, C.Pair_XLZ, C.Pair_ujV, C.Pair_gc6, C.Pair_HFk, C.Pair_AqW, C.Pair_t9A, C.Pair_bLJ, C.Pair_3s4, C.Pair_06X, C.Pair_ki2, C.Pair_u7k, C.Pair_IIf, C.Pair_cDU, C.Pair_2No, C.Pair_4pG, C.Pair_zT2, C.Pair_2Vk0, C.Pair_gkc, C.Pair_vop, C.Pair_keG, C.Pair_Nw8, C.Pair_yTF, C.Pair_VWp, C.Pair_oWp, C.Pair_olH, C.Pair_lCi, C.Pair_cGl, C.Pair_hWH, C.Pair_oCX, C.Pair_Q05, C.Pair_OGa, C.Pair_nYT, C.Pair_QcL, C.Pair_69P, C.Pair_mCA, C.Pair_Nw80, C.Pair_uyr, C.Pair_eD3, C.Pair_cb9, C.Pair_oyn, C.Pair_0, C.Pair_qVK, C.Pair_46y, C.Pair_iOU, C.Pair_00, C.Pair_gsm, C.Pair_MYA0, C.Pair_Hhw, C.Pair_7BT, C.Pair_2jN, C.Pair_ql5, C.Pair_QE6, C.Pair_AiQ, C.Pair_mdZ, C.Pair_4Cz, C.Pair_ImU, C.Pair_ivJ, C.Pair_4AN, C.Pair_RXb, C.Pair_vEV, C.Pair_qp8, C.Pair_SDM]);
-  C.List_yrN = H.setRuntimeTypeInfo(Isolate.makeConstantList(["A::href", "AREA::href", "BLOCKQUOTE::cite", "BODY::background", "COMMAND::icon", "DEL::cite", "FORM::action", "IMG::src", "INPUT::src", "INS::cite", "Q::cite", "VIDEO::poster"]), [P.String]);
   C.List_0 = Isolate.makeConstantList(["AElig", "AElig;", "AMP", "AMP;", "Aacute", "Aacute;", "Abreve;", "Acirc", "Acirc;", "Acy;", "Afr;", "Agrave", "Agrave;", "Alpha;", "Amacr;", "And;", "Aogon;", "Aopf;", "ApplyFunction;", "Aring", "Aring;", "Ascr;", "Assign;", "Atilde", "Atilde;", "Auml", "Auml;", "Backslash;", "Barv;", "Barwed;", "Bcy;", "Because;", "Bernoullis;", "Beta;", "Bfr;", "Bopf;", "Breve;", "Bscr;", "Bumpeq;", "CHcy;", "COPY", "COPY;", "Cacute;", "Cap;", "CapitalDifferentialD;", "Cayleys;", "Ccaron;", "Ccedil", "Ccedil;", "Ccirc;", "Cconint;", "Cdot;", "Cedilla;", "CenterDot;", "Cfr;", "Chi;", "CircleDot;", "CircleMinus;", "CirclePlus;", "CircleTimes;", "ClockwiseContourIntegral;", "CloseCurlyDoubleQuote;", "CloseCurlyQuote;", "Colon;", "Colone;", "Congruent;", "Conint;", "ContourIntegral;", "Copf;", "Coproduct;", "CounterClockwiseContourIntegral;", "Cross;", "Cscr;", "Cup;", "CupCap;", "DD;", "DDotrahd;", "DJcy;", "DScy;", "DZcy;", "Dagger;", "Darr;", "Dashv;", "Dcaron;", "Dcy;", "Del;", "Delta;", "Dfr;", "DiacriticalAcute;", "DiacriticalDot;", "DiacriticalDoubleAcute;", "DiacriticalGrave;", "DiacriticalTilde;", "Diamond;", "DifferentialD;", "Dopf;", "Dot;", "DotDot;", "DotEqual;", "DoubleContourIntegral;", "DoubleDot;", "DoubleDownArrow;", "DoubleLeftArrow;", "DoubleLeftRightArrow;", "DoubleLeftTee;", "DoubleLongLeftArrow;", "DoubleLongLeftRightArrow;", "DoubleLongRightArrow;", "DoubleRightArrow;", "DoubleRightTee;", "DoubleUpArrow;", "DoubleUpDownArrow;", "DoubleVerticalBar;", "DownArrow;", "DownArrowBar;", "DownArrowUpArrow;", "DownBreve;", "DownLeftRightVector;", "DownLeftTeeVector;", "DownLeftVector;", "DownLeftVectorBar;", "DownRightTeeVector;", "DownRightVector;", "DownRightVectorBar;", "DownTee;", "DownTeeArrow;", "Downarrow;", "Dscr;", "Dstrok;", "ENG;", "ETH", "ETH;", "Eacute", "Eacute;", "Ecaron;", "Ecirc", "Ecirc;", "Ecy;", "Edot;", "Efr;", "Egrave", "Egrave;", "Element;", "Emacr;", "EmptySmallSquare;", "EmptyVerySmallSquare;", "Eogon;", "Eopf;", "Epsilon;", "Equal;", "EqualTilde;", "Equilibrium;", "Escr;", "Esim;", "Eta;", "Euml", "Euml;", "Exists;", "ExponentialE;", "Fcy;", "Ffr;", "FilledSmallSquare;", "FilledVerySmallSquare;", "Fopf;", "ForAll;", "Fouriertrf;", "Fscr;", "GJcy;", "GT", "GT;", "Gamma;", "Gammad;", "Gbreve;", "Gcedil;", "Gcirc;", "Gcy;", "Gdot;", "Gfr;", "Gg;", "Gopf;", "GreaterEqual;", "GreaterEqualLess;", "GreaterFullEqual;", "GreaterGreater;", "GreaterLess;", "GreaterSlantEqual;", "GreaterTilde;", "Gscr;", "Gt;", "HARDcy;", "Hacek;", "Hat;", "Hcirc;", "Hfr;", "HilbertSpace;", "Hopf;", "HorizontalLine;", "Hscr;", "Hstrok;", "HumpDownHump;", "HumpEqual;", "IEcy;", "IJlig;", "IOcy;", "Iacute", "Iacute;", "Icirc", "Icirc;", "Icy;", "Idot;", "Ifr;", "Igrave", "Igrave;", "Im;", "Imacr;", "ImaginaryI;", "Implies;", "Int;", "Integral;", "Intersection;", "InvisibleComma;", "InvisibleTimes;", "Iogon;", "Iopf;", "Iota;", "Iscr;", "Itilde;", "Iukcy;", "Iuml", "Iuml;", "Jcirc;", "Jcy;", "Jfr;", "Jopf;", "Jscr;", "Jsercy;", "Jukcy;", "KHcy;", "KJcy;", "Kappa;", "Kcedil;", "Kcy;", "Kfr;", "Kopf;", "Kscr;", "LJcy;", "LT", "LT;", "Lacute;", "Lambda;", "Lang;", "Laplacetrf;", "Larr;", "Lcaron;", "Lcedil;", "Lcy;", "LeftAngleBracket;", "LeftArrow;", "LeftArrowBar;", "LeftArrowRightArrow;", "LeftCeiling;", "LeftDoubleBracket;", "LeftDownTeeVector;", "LeftDownVector;", "LeftDownVectorBar;", "LeftFloor;", "LeftRightArrow;", "LeftRightVector;", "LeftTee;", "LeftTeeArrow;", "LeftTeeVector;", "LeftTriangle;", "LeftTriangleBar;", "LeftTriangleEqual;", "LeftUpDownVector;", "LeftUpTeeVector;", "LeftUpVector;", "LeftUpVectorBar;", "LeftVector;", "LeftVectorBar;", "Leftarrow;", "Leftrightarrow;", "LessEqualGreater;", "LessFullEqual;", "LessGreater;", "LessLess;", "LessSlantEqual;", "LessTilde;", "Lfr;", "Ll;", "Lleftarrow;", "Lmidot;", "LongLeftArrow;", "LongLeftRightArrow;", "LongRightArrow;", "Longleftarrow;", "Longleftrightarrow;", "Longrightarrow;", "Lopf;", "LowerLeftArrow;", "LowerRightArrow;", "Lscr;", "Lsh;", "Lstrok;", "Lt;", "Map;", "Mcy;", "MediumSpace;", "Mellintrf;", "Mfr;", "MinusPlus;", "Mopf;", "Mscr;", "Mu;", "NJcy;", "Nacute;", "Ncaron;", "Ncedil;", "Ncy;", "NegativeMediumSpace;", "NegativeThickSpace;", "NegativeThinSpace;", "NegativeVeryThinSpace;", "NestedGreaterGreater;", "NestedLessLess;", "NewLine;", "Nfr;", "NoBreak;", "NonBreakingSpace;", "Nopf;", "Not;", "NotCongruent;", "NotCupCap;", "NotDoubleVerticalBar;", "NotElement;", "NotEqual;", "NotEqualTilde;", "NotExists;", "NotGreater;", "NotGreaterEqual;", "NotGreaterFullEqual;", "NotGreaterGreater;", "NotGreaterLess;", "NotGreaterSlantEqual;", "NotGreaterTilde;", "NotHumpDownHump;", "NotHumpEqual;", "NotLeftTriangle;", "NotLeftTriangleBar;", "NotLeftTriangleEqual;", "NotLess;", "NotLessEqual;", "NotLessGreater;", "NotLessLess;", "NotLessSlantEqual;", "NotLessTilde;", "NotNestedGreaterGreater;", "NotNestedLessLess;", "NotPrecedes;", "NotPrecedesEqual;", "NotPrecedesSlantEqual;", "NotReverseElement;", "NotRightTriangle;", "NotRightTriangleBar;", "NotRightTriangleEqual;", "NotSquareSubset;", "NotSquareSubsetEqual;", "NotSquareSuperset;", "NotSquareSupersetEqual;", "NotSubset;", "NotSubsetEqual;", "NotSucceeds;", "NotSucceedsEqual;", "NotSucceedsSlantEqual;", "NotSucceedsTilde;", "NotSuperset;", "NotSupersetEqual;", "NotTilde;", "NotTildeEqual;", "NotTildeFullEqual;", "NotTildeTilde;", "NotVerticalBar;", "Nscr;", "Ntilde", "Ntilde;", "Nu;", "OElig;", "Oacute", "Oacute;", "Ocirc", "Ocirc;", "Ocy;", "Odblac;", "Ofr;", "Ograve", "Ograve;", "Omacr;", "Omega;", "Omicron;", "Oopf;", "OpenCurlyDoubleQuote;", "OpenCurlyQuote;", "Or;", "Oscr;", "Oslash", "Oslash;", "Otilde", "Otilde;", "Otimes;", "Ouml", "Ouml;", "OverBar;", "OverBrace;", "OverBracket;", "OverParenthesis;", "PartialD;", "Pcy;", "Pfr;", "Phi;", "Pi;", "PlusMinus;", "Poincareplane;", "Popf;", "Pr;", "Precedes;", "PrecedesEqual;", "PrecedesSlantEqual;", "PrecedesTilde;", "Prime;", "Product;", "Proportion;", "Proportional;", "Pscr;", "Psi;", "QUOT", "QUOT;", "Qfr;", "Qopf;", "Qscr;", "RBarr;", "REG", "REG;", "Racute;", "Rang;", "Rarr;", "Rarrtl;", "Rcaron;", "Rcedil;", "Rcy;", "Re;", "ReverseElement;", "ReverseEquilibrium;", "ReverseUpEquilibrium;", "Rfr;", "Rho;", "RightAngleBracket;", "RightArrow;", "RightArrowBar;", "RightArrowLeftArrow;", "RightCeiling;", "RightDoubleBracket;", "RightDownTeeVector;", "RightDownVector;", "RightDownVectorBar;", "RightFloor;", "RightTee;", "RightTeeArrow;", "RightTeeVector;", "RightTriangle;", "RightTriangleBar;", "RightTriangleEqual;", "RightUpDownVector;", "RightUpTeeVector;", "RightUpVector;", "RightUpVectorBar;", "RightVector;", "RightVectorBar;", "Rightarrow;", "Ropf;", "RoundImplies;", "Rrightarrow;", "Rscr;", "Rsh;", "RuleDelayed;", "SHCHcy;", "SHcy;", "SOFTcy;", "Sacute;", "Sc;", "Scaron;", "Scedil;", "Scirc;", "Scy;", "Sfr;", "ShortDownArrow;", "ShortLeftArrow;", "ShortRightArrow;", "ShortUpArrow;", "Sigma;", "SmallCircle;", "Sopf;", "Sqrt;", "Square;", "SquareIntersection;", "SquareSubset;", "SquareSubsetEqual;", "SquareSuperset;", "SquareSupersetEqual;", "SquareUnion;", "Sscr;", "Star;", "Sub;", "Subset;", "SubsetEqual;", "Succeeds;", "SucceedsEqual;", "SucceedsSlantEqual;", "SucceedsTilde;", "SuchThat;", "Sum;", "Sup;", "Superset;", "SupersetEqual;", "Supset;", "THORN", "THORN;", "TRADE;", "TSHcy;", "TScy;", "Tab;", "Tau;", "Tcaron;", "Tcedil;", "Tcy;", "Tfr;", "Therefore;", "Theta;", "ThickSpace;", "ThinSpace;", "Tilde;", "TildeEqual;", "TildeFullEqual;", "TildeTilde;", "Topf;", "TripleDot;", "Tscr;", "Tstrok;", "Uacute", "Uacute;", "Uarr;", "Uarrocir;", "Ubrcy;", "Ubreve;", "Ucirc", "Ucirc;", "Ucy;", "Udblac;", "Ufr;", "Ugrave", "Ugrave;", "Umacr;", "UnderBar;", "UnderBrace;", "UnderBracket;", "UnderParenthesis;", "Union;", "UnionPlus;", "Uogon;", "Uopf;", "UpArrow;", "UpArrowBar;", "UpArrowDownArrow;", "UpDownArrow;", "UpEquilibrium;", "UpTee;", "UpTeeArrow;", "Uparrow;", "Updownarrow;", "UpperLeftArrow;", "UpperRightArrow;", "Upsi;", "Upsilon;", "Uring;", "Uscr;", "Utilde;", "Uuml", "Uuml;", "VDash;", "Vbar;", "Vcy;", "Vdash;", "Vdashl;", "Vee;", "Verbar;", "Vert;", "VerticalBar;", "VerticalLine;", "VerticalSeparator;", "VerticalTilde;", "VeryThinSpace;", "Vfr;", "Vopf;", "Vscr;", "Vvdash;", "Wcirc;", "Wedge;", "Wfr;", "Wopf;", "Wscr;", "Xfr;", "Xi;", "Xopf;", "Xscr;", "YAcy;", "YIcy;", "YUcy;", "Yacute", "Yacute;", "Ycirc;", "Ycy;", "Yfr;", "Yopf;", "Yscr;", "Yuml;", "ZHcy;", "Zacute;", "Zcaron;", "Zcy;", "Zdot;", "ZeroWidthSpace;", "Zeta;", "Zfr;", "Zopf;", "Zscr;", "aacute", "aacute;", "abreve;", "ac;", "acE;", "acd;", "acirc", "acirc;", "acute", "acute;", "acy;", "aelig", "aelig;", "af;", "afr;", "agrave", "agrave;", "alefsym;", "aleph;", "alpha;", "amacr;", "amalg;", "amp", "amp;", "and;", "andand;", "andd;", "andslope;", "andv;", "ang;", "ange;", "angle;", "angmsd;", "angmsdaa;", "angmsdab;", "angmsdac;", "angmsdad;", "angmsdae;", "angmsdaf;", "angmsdag;", "angmsdah;", "angrt;", "angrtvb;", "angrtvbd;", "angsph;", "angst;", "angzarr;", "aogon;", "aopf;", "ap;", "apE;", "apacir;", "ape;", "apid;", "apos;", "approx;", "approxeq;", "aring", "aring;", "ascr;", "ast;", "asymp;", "asympeq;", "atilde", "atilde;", "auml", "auml;", "awconint;", "awint;", "bNot;", "backcong;", "backepsilon;", "backprime;", "backsim;", "backsimeq;", "barvee;", "barwed;", "barwedge;", "bbrk;", "bbrktbrk;", "bcong;", "bcy;", "bdquo;", "becaus;", "because;", "bemptyv;", "bepsi;", "bernou;", "beta;", "beth;", "between;", "bfr;", "bigcap;", "bigcirc;", "bigcup;", "bigodot;", "bigoplus;", "bigotimes;", "bigsqcup;", "bigstar;", "bigtriangledown;", "bigtriangleup;", "biguplus;", "bigvee;", "bigwedge;", "bkarow;", "blacklozenge;", "blacksquare;", "blacktriangle;", "blacktriangledown;", "blacktriangleleft;", "blacktriangleright;", "blank;", "blk12;", "blk14;", "blk34;", "block;", "bne;", "bnequiv;", "bnot;", "bopf;", "bot;", "bottom;", "bowtie;", "boxDL;", "boxDR;", "boxDl;", "boxDr;", "boxH;", "boxHD;", "boxHU;", "boxHd;", "boxHu;", "boxUL;", "boxUR;", "boxUl;", "boxUr;", "boxV;", "boxVH;", "boxVL;", "boxVR;", "boxVh;", "boxVl;", "boxVr;", "boxbox;", "boxdL;", "boxdR;", "boxdl;", "boxdr;", "boxh;", "boxhD;", "boxhU;", "boxhd;", "boxhu;", "boxminus;", "boxplus;", "boxtimes;", "boxuL;", "boxuR;", "boxul;", "boxur;", "boxv;", "boxvH;", "boxvL;", "boxvR;", "boxvh;", "boxvl;", "boxvr;", "bprime;", "breve;", "brvbar", "brvbar;", "bscr;", "bsemi;", "bsim;", "bsime;", "bsol;", "bsolb;", "bsolhsub;", "bull;", "bullet;", "bump;", "bumpE;", "bumpe;", "bumpeq;", "cacute;", "cap;", "capand;", "capbrcup;", "capcap;", "capcup;", "capdot;", "caps;", "caret;", "caron;", "ccaps;", "ccaron;", "ccedil", "ccedil;", "ccirc;", "ccups;", "ccupssm;", "cdot;", "cedil", "cedil;", "cemptyv;", "cent", "cent;", "centerdot;", "cfr;", "chcy;", "check;", "checkmark;", "chi;", "cir;", "cirE;", "circ;", "circeq;", "circlearrowleft;", "circlearrowright;", "circledR;", "circledS;", "circledast;", "circledcirc;", "circleddash;", "cire;", "cirfnint;", "cirmid;", "cirscir;", "clubs;", "clubsuit;", "colon;", "colone;", "coloneq;", "comma;", "commat;", "comp;", "compfn;", "complement;", "complexes;", "cong;", "congdot;", "conint;", "copf;", "coprod;", "copy", "copy;", "copysr;", "crarr;", "cross;", "cscr;", "csub;", "csube;", "csup;", "csupe;", "ctdot;", "cudarrl;", "cudarrr;", "cuepr;", "cuesc;", "cularr;", "cularrp;", "cup;", "cupbrcap;", "cupcap;", "cupcup;", "cupdot;", "cupor;", "cups;", "curarr;", "curarrm;", "curlyeqprec;", "curlyeqsucc;", "curlyvee;", "curlywedge;", "curren", "curren;", "curvearrowleft;", "curvearrowright;", "cuvee;", "cuwed;", "cwconint;", "cwint;", "cylcty;", "dArr;", "dHar;", "dagger;", "daleth;", "darr;", "dash;", "dashv;", "dbkarow;", "dblac;", "dcaron;", "dcy;", "dd;", "ddagger;", "ddarr;", "ddotseq;", "deg", "deg;", "delta;", "demptyv;", "dfisht;", "dfr;", "dharl;", "dharr;", "diam;", "diamond;", "diamondsuit;", "diams;", "die;", "digamma;", "disin;", "div;", "divide", "divide;", "divideontimes;", "divonx;", "djcy;", "dlcorn;", "dlcrop;", "dollar;", "dopf;", "dot;", "doteq;", "doteqdot;", "dotminus;", "dotplus;", "dotsquare;", "doublebarwedge;", "downarrow;", "downdownarrows;", "downharpoonleft;", "downharpoonright;", "drbkarow;", "drcorn;", "drcrop;", "dscr;", "dscy;", "dsol;", "dstrok;", "dtdot;", "dtri;", "dtrif;", "duarr;", "duhar;", "dwangle;", "dzcy;", "dzigrarr;", "eDDot;", "eDot;", "eacute", "eacute;", "easter;", "ecaron;", "ecir;", "ecirc", "ecirc;", "ecolon;", "ecy;", "edot;", "ee;", "efDot;", "efr;", "eg;", "egrave", "egrave;", "egs;", "egsdot;", "el;", "elinters;", "ell;", "els;", "elsdot;", "emacr;", "empty;", "emptyset;", "emptyv;", "emsp13;", "emsp14;", "emsp;", "eng;", "ensp;", "eogon;", "eopf;", "epar;", "eparsl;", "eplus;", "epsi;", "epsilon;", "epsiv;", "eqcirc;", "eqcolon;", "eqsim;", "eqslantgtr;", "eqslantless;", "equals;", "equest;", "equiv;", "equivDD;", "eqvparsl;", "erDot;", "erarr;", "escr;", "esdot;", "esim;", "eta;", "eth", "eth;", "euml", "euml;", "euro;", "excl;", "exist;", "expectation;", "exponentiale;", "fallingdotseq;", "fcy;", "female;", "ffilig;", "fflig;", "ffllig;", "ffr;", "filig;", "fjlig;", "flat;", "fllig;", "fltns;", "fnof;", "fopf;", "forall;", "fork;", "forkv;", "fpartint;", "frac12", "frac12;", "frac13;", "frac14", "frac14;", "frac15;", "frac16;", "frac18;", "frac23;", "frac25;", "frac34", "frac34;", "frac35;", "frac38;", "frac45;", "frac56;", "frac58;", "frac78;", "frasl;", "frown;", "fscr;", "gE;", "gEl;", "gacute;", "gamma;", "gammad;", "gap;", "gbreve;", "gcirc;", "gcy;", "gdot;", "ge;", "gel;", "geq;", "geqq;", "geqslant;", "ges;", "gescc;", "gesdot;", "gesdoto;", "gesdotol;", "gesl;", "gesles;", "gfr;", "gg;", "ggg;", "gimel;", "gjcy;", "gl;", "glE;", "gla;", "glj;", "gnE;", "gnap;", "gnapprox;", "gne;", "gneq;", "gneqq;", "gnsim;", "gopf;", "grave;", "gscr;", "gsim;", "gsime;", "gsiml;", "gt", "gt;", "gtcc;", "gtcir;", "gtdot;", "gtlPar;", "gtquest;", "gtrapprox;", "gtrarr;", "gtrdot;", "gtreqless;", "gtreqqless;", "gtrless;", "gtrsim;", "gvertneqq;", "gvnE;", "hArr;", "hairsp;", "half;", "hamilt;", "hardcy;", "harr;", "harrcir;", "harrw;", "hbar;", "hcirc;", "hearts;", "heartsuit;", "hellip;", "hercon;", "hfr;", "hksearow;", "hkswarow;", "hoarr;", "homtht;", "hookleftarrow;", "hookrightarrow;", "hopf;", "horbar;", "hscr;", "hslash;", "hstrok;", "hybull;", "hyphen;", "iacute", "iacute;", "ic;", "icirc", "icirc;", "icy;", "iecy;", "iexcl", "iexcl;", "iff;", "ifr;", "igrave", "igrave;", "ii;", "iiiint;", "iiint;", "iinfin;", "iiota;", "ijlig;", "imacr;", "image;", "imagline;", "imagpart;", "imath;", "imof;", "imped;", "in;", "incare;", "infin;", "infintie;", "inodot;", "int;", "intcal;", "integers;", "intercal;", "intlarhk;", "intprod;", "iocy;", "iogon;", "iopf;", "iota;", "iprod;", "iquest", "iquest;", "iscr;", "isin;", "isinE;", "isindot;", "isins;", "isinsv;", "isinv;", "it;", "itilde;", "iukcy;", "iuml", "iuml;", "jcirc;", "jcy;", "jfr;", "jmath;", "jopf;", "jscr;", "jsercy;", "jukcy;", "kappa;", "kappav;", "kcedil;", "kcy;", "kfr;", "kgreen;", "khcy;", "kjcy;", "kopf;", "kscr;", "lAarr;", "lArr;", "lAtail;", "lBarr;", "lE;", "lEg;", "lHar;", "lacute;", "laemptyv;", "lagran;", "lambda;", "lang;", "langd;", "langle;", "lap;", "laquo", "laquo;", "larr;", "larrb;", "larrbfs;", "larrfs;", "larrhk;", "larrlp;", "larrpl;", "larrsim;", "larrtl;", "lat;", "latail;", "late;", "lates;", "lbarr;", "lbbrk;", "lbrace;", "lbrack;", "lbrke;", "lbrksld;", "lbrkslu;", "lcaron;", "lcedil;", "lceil;", "lcub;", "lcy;", "ldca;", "ldquo;", "ldquor;", "ldrdhar;", "ldrushar;", "ldsh;", "le;", "leftarrow;", "leftarrowtail;", "leftharpoondown;", "leftharpoonup;", "leftleftarrows;", "leftrightarrow;", "leftrightarrows;", "leftrightharpoons;", "leftrightsquigarrow;", "leftthreetimes;", "leg;", "leq;", "leqq;", "leqslant;", "les;", "lescc;", "lesdot;", "lesdoto;", "lesdotor;", "lesg;", "lesges;", "lessapprox;", "lessdot;", "lesseqgtr;", "lesseqqgtr;", "lessgtr;", "lesssim;", "lfisht;", "lfloor;", "lfr;", "lg;", "lgE;", "lhard;", "lharu;", "lharul;", "lhblk;", "ljcy;", "ll;", "llarr;", "llcorner;", "llhard;", "lltri;", "lmidot;", "lmoust;", "lmoustache;", "lnE;", "lnap;", "lnapprox;", "lne;", "lneq;", "lneqq;", "lnsim;", "loang;", "loarr;", "lobrk;", "longleftarrow;", "longleftrightarrow;", "longmapsto;", "longrightarrow;", "looparrowleft;", "looparrowright;", "lopar;", "lopf;", "loplus;", "lotimes;", "lowast;", "lowbar;", "loz;", "lozenge;", "lozf;", "lpar;", "lparlt;", "lrarr;", "lrcorner;", "lrhar;", "lrhard;", "lrm;", "lrtri;", "lsaquo;", "lscr;", "lsh;", "lsim;", "lsime;", "lsimg;", "lsqb;", "lsquo;", "lsquor;", "lstrok;", "lt", "lt;", "ltcc;", "ltcir;", "ltdot;", "lthree;", "ltimes;", "ltlarr;", "ltquest;", "ltrPar;", "ltri;", "ltrie;", "ltrif;", "lurdshar;", "luruhar;", "lvertneqq;", "lvnE;", "mDDot;", "macr", "macr;", "male;", "malt;", "maltese;", "map;", "mapsto;", "mapstodown;", "mapstoleft;", "mapstoup;", "marker;", "mcomma;", "mcy;", "mdash;", "measuredangle;", "mfr;", "mho;", "micro", "micro;", "mid;", "midast;", "midcir;", "middot", "middot;", "minus;", "minusb;", "minusd;", "minusdu;", "mlcp;", "mldr;", "mnplus;", "models;", "mopf;", "mp;", "mscr;", "mstpos;", "mu;", "multimap;", "mumap;", "nGg;", "nGt;", "nGtv;", "nLeftarrow;", "nLeftrightarrow;", "nLl;", "nLt;", "nLtv;", "nRightarrow;", "nVDash;", "nVdash;", "nabla;", "nacute;", "nang;", "nap;", "napE;", "napid;", "napos;", "napprox;", "natur;", "natural;", "naturals;", "nbsp", "nbsp;", "nbump;", "nbumpe;", "ncap;", "ncaron;", "ncedil;", "ncong;", "ncongdot;", "ncup;", "ncy;", "ndash;", "ne;", "neArr;", "nearhk;", "nearr;", "nearrow;", "nedot;", "nequiv;", "nesear;", "nesim;", "nexist;", "nexists;", "nfr;", "ngE;", "nge;", "ngeq;", "ngeqq;", "ngeqslant;", "nges;", "ngsim;", "ngt;", "ngtr;", "nhArr;", "nharr;", "nhpar;", "ni;", "nis;", "nisd;", "niv;", "njcy;", "nlArr;", "nlE;", "nlarr;", "nldr;", "nle;", "nleftarrow;", "nleftrightarrow;", "nleq;", "nleqq;", "nleqslant;", "nles;", "nless;", "nlsim;", "nlt;", "nltri;", "nltrie;", "nmid;", "nopf;", "not", "not;", "notin;", "notinE;", "notindot;", "notinva;", "notinvb;", "notinvc;", "notni;", "notniva;", "notnivb;", "notnivc;", "npar;", "nparallel;", "nparsl;", "npart;", "npolint;", "npr;", "nprcue;", "npre;", "nprec;", "npreceq;", "nrArr;", "nrarr;", "nrarrc;", "nrarrw;", "nrightarrow;", "nrtri;", "nrtrie;", "nsc;", "nsccue;", "nsce;", "nscr;", "nshortmid;", "nshortparallel;", "nsim;", "nsime;", "nsimeq;", "nsmid;", "nspar;", "nsqsube;", "nsqsupe;", "nsub;", "nsubE;", "nsube;", "nsubset;", "nsubseteq;", "nsubseteqq;", "nsucc;", "nsucceq;", "nsup;", "nsupE;", "nsupe;", "nsupset;", "nsupseteq;", "nsupseteqq;", "ntgl;", "ntilde", "ntilde;", "ntlg;", "ntriangleleft;", "ntrianglelefteq;", "ntriangleright;", "ntrianglerighteq;", "nu;", "num;", "numero;", "numsp;", "nvDash;", "nvHarr;", "nvap;", "nvdash;", "nvge;", "nvgt;", "nvinfin;", "nvlArr;", "nvle;", "nvlt;", "nvltrie;", "nvrArr;", "nvrtrie;", "nvsim;", "nwArr;", "nwarhk;", "nwarr;", "nwarrow;", "nwnear;", "oS;", "oacute", "oacute;", "oast;", "ocir;", "ocirc", "ocirc;", "ocy;", "odash;", "odblac;", "odiv;", "odot;", "odsold;", "oelig;", "ofcir;", "ofr;", "ogon;", "ograve", "ograve;", "ogt;", "ohbar;", "ohm;", "oint;", "olarr;", "olcir;", "olcross;", "oline;", "olt;", "omacr;", "omega;", "omicron;", "omid;", "ominus;", "oopf;", "opar;", "operp;", "oplus;", "or;", "orarr;", "ord;", "order;", "orderof;", "ordf", "ordf;", "ordm", "ordm;", "origof;", "oror;", "orslope;", "orv;", "oscr;", "oslash", "oslash;", "osol;", "otilde", "otilde;", "otimes;", "otimesas;", "ouml", "ouml;", "ovbar;", "par;", "para", "para;", "parallel;", "parsim;", "parsl;", "part;", "pcy;", "percnt;", "period;", "permil;", "perp;", "pertenk;", "pfr;", "phi;", "phiv;", "phmmat;", "phone;", "pi;", "pitchfork;", "piv;", "planck;", "planckh;", "plankv;", "plus;", "plusacir;", "plusb;", "pluscir;", "plusdo;", "plusdu;", "pluse;", "plusmn", "plusmn;", "plussim;", "plustwo;", "pm;", "pointint;", "popf;", "pound", "pound;", "pr;", "prE;", "prap;", "prcue;", "pre;", "prec;", "precapprox;", "preccurlyeq;", "preceq;", "precnapprox;", "precneqq;", "precnsim;", "precsim;", "prime;", "primes;", "prnE;", "prnap;", "prnsim;", "prod;", "profalar;", "profline;", "profsurf;", "prop;", "propto;", "prsim;", "prurel;", "pscr;", "psi;", "puncsp;", "qfr;", "qint;", "qopf;", "qprime;", "qscr;", "quaternions;", "quatint;", "quest;", "questeq;", "quot", "quot;", "rAarr;", "rArr;", "rAtail;", "rBarr;", "rHar;", "race;", "racute;", "radic;", "raemptyv;", "rang;", "rangd;", "range;", "rangle;", "raquo", "raquo;", "rarr;", "rarrap;", "rarrb;", "rarrbfs;", "rarrc;", "rarrfs;", "rarrhk;", "rarrlp;", "rarrpl;", "rarrsim;", "rarrtl;", "rarrw;", "ratail;", "ratio;", "rationals;", "rbarr;", "rbbrk;", "rbrace;", "rbrack;", "rbrke;", "rbrksld;", "rbrkslu;", "rcaron;", "rcedil;", "rceil;", "rcub;", "rcy;", "rdca;", "rdldhar;", "rdquo;", "rdquor;", "rdsh;", "real;", "realine;", "realpart;", "reals;", "rect;", "reg", "reg;", "rfisht;", "rfloor;", "rfr;", "rhard;", "rharu;", "rharul;", "rho;", "rhov;", "rightarrow;", "rightarrowtail;", "rightharpoondown;", "rightharpoonup;", "rightleftarrows;", "rightleftharpoons;", "rightrightarrows;", "rightsquigarrow;", "rightthreetimes;", "ring;", "risingdotseq;", "rlarr;", "rlhar;", "rlm;", "rmoust;", "rmoustache;", "rnmid;", "roang;", "roarr;", "robrk;", "ropar;", "ropf;", "roplus;", "rotimes;", "rpar;", "rpargt;", "rppolint;", "rrarr;", "rsaquo;", "rscr;", "rsh;", "rsqb;", "rsquo;", "rsquor;", "rthree;", "rtimes;", "rtri;", "rtrie;", "rtrif;", "rtriltri;", "ruluhar;", "rx;", "sacute;", "sbquo;", "sc;", "scE;", "scap;", "scaron;", "sccue;", "sce;", "scedil;", "scirc;", "scnE;", "scnap;", "scnsim;", "scpolint;", "scsim;", "scy;", "sdot;", "sdotb;", "sdote;", "seArr;", "searhk;", "searr;", "searrow;", "sect", "sect;", "semi;", "seswar;", "setminus;", "setmn;", "sext;", "sfr;", "sfrown;", "sharp;", "shchcy;", "shcy;", "shortmid;", "shortparallel;", "shy", "shy;", "sigma;", "sigmaf;", "sigmav;", "sim;", "simdot;", "sime;", "simeq;", "simg;", "simgE;", "siml;", "simlE;", "simne;", "simplus;", "simrarr;", "slarr;", "smallsetminus;", "smashp;", "smeparsl;", "smid;", "smile;", "smt;", "smte;", "smtes;", "softcy;", "sol;", "solb;", "solbar;", "sopf;", "spades;", "spadesuit;", "spar;", "sqcap;", "sqcaps;", "sqcup;", "sqcups;", "sqsub;", "sqsube;", "sqsubset;", "sqsubseteq;", "sqsup;", "sqsupe;", "sqsupset;", "sqsupseteq;", "squ;", "square;", "squarf;", "squf;", "srarr;", "sscr;", "ssetmn;", "ssmile;", "sstarf;", "star;", "starf;", "straightepsilon;", "straightphi;", "strns;", "sub;", "subE;", "subdot;", "sube;", "subedot;", "submult;", "subnE;", "subne;", "subplus;", "subrarr;", "subset;", "subseteq;", "subseteqq;", "subsetneq;", "subsetneqq;", "subsim;", "subsub;", "subsup;", "succ;", "succapprox;", "succcurlyeq;", "succeq;", "succnapprox;", "succneqq;", "succnsim;", "succsim;", "sum;", "sung;", "sup1", "sup1;", "sup2", "sup2;", "sup3", "sup3;", "sup;", "supE;", "supdot;", "supdsub;", "supe;", "supedot;", "suphsol;", "suphsub;", "suplarr;", "supmult;", "supnE;", "supne;", "supplus;", "supset;", "supseteq;", "supseteqq;", "supsetneq;", "supsetneqq;", "supsim;", "supsub;", "supsup;", "swArr;", "swarhk;", "swarr;", "swarrow;", "swnwar;", "szlig", "szlig;", "target;", "tau;", "tbrk;", "tcaron;", "tcedil;", "tcy;", "tdot;", "telrec;", "tfr;", "there4;", "therefore;", "theta;", "thetasym;", "thetav;", "thickapprox;", "thicksim;", "thinsp;", "thkap;", "thksim;", "thorn", "thorn;", "tilde;", "times", "times;", "timesb;", "timesbar;", "timesd;", "tint;", "toea;", "top;", "topbot;", "topcir;", "topf;", "topfork;", "tosa;", "tprime;", "trade;", "triangle;", "triangledown;", "triangleleft;", "trianglelefteq;", "triangleq;", "triangleright;", "trianglerighteq;", "tridot;", "trie;", "triminus;", "triplus;", "trisb;", "tritime;", "trpezium;", "tscr;", "tscy;", "tshcy;", "tstrok;", "twixt;", "twoheadleftarrow;", "twoheadrightarrow;", "uArr;", "uHar;", "uacute", "uacute;", "uarr;", "ubrcy;", "ubreve;", "ucirc", "ucirc;", "ucy;", "udarr;", "udblac;", "udhar;", "ufisht;", "ufr;", "ugrave", "ugrave;", "uharl;", "uharr;", "uhblk;", "ulcorn;", "ulcorner;", "ulcrop;", "ultri;", "umacr;", "uml", "uml;", "uogon;", "uopf;", "uparrow;", "updownarrow;", "upharpoonleft;", "upharpoonright;", "uplus;", "upsi;", "upsih;", "upsilon;", "upuparrows;", "urcorn;", "urcorner;", "urcrop;", "uring;", "urtri;", "uscr;", "utdot;", "utilde;", "utri;", "utrif;", "uuarr;", "uuml", "uuml;", "uwangle;", "vArr;", "vBar;", "vBarv;", "vDash;", "vangrt;", "varepsilon;", "varkappa;", "varnothing;", "varphi;", "varpi;", "varpropto;", "varr;", "varrho;", "varsigma;", "varsubsetneq;", "varsubsetneqq;", "varsupsetneq;", "varsupsetneqq;", "vartheta;", "vartriangleleft;", "vartriangleright;", "vcy;", "vdash;", "vee;", "veebar;", "veeeq;", "vellip;", "verbar;", "vert;", "vfr;", "vltri;", "vnsub;", "vnsup;", "vopf;", "vprop;", "vrtri;", "vscr;", "vsubnE;", "vsubne;", "vsupnE;", "vsupne;", "vzigzag;", "wcirc;", "wedbar;", "wedge;", "wedgeq;", "weierp;", "wfr;", "wopf;", "wp;", "wr;", "wreath;", "wscr;", "xcap;", "xcirc;", "xcup;", "xdtri;", "xfr;", "xhArr;", "xharr;", "xi;", "xlArr;", "xlarr;", "xmap;", "xnis;", "xodot;", "xopf;", "xoplus;", "xotime;", "xrArr;", "xrarr;", "xscr;", "xsqcup;", "xuplus;", "xutri;", "xvee;", "xwedge;", "yacute", "yacute;", "yacy;", "ycirc;", "ycy;", "yen", "yen;", "yfr;", "yicy;", "yopf;", "yscr;", "yucy;", "yuml", "yuml;", "zacute;", "zcaron;", "zcy;", "zdot;", "zeetrf;", "zeta;", "zfr;", "zhcy;", "zigrarr;", "zopf;", "zscr;", "zwj;", "zwnj;"]);
   C.Map_0uQj = new H.ConstantStringMap(2231, {AElig: "\u00c6", "AElig;": "\u00c6", AMP: "&", "AMP;": "&", Aacute: "\u00c1", "Aacute;": "\u00c1", "Abreve;": "\u0102", Acirc: "\u00c2", "Acirc;": "\u00c2", "Acy;": "\u0410", "Afr;": "\ud835\udd04", Agrave: "\u00c0", "Agrave;": "\u00c0", "Alpha;": "\u0391", "Amacr;": "\u0100", "And;": "\u2a53", "Aogon;": "\u0104", "Aopf;": "\ud835\udd38", "ApplyFunction;": "\u2061", Aring: "\u00c5", "Aring;": "\u00c5", "Ascr;": "\ud835\udc9c", "Assign;": "\u2254", Atilde: "\u00c3", "Atilde;": "\u00c3", Auml: "\u00c4", "Auml;": "\u00c4", "Backslash;": "\u2216", "Barv;": "\u2ae7", "Barwed;": "\u2306", "Bcy;": "\u0411", "Because;": "\u2235", "Bernoullis;": "\u212c", "Beta;": "\u0392", "Bfr;": "\ud835\udd05", "Bopf;": "\ud835\udd39", "Breve;": "\u02d8", "Bscr;": "\u212c", "Bumpeq;": "\u224e", "CHcy;": "\u0427", COPY: "\u00a9", "COPY;": "\u00a9", "Cacute;": "\u0106", "Cap;": "\u22d2", "CapitalDifferentialD;": "\u2145", "Cayleys;": "\u212d", "Ccaron;": "\u010c", Ccedil: "\u00c7", "Ccedil;": "\u00c7", "Ccirc;": "\u0108", "Cconint;": "\u2230", "Cdot;": "\u010a", "Cedilla;": "\u00b8", "CenterDot;": "\u00b7", "Cfr;": "\u212d", "Chi;": "\u03a7", "CircleDot;": "\u2299", "CircleMinus;": "\u2296", "CirclePlus;": "\u2295", "CircleTimes;": "\u2297", "ClockwiseContourIntegral;": "\u2232", "CloseCurlyDoubleQuote;": "\u201d", "CloseCurlyQuote;": "\u2019", "Colon;": "\u2237", "Colone;": "\u2a74", "Congruent;": "\u2261", "Conint;": "\u222f", "ContourIntegral;": "\u222e", "Copf;": "\u2102", "Coproduct;": "\u2210", "CounterClockwiseContourIntegral;": "\u2233", "Cross;": "\u2a2f", "Cscr;": "\ud835\udc9e", "Cup;": "\u22d3", "CupCap;": "\u224d", "DD;": "\u2145", "DDotrahd;": "\u2911", "DJcy;": "\u0402", "DScy;": "\u0405", "DZcy;": "\u040f", "Dagger;": "\u2021", "Darr;": "\u21a1", "Dashv;": "\u2ae4", "Dcaron;": "\u010e", "Dcy;": "\u0414", "Del;": "\u2207", "Delta;": "\u0394", "Dfr;": "\ud835\udd07", "DiacriticalAcute;": "\u00b4", "DiacriticalDot;": "\u02d9", "DiacriticalDoubleAcute;": "\u02dd", "DiacriticalGrave;": "`", "DiacriticalTilde;": "\u02dc", "Diamond;": "\u22c4", "DifferentialD;": "\u2146", "Dopf;": "\ud835\udd3b", "Dot;": "\u00a8", "DotDot;": "\u20dc", "DotEqual;": "\u2250", "DoubleContourIntegral;": "\u222f", "DoubleDot;": "\u00a8", "DoubleDownArrow;": "\u21d3", "DoubleLeftArrow;": "\u21d0", "DoubleLeftRightArrow;": "\u21d4", "DoubleLeftTee;": "\u2ae4", "DoubleLongLeftArrow;": "\u27f8", "DoubleLongLeftRightArrow;": "\u27fa", "DoubleLongRightArrow;": "\u27f9", "DoubleRightArrow;": "\u21d2", "DoubleRightTee;": "\u22a8", "DoubleUpArrow;": "\u21d1", "DoubleUpDownArrow;": "\u21d5", "DoubleVerticalBar;": "\u2225", "DownArrow;": "\u2193", "DownArrowBar;": "\u2913", "DownArrowUpArrow;": "\u21f5", "DownBreve;": "\u0311", "DownLeftRightVector;": "\u2950", "DownLeftTeeVector;": "\u295e", "DownLeftVector;": "\u21bd", "DownLeftVectorBar;": "\u2956", "DownRightTeeVector;": "\u295f", "DownRightVector;": "\u21c1", "DownRightVectorBar;": "\u2957", "DownTee;": "\u22a4", "DownTeeArrow;": "\u21a7", "Downarrow;": "\u21d3", "Dscr;": "\ud835\udc9f", "Dstrok;": "\u0110", "ENG;": "\u014a", ETH: "\u00d0", "ETH;": "\u00d0", Eacute: "\u00c9", "Eacute;": "\u00c9", "Ecaron;": "\u011a", Ecirc: "\u00ca", "Ecirc;": "\u00ca", "Ecy;": "\u042d", "Edot;": "\u0116", "Efr;": "\ud835\udd08", Egrave: "\u00c8", "Egrave;": "\u00c8", "Element;": "\u2208", "Emacr;": "\u0112", "EmptySmallSquare;": "\u25fb", "EmptyVerySmallSquare;": "\u25ab", "Eogon;": "\u0118", "Eopf;": "\ud835\udd3c", "Epsilon;": "\u0395", "Equal;": "\u2a75", "EqualTilde;": "\u2242", "Equilibrium;": "\u21cc", "Escr;": "\u2130", "Esim;": "\u2a73", "Eta;": "\u0397", Euml: "\u00cb", "Euml;": "\u00cb", "Exists;": "\u2203", "ExponentialE;": "\u2147", "Fcy;": "\u0424", "Ffr;": "\ud835\udd09", "FilledSmallSquare;": "\u25fc", "FilledVerySmallSquare;": "\u25aa", "Fopf;": "\ud835\udd3d", "ForAll;": "\u2200", "Fouriertrf;": "\u2131", "Fscr;": "\u2131", "GJcy;": "\u0403", GT: ">", "GT;": ">", "Gamma;": "\u0393", "Gammad;": "\u03dc", "Gbreve;": "\u011e", "Gcedil;": "\u0122", "Gcirc;": "\u011c", "Gcy;": "\u0413", "Gdot;": "\u0120", "Gfr;": "\ud835\udd0a", "Gg;": "\u22d9", "Gopf;": "\ud835\udd3e", "GreaterEqual;": "\u2265", "GreaterEqualLess;": "\u22db", "GreaterFullEqual;": "\u2267", "GreaterGreater;": "\u2aa2", "GreaterLess;": "\u2277", "GreaterSlantEqual;": "\u2a7e", "GreaterTilde;": "\u2273", "Gscr;": "\ud835\udca2", "Gt;": "\u226b", "HARDcy;": "\u042a", "Hacek;": "\u02c7", "Hat;": "^", "Hcirc;": "\u0124", "Hfr;": "\u210c", "HilbertSpace;": "\u210b", "Hopf;": "\u210d", "HorizontalLine;": "\u2500", "Hscr;": "\u210b", "Hstrok;": "\u0126", "HumpDownHump;": "\u224e", "HumpEqual;": "\u224f", "IEcy;": "\u0415", "IJlig;": "\u0132", "IOcy;": "\u0401", Iacute: "\u00cd", "Iacute;": "\u00cd", Icirc: "\u00ce", "Icirc;": "\u00ce", "Icy;": "\u0418", "Idot;": "\u0130", "Ifr;": "\u2111", Igrave: "\u00cc", "Igrave;": "\u00cc", "Im;": "\u2111", "Imacr;": "\u012a", "ImaginaryI;": "\u2148", "Implies;": "\u21d2", "Int;": "\u222c", "Integral;": "\u222b", "Intersection;": "\u22c2", "InvisibleComma;": "\u2063", "InvisibleTimes;": "\u2062", "Iogon;": "\u012e", "Iopf;": "\ud835\udd40", "Iota;": "\u0399", "Iscr;": "\u2110", "Itilde;": "\u0128", "Iukcy;": "\u0406", Iuml: "\u00cf", "Iuml;": "\u00cf", "Jcirc;": "\u0134", "Jcy;": "\u0419", "Jfr;": "\ud835\udd0d", "Jopf;": "\ud835\udd41", "Jscr;": "\ud835\udca5", "Jsercy;": "\u0408", "Jukcy;": "\u0404", "KHcy;": "\u0425", "KJcy;": "\u040c", "Kappa;": "\u039a", "Kcedil;": "\u0136", "Kcy;": "\u041a", "Kfr;": "\ud835\udd0e", "Kopf;": "\ud835\udd42", "Kscr;": "\ud835\udca6", "LJcy;": "\u0409", LT: "<", "LT;": "<", "Lacute;": "\u0139", "Lambda;": "\u039b", "Lang;": "\u27ea", "Laplacetrf;": "\u2112", "Larr;": "\u219e", "Lcaron;": "\u013d", "Lcedil;": "\u013b", "Lcy;": "\u041b", "LeftAngleBracket;": "\u27e8", "LeftArrow;": "\u2190", "LeftArrowBar;": "\u21e4", "LeftArrowRightArrow;": "\u21c6", "LeftCeiling;": "\u2308", "LeftDoubleBracket;": "\u27e6", "LeftDownTeeVector;": "\u2961", "LeftDownVector;": "\u21c3", "LeftDownVectorBar;": "\u2959", "LeftFloor;": "\u230a", "LeftRightArrow;": "\u2194", "LeftRightVector;": "\u294e", "LeftTee;": "\u22a3", "LeftTeeArrow;": "\u21a4", "LeftTeeVector;": "\u295a", "LeftTriangle;": "\u22b2", "LeftTriangleBar;": "\u29cf", "LeftTriangleEqual;": "\u22b4", "LeftUpDownVector;": "\u2951", "LeftUpTeeVector;": "\u2960", "LeftUpVector;": "\u21bf", "LeftUpVectorBar;": "\u2958", "LeftVector;": "\u21bc", "LeftVectorBar;": "\u2952", "Leftarrow;": "\u21d0", "Leftrightarrow;": "\u21d4", "LessEqualGreater;": "\u22da", "LessFullEqual;": "\u2266", "LessGreater;": "\u2276", "LessLess;": "\u2aa1", "LessSlantEqual;": "\u2a7d", "LessTilde;": "\u2272", "Lfr;": "\ud835\udd0f", "Ll;": "\u22d8", "Lleftarrow;": "\u21da", "Lmidot;": "\u013f", "LongLeftArrow;": "\u27f5", "LongLeftRightArrow;": "\u27f7", "LongRightArrow;": "\u27f6", "Longleftarrow;": "\u27f8", "Longleftrightarrow;": "\u27fa", "Longrightarrow;": "\u27f9", "Lopf;": "\ud835\udd43", "LowerLeftArrow;": "\u2199", "LowerRightArrow;": "\u2198", "Lscr;": "\u2112", "Lsh;": "\u21b0", "Lstrok;": "\u0141", "Lt;": "\u226a", "Map;": "\u2905", "Mcy;": "\u041c", "MediumSpace;": "\u205f", "Mellintrf;": "\u2133", "Mfr;": "\ud835\udd10", "MinusPlus;": "\u2213", "Mopf;": "\ud835\udd44", "Mscr;": "\u2133", "Mu;": "\u039c", "NJcy;": "\u040a", "Nacute;": "\u0143", "Ncaron;": "\u0147", "Ncedil;": "\u0145", "Ncy;": "\u041d", "NegativeMediumSpace;": "\u200b", "NegativeThickSpace;": "\u200b", "NegativeThinSpace;": "\u200b", "NegativeVeryThinSpace;": "\u200b", "NestedGreaterGreater;": "\u226b", "NestedLessLess;": "\u226a", "NewLine;": "\n", "Nfr;": "\ud835\udd11", "NoBreak;": "\u2060", "NonBreakingSpace;": "\u00a0", "Nopf;": "\u2115", "Not;": "\u2aec", "NotCongruent;": "\u2262", "NotCupCap;": "\u226d", "NotDoubleVerticalBar;": "\u2226", "NotElement;": "\u2209", "NotEqual;": "\u2260", "NotEqualTilde;": "\u2242\u0338", "NotExists;": "\u2204", "NotGreater;": "\u226f", "NotGreaterEqual;": "\u2271", "NotGreaterFullEqual;": "\u2267\u0338", "NotGreaterGreater;": "\u226b\u0338", "NotGreaterLess;": "\u2279", "NotGreaterSlantEqual;": "\u2a7e\u0338", "NotGreaterTilde;": "\u2275", "NotHumpDownHump;": "\u224e\u0338", "NotHumpEqual;": "\u224f\u0338", "NotLeftTriangle;": "\u22ea", "NotLeftTriangleBar;": "\u29cf\u0338", "NotLeftTriangleEqual;": "\u22ec", "NotLess;": "\u226e", "NotLessEqual;": "\u2270", "NotLessGreater;": "\u2278", "NotLessLess;": "\u226a\u0338", "NotLessSlantEqual;": "\u2a7d\u0338", "NotLessTilde;": "\u2274", "NotNestedGreaterGreater;": "\u2aa2\u0338", "NotNestedLessLess;": "\u2aa1\u0338", "NotPrecedes;": "\u2280", "NotPrecedesEqual;": "\u2aaf\u0338", "NotPrecedesSlantEqual;": "\u22e0", "NotReverseElement;": "\u220c", "NotRightTriangle;": "\u22eb", "NotRightTriangleBar;": "\u29d0\u0338", "NotRightTriangleEqual;": "\u22ed", "NotSquareSubset;": "\u228f\u0338", "NotSquareSubsetEqual;": "\u22e2", "NotSquareSuperset;": "\u2290\u0338", "NotSquareSupersetEqual;": "\u22e3", "NotSubset;": "\u2282\u20d2", "NotSubsetEqual;": "\u2288", "NotSucceeds;": "\u2281", "NotSucceedsEqual;": "\u2ab0\u0338", "NotSucceedsSlantEqual;": "\u22e1", "NotSucceedsTilde;": "\u227f\u0338", "NotSuperset;": "\u2283\u20d2", "NotSupersetEqual;": "\u2289", "NotTilde;": "\u2241", "NotTildeEqual;": "\u2244", "NotTildeFullEqual;": "\u2247", "NotTildeTilde;": "\u2249", "NotVerticalBar;": "\u2224", "Nscr;": "\ud835\udca9", Ntilde: "\u00d1", "Ntilde;": "\u00d1", "Nu;": "\u039d", "OElig;": "\u0152", Oacute: "\u00d3", "Oacute;": "\u00d3", Ocirc: "\u00d4", "Ocirc;": "\u00d4", "Ocy;": "\u041e", "Odblac;": "\u0150", "Ofr;": "\ud835\udd12", Ograve: "\u00d2", "Ograve;": "\u00d2", "Omacr;": "\u014c", "Omega;": "\u03a9", "Omicron;": "\u039f", "Oopf;": "\ud835\udd46", "OpenCurlyDoubleQuote;": "\u201c", "OpenCurlyQuote;": "\u2018", "Or;": "\u2a54", "Oscr;": "\ud835\udcaa", Oslash: "\u00d8", "Oslash;": "\u00d8", Otilde: "\u00d5", "Otilde;": "\u00d5", "Otimes;": "\u2a37", Ouml: "\u00d6", "Ouml;": "\u00d6", "OverBar;": "\u203e", "OverBrace;": "\u23de", "OverBracket;": "\u23b4", "OverParenthesis;": "\u23dc", "PartialD;": "\u2202", "Pcy;": "\u041f", "Pfr;": "\ud835\udd13", "Phi;": "\u03a6", "Pi;": "\u03a0", "PlusMinus;": "\u00b1", "Poincareplane;": "\u210c", "Popf;": "\u2119", "Pr;": "\u2abb", "Precedes;": "\u227a", "PrecedesEqual;": "\u2aaf", "PrecedesSlantEqual;": "\u227c", "PrecedesTilde;": "\u227e", "Prime;": "\u2033", "Product;": "\u220f", "Proportion;": "\u2237", "Proportional;": "\u221d", "Pscr;": "\ud835\udcab", "Psi;": "\u03a8", QUOT: "\"", "QUOT;": "\"", "Qfr;": "\ud835\udd14", "Qopf;": "\u211a", "Qscr;": "\ud835\udcac", "RBarr;": "\u2910", REG: "\u00ae", "REG;": "\u00ae", "Racute;": "\u0154", "Rang;": "\u27eb", "Rarr;": "\u21a0", "Rarrtl;": "\u2916", "Rcaron;": "\u0158", "Rcedil;": "\u0156", "Rcy;": "\u0420", "Re;": "\u211c", "ReverseElement;": "\u220b", "ReverseEquilibrium;": "\u21cb", "ReverseUpEquilibrium;": "\u296f", "Rfr;": "\u211c", "Rho;": "\u03a1", "RightAngleBracket;": "\u27e9", "RightArrow;": "\u2192", "RightArrowBar;": "\u21e5", "RightArrowLeftArrow;": "\u21c4", "RightCeiling;": "\u2309", "RightDoubleBracket;": "\u27e7", "RightDownTeeVector;": "\u295d", "RightDownVector;": "\u21c2", "RightDownVectorBar;": "\u2955", "RightFloor;": "\u230b", "RightTee;": "\u22a2", "RightTeeArrow;": "\u21a6", "RightTeeVector;": "\u295b", "RightTriangle;": "\u22b3", "RightTriangleBar;": "\u29d0", "RightTriangleEqual;": "\u22b5", "RightUpDownVector;": "\u294f", "RightUpTeeVector;": "\u295c", "RightUpVector;": "\u21be", "RightUpVectorBar;": "\u2954", "RightVector;": "\u21c0", "RightVectorBar;": "\u2953", "Rightarrow;": "\u21d2", "Ropf;": "\u211d", "RoundImplies;": "\u2970", "Rrightarrow;": "\u21db", "Rscr;": "\u211b", "Rsh;": "\u21b1", "RuleDelayed;": "\u29f4", "SHCHcy;": "\u0429", "SHcy;": "\u0428", "SOFTcy;": "\u042c", "Sacute;": "\u015a", "Sc;": "\u2abc", "Scaron;": "\u0160", "Scedil;": "\u015e", "Scirc;": "\u015c", "Scy;": "\u0421", "Sfr;": "\ud835\udd16", "ShortDownArrow;": "\u2193", "ShortLeftArrow;": "\u2190", "ShortRightArrow;": "\u2192", "ShortUpArrow;": "\u2191", "Sigma;": "\u03a3", "SmallCircle;": "\u2218", "Sopf;": "\ud835\udd4a", "Sqrt;": "\u221a", "Square;": "\u25a1", "SquareIntersection;": "\u2293", "SquareSubset;": "\u228f", "SquareSubsetEqual;": "\u2291", "SquareSuperset;": "\u2290", "SquareSupersetEqual;": "\u2292", "SquareUnion;": "\u2294", "Sscr;": "\ud835\udcae", "Star;": "\u22c6", "Sub;": "\u22d0", "Subset;": "\u22d0", "SubsetEqual;": "\u2286", "Succeeds;": "\u227b", "SucceedsEqual;": "\u2ab0", "SucceedsSlantEqual;": "\u227d", "SucceedsTilde;": "\u227f", "SuchThat;": "\u220b", "Sum;": "\u2211", "Sup;": "\u22d1", "Superset;": "\u2283", "SupersetEqual;": "\u2287", "Supset;": "\u22d1", THORN: "\u00de", "THORN;": "\u00de", "TRADE;": "\u2122", "TSHcy;": "\u040b", "TScy;": "\u0426", "Tab;": "\t", "Tau;": "\u03a4", "Tcaron;": "\u0164", "Tcedil;": "\u0162", "Tcy;": "\u0422", "Tfr;": "\ud835\udd17", "Therefore;": "\u2234", "Theta;": "\u0398", "ThickSpace;": "\u205f\u200a", "ThinSpace;": "\u2009", "Tilde;": "\u223c", "TildeEqual;": "\u2243", "TildeFullEqual;": "\u2245", "TildeTilde;": "\u2248", "Topf;": "\ud835\udd4b", "TripleDot;": "\u20db", "Tscr;": "\ud835\udcaf", "Tstrok;": "\u0166", Uacute: "\u00da", "Uacute;": "\u00da", "Uarr;": "\u219f", "Uarrocir;": "\u2949", "Ubrcy;": "\u040e", "Ubreve;": "\u016c", Ucirc: "\u00db", "Ucirc;": "\u00db", "Ucy;": "\u0423", "Udblac;": "\u0170", "Ufr;": "\ud835\udd18", Ugrave: "\u00d9", "Ugrave;": "\u00d9", "Umacr;": "\u016a", "UnderBar;": "_", "UnderBrace;": "\u23df", "UnderBracket;": "\u23b5", "UnderParenthesis;": "\u23dd", "Union;": "\u22c3", "UnionPlus;": "\u228e", "Uogon;": "\u0172", "Uopf;": "\ud835\udd4c", "UpArrow;": "\u2191", "UpArrowBar;": "\u2912", "UpArrowDownArrow;": "\u21c5", "UpDownArrow;": "\u2195", "UpEquilibrium;": "\u296e", "UpTee;": "\u22a5", "UpTeeArrow;": "\u21a5", "Uparrow;": "\u21d1", "Updownarrow;": "\u21d5", "UpperLeftArrow;": "\u2196", "UpperRightArrow;": "\u2197", "Upsi;": "\u03d2", "Upsilon;": "\u03a5", "Uring;": "\u016e", "Uscr;": "\ud835\udcb0", "Utilde;": "\u0168", Uuml: "\u00dc", "Uuml;": "\u00dc", "VDash;": "\u22ab", "Vbar;": "\u2aeb", "Vcy;": "\u0412", "Vdash;": "\u22a9", "Vdashl;": "\u2ae6", "Vee;": "\u22c1", "Verbar;": "\u2016", "Vert;": "\u2016", "VerticalBar;": "\u2223", "VerticalLine;": "|", "VerticalSeparator;": "\u2758", "VerticalTilde;": "\u2240", "VeryThinSpace;": "\u200a", "Vfr;": "\ud835\udd19", "Vopf;": "\ud835\udd4d", "Vscr;": "\ud835\udcb1", "Vvdash;": "\u22aa", "Wcirc;": "\u0174", "Wedge;": "\u22c0", "Wfr;": "\ud835\udd1a", "Wopf;": "\ud835\udd4e", "Wscr;": "\ud835\udcb2", "Xfr;": "\ud835\udd1b", "Xi;": "\u039e", "Xopf;": "\ud835\udd4f", "Xscr;": "\ud835\udcb3", "YAcy;": "\u042f", "YIcy;": "\u0407", "YUcy;": "\u042e", Yacute: "\u00dd", "Yacute;": "\u00dd", "Ycirc;": "\u0176", "Ycy;": "\u042b", "Yfr;": "\ud835\udd1c", "Yopf;": "\ud835\udd50", "Yscr;": "\ud835\udcb4", "Yuml;": "\u0178", "ZHcy;": "\u0416", "Zacute;": "\u0179", "Zcaron;": "\u017d", "Zcy;": "\u0417", "Zdot;": "\u017b", "ZeroWidthSpace;": "\u200b", "Zeta;": "\u0396", "Zfr;": "\u2128", "Zopf;": "\u2124", "Zscr;": "\ud835\udcb5", aacute: "\u00e1", "aacute;": "\u00e1", "abreve;": "\u0103", "ac;": "\u223e", "acE;": "\u223e\u0333", "acd;": "\u223f", acirc: "\u00e2", "acirc;": "\u00e2", acute: "\u00b4", "acute;": "\u00b4", "acy;": "\u0430", aelig: "\u00e6", "aelig;": "\u00e6", "af;": "\u2061", "afr;": "\ud835\udd1e", agrave: "\u00e0", "agrave;": "\u00e0", "alefsym;": "\u2135", "aleph;": "\u2135", "alpha;": "\u03b1", "amacr;": "\u0101", "amalg;": "\u2a3f", amp: "&", "amp;": "&", "and;": "\u2227", "andand;": "\u2a55", "andd;": "\u2a5c", "andslope;": "\u2a58", "andv;": "\u2a5a", "ang;": "\u2220", "ange;": "\u29a4", "angle;": "\u2220", "angmsd;": "\u2221", "angmsdaa;": "\u29a8", "angmsdab;": "\u29a9", "angmsdac;": "\u29aa", "angmsdad;": "\u29ab", "angmsdae;": "\u29ac", "angmsdaf;": "\u29ad", "angmsdag;": "\u29ae", "angmsdah;": "\u29af", "angrt;": "\u221f", "angrtvb;": "\u22be", "angrtvbd;": "\u299d", "angsph;": "\u2222", "angst;": "\u00c5", "angzarr;": "\u237c", "aogon;": "\u0105", "aopf;": "\ud835\udd52", "ap;": "\u2248", "apE;": "\u2a70", "apacir;": "\u2a6f", "ape;": "\u224a", "apid;": "\u224b", "apos;": "'", "approx;": "\u2248", "approxeq;": "\u224a", aring: "\u00e5", "aring;": "\u00e5", "ascr;": "\ud835\udcb6", "ast;": "*", "asymp;": "\u2248", "asympeq;": "\u224d", atilde: "\u00e3", "atilde;": "\u00e3", auml: "\u00e4", "auml;": "\u00e4", "awconint;": "\u2233", "awint;": "\u2a11", "bNot;": "\u2aed", "backcong;": "\u224c", "backepsilon;": "\u03f6", "backprime;": "\u2035", "backsim;": "\u223d", "backsimeq;": "\u22cd", "barvee;": "\u22bd", "barwed;": "\u2305", "barwedge;": "\u2305", "bbrk;": "\u23b5", "bbrktbrk;": "\u23b6", "bcong;": "\u224c", "bcy;": "\u0431", "bdquo;": "\u201e", "becaus;": "\u2235", "because;": "\u2235", "bemptyv;": "\u29b0", "bepsi;": "\u03f6", "bernou;": "\u212c", "beta;": "\u03b2", "beth;": "\u2136", "between;": "\u226c", "bfr;": "\ud835\udd1f", "bigcap;": "\u22c2", "bigcirc;": "\u25ef", "bigcup;": "\u22c3", "bigodot;": "\u2a00", "bigoplus;": "\u2a01", "bigotimes;": "\u2a02", "bigsqcup;": "\u2a06", "bigstar;": "\u2605", "bigtriangledown;": "\u25bd", "bigtriangleup;": "\u25b3", "biguplus;": "\u2a04", "bigvee;": "\u22c1", "bigwedge;": "\u22c0", "bkarow;": "\u290d", "blacklozenge;": "\u29eb", "blacksquare;": "\u25aa", "blacktriangle;": "\u25b4", "blacktriangledown;": "\u25be", "blacktriangleleft;": "\u25c2", "blacktriangleright;": "\u25b8", "blank;": "\u2423", "blk12;": "\u2592", "blk14;": "\u2591", "blk34;": "\u2593", "block;": "\u2588", "bne;": "=\u20e5", "bnequiv;": "\u2261\u20e5", "bnot;": "\u2310", "bopf;": "\ud835\udd53", "bot;": "\u22a5", "bottom;": "\u22a5", "bowtie;": "\u22c8", "boxDL;": "\u2557", "boxDR;": "\u2554", "boxDl;": "\u2556", "boxDr;": "\u2553", "boxH;": "\u2550", "boxHD;": "\u2566", "boxHU;": "\u2569", "boxHd;": "\u2564", "boxHu;": "\u2567", "boxUL;": "\u255d", "boxUR;": "\u255a", "boxUl;": "\u255c", "boxUr;": "\u2559", "boxV;": "\u2551", "boxVH;": "\u256c", "boxVL;": "\u2563", "boxVR;": "\u2560", "boxVh;": "\u256b", "boxVl;": "\u2562", "boxVr;": "\u255f", "boxbox;": "\u29c9", "boxdL;": "\u2555", "boxdR;": "\u2552", "boxdl;": "\u2510", "boxdr;": "\u250c", "boxh;": "\u2500", "boxhD;": "\u2565", "boxhU;": "\u2568", "boxhd;": "\u252c", "boxhu;": "\u2534", "boxminus;": "\u229f", "boxplus;": "\u229e", "boxtimes;": "\u22a0", "boxuL;": "\u255b", "boxuR;": "\u2558", "boxul;": "\u2518", "boxur;": "\u2514", "boxv;": "\u2502", "boxvH;": "\u256a", "boxvL;": "\u2561", "boxvR;": "\u255e", "boxvh;": "\u253c", "boxvl;": "\u2524", "boxvr;": "\u251c", "bprime;": "\u2035", "breve;": "\u02d8", brvbar: "\u00a6", "brvbar;": "\u00a6", "bscr;": "\ud835\udcb7", "bsemi;": "\u204f", "bsim;": "\u223d", "bsime;": "\u22cd", "bsol;": "\\", "bsolb;": "\u29c5", "bsolhsub;": "\u27c8", "bull;": "\u2022", "bullet;": "\u2022", "bump;": "\u224e", "bumpE;": "\u2aae", "bumpe;": "\u224f", "bumpeq;": "\u224f", "cacute;": "\u0107", "cap;": "\u2229", "capand;": "\u2a44", "capbrcup;": "\u2a49", "capcap;": "\u2a4b", "capcup;": "\u2a47", "capdot;": "\u2a40", "caps;": "\u2229\ufe00", "caret;": "\u2041", "caron;": "\u02c7", "ccaps;": "\u2a4d", "ccaron;": "\u010d", ccedil: "\u00e7", "ccedil;": "\u00e7", "ccirc;": "\u0109", "ccups;": "\u2a4c", "ccupssm;": "\u2a50", "cdot;": "\u010b", cedil: "\u00b8", "cedil;": "\u00b8", "cemptyv;": "\u29b2", cent: "\u00a2", "cent;": "\u00a2", "centerdot;": "\u00b7", "cfr;": "\ud835\udd20", "chcy;": "\u0447", "check;": "\u2713", "checkmark;": "\u2713", "chi;": "\u03c7", "cir;": "\u25cb", "cirE;": "\u29c3", "circ;": "\u02c6", "circeq;": "\u2257", "circlearrowleft;": "\u21ba", "circlearrowright;": "\u21bb", "circledR;": "\u00ae", "circledS;": "\u24c8", "circledast;": "\u229b", "circledcirc;": "\u229a", "circleddash;": "\u229d", "cire;": "\u2257", "cirfnint;": "\u2a10", "cirmid;": "\u2aef", "cirscir;": "\u29c2", "clubs;": "\u2663", "clubsuit;": "\u2663", "colon;": ":", "colone;": "\u2254", "coloneq;": "\u2254", "comma;": ",", "commat;": "@", "comp;": "\u2201", "compfn;": "\u2218", "complement;": "\u2201", "complexes;": "\u2102", "cong;": "\u2245", "congdot;": "\u2a6d", "conint;": "\u222e", "copf;": "\ud835\udd54", "coprod;": "\u2210", copy: "\u00a9", "copy;": "\u00a9", "copysr;": "\u2117", "crarr;": "\u21b5", "cross;": "\u2717", "cscr;": "\ud835\udcb8", "csub;": "\u2acf", "csube;": "\u2ad1", "csup;": "\u2ad0", "csupe;": "\u2ad2", "ctdot;": "\u22ef", "cudarrl;": "\u2938", "cudarrr;": "\u2935", "cuepr;": "\u22de", "cuesc;": "\u22df", "cularr;": "\u21b6", "cularrp;": "\u293d", "cup;": "\u222a", "cupbrcap;": "\u2a48", "cupcap;": "\u2a46", "cupcup;": "\u2a4a", "cupdot;": "\u228d", "cupor;": "\u2a45", "cups;": "\u222a\ufe00", "curarr;": "\u21b7", "curarrm;": "\u293c", "curlyeqprec;": "\u22de", "curlyeqsucc;": "\u22df", "curlyvee;": "\u22ce", "curlywedge;": "\u22cf", curren: "\u00a4", "curren;": "\u00a4", "curvearrowleft;": "\u21b6", "curvearrowright;": "\u21b7", "cuvee;": "\u22ce", "cuwed;": "\u22cf", "cwconint;": "\u2232", "cwint;": "\u2231", "cylcty;": "\u232d", "dArr;": "\u21d3", "dHar;": "\u2965", "dagger;": "\u2020", "daleth;": "\u2138", "darr;": "\u2193", "dash;": "\u2010", "dashv;": "\u22a3", "dbkarow;": "\u290f", "dblac;": "\u02dd", "dcaron;": "\u010f", "dcy;": "\u0434", "dd;": "\u2146", "ddagger;": "\u2021", "ddarr;": "\u21ca", "ddotseq;": "\u2a77", deg: "\u00b0", "deg;": "\u00b0", "delta;": "\u03b4", "demptyv;": "\u29b1", "dfisht;": "\u297f", "dfr;": "\ud835\udd21", "dharl;": "\u21c3", "dharr;": "\u21c2", "diam;": "\u22c4", "diamond;": "\u22c4", "diamondsuit;": "\u2666", "diams;": "\u2666", "die;": "\u00a8", "digamma;": "\u03dd", "disin;": "\u22f2", "div;": "\u00f7", divide: "\u00f7", "divide;": "\u00f7", "divideontimes;": "\u22c7", "divonx;": "\u22c7", "djcy;": "\u0452", "dlcorn;": "\u231e", "dlcrop;": "\u230d", "dollar;": "$", "dopf;": "\ud835\udd55", "dot;": "\u02d9", "doteq;": "\u2250", "doteqdot;": "\u2251", "dotminus;": "\u2238", "dotplus;": "\u2214", "dotsquare;": "\u22a1", "doublebarwedge;": "\u2306", "downarrow;": "\u2193", "downdownarrows;": "\u21ca", "downharpoonleft;": "\u21c3", "downharpoonright;": "\u21c2", "drbkarow;": "\u2910", "drcorn;": "\u231f", "drcrop;": "\u230c", "dscr;": "\ud835\udcb9", "dscy;": "\u0455", "dsol;": "\u29f6", "dstrok;": "\u0111", "dtdot;": "\u22f1", "dtri;": "\u25bf", "dtrif;": "\u25be", "duarr;": "\u21f5", "duhar;": "\u296f", "dwangle;": "\u29a6", "dzcy;": "\u045f", "dzigrarr;": "\u27ff", "eDDot;": "\u2a77", "eDot;": "\u2251", eacute: "\u00e9", "eacute;": "\u00e9", "easter;": "\u2a6e", "ecaron;": "\u011b", "ecir;": "\u2256", ecirc: "\u00ea", "ecirc;": "\u00ea", "ecolon;": "\u2255", "ecy;": "\u044d", "edot;": "\u0117", "ee;": "\u2147", "efDot;": "\u2252", "efr;": "\ud835\udd22", "eg;": "\u2a9a", egrave: "\u00e8", "egrave;": "\u00e8", "egs;": "\u2a96", "egsdot;": "\u2a98", "el;": "\u2a99", "elinters;": "\u23e7", "ell;": "\u2113", "els;": "\u2a95", "elsdot;": "\u2a97", "emacr;": "\u0113", "empty;": "\u2205", "emptyset;": "\u2205", "emptyv;": "\u2205", "emsp13;": "\u2004", "emsp14;": "\u2005", "emsp;": "\u2003", "eng;": "\u014b", "ensp;": "\u2002", "eogon;": "\u0119", "eopf;": "\ud835\udd56", "epar;": "\u22d5", "eparsl;": "\u29e3", "eplus;": "\u2a71", "epsi;": "\u03b5", "epsilon;": "\u03b5", "epsiv;": "\u03f5", "eqcirc;": "\u2256", "eqcolon;": "\u2255", "eqsim;": "\u2242", "eqslantgtr;": "\u2a96", "eqslantless;": "\u2a95", "equals;": "=", "equest;": "\u225f", "equiv;": "\u2261", "equivDD;": "\u2a78", "eqvparsl;": "\u29e5", "erDot;": "\u2253", "erarr;": "\u2971", "escr;": "\u212f", "esdot;": "\u2250", "esim;": "\u2242", "eta;": "\u03b7", eth: "\u00f0", "eth;": "\u00f0", euml: "\u00eb", "euml;": "\u00eb", "euro;": "\u20ac", "excl;": "!", "exist;": "\u2203", "expectation;": "\u2130", "exponentiale;": "\u2147", "fallingdotseq;": "\u2252", "fcy;": "\u0444", "female;": "\u2640", "ffilig;": "\ufb03", "fflig;": "\ufb00", "ffllig;": "\ufb04", "ffr;": "\ud835\udd23", "filig;": "\ufb01", "fjlig;": "fj", "flat;": "\u266d", "fllig;": "\ufb02", "fltns;": "\u25b1", "fnof;": "\u0192", "fopf;": "\ud835\udd57", "forall;": "\u2200", "fork;": "\u22d4", "forkv;": "\u2ad9", "fpartint;": "\u2a0d", frac12: "\u00bd", "frac12;": "\u00bd", "frac13;": "\u2153", frac14: "\u00bc", "frac14;": "\u00bc", "frac15;": "\u2155", "frac16;": "\u2159", "frac18;": "\u215b", "frac23;": "\u2154", "frac25;": "\u2156", frac34: "\u00be", "frac34;": "\u00be", "frac35;": "\u2157", "frac38;": "\u215c", "frac45;": "\u2158", "frac56;": "\u215a", "frac58;": "\u215d", "frac78;": "\u215e", "frasl;": "\u2044", "frown;": "\u2322", "fscr;": "\ud835\udcbb", "gE;": "\u2267", "gEl;": "\u2a8c", "gacute;": "\u01f5", "gamma;": "\u03b3", "gammad;": "\u03dd", "gap;": "\u2a86", "gbreve;": "\u011f", "gcirc;": "\u011d", "gcy;": "\u0433", "gdot;": "\u0121", "ge;": "\u2265", "gel;": "\u22db", "geq;": "\u2265", "geqq;": "\u2267", "geqslant;": "\u2a7e", "ges;": "\u2a7e", "gescc;": "\u2aa9", "gesdot;": "\u2a80", "gesdoto;": "\u2a82", "gesdotol;": "\u2a84", "gesl;": "\u22db\ufe00", "gesles;": "\u2a94", "gfr;": "\ud835\udd24", "gg;": "\u226b", "ggg;": "\u22d9", "gimel;": "\u2137", "gjcy;": "\u0453", "gl;": "\u2277", "glE;": "\u2a92", "gla;": "\u2aa5", "glj;": "\u2aa4", "gnE;": "\u2269", "gnap;": "\u2a8a", "gnapprox;": "\u2a8a", "gne;": "\u2a88", "gneq;": "\u2a88", "gneqq;": "\u2269", "gnsim;": "\u22e7", "gopf;": "\ud835\udd58", "grave;": "`", "gscr;": "\u210a", "gsim;": "\u2273", "gsime;": "\u2a8e", "gsiml;": "\u2a90", gt: ">", "gt;": ">", "gtcc;": "\u2aa7", "gtcir;": "\u2a7a", "gtdot;": "\u22d7", "gtlPar;": "\u2995", "gtquest;": "\u2a7c", "gtrapprox;": "\u2a86", "gtrarr;": "\u2978", "gtrdot;": "\u22d7", "gtreqless;": "\u22db", "gtreqqless;": "\u2a8c", "gtrless;": "\u2277", "gtrsim;": "\u2273", "gvertneqq;": "\u2269\ufe00", "gvnE;": "\u2269\ufe00", "hArr;": "\u21d4", "hairsp;": "\u200a", "half;": "\u00bd", "hamilt;": "\u210b", "hardcy;": "\u044a", "harr;": "\u2194", "harrcir;": "\u2948", "harrw;": "\u21ad", "hbar;": "\u210f", "hcirc;": "\u0125", "hearts;": "\u2665", "heartsuit;": "\u2665", "hellip;": "\u2026", "hercon;": "\u22b9", "hfr;": "\ud835\udd25", "hksearow;": "\u2925", "hkswarow;": "\u2926", "hoarr;": "\u21ff", "homtht;": "\u223b", "hookleftarrow;": "\u21a9", "hookrightarrow;": "\u21aa", "hopf;": "\ud835\udd59", "horbar;": "\u2015", "hscr;": "\ud835\udcbd", "hslash;": "\u210f", "hstrok;": "\u0127", "hybull;": "\u2043", "hyphen;": "\u2010", iacute: "\u00ed", "iacute;": "\u00ed", "ic;": "\u2063", icirc: "\u00ee", "icirc;": "\u00ee", "icy;": "\u0438", "iecy;": "\u0435", iexcl: "\u00a1", "iexcl;": "\u00a1", "iff;": "\u21d4", "ifr;": "\ud835\udd26", igrave: "\u00ec", "igrave;": "\u00ec", "ii;": "\u2148", "iiiint;": "\u2a0c", "iiint;": "\u222d", "iinfin;": "\u29dc", "iiota;": "\u2129", "ijlig;": "\u0133", "imacr;": "\u012b", "image;": "\u2111", "imagline;": "\u2110", "imagpart;": "\u2111", "imath;": "\u0131", "imof;": "\u22b7", "imped;": "\u01b5", "in;": "\u2208", "incare;": "\u2105", "infin;": "\u221e", "infintie;": "\u29dd", "inodot;": "\u0131", "int;": "\u222b", "intcal;": "\u22ba", "integers;": "\u2124", "intercal;": "\u22ba", "intlarhk;": "\u2a17", "intprod;": "\u2a3c", "iocy;": "\u0451", "iogon;": "\u012f", "iopf;": "\ud835\udd5a", "iota;": "\u03b9", "iprod;": "\u2a3c", iquest: "\u00bf", "iquest;": "\u00bf", "iscr;": "\ud835\udcbe", "isin;": "\u2208", "isinE;": "\u22f9", "isindot;": "\u22f5", "isins;": "\u22f4", "isinsv;": "\u22f3", "isinv;": "\u2208", "it;": "\u2062", "itilde;": "\u0129", "iukcy;": "\u0456", iuml: "\u00ef", "iuml;": "\u00ef", "jcirc;": "\u0135", "jcy;": "\u0439", "jfr;": "\ud835\udd27", "jmath;": "\u0237", "jopf;": "\ud835\udd5b", "jscr;": "\ud835\udcbf", "jsercy;": "\u0458", "jukcy;": "\u0454", "kappa;": "\u03ba", "kappav;": "\u03f0", "kcedil;": "\u0137", "kcy;": "\u043a", "kfr;": "\ud835\udd28", "kgreen;": "\u0138", "khcy;": "\u0445", "kjcy;": "\u045c", "kopf;": "\ud835\udd5c", "kscr;": "\ud835\udcc0", "lAarr;": "\u21da", "lArr;": "\u21d0", "lAtail;": "\u291b", "lBarr;": "\u290e", "lE;": "\u2266", "lEg;": "\u2a8b", "lHar;": "\u2962", "lacute;": "\u013a", "laemptyv;": "\u29b4", "lagran;": "\u2112", "lambda;": "\u03bb", "lang;": "\u27e8", "langd;": "\u2991", "langle;": "\u27e8", "lap;": "\u2a85", laquo: "\u00ab", "laquo;": "\u00ab", "larr;": "\u2190", "larrb;": "\u21e4", "larrbfs;": "\u291f", "larrfs;": "\u291d", "larrhk;": "\u21a9", "larrlp;": "\u21ab", "larrpl;": "\u2939", "larrsim;": "\u2973", "larrtl;": "\u21a2", "lat;": "\u2aab", "latail;": "\u2919", "late;": "\u2aad", "lates;": "\u2aad\ufe00", "lbarr;": "\u290c", "lbbrk;": "\u2772", "lbrace;": "{", "lbrack;": "[", "lbrke;": "\u298b", "lbrksld;": "\u298f", "lbrkslu;": "\u298d", "lcaron;": "\u013e", "lcedil;": "\u013c", "lceil;": "\u2308", "lcub;": "{", "lcy;": "\u043b", "ldca;": "\u2936", "ldquo;": "\u201c", "ldquor;": "\u201e", "ldrdhar;": "\u2967", "ldrushar;": "\u294b", "ldsh;": "\u21b2", "le;": "\u2264", "leftarrow;": "\u2190", "leftarrowtail;": "\u21a2", "leftharpoondown;": "\u21bd", "leftharpoonup;": "\u21bc", "leftleftarrows;": "\u21c7", "leftrightarrow;": "\u2194", "leftrightarrows;": "\u21c6", "leftrightharpoons;": "\u21cb", "leftrightsquigarrow;": "\u21ad", "leftthreetimes;": "\u22cb", "leg;": "\u22da", "leq;": "\u2264", "leqq;": "\u2266", "leqslant;": "\u2a7d", "les;": "\u2a7d", "lescc;": "\u2aa8", "lesdot;": "\u2a7f", "lesdoto;": "\u2a81", "lesdotor;": "\u2a83", "lesg;": "\u22da\ufe00", "lesges;": "\u2a93", "lessapprox;": "\u2a85", "lessdot;": "\u22d6", "lesseqgtr;": "\u22da", "lesseqqgtr;": "\u2a8b", "lessgtr;": "\u2276", "lesssim;": "\u2272", "lfisht;": "\u297c", "lfloor;": "\u230a", "lfr;": "\ud835\udd29", "lg;": "\u2276", "lgE;": "\u2a91", "lhard;": "\u21bd", "lharu;": "\u21bc", "lharul;": "\u296a", "lhblk;": "\u2584", "ljcy;": "\u0459", "ll;": "\u226a", "llarr;": "\u21c7", "llcorner;": "\u231e", "llhard;": "\u296b", "lltri;": "\u25fa", "lmidot;": "\u0140", "lmoust;": "\u23b0", "lmoustache;": "\u23b0", "lnE;": "\u2268", "lnap;": "\u2a89", "lnapprox;": "\u2a89", "lne;": "\u2a87", "lneq;": "\u2a87", "lneqq;": "\u2268", "lnsim;": "\u22e6", "loang;": "\u27ec", "loarr;": "\u21fd", "lobrk;": "\u27e6", "longleftarrow;": "\u27f5", "longleftrightarrow;": "\u27f7", "longmapsto;": "\u27fc", "longrightarrow;": "\u27f6", "looparrowleft;": "\u21ab", "looparrowright;": "\u21ac", "lopar;": "\u2985", "lopf;": "\ud835\udd5d", "loplus;": "\u2a2d", "lotimes;": "\u2a34", "lowast;": "\u2217", "lowbar;": "_", "loz;": "\u25ca", "lozenge;": "\u25ca", "lozf;": "\u29eb", "lpar;": "(", "lparlt;": "\u2993", "lrarr;": "\u21c6", "lrcorner;": "\u231f", "lrhar;": "\u21cb", "lrhard;": "\u296d", "lrm;": "\u200e", "lrtri;": "\u22bf", "lsaquo;": "\u2039", "lscr;": "\ud835\udcc1", "lsh;": "\u21b0", "lsim;": "\u2272", "lsime;": "\u2a8d", "lsimg;": "\u2a8f", "lsqb;": "[", "lsquo;": "\u2018", "lsquor;": "\u201a", "lstrok;": "\u0142", lt: "<", "lt;": "<", "ltcc;": "\u2aa6", "ltcir;": "\u2a79", "ltdot;": "\u22d6", "lthree;": "\u22cb", "ltimes;": "\u22c9", "ltlarr;": "\u2976", "ltquest;": "\u2a7b", "ltrPar;": "\u2996", "ltri;": "\u25c3", "ltrie;": "\u22b4", "ltrif;": "\u25c2", "lurdshar;": "\u294a", "luruhar;": "\u2966", "lvertneqq;": "\u2268\ufe00", "lvnE;": "\u2268\ufe00", "mDDot;": "\u223a", macr: "\u00af", "macr;": "\u00af", "male;": "\u2642", "malt;": "\u2720", "maltese;": "\u2720", "map;": "\u21a6", "mapsto;": "\u21a6", "mapstodown;": "\u21a7", "mapstoleft;": "\u21a4", "mapstoup;": "\u21a5", "marker;": "\u25ae", "mcomma;": "\u2a29", "mcy;": "\u043c", "mdash;": "\u2014", "measuredangle;": "\u2221", "mfr;": "\ud835\udd2a", "mho;": "\u2127", micro: "\u00b5", "micro;": "\u00b5", "mid;": "\u2223", "midast;": "*", "midcir;": "\u2af0", middot: "\u00b7", "middot;": "\u00b7", "minus;": "\u2212", "minusb;": "\u229f", "minusd;": "\u2238", "minusdu;": "\u2a2a", "mlcp;": "\u2adb", "mldr;": "\u2026", "mnplus;": "\u2213", "models;": "\u22a7", "mopf;": "\ud835\udd5e", "mp;": "\u2213", "mscr;": "\ud835\udcc2", "mstpos;": "\u223e", "mu;": "\u03bc", "multimap;": "\u22b8", "mumap;": "\u22b8", "nGg;": "\u22d9\u0338", "nGt;": "\u226b\u20d2", "nGtv;": "\u226b\u0338", "nLeftarrow;": "\u21cd", "nLeftrightarrow;": "\u21ce", "nLl;": "\u22d8\u0338", "nLt;": "\u226a\u20d2", "nLtv;": "\u226a\u0338", "nRightarrow;": "\u21cf", "nVDash;": "\u22af", "nVdash;": "\u22ae", "nabla;": "\u2207", "nacute;": "\u0144", "nang;": "\u2220\u20d2", "nap;": "\u2249", "napE;": "\u2a70\u0338", "napid;": "\u224b\u0338", "napos;": "\u0149", "napprox;": "\u2249", "natur;": "\u266e", "natural;": "\u266e", "naturals;": "\u2115", nbsp: "\u00a0", "nbsp;": "\u00a0", "nbump;": "\u224e\u0338", "nbumpe;": "\u224f\u0338", "ncap;": "\u2a43", "ncaron;": "\u0148", "ncedil;": "\u0146", "ncong;": "\u2247", "ncongdot;": "\u2a6d\u0338", "ncup;": "\u2a42", "ncy;": "\u043d", "ndash;": "\u2013", "ne;": "\u2260", "neArr;": "\u21d7", "nearhk;": "\u2924", "nearr;": "\u2197", "nearrow;": "\u2197", "nedot;": "\u2250\u0338", "nequiv;": "\u2262", "nesear;": "\u2928", "nesim;": "\u2242\u0338", "nexist;": "\u2204", "nexists;": "\u2204", "nfr;": "\ud835\udd2b", "ngE;": "\u2267\u0338", "nge;": "\u2271", "ngeq;": "\u2271", "ngeqq;": "\u2267\u0338", "ngeqslant;": "\u2a7e\u0338", "nges;": "\u2a7e\u0338", "ngsim;": "\u2275", "ngt;": "\u226f", "ngtr;": "\u226f", "nhArr;": "\u21ce", "nharr;": "\u21ae", "nhpar;": "\u2af2", "ni;": "\u220b", "nis;": "\u22fc", "nisd;": "\u22fa", "niv;": "\u220b", "njcy;": "\u045a", "nlArr;": "\u21cd", "nlE;": "\u2266\u0338", "nlarr;": "\u219a", "nldr;": "\u2025", "nle;": "\u2270", "nleftarrow;": "\u219a", "nleftrightarrow;": "\u21ae", "nleq;": "\u2270", "nleqq;": "\u2266\u0338", "nleqslant;": "\u2a7d\u0338", "nles;": "\u2a7d\u0338", "nless;": "\u226e", "nlsim;": "\u2274", "nlt;": "\u226e", "nltri;": "\u22ea", "nltrie;": "\u22ec", "nmid;": "\u2224", "nopf;": "\ud835\udd5f", not: "\u00ac", "not;": "\u00ac", "notin;": "\u2209", "notinE;": "\u22f9\u0338", "notindot;": "\u22f5\u0338", "notinva;": "\u2209", "notinvb;": "\u22f7", "notinvc;": "\u22f6", "notni;": "\u220c", "notniva;": "\u220c", "notnivb;": "\u22fe", "notnivc;": "\u22fd", "npar;": "\u2226", "nparallel;": "\u2226", "nparsl;": "\u2afd\u20e5", "npart;": "\u2202\u0338", "npolint;": "\u2a14", "npr;": "\u2280", "nprcue;": "\u22e0", "npre;": "\u2aaf\u0338", "nprec;": "\u2280", "npreceq;": "\u2aaf\u0338", "nrArr;": "\u21cf", "nrarr;": "\u219b", "nrarrc;": "\u2933\u0338", "nrarrw;": "\u219d\u0338", "nrightarrow;": "\u219b", "nrtri;": "\u22eb", "nrtrie;": "\u22ed", "nsc;": "\u2281", "nsccue;": "\u22e1", "nsce;": "\u2ab0\u0338", "nscr;": "\ud835\udcc3", "nshortmid;": "\u2224", "nshortparallel;": "\u2226", "nsim;": "\u2241", "nsime;": "\u2244", "nsimeq;": "\u2244", "nsmid;": "\u2224", "nspar;": "\u2226", "nsqsube;": "\u22e2", "nsqsupe;": "\u22e3", "nsub;": "\u2284", "nsubE;": "\u2ac5\u0338", "nsube;": "\u2288", "nsubset;": "\u2282\u20d2", "nsubseteq;": "\u2288", "nsubseteqq;": "\u2ac5\u0338", "nsucc;": "\u2281", "nsucceq;": "\u2ab0\u0338", "nsup;": "\u2285", "nsupE;": "\u2ac6\u0338", "nsupe;": "\u2289", "nsupset;": "\u2283\u20d2", "nsupseteq;": "\u2289", "nsupseteqq;": "\u2ac6\u0338", "ntgl;": "\u2279", ntilde: "\u00f1", "ntilde;": "\u00f1", "ntlg;": "\u2278", "ntriangleleft;": "\u22ea", "ntrianglelefteq;": "\u22ec", "ntriangleright;": "\u22eb", "ntrianglerighteq;": "\u22ed", "nu;": "\u03bd", "num;": "#", "numero;": "\u2116", "numsp;": "\u2007", "nvDash;": "\u22ad", "nvHarr;": "\u2904", "nvap;": "\u224d\u20d2", "nvdash;": "\u22ac", "nvge;": "\u2265\u20d2", "nvgt;": ">\u20d2", "nvinfin;": "\u29de", "nvlArr;": "\u2902", "nvle;": "\u2264\u20d2", "nvlt;": "<\u20d2", "nvltrie;": "\u22b4\u20d2", "nvrArr;": "\u2903", "nvrtrie;": "\u22b5\u20d2", "nvsim;": "\u223c\u20d2", "nwArr;": "\u21d6", "nwarhk;": "\u2923", "nwarr;": "\u2196", "nwarrow;": "\u2196", "nwnear;": "\u2927", "oS;": "\u24c8", oacute: "\u00f3", "oacute;": "\u00f3", "oast;": "\u229b", "ocir;": "\u229a", ocirc: "\u00f4", "ocirc;": "\u00f4", "ocy;": "\u043e", "odash;": "\u229d", "odblac;": "\u0151", "odiv;": "\u2a38", "odot;": "\u2299", "odsold;": "\u29bc", "oelig;": "\u0153", "ofcir;": "\u29bf", "ofr;": "\ud835\udd2c", "ogon;": "\u02db", ograve: "\u00f2", "ograve;": "\u00f2", "ogt;": "\u29c1", "ohbar;": "\u29b5", "ohm;": "\u03a9", "oint;": "\u222e", "olarr;": "\u21ba", "olcir;": "\u29be", "olcross;": "\u29bb", "oline;": "\u203e", "olt;": "\u29c0", "omacr;": "\u014d", "omega;": "\u03c9", "omicron;": "\u03bf", "omid;": "\u29b6", "ominus;": "\u2296", "oopf;": "\ud835\udd60", "opar;": "\u29b7", "operp;": "\u29b9", "oplus;": "\u2295", "or;": "\u2228", "orarr;": "\u21bb", "ord;": "\u2a5d", "order;": "\u2134", "orderof;": "\u2134", ordf: "\u00aa", "ordf;": "\u00aa", ordm: "\u00ba", "ordm;": "\u00ba", "origof;": "\u22b6", "oror;": "\u2a56", "orslope;": "\u2a57", "orv;": "\u2a5b", "oscr;": "\u2134", oslash: "\u00f8", "oslash;": "\u00f8", "osol;": "\u2298", otilde: "\u00f5", "otilde;": "\u00f5", "otimes;": "\u2297", "otimesas;": "\u2a36", ouml: "\u00f6", "ouml;": "\u00f6", "ovbar;": "\u233d", "par;": "\u2225", para: "\u00b6", "para;": "\u00b6", "parallel;": "\u2225", "parsim;": "\u2af3", "parsl;": "\u2afd", "part;": "\u2202", "pcy;": "\u043f", "percnt;": "%", "period;": ".", "permil;": "\u2030", "perp;": "\u22a5", "pertenk;": "\u2031", "pfr;": "\ud835\udd2d", "phi;": "\u03c6", "phiv;": "\u03d5", "phmmat;": "\u2133", "phone;": "\u260e", "pi;": "\u03c0", "pitchfork;": "\u22d4", "piv;": "\u03d6", "planck;": "\u210f", "planckh;": "\u210e", "plankv;": "\u210f", "plus;": "+", "plusacir;": "\u2a23", "plusb;": "\u229e", "pluscir;": "\u2a22", "plusdo;": "\u2214", "plusdu;": "\u2a25", "pluse;": "\u2a72", plusmn: "\u00b1", "plusmn;": "\u00b1", "plussim;": "\u2a26", "plustwo;": "\u2a27", "pm;": "\u00b1", "pointint;": "\u2a15", "popf;": "\ud835\udd61", pound: "\u00a3", "pound;": "\u00a3", "pr;": "\u227a", "prE;": "\u2ab3", "prap;": "\u2ab7", "prcue;": "\u227c", "pre;": "\u2aaf", "prec;": "\u227a", "precapprox;": "\u2ab7", "preccurlyeq;": "\u227c", "preceq;": "\u2aaf", "precnapprox;": "\u2ab9", "precneqq;": "\u2ab5", "precnsim;": "\u22e8", "precsim;": "\u227e", "prime;": "\u2032", "primes;": "\u2119", "prnE;": "\u2ab5", "prnap;": "\u2ab9", "prnsim;": "\u22e8", "prod;": "\u220f", "profalar;": "\u232e", "profline;": "\u2312", "profsurf;": "\u2313", "prop;": "\u221d", "propto;": "\u221d", "prsim;": "\u227e", "prurel;": "\u22b0", "pscr;": "\ud835\udcc5", "psi;": "\u03c8", "puncsp;": "\u2008", "qfr;": "\ud835\udd2e", "qint;": "\u2a0c", "qopf;": "\ud835\udd62", "qprime;": "\u2057", "qscr;": "\ud835\udcc6", "quaternions;": "\u210d", "quatint;": "\u2a16", "quest;": "?", "questeq;": "\u225f", quot: "\"", "quot;": "\"", "rAarr;": "\u21db", "rArr;": "\u21d2", "rAtail;": "\u291c", "rBarr;": "\u290f", "rHar;": "\u2964", "race;": "\u223d\u0331", "racute;": "\u0155", "radic;": "\u221a", "raemptyv;": "\u29b3", "rang;": "\u27e9", "rangd;": "\u2992", "range;": "\u29a5", "rangle;": "\u27e9", raquo: "\u00bb", "raquo;": "\u00bb", "rarr;": "\u2192", "rarrap;": "\u2975", "rarrb;": "\u21e5", "rarrbfs;": "\u2920", "rarrc;": "\u2933", "rarrfs;": "\u291e", "rarrhk;": "\u21aa", "rarrlp;": "\u21ac", "rarrpl;": "\u2945", "rarrsim;": "\u2974", "rarrtl;": "\u21a3", "rarrw;": "\u219d", "ratail;": "\u291a", "ratio;": "\u2236", "rationals;": "\u211a", "rbarr;": "\u290d", "rbbrk;": "\u2773", "rbrace;": "}", "rbrack;": "]", "rbrke;": "\u298c", "rbrksld;": "\u298e", "rbrkslu;": "\u2990", "rcaron;": "\u0159", "rcedil;": "\u0157", "rceil;": "\u2309", "rcub;": "}", "rcy;": "\u0440", "rdca;": "\u2937", "rdldhar;": "\u2969", "rdquo;": "\u201d", "rdquor;": "\u201d", "rdsh;": "\u21b3", "real;": "\u211c", "realine;": "\u211b", "realpart;": "\u211c", "reals;": "\u211d", "rect;": "\u25ad", reg: "\u00ae", "reg;": "\u00ae", "rfisht;": "\u297d", "rfloor;": "\u230b", "rfr;": "\ud835\udd2f", "rhard;": "\u21c1", "rharu;": "\u21c0", "rharul;": "\u296c", "rho;": "\u03c1", "rhov;": "\u03f1", "rightarrow;": "\u2192", "rightarrowtail;": "\u21a3", "rightharpoondown;": "\u21c1", "rightharpoonup;": "\u21c0", "rightleftarrows;": "\u21c4", "rightleftharpoons;": "\u21cc", "rightrightarrows;": "\u21c9", "rightsquigarrow;": "\u219d", "rightthreetimes;": "\u22cc", "ring;": "\u02da", "risingdotseq;": "\u2253", "rlarr;": "\u21c4", "rlhar;": "\u21cc", "rlm;": "\u200f", "rmoust;": "\u23b1", "rmoustache;": "\u23b1", "rnmid;": "\u2aee", "roang;": "\u27ed", "roarr;": "\u21fe", "robrk;": "\u27e7", "ropar;": "\u2986", "ropf;": "\ud835\udd63", "roplus;": "\u2a2e", "rotimes;": "\u2a35", "rpar;": ")", "rpargt;": "\u2994", "rppolint;": "\u2a12", "rrarr;": "\u21c9", "rsaquo;": "\u203a", "rscr;": "\ud835\udcc7", "rsh;": "\u21b1", "rsqb;": "]", "rsquo;": "\u2019", "rsquor;": "\u2019", "rthree;": "\u22cc", "rtimes;": "\u22ca", "rtri;": "\u25b9", "rtrie;": "\u22b5", "rtrif;": "\u25b8", "rtriltri;": "\u29ce", "ruluhar;": "\u2968", "rx;": "\u211e", "sacute;": "\u015b", "sbquo;": "\u201a", "sc;": "\u227b", "scE;": "\u2ab4", "scap;": "\u2ab8", "scaron;": "\u0161", "sccue;": "\u227d", "sce;": "\u2ab0", "scedil;": "\u015f", "scirc;": "\u015d", "scnE;": "\u2ab6", "scnap;": "\u2aba", "scnsim;": "\u22e9", "scpolint;": "\u2a13", "scsim;": "\u227f", "scy;": "\u0441", "sdot;": "\u22c5", "sdotb;": "\u22a1", "sdote;": "\u2a66", "seArr;": "\u21d8", "searhk;": "\u2925", "searr;": "\u2198", "searrow;": "\u2198", sect: "\u00a7", "sect;": "\u00a7", "semi;": ";", "seswar;": "\u2929", "setminus;": "\u2216", "setmn;": "\u2216", "sext;": "\u2736", "sfr;": "\ud835\udd30", "sfrown;": "\u2322", "sharp;": "\u266f", "shchcy;": "\u0449", "shcy;": "\u0448", "shortmid;": "\u2223", "shortparallel;": "\u2225", shy: "\u00ad", "shy;": "\u00ad", "sigma;": "\u03c3", "sigmaf;": "\u03c2", "sigmav;": "\u03c2", "sim;": "\u223c", "simdot;": "\u2a6a", "sime;": "\u2243", "simeq;": "\u2243", "simg;": "\u2a9e", "simgE;": "\u2aa0", "siml;": "\u2a9d", "simlE;": "\u2a9f", "simne;": "\u2246", "simplus;": "\u2a24", "simrarr;": "\u2972", "slarr;": "\u2190", "smallsetminus;": "\u2216", "smashp;": "\u2a33", "smeparsl;": "\u29e4", "smid;": "\u2223", "smile;": "\u2323", "smt;": "\u2aaa", "smte;": "\u2aac", "smtes;": "\u2aac\ufe00", "softcy;": "\u044c", "sol;": "/", "solb;": "\u29c4", "solbar;": "\u233f", "sopf;": "\ud835\udd64", "spades;": "\u2660", "spadesuit;": "\u2660", "spar;": "\u2225", "sqcap;": "\u2293", "sqcaps;": "\u2293\ufe00", "sqcup;": "\u2294", "sqcups;": "\u2294\ufe00", "sqsub;": "\u228f", "sqsube;": "\u2291", "sqsubset;": "\u228f", "sqsubseteq;": "\u2291", "sqsup;": "\u2290", "sqsupe;": "\u2292", "sqsupset;": "\u2290", "sqsupseteq;": "\u2292", "squ;": "\u25a1", "square;": "\u25a1", "squarf;": "\u25aa", "squf;": "\u25aa", "srarr;": "\u2192", "sscr;": "\ud835\udcc8", "ssetmn;": "\u2216", "ssmile;": "\u2323", "sstarf;": "\u22c6", "star;": "\u2606", "starf;": "\u2605", "straightepsilon;": "\u03f5", "straightphi;": "\u03d5", "strns;": "\u00af", "sub;": "\u2282", "subE;": "\u2ac5", "subdot;": "\u2abd", "sube;": "\u2286", "subedot;": "\u2ac3", "submult;": "\u2ac1", "subnE;": "\u2acb", "subne;": "\u228a", "subplus;": "\u2abf", "subrarr;": "\u2979", "subset;": "\u2282", "subseteq;": "\u2286", "subseteqq;": "\u2ac5", "subsetneq;": "\u228a", "subsetneqq;": "\u2acb", "subsim;": "\u2ac7", "subsub;": "\u2ad5", "subsup;": "\u2ad3", "succ;": "\u227b", "succapprox;": "\u2ab8", "succcurlyeq;": "\u227d", "succeq;": "\u2ab0", "succnapprox;": "\u2aba", "succneqq;": "\u2ab6", "succnsim;": "\u22e9", "succsim;": "\u227f", "sum;": "\u2211", "sung;": "\u266a", sup1: "\u00b9", "sup1;": "\u00b9", sup2: "\u00b2", "sup2;": "\u00b2", sup3: "\u00b3", "sup3;": "\u00b3", "sup;": "\u2283", "supE;": "\u2ac6", "supdot;": "\u2abe", "supdsub;": "\u2ad8", "supe;": "\u2287", "supedot;": "\u2ac4", "suphsol;": "\u27c9", "suphsub;": "\u2ad7", "suplarr;": "\u297b", "supmult;": "\u2ac2", "supnE;": "\u2acc", "supne;": "\u228b", "supplus;": "\u2ac0", "supset;": "\u2283", "supseteq;": "\u2287", "supseteqq;": "\u2ac6", "supsetneq;": "\u228b", "supsetneqq;": "\u2acc", "supsim;": "\u2ac8", "supsub;": "\u2ad4", "supsup;": "\u2ad6", "swArr;": "\u21d9", "swarhk;": "\u2926", "swarr;": "\u2199", "swarrow;": "\u2199", "swnwar;": "\u292a", szlig: "\u00df", "szlig;": "\u00df", "target;": "\u2316", "tau;": "\u03c4", "tbrk;": "\u23b4", "tcaron;": "\u0165", "tcedil;": "\u0163", "tcy;": "\u0442", "tdot;": "\u20db", "telrec;": "\u2315", "tfr;": "\ud835\udd31", "there4;": "\u2234", "therefore;": "\u2234", "theta;": "\u03b8", "thetasym;": "\u03d1", "thetav;": "\u03d1", "thickapprox;": "\u2248", "thicksim;": "\u223c", "thinsp;": "\u2009", "thkap;": "\u2248", "thksim;": "\u223c", thorn: "\u00fe", "thorn;": "\u00fe", "tilde;": "\u02dc", times: "\u00d7", "times;": "\u00d7", "timesb;": "\u22a0", "timesbar;": "\u2a31", "timesd;": "\u2a30", "tint;": "\u222d", "toea;": "\u2928", "top;": "\u22a4", "topbot;": "\u2336", "topcir;": "\u2af1", "topf;": "\ud835\udd65", "topfork;": "\u2ada", "tosa;": "\u2929", "tprime;": "\u2034", "trade;": "\u2122", "triangle;": "\u25b5", "triangledown;": "\u25bf", "triangleleft;": "\u25c3", "trianglelefteq;": "\u22b4", "triangleq;": "\u225c", "triangleright;": "\u25b9", "trianglerighteq;": "\u22b5", "tridot;": "\u25ec", "trie;": "\u225c", "triminus;": "\u2a3a", "triplus;": "\u2a39", "trisb;": "\u29cd", "tritime;": "\u2a3b", "trpezium;": "\u23e2", "tscr;": "\ud835\udcc9", "tscy;": "\u0446", "tshcy;": "\u045b", "tstrok;": "\u0167", "twixt;": "\u226c", "twoheadleftarrow;": "\u219e", "twoheadrightarrow;": "\u21a0", "uArr;": "\u21d1", "uHar;": "\u2963", uacute: "\u00fa", "uacute;": "\u00fa", "uarr;": "\u2191", "ubrcy;": "\u045e", "ubreve;": "\u016d", ucirc: "\u00fb", "ucirc;": "\u00fb", "ucy;": "\u0443", "udarr;": "\u21c5", "udblac;": "\u0171", "udhar;": "\u296e", "ufisht;": "\u297e", "ufr;": "\ud835\udd32", ugrave: "\u00f9", "ugrave;": "\u00f9", "uharl;": "\u21bf", "uharr;": "\u21be", "uhblk;": "\u2580", "ulcorn;": "\u231c", "ulcorner;": "\u231c", "ulcrop;": "\u230f", "ultri;": "\u25f8", "umacr;": "\u016b", uml: "\u00a8", "uml;": "\u00a8", "uogon;": "\u0173", "uopf;": "\ud835\udd66", "uparrow;": "\u2191", "updownarrow;": "\u2195", "upharpoonleft;": "\u21bf", "upharpoonright;": "\u21be", "uplus;": "\u228e", "upsi;": "\u03c5", "upsih;": "\u03d2", "upsilon;": "\u03c5", "upuparrows;": "\u21c8", "urcorn;": "\u231d", "urcorner;": "\u231d", "urcrop;": "\u230e", "uring;": "\u016f", "urtri;": "\u25f9", "uscr;": "\ud835\udcca", "utdot;": "\u22f0", "utilde;": "\u0169", "utri;": "\u25b5", "utrif;": "\u25b4", "uuarr;": "\u21c8", uuml: "\u00fc", "uuml;": "\u00fc", "uwangle;": "\u29a7", "vArr;": "\u21d5", "vBar;": "\u2ae8", "vBarv;": "\u2ae9", "vDash;": "\u22a8", "vangrt;": "\u299c", "varepsilon;": "\u03f5", "varkappa;": "\u03f0", "varnothing;": "\u2205", "varphi;": "\u03d5", "varpi;": "\u03d6", "varpropto;": "\u221d", "varr;": "\u2195", "varrho;": "\u03f1", "varsigma;": "\u03c2", "varsubsetneq;": "\u228a\ufe00", "varsubsetneqq;": "\u2acb\ufe00", "varsupsetneq;": "\u228b\ufe00", "varsupsetneqq;": "\u2acc\ufe00", "vartheta;": "\u03d1", "vartriangleleft;": "\u22b2", "vartriangleright;": "\u22b3", "vcy;": "\u0432", "vdash;": "\u22a2", "vee;": "\u2228", "veebar;": "\u22bb", "veeeq;": "\u225a", "vellip;": "\u22ee", "verbar;": "|", "vert;": "|", "vfr;": "\ud835\udd33", "vltri;": "\u22b2", "vnsub;": "\u2282\u20d2", "vnsup;": "\u2283\u20d2", "vopf;": "\ud835\udd67", "vprop;": "\u221d", "vrtri;": "\u22b3", "vscr;": "\ud835\udccb", "vsubnE;": "\u2acb\ufe00", "vsubne;": "\u228a\ufe00", "vsupnE;": "\u2acc\ufe00", "vsupne;": "\u228b\ufe00", "vzigzag;": "\u299a", "wcirc;": "\u0175", "wedbar;": "\u2a5f", "wedge;": "\u2227", "wedgeq;": "\u2259", "weierp;": "\u2118", "wfr;": "\ud835\udd34", "wopf;": "\ud835\udd68", "wp;": "\u2118", "wr;": "\u2240", "wreath;": "\u2240", "wscr;": "\ud835\udccc", "xcap;": "\u22c2", "xcirc;": "\u25ef", "xcup;": "\u22c3", "xdtri;": "\u25bd", "xfr;": "\ud835\udd35", "xhArr;": "\u27fa", "xharr;": "\u27f7", "xi;": "\u03be", "xlArr;": "\u27f8", "xlarr;": "\u27f5", "xmap;": "\u27fc", "xnis;": "\u22fb", "xodot;": "\u2a00", "xopf;": "\ud835\udd69", "xoplus;": "\u2a01", "xotime;": "\u2a02", "xrArr;": "\u27f9", "xrarr;": "\u27f6", "xscr;": "\ud835\udccd", "xsqcup;": "\u2a06", "xuplus;": "\u2a04", "xutri;": "\u25b3", "xvee;": "\u22c1", "xwedge;": "\u22c0", yacute: "\u00fd", "yacute;": "\u00fd", "yacy;": "\u044f", "ycirc;": "\u0177", "ycy;": "\u044b", yen: "\u00a5", "yen;": "\u00a5", "yfr;": "\ud835\udd36", "yicy;": "\u0457", "yopf;": "\ud835\udd6a", "yscr;": "\ud835\udcce", "yucy;": "\u044e", yuml: "\u00ff", "yuml;": "\u00ff", "zacute;": "\u017a", "zcaron;": "\u017e", "zcy;": "\u0437", "zdot;": "\u017c", "zeetrf;": "\u2128", "zeta;": "\u03b6", "zfr;": "\ud835\udd37", "zhcy;": "\u0436", "zigrarr;": "\u21dd", "zopf;": "\ud835\udd6b", "zscr;": "\ud835\udccf", "zwj;": "\u200d", "zwnj;": "\u200c"}, C.List_0);
   C.List_AR9 = Isolate.makeConstantList(["null-character", "invalid-codepoint", "incorrectly-placed-solidus", "incorrect-cr-newline-entity", "illegal-windows-1252-entity", "cant-convert-numeric-entity", "illegal-codepoint-for-numeric-entity", "numeric-entity-without-semicolon", "expected-numeric-entity-but-got-eof", "expected-numeric-entity", "named-entity-without-semicolon", "expected-named-entity", "attributes-in-end-tag", "self-closing-flag-on-end-tag", "expected-tag-name-but-got-right-bracket", "expected-tag-name-but-got-question-mark", "expected-tag-name", "expected-closing-tag-but-got-right-bracket", "expected-closing-tag-but-got-eof", "expected-closing-tag-but-got-char", "eof-in-tag-name", "expected-attribute-name-but-got-eof", "eof-in-attribute-name", "invalid-character-in-attribute-name", "duplicate-attribute", "expected-end-of-tag-name-but-got-eof", "expected-attribute-value-but-got-eof", "expected-attribute-value-but-got-right-bracket", "equals-in-unquoted-attribute-value", "unexpected-character-in-unquoted-attribute-value", "invalid-character-after-attribute-name", "unexpected-character-after-attribute-value", "eof-in-attribute-value-double-quote", "eof-in-attribute-value-single-quote", "eof-in-attribute-value-no-quotes", "unexpected-EOF-after-solidus-in-tag", "unexpected-character-after-soldius-in-tag", "expected-dashes-or-doctype", "unexpected-bang-after-double-dash-in-comment", "unexpected-space-after-double-dash-in-comment", "incorrect-comment", "eof-in-comment", "eof-in-comment-end-dash", "unexpected-dash-after-double-dash-in-comment", "eof-in-comment-double-dash", "eof-in-comment-end-space-state", "eof-in-comment-end-bang-state", "unexpected-char-in-comment", "need-space-after-doctype", "expected-doctype-name-but-got-right-bracket", "expected-doctype-name-but-got-eof", "eof-in-doctype-name", "eof-in-doctype", "expected-space-or-right-bracket-in-doctype", "unexpected-end-of-doctype", "unexpected-char-in-doctype", "eof-in-innerhtml", "unexpected-doctype", "non-html-root", "expected-doctype-but-got-eof", "unknown-doctype", "expected-doctype-but-got-chars", "expected-doctype-but-got-start-tag", "expected-doctype-but-got-end-tag", "end-tag-after-implied-root", "expected-named-closing-tag-but-got-eof", "two-heads-are-not-better-than-one", "unexpected-end-tag", "unexpected-start-tag-out-of-my-head", "unexpected-start-tag", "missing-end-tag", "missing-end-tags", "unexpected-start-tag-implies-end-tag", "unexpected-start-tag-treated-as", "deprecated-tag", "unexpected-start-tag-ignored", "expected-one-end-tag-but-got-another", "end-tag-too-early", "end-tag-too-early-named", "end-tag-too-early-ignored", "adoption-agency-1.1", "adoption-agency-1.2", "adoption-agency-1.3", "unexpected-end-tag-treated-as", "no-end-tag", "unexpected-implied-end-tag-in-table", "unexpected-implied-end-tag-in-table-body", "unexpected-char-implies-table-voodoo", "unexpected-hidden-input-in-table", "unexpected-form-in-table", "unexpected-start-tag-implies-table-voodoo", "unexpected-end-tag-implies-table-voodoo", "unexpected-cell-in-table-body", "unexpected-cell-end-tag", "unexpected-end-tag-in-table-body", "unexpected-implied-end-tag-in-table-row", "unexpected-end-tag-in-table-row", "unexpected-select-in-select", "unexpected-input-in-select", "unexpected-start-tag-in-select", "unexpected-end-tag-in-select", "unexpected-table-element-start-tag-in-select-in-table", "unexpected-table-element-end-tag-in-select-in-table", "unexpected-char-after-body", "unexpected-start-tag-after-body", "unexpected-end-tag-after-body", "unexpected-char-in-frameset", "unexpected-start-tag-in-frameset", "unexpected-frameset-in-frameset-innerhtml", "unexpected-end-tag-in-frameset", "unexpected-char-after-frameset", "unexpected-start-tag-after-frameset", "unexpected-end-tag-after-frameset", "unexpected-end-tag-after-body-innerhtml", "expected-eof-but-got-char", "expected-eof-but-got-start-tag", "expected-eof-but-got-end-tag", "eof-in-table", "eof-in-select", "eof-in-frameset", "eof-in-script-in-script", "eof-in-foreign-lands", "non-void-element-with-trailing-solidus", "unexpected-html-element-in-foreign-content", "unexpected-end-tag-before-html", "undefined-error"]);
@@ -24908,7 +24695,7 @@
   C.AttributeName_gQW = new B.AttributeName(null, "xmlns", "http://www.w3.org/2000/xmlns/");
   C.AttributeName_CTA = new B.AttributeName("xmlns", "xlink", "http://www.w3.org/2000/xmlns/");
   C.Map_VIbiD = new H.ConstantStringMap(12, {"xlink:actuate": C.AttributeName_QUH, "xlink:arcrole": C.AttributeName_adc, "xlink:href": C.AttributeName_cHZ, "xlink:role": C.AttributeName_aZ8, "xlink:show": C.AttributeName_Xda, "xlink:title": C.AttributeName_wIv, "xlink:type": C.AttributeName_rP3, "xml:base": C.AttributeName_kyU, "xml:lang": C.AttributeName_dik, "xml:space": C.AttributeName_3bx, xmlns: C.AttributeName_gQW, "xmlns:xlink": C.AttributeName_CTA}, C.List_VIq);
-  C.Map_empty = new H.ConstantStringMap(0, {}, C.List_empty);
+  C.Map_empty = new H.ConstantStringMap(0, {}, C.List_empty0);
   C.List_fbO = Isolate.makeConstantList(["attributename", "attributetype", "basefrequency", "baseprofile", "calcmode", "clippathunits", "contentscripttype", "contentstyletype", "diffuseconstant", "edgemode", "externalresourcesrequired", "filterres", "filterunits", "glyphref", "gradienttransform", "gradientunits", "kernelmatrix", "kernelunitlength", "keypoints", "keysplines", "keytimes", "lengthadjust", "limitingconeangle", "markerheight", "markerunits", "markerwidth", "maskcontentunits", "maskunits", "numoctaves", "pathlength", "patterncontentunits", "patterntransform", "patternunits", "pointsatx", "pointsaty", "pointsatz", "preservealpha", "preserveaspectratio", "primitiveunits", "refx", "refy", "repeatcount", "repeatdur", "requiredextensions", "requiredfeatures", "specularconstant", "specularexponent", "spreadmethod", "startoffset", "stddeviation", "stitchtiles", "surfacescale", "systemlanguage", "tablevalues", "targetx", "targety", "textlength", "viewbox", "viewtarget", "xchannelselector", "ychannelselector", "zoomandpan"]);
   C.Map_fbSNt = new H.ConstantStringMap(62, {attributename: "attributeName", attributetype: "attributeType", basefrequency: "baseFrequency", baseprofile: "baseProfile", calcmode: "calcMode", clippathunits: "clipPathUnits", contentscripttype: "contentScriptType", contentstyletype: "contentStyleType", diffuseconstant: "diffuseConstant", edgemode: "edgeMode", externalresourcesrequired: "externalResourcesRequired", filterres: "filterRes", filterunits: "filterUnits", glyphref: "glyphRef", gradienttransform: "gradientTransform", gradientunits: "gradientUnits", kernelmatrix: "kernelMatrix", kernelunitlength: "kernelUnitLength", keypoints: "keyPoints", keysplines: "keySplines", keytimes: "keyTimes", lengthadjust: "lengthAdjust", limitingconeangle: "limitingConeAngle", markerheight: "markerHeight", markerunits: "markerUnits", markerwidth: "markerWidth", maskcontentunits: "maskContentUnits", maskunits: "maskUnits", numoctaves: "numOctaves", pathlength: "pathLength", patterncontentunits: "patternContentUnits", patterntransform: "patternTransform", patternunits: "patternUnits", pointsatx: "pointsAtX", pointsaty: "pointsAtY", pointsatz: "pointsAtZ", preservealpha: "preserveAlpha", preserveaspectratio: "preserveAspectRatio", primitiveunits: "primitiveUnits", refx: "refX", refy: "refY", repeatcount: "repeatCount", repeatdur: "repeatDur", requiredextensions: "requiredExtensions", requiredfeatures: "requiredFeatures", specularconstant: "specularConstant", specularexponent: "specularExponent", spreadmethod: "spreadMethod", startoffset: "startOffset", stddeviation: "stdDeviation", stitchtiles: "stitchTiles", surfacescale: "surfaceScale", systemlanguage: "systemLanguage", tablevalues: "tableValues", targetx: "targetX", targety: "targetY", textlength: "textLength", viewbox: "viewBox", viewtarget: "viewTarget", xchannelselector: "xChannelSelector", ychannelselector: "yChannelSelector", zoomandpan: "zoomAndPan"}, C.List_fbO);
   C.List_li_dt_dd = Isolate.makeConstantList(["li", "dt", "dd"]);
@@ -24939,14 +24726,12 @@
   $.Zone__current = C.C__RootZone;
   $.Expando__keyCount = 0;
   $.Stopwatch__frequency = null;
-  $.Element__parseDocument = null;
-  $.Element__parseRange = null;
-  $.Element__defaultValidator = null;
-  $.Element__defaultSanitizer = null;
   $.GitHub_defaultClient = null;
   $.Device__isOpera = null;
   $.Device__isWebKit = null;
   $.$octocat = null;
+  $._currentUriBase = null;
+  $._current = null;
   $ = null;
   init.isHunkLoaded = function(hunkHash) {
     return !!$dart_deferred_initializers$[hunkHash];
@@ -24970,7 +24755,9 @@
       var lazyValue = lazies[i++];
       Isolate.$lazy(fieldName, getterName, lazyValue, staticName);
     }
-  })(["IsolateNatives_thisScript", "$get$IsolateNatives_thisScript", "thisScript", function() {
+  })(["DART_CLOSURE_PROPERTY_NAME", "$get$DART_CLOSURE_PROPERTY_NAME", "DART_CLOSURE_PROPERTY_NAME", function() {
+    return init.getIsolateTag("_$dart_dartClosure");
+  }, "IsolateNatives_thisScript", "$get$IsolateNatives_thisScript", "thisScript", function() {
     return H.IsolateNatives_computeThisScript();
   }, "IsolateNatives_workerIds", "$get$IsolateNatives_workerIds", "workerIds", function() {
     return H.setRuntimeTypeInfo(new P.Expando(null), [P.$int]);
@@ -25051,10 +24838,6 @@
     return t1;
   }, "_toStringVisiting", "$get$_toStringVisiting", "_toStringVisiting", function() {
     return [];
-  }, "_Html5NodeValidator__allowedElements", "$get$_Html5NodeValidator__allowedElements", "_allowedElements", function() {
-    return P.LinkedHashSet_LinkedHashSet$from(["A", "ABBR", "ACRONYM", "ADDRESS", "AREA", "ARTICLE", "ASIDE", "AUDIO", "B", "BDI", "BDO", "BIG", "BLOCKQUOTE", "BR", "BUTTON", "CANVAS", "CAPTION", "CENTER", "CITE", "CODE", "COL", "COLGROUP", "COMMAND", "DATA", "DATALIST", "DD", "DEL", "DETAILS", "DFN", "DIR", "DIV", "DL", "DT", "EM", "FIELDSET", "FIGCAPTION", "FIGURE", "FONT", "FOOTER", "FORM", "H1", "H2", "H3", "H4", "H5", "H6", "HEADER", "HGROUP", "HR", "I", "IFRAME", "IMG", "INPUT", "INS", "KBD", "LABEL", "LEGEND", "LI", "MAP", "MARK", "MENU", "METER", "NAV", "NOBR", "OL", "OPTGROUP", "OPTION", "OUTPUT", "P", "PRE", "PROGRESS", "Q", "S", "SAMP", "SECTION", "SELECT", "SMALL", "SOURCE", "SPAN", "STRIKE", "STRONG", "SUB", "SUMMARY", "SUP", "TABLE", "TBODY", "TD", "TEXTAREA", "TFOOT", "TH", "THEAD", "TIME", "TR", "TRACK", "TT", "U", "UL", "VAR", "VIDEO", "WBR"], null);
-  }, "_Html5NodeValidator__attributeValidators", "$get$_Html5NodeValidator__attributeValidators", "_attributeValidators", function() {
-    return P.LinkedHashMap__makeEmpty();
   }, "consoleSupport", "$get$consoleSupport", "consoleSupport", function() {
     return new S.ConsoleSupport();
   }, "random", "$get$random", "random", function() {
@@ -25075,7 +24858,7 @@
   Isolate = Isolate.$finishIsolateConstructor(Isolate);
   $ = new Isolate();
   init.metadata = [null, false];
-  init.types = [{func: 1, ret: P.bool}, {func: 1, args: [,]}, {func: 1}, {func: 1, void: true}, {func: 1, args: [,,]}, {func: 1, ret: P.bool, args: [P.String]}, {func: 1, void: true, args: [{func: 1, void: true}]}, {func: 1, args: [P.$int,,]}, {func: 1, args: [,], opt: [,]}, {func: 1, ret: P.String, args: [P.$int]}, {func: 1, ret: P.bool, args: [W.Element, P.String, P.String, W._Html5NodeValidator]}, {func: 1, ret: P.$int, args: [,]}, {func: 1, args: [P.$int]}, {func: 1, args: [P.bool]}, {func: 1, void: true, args: [, P.StackTrace]}, {func: 1, args: [{func: 1, void: true}]}, {func: 1, ret: P.$int, args: [, P.$int]}, {func: 1, void: true, args: [P.$int, P.$int]}, {func: 1, args: [P.Symbol,,]}, {func: 1, void: true, args: [P.Object], opt: [P.StackTrace]}, {func: 1, ret: P.$int, args: [,,]}, {func: 1, void: true, args: [P.String]}, {func: 1, void: true, args: [P.String], opt: [,]}, {func: 1, ret: P.$int, args: [P.$int, P.$int]}, {func: 1, void: true, args: [,], opt: [P.StackTrace]}, {func: 1, args: [W.HttpRequest]}, {func: 1, void: true, args: [W.Node, W.Node]}, {func: 1, ret: P.String}, {func: 1, ret: P.bool, args: [B.Selector]}, {func: 1, args: [P.String]}, {func: 1, ret: S.Token, named: {unicodeRange: null}}, {func: 1, ret: P.Future}, {func: 1, ret: G.FileSpan, args: [P.$int], opt: [P.$int]}, {func: 1, ret: P.num}, {func: 1, args: [, P.String]}, {func: 1, args: [, P.StackTrace]}, {func: 1, ret: P.String, args: [P.String]}, {func: 1, void: true, args: [P.String, T.SourceSpan]}];
+  init.types = [{func: 1, ret: P.bool}, {func: 1}, {func: 1, args: [,]}, {func: 1, v: true}, {func: 1, args: [,,]}, {func: 1, ret: P.bool, args: [P.String]}, {func: 1, v: true, args: [{func: 1, v: true}]}, {func: 1, args: [,], opt: [,]}, {func: 1, ret: P.String, args: [P.$int]}, {func: 1, args: [, P.String]}, {func: 1, args: [P.String]}, {func: 1, ret: S.Token, named: {unicodeRange: null}}, {func: 1, v: true, args: [P.String, T.SourceSpan]}, {func: 1, args: [{func: 1, v: true}]}, {func: 1, v: true, args: [P.Object], opt: [P.StackTrace]}, {func: 1, v: true, args: [,], opt: [P.StackTrace]}, {func: 1, args: [P.bool]}, {func: 1, args: [, P.StackTrace]}, {func: 1, v: true, args: [, P.StackTrace]}, {func: 1, ret: P.$int, args: [, P.$int]}, {func: 1, v: true, args: [P.$int, P.$int]}, {func: 1, ret: P.$int, args: [,,]}, {func: 1, v: true, args: [P.String]}, {func: 1, v: true, args: [P.String], opt: [,]}, {func: 1, ret: P.$int, args: [P.$int, P.$int]}, {func: 1, ret: P.Future}, {func: 1, args: [W.HttpRequest]}, {func: 1, ret: P.String}, {func: 1, ret: P.bool, args: [B.Selector]}, {func: 1, ret: G.FileSpan, args: [P.$int], opt: [P.$int]}, {func: 1, ret: P.num}, {func: 1, ret: P.String, args: [P.String]}];
   function convertToFastObject(properties) {
     function MyClass() {
     }

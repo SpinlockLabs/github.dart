@@ -59,7 +59,7 @@ class _YamlMapNodes extends MapBase<dynamic, YamlNode>
   final SourceSpan _span;
 
   Iterable get keys => _dartMap.keys.map((key) =>
-      new YamlScalar.internal(key, _span, ScalarStyle.ANY));
+      new YamlScalar.internalWithSpan(key, _span));
 
   _YamlMapNodes(this._dartMap, this._span);
 
@@ -151,5 +151,5 @@ class _YamlListNodes extends ListBase<YamlNode> {
 YamlNode _nodeForValue(value, SourceSpan span) {
   if (value is Map) return new YamlMapWrapper._(value, span);
   if (value is List) return new YamlListWrapper._(value, span);
-  return new YamlScalar.internal(value, span, ScalarStyle.ANY);
+  return new YamlScalar.internalWithSpan(value, span);
 }

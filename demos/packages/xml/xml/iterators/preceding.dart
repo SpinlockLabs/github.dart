@@ -1,21 +1,20 @@
 part of xml;
 
-/**
- * Iterable to walk over the precedents of a node.
- */
+/// Iterable to walk over the precedents of a node.
 class _XmlPrecedingIterable extends IterableBase<XmlNode> {
+
   final XmlNode start;
 
   _XmlPrecedingIterable(this.start);
 
   @override
   Iterator<XmlNode> get iterator => new _XmlPrecedingIterator(start);
+
 }
 
-/**
- * Iterator to walk over the precedents of a node.
- */
+/// Iterator to walk over the precedents of a node.
 class _XmlPrecedingIterator extends Iterator<XmlNode> {
+
   final XmlNode start;
   final List<XmlNode> todo = new List();
 
@@ -43,4 +42,5 @@ class _XmlPrecedingIterator extends Iterator<XmlNode> {
       return true;
     }
   }
+
 }

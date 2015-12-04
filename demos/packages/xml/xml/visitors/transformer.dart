@@ -1,14 +1,12 @@
 part of xml;
 
-/**
- * Transformer that creates an identical copy of the visited nodes.
- *
- * Subclass and override one or more of the methods to modify the generated copy.
- */
+/// Transformer that creates an identical copy of the visited nodes.
+///
+/// Subclass and override one or more of the methods to modify the generated copy.
 class XmlTransformer extends XmlVisitor {
+
   @override
-  visitAttribute(XmlAttribute node) =>
-      new XmlAttribute(visit(node.name), node.value);
+  visitAttribute(XmlAttribute node) => new XmlAttribute(visit(node.name), node.value);
 
   @override
   visitCDATA(XmlCDATA node) => new XmlCDATA(node.text);
@@ -23,16 +21,18 @@ class XmlTransformer extends XmlVisitor {
   visitDocument(XmlDocument node) => new XmlDocument(visitAll(node.children));
 
   @override
-  visitElement(XmlElement node) => new XmlElement(
-      visit(node.name), visitAll(node.attributes), visitAll(node.children));
+  visitDocumentFragment(XmlDocumentFragment node) => new XmlDocumentFragment(visitAll(node.children));
+
+  @override
+  visitElement(XmlElement node) => new XmlElement(visit(node.name), visitAll(node.attributes), visitAll(node.children));
 
   @override
   visitName(XmlName name) => new XmlName.fromString(name.qualified);
 
   @override
-  visitProcessing(XmlProcessing node) =>
-      new XmlProcessing(node.target, node.text);
+  visitProcessing(XmlProcessing node) => new XmlProcessing(node.target, node.text);
 
   @override
   visitText(XmlText node) => new XmlText(node.text);
+
 }

@@ -6,7 +6,13 @@ library source_span.location;
 
 import 'span.dart';
 
-// A class that describes a single location within a source file.
+// TODO(nweiz): Use SourceLocationMixin once we decide to cut a release with
+// breaking changes. See SourceLocationMixin for details.
+
+/// A class that describes a single location within a source file.
+///
+/// This class should not be extended. Instead, [SourceLocationBase] should be
+/// extended instead.
 class SourceLocation implements Comparable<SourceLocation> {
   /// URL of the source containing this location.
   ///
@@ -43,11 +49,11 @@ class SourceLocation implements Comparable<SourceLocation> {
         offset = offset,
         line = line == null ? 0 : line,
         column = column == null ? offset : column {
-    if (this.offset < 0) {
+    if (offset < 0) {
       throw new RangeError("Offset may not be negative, was $offset.");
-    } else if (this.line < 0) {
+    } else if (line != null && line < 0) {
       throw new RangeError("Line may not be negative, was $line.");
-    } else if (this.column < 0) {
+    } else if (column != null && column < 0) {
       throw new RangeError("Column may not be negative, was $column.");
     }
   }
@@ -84,4 +90,11 @@ class SourceLocation implements Comparable<SourceLocation> {
   int get hashCode => sourceUrl.hashCode + offset;
 
   String toString() => '<$runtimeType: $offset $toolString>';
+}
+
+/// A base class for source locations with [offset], [line], and [column] known
+/// at construction time.
+class SourceLocationBase extends SourceLocation {
+  SourceLocationBase(int offset, {sourceUrl, int line, int column})
+      : super(offset, sourceUrl: sourceUrl, line: line, column: column);
 }

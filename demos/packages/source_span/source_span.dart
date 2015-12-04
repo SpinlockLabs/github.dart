@@ -6,6 +6,7 @@ library source_span;
 
 export "src/file.dart";
 export "src/location.dart";
+export "src/location_mixin.dart";
 export "src/span.dart";
 export "src/span_exception.dart";
 export "src/span_mixin.dart";

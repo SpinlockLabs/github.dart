@@ -1,8 +1,6 @@
 part of xml;
 
-/**
- * A visitor that writes XML nodes exactly as they were parsed.
- */
+/// A visitor that writes XML nodes exactly as they were parsed.
 class XmlWriter extends XmlVisitor {
 
   final StringBuffer buffer;
@@ -43,6 +41,11 @@ class XmlWriter extends XmlVisitor {
   @override
   visitDocument(XmlDocument node) {
     writeChildren(node);
+  }
+
+  @override
+  visitDocumentFragment(XmlDocumentFragment node) {
+    buffer.write('#document-fragment');
   }
 
   @override
@@ -98,9 +101,7 @@ class XmlWriter extends XmlVisitor {
 }
 
 
-/**
- * A visitor that writes XML nodes correctly indented and with whitespaces adapted.
- */
+/// A visitor that writes XML nodes correctly indented and with whitespaces adapted.
 class XmlPrettyWriter extends XmlWriter {
 
   int level = 0;

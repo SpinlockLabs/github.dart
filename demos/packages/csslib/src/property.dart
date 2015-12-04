@@ -278,10 +278,11 @@ class Color implements _StyleProperty, ColorBase {
           return new Hsla(args[0], args[1], args[2], args[3]).toHexArgbString();
         default:
           // Type not defined UnsupportedOperationException should have thrown.
-          assert(true);
+          assert(false);
           break;
       }
     }
+    return null;
   }
 
   static int hexToInt(String hex) => int.parse(hex, radix: 16);
@@ -785,6 +786,7 @@ class PointXY implements _StyleProperty {
 
   String get cssExpression {
     // TODO(terry): TBD
+    return null;
   }
 }
 

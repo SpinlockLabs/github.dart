@@ -22,12 +22,21 @@ int _rotl32(int val, int shift) {
 // Base class encapsulating common behavior for cryptographic hash
 // functions.
 abstract class _HashBase implements Hash {
+  final int _chunkSizeInWords;
+  final int _digestSizeInWords;
+  final bool _bigEndianWords;
+  final Uint32List _currentChunk;
+  final Uint32List _h;
+  int _lengthInBytes = 0;
+  List<int> _pendingData;
+  bool _digestCalled = false;
+
   _HashBase(int chunkSizeInWords,
             int digestSizeInWords,
             bool this._bigEndianWords)
       : _pendingData = [],
-        _currentChunk = new List(chunkSizeInWords),
-        _h = new List(digestSizeInWords),
+        _currentChunk = new Uint32List(chunkSizeInWords),
+        _h = new Uint32List(digestSizeInWords),
         _chunkSizeInWords = chunkSizeInWords,
         _digestSizeInWords = digestSizeInWords;
 
@@ -60,7 +69,7 @@ abstract class _HashBase implements Hash {
   }
 
   // One round of the hash computation.
-  void _updateHash(List<int> m);
+  void _updateHash(Uint32List m);
 
   // Helper methods.
   int _add32(x, y) => (x + y) & _MASK_32;
@@ -95,7 +104,7 @@ abstract class _HashBase implements Hash {
 
   // Convert a 32-bit word to four bytes.
   List<int> _wordToBytes(int word) {
-    List<int> bytes = new List(_BYTES_PER_WORD);
+    List bytes = new List<int>(_BYTES_PER_WORD);
     bytes[0] = (word >> (_bigEndianWords ? 24 : 0)) & _MASK_8;
     bytes[1] = (word >> (_bigEndianWords ? 16 : 8)) & _MASK_8;
     bytes[2] = (word >> (_bigEndianWords ? 8 : 16)) & _MASK_8;
@@ -139,14 +148,4 @@ abstract class _HashBase implements Hash {
       _pendingData.addAll(_wordToBytes(0));
     }
   }
-
-  // Hasher state.
-  final int _chunkSizeInWords;
-  final int _digestSizeInWords;
-  final bool _bigEndianWords;
-  int _lengthInBytes = 0;
-  List<int> _pendingData;
-  final List<int> _currentChunk;
-  final List<int> _h;
-  bool _digestCalled = false;
 }

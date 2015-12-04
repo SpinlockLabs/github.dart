@@ -6,7 +6,7 @@ library mock.mock;
 
 import 'dart:mirrors';
 
-import 'package:unittest/unittest.dart';
+import 'package:matcher/matcher.dart';
 
 import 'action.dart';
 import 'behavior.dart';

@@ -357,7 +357,7 @@ class MultiEquality<E> implements Equality<E> {
  *
  * In ordered mode, lists and iterables are required to have equal elements
  * in the same order. In unordered mode, the order of elements in iterables
- * and lists are not importan.
+ * and lists are not important.
  *
  * A list is only equal to another list, likewise for sets and maps. All other
  * iterables are compared as iterables only.
