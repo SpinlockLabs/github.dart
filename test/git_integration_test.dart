@@ -96,7 +96,7 @@ main() {
   test('create and get a new reference (branch)', () async {
     var branchName = _randomGitName();
 
-    var createdRef = await github.git
+    await github.git
         .createReference(slug, 'refs/heads/$branchName', createdCommitSha);
 
     var fetchedRef = await github.git.getReference(slug, 'heads/$branchName');
