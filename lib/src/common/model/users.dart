@@ -2,6 +2,8 @@ part of github.common;
 
 /// Model class for a user.
 class User {
+  Map json;
+
   /// User's Username
   String login;
 
@@ -91,7 +93,8 @@ class User {
       ..followersCount = input['followers']
       ..followingCount = input['following']
       ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
+      ..updatedAt = parseDateTime(input['updated_at'])
+      ..json = input;
   }
 }
 
@@ -136,7 +139,8 @@ class CurrentUser extends User {
       ..updatedAt = parseDateTime(input['updated_at'])
       ..privateReposCount = input['total_private_repos']
       ..ownedPrivateReposCount = input['owned_private_repos']
-      ..plan = UserPlan.fromJSON(input['plan']);
+      ..plan = UserPlan.fromJSON(input['plan'])
+      ..json = input;
   }
 }
 
