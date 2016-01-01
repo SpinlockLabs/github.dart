@@ -7,5 +7,5 @@ class Response {
 
   Response(this.body, this.headers, this.statusCode);
 
-  dynamic asJSON() => JSON.decode(body);
+  dynamic asJSON() => const JsonDecoder().convert(body);
 }

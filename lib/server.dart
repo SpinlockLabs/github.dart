@@ -7,10 +7,10 @@ import "dart:async";
 import "dart:io";
 import "dart:convert";
 
-import 'common.dart';
-export 'common.dart';
+import "common.dart";
+export "common.dart";
 
-import 'http.dart' as http;
+import "http.dart" as http;
 
 part "src/server/hooks.dart";
 
@@ -47,7 +47,7 @@ class _IOClient extends http.Client {
       }
       return req.close();
     }).then((response) {
-      response.transform(UTF8.decoder).join().then((value) {
+      response.transform(const Utf8Decoder()).join().then((value) {
         var map = {};
 
         response.headers.forEach((key, value) => map[key] = value.first);
