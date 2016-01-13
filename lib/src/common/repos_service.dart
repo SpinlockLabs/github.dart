@@ -267,13 +267,21 @@ class RepositoriesService extends Service {
 
   /// Fetches the readme file for a repository.
   ///
+  /// The name of the commit/branch/tag may be specified with [ref]. If no [ref]
+  /// is defined, the repository's default branch is used (usually master).
+  ///
   /// API docs: https://developer.github.com/v3/repos/contents/#get-the-readme
-  Future<GitHubFile> getReadme(RepositorySlug slug) {
+  Future<GitHubFile> getReadme(RepositorySlug slug, {String ref}) {
     var headers = {};
 
-    return _github.getJSON("/repos/${slug.fullName}/readme",
-        headers: headers,
-        statusCode: StatusCodes.OK, fail: (http.Response response) {
+    String url = "/repos/${slug.fullName}/readme";
+
+    if (ref != null) {
+      url += '?ref=$ref';
+    }
+
+    return _github.getJSON(url, headers: headers, statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(_github, response.body);
       }
@@ -291,10 +299,19 @@ class RepositoriesService extends Service {
   /// Use [RepositoryContents.isFile] or [RepositoryContents.isDirectory] to
   /// distinguish between both result types.
   ///
+  /// The name of the commit/branch/tag may be specified with [ref]. If no [ref]
+  /// is defined, the repository's default branch is used (usually master).
+  ///
   /// API docs: https://developer.github.com/v3/repos/contents/#get-contents
-  Future<RepositoryContents> getContents(RepositorySlug slug, String path) {
-    return _github.getJSON("/repos/${slug.fullName}/contents/${path}",
-        convert: (input) {
+  Future<RepositoryContents> getContents(RepositorySlug slug, String path,
+      {String ref}) {
+    String url = "/repos/${slug.fullName}/contents/${path}";
+
+    if (ref != null) {
+      url += '?ref=$ref';
+    }
+
+    return _github.getJSON(url, convert: (input) {
       var contents = new RepositoryContents();
       if (input is Map) {
         contents.file = GitHubFile.fromJSON(input);
