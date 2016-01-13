@@ -61,7 +61,7 @@ class PullRequestInformation {
 
     var pr = into != null ? into : new PullRequestInformation();
     pr.head = PullRequestHead.fromJSON(input['head']);
-    pr.base = PullRequestHead.fromJSON(input['head']);
+    pr.base = PullRequestHead.fromJSON(input['base']);
     pr.htmlUrl = input['html_url'];
     pr.diffUrl = input['diff_url'];
     pr.patchUrl = input['patch_url'];
