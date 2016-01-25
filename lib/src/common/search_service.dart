@@ -47,6 +47,54 @@ class SearchService extends Service {
     return controller.stream;
   }
 
+  Stream code(String query, {String language, String filename, String user,
+    int pages: 2, int perPage: 30}) {
+
+    var params = {"q": query};
+
+    if (language != null) {
+      params['language'] = language;
+    }
+
+    if (filename != null) {
+      params['filename'] = filename;
+    }
+
+    if (user != null) {
+      params['user'] = user;
+    }
+
+    params["per_page"] = perPage;
+
+    var controller = new StreamController();
+
+    var isFirst = true;
+
+    new PaginationHelper(_github)
+        .fetchStreamed("GET", "/search/code", params: params, pages: pages)
+        .listen((response) {
+      if (response.statusCode == 403 &&
+          response.body.contains("rate limit") &&
+          isFirst) {
+        throw new RateLimitHit(_github);
+      }
+
+      isFirst = false;
+
+      var input = JSON.decode(response.body);
+
+      if (input['items'] == null) {
+        return;
+      }
+
+      List<dynamic> items = input['items'];
+
+      items.map((item) => User.fromJSON(item)).forEach(controller.add);
+    }).onDone(controller.close);
+
+    return controller.stream;
+  }
+
   // TODO: Implement code: https://developer.github.com/v3/search/#search-code
   // TODO: Implement issues: https://developer.github.com/v3/search/#search-issues
 
