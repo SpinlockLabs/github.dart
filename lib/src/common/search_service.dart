@@ -89,7 +89,7 @@ class SearchService extends Service {
 
       List<dynamic> items = input['items'];
 
-      items.map((item) => User.fromJSON(item)).forEach(controller.add);
+      items.forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
