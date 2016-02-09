@@ -1,3 +1,8 @@
+## v2.3.2
+
+- Automatically attempt to find GitHub user information in the process environment when running on the standalone VM. 
+- Add `ref` parameter to `getReadme` method for the repository service.
+
 ## v2.3.1
 
 - Cache base64 decoded `text` property in `GitHubFile`
