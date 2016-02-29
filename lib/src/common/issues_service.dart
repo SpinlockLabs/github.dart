@@ -17,9 +17,10 @@ class IssuesService extends Service {
       String direction,
       String sort,
       DateTime since,
-      int perPage}) {
-    return _listIssues("/issues",
-        milestoneNumber, state, direction, sort, since, perPage);
+      int perPage,
+      List<String> labels}) {
+    return _listIssues("/issues", milestoneNumber, state, direction, sort,
+        since, perPage, labels);
   }
 
   /// List all issues across owned and member repositories for the authenticated
@@ -32,9 +33,10 @@ class IssuesService extends Service {
       String direction,
       String sort,
       DateTime since,
-      int perPage}) {
-    return _listIssues("/user/issues",
-        milestoneNumber, state, direction, sort, since, perPage);
+      int perPage,
+      List<String> labels}) {
+    return _listIssues("/user/issues", milestoneNumber, state, direction, sort,
+        since, perPage, labels);
   }
 
   /// List all issues for a given organization for the authenticated user.
@@ -46,9 +48,10 @@ class IssuesService extends Service {
       String direction,
       String sort,
       DateTime since,
-      int perPage}) {
-    return _listIssues("/orgs/${org}/issues",
-        milestoneNumber, state, direction, sort, since, perPage);
+      int perPage,
+      List<String> labels}) {
+    return _listIssues("/orgs/${org}/issues", milestoneNumber, state, direction,
+        sort, since, perPage, labels);
   }
 
   /// Lists the issues for the specified repository.
@@ -62,14 +65,21 @@ class IssuesService extends Service {
       String direction,
       String sort,
       DateTime since,
-      int perPage}) {
-    return _listIssues("/repos/${slug.fullName}/issues",
-        milestoneNumber, state, direction, sort, since, perPage);
+      int perPage,
+      List<String> labels}) {
+    return _listIssues("/repos/${slug.fullName}/issues", milestoneNumber, state,
+        direction, sort, since, perPage, labels);
   }
 
-  Stream<Issue> _listIssues(String pathSegment, int milestoneNumber,
-      String state, String direction, String sort, DateTime since,
-      int perPage) {
+  Stream<Issue> _listIssues(
+      String pathSegment,
+      int milestoneNumber,
+      String state,
+      String direction,
+      String sort,
+      DateTime since,
+      int perPage,
+      List<String> labels) {
     var params = <String, String>{};
 
     if (perPage != null) {
@@ -101,6 +111,10 @@ class IssuesService extends Service {
       // Only issues updated at or after this time are returned.
       // This is a timestamp in ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ.
       params['since'] = since.toUtc().toIso8601String();
+    }
+
+    if (labels != null && labels.isNotEmpty) {
+      params['labels'] = labels.join(',');
     }
 
     return new PaginationHelper(_github)
