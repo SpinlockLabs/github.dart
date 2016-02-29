@@ -19,6 +19,8 @@ import "package:xml/xml.dart" as xml;
 
 import "http.dart" as http;
 
+import 'src/util.dart';
+
 part "src/common/github.dart";
 
 // Util

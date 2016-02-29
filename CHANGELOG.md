@@ -1,3 +1,7 @@
+## v3.0.0
+
+- *BREAKING* Removed a number of top-level methods from the public API.
+
 ## v2.3.2
 
 - Automatically attempt to find GitHub user information in the process environment when running on the standalone VM. 

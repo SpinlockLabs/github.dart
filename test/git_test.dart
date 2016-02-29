@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:github/common.dart';
+import 'package:github/src/util.dart';
 import 'package:github/http.dart' as http;
 import 'package:mock/mock.dart';
 import 'package:test/test.dart';

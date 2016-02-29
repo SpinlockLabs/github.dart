@@ -1,4 +1,4 @@
-import 'package:github/common.dart';
+import 'package:github/src/util.dart';
 
 void main() {
   var it = parseLinkHeader(
