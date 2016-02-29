@@ -331,7 +331,8 @@ class GitHub {
           throw new InvalidJSON(this, message);
         } else if (message == "Body should be a JSON Hash") {
           throw new InvalidJSON(this, message);
-        } else throw new BadRequest(this);
+        } else
+          throw new BadRequest(this);
         break;
       case 422:
         var buff = new StringBuffer();
@@ -416,7 +417,8 @@ class GitHub {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
         return null;
-      } else return response;
+      } else
+        return response;
     });
   }
 

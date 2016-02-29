@@ -6,13 +6,8 @@
 library github.common;
 
 import "dart:async";
-import "dart:convert" show
-  JSON,
-  UTF8,
-  JsonEncoder,
-  JsonDecoder,
-  Utf8Encoder,
-  Utf8Decoder;
+import "dart:convert"
+    show JSON, UTF8, JsonEncoder, JsonDecoder, Utf8Encoder, Utf8Decoder;
 import "package:crypto/crypto.dart" show CryptoUtils;
 
 import "package:html/parser.dart" as htmlParser;

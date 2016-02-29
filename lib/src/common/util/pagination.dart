@@ -92,11 +92,12 @@ class PaginationHelper<T> {
       int statusCode: 200,
       String preview}) {
     return jsonObjects(method, path,
-        pages: pages,
-        headers: headers,
-        params: params,
-        body: body,
-        statusCode: statusCode,
-        preview: preview).map(converter);
+            pages: pages,
+            headers: headers,
+            params: params,
+            body: body,
+            statusCode: statusCode,
+            preview: preview)
+        .map(converter);
   }
 }

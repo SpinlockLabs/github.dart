@@ -10,10 +10,7 @@ import 'package:test/test.dart';
 
 import 'helper.dart';
 
-class MockGitHub extends MockWithNamedArgs implements GitHub {
-  // This removes the compiler warning.
-  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
+class MockGitHub extends MockWithNamedArgs implements GitHub {}
 
 main() {
   MockGitHub github;

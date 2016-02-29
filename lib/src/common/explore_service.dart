@@ -12,8 +12,8 @@ class ExploreService extends Service {
 
     if (language != null) url += "?l=${language}";
 
-    if (since != null) url +=
-        language == null ? "?since=${since}" : "&since=${since}";
+    if (since != null)
+      url += language == null ? "?since=${since}" : "&since=${since}";
 
     var controller = new StreamController();
 

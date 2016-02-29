@@ -17,8 +17,10 @@ void main(List<String> args) {
   addTask("analyze",
       createAnalyzerTask(getvar("analyzer.files").map(parse_config_value)));
   addTask("version", createVersionTask());
-  addTask("publish",
-      createProcessTask("pub", args: ["publish", "-f"], description: "Publishes a New Version"),
+  addTask(
+      "publish",
+      createProcessTask("pub",
+          args: ["publish", "-f"], description: "Publishes a New Version"),
       dependencies: ["version"]);
   addTask("bench", createBenchTask());
   addTask(
