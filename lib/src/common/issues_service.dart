@@ -12,12 +12,14 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listAll(
-      {String state,
+      {int milestoneNumber,
+      String state,
       String direction,
       String sort,
       DateTime since,
       int perPage}) {
-    return _listIssues("/issues", state, direction, sort, since, perPage);
+    return _listIssues("/issues",
+        milestoneNumber, state, direction, sort, since, perPage);
   }
 
   /// List all issues across owned and member repositories for the authenticated
@@ -25,25 +27,28 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByUser(
-      {String state,
+      {int milestoneNumber,
+      String state,
       String direction,
       String sort,
       DateTime since,
       int perPage}) {
-    return _listIssues("/user/issues", state, direction, sort, since, perPage);
+    return _listIssues("/user/issues",
+        milestoneNumber, state, direction, sort, since, perPage);
   }
 
   /// List all issues for a given organization for the authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/issues/#list-issues
   Stream<Issue> listByOrg(String org,
-      {String state,
+      {int milestoneNumber,
+      String state,
       String direction,
       String sort,
       DateTime since,
       int perPage}) {
-    return _listIssues(
-        "/orgs/${org}/issues", state, direction, sort, since, perPage);
+    return _listIssues("/orgs/${org}/issues",
+        milestoneNumber, state, direction, sort, since, perPage);
   }
 
   /// Lists the issues for the specified repository.
@@ -52,21 +57,29 @@ class IssuesService extends Service {
   ///
   /// API docs:https://developer.github.com/v3/issues/#list-issues-for-a-repository
   Stream<Issue> listByRepo(RepositorySlug slug,
-      {String state,
+      {int milestoneNumber,
+      String state,
       String direction,
       String sort,
       DateTime since,
       int perPage}) {
-    return _listIssues("/repos/${slug.fullName}/issues", state, direction, sort,
-        since, perPage);
+    return _listIssues("/repos/${slug.fullName}/issues",
+        milestoneNumber, state, direction, sort, since, perPage);
   }
 
-  Stream<Issue> _listIssues(String pathSegment, String state, String direction,
-      String sort, DateTime since, int perPage) {
+  Stream<Issue> _listIssues(String pathSegment, int milestoneNumber,
+      String state, String direction, String sort, DateTime since,
+      int perPage) {
     var params = <String, String>{};
 
     if (perPage != null) {
       params['per_page'] = perPage.toString();
+    }
+
+    if (milestoneNumber != null) {
+      // should be a milestone number (e.g. '34') not a milestone title
+      // (e.g. '1.15')
+      params['milestone'] = milestoneNumber;
     }
 
     if (state != null) {
