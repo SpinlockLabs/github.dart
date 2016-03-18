@@ -117,8 +117,8 @@ class _IOClient extends http.Client {
 
         var resp = new http.Response(value, map, response.statusCode);
         completer.complete(resp);
-      });
-    });
+      }).catchError(completer.completeError);
+    }).catchError(completer.completeError);
 
     return completer.future;
   }
