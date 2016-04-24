@@ -314,7 +314,7 @@ class GitHub {
    */
   void handleStatusCode(http.Response response) {
     String message;
-    List<String> errors;
+    List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
       var json = response.asJSON();
       message = json['message'];

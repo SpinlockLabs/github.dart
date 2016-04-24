@@ -266,10 +266,11 @@ class IssuesService extends Service {
   /// Deletes a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#delete-a-label
-  Future<bool> deleteLabel(RepositorySlug slug, String name) {
-    return _github
-        .request("DELETE", "/repos/${slug.fullName}/labels/${name}")
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> deleteLabel(RepositorySlug slug, String name) async {
+    var response = await _github.request(
+        "DELETE", "/repos/${slug.fullName}/labels/${name}");
+
+    return response.statusCode == StatusCodes.NO_CONTENT;
   }
 
   /// Lists all labels for an issue.
@@ -310,11 +311,11 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#remove-a-label-from-an-issue
   Future<bool> removeLabelForIssue(
-      RepositorySlug slug, int issueNumber, String label) {
-    return _github
-        .request("DELETE",
-            "/repos/${slug.fullName}/issues/${issueNumber}/labels/${label}")
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+      RepositorySlug slug, int issueNumber, String label) async {
+    var response = await _github.request("DELETE",
+        "/repos/${slug.fullName}/issues/${issueNumber}/labels/${label}");
+
+    return response.statusCode == StatusCodes.OK;
   }
 
   /// Removes all labels for an issue.
