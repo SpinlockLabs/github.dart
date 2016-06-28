@@ -38,8 +38,7 @@ class GitHubFile {
   /// Text Content
   String get text {
     if (_text == null) {
-      _text =
-          new String.fromCharCodes(CryptoUtils.base64StringToBytes(content));
+      _text = UTF8.decode(BASE64.decode(content));
     }
     return _text;
   }
