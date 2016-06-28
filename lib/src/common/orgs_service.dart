@@ -174,14 +174,14 @@ class OrganizationsService extends Service {
     var completer = new Completer();
 
     _github.getJSON("/teams/${teamId}/memberships/${user}", statusCode: 200,
-            fail: (http.Response response) {
+        fail: (http.Response response) {
       if (response.statusCode == 404) {
         completer.complete(new TeamMembershipState(null));
       } else {
         _github.handleStatusCode(response);
       }
-    }, convert: (json) => new TeamMembershipState(json['state']))
-        .then(completer.complete);
+    }, convert: (json) => new TeamMembershipState(json['state'])).then(
+        completer.complete);
 
     return completer.future;
   }

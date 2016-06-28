@@ -6,14 +6,7 @@
 library github.common;
 
 import "dart:async";
-import "dart:convert" show
-  JSON,
-  UTF8,
-  JsonEncoder,
-  JsonDecoder,
-  Utf8Encoder,
-  Utf8Decoder;
-import "package:crypto/crypto.dart" show CryptoUtils;
+import "dart:convert" show BASE64, JSON, UTF8;
 
 import "package:html/parser.dart" as htmlParser;
 import "package:html/dom.dart" as html;
@@ -24,11 +17,12 @@ import "package:xml/xml.dart" as xml;
 
 import "http.dart" as http;
 
+import 'src/util.dart';
+
 part "src/common/github.dart";
 
 // Util
 part "src/common/util/auth.dart";
-part "src/common/util/encoding_utils.dart";
 part "src/common/util/json.dart";
 part "src/common/util/oauth2.dart";
 part "src/common/util/errors.dart";

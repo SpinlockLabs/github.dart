@@ -4,7 +4,7 @@ import "package:quiver/async.dart";
 
 main() async {
   var github = createGitHubClient();
-  
+
   github.organizations.get("DirectMyFile").then((organization) {
     return github.organizations.listTeams(organization.name).toList();
   }).then((teams) {

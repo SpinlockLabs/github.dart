@@ -314,7 +314,7 @@ class GitHub {
    */
   void handleStatusCode(http.Response response) {
     String message;
-    List<String> errors;
+    List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
       var json = response.asJSON();
       message = json['message'];
@@ -331,7 +331,8 @@ class GitHub {
           throw new InvalidJSON(this, message);
         } else if (message == "Body should be a JSON Hash") {
           throw new InvalidJSON(this, message);
-        } else throw new BadRequest(this);
+        } else
+          throw new BadRequest(this);
         break;
       case 422:
         var buff = new StringBuffer();
@@ -379,7 +380,8 @@ class GitHub {
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
-      var userAndPass = utf8ToBase64('${auth.username}:${auth.password}');
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
     }
 
@@ -416,7 +418,8 @@ class GitHub {
         fail != null ? fail(response) : null;
         handleStatusCode(response);
         return null;
-      } else return response;
+      } else
+        return response;
     });
   }
 

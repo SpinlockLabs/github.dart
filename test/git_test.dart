@@ -4,16 +4,14 @@ import 'dart:async';
 import 'dart:convert' show JSON;
 
 import 'package:github/common.dart';
+import 'package:github/src/util.dart';
 import 'package:github/http.dart' as http;
 import 'package:mock/mock.dart';
 import 'package:test/test.dart';
 
 import 'helper.dart';
 
-class MockGitHub extends MockWithNamedArgs implements GitHub {
-  // This removes the compiler warning.
-  noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
+class MockGitHub extends MockWithNamedArgs implements GitHub {}
 
 main() {
   MockGitHub github;

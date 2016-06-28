@@ -24,8 +24,8 @@ void init(String script, {void onReady()}) {
     var ready = false;
 
     void sendCode() {
-      popup.postMessage(
-          {"command": "code", "code": code}, window.location.href);
+      popup
+          .postMessage({"command": "code", "code": code}, window.location.href);
     }
 
     window.addEventListener("message", (event) {
@@ -52,10 +52,9 @@ Map<String, String> queryString =
 
 GitHub _createGitHub() {
   initGitHub();
-  return new GitHub(
-      auth: queryString["token"] != null
-          ? new Authentication.withToken(queryString["token"])
-          : new Authentication.anonymous());
+  return new GitHub(auth: queryString["token"] != null
+      ? new Authentication.withToken(queryString["token"])
+      : new Authentication.anonymous());
 }
 
 GitHub github = _createGitHub();

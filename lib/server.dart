@@ -50,12 +50,8 @@ const List<String> COMMON_GITHUB_TOKEN_ENV_KEYS = const [
 Authentication findAuthenticationFromEnvironment() {
   if (Platform.isMacOS) {
     try {
-      var result = Process.runSync("security", const [
-        "find-internet-password",
-        "-g",
-        "-s",
-        "github.com"
-      ]);
+      var result = Process.runSync("security",
+          const ["find-internet-password", "-g", "-s", "github.com"]);
 
       if (result.exitCode != 0) {
         throw "Don't use keychain.";
@@ -68,8 +64,7 @@ Authentication findAuthenticationFromEnvironment() {
       String password = result.stderr.toString().split("password:")[1].trim();
       password = password.substring(1, password.length - 1);
       return new Authentication.basic(username.trim(), password.trim());
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Map<String, String> env = Platform.environment;
@@ -82,9 +77,7 @@ Authentication findAuthenticationFromEnvironment() {
 
   if (env["GITHUB_USERNAME"] is String && env["GITHUB_PASSWORD"] is String) {
     return new Authentication.basic(
-      env["GITHUB_USERNAME"],
-      env["GITHUB_PASSWORD"]
-    );
+        env["GITHUB_USERNAME"], env["GITHUB_PASSWORD"]);
   }
 
   return new Authentication.anonymous();
