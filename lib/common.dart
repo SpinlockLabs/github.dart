@@ -8,46 +8,23 @@ library github.common;
 import "dart:async";
 import "dart:convert" show BASE64, JSON, UTF8;
 
-import "package:html/parser.dart" as htmlParser;
 import "package:html/dom.dart" as html;
-
+import "package:html/parser.dart" as htmlParser;
 import "package:http/http.dart" as http;
-
 import "package:quiver/async.dart" show FutureGroup;
-
 import "package:xml/xml.dart" as xml;
 
 import 'src/util.dart';
 
-part "src/common/github.dart";
-
-// Util
-part "src/common/util/auth.dart";
-part "src/common/util/json.dart";
-part "src/common/util/oauth2.dart";
-part "src/common/util/errors.dart";
-part "src/common/util/pagination.dart";
-part "src/common/util/service.dart";
-part "src/common/util/utils.dart";
-part "src/common/util/crawler.dart";
-
-// Services
 part "src/common/activity_service.dart";
 part "src/common/authorizations_service.dart";
 part "src/common/blog_service.dart";
 part "src/common/explore_service.dart";
 part "src/common/gists_service.dart";
 part "src/common/git_service.dart";
+part "src/common/github.dart";
 part "src/common/issues_service.dart";
 part "src/common/misc_service.dart";
-part "src/common/orgs_service.dart";
-part "src/common/pulls_service.dart";
-part "src/common/repos_service.dart";
-part "src/common/search_service.dart";
-part "src/common/url_shortener_service.dart";
-part "src/common/users_service.dart";
-
-// Models
 part "src/common/model/activity.dart";
 part "src/common/model/authorizations.dart";
 part "src/common/model/blog.dart";
@@ -72,3 +49,18 @@ part "src/common/model/repos_stats.dart";
 part "src/common/model/repos_statuses.dart";
 part "src/common/model/search.dart";
 part "src/common/model/users.dart";
+part "src/common/orgs_service.dart";
+part "src/common/pulls_service.dart";
+part "src/common/repos_service.dart";
+part "src/common/search_service.dart";
+part "src/common/url_shortener_service.dart";
+part "src/common/users_service.dart";
+part "src/common/util/auth.dart";
+part "src/common/util/crawler.dart";
+part "src/common/util/errors.dart";
+part "src/common/util/json.dart";
+part "src/common/util/oauth2.dart";
+part "src/common/util/pagination.dart";
+part "src/common/util/service.dart";
+part "src/common/util/utils.dart";
+

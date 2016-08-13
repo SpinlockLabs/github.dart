@@ -4,13 +4,14 @@
 library github.server;
 
 import "dart:async";
-import "dart:io";
 import "dart:convert";
-
-import "common.dart";
-export "common.dart";
+import "dart:io";
 
 import "package:http/http.dart" as http;
+
+import "common.dart";
+
+export "common.dart";
 
 part "src/server/hooks.dart";
 
