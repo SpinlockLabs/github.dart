@@ -7,6 +7,7 @@ environment:
   sdk: '>=1.13.0 <2.0.0'
 dependencies:
   html: '^0.12.0'
+  http: '^0.11.3'
   quiver: '>=0.20.0 <0.25.0'
   xml: '^2.0.0'
 dev_dependencies:

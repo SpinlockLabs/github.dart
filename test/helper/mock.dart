@@ -1,7 +1,6 @@
 part of github.test.helper;
 
 GitHub createMockGitHub() {
-  initGitHub();
   return new GitHub(client: httpClient);
 }
 

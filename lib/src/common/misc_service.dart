@@ -76,8 +76,8 @@ class MiscService extends Service {
     var u = "http://feeds.feedburner.com/Octocats.xml";
 
     _github.client
-        .request(new http.Request(
-            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}"))
+        .get(
+            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}")
         .then((response) {
       var document = htmlParser.parse(response.body);
       document.querySelectorAll("entry").forEach((entry) {

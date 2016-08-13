@@ -17,7 +17,7 @@ class ExploreService extends Service {
 
     var controller = new StreamController();
 
-    _github.client.request(new http.Request(url)).then((response) {
+    _github.client.get(url).then((response) {
       var doc = htmlParser.parse(response.body);
       var items = doc.querySelectorAll(
           "li.repo-leaderboard-list-item.leaderboard-list-item");
@@ -47,7 +47,7 @@ class ExploreService extends Service {
   Future<Showcase> getShowcase(ShowcaseInfo info) {
     var completer = new Completer();
 
-    _github.client.request(new http.Request(info.url)).then((response) {
+    _github.client.get(info.url).then((response) {
       var doc = htmlParser.parse(response.body);
       var showcase = new Showcase();
 
@@ -123,10 +123,10 @@ class ExploreService extends Service {
       for (var link in links) {
         if (link.text.contains("Next")) {
           didFetchMore = true;
-          GitHub
-              .defaultClient()
-              .request(new http.Request(link.attributes['href']))
-              .then(handleResponse);
+
+          var client = new http.Client();
+
+          client.get(link.attributes['href']).then(handleResponse);
         }
       }
 
@@ -135,9 +135,7 @@ class ExploreService extends Service {
       }
     };
 
-    _github.client
-        .request(new http.Request("https://github.com/showcases"))
-        .then(handleResponse);
+    _github.client.get("https://github.com/showcases").then(handleResponse);
 
     return controller.stream;
   }

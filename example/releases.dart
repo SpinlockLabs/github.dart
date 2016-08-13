@@ -32,6 +32,7 @@ void loadReleases() {
         rel.appendHtml("<br/><b>${key}</b>: ${value}",
             treeSanitizer: NodeTreeSanitizer.trusted);
       }
+
       append("Tag", '<a href=${release.htmlUrl}>${release.tagName}</a>');
       append("Download",
           '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>');

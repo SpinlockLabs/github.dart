@@ -39,7 +39,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
   Stream<Repository> listOrganizationRepositories(String org,
       {String type: "all"}) {
-    var params = {"type": type,};
+    var params = {
+      "type": type,
+    };
 
     return new PaginationHelper(_github).objects(
         "GET", "/orgs/${org}/repos", Repository.fromJSON,
@@ -359,7 +361,7 @@ class RepositoriesService extends Service {
         .request("DELETE", "/repos/${slug.fullName}/contents/${path}",
             body: JSON.encode(map), statusCode: 200)
         .then((response) {
-      return ContentCreation.fromJSON(response.asJSON());
+      return ContentCreation.fromJSON(JSON.decode(response.body));
     });
   }
 

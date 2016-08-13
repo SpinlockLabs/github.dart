@@ -200,7 +200,7 @@ class OrganizationsService extends Service {
         _github.handleStatusCode(response);
       }
     }).then((response) {
-      return new TeamMembershipState(response.asJSON()["state"]);
+      return new TeamMembershipState(JSON.decode(response.body)["state"]);
     }).then(completer.complete);
 
     return completer.future;

@@ -79,11 +79,10 @@ class OAuth2Flow {
       "redirect_uri": redirectUri
     });
 
-    return (github == null ? GitHub.defaultClient() : github.client)
-        .request(new http.Request("${baseUrl}/access_token",
-            body: body, method: "POST", headers: headers))
+    return (github == null ? new http.Client() : github.client)
+        .post("${baseUrl}/access_token", body: body, headers: headers)
         .then((response) {
-      var json = response.asJSON();
+      var json = JSON.decode(response.body);
       if (json['error'] != null) {
         throw json;
       }

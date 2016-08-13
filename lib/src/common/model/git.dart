@@ -12,7 +12,7 @@ class GitBlob {
     if (input == null) return null;
 
     return new GitBlob()
-      ..content = input['content']
+      ..content = (input['content'] as String)?.trim() // includes newline?
       ..encoding = input['encoding']
       ..url = input['url']
       ..sha = input['sha']

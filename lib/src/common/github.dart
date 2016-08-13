@@ -16,11 +16,6 @@ class GitHub {
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
   /**
-   * Default Client Creator
-   */
-  static ClientCreator defaultClient;
-
-  /**
    * Authentication Information
    */
   Authentication auth;
@@ -89,7 +84,7 @@ class GitHub {
       this.endpoint: "https://api.github.com",
       http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
-        this.client = client == null ? defaultClient() : client;
+        this.client = client == null ? new http.Client() : client;
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
@@ -286,7 +281,7 @@ class GitHub {
       Map<String, String> params,
       JSONConverter convert,
       body,
-      String preview}) {
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -299,14 +294,13 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("POST", path,
+    var response = await request("POST", path,
         headers: headers,
         params: params,
         body: body,
         statusCode: statusCode,
-        fail: fail).then((response) {
-      return convert(JSON.decode(response.body));
-    });
+        fail: fail);
+    return convert(JSON.decode(response.body));
   }
 
   /**
@@ -316,7 +310,7 @@ class GitHub {
     String message;
     List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
-      var json = response.asJSON();
+      var json = JSON.decode(response.body);
       message = json['message'];
       errors = json['errors'];
     }
@@ -370,7 +364,7 @@ class GitHub {
       String body,
       int statusCode,
       void fail(http.Response response),
-      String preview}) {
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -409,18 +403,23 @@ class GitHub {
       url.write(queryString);
     }
 
-    return client
-        .request(new http.Request(url.toString(),
-            method: method, headers: headers, body: body))
-        .then((response) {
-      _updateRateLimit(response.headers);
-      if (statusCode != null && statusCode != response.statusCode) {
-        fail != null ? fail(response) : null;
-        handleStatusCode(response);
-        return null;
-      } else
-        return response;
-    });
+    var request = new http.Request(method, Uri.parse(url.toString()));
+    request.headers.addAll(headers);
+    if (body != null) {
+      request.body = body;
+    }
+
+    var streamedResponse = await client.send(request);
+
+    var response = await http.Response.fromStream(streamedResponse);
+
+    _updateRateLimit(response.headers);
+    if (statusCode != null && statusCode != response.statusCode) {
+      fail != null ? fail(response) : null;
+      handleStatusCode(response);
+      return null;
+    } else
+      return response;
   }
 
   /**

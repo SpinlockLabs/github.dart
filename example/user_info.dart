@@ -41,6 +41,7 @@ void loadUser() {
           """);
         }
       }
+
       append("Biography", user.bio);
       append("Company", user.company);
       append("Email", user.email);
