@@ -1,4 +1,6 @@
-part of github.browser;
+import 'dart:html' hide Client;
+
+import '../common.dart';
 
 /**
  * Browser-Specific Helpers

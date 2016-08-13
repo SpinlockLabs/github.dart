@@ -3,7 +3,7 @@ library github.test.git_test;
 import 'dart:async';
 import 'dart:convert' show JSON;
 
-import 'package:github/common.dart';
+import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
 import "package:http/http.dart" as http;
 import 'package:mock/mock.dart';

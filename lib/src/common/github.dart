@@ -16,11 +16,6 @@ class GitHub {
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
   /**
-   * Default Client Creator
-   */
-  static ClientCreator defaultClient;
-
-  /**
    * Authentication Information
    */
   Authentication auth;
@@ -89,7 +84,7 @@ class GitHub {
       this.endpoint: "https://api.github.com",
       http.Client client})
       : this.auth = auth == null ? new Authentication.anonymous() : auth,
-        this.client = client == null ? defaultClient() : client;
+        this.client = client == null ? new http.Client() : client;
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {

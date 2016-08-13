@@ -6,25 +6,15 @@
  */
 library github.browser;
 
-import 'dart:html' hide Client;
+import "src/common.dart";
 
-import 'package:http/http.dart';
-
-import "common.dart";
-
-export "common.dart";
-
-part "src/browser/helper.dart";
-
-void initGitHub() {
-  GitHub.defaultClient = () => new Client();
-}
+export "src/browser/helper.dart";
+export "src/common.dart";
 
 /**
  * Creates a GitHub Client
  */
 GitHub createGitHubClient(
     {Authentication auth, String endpoint: "https://api.github.com"}) {
-  initGitHub();
   return new GitHub(auth: auth, endpoint: endpoint);
 }

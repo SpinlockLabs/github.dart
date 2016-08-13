@@ -1,4 +1,8 @@
-part of github.server;
+import "dart:async";
+import "dart:convert";
+import "dart:io";
+
+import "../common.dart";
 
 class HookMiddleware {
   final StreamController<HookEvent> _eventController =

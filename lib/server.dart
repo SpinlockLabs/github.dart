@@ -3,21 +3,12 @@
  */
 library github.server;
 
-import "dart:async";
-import "dart:convert";
 import "dart:io";
 
-import "package:http/http.dart" as http;
+import "src/common.dart";
 
-import "common.dart";
-
-export "common.dart";
-
-part "src/server/hooks.dart";
-
-void initGitHub() {
-  GitHub.defaultClient = () => new http.IOClient();
-}
+export "src/common.dart";
+export "src/server/hooks.dart";
 
 /**
  * Creates a GitHub Client.
@@ -31,7 +22,6 @@ GitHub createGitHubClient(
     auth = findAuthenticationFromEnvironment();
   }
 
-  initGitHub();
   return new GitHub(auth: auth, endpoint: endpoint);
 }
 

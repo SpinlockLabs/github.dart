@@ -1,6 +1,8 @@
 ## v3.0.0
 
 - *BREAKING* Removed a number of top-level methods from the public API.
+- *BREAKING* Removed `markdown.dart` library – use the `markdown` package instead.
+- *BREAKING* Removed the `dates.dart` library.
 
 ## v2.3.2
 

@@ -123,10 +123,10 @@ class ExploreService extends Service {
       for (var link in links) {
         if (link.text.contains("Next")) {
           didFetchMore = true;
-          GitHub
-              .defaultClient()
-              .get(link.attributes['href'])
-              .then(handleResponse);
+
+          var client = new http.Client();
+
+          client.get(link.attributes['href']).then(handleResponse);
         }
       }
 
