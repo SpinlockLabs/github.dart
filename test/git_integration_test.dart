@@ -1,5 +1,7 @@
 library github.test.integration.git_integration_test;
 
+import 'dart:convert';
+
 import 'package:github/server.dart';
 
 import 'package:test/test.dart';
@@ -43,7 +45,9 @@ main() {
 
     var fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
 
-    expect(base64ToUtf8(fetchedBlob.content), equals('bbb'));
+    var base64Decoded = BASE64.decode(fetchedBlob.content);
+
+    expect(UTF8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
     expect(
         fetchedBlob.url,
