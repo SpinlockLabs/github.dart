@@ -4,13 +4,13 @@ final MockHTTPClient httpClient = new MockHTTPClient();
 
 typedef http.Response ResponseCreator(http.Request request);
 
-class MockHTTPClient extends http.Client {
+class MockHTTPClient extends http.BaseClient {
   final Map<Pattern, ResponseCreator> responses = {};
 
   @override
-  Future<http.Response> request(http.Request request) {
+  Future<http.StreamedResponse> send(http.Request request) {
     var creator = responses.keys.firstWhere(
-        (it) => it.allMatches(request.url).isNotEmpty,
+        (it) => it.allMatches(request.url.toString()).isNotEmpty,
         orElse: () => null);
     if (creator == null) {
       throw new Exception("No Response Configured");
@@ -21,7 +21,7 @@ class MockHTTPClient extends http.Client {
 
 class MockResponse extends http.Response {
   MockResponse(String body, Map<String, String> headers, int statusCode)
-      : super(body, headers, statusCode);
+      : super(body, statusCode, headers: headers);
 
   factory MockResponse.fromAsset(String name) {
     Map<String, dynamic> responseData =

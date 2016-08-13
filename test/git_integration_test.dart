@@ -37,7 +37,7 @@ main() {
   });
 
   test('create and get a new blob', () async {
-    CreateGitBlob newBlob = new CreateGitBlob('bbb', 'utf-8');
+    var newBlob = new CreateGitBlob('bbb', 'utf-8');
 
     // createBlob()
     var createdBlob = await github.git.createBlob(slug, newBlob);

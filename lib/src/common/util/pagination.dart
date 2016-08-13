@@ -76,7 +76,7 @@ class PaginationHelper<T> {
         params: params,
         body: body,
         statusCode: statusCode)) {
-      var json = response.asJSON() as List;
+      var json = JSON.decode(response.body) as List;
 
       for (var item in json) {
         yield item;

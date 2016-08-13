@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:github/http.dart' as http;
+import "package:http/http.dart" as http;
 import 'package:github/server.dart';
 import 'package:mock/mock.dart';
 import 'package:test/test.dart';

@@ -361,7 +361,7 @@ class RepositoriesService extends Service {
         .request("DELETE", "/repos/${slug.fullName}/contents/${path}",
             body: JSON.encode(map), statusCode: 200)
         .then((response) {
-      return ContentCreation.fromJSON(response.asJSON());
+      return ContentCreation.fromJSON(JSON.decode(response.body));
     });
   }
 

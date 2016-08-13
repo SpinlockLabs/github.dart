@@ -141,7 +141,7 @@ class GistsService extends Service {
     return _github
         .request("POST", "/gists/${id}/forks", statusCode: 201)
         .then((response) {
-      return Gist.fromJSON(response.asJSON());
+      return Gist.fromJSON(JSON.decode(response.body));
     });
   }
 
