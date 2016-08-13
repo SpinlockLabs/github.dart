@@ -52,9 +52,10 @@ Map<String, String> queryString =
 
 GitHub _createGitHub() {
   initGitHub();
-  return new GitHub(auth: queryString["token"] != null
-      ? new Authentication.withToken(queryString["token"])
-      : new Authentication.anonymous());
+  return new GitHub(
+      auth: queryString["token"] != null
+          ? new Authentication.withToken(queryString["token"])
+          : new Authentication.anonymous());
 }
 
 GitHub github = _createGitHub();

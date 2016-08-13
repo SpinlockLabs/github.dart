@@ -39,7 +39,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
   Stream<Repository> listOrganizationRepositories(String org,
       {String type: "all"}) {
-    var params = {"type": type,};
+    var params = {
+      "type": type,
+    };
 
     return new PaginationHelper(_github).objects(
         "GET", "/orgs/${org}/repos", Repository.fromJSON,
