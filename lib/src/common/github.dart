@@ -370,7 +370,7 @@ class GitHub {
       String body,
       int statusCode,
       void fail(http.Response response),
-      String preview}) {
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -409,18 +409,17 @@ class GitHub {
       url.write(queryString);
     }
 
-    return client
-        .request(new http.Request(url.toString(),
-            method: method, headers: headers, body: body))
-        .then((response) {
-      _updateRateLimit(response.headers);
-      if (statusCode != null && statusCode != response.statusCode) {
-        fail != null ? fail(response) : null;
-        handleStatusCode(response);
-        return null;
-      } else
-        return response;
-    });
+    var request = new http.Request(url.toString(),
+        method: method, headers: headers, body: body);
+
+    var response = await client.request(request);
+    _updateRateLimit(response.headers);
+    if (statusCode != null && statusCode != response.statusCode) {
+      fail != null ? fail(response) : null;
+      handleStatusCode(response);
+      return null;
+    } else
+      return response;
   }
 
   /**
