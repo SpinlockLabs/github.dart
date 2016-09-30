@@ -241,7 +241,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#get-a-single-label
   Future<IssueLabel> getLabel(RepositorySlug slug, String name) {
     return _github.getJSON("/repos/${slug.fullName}/labels/${name}",
-        convert: IssueLabel.fromJSON);
+        convert: IssueLabel.fromJSON, statusCode: StatusCodes.OK);
   }
 
   /// Creates a new label on the specified repository.

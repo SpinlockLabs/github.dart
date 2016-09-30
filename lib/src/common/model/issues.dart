@@ -181,6 +181,9 @@ class IssueLabel {
   static IssueLabel fromJSON(input) {
     if (input == null) return null;
 
+    assert(input['name'] != null);
+    assert(input['color'] != null);
+
     return new IssueLabel()
       ..name = input['name']
       ..color = input['color'];
