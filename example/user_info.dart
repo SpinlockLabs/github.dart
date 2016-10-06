@@ -33,7 +33,7 @@ void loadUser() {
       <b>Name</b>: ${user.name}
       """);
 
-      void append(String name, value) {
+      void append(String name, dynamic value) {
         if (value != null) {
           info.appendHtml("""
             <br/>

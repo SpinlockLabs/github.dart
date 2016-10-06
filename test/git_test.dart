@@ -13,7 +13,7 @@ import 'helper.dart';
 
 class MockGitHub extends MockWithNamedArgs implements GitHub {}
 
-main() {
+void main() {
   MockGitHub github;
   GitService git;
   RepositorySlug repo;

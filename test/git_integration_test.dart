@@ -6,7 +6,7 @@ import 'package:github/server.dart';
 
 import 'package:test/test.dart';
 
-main() {
+void main() {
   String firstCommitSha;
   String firstCommitTreeSha;
 

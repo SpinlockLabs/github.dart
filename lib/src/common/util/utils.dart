@@ -10,9 +10,7 @@ class NotReadyYet {
 
 /// Specifies the original API Field Name
 class ApiName {
-  /**
   /// Original API Field Name
-   */
   final String name;
 
   const ApiName(this.name);

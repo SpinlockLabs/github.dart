@@ -71,9 +71,9 @@ class Issue {
       ..number = input['number']
       ..state = input['state']
       ..title = input['title']
-      ..user = User.fromJSON(input['user'])
+      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
       ..labels = labels.map(IssueLabel.fromJSON).toList(growable: false)
-      ..assignee = User.fromJSON(input['assignee'])
+      ..assignee = User.fromJSON(input['assignee'] as Map<String, dynamic>)
       ..milestone =
           Milestone.fromJSON(input['milestone'] as Map<String, dynamic>)
       ..commentsCount = input['comments']
@@ -82,7 +82,7 @@ class Issue {
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..closedAt = parseDateTime(input['closed_at'])
-      ..closedBy = User.fromJSON(input['closed_by'])
+      ..closedBy = User.fromJSON(input['closed_by'] as Map<String, dynamic>)
       ..body = input['body'];
   }
 
@@ -163,7 +163,7 @@ class IssueComment {
     return new IssueComment()
       ..id = input['id']
       ..body = input['body']
-      ..user = User.fromJSON(input['user'])
+      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..url = input['url']
@@ -244,7 +244,7 @@ class Milestone {
       ..state = input['state']
       ..title = input['title']
       ..description = input['description']
-      ..creator = User.fromJSON(input['creator'])
+      ..creator = User.fromJSON(input['creator'] as Map<String, dynamic>)
       ..openIssuesCount = input['open_issues']
       ..closedIssuesCount = input['closed_issues']
       ..createdAt = parseDateTime(input['created_at'])

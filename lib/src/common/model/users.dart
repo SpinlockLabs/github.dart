@@ -67,7 +67,7 @@ class User {
   @ApiName("updated_at")
   DateTime updatedAt;
 
-  static User fromJSON(input) {
+  static User fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     if (input['avatar_url'] == null) {
@@ -115,7 +115,7 @@ class CurrentUser extends User {
   /// The User's GitHub Plan
   UserPlan plan;
 
-  static CurrentUser fromJSON(input) {
+  static CurrentUser fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CurrentUser()
@@ -139,38 +139,28 @@ class CurrentUser extends User {
       ..updatedAt = parseDateTime(input['updated_at'])
       ..privateReposCount = input['total_private_repos']
       ..ownedPrivateReposCount = input['owned_private_repos']
-      ..plan = UserPlan.fromJSON(input['plan'])
+      ..plan = UserPlan.fromJSON(input['plan'] as Map<String, dynamic>)
       ..json = input;
   }
 }
 
-/**
- * A Users GitHub Plan
- */
+/// A Users GitHub Plan
 class UserPlan {
-  /**
-   * Plan Name
-   */
+  // Plan Name
   String name;
 
-  /**
-   * Plan Space
-   */
+  // Plan Space
   int space;
 
-  /**
-   * Number of Private Repositories
-   */
+  // Number of Private Repositories
   @ApiName("private_repos")
   int privateReposCount;
 
-  /**
-   * Number of Collaborators
-   */
+  // Number of Collaborators
   @ApiName("collaborators")
   int collaboratorsCount;
 
-  static UserPlan fromJSON(input) {
+  static UserPlan fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return new UserPlan()
       ..name = input['name']
@@ -186,7 +176,7 @@ class UserEmail {
   bool verified;
   bool primary;
 
-  static UserEmail fromJSON(input) {
+  static UserEmail fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new UserEmail()

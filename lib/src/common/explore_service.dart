@@ -18,7 +18,7 @@ class ExploreService extends Service {
     var controller = new StreamController<TrendingRepository>();
 
     _github.client.get(url).then((response) {
-      var doc = htmlParser.parse(response.body);
+      var doc = html_parser.parse(response.body);
       var items = doc.querySelectorAll(
           "li.repo-leaderboard-list-item.leaderboard-list-item");
 
@@ -48,7 +48,7 @@ class ExploreService extends Service {
     var completer = new Completer<Showcase>();
 
     _github.client.get(info.url).then((response) {
-      var doc = htmlParser.parse(response.body);
+      var doc = html_parser.parse(response.body);
       var showcase = new Showcase();
 
       var title = doc.querySelector(".collection-header").text;
@@ -95,7 +95,7 @@ class ExploreService extends Service {
     Function handleResponse;
 
     handleResponse = (response) {
-      var doc = htmlParser.parse(response.body);
+      var doc = html_parser.parse(response.body);
 
       var cards = doc.querySelectorAll(".collection-card");
 

@@ -62,7 +62,7 @@ class GitHubFile {
       ..sha = input['sha']
       ..gitUrl = input['git_url']
       ..htmlUrl = input['html_url']
-      ..links = Links.fromJSON(input['_links'])
+      ..links = Links.fromJSON(input['_links'] as Map<String, dynamic>)
       ..sourceRepository = slug;
   }
 }
@@ -81,7 +81,7 @@ class Links {
   @ApiName("html")
   String html;
 
-  static Links fromJSON(input) {
+  static Links fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var links = new Links();

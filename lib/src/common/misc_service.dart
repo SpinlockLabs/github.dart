@@ -81,13 +81,13 @@ class MiscService extends Service {
         .get(
             "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}")
         .then((response) {
-      var document = htmlParser.parse(response.body);
+      var document = html_parser.parse(response.body);
       document.querySelectorAll("entry").forEach((entry) {
         var name = entry.querySelector("title").text;
         var c = "<html><body>" +
             entry.querySelector("content").innerHtml +
             "</body></html>";
-        var content = htmlParser.parse(c);
+        var content = html_parser.parse(c);
         var image = content.querySelector("a img").attributes['src'];
         var url = entry.querySelector("link").attributes['href'];
 

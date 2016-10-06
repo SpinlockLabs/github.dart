@@ -11,15 +11,6 @@ class Authentication {
   /// GitHub Password
   final String password;
 
-  /// Anonymous Authentication Flag
-  bool get isAnonymous => !isBasic && !isToken;
-
-  /// Basic Authentication Flag
-  bool get isBasic => username != null;
-
-  /// Token Authentication Flag
-  bool get isToken => token != null;
-
   /// Creates an [Authentication] instance that uses the specified OAuth2 [token].
   Authentication.withToken(this.token)
       : username = null,
@@ -33,4 +24,13 @@ class Authentication {
 
   /// Creates an [Authentication] instance that uses a username and password.
   Authentication.basic(this.username, this.password) : token = null;
+
+  /// Anonymous Authentication Flag
+  bool get isAnonymous => !isBasic && !isToken;
+
+  /// Basic Authentication Flag
+  bool get isBasic => username != null;
+
+  /// Token Authentication Flag
+  bool get isToken => token != null;
 }

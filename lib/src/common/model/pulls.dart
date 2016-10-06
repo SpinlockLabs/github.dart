@@ -74,7 +74,7 @@ class PullRequestInformation {
     pr.updatedAt = parseDateTime(input['updated_at']);
     pr.closedAt = parseDateTime(input['closed_at']);
     pr.mergedAt = parseDateTime(input['merged_at']);
-    pr.user = User.fromJSON(input['user']);
+    pr.user = User.fromJSON(input['user'] as Map<String, dynamic>);
     return pr;
   }
 }
@@ -121,7 +121,7 @@ class PullRequest extends PullRequestInformation {
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
     pr.id = input['id'];
-    pr.mergedBy = User.fromJSON(input['merged_by']);
+    pr.mergedBy = User.fromJSON(input['merged_by'] as Map<String, dynamic>);
     pr.mergeCommitSha = input['merge_commit_sha'];
     pr.commentsCount = input['comments'];
     pr.commitsCount = input['commits'];
@@ -174,7 +174,7 @@ class PullRequestHead {
     head.label = input['label'];
     head.ref = input['ref'];
     head.sha = input['sha'];
-    head.user = User.fromJSON(input['user']);
+    head.user = User.fromJSON(input['user'] as Map<String, dynamic>);
     head.repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>);
     return head;
   }
@@ -252,13 +252,13 @@ class PullRequestComment {
       ..originalPosition = input['original_position']
       ..commitID = input['commit_id']
       ..originalCommitID = input['original_commit_id']
-      ..user = User.fromJSON(input['user'])
+      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
       ..body = input['body']
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..url = input['html_url']
       ..pullRequestUrl = input['pull_request_url']
-      ..links = Links.fromJSON(input['_links']);
+      ..links = Links.fromJSON(input['_links'] as Map<String, dynamic>);
   }
 }
 
