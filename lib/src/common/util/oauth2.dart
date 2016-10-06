@@ -82,12 +82,12 @@ class OAuth2Flow {
     return (github == null ? new http.Client() : github.client)
         .post("${baseUrl}/access_token", body: body, headers: headers)
         .then((response) {
-      var json = JSON.decode(response.body);
+      var json = JSON.decode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
         throw json;
       }
-      return new ExchangeResponse(
-          json['access_token'], json['token_type'], json['scope'].split(","));
+      return new ExchangeResponse(json['access_token'], json['token_type'],
+          (json['scope'] as String).split(","));
     });
   }
 }

@@ -11,8 +11,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return new PaginationHelper(_github)
-        .objects("GET", "/users/${username}/gists", Gist.fromJSON);
+    return new PaginationHelper(_github).objects(
+        "GET", "/users/${username}/gists", Gist.fromJSON) as Stream<Gist>;
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -20,8 +20,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return new PaginationHelper(_github)
-        .objects("GET", "/gists", Gist.fromJSON);
+    return new PaginationHelper(_github).objects("GET", "/gists", Gist.fromJSON)
+        as Stream<Gist>;
   }
 
   /// Fetches the currently authenticated user's public gists.
@@ -29,7 +29,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
     return new PaginationHelper(_github)
-        .objects("GET", "/gists/public", Gist.fromJSON);
+        .objects("GET", "/gists/public", Gist.fromJSON) as Stream<Gist>;
   }
 
   /// Fetches the currently authenticated user's starred gists.
@@ -37,7 +37,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
     return new PaginationHelper(_github)
-        .objects("GET", "/gists/starred", Gist.fromJSON);
+        .objects("GET", "/gists/starred", Gist.fromJSON) as Stream<Gist>;
   }
 
   /// Fetches a Gist by the specified [id].
@@ -45,7 +45,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
   Future<Gist> getGist(String id) {
     return _github.getJSON("/gists/${id}",
-        statusCode: StatusCodes.OK, convert: Gist.fromJSON);
+        statusCode: StatusCodes.OK, convert: Gist.fromJSON) as Future<Gist>;
   }
 
   /// Creates a Gist
@@ -53,7 +53,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
   Future<Gist> createGist(Map<String, String> files,
       {String description, bool public: false}) {
-    var map = {"files": {}};
+    var map = <String, dynamic>{"files": {}};
 
     if (description != null) {
       map["description"] = description;
@@ -70,7 +70,9 @@ class GistsService extends Service {
     map["files"] = f;
 
     return _github.postJSON("/gists",
-        statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
+        statusCode: 201,
+        body: JSON.encode(map),
+        convert: Gist.fromJSON) as Future<Gist>;
   }
 
   /// Deletes the specified Gist.
@@ -102,7 +104,9 @@ class GistsService extends Service {
     }
 
     return _github.postJSON("/gists/${id}",
-        statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
+        statusCode: 200,
+        body: JSON.encode(map),
+        convert: Gist.fromJSON) as Future<Gist>;
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
@@ -152,7 +156,8 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
     return new PaginationHelper(_github)
-        .objects("GET", "/gists/${gistId}/comments", GistComment.fromJSON);
+            .objects("GET", "/gists/${gistId}/comments", GistComment.fromJSON)
+        as Stream<GistComment>;
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
@@ -162,7 +167,8 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return _github.postJSON("/gists/${gistId}/comments",
-        body: request.toJSON(), convert: GistComment.fromJSON);
+        body: request.toJSON(),
+        convert: GistComment.fromJSON) as Future<GistComment>;
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment
