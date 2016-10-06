@@ -12,14 +12,15 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    return _github.getJSON("/emojis", statusCode: StatusCodes.OK);
+    return _github.getJSON("/emojis", statusCode: StatusCodes.OK)
+        as Future<Map<String, String>>;
   }
 
   /// Lists available .gitignore template names.
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
   Future<List<String>> listGitignoreTemplates() {
-    return _github.getJSON("/gitignore/templates");
+    return _github.getJSON("/gitignore/templates") as Future<List<String>>;
   }
 
   /// Gets a .gitignore template by [name].
@@ -28,7 +29,7 @@ class MiscService extends Service {
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
   Future<GitignoreTemplate> getGitignoreTemplate(String name) {
     return _github.getJSON("/gitignore/templates/${name}",
-        convert: GitignoreTemplate.fromJSON);
+        convert: GitignoreTemplate.fromJSON) as Future<GitignoreTemplate>;
   }
 
   /// Renders Markdown from the [input].
@@ -64,14 +65,15 @@ class MiscService extends Service {
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() {
     return _github.getJSON("https://status.github.com/api/status.json",
-        statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
+        statusCode: StatusCodes.OK,
+        convert: APIStatus.fromJSON) as Future<APIStatus>;
   }
 
   /// Returns a stream of Octocats from Octodex.
   ///
   /// See: https://octodex.github.com/
   Stream<Octocat> listOctodex({bool cors: false}) {
-    var controller = new StreamController();
+    var controller = new StreamController<Octocat>();
 
     var u = "http://feeds.feedburner.com/Octocats.xml";
 
@@ -102,7 +104,7 @@ class MiscService extends Service {
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {
-    var params = {};
+    var params = <String, String>{};
 
     if (text != null) {
       params["s"] = text;
