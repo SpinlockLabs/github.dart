@@ -154,7 +154,7 @@ class CreateRelease {
   CreateRelease(this.tagName);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("tag_name", tagName, map);
     putValue("name", name, map);
     putValue("body", body, map);

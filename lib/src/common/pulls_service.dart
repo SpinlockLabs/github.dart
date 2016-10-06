@@ -35,7 +35,7 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
   Future<PullRequest> edit(RepositorySlug slug, int number,
       {String title, String body, String state}) {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("state", state, map);

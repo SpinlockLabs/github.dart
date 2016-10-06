@@ -58,7 +58,7 @@ class CreateStatus {
   CreateStatus(this.state);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("state", state, map);
     putValue("target_url", targetUrl, map);
     putValue("description", description, map);

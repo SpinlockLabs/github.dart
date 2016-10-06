@@ -31,18 +31,18 @@ class Hook {
 
   Map<String, dynamic> config;
 
-  static Hook fromJSON(repoName, input) {
+  static Hook fromJSON(String repoName, Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Hook()
-      ..events = input['events']
+      ..events = input['events'] as List<String>
       ..active = input['active']
       ..name = input['name']
       ..id = input['id']
       ..repoName = repoName
       ..updatedAt = parseDateTime(input['updated_at'])
       ..createdAt = parseDateTime(input['created_at'])
-      ..config = input['config'];
+      ..config = input['config'] as Map<String, dynamic>;
   }
 }
 

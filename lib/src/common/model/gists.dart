@@ -170,7 +170,7 @@ class CreateGistComment {
   CreateGistComment(this.body);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     map['body'] = body;
     return JSON.encode(map);
   }

@@ -87,7 +87,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
   Future<Gist> editGist(String id,
       {String description, Map<String, String> files}) {
-    var map = {};
+    var map = <String, dynamic>{};
 
     if (description != null) {
       map["description"] = description;
