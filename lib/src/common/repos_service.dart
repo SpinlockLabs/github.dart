@@ -151,7 +151,9 @@ class RepositoriesService extends Service {
       "default_branch": "defaultBranch"
     });
     return _github.postJSON("/repos/${repo.fullName}",
-        body: data, statusCode: 200) as Future<Repository>;
+        // TODO: data probably needs to be json encoded?
+        body: data,
+        statusCode: 200) as Future<Repository>;
   }
 
   /// Deletes a repository.
@@ -291,12 +293,13 @@ class RepositoriesService extends Service {
     }
 
     return _github.getJSON(url, headers: headers, statusCode: StatusCodes.OK,
-            fail: (http.Response response) {
+        fail: (http.Response response) {
       if (response.statusCode == 404) {
         throw new NotFound(_github, response.body);
       }
-    }, convert: (input) => GitHubFile.fromJSON(input, slug))
-        as Future<GitHubFile>;
+    },
+        convert: (Map<String, dynamic> input) =>
+            GitHubFile.fromJSON(input, slug)) as Future<GitHubFile>;
   }
 
   /// Fetches content in a repository at the specified [path].
@@ -325,9 +328,11 @@ class RepositoriesService extends Service {
     return _github.getJSON(url, convert: (input) {
       var contents = new RepositoryContents();
       if (input is Map) {
-        contents.file = GitHubFile.fromJSON(input);
+        contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
       } else {
-        contents.tree = copyOf(input.map((it) => GitHubFile.fromJSON(it)));
+        contents.tree = (input as List<Map<String, dynamic>>)
+            .map((Map<String, dynamic> it) => GitHubFile.fromJSON(it))
+            .toList();
       }
       return contents;
     }) as Future<RepositoryContents>;
@@ -341,7 +346,8 @@ class RepositoriesService extends Service {
         .request("PUT", "/repos/${slug.fullName}/contents/${file.path}",
             body: file.toJSON())
         .then((response) {
-      return ContentCreation.fromJSON(JSON.decode(response.body));
+      return ContentCreation
+          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -355,6 +361,7 @@ class RepositoriesService extends Service {
         {"message": message, "content": content, "sha": sha, "branch": branch});
 
     return _github.postJSON("/repos/${slug.fullName}/contents/${path}",
+        // TODO: map probably needs to be json encoded
         body: map,
         statusCode: 200,
         convert: ContentCreation.fromJSON) as Future<ContentCreation>;
@@ -372,7 +379,8 @@ class RepositoriesService extends Service {
         .request("DELETE", "/repos/${slug.fullName}/contents/${path}",
             body: JSON.encode(map), statusCode: 200)
         .then((response) {
-      return ContentCreation.fromJSON(JSON.decode(response.body));
+      return ContentCreation
+          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -413,9 +421,10 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/hooks/#list-hooks
   Stream<Hook> listHooks(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-        "GET",
-        "/repos/${slug.fullName}/hooks",
-        (input) => Hook.fromJSON(slug.fullName, input)) as Stream<Hook>;
+            "GET",
+            "/repos/${slug.fullName}/hooks",
+            (Map<String, dynamic> input) => Hook.fromJSON(slug.fullName, input))
+        as Stream<Hook>;
   }
 
   /// Fetches a single hook by [id].
@@ -423,7 +432,8 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/hooks/#get-single-hook
   Future<Hook> getHook(RepositorySlug slug, int id) {
     return _github.getJSON("/repos/${slug.fullName}/hooks/${id}",
-        convert: (i) => Hook.fromJSON(slug.fullName, i)) as Future<Hook>;
+        convert: (Map<String, dynamic> i) =>
+            Hook.fromJSON(slug.fullName, i)) as Future<Hook>;
   }
 
   /// Creates a repository hook based on the specified [hook].
@@ -431,7 +441,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/hooks/#create-a-hook
   Future<Hook> createHook(RepositorySlug slug, CreateHook hook) {
     return _github.postJSON("/repos/${slug.fullName}/hooks",
-        convert: (i) => Hook.fromJSON(slug.fullName, i),
+        convert: (Map<String, dynamic> i) => Hook.fromJSON(slug.fullName, i),
         body: hook.toJSON()) as Future<Hook>;
   }
 
@@ -560,8 +570,8 @@ class RepositoriesService extends Service {
         });
         return null;
       } else {
-        completer
-            .complete(json.map((it) => ContributorStatistics.fromJSON(it)));
+        completer.complete(json.map(
+            (Map<String, dynamic> it) => ContributorStatistics.fromJSON(it)));
       }
     };
     _github

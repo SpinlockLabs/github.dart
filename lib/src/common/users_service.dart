@@ -11,7 +11,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
   Future<User> getUser(String name) =>
-      _github.getJSON("/users/${name}", convert: User.fromJSON);
+      _github.getJSON("/users/${name}", convert: User.fromJSON) as Future<User>;
 
   /// Updates the Current User.
   ///
@@ -35,12 +35,15 @@ class UsersService extends Service {
     });
 
     return _github.postJSON("/user",
-        body: map, statusCode: 200, convert: CurrentUser.fromJSON);
+        // TODO: map probably needs to be JSON encoded.
+        body: map,
+        statusCode: 200,
+        convert: CurrentUser.fromJSON) as Future<CurrentUser>;
   }
 
   /// Fetches a list of users specified by [names].
   Stream<User> getUsers(List<String> names, {int pages}) {
-    var controller = new StreamController();
+    var controller = new StreamController<User>();
 
     var group = new FutureGroup();
 
@@ -68,7 +71,7 @@ class UsersService extends Service {
       if (response.statusCode == StatusCodes.FORBIDDEN) {
         throw new AccessForbidden(_github);
       }
-    }, convert: CurrentUser.fromJSON);
+    }, convert: CurrentUser.fromJSON) as Future<CurrentUser>;
   }
 
   /// Checks if a user exists.
@@ -83,13 +86,13 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/#get-all-users
   Stream<User> listUsers({int pages, int since}) =>
       new PaginationHelper(_github).objects("GET", "/users", User.fromJSON,
-          pages: pages, params: {"since": since});
+          pages: pages, params: {"since": since}) as Stream<User>;
 
   /// Lists all email addresses for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
   Stream<UserEmail> listEmails() => new PaginationHelper(_github)
-      .objects("GET", "/user/emails", UserEmail.fromJSON);
+      .objects("GET", "/user/emails", UserEmail.fromJSON) as Stream<UserEmail>;
 
   /// Add Emails
   ///
@@ -97,7 +100,7 @@ class UsersService extends Service {
   Stream<UserEmail> addEmails(List<String> emails) =>
       new PaginationHelper(_github).objects(
           "POST", "/user/emails", UserEmail.fromJSON,
-          statusCode: 201, body: JSON.encode(emails));
+          statusCode: 201, body: JSON.encode(emails)) as Stream<UserEmail>;
 
   /// Delete Emails
   ///
@@ -112,7 +115,7 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listUserFollowers(String user) => new PaginationHelper(_github)
       .objects("GET", "/users/${user}/followers", User.fromJSON,
-          statusCode: 200);
+          statusCode: 200) as Stream<User>;
 
   /// Check if the current user is following the specified user.
   Future<bool> isFollowingUser(String user) =>
@@ -148,7 +151,8 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listCurrentUserFollowers() => new PaginationHelper(_github)
-      .objects("GET", "/user/followers", User.fromJSON, statusCode: 200);
+          .objects("GET", "/user/followers", User.fromJSON, statusCode: 200)
+      as Stream<User>;
 
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
   /// the public keys for the authenticated user are fetched.
@@ -158,7 +162,7 @@ class UsersService extends Service {
   Stream<PublicKey> listPublicKeys([String userLogin]) {
     var path = userLogin == null ? "/user/keys" : "/users/${userLogin}/keys";
     return new PaginationHelper(_github)
-        .objects("GET", path, PublicKey.fromJSON);
+        .objects("GET", path, PublicKey.fromJSON) as Stream<PublicKey>;
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key
@@ -167,7 +171,8 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/keys/#create-a-public-key
   Future<PublicKey> createPublicKey(CreatePublicKey key) {
-    return _github.postJSON("/user/keys", body: key.toJSON());
+    return _github.postJSON("/user/keys", body: key.toJSON())
+        as Future<PublicKey>;
   }
 
   // TODO: Implement updatePublicKey: https://developer.github.com/v3/users/keys/#update-a-public-key
