@@ -156,8 +156,7 @@ class IssuesService extends Service {
       throw new GitHubError(_github, response.body);
     }
 
-    return Issue.fromJSON(JSON.decode(response.body) as Map<String, dynamic>)
-        as Future<Issue>;
+    return Issue.fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
   }
 
   /// Lists all available assignees (owners and collaborators) to which issues

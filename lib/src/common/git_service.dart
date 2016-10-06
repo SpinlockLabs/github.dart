@@ -102,8 +102,7 @@ class GitService extends Service {
             body: body, headers: headers)
         .then((response) {
       return GitReference
-              .fromJSON(JSON.decode(response.body) as Map<String, dynamic>)
-          as Future<GitReference>;
+          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
     });
   }
 
