@@ -72,7 +72,8 @@ class RepositoriesService extends Service {
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
         .listen((http.Response response) {
       var list = JSON.decode(response.body);
-      var repos = new List.from(list.map((it) => Repository.fromJSON(it)));
+      var repos = new List.from(
+          list.map((Map<String, dynamic> it) => Repository.fromJSON(it)));
       for (var repo in repos) controller.add(repo);
     });
 
