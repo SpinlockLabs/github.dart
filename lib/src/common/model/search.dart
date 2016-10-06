@@ -9,7 +9,8 @@ class SearchResults<T> {
 
   List<T> items;
 
-  static SearchResults fromJSON(input, JSONConverter resultConverter) {
+  static SearchResults fromJSON(
+      Map<String, dynamic> input, JSONConverter resultConverter) {
     var results = new SearchResults();
     results
       ..totalCount = input['total_count']
@@ -32,7 +33,7 @@ abstract class SearchResult {
 }
 
 class RepositorySearchResult extends Repository with SearchResult {
-  static RepositorySearchResult fromJSON(input) {
+  static RepositorySearchResult fromJSON(Map<String, dynamic> input) {
     var result = new RepositorySearchResult();
     Repository.fromJSON(input, result);
     result.score = input['score'];
