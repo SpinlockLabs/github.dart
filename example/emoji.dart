@@ -2,14 +2,14 @@ import "dart:html";
 
 import "common.dart";
 
-DivElement $emoji;
+DivElement emojiDiv;
 Map<String, String> emojis;
 
 void main() {
   init("emoji.dart", onReady: () {
-    $emoji = querySelector("#emojis");
+    emojiDiv = querySelector("#emojis");
     loadEmojis();
-    var searchBox = querySelector("#search-box");
+    var searchBox = querySelector("#search-box") as InputElement;
     searchBox.onKeyUp.listen((event) {
       filter(searchBox.value);
     });
@@ -28,7 +28,7 @@ void loadEmojis() {
       h.append(new ImageElement(src: url, width: 64, height: 64)
         ..classes.add("emoji"));
       h.append(new ParagraphElement()..text = ":${name}:");
-      $emoji.append(h);
+      emojiDiv.append(h);
     });
   });
 }
@@ -40,7 +40,7 @@ void filter(String query) {
     return;
   }
   lastQuery = query;
-  var boxes = $emoji.children;
+  var boxes = emojiDiv.children;
   for (var box in boxes) {
     var boxName = box.querySelector("p");
     var t = boxName.text;

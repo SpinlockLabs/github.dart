@@ -1,6 +1,7 @@
 import "dart:html";
 
-import "package:github/browser.dart";
+import 'package:github/browser.dart';
+import "package:github/markdown.dart" as markdown;
 
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();

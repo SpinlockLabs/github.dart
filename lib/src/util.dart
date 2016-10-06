@@ -1,4 +1,4 @@
-final RegExp GITHUB_DATE_REMOVE = new RegExp(r'\.\d*');
+final RegExp githubDateRemoveRegExp = new RegExp(r'\.\d*');
 
 String buildQueryString(Map<String, dynamic> params) {
   var queryString = new StringBuffer();
@@ -41,7 +41,7 @@ void putValue(String name, dynamic value, Map<String, dynamic> map) {
 
 //TODO(kevmoo): use regex here.
 Map<String, String> parseLinkHeader(String input) {
-  var out = {};
+  var out = <String, String> {};
   var parts = input.split(", ");
   for (var part in parts) {
     if (part[0] != "<") {
@@ -58,7 +58,7 @@ Map<String, String> parseLinkHeader(String input) {
 }
 
 List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
-  var out = [];
+  var out = <MapEntry<dynamic, dynamic>> [];
   for (var key in input.keys) {
     out.add(new MapEntry<dynamic, dynamic>(key, input[key]));
   }
@@ -82,7 +82,7 @@ DateTime parseDateTime(String input) {
 }
 
 Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
-  var map = {};
+  var map = <String, dynamic> {};
   for (var key in input.keys) {
     if (input[key] != null) {
       map[key] = input[key];
