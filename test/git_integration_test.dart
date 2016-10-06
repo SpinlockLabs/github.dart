@@ -2,6 +2,7 @@ library github.test.integration.git_integration_test;
 
 import 'dart:convert';
 
+import 'dart:io';
 import 'package:github/server.dart';
 
 import 'package:test/test.dart';
@@ -17,9 +18,9 @@ void main() {
   RepositorySlug slug;
 
   setUpAll(() {
-    var authToken = '<some token>';
-    var repoOwner = '<some user/org>';
-    var repoName = '<some repo>';
+    var authToken = Platform.environment['GITHUB_API_TOKEN'];
+    var repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
+    var repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
 
     github = createGitHubClient(auth: new Authentication.withToken(authToken));
     slug = new RepositorySlug(repoOwner, repoName);
