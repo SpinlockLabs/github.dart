@@ -15,7 +15,7 @@ class ExploreService extends Service {
     if (since != null)
       url += language == null ? "?since=${since}" : "&since=${since}";
 
-    var controller = new StreamController();
+    var controller = new StreamController<TrendingRepository>();
 
     _github.client.get(url).then((response) {
       var doc = htmlParser.parse(response.body);
@@ -45,7 +45,7 @@ class ExploreService extends Service {
   }
 
   Future<Showcase> getShowcase(ShowcaseInfo info) {
-    var completer = new Completer();
+    var completer = new Completer<Showcase>();
 
     _github.client.get(info.url).then((response) {
       var doc = htmlParser.parse(response.body);
@@ -60,6 +60,7 @@ class ExploreService extends Service {
 
       var description = page.querySelector(".collection-description");
 
+      // TODO: This is most likely wrong
       showcase.description = description;
       showcase.lastUpdated = lastUpdated;
       showcase.title = title;
@@ -89,7 +90,7 @@ class ExploreService extends Service {
   }
 
   Stream<ShowcaseInfo> listShowcases() {
-    var controller = new StreamController();
+    var controller = new StreamController<ShowcaseInfo>();
 
     Function handleResponse;
 

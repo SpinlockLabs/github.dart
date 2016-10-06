@@ -56,12 +56,13 @@ class PullRequestInformation {
 
   PullRequestInformation([this.isCompletePullRequest = false]);
 
-  static PullRequestInformation fromJSON(input, [PullRequestInformation into]) {
+  static PullRequestInformation fromJSON(Map<String, dynamic> input,
+      [PullRequestInformation into]) {
     if (input == null) return null;
 
     var pr = into != null ? into : new PullRequestInformation();
-    pr.head = PullRequestHead.fromJSON(input['head']);
-    pr.base = PullRequestHead.fromJSON(input['base']);
+    pr.head = PullRequestHead.fromJSON(input['head'] as Map<String, dynamic>);
+    pr.base = PullRequestHead.fromJSON(input['base'] as Map<String, dynamic>);
     pr.htmlUrl = input['html_url'];
     pr.diffUrl = input['diff_url'];
     pr.patchUrl = input['patch_url'];
@@ -113,7 +114,7 @@ class PullRequest extends PullRequestInformation {
 
   PullRequest() : super(true);
 
-  static PullRequest fromJSON(input) {
+  static PullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     PullRequest pr = PullRequestInformation.fromJSON(input, new PullRequest());
@@ -139,7 +140,7 @@ class PullRequestMerge {
 
   PullRequestMerge();
 
-  static PullRequestMerge fromJSON(input) {
+  static PullRequestMerge fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new PullRequestMerge()
@@ -166,7 +167,7 @@ class PullRequestHead {
   /// Repository
   Repository repo;
 
-  static PullRequestHead fromJSON(input) {
+  static PullRequestHead fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var head = new PullRequestHead();
@@ -174,7 +175,7 @@ class PullRequestHead {
     head.ref = input['ref'];
     head.sha = input['sha'];
     head.user = User.fromJSON(input['user']);
-    head.repo = Repository.fromJSON(input['repo']);
+    head.repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>);
     return head;
   }
 }
@@ -196,7 +197,7 @@ class CreatePullRequest {
   CreatePullRequest(this.title, this.head, this.base, {this.body});
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("head", head, map);
     putValue("base", base, map);
@@ -240,7 +241,7 @@ class PullRequestComment {
   @ApiName("_links")
   Links links;
 
-  static PullRequestComment fromJSON(input) {
+  static PullRequestComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new PullRequestComment()
@@ -275,7 +276,7 @@ class CreatePullRequestComment {
   CreatePullRequestComment(this.body, this.commitId, this.path, this.position);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("body", body, map);
     putValue("commit_id", commitId, map);
     putValue("path", path, map);
@@ -298,7 +299,7 @@ class PullRequestFile {
   String rawUrl;
   String patch;
 
-  static PullRequestFile fromJSON(input) {
+  static PullRequestFile fromJSON(Map<String, dynamic> input) {
     var file = new PullRequestFile();
     file.sha = input['sha'];
     file.filename = input['filename'];

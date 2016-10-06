@@ -48,7 +48,7 @@ class GitHubFile {
   /// Source Repository
   RepositorySlug sourceRepository;
 
-  static GitHubFile fromJSON(input, [RepositorySlug slug]) {
+  static GitHubFile fromJSON(Map<String, dynamic> input, [RepositorySlug slug]) {
     if (input == null) return null;
 
     return new GitHubFile()
@@ -112,7 +112,7 @@ class CreateFile {
   CreateFile(this.path, this.content, this.message);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic> {};
     putValue("path", path, map);
     putValue("message", message, map);
     putValue("content", content, map);
