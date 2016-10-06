@@ -8,7 +8,7 @@ class GitBlob {
   String sha;
   int size;
 
-  static GitBlob fromJSON(input) {
+  static GitBlob fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitBlob()
@@ -50,7 +50,7 @@ class GitCommit {
   @ApiName('comment_count')
   int commentCount;
 
-  static GitCommit fromJSON(input) {
+  static GitCommit fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var commit = new GitCommit()
@@ -60,19 +60,21 @@ class GitCommit {
       ..commentCount = input['comment_count'];
 
     if (input['author'] != null) {
-      commit.author = GitCommitUser.fromJSON(input['author']);
+      commit.author =
+          GitCommitUser.fromJSON(input['author'] as Map<String, dynamic>);
     }
 
     if (input['committer'] != null) {
-      commit.committer = GitCommitUser.fromJSON(input['committer']);
+      commit.committer =
+          GitCommitUser.fromJSON(input['committer'] as Map<String, dynamic>);
     }
 
     if (input['tree'] != null) {
-      commit.tree = GitTree.fromJSON(input['tree']);
+      commit.tree = GitTree.fromJSON(input['tree'] as Map<String, dynamic>);
     }
 
     if (input['parents'] != null) {
-      commit.parents = input['parents']
+      commit.parents = (input['parents'] as List<Map<String, dynamic>>)
           .map((Map<String, dynamic> parent) => GitCommit.fromJSON(parent))
           .toList();
     }
@@ -102,7 +104,7 @@ class CreateGitCommit {
   CreateGitCommit(this.message, this.tree);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue('message', message, map);
     putValue('tree', tree, map);
     putValue('parents', parents, map);
@@ -128,7 +130,7 @@ class GitCommitUser {
 
   GitCommitUser(this.name, this.email, this.date);
 
-  static GitCommitUser fromJSON(input) {
+  static GitCommitUser fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitCommitUser(
@@ -136,7 +138,7 @@ class GitCommitUser {
   }
 
   Map<String, dynamic> toMap() {
-    var map = {};
+    var map = <String, dynamic>{};
 
     putValue('name', name, map);
     putValue('email', email, map);
@@ -158,7 +160,7 @@ class GitTree {
   @ApiName("tree")
   List<GitTreeEntry> entries;
 
-  static GitTree fromJSON(input) {
+  static GitTree fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var tree = new GitTree()
@@ -168,7 +170,7 @@ class GitTree {
 
     // There are no tree entries if it's a tree referenced from a GitCommit.
     if (input['tree'] != null) {
-      tree.entries = input['tree']
+      tree.entries = (input['tree'] as List<Map<String, dynamic>>)
           .map((Map<String, dynamic> it) => GitTreeEntry.fromJSON(it))
           .toList(growable: false);
     }
@@ -187,7 +189,7 @@ class GitTreeEntry {
   String sha;
   String url;
 
-  static GitTreeEntry fromJSON(input) {
+  static GitTreeEntry fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitTreeEntry()
@@ -216,7 +218,7 @@ class CreateGitTree {
   CreateGitTree(this.entries);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
 
     putValue('base_tree', baseTree, map);
 
@@ -242,7 +244,7 @@ class CreateGitTreeEntry {
   CreateGitTreeEntry(this.path, this.mode, this.type, {this.sha, this.content});
 
   Map<String, dynamic> toMap() {
-    var map = {};
+    var map = <String, dynamic>{};
 
     putValue('path', path, map);
     putValue('mode', mode, map);
@@ -260,13 +262,13 @@ class GitReference {
   String url;
   GitObject object;
 
-  static GitReference fromJSON(input) {
+  static GitReference fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitReference()
       ..ref = input['ref']
       ..url = input['url']
-      ..object = GitObject.fromJSON(input['object']);
+      ..object = GitObject.fromJSON(input['object'] as Map<String, dynamic>);
   }
 }
 
@@ -279,7 +281,7 @@ class GitTag {
   GitCommitUser tagger;
   GitObject object;
 
-  static GitTag fromJSON(input) {
+  static GitTag fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitTag()
@@ -287,8 +289,8 @@ class GitTag {
       ..sha = input['sha']
       ..url = input['url']
       ..message = input['message']
-      ..tagger = GitCommitUser.fromJSON(input['tagger'])
-      ..object = GitObject.fromJSON(input['object']);
+      ..tagger = GitCommitUser.fromJSON(input['tagger'] as Map<String, dynamic>)
+      ..object = GitObject.fromJSON(input['object'] as Map<String, dynamic>);
   }
 }
 
@@ -303,7 +305,7 @@ class CreateGitTag {
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
 
     putValue('tag', tag, map);
     putValue('message', message, map);
@@ -321,7 +323,7 @@ class GitObject {
   String sha;
   String url;
 
-  static GitObject fromJSON(input) {
+  static GitObject fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitObject()

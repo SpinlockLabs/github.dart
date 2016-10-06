@@ -15,12 +15,12 @@ class Authorization {
 
   Map<String, dynamic> json;
 
-  static Authorization fromJSON(input) {
+  static Authorization fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Authorization()
       ..id = input['id']
-      ..scopes = input['scopes']
+      ..scopes = input['scopes'] as List<String>
       ..token = input['token']
       ..app = AuthorizationApplication.fromJSON(input['app'])
       ..note = input['note']
@@ -63,7 +63,7 @@ class CreateAuthorization {
   CreateAuthorization(this.note);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic> {};
     putValue("note", note, map);
     putValue("note_url", noteUrl, map);
     putValue("client_id", clientID, map);

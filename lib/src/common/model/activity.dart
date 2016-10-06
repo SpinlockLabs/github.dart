@@ -19,7 +19,7 @@ class Event {
 
   Map<String, dynamic> payload;
 
-  static Event fromJSON(input) {
+  static Event fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var event = new Event();
@@ -34,7 +34,7 @@ class Event {
       ..createdAt = parseDateTime(input['created_at'])
       ..id = input['id']
       ..actor = User.fromJSON(input['actor'])
-      ..payload = input['payload'];
+      ..payload = input['payload'] as Map<String, dynamic>;
 
     return event;
   }
@@ -51,7 +51,7 @@ class RepositorySubscription {
 
   RepositorySubscription();
 
-  static RepositorySubscription fromJSON(input) {
+  static RepositorySubscription fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new RepositorySubscription()
