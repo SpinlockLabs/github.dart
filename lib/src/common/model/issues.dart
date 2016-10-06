@@ -58,10 +58,10 @@ class Issue {
   @ApiName("closed_by")
   User closedBy;
 
-  static Issue fromJSON(input) {
+  static Issue fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var labels = input['labels'];
+    var labels = input['labels'] as List<Map<String, dynamic>>;
     if (labels == null) labels = [];
 
     return new Issue()
@@ -74,9 +74,11 @@ class Issue {
       ..user = User.fromJSON(input['user'])
       ..labels = labels.map(IssueLabel.fromJSON).toList(growable: false)
       ..assignee = User.fromJSON(input['assignee'])
-      ..milestone = Milestone.fromJSON(input['milestone'])
+      ..milestone =
+          Milestone.fromJSON(input['milestone'] as Map<String, dynamic>)
       ..commentsCount = input['comments']
-      ..pullRequest = IssuePullRequest.fromJSON(input['pull_request'])
+      ..pullRequest = IssuePullRequest
+          .fromJSON(input['pull_request'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..closedAt = parseDateTime(input['closed_at'])
@@ -100,7 +102,7 @@ class IssueRequest {
   IssueRequest();
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("labels", labels, map);
@@ -125,7 +127,7 @@ class IssuePullRequest {
   @ApiName("patch_url")
   String patchUrl;
 
-  static IssuePullRequest fromJSON(input) {
+  static IssuePullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new IssuePullRequest()
@@ -155,7 +157,7 @@ class IssueComment {
   @ApiName("issue_url")
   String issueUrl;
 
-  static IssueComment fromJSON(input) {
+  static IssueComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new IssueComment()
@@ -178,7 +180,7 @@ class IssueLabel {
   /// Label Color
   String color;
 
-  static IssueLabel fromJSON(input) {
+  static IssueLabel fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     assert(input['name'] != null);
@@ -189,6 +191,7 @@ class IssueLabel {
       ..color = input['color'];
   }
 
+  @override
   String toString() => 'IssueLabel: $name';
 }
 
@@ -232,7 +235,7 @@ class Milestone {
   @ApiName("due_on")
   DateTime dueOn;
 
-  static Milestone fromJSON(input) {
+  static Milestone fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Milestone()
@@ -261,7 +264,7 @@ class CreateMilestone {
   CreateMilestone(this.title);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("state", state, map);
     putValue(description, description, map);

@@ -18,7 +18,8 @@ class MockWithNamedArgs extends Mock {
     log = new LogEntryListNamedArgs(() => _lastNamedArgs);
   }
 
-  noSuchMethod(Invocation invocation) {
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
     _lastNamedArgs = invocation.namedArguments;
     return super.noSuchMethod(invocation);
   }
@@ -41,6 +42,7 @@ class LogEntryListNamedArgs extends LogEntryList {
 
   LogEntryListNamedArgs(this.getLastNamedArgs);
 
+  @override
   add(LogEntry entry) {
     logs.add(new LogEntryNamedArgs(entry, getLastNamedArgs()));
   }
