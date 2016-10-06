@@ -151,7 +151,7 @@ class GistComment {
 
   String body;
 
-  static GistComment fromJSON(input) {
+  static GistComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GistComment()
