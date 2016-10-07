@@ -11,8 +11,6 @@ import 'package:test/test.dart';
 
 import 'helper.dart';
 
-//class MockGitHub extends MockWithNamedArgs implements GitHub {}
-
 class MockGitHub extends Mock implements GitHub {}
 
 void main() {
@@ -151,18 +149,21 @@ void main() {
 
     test('creates valid JSON body', () {
       // given
-      http.Response res = new http.Response('{}', 200);
-      github
-          .when(callsTo('request', anything, anything))
-          .alwaysReturn(new Future.value(res));
+      http.Response expectedResponse = new http.Response('{}', 200);
+      when(github.request(any, any,
+              body: any, headers: typed(any, named: 'headers')))
+          .thenReturn(new Future.value(expectedResponse));
 
       // when
       git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-      Map headers = entry.namedArgs[#headers];
+      var captured = verify(github.request(any, any,
+              body: captureAny, headers: typed(captureAny, named: 'headers')))
+          .captured;
+
+      var body = JSON.decode(captured[0]);
+      var headers = captured[1];
 
       expect(body['sha'], equals(someSha));
       expect(body['force'], equals(true));
@@ -173,18 +174,15 @@ void main() {
   group('deleteReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response res = new http.Response('{}', 200);
-      github
-          .when(callsTo('request', anything, anything))
-          .alwaysReturn(new Future.value(res));
+      http.Response expectedResponse = new http.Response('{}', 200);
+      when(github.request(any, any))
+          .thenReturn(new Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
 
       // then
-      github
-          .getLogs(callsTo('request', 'DELETE', '/repos/o/n/git/refs/heads/b'))
-          .verify(happenedOnce);
+      verify(github.request('DELETE', '/repos/o/n/git/refs/heads/b'));
     });
   });
 
@@ -192,33 +190,28 @@ void main() {
     test('constructs correct path', () {
       git.getTag(repo, someSha);
 
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/tags/someSHA'))
-          .verify(happenedOnce);
+      verify(github.getJSON('/repos/o/n/git/tags/someSHA',
+          convert: GitTag.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
   group('createTag()', () {
-    test('constructs correct path', () {
-      git.createTag(
-          repo,
-          new CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
-              new GitCommitUser('aName', 'aEmail', new DateTime.now())));
+    var createGitTag = new CreateGitTag('v0.0.1', 'a message', someSha,
+        'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now()));
 
-      github
-          .getLogs(callsTo('postJSON', '/repos/o/n/git/tags'))
-          .verify(happenedOnce);
+    test('constructs correct path', () {
+      git.createTag(repo, createGitTag);
+
+      verify(github.postJSON('/repos/o/n/git/tags',
+          convert: GitTag.fromJSON,
+          statusCode: StatusCodes.CREATED,
+          body: createGitTag.toJSON()));
     });
 
     test('creates valid JSON body', () {
-      git.createTag(
-          repo,
-          new CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
-              new GitCommitUser('aName', 'aEmail', new DateTime.now())));
+      git.createTag(repo, createGitTag);
 
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
+      var body = captureSentBody(github);
       expect(body['tag'], equals('v0.0.1'));
       expect(body['message'], equals('a message'));
       expect(body['object'], equals(someSha));
@@ -311,4 +304,14 @@ captureSentBody(MockGitHub github) {
 
   var body = JSON.decode(bodyString);
   return body;
+}
+
+captureSentHeaders(MockGitHub github) {
+  var headersString = verify(github.postJSON(any,
+          convert: any, statusCode: any, body: any, headers: typed(captureAny)))
+      .captured
+      .single;
+
+  var headers = JSON.decode(headersString);
+  return headers;
 }
