@@ -344,6 +344,32 @@ class Branch {
   }
 }
 
+class BranchProtection {
+  RequiredStatusChecks requiredStatusChecks;
+
+  static BranchProtection fromJSON(Map<String, dynamic> input) {
+    var branchProtection = new BranchProtection()
+      ..requiredStatusChecks = RequiredStatusChecks
+          .fromJson(input['required_status_checks'] as Map<String, dynamic>);
+    return branchProtection;
+  }
+}
+
+class RequiredStatusChecks {
+  List<String> contexts = <String>[];
+  bool strict;
+  bool includeAdmins;
+
+  static RequiredStatusChecks fromJson(Map<String, dynamic> input) {
+    var requiredStatusChecks = new RequiredStatusChecks()
+      ..strict = input['strict']
+      ..includeAdmins = input['include_admins']
+      ..contexts = input['contexts'] as List<String>;
+
+    return requiredStatusChecks;
+  }
+}
+
 /// A Breakdown of the Languages a repository uses.
 class LanguageBreakdown {
   final Map<String, int> _data;

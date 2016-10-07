@@ -154,6 +154,16 @@ void main() {
       expect(issue.title, issueRequest.title);
     });
   });
+
+  group('branch protection', () {
+    test('get protection', () async {
+      var result = await github.git.getBranchProtection(slug, 'master');
+
+      expect(result.requiredStatusChecks.contexts, isEmpty);
+      expect(result.requiredStatusChecks.includeAdmins, isTrue);
+      expect(result.requiredStatusChecks.strict, isTrue);
+    });
+  });
 }
 
 String _randomGitName() {

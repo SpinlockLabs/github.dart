@@ -288,6 +288,31 @@ void main() {
       expect(body['tree'][0]['content'], equals('some file content'));
     });
   });
+
+  group('updateBranchProtection', () {
+    var branchName = 'branchName';
+  });
+
+  group('getBranchProtection', () {
+    var branchName = 'branchName';
+    test('constructs correct path', () {
+      git.getBranchProtection(repo, branchName);
+
+      verify(github.getJSON('/repos/o/n/branches/$branchName/protection',
+          convert: BranchProtection.fromJSON,
+          statusCode: StatusCodes.OK,
+          preview: any));
+    });
+
+    test('adds the preview headers headers', () {
+      git.getBranchProtection(repo, branchName);
+
+      verify(github.getJSON(any,
+          statusCode: any,
+          preview: 'application/vnd.github.loki-preview+json',
+          convert: any));
+    });
+  });
 }
 
 Map<String, dynamic> captureSentBody(MockGitHub github) {
