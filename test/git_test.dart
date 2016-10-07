@@ -6,17 +6,20 @@ import 'dart:convert' show JSON;
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
 import "package:http/http.dart" as http;
-import 'package:mock/mock.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'helper.dart';
 
-class MockGitHub extends MockWithNamedArgs implements GitHub {}
+//class MockGitHub extends MockWithNamedArgs implements GitHub {}
+
+class MockGitHub extends Mock implements GitHub {}
 
 void main() {
   MockGitHub github;
   GitService git;
   RepositorySlug repo;
+  var someSha = 'someSHA';
 
   setUp(() {
     github = new MockGitHub();
@@ -24,15 +27,12 @@ void main() {
     repo = new RepositorySlug('o', 'n');
   });
 
-  //
-  // BLOB
-  //
   group('getBlob()', () {
     test('constructs correct path', () {
       git.getBlob(repo, 'sh');
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/blobs/sh'))
-          .verify(happenedOnce);
+
+      verify(github.getJSON('/repos/o/n/git/blobs/sh',
+          convert: GitBlob.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
@@ -41,33 +41,28 @@ void main() {
       CreateGitBlob blob = new CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
-      github
-          .getLogs(callsTo('postJSON', '/repos/o/n/git/blobs'))
-          .verify(happenedOnce);
+      verify(github.postJSON('/repos/o/n/git/blobs',
+          convert: GitBlob.fromJSON,
+          statusCode: StatusCodes.CREATED,
+          body: blob.toJSON()));
     });
 
     test('creates valid JSON body', () {
       CreateGitBlob blob = new CreateGitBlob('bbb', 'utf-8');
+
       git.createBlob(repo, blob);
-
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
+      var body = captureSentBody(github);
       expect(body['content'], equals('bbb'));
       expect(body['encoding'], equals('utf-8'));
     });
   });
 
-  //
-  // COMMIT
-  //
   group('getCommit()', () {
     test('constructs correct path', () {
       git.getCommit(repo, 'sh');
 
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/commits/sh'))
-          .verify(happenedOnce);
+      verify(github.getJSON('/repos/o/n/git/commits/sh',
+          convert: GitCommit.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
@@ -76,9 +71,10 @@ void main() {
       CreateGitCommit commit = new CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
-      github
-          .getLogs(callsTo('postJSON', '/repos/o/n/git/commits'))
-          .verify(happenedOnce);
+      verify(github.postJSON('/repos/o/n/git/commits',
+          convert: GitCommit.fromJSON,
+          statusCode: StatusCodes.CREATED,
+          body: commit.toJSON()));
     });
 
     test('creates valid JSON body', () {
@@ -94,9 +90,7 @@ void main() {
       git.createCommit(repo, commit);
 
       // then
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
+      var body = captureSentBody(github);
       expect(body['message'], equals('aMessage'));
       expect(body['tree'], equals('aTreeSha'));
       expect(body['parents'], equals(['parentSha1', 'parentSha2']));
@@ -109,55 +103,50 @@ void main() {
     });
   });
 
-  //
-  // REFERENCE
-  //
   group('getReference()', () {
     test('constructs correct path', () {
       git.getReference(repo, 'heads/b');
 
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/refs/heads/b'))
-          .verify(happenedOnce);
+      verify(github.getJSON('/repos/o/n/git/refs/heads/b',
+          convert: GitReference.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
   group('createReference()', () {
+    var someRef = 'refs/heads/b';
     test('constructs correct path', () {
-      git.createReference(repo, 'refs/heads/b', 'someSHA');
+      git.createReference(repo, someRef, someSha);
 
-      github
-          .getLogs(callsTo('postJSON', '/repos/o/n/git/refs'))
-          .verify(happenedOnce);
+      verify(github.postJSON('/repos/o/n/git/refs',
+          convert: GitReference.fromJSON,
+          statusCode: StatusCodes.CREATED,
+          body: JSON.encode({'ref': someRef, 'sha': someSha})));
     });
 
     test('creates valid JSON body', () {
-      git.createReference(repo, 'refs/heads/b', 'someSHA');
+      git.createReference(repo, someRef, someSha);
 
-      // then
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
-      expect(body['ref'], equals('refs/heads/b'));
-      expect(body['sha'], equals('someSHA'));
+      var body = captureSentBody(github);
+      expect(body['ref'], equals(someRef));
+      expect(body['sha'], equals(someSha));
     });
   });
 
   group('editReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response res = new http.Response('{}', 200);
-      github
-          .when(callsTo('request', anything, anything))
-          .alwaysReturn(new Future.value(res));
+      http.Response expectedResponse = new http.Response('{}', 200);
+
+      when(github.request(any, any,
+              body: any, headers: typed(any, named: 'headers')))
+          .thenReturn(new Future.value(expectedResponse));
 
       // when
-      git.editReference(repo, 'heads/b', 'someSHA');
+      git.editReference(repo, 'heads/b', someSha);
 
       // then
-      github
-          .getLogs(callsTo('request', 'PATCH', '/repos/o/n/git/refs/heads/b'))
-          .verify(happenedOnce);
+      verify(github.request('PATCH', '/repos/o/n/git/refs/heads/b',
+          headers: typed(any, named: 'headers'), body: any));
     });
 
     test('creates valid JSON body', () {
@@ -168,14 +157,14 @@ void main() {
           .alwaysReturn(new Future.value(res));
 
       // when
-      git.editReference(repo, 'heads/b', 'someSHA', force: true);
+      git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
       LogEntryNamedArgs entry = github.getLogs().first;
       Map body = JSON.decode(entry.namedArgs[#body]);
       Map headers = entry.namedArgs[#headers];
 
-      expect(body['sha'], equals('someSHA'));
+      expect(body['sha'], equals(someSha));
       expect(body['force'], equals(true));
       expect(headers['content-length'], equals('30'));
     });
@@ -199,12 +188,9 @@ void main() {
     });
   });
 
-  //
-  // TAG
-  //
   group('getTag()', () {
     test('constructs correct path', () {
-      git.getTag(repo, 'someSHA');
+      git.getTag(repo, someSha);
 
       github
           .getLogs(callsTo('getJSON', '/repos/o/n/git/tags/someSHA'))
@@ -216,7 +202,7 @@ void main() {
     test('constructs correct path', () {
       git.createTag(
           repo,
-          new CreateGitTag('v0.0.1', 'a message', 'someSHA', 'commit',
+          new CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
               new GitCommitUser('aName', 'aEmail', new DateTime.now())));
 
       github
@@ -227,7 +213,7 @@ void main() {
     test('creates valid JSON body', () {
       git.createTag(
           repo,
-          new CreateGitTag('v0.0.1', 'a message', 'someSHA', 'commit',
+          new CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
               new GitCommitUser('aName', 'aEmail', new DateTime.now())));
 
       LogEntryNamedArgs entry = github.getLogs().first;
@@ -235,18 +221,12 @@ void main() {
 
       expect(body['tag'], equals('v0.0.1'));
       expect(body['message'], equals('a message'));
-      expect(body['object'], equals('someSHA'));
+      expect(body['object'], equals(someSha));
       expect(body['type'], equals('commit'));
       expect(body['tagger']['name'], equals('aName'));
     });
   });
 
-  //
-  // TREE
-  //
-  //
-  // TREE
-  //
   group('getTree()', () {
     test('constructs correct path', () {
       git.getTree(repo, 'sh');
@@ -321,4 +301,14 @@ void main() {
       expect(body['tree'][0]['content'], equals('some file content'));
     });
   });
+}
+
+captureSentBody(MockGitHub github) {
+  var bodyString = verify(
+          github.postJSON(any, convert: any, statusCode: any, body: captureAny))
+      .captured
+      .single;
+
+  var body = JSON.decode(bodyString);
+  return body;
 }
