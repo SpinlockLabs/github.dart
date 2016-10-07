@@ -9,8 +9,6 @@ import "package:http/http.dart" as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'helper.dart';
-
 class MockGitHub extends Mock implements GitHub {}
 
 void main() {
@@ -224,9 +222,8 @@ void main() {
     test('constructs correct path', () {
       git.getTree(repo, 'sh');
 
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/trees/sh'))
-          .verify(happenedOnce);
+      verify(github.getJSON('/repos/o/n/git/trees/sh',
+          convert: GitTree.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
@@ -234,19 +231,20 @@ void main() {
     test('constructs correct path', () {
       git.getTree(repo, 'sh', recursive: true);
 
-      github
-          .getLogs(callsTo('getJSON', '/repos/o/n/git/trees/sh?recursive=1'))
-          .verify(happenedOnce);
+      verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
+          convert: GitTree.fromJSON, statusCode: StatusCodes.OK));
     });
   });
 
   group('createTree()', () {
     test('constructs correct path', () {
-      git.createTree(repo, new CreateGitTree([]));
+      var createGitTree = new CreateGitTree([]);
+      git.createTree(repo, createGitTree);
 
-      github
-          .getLogs(callsTo('postJSON', '/repos/o/n/git/trees'))
-          .verify(happenedOnce);
+      verify(github.postJSON('/repos/o/n/git/trees',
+          convert: GitTree.fromJSON,
+          statusCode: StatusCodes.CREATED,
+          body: createGitTree.toJSON()));
     });
 
     test('with sha creates valid JSON body', () {
@@ -260,9 +258,7 @@ void main() {
       git.createTree(repo, tree);
 
       // then
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
+      var body = captureSentBody(github);
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -283,9 +279,7 @@ void main() {
       git.createTree(repo, tree);
 
       // then
-      LogEntryNamedArgs entry = github.getLogs().first;
-      Map body = JSON.decode(entry.namedArgs[#body]);
-
+      var body = captureSentBody(github);
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -296,22 +290,12 @@ void main() {
   });
 }
 
-captureSentBody(MockGitHub github) {
+Map<String, dynamic> captureSentBody(MockGitHub github) {
   var bodyString = verify(
           github.postJSON(any, convert: any, statusCode: any, body: captureAny))
       .captured
       .single;
 
-  var body = JSON.decode(bodyString);
+  var body = JSON.decode(bodyString) as Map<String, dynamic>;
   return body;
-}
-
-captureSentHeaders(MockGitHub github) {
-  var headersString = verify(github.postJSON(any,
-          convert: any, statusCode: any, body: any, headers: typed(captureAny)))
-      .captured
-      .single;
-
-  var headers = JSON.decode(headersString);
-  return headers;
 }
