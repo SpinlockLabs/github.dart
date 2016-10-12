@@ -8,7 +8,7 @@ class GitignoreTemplate {
   /// Template Source
   String source;
 
-  static GitignoreTemplate fromJSON(input) {
+  static GitignoreTemplate fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GitignoreTemplate()
@@ -52,7 +52,7 @@ class APIStatus {
   @ApiName("body")
   String message;
 
-  static APIStatus fromJSON(input) {
+  static APIStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new APIStatus()

@@ -2,32 +2,25 @@ part of github.common;
 
 typedef http.Client ClientCreator();
 
-/**
- * The Main GitHub Client
- *
- * ## Example
- *
- *      var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
- *      // Use the Client
- */
+///  The Main GitHub Client
+///
+///  ## Example
+///
+///       var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
+///       // Use the Client
+///
 class GitHub {
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
-  /**
-   * Authentication Information
-   */
+  /// Authentication Information
   Authentication auth;
 
-  /**
-   * API Endpoint
-   */
+  /// API Endpoint
   final String endpoint;
 
-  /**
-   * HTTP Client
-   */
+  /// HTTP Client
   final http.Client client;
 
   ActivityService _activity;
@@ -44,6 +37,17 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
+
+  /// Creates a new [GitHub] instance.
+  ///
+  /// [endpoint] is the api endpoint to use
+  /// [auth] is the authentication information
+  GitHub(
+      {Authentication auth,
+      this.endpoint: "https://api.github.com",
+      http.Client client})
+      : this.auth = auth == null ? new Authentication.anonymous() : auth,
+        this.client = client == null ? new http.Client() : client;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -71,20 +75,6 @@ class GitHub {
           isUtc: true);
 
   int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
-
-  /**
-   * Creates a new [GitHub] instance.
-   *
-   * [fetcher] is the HTTP Transporter to use
-   * [endpoint] is the api endpoint to use
-   * [auth] is the authentication information
-   */
-  GitHub(
-      {Authentication auth,
-      this.endpoint: "https://api.github.com",
-      http.Client client})
-      : this.auth = auth == null ? new Authentication.anonymous() : auth,
-        this.client = client == null ? new http.Client() : client;
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
@@ -201,26 +191,19 @@ class GitHub {
     return _users;
   }
 
-  /**
-   * Handles Get Requests that respond with JSON
-   *
-   * [path] can either be a path like '/repos' or a full url.
-   *
-   * [statusCode] is the expected status code. If it is null, it is ignored.
-   * If the status code that the response returns is not the status code you provide
-   * then the [fail] function will be called with the HTTP Response.
-   * If you don't throw an error or break out somehow, it will go into some error checking
-   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
-   * for errors, it throws an Unknown Error.
-   *
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   *
-   * [params] are query string parameters.
-   *
-   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
-   * The future will pass the object returned from this function to the then method.
-   * The default [convert] function returns the input object.
-   */
+  /// Handles Get Requests that respond with JSON
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [statusCode] is the expected status code. If it is null, it is ignored.
+  /// If the status code that the response returns is not the status code you provide
+  /// then the [fail] function will be called with the HTTP Response.
+  /// If you don't throw an error or break out somehow, it will go into some error checking
+  /// that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+  /// for errors, it throws an Unknown Error.
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+  /// The future will pass the object returned from this function to the then method.
+  /// The default [convert] function returns the input object.
   Future<dynamic> getJSON(String path,
       {int statusCode,
       void fail(http.Response response),
@@ -252,35 +235,31 @@ class GitHub {
     return convert(json);
   }
 
-  /**
-   * Handles Post Requests that respond with JSON
-   *
-   * [path] can either be a path like '/repos' or a full url.
-   *
-   * [statusCode] is the expected status code. If it is null, it is ignored.
-   * If the status code that the response returns is not the status code you provide
-   * then the [fail] function will be called with the HTTP Response.
-   * If you don't throw an error or break out somehow, it will go into some error checking
-   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
-   * for errors, it throws an Unknown Error.
-   *
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   *
-   * [params] are query string parameters.
-   *
-   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
-   * The future will pass the object returned from this function to the then method.
-   * The default [convert] function returns the input object.
-   *
-   * [body] is the data to send to the server.
-   */
+  /// Handles Post Requests that respond with JSO
+  ///
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [statusCode] is the expected status code. If it is null, it is ignored.
+  /// If the status code that the response returns is not the status code you provide
+  /// then the [fail] function will be called with the HTTP Response.
+  ///
+  /// If you don't throw an error or break out somehow, it will go into some error checking
+  /// that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+  /// for errors, it throws an Unknown Error.
+  ///
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+  ///
+  /// The future will pass the object returned from this function to the then method.
+  /// The default [convert] function returns the input object.
+  /// [body] is the data to send to the server.
   Future<dynamic> postJSON(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
       JSONConverter convert,
-      body,
+      String body,
       String preview}) async {
     if (headers == null) headers = {};
 
@@ -303,16 +282,16 @@ class GitHub {
     return convert(JSON.decode(response.body));
   }
 
-  /**
-   * Internal method to handle status codes
-   */
+  ///
+  /// Internal method to handle status codes
+  ///
   void handleStatusCode(http.Response response) {
     String message;
     List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
       var json = JSON.decode(response.body);
       message = json['message'];
-      errors = json['errors'];
+      errors = json['errors'] as List<Map<String, String>>;
     }
     switch (response.statusCode) {
       case 404:
@@ -349,15 +328,14 @@ class GitHub {
     throw new UnknownError(this, message);
   }
 
-  /**
-   * Handles Authenticated Requests in an easy to understand way.
-   *
-   * [method] is the HTTP method.
-   * [path] can either be a path like '/repos' or a full url.
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * [params] are query string parameters.
-   * [body] is the body content of requests that take content.
-   */
+  /// Handles Authenticated Requests in an easy to understand way.
+  ///
+  /// [method] is the HTTP method.
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [body] is the body content of requests that take content.
+  ///
   Future<http.Response> request(String method, String path,
       {Map<String, String> headers,
       Map<String, dynamic> params,
@@ -422,11 +400,8 @@ class GitHub {
       return response;
   }
 
-  /**
-   * Disposes of this GitHub Instance.
-   *
-   * No other methods on this instance should be called after this method is called.
-   */
+  /// Disposes of this GitHub Instance.
+  /// No other methods on this instance should be called after this method is called.
   void dispose() {
     // Destroy the Authentication Information
     // This is needed for security reasons.

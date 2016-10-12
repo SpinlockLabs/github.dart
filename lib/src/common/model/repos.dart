@@ -90,7 +90,8 @@ class Repository {
   @ApiName("pushed_at")
   DateTime pushedAt;
 
-  static Repository fromJSON(input, [Repository instance]) {
+  static Repository fromJSON(Map<String, dynamic> input,
+      [Repository instance]) {
     if (input == null) return null;
 
     if (instance == null) instance = new Repository();
@@ -119,12 +120,14 @@ class Repository {
       ..createdAt = parseDateTime(input['created_at'])
       ..pushedAt = parseDateTime(input['pushed_at'])
       ..isPrivate = input['private']
-      ..owner = UserInformation.fromJSON(input['owner']);
+      ..owner =
+          UserInformation.fromJSON(input['owner'] as Map<String, dynamic>);
   }
 
   /// Gets the Repository Slug (Full Name).
   RepositorySlug slug() => new RepositorySlug(owner.login, name);
 
+  @override
   String toString() => 'Repository: ${owner.login}/$name';
 }
 
@@ -150,7 +153,7 @@ class CloneUrls {
   /// https://github.com/user/repo
   String svn;
 
-  static CloneUrls fromJSON(input) {
+  static CloneUrls fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CloneUrls()
@@ -167,18 +170,19 @@ class Tag {
   String zipUrl;
   String tarUrl;
 
-  static Tag fromJSON(input) {
+  static Tag fromJSON(Map<String, dynamic> input) {
     if (input == null) {
       return null;
     }
 
     return new Tag()
       ..name = input['name']
-      ..commit = CommitInfo.fromJson(input['commit'])
+      ..commit = CommitInfo.fromJson(input['commit'] as Map<String, dynamic>)
       ..tarUrl = input['tarball_url']
       ..zipUrl = input['zipball_url'];
   }
 
+  @override
   String toString() => 'Tag: $name';
 }
 
@@ -186,14 +190,15 @@ class CommitInfo {
   String sha;
   GitTree tree;
 
-  static CommitInfo fromJson(input) {
+  static CommitInfo fromJson(Map<String, dynamic> input) {
     if (input == null) {
       return null;
     }
 
     return new CommitInfo()
       ..sha = input['sha']
-      ..tree = GitTree.fromJSON(input['commit']['tree']);
+      ..tree =
+          GitTree.fromJSON(input['commit']['tree'] as Map<String, dynamic>);
   }
 }
 
@@ -213,7 +218,7 @@ class UserInformation {
   @ApiName("html_url")
   String htmlUrl;
 
-  static UserInformation fromJSON(input) {
+  static UserInformation fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new UserInformation()
@@ -247,9 +252,11 @@ class RepositorySlug {
   /// Example: owner/name
   String get fullName => "${owner}/${name}";
 
+  @override
   bool operator ==(Object obj) =>
       obj is RepositorySlug && obj.fullName == fullName;
 
+  @override
   int get hashCode => fullName.hashCode;
 
   @override
@@ -326,12 +333,12 @@ class Branch {
   /// Commit Information
   CommitInfo commit;
 
-  static Branch fromJSON(input) {
+  static Branch fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var branch = new Branch()
       ..name = input['name']
-      ..commit = CommitInfo.fromJson(input['commit']);
+      ..commit = CommitInfo.fromJson(input['commit'] as Map<String, dynamic>);
 
     return branch;
   }
@@ -362,7 +369,7 @@ class LanguageBreakdown {
 
   /// Creates a list of lists with a tuple of the language name and the bytes.
   List<List<dynamic>> toList() {
-    var out = [];
+    var out = <List<dynamic>>[];
     for (var key in info.keys) {
       out.add([key, info[key]]);
     }

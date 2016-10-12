@@ -1,8 +1,6 @@
 part of github.common;
 
-/**
- * Crawls a Repository to Fetch All Files
- */
+// Crawls a Repository to Fetch All Files
 class RepositoryCrawler {
   final GitHub github;
   final RepositorySlug slug;

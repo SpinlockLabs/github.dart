@@ -54,7 +54,7 @@ class Release {
   /// Release Assets
   List<ReleaseAsset> assets;
 
-  static Release fromJSON(input) {
+  static Release fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Release()
@@ -69,8 +69,8 @@ class Release {
       ..draft = input['draft']
       ..prerelease = input['prelease']
       ..author = input['author']
-      ..assets =
-          new List.from(input['assets'].map((it) => ReleaseAsset.fromJSON(it)))
+      ..assets = new List.from(input['assets']
+          .map((Map<String, dynamic> it) => ReleaseAsset.fromJSON(it)))
       ..name = input['name']
       ..createdAt = parseDateTime(input['created_at'])
       ..publishedAt = parseDateTime(input['published_at']);
@@ -114,7 +114,7 @@ class ReleaseAsset {
   @ApiName("updated_at")
   DateTime updatedAt;
 
-  static ReleaseAsset fromJSON(input) {
+  static ReleaseAsset fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new ReleaseAsset()
@@ -154,7 +154,7 @@ class CreateRelease {
   CreateRelease(this.tagName);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("tag_name", tagName, map);
     putValue("name", name, map);
     putValue("body", body, map);

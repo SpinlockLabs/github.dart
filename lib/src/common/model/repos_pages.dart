@@ -12,7 +12,7 @@ class RepositoryPages {
   @ApiName("custom_404")
   bool hasCustom404;
 
-  static RepositoryPages fromJSON(input) {
+  static RepositoryPages fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var pages = new RepositoryPages();

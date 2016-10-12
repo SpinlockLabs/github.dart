@@ -4,11 +4,11 @@ import "package:github/browser.dart";
 
 import "common.dart";
 
-DivElement $releases;
+DivElement releasesDiv;
 
 void main() {
   init("releases.dart", onReady: () {
-    $releases = querySelector("#releases");
+    releasesDiv = querySelector("#releases");
     loadReleases();
   });
 }
@@ -19,15 +19,15 @@ void loadReleases() {
       .toList()
       .then((releases) {
     for (var release in releases) {
-      $releases.appendHtml(
+      releasesDiv.appendHtml(
           """
       <div class="repo box" id="release-${release.id}">
         <h1>${release.name}</h1>
       </div>
       """,
           treeSanitizer: NodeTreeSanitizer.trusted);
-      var rel = $releases.querySelector("#release-${release.id}");
-      void append(String key, value) {
+      var rel = releasesDiv.querySelector("#release-${release.id}");
+      void append(String key, String value) {
         if (value == null) return;
         rel.appendHtml("<br/><b>${key}</b>: ${value}",
             treeSanitizer: NodeTreeSanitizer.trusted);

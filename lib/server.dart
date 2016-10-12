@@ -1,6 +1,4 @@
-/**
- * GitHub for the Server
- */
+/// GitHub for the Server
 library github.server;
 
 import "dart:io";
@@ -10,12 +8,9 @@ import "src/common.dart";
 export "src/common.dart";
 export "src/server/hooks.dart";
 
-/**
- * Creates a GitHub Client.
- *
- * If [auth] is not specified, then it will be automatically configured
- * from the environment as per [findAuthenticationFromEnvironment].
- */
+/// Creates a GitHub Client.
+/// If [auth] is not specified, then it will be automatically configured
+/// from the environment as per [findAuthenticationFromEnvironment].
 GitHub createGitHubClient(
     {Authentication auth, String endpoint: "https://api.github.com"}) {
   if (auth == null) {
@@ -55,7 +50,9 @@ Authentication findAuthenticationFromEnvironment() {
       String password = result.stderr.toString().split("password:")[1].trim();
       password = password.substring(1, password.length - 1);
       return new Authentication.basic(username.trim(), password.trim());
-    } catch (e) {}
+    } catch (e) {
+      print(e);
+    }
   }
 
   Map<String, String> env = Platform.environment;

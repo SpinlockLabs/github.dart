@@ -5,7 +5,7 @@ import "helper.dart";
 import "package:github/src/common.dart";
 import "package:test/test.dart";
 
-main() {
+void main() {
   group("slugFromAPIUrl()", () {
     test("https://api.github.com/repos/DirectMyFile/irc.dart slug is correct",
         () {

@@ -2,19 +2,21 @@ part of github.test.helper;
 
 final MockHTTPClient httpClient = new MockHTTPClient();
 
-typedef http.Response ResponseCreator(http.Request request);
+typedef http.Response ResponseCreator(http.BaseRequest request);
 
 class MockHTTPClient extends http.BaseClient {
-  final Map<Pattern, ResponseCreator> responses = {};
+  final Map<Pattern, ResponseCreator> responses = <Pattern, ResponseCreator>{};
 
   @override
-  Future<http.StreamedResponse> send(http.Request request) {
-    var creator = responses.keys.firstWhere(
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    var matchingUrlCreatorKey = responses.keys.firstWhere(
         (it) => it.allMatches(request.url.toString()).isNotEmpty,
         orElse: () => null);
+    var creator = responses[matchingUrlCreatorKey];
     if (creator == null) {
       throw new Exception("No Response Configured");
     }
+
     return new Future.value(creator(request));
   }
 }
@@ -25,8 +27,10 @@ class MockResponse extends http.Response {
 
   factory MockResponse.fromAsset(String name) {
     Map<String, dynamic> responseData =
-        JSON.decode(asset("responses/${name}.json").readAsStringSync());
-    Map<String, String> headers = responseData['headers'];
+        JSON.decode(asset("responses/${name}.json").readAsStringSync())
+        as Map<String, dynamic>;
+    Map<String, String> headers =
+        responseData['headers'] as Map<String, String>;
     dynamic body = responseData['body'];
     int statusCode = responseData['statusCode'];
     String actualBody;

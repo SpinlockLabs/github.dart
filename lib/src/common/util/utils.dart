@@ -10,9 +10,7 @@ class NotReadyYet {
 
 /// Specifies the original API Field Name
 class ApiName {
-  /**
   /// Original API Field Name
-   */
   final String name;
 
   const ApiName(this.name);
@@ -31,7 +29,7 @@ class OnlyWhen {
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
 String dateToGitHubIso8601(DateTime date) {
   // Regex removes the milliseconds.
-  return date.toUtc().toIso8601String().replaceAll(GITHUB_DATE_REMOVE, '');
+  return date.toUtc().toIso8601String().replaceAll(githubDateRemoveRegExp, '');
 }
 
 RepositorySlug slugFromAPIUrl(String url) {

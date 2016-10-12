@@ -38,7 +38,7 @@ class RepositoryCommit {
   /// The files changed in this commit.
   List<CommitFile> files;
 
-  static RepositoryCommit fromJSON(input) {
+  static RepositoryCommit fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var commit = new RepositoryCommit()
@@ -46,19 +46,21 @@ class RepositoryCommit {
       ..sha = input['sha']
       ..htmlUrl = input['html_url']
       ..commentsUrl = input['comments_url']
-      ..commit = GitCommit.fromJSON(input['commit'])
-      ..author = User.fromJSON(input['author'])
-      ..committer = User.fromJSON(input['committer'])
-      ..stats = CommitStats.fromJSON(input['stats']);
+      ..commit = GitCommit.fromJSON(input['commit'] as Map<String, dynamic>)
+      ..author = User.fromJSON(input['author'] as Map<String, dynamic>)
+      ..committer = User.fromJSON(input['committer'] as Map<String, dynamic>)
+      ..stats = CommitStats.fromJSON(input['stats'] as Map<String, dynamic>);
 
     if (input['parents'] != null) {
-      commit.parents =
-          input['parents'].map((parent) => GitCommit.fromJSON(parent)).toList();
+      commit.parents = (input['parents'] as List<Map<String, dynamic>>)
+          .map((parent) => GitCommit.fromJSON(parent))
+          .toList();
     }
 
     if (input['files'] != null) {
-      commit.files =
-          input['files'].map((file) => CommitFile.fromJSON(file)).toList();
+      commit.files = (input['files'] as List<Map<String, dynamic>>)
+          .map((file) => CommitFile.fromJSON(file))
+          .toList();
     }
 
     return commit;
@@ -76,7 +78,7 @@ class CommitStats {
   /// Total changes.
   int total;
 
-  static CommitStats fromJSON(input) {
+  static CommitStats fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CommitStats()
@@ -106,7 +108,7 @@ class CommitFile {
 
   Map<String, dynamic> json;
 
-  static CommitFile fromJSON(input) {
+  static CommitFile fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CommitFile()

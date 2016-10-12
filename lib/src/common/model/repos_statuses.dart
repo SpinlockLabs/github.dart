@@ -10,16 +10,18 @@ class CombinedRepositoryStatus {
 
   CombinedRepositoryStatus();
 
-  static CombinedRepositoryStatus fromJSON(input) {
+  static CombinedRepositoryStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CombinedRepositoryStatus()
       ..state = input["state"]
       ..sha = input["sha"]
       ..totalCount = input["total_count"]
-      ..statuses =
-          input["statuses"].map((it) => RepositoryStatus.fromJSON(it)).toList()
-      ..repository = Repository.fromJSON(input["repository"]);
+      ..statuses = (input["statuses"] as List<Map<String, dynamic>>)
+          .map((it) => RepositoryStatus.fromJSON(it))
+          .toList()
+      ..repository =
+          Repository.fromJSON(input["repository"] as Map<String, dynamic>);
   }
 }
 
@@ -32,7 +34,7 @@ class RepositoryStatus {
   String description;
   String context;
 
-  static RepositoryStatus fromJSON(input) {
+  static RepositoryStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new RepositoryStatus()
@@ -58,7 +60,7 @@ class CreateStatus {
   CreateStatus(this.state);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("state", state, map);
     putValue("target_url", targetUrl, map);
     putValue("description", description, map);

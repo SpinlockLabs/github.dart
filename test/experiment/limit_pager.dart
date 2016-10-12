@@ -8,9 +8,7 @@ void main() {
 const int MAX_PER_PAGE = 100;
 const int ACCURACY_RANGE = 5;
 
-/**
- * Solves the most efficient way to fetch the number of objects [limit] with the least requests.
- */
+/// Solves the most efficient way to fetch the number of objects [limit] with the least requests.
 PaginationInformation solve(int limit) {
   if (limit < 0) {
     throw new RangeError("limit cannot be less than zero (was ${limit})");
@@ -38,6 +36,7 @@ class PaginationInformation {
 
   PaginationInformation(this.limit, this.pages, this.itemsPerPage);
 
+  @override
   String toString() =>
       "limit: ${limit}, pages: ${pages}, per page: ${itemsPerPage}";
 }

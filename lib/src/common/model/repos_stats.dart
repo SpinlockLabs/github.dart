@@ -11,14 +11,14 @@ class ContributorStatistics {
   /// Weekly Statistics
   List<ContributorWeekStatistics> weeks;
 
-  static ContributorStatistics fromJSON(input) {
+  static ContributorStatistics fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new ContributorStatistics()
-      ..author = User.fromJSON(input['author'])
+      ..author = User.fromJSON(input['author'] as Map<String, dynamic>)
       ..total = input['total']
-      ..weeks =
-          input['weeks'].map((it) => ContributorWeekStatistics.fromJSON(it));
+      ..weeks = (input['weeks'] as List<Map<String, dynamic>>)
+          .map((it) => ContributorWeekStatistics.fromJSON(it));
   }
 }
 
@@ -37,7 +37,7 @@ class ContributorWeekStatistics {
   /// Number of Commits
   int commits;
 
-  static ContributorWeekStatistics fromJSON(input) {
+  static ContributorWeekStatistics fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new ContributorWeekStatistics()
@@ -56,12 +56,12 @@ class ContributorParticipation {
   /// Commit Counts for the Owner
   List<int> owner;
 
-  static ContributorParticipation fromJSON(input) {
+  static ContributorParticipation fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new ContributorParticipation()
-      ..all = input['all']
-      ..owner = input['owner'];
+      ..all = input['all'] as List<int>
+      ..owner = input['owner'] as List<int>;
   }
 }
 
@@ -76,11 +76,11 @@ class YearCommitCountWeek {
   /// Timestamp for Beginning of Week
   int timestamp;
 
-  static YearCommitCountWeek fromJSON(input) {
+  static YearCommitCountWeek fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var c = new YearCommitCountWeek();
-    c.days = input["days"];
+    c.days = input["days"] as List<int>;
     c.total = input["total"];
     c.timestamp = input["week"];
     return c;
@@ -98,7 +98,7 @@ class WeeklyChangesCount {
   /// Number of Deletions
   int deletions;
 
-  static WeeklyChangesCount fromJSON(input) {
+  static WeeklyChangesCount fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     var c = new WeeklyChangesCount();
     c.timestamp = input[0];
@@ -119,7 +119,7 @@ class PunchcardEntry {
   /// Number of Commits
   int commits;
 
-  static PunchcardEntry fromJSON(input) {
+  static PunchcardEntry fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     var c = new PunchcardEntry();
     c.weekday = input[0];

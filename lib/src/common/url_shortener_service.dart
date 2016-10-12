@@ -10,7 +10,7 @@ class UrlShortenerService extends Service {
   /// Shortens the provided [url]. An optional [code] can be provided to create
   /// your own vanity URL.
   Future<String> shortenUrl(String url, {String code}) {
-    var params = {};
+    var params = <String, String>{};
 
     params['url'] = url;
 

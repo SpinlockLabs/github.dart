@@ -2,12 +2,12 @@
 import "dart:async";
 import "dart:io";
 
-var packages_dir = new Directory("packages/");
+Directory packagesDirectory = new Directory("packages/");
 
 void main(List<String> args) {
   var future = new Future.value(null);
 
-  if (!packages_dir.existsSync()) {
+  if (!packagesDirectory.existsSync()) {
     future = execute("pub get");
   }
 
