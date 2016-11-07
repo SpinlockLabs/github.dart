@@ -47,7 +47,7 @@ class TeamNotFound extends NotFound {
 
 /// Access was forbidden to a resource
 class AccessForbidden extends GitHubError {
-  AccessForbidden(GitHub github) : super(github, "Access Forbbidden");
+  AccessForbidden(GitHub github) : super(github, "Access Forbidden");
 }
 
 /// Client hit the rate limit.
