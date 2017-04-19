@@ -222,6 +222,14 @@ class GitHub {
     }
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+    if (auth.isToken) {
+      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+    } else if (auth.isBasic) {
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+    }
+
 
     var response = await request("GET", path,
         headers: headers, params: params, statusCode: statusCode, fail: fail);
