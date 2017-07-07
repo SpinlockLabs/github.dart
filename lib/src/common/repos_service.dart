@@ -65,19 +65,13 @@ class RepositoriesService extends Service {
 
     var pages = limit != null ? (limit / 30).ceil() : null;
 
-    // TODO: Close this, but where?
-    var controller = new StreamController<Repository>.broadcast();
-
-    new PaginationHelper(_github)
+    return new PaginationHelper(_github)
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
-        .listen((http.Response response) {
-      var list = JSON.decode(response.body);
-      var repos = new List.from(
-          list.map((Map<String, dynamic> it) => Repository.fromJSON(it)));
-      for (var repo in repos) controller.add(repo);
-    });
+        .expand((http.Response response) {
+      var list = JSON.decode(response.body) as List<Map<String, dynamic>>;
 
-    return controller.stream.take(limit);
+      return list.map((Map<String, dynamic> it) => Repository.fromJSON(it));
+    });
   }
 
   /// Creates a repository with [repository]. If an [org] is specified, the new
