@@ -184,9 +184,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-languages
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages",
-          statusCode: StatusCodes.OK,
-          convert: (Map<String, int> input) => new LanguageBreakdown(input))
-      as Future<LanguageBreakdown>;
+              statusCode: StatusCodes.OK,
+              convert: (Map<String, int> input) => new LanguageBreakdown(input))
+          as Future<LanguageBreakdown>;
 
   /// Lists the tags of the specified repository.
   ///
@@ -287,12 +287,14 @@ class RepositoriesService extends Service {
       url += '?ref=$ref';
     }
 
-    return _github.getJSON(url, headers: headers, statusCode: StatusCodes.OK,
+    return _github.getJSON(url,
+        headers: headers,
+        statusCode: StatusCodes.OK,
         fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        throw new NotFound(_github, response.body);
-      }
-    },
+          if (response.statusCode == 404) {
+            throw new NotFound(_github, response.body);
+          }
+        },
         convert: (Map<String, dynamic> input) =>
             GitHubFile.fromJSON(input, slug)) as Future<GitHubFile>;
   }
