@@ -58,7 +58,9 @@ class GitHubFile {
       ..size = input['size']
       ..name = input['name']
       ..path = input['path']
-      ..content = input['content']
+      ..content = input['content'] == null
+          ? null
+          : LineSplitter.split(input['content']).join()
       ..sha = input['sha']
       ..gitUrl = input['git_url']
       ..htmlUrl = input['html_url']

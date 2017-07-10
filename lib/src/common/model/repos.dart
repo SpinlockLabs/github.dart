@@ -195,10 +195,14 @@ class CommitInfo {
       return null;
     }
 
-    return new CommitInfo()
-      ..sha = input['sha']
-      ..tree =
-          GitTree.fromJSON(input['commit']['tree'] as Map<String, dynamic>);
+    var info = new CommitInfo()..sha = input['sha'];
+
+    var commit = input['commit'] as Map<String, dynamic>;
+    if (commit != null) {
+      info.tree = GitTree.fromJSON(commit['tree']);
+    }
+
+    return info;
   }
 }
 

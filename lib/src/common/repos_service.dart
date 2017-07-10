@@ -65,19 +65,13 @@ class RepositoriesService extends Service {
 
     var pages = limit != null ? (limit / 30).ceil() : null;
 
-    // TODO: Close this, but where?
-    var controller = new StreamController<Repository>.broadcast();
-
-    new PaginationHelper(_github)
+    return new PaginationHelper(_github)
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
-        .listen((http.Response response) {
-      var list = JSON.decode(response.body);
-      var repos = new List.from(
-          list.map((Map<String, dynamic> it) => Repository.fromJSON(it)));
-      for (var repo in repos) controller.add(repo);
-    });
+        .expand((http.Response response) {
+      var list = JSON.decode(response.body) as List<Map<String, dynamic>>;
 
-    return controller.stream.take(limit);
+      return list.map((Map<String, dynamic> it) => Repository.fromJSON(it));
+    });
   }
 
   /// Creates a repository with [repository]. If an [org] is specified, the new
@@ -190,9 +184,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-languages
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages",
-          statusCode: StatusCodes.OK,
-          convert: (Map<String, int> input) => new LanguageBreakdown(input))
-      as Future<LanguageBreakdown>;
+              statusCode: StatusCodes.OK,
+              convert: (Map<String, int> input) => new LanguageBreakdown(input))
+          as Future<LanguageBreakdown>;
 
   /// Lists the tags of the specified repository.
   ///
@@ -293,12 +287,14 @@ class RepositoriesService extends Service {
       url += '?ref=$ref';
     }
 
-    return _github.getJSON(url, headers: headers, statusCode: StatusCodes.OK,
+    return _github.getJSON(url,
+        headers: headers,
+        statusCode: StatusCodes.OK,
         fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        throw new NotFound(_github, response.body);
-      }
-    },
+          if (response.statusCode == 404) {
+            throw new NotFound(_github, response.body);
+          }
+        },
         convert: (Map<String, dynamic> input) =>
             GitHubFile.fromJSON(input, slug)) as Future<GitHubFile>;
   }
@@ -329,6 +325,13 @@ class RepositoriesService extends Service {
     return _github.getJSON(url, convert: (input) {
       var contents = new RepositoryContents();
       if (input is Map) {
+        // Weird one-off. If the content of `input` is JSON w/ a message
+        // it was likely a 404 – but we don't have the status code here
+        // But we can guess an the JSON content
+        if (input.containsKey('message')) {
+          throw new GitHubError(_github, input['message'],
+              apiUrl: input['documentation_url']);
+        }
         contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
       } else {
         contents.tree = (input as List<Map<String, dynamic>>)
