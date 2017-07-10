@@ -325,6 +325,13 @@ class RepositoriesService extends Service {
     return _github.getJSON(url, convert: (input) {
       var contents = new RepositoryContents();
       if (input is Map) {
+        // Weird one-off. If the content of `input` is JSON w/ a message
+        // it was likely a 404 – but we don't have the status code here
+        // But we can guess an the JSON content
+        if (input.containsKey('message')) {
+          throw new GitHubError(_github, input['message'],
+              apiUrl: input['documentation_url']);
+        }
         contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
       } else {
         contents.tree = (input as List<Map<String, dynamic>>)
