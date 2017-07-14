@@ -147,7 +147,7 @@ class GitService extends Service {
     }
 
     return _github.getJSON(path,
-        convert: GitTree.fromJSON,
+        convert: (j) => new GitTree.fromJson(j),
         statusCode: StatusCodes.OK) as Future<GitTree>;
   }
 
@@ -156,7 +156,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/trees/#create-a-tree
   Future<GitTree> createTree(RepositorySlug slug, CreateGitTree tree) {
     return _github.postJSON('/repos/${slug.fullName}/git/trees',
-        convert: GitTree.fromJSON,
+        convert: (j) => new GitTree.fromJson(j),
         statusCode: StatusCodes.CREATED,
         body: tree.toJSON()) as Future<GitTree>;
   }

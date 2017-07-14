@@ -1,5 +1,5 @@
 name: github
-version: 3.0.2
+version: 4.0.0-dev
 author: Kenneth Endfinger <kaendfinger@gmail.com>
 description: GitHub API Client Library
 homepage: https://github.com/DirectMyFile/github.dart
@@ -8,10 +8,12 @@ environment:
 dependencies:
   html: '>=0.12.0 <0.14.0'
   http: '^0.11.3'
-  quiver: '>=0.20.0 <0.25.0'
-  xml: '^2.0.0'
   markdown: '^0.11.1'
+  quiver: '>=0.20.0 <0.25.0'
+  source_gen: '^0.6.1'
+  xml: '^2.0.0'
 dev_dependencies:
   browser: '^0.10.0+2'
+  build_runner: ^0.3.0
   test: '^0.12.0'
   mockito: '^1.0.1'

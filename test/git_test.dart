@@ -223,7 +223,7 @@ void main() {
       git.getTree(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: GitTree.fromJSON, statusCode: StatusCodes.OK));
+          convert: (j) => new GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
@@ -232,7 +232,7 @@ void main() {
       git.getTree(repo, 'sh', recursive: true);
 
       verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: GitTree.fromJSON, statusCode: StatusCodes.OK));
+          convert: (j) => new GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
@@ -242,7 +242,7 @@ void main() {
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
-          convert: GitTree.fromJSON,
+          convert: (j) => new GitTree.fromJson(j),
           statusCode: StatusCodes.CREATED,
           body: createGitTree.toJSON()));
     });

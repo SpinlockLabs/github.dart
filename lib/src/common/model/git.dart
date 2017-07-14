@@ -50,9 +50,9 @@ class GitCommit {
   @ApiName('comment_count')
   int commentCount;
 
-  static GitCommit fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  GitCommit();
 
+  factory GitCommit.fromJson(input) {
     var commit = new GitCommit()
       ..sha = input['sha']
       ..url = input['url']
@@ -70,7 +70,7 @@ class GitCommit {
     }
 
     if (input['tree'] != null) {
-      commit.tree = GitTree.fromJSON(input['tree'] as Map<String, dynamic>);
+      commit.tree = new GitTree.fromJson(input['tree'] as Map<String, dynamic>);
     }
 
     if (input['parents'] != null) {
@@ -80,6 +80,12 @@ class GitCommit {
     }
 
     return commit;
+  }
+
+  static GitCommit fromJSON(Map<String, dynamic> input) {
+    if (input == null) return null;
+
+    return new GitCommit.fromJson(input);
   }
 }
 
@@ -149,57 +155,40 @@ class GitCommitUser {
 }
 
 /// Model class for a GitHub tree.
+@JsonSerializable(createToJson: false)
 class GitTree {
-  String sha;
-  String url;
+  final String sha;
+  final String url;
 
   /// If truncated is true, the number of items in the tree array exceeded
   /// GitHub's maximum limit.
-  bool truncated;
+  final bool truncated;
 
-  @ApiName("tree")
-  List<GitTreeEntry> entries;
+  @JsonKey("tree")
+  final List<GitTreeEntry> entries;
 
-  static GitTree fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  GitTree(this.sha, this.url, this.truncated, this.entries);
 
-    var tree = new GitTree()
-      ..sha = input['sha']
-      ..url = input['url']
-      ..truncated = input['truncated'];
-
-    // There are no tree entries if it's a tree referenced from a GitCommit.
-    if (input['tree'] != null) {
-      tree.entries = (input['tree'] as List<Map<String, dynamic>>)
-          .map((Map<String, dynamic> it) => GitTreeEntry.fromJSON(it))
-          .toList(growable: false);
-    }
-    return tree;
-  }
+  factory GitTree.fromJson(Map<String, dynamic> json) =>
+      json == null ? null : _$GitTreeFromJson(json);
 }
 
 /// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
+@JsonSerializable(createToJson: false)
 class GitTreeEntry {
-  String path;
-  String mode;
-  String type;
-  int size;
-  String sha;
-  String url;
+  final String path;
+  final String mode;
+  final String type;
+  final int size;
+  final String sha;
+  final String url;
 
-  static GitTreeEntry fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  GitTreeEntry(this.path, this.mode, this.type, this.size, this.sha, this.url);
 
-    return new GitTreeEntry()
-      ..path = input['path']
-      ..mode = input['mode']
-      ..type = input['type']
-      ..size = input['size']
-      ..sha = input['sha']
-      ..url = input['url'];
-  }
+  factory GitTreeEntry.fromJson(Map<String, dynamic> json) =>
+      _$GitTreeEntryFromJson(json);
 }
 
 /// Model class for a new tree to be created.

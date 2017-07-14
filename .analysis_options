@@ -8,7 +8,7 @@ linter:
     - always_declare_return_types
 #    - avoid_as
     - camel_case_types
-    - constant_identifier_names
+#    - constant_identifier_names
     - empty_constructor_bodies
     - implementation_imports
     - library_names
@@ -38,7 +38,7 @@ linter:
     - test_types_in_equals
     - throw_in_finally
     - valid_regexps
-    - annotate_overrides
+#    - annotate_overrides
     - avoid_init_to_null
     - avoid_return_types_on_setters
     - await_only_futures

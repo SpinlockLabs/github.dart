@@ -9,10 +9,12 @@ import "package:html/dom.dart" as html;
 import "package:html/parser.dart" as html_parser;
 import "package:http/http.dart" as http;
 import "package:quiver/async.dart" show FutureGroup;
+import "package:source_gen/generators/json_serializable.dart";
 import "package:xml/xml.dart" as xml;
 
 import 'util.dart';
 
+part "common.g.dart";
 part "common/activity_service.dart";
 part "common/authorizations_service.dart";
 part "common/blog_service.dart";
