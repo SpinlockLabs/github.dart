@@ -164,24 +164,20 @@ class CloneUrls {
   }
 }
 
+@JsonSerializable(createToJson: false)
 class Tag {
-  String name;
-  CommitInfo commit;
-  String zipUrl;
-  String tarUrl;
+  final String name;
+  final CommitInfo commit;
 
-  static Tag fromJSON(Map<String, dynamic> input) {
-    if (input == null) {
-      return null;
-    }
+  @JsonKey('zipball_url')
+  final String zipUrl;
+  @JsonKey('tarball_url')
+  final String tarUrl;
 
-    return new Tag()
-      ..name = input['name']
-      ..commit =
-          new CommitInfo.fromJson(input['commit'] as Map<String, dynamic>)
-      ..tarUrl = input['tarball_url']
-      ..zipUrl = input['zipball_url'];
-  }
+  Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
+
+  factory Tag.fromJson(Map<String, dynamic> input) =>
+      input == null ? null : _$TagFromJson(input);
 
   @override
   String toString() => 'Tag: $name';
@@ -189,7 +185,7 @@ class Tag {
 
 @JsonSerializable(createToJson: false)
 class CommitData {
-  final Object sha;
+  final String sha;
   final GitCommit commit;
 
   @JsonKey("url")
@@ -202,7 +198,7 @@ class CommitData {
   final String commentsUrl;
 
   final CommitDataUser author, committer;
-  final Object parents;
+  final List<Map<String, dynamic>> parents;
 
   CommitData(this.sha, this.commit, this.url, this.htmlUrl, this.commentsUrl,
       this.author, this.committer, this.parents);

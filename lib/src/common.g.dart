@@ -30,11 +30,22 @@ GitTreeEntry _$GitTreeEntryFromJson(Map json) => new GitTreeEntry(
 
 // **************************************************************************
 // Generator: JsonSerializableGenerator
+// Target: class Tag
+// **************************************************************************
+
+Tag _$TagFromJson(Map json) => new Tag(
+    json['name'] as String,
+    json['commit'] == null ? null : new CommitInfo.fromJson(json['commit']),
+    json['zipball_url'] as String,
+    json['tarball_url'] as String);
+
+// **************************************************************************
+// Generator: JsonSerializableGenerator
 // Target: class CommitData
 // **************************************************************************
 
 CommitData _$CommitDataFromJson(Map json) => new CommitData(
-    json['sha'],
+    json['sha'] as String,
     json['commit'] == null ? null : new GitCommit.fromJson(json['commit']),
     json['url'] as String,
     json['html_url'] as String,
@@ -43,7 +54,9 @@ CommitData _$CommitDataFromJson(Map json) => new CommitData(
     json['committer'] == null
         ? null
         : new CommitDataUser.fromJson(json['committer']),
-    json['parents']);
+    (json['parents'] as List)
+        ?.map((v0) => v0 as Map<String, dynamic>)
+        ?.toList());
 
 // **************************************************************************
 // Generator: JsonSerializableGenerator

@@ -193,7 +193,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-tags
   Stream<Tag> listTags(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-        'GET', '/repos/${slug.fullName}/tags', Tag.fromJSON) as Stream<Tag>;
+        'GET', '/repos/${slug.fullName}/tags', (j) => new Tag.fromJson(j)) as Stream<Tag>;
   }
 
   /// Lists the branches of the specified repository.

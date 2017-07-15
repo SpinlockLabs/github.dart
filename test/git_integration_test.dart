@@ -34,7 +34,7 @@ void main() {
   test('get last commit of master', () async {
     var branch = await github.repositories.getBranch(slug, 'master');
     firstCommitSha = branch.commit.sha;
-    firstCommitTreeSha = branch.commit.tree.sha;
+    firstCommitTreeSha = branch.commit.commit.sha;
   });
 
   test('create and get a new blob', () async {
