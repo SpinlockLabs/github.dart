@@ -1,3 +1,7 @@
+## v4.0.0
+
+* Make fields in many objects read-only.
+
 ## v3.0.0
 
 - *BREAKING* Removed a number of top-level methods from the public API.
