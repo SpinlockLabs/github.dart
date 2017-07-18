@@ -270,7 +270,14 @@ class RepositoriesService extends Service {
         convert: RepositoryCommit.fromJSON) as Future<RepositoryCommit>;
   }
 
-  // TODO: Implement compareCommits: https://developer.github.com/v3/repos/commits/#compare-two-commits
+  /// [refBase] and [refHead] can be the same value for a branch, commit, or ref
+  /// in [slug] or specify other repositories by using `repo:ref` syntax.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/commits/#compare-two-commits
+  Future<GitHubComparison> compareCommits(
+          RepositorySlug slug, String refBase, String refHead) =>
+      _github.getJSON("/repos/${slug.fullName}/compare/${refBase}...${refHead}",
+          convert: (j) => new GitHubComparison.fromJson(j));
 
   /// Fetches the readme file for a repository.
   ///

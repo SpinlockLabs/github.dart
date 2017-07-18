@@ -1,6 +1,7 @@
 ## v4.0.0
 
-* Make fields in many objects read-only.
+- Make fields in many objects read-only.
+- Initial support for comparing commits.
 
 ## v3.0.0
 

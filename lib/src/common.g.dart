@@ -30,6 +30,18 @@ GitTreeEntry _$GitTreeEntryFromJson(Map json) => new GitTreeEntry(
 
 // **************************************************************************
 // Generator: JsonSerializableGenerator
+// Target: class GitHubComparison
+// **************************************************************************
+
+GitHubComparison _$GitHubComparisonFromJson(Map json) => new GitHubComparison(
+    json['url'] as String,
+    json['status'] as String,
+    json['ahead_by'] as int,
+    json['behind_by'] as int,
+    json['total_commits'] as int);
+
+// **************************************************************************
+// Generator: JsonSerializableGenerator
 // Target: class Tag
 // **************************************************************************
 
