@@ -28,7 +28,7 @@ class MockResponse extends http.Response {
   factory MockResponse.fromAsset(String name) {
     Map<String, dynamic> responseData =
         JSON.decode(asset("responses/${name}.json").readAsStringSync())
-        as Map<String, dynamic>;
+            as Map<String, dynamic>;
     Map<String, String> headers =
         responseData['headers'] as Map<String, String>;
     dynamic body = responseData['body'];

@@ -29,8 +29,9 @@ void loadUsers() {
         h.append(new BRElement());
       }
 
-      h.append(GitHubBrowserHelper.createAvatarImage(user,
-          width: 64, height: 64)..classes.add("avatar"));
+      h.append(
+          GitHubBrowserHelper.createAvatarImage(user, width: 64, height: 64)
+            ..classes.add("avatar"));
       var buff = new StringBuffer();
 
       buff
