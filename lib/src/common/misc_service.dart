@@ -27,10 +27,9 @@ class MiscService extends Service {
   /// All template names can be fetched using [listGitignoreTemplates].
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
-  Future<GitignoreTemplate> getGitignoreTemplate(String name) {
-    return _github.getJSON("/gitignore/templates/${name}",
-        convert: GitignoreTemplate.fromJSON) as Future<GitignoreTemplate>;
-  }
+  Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
+      _github.getJSON("/gitignore/templates/${name}",
+          convert: GitignoreTemplate.fromJSON);
 
   /// Renders Markdown from the [input].
   ///
@@ -63,11 +62,9 @@ class MiscService extends Service {
   }
 
   /// Gets the GitHub API Status.
-  Future<APIStatus> getApiStatus() {
-    return _github.getJSON("https://status.github.com/api/status.json",
-        statusCode: StatusCodes.OK,
-        convert: APIStatus.fromJSON) as Future<APIStatus>;
-  }
+  Future<APIStatus> getApiStatus() =>
+      _github.getJSON("https://status.github.com/api/status.json",
+          statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
 
   /// Returns a stream of Octocats from Octodex.
   ///

@@ -24,15 +24,13 @@ class OrganizationsService extends Service {
   /// Fetches the organization specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/orgs/#get-an-organization
-  Future<Organization> get(String name) {
-    return _github.getJSON("/orgs/${name}",
-        convert: Organization.fromJSON,
-        statusCode: StatusCodes.OK, fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        throw new OrganizationNotFound(_github, name);
-      }
-    }) as Future<Organization>;
-  }
+  Future<Organization> get(String name) => _github.getJSON("/orgs/${name}",
+          convert: Organization.fromJSON,
+          statusCode: StatusCodes.OK, fail: (http.Response response) {
+        if (response.statusCode == 404) {
+          throw new OrganizationNotFound(_github, name);
+        }
+      });
 
   /// Fetches the organizations specified by [names].
   Stream<Organization> getMulti(List<String> names) {
@@ -287,11 +285,9 @@ class OrganizationsService extends Service {
   /// Fetches a single hook by [id].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
-  Future<Hook> getHook(String org, int id) {
-    return _github.getJSON("/orgs/${org}/hooks/${id}",
-            convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i))
-        as Future<Hook>;
-  }
+  Future<Hook> getHook(String org, int id) =>
+      _github.getJSON("/orgs/${org}/hooks/${id}",
+          convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i));
 
   /// Creates an organization hook based on the specified [hook].
   ///

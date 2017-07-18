@@ -180,11 +180,9 @@ class ActivityService extends Service {
   /// Fetches the specified notification thread.
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#view-a-single-thread
-  Future<Notification> getThread(String threadId) {
-    return _github.getJSON("/notification/threads/${threadId}",
-        statusCode: StatusCodes.OK,
-        convert: Notification.fromJSON) as Future<Notification>;
-  }
+  Future<Notification> getThread(String threadId) =>
+      _github.getJSON("/notification/threads/${threadId}",
+          statusCode: StatusCodes.OK, convert: Notification.fromJSON);
 
   // TODO: Implement markThreadRead: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
   // TODO: Implement getThreadSubscription: https://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
@@ -276,12 +274,9 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#get-a-repository-subscription
   Future<RepositorySubscription> getRepositorySubscription(
-      RepositorySlug slug) {
-    return _github.getJSON("/repos/${slug.fullName}/subscription",
-            statusCode: StatusCodes.OK,
-            convert: RepositorySubscription.fromJSON)
-        as Future<RepositorySubscription>;
-  }
+          RepositorySlug slug) =>
+      _github.getJSON("/repos/${slug.fullName}/subscription",
+          statusCode: StatusCodes.OK, convert: RepositorySubscription.fromJSON);
 
   /// Sets the Repository Subscription Status
   ///

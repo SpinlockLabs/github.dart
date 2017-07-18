@@ -204,12 +204,12 @@ class GitHub {
   /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
-  Future<dynamic> getJSON(String path,
+  Future<T> getJSON<T>(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
-      JSONConverter convert,
+      JSONConverter<T> convert,
       String preview}) async {
     if (headers == null) headers = {};
 

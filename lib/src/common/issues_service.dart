@@ -138,10 +138,9 @@ class IssuesService extends Service {
   /// Get an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/#get-a-single-issue
-  Future<Issue> get(RepositorySlug slug, int issueNumber) {
-    return _github.getJSON("/repos/${slug.fullName}/issues/${issueNumber}",
-        convert: Issue.fromJSON) as Future<Issue>;
-  }
+  Future<Issue> get(RepositorySlug slug, int issueNumber) =>
+      _github.getJSON("/repos/${slug.fullName}/issues/${issueNumber}",
+          convert: Issue.fromJSON);
 
   /// Create an issue.
   ///
@@ -202,10 +201,9 @@ class IssuesService extends Service {
   /// Fetches the specified issue comment.
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#get-a-single-comment
-  Future<IssueComment> getComment(RepositorySlug slug, int id) {
-    return _github.getJSON("/repos/${slug.fullName}/issues/comments/${id}",
-        convert: IssueComment.fromJSON) as Future<IssueComment>;
-  }
+  Future<IssueComment> getComment(RepositorySlug slug, int id) =>
+      _github.getJSON("/repos/${slug.fullName}/issues/comments/${id}",
+          convert: IssueComment.fromJSON);
 
   /// Creates a new comment on the specified issue
   ///
@@ -245,11 +243,9 @@ class IssuesService extends Service {
   /// Fetches a single label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#get-a-single-label
-  Future<IssueLabel> getLabel(RepositorySlug slug, String name) {
-    return _github.getJSON("/repos/${slug.fullName}/labels/${name}",
-        convert: IssueLabel.fromJSON,
-        statusCode: StatusCodes.OK) as Future<IssueLabel>;
-  }
+  Future<IssueLabel> getLabel(RepositorySlug slug, String name) =>
+      _github.getJSON("/repos/${slug.fullName}/labels/${name}",
+          convert: IssueLabel.fromJSON, statusCode: StatusCodes.OK);
 
   /// Creates a new label on the specified repository.
   ///

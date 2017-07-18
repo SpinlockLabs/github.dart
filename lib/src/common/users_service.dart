@@ -11,7 +11,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
   Future<User> getUser(String name) =>
-      _github.getJSON("/users/${name}", convert: User.fromJSON) as Future<User>;
+      _github.getJSON("/users/${name}", convert: User.fromJSON);
 
   /// Updates the Current User.
   ///
@@ -65,14 +65,13 @@ class UsersService extends Service {
   /// Throws [AccessForbidden] if we are not authenticated.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-the-authenticated-user
-  Future<CurrentUser> getCurrentUser() {
-    return _github.getJSON("/user", statusCode: StatusCodes.OK,
-        fail: (http.Response response) {
-      if (response.statusCode == StatusCodes.FORBIDDEN) {
-        throw new AccessForbidden(_github);
-      }
-    }, convert: CurrentUser.fromJSON) as Future<CurrentUser>;
-  }
+  Future<CurrentUser> getCurrentUser() =>
+      _github.getJSON("/user", statusCode: StatusCodes.OK,
+          fail: (http.Response response) {
+        if (response.statusCode == StatusCodes.FORBIDDEN) {
+          throw new AccessForbidden(_github);
+        }
+      }, convert: CurrentUser.fromJSON);
 
   /// Checks if a user exists.
   Future<bool> isUser(String name) => _github

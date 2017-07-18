@@ -16,11 +16,9 @@ class PullRequestsService extends Service {
   /// Fetches a single pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#get-a-single-pull-request
-  Future<PullRequest> get(RepositorySlug slug, int number) {
-    return _github.getJSON("/repos/${slug.fullName}/pulls/${number}",
-        convert: PullRequest.fromJSON,
-        statusCode: StatusCodes.OK) as Future<PullRequest>;
-  }
+  Future<PullRequest> get(RepositorySlug slug, int number) =>
+      _github.getJSON("/repos/${slug.fullName}/pulls/${number}",
+          convert: PullRequest.fromJSON, statusCode: StatusCodes.OK);
 
   /// Creates a Pull Request based on the given [request].
   ///
