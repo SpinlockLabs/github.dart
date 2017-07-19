@@ -71,8 +71,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
   Stream<Event> listEventsForOrganization(String name, {int pages}) {
-    return new PaginationHelper(_github).objects(
-            "GET", "/orgs/${name}/events", Event.fromJSON, pages: pages)
+    return new PaginationHelper(_github)
+            .objects("GET", "/orgs/$name/events", Event.fromJSON, pages: pages)
         as Stream<Event>;
   }
 
@@ -80,26 +80,26 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
   EventPoller pollEventsForOrganization(String name) =>
-      new EventPoller(_github, "/orgs/${name}/events");
+      new EventPoller(_github, "/orgs/$name/events");
 
   /// Returns an [EventPoller] for events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-that-a-user-has-received
   EventPoller pollEventsReceivedByUser(String user) =>
-      new EventPoller(_github, "/users/${user}/events");
+      new EventPoller(_github, "/users/$user/events");
 
   /// Returns an [EventPoller] for events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-that-a-user-has-received
   EventPoller pollPublicEventsReceivedByUser(String user) =>
-      new EventPoller(_github, "/repos/${user}/events/public");
+      new EventPoller(_github, "/repos/$user/events/public");
 
   /// Lists the events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
   Stream<Event> listEventsPerformedByUser(String username, {int pages}) {
     return new PaginationHelper(_github).objects(
-            "GET", "/users/${username}/events", Event.fromJSON, pages: pages)
+            "GET", "/users/$username/events", Event.fromJSON, pages: pages)
         as Stream<Event>;
   }
 
@@ -108,7 +108,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-performed-by-a-user
   Stream<Event> listPublicEventsPerformedByUser(String username, {int pages}) {
     return new PaginationHelper(_github).objects(
-        "GET", "/users/${username}/events/public", Event.fromJSON,
+        "GET", "/users/$username/events/public", Event.fromJSON,
         pages: pages) as Stream<Event>;
   }
 
@@ -116,7 +116,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-for-an-organization
   EventPoller pollUserEventsForOrganization(String user, String organization) =>
-      new EventPoller(_github, "/users/${user}/events/orgs/${organization}");
+      new EventPoller(_github, "/users/$user/events/orgs/$organization");
 
   // TODO: Implement listFeeds: https://developer.github.com/v3/activity/feeds/#list-feeds
 
@@ -181,7 +181,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#view-a-single-thread
   Future<Notification> getThread(String threadId) =>
-      _github.getJSON("/notification/threads/${threadId}",
+      _github.getJSON("/notification/threads/$threadId",
           statusCode: StatusCodes.OK, convert: Notification.fromJSON);
 
   // TODO: Implement markThreadRead: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
@@ -203,7 +203,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
   Stream<Repository> listStarredByUser(String user) {
     return new PaginationHelper(_github)
-            .objects("GET", "/users/${user}/starred", Repository.fromJSON)
+            .objects("GET", "/users/$user/starred", Repository.fromJSON)
         as Stream<Repository>;
   }
 
@@ -259,7 +259,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
   Stream<Repository> listWatchedByUser(String user) {
     return new PaginationHelper<Repository>(_github)
-        .objects("GET", '/users/${user}/subscriptions', Repository.fromJSON);
+        .objects("GET", '/users/$user/subscriptions', Repository.fromJSON);
   }
 
   /// Lists the repositories the current user is watching.

@@ -317,7 +317,7 @@ class RepositorySlug {
   /// The Full Name of the Repository
   ///
   /// Example: owner/name
-  String get fullName => "${owner}/${name}";
+  String get fullName => "$owner/$name";
 
   @override
   bool operator ==(Object obj) =>
@@ -327,7 +327,7 @@ class RepositorySlug {
   int get hashCode => fullName.hashCode;
 
   @override
-  String toString() => "${owner}/${name}";
+  String toString() => "$owner/$name";
 }
 
 /// Model class for a new repository to be created.
@@ -448,7 +448,7 @@ class LanguageBreakdown {
   String toString() {
     var buffer = new StringBuffer();
     _data.forEach((key, value) {
-      buffer.writeln("${key}: ${value}");
+      buffer.writeln("$key: $value");
     });
     return buffer.toString();
   }

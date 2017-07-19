@@ -11,7 +11,7 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/blobs/#get-a-blob
   Future<GitBlob> getBlob(RepositorySlug slug, String sha) =>
-      _github.getJSON('/repos/${slug.fullName}/git/blobs/${sha}',
+      _github.getJSON('/repos/${slug.fullName}/git/blobs/$sha',
           convert: GitBlob.fromJSON, statusCode: StatusCodes.OK);
 
   /// Creates a blob with specified [blob] content.
@@ -28,7 +28,7 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/commits/#get-a-commit
   Future<GitCommit> getCommit(RepositorySlug slug, String sha) =>
-      _github.getJSON('/repos/${slug.fullName}/git/commits/${sha}',
+      _github.getJSON('/repos/${slug.fullName}/git/commits/$sha',
           convert: GitCommit.fromJSON, statusCode: StatusCodes.OK);
 
   /// Creates a new commit in a repository.
@@ -47,7 +47,7 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#get-a-reference
   Future<GitReference> getReference(RepositorySlug slug, String ref) =>
-      _github.getJSON('/repos/${slug.fullName}/git/refs/${ref}',
+      _github.getJSON('/repos/${slug.fullName}/git/refs/$ref',
           convert: GitReference.fromJSON, statusCode: StatusCodes.OK);
 
   /// Lists the references in a repository.
@@ -92,7 +92,7 @@ class GitService extends Service {
     var headers = {'content-length': body.length.toString()};
 
     return _github
-        .request('PATCH', '/repos/${slug.fullName}/git/refs/${ref}',
+        .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',
             body: body, headers: headers)
         .then((response) {
       return GitReference
@@ -105,7 +105,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#delete-a-reference
   Future<bool> deleteReference(RepositorySlug slug, String ref) {
     return _github
-        .request("DELETE", "/repos/${slug.fullName}/git/refs/${ref}")
+        .request("DELETE", "/repos/${slug.fullName}/git/refs/$ref")
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
@@ -113,7 +113,7 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/tags/#get-a-tag
   Future<GitTag> getTag(RepositorySlug slug, String sha) =>
-      _github.getJSON('/repos/${slug.fullName}/git/tags/${sha}',
+      _github.getJSON('/repos/${slug.fullName}/git/tags/$sha',
           convert: GitTag.fromJSON, statusCode: StatusCodes.OK);
 
   /// Creates a new tag in a repository.
@@ -133,7 +133,7 @@ class GitService extends Service {
   /// and https://developer.github.com/v3/git/trees/#get-a-tree-recursively
   Future<GitTree> getTree(RepositorySlug slug, String sha,
       {bool recursive: false}) {
-    var path = '/repos/${slug.fullName}/git/trees/${sha}';
+    var path = '/repos/${slug.fullName}/git/trees/$sha';
     if (recursive) {
       path += '?recursive=1';
     }

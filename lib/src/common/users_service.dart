@@ -11,7 +11,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
   Future<User> getUser(String name) =>
-      _github.getJSON("/users/${name}", convert: User.fromJSON);
+      _github.getJSON("/users/$name", convert: User.fromJSON);
 
   /// Updates the Current User.
   ///
@@ -75,7 +75,7 @@ class UsersService extends Service {
 
   /// Checks if a user exists.
   Future<bool> isUser(String name) => _github
-      .request("GET", "/users/${name}")
+      .request("GET", "/users/$name")
       .then((resp) => resp.statusCode == StatusCodes.OK);
 
   // TODO: Implement editUser: https://developer.github.com/v3/users/#update-the-authenticated-user
@@ -113,25 +113,25 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listUserFollowers(String user) => new PaginationHelper(_github)
-      .objects("GET", "/users/${user}/followers", User.fromJSON,
+      .objects("GET", "/users/$user/followers", User.fromJSON,
           statusCode: 200) as Stream<User>;
 
   /// Check if the current user is following the specified user.
   Future<bool> isFollowingUser(String user) =>
-      _github.request("GET", "/user/following/${user}").then((response) {
+      _github.request("GET", "/user/following/$user").then((response) {
         return response.statusCode == 204;
       });
 
   /// Check if the specified user is following target.
   Future<bool> isUserFollowing(String user, String target) =>
-      _github.request("GET", "/users/${user}/following/${target}").then((x) {
+      _github.request("GET", "/users/$user/following/$target").then((x) {
         return x.statusCode == 204;
       });
 
   /// Follows a user.
   Future<bool> followUser(String user) {
     return _github
-        .request("POST", "/user/following/${user}", statusCode: 204)
+        .request("POST", "/user/following/$user", statusCode: 204)
         .then((response) {
       return response.statusCode == 204;
     });
@@ -140,7 +140,7 @@ class UsersService extends Service {
   /// Unfollows a user.
   Future<bool> unfollowUser(String user) {
     return _github
-        .request("DELETE", "/user/following/${user}", statusCode: 204)
+        .request("DELETE", "/user/following/$user", statusCode: 204)
         .then((response) {
       return response.statusCode == 204;
     });
@@ -159,7 +159,7 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/keys/#list-public-keys-for-a-user
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
-    var path = userLogin == null ? "/user/keys" : "/users/${userLogin}/keys";
+    var path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
     return new PaginationHelper(_github)
         .objects("GET", path, PublicKey.fromJSON) as Stream<PublicKey>;
   }

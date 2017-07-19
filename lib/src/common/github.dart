@@ -228,7 +228,7 @@ class GitHub {
     } else if (auth.isBasic) {
       var userAndPass =
           BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     var response = await request("GET", path,
@@ -286,7 +286,7 @@ class GitHub {
     } else if (auth.isBasic) {
       var userAndPass =
           BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     var response = await request("POST", path,
@@ -326,7 +326,7 @@ class GitHub {
       case 422:
         var buff = new StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: ${message}");
+        buff.writeln("  Message: $message");
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -334,9 +334,9 @@ class GitHub {
             var field = error['field'];
             var code = error['code'];
             buff
-              ..writeln("    Resource: ${resource}")
-              ..writeln("    Field ${field}")
-              ..write("    Code: ${code}");
+              ..writeln("    Resource: $resource")
+              ..writeln("    Field $field")
+              ..write("    Code: $code");
           }
         }
         throw new ValidationFailed(this, buff.toString());
@@ -370,7 +370,7 @@ class GitHub {
     } else if (auth.isBasic) {
       var userAndPass =
           BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     if (method == "PUT" && body == null) {

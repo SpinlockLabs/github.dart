@@ -13,7 +13,7 @@ String buildQueryString(Map<String, dynamic> params) {
     if (params[key] == null) {
       continue;
     }
-    queryString.write("${key}=${Uri.encodeComponent(params[key].toString())}");
+    queryString.write("$key=${Uri.encodeComponent(params[key].toString())}");
     if (i != params.keys.length) {
       queryString.write("&");
     }

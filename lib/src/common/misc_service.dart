@@ -28,7 +28,7 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
   Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
-      _github.getJSON("/gitignore/templates/${name}",
+      _github.getJSON("/gitignore/templates/$name",
           convert: GitignoreTemplate.fromJSON);
 
   /// Renders Markdown from the [input].
