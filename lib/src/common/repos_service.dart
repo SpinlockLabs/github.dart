@@ -17,8 +17,7 @@ class RepositoriesService extends Service {
     var params = {"type": type, "sort": sort, "direction": direction};
 
     return new PaginationHelper(_github)
-            .objects("GET", "/user/repos", Repository.fromJSON, params: params)
-        as Stream<Repository>;
+        .objects("GET", "/user/repos", Repository.fromJSON, params: params);
   }
 
   /// Lists the repositories of the user specified by [user] in a streamed fashion.
@@ -31,8 +30,8 @@ class RepositoriesService extends Service {
     var params = {"type": type, "sort": sort, "direction": direction};
 
     return new PaginationHelper(_github).objects(
-            "GET", "/users/$user/repos", Repository.fromJSON, params: params)
-        as Stream<Repository>;
+        "GET", "/users/$user/repos", Repository.fromJSON,
+        params: params);
   }
 
   /// List repositories for the specified [org].
@@ -45,8 +44,8 @@ class RepositoriesService extends Service {
     };
 
     return new PaginationHelper(_github).objects(
-            "GET", "/orgs/$org/repos", Repository.fromJSON, params: params)
-        as Stream<Repository>;
+        "GET", "/orgs/$org/repos", Repository.fromJSON,
+        params: params);
   }
 
   /// Lists all the public repositories on GitHub, in the order that they were
@@ -174,8 +173,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-teams
   Stream<Team> listTeams(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        'GET', '/repos/${slug.fullName}/teams', Team.fromJSON) as Stream<Team>;
+    return new PaginationHelper(_github)
+        .objects('GET', '/repos/${slug.fullName}/teams', Team.fromJSON);
   }
 
   /// Gets a language breakdown for the specified repository.
@@ -191,8 +190,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-tags
   Stream<Tag> listTags(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-            'GET', '/repos/${slug.fullName}/tags', (j) => new Tag.fromJson(j))
-        as Stream<Tag>;
+        'GET', '/repos/${slug.fullName}/tags', (j) => new Tag.fromJson(j));
   }
 
   /// Lists the branches of the specified repository.
@@ -200,8 +198,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-branches
   Stream<Branch> listBranches(RepositorySlug slug) {
     return new PaginationHelper(_github)
-            .objects('GET', '/repos/${slug.fullName}/branches', Branch.fromJSON)
-        as Stream<Branch>;
+        .objects('GET', '/repos/${slug.fullName}/branches', Branch.fromJSON);
   }
 
   /// Fetches the specified branch.
@@ -215,9 +212,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
   Stream<User> listCollaborators(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-            "GET", "/repos/${slug.fullName}/collaborators", User.fromJSON)
-        as Stream<User>;
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/collaborators", User.fromJSON);
   }
 
   Future<bool> isCollaborator(RepositorySlug slug, String user) {
@@ -256,8 +252,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
   Stream<RepositoryCommit> listCommits(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-            "GET", "/repos/${slug.fullName}/commits", RepositoryCommit.fromJSON)
-        as Stream<RepositoryCommit>;
+        "GET", "/repos/${slug.fullName}/commits", RepositoryCommit.fromJSON);
   }
 
   /// Fetches the specified commit.
@@ -408,9 +403,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/forks/#list-forks
   Stream<Repository> listForks(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-            "GET", "/repos/${slug.fullName}/forks", Repository.fromJSON)
-        as Stream<Repository>;
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/forks", Repository.fromJSON);
   }
 
   /// Creates a fork for the authenticated user.
@@ -428,10 +422,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/hooks/#list-hooks
   Stream<Hook> listHooks(RepositorySlug slug) {
     return new PaginationHelper(_github).objects(
-            "GET",
-            "/repos/${slug.fullName}/hooks",
-            (Map<String, dynamic> input) => Hook.fromJSON(slug.fullName, input))
-        as Stream<Hook>;
+        "GET",
+        "/repos/${slug.fullName}/hooks",
+        (Map<String, dynamic> input) => Hook.fromJSON(slug.fullName, input));
   }
 
   /// Fetches a single hook by [id].
@@ -485,8 +478,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/keys/#list
   Stream<PublicKey> listDeployKeys(RepositorySlug slug) {
     return new PaginationHelper(_github)
-            .objects("GET", "/repos/${slug.fullName}/keys", PublicKey.fromJSON)
-        as Stream<PublicKey>;
+        .objects("GET", "/repos/${slug.fullName}/keys", PublicKey.fromJSON);
   }
 
   // TODO: Implement getDeployKey: https://developer.github.com/v3/repos/keys/#get
@@ -526,9 +518,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
   Stream<Release> listReleases(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-            "GET", "/repos/${slug.fullName}/releases", Release.fromJSON)
-        as Stream<Release>;
+    return new PaginationHelper(_github)
+        .objects("GET", "/repos/${slug.fullName}/releases", Release.fromJSON);
   }
 
   /// Fetches a single release.
@@ -588,7 +579,7 @@ class RepositoriesService extends Service {
     return new PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/commit_activity",
-        YearCommitCountWeek.fromJSON) as Stream<YearCommitCountWeek>;
+        YearCommitCountWeek.fromJSON);
   }
 
   /// Fetches weekly addition and deletion counts.
@@ -598,7 +589,7 @@ class RepositoriesService extends Service {
     return new PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/code_frequency",
-        WeeklyChangesCount.fromJSON) as Stream<WeeklyChangesCount>;
+        WeeklyChangesCount.fromJSON);
   }
 
   /// Fetches Participation Breakdowns.
@@ -612,10 +603,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#punch-card
   Stream<PunchcardEntry> listPunchcard(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET",
-        "/repos/${slug.fullName}/stats/punchcard",
-        PunchcardEntry.fromJSON) as Stream<PunchcardEntry>;
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/stats/punchcard", PunchcardEntry.fromJSON);
   }
 
   /// Lists the statuses of a repository at the specified reference.
@@ -626,7 +615,7 @@ class RepositoriesService extends Service {
     return new PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/commits/$ref/statuses",
-        RepositoryStatus.fromJSON) as Stream<RepositoryStatus>;
+        RepositoryStatus.fromJSON);
   }
 
   /// Creates a new status for a repository at the specified reference.

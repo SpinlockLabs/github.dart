@@ -85,13 +85,13 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/#get-all-users
   Stream<User> listUsers({int pages, int since}) =>
       new PaginationHelper(_github).objects("GET", "/users", User.fromJSON,
-          pages: pages, params: {"since": since}) as Stream<User>;
+          pages: pages, params: {"since": since});
 
   /// Lists all email addresses for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
   Stream<UserEmail> listEmails() => new PaginationHelper(_github)
-      .objects("GET", "/user/emails", UserEmail.fromJSON) as Stream<UserEmail>;
+      .objects("GET", "/user/emails", UserEmail.fromJSON);
 
   /// Add Emails
   ///
@@ -99,7 +99,7 @@ class UsersService extends Service {
   Stream<UserEmail> addEmails(List<String> emails) =>
       new PaginationHelper(_github).objects(
           "POST", "/user/emails", UserEmail.fromJSON,
-          statusCode: 201, body: JSON.encode(emails)) as Stream<UserEmail>;
+          statusCode: 201, body: JSON.encode(emails));
 
   /// Delete Emails
   ///
@@ -113,8 +113,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listUserFollowers(String user) => new PaginationHelper(_github)
-      .objects("GET", "/users/$user/followers", User.fromJSON,
-          statusCode: 200) as Stream<User>;
+      .objects("GET", "/users/$user/followers", User.fromJSON, statusCode: 200);
 
   /// Check if the current user is following the specified user.
   Future<bool> isFollowingUser(String user) =>
@@ -150,8 +149,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listCurrentUserFollowers() => new PaginationHelper(_github)
-          .objects("GET", "/user/followers", User.fromJSON, statusCode: 200)
-      as Stream<User>;
+      .objects("GET", "/user/followers", User.fromJSON, statusCode: 200);
 
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
   /// the public keys for the authenticated user are fetched.
@@ -161,7 +159,7 @@ class UsersService extends Service {
   Stream<PublicKey> listPublicKeys([String userLogin]) {
     var path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
     return new PaginationHelper(_github)
-        .objects("GET", path, PublicKey.fromJSON) as Stream<PublicKey>;
+        .objects("GET", path, PublicKey.fromJSON);
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key

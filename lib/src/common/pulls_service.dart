@@ -10,7 +10,7 @@ class PullRequestsService extends Service {
   Stream<PullRequest> list(RepositorySlug slug, {int pages}) {
     return new PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/pulls", PullRequest.fromJSON,
-        pages: pages) as Stream<PullRequest>;
+        pages: pages);
   }
 
   /// Fetches a single pull request.
@@ -56,7 +56,7 @@ class PullRequestsService extends Service {
     return new PaginationHelper(_github).objects(
         "GET",
         '/repos/${slug.fullName}/pulls/$number/commits',
-        RepositoryCommit.fromJSON) as Stream<RepositoryCommit>;
+        RepositoryCommit.fromJSON);
   }
 
   Stream<RepositoryCommit> listFiles(RepositorySlug slug, int number) {
@@ -102,17 +102,15 @@ class PullRequestsService extends Service {
     return new PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/pulls/$number/comments",
-        PullRequestComment.fromJSON) as Stream<PullRequestComment>;
+        PullRequestComment.fromJSON);
   }
 
   /// Lists all comments on all pull requests for the repository.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
   Stream<PullRequestComment> listComments(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        "GET",
-        "/repos/${slug.fullName}/pulls/comments",
-        PullRequestComment.fromJSON) as Stream<PullRequestComment>;
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/pulls/comments", PullRequestComment.fromJSON);
   }
 
   /// Creates a new pull request comment.

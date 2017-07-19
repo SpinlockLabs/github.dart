@@ -64,7 +64,7 @@ class GitService extends Service {
     }
 
     return new PaginationHelper(_github)
-        .objects('GET', path, GitReference.fromJSON) as Stream<GitReference>;
+        .objects('GET', path, GitReference.fromJSON);
   }
 
   /// Creates a new reference in a repository.

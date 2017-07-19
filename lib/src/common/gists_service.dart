@@ -11,8 +11,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/users/$username/gists", Gist.fromJSON) as Stream<Gist>;
+    return new PaginationHelper(_github)
+        .objects("GET", "/users/$username/gists", Gist.fromJSON);
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -20,8 +20,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return new PaginationHelper(_github).objects("GET", "/gists", Gist.fromJSON)
-        as Stream<Gist>;
+    return new PaginationHelper(_github)
+        .objects("GET", "/gists", Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's public gists.
@@ -29,7 +29,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
     return new PaginationHelper(_github)
-        .objects("GET", "/gists/public", Gist.fromJSON) as Stream<Gist>;
+        .objects("GET", "/gists/public", Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's starred gists.
@@ -37,7 +37,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
     return new PaginationHelper(_github)
-        .objects("GET", "/gists/starred", Gist.fromJSON) as Stream<Gist>;
+        .objects("GET", "/gists/starred", Gist.fromJSON);
   }
 
   /// Fetches a Gist by the specified [id].
@@ -154,8 +154,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
     return new PaginationHelper(_github)
-            .objects("GET", "/gists/$gistId/comments", GistComment.fromJSON)
-        as Stream<GistComment>;
+        .objects("GET", "/gists/$gistId/comments", GistComment.fromJSON);
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
