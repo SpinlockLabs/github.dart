@@ -27,7 +27,7 @@ class CreatePublicKey {
   CreatePublicKey(this.title, this.key);
 
   String toJSON() {
-    var map = <String, dynamic> {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("key", key, map);
     return JSON.encode(map);

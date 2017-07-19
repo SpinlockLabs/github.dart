@@ -1,5 +1,42 @@
 part of github.common;
 
+@JsonSerializable(createToJson: false)
+class GitHubComparison {
+  final String url;
+
+  final String status;
+
+  @JsonKey('ahead_by')
+  final int aheadBy;
+
+  @JsonKey('behind_by')
+  final int behindBy;
+
+  @JsonKey('total_commits')
+  final int totalCommits;
+
+  GitHubComparison(
+      this.url, this.status, this.aheadBy, this.behindBy, this.totalCommits);
+
+  factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
+      _$GitHubComparisonFromJson(json);
+
+  String toString() {
+    switch (status) {
+      case 'identical':
+        return "GitHubComparison: identical";
+      case 'behind':
+        return "GitHubComparison: behind ($behindBy)";
+      case 'diverged':
+        return "GitHubComparison: diverged";
+      case 'ahead':
+        return "GitHubComparison: ahead ($aheadBy)";
+      default:
+        return "Huh??? - $status";
+    }
+  }
+}
+
 /// Model class for a repository.
 class Repository {
   /// Repository Name
@@ -280,7 +317,7 @@ class RepositorySlug {
   /// The Full Name of the Repository
   ///
   /// Example: owner/name
-  String get fullName => "${owner}/${name}";
+  String get fullName => "$owner/$name";
 
   @override
   bool operator ==(Object obj) =>
@@ -290,7 +327,7 @@ class RepositorySlug {
   int get hashCode => fullName.hashCode;
 
   @override
-  String toString() => "${owner}/${name}";
+  String toString() => "$owner/$name";
 }
 
 /// Model class for a new repository to be created.
@@ -411,7 +448,7 @@ class LanguageBreakdown {
   String toString() {
     var buffer = new StringBuffer();
     _data.forEach((key, value) {
-      buffer.writeln("${key}: ${value}");
+      buffer.writeln("$key: $value");
     });
     return buffer.toString();
   }

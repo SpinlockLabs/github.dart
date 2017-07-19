@@ -53,7 +53,7 @@ void main() {
     expect(
         fetchedBlob.url,
         equals(
-            'https://api.github.com/repos/${slug.fullName}/git/blobs/${createdBlobSha}'));
+            'https://api.github.com/repos/${slug.fullName}/git/blobs/$createdBlobSha'));
     expect(fetchedBlob.sha, equals(createdBlobSha));
     expect(fetchedBlob.size, equals(3));
   });
