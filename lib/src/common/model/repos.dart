@@ -6,13 +6,13 @@ class GitHubComparison {
 
   final String status;
 
-  @JsonKey('ahead_by')
+  @JsonKey(name: 'ahead_by')
   final int aheadBy;
 
-  @JsonKey('behind_by')
+  @JsonKey(name: 'behind_by')
   final int behindBy;
 
-  @JsonKey('total_commits')
+  @JsonKey(name: 'total_commits')
   final int totalCommits;
 
   GitHubComparison(
@@ -206,9 +206,9 @@ class Tag {
   final String name;
   final CommitInfo commit;
 
-  @JsonKey('zipball_url')
+  @JsonKey(name: 'zipball_url')
   final String zipUrl;
-  @JsonKey('tarball_url')
+  @JsonKey(name: 'tarball_url')
   final String tarUrl;
 
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
@@ -225,13 +225,13 @@ class CommitData {
   final String sha;
   final GitCommit commit;
 
-  @JsonKey("url")
+  @JsonKey(name: "url")
   final String url;
 
-  @JsonKey("html_url")
+  @JsonKey(name: "html_url")
   final String htmlUrl;
 
-  @JsonKey("comments_url")
+  @JsonKey(name: "comments_url")
   final String commentsUrl;
 
   final CommitDataUser author, committer;
@@ -277,11 +277,11 @@ class UserInformation {
   final int id;
 
   /// Avatar Url
-  @JsonKey("avatar_url")
+  @JsonKey(name: "avatar_url")
   final String avatarUrl;
 
   /// Url to the user's GitHub Profile
-  @JsonKey("html_url")
+  @JsonKey(name: "html_url")
   final String htmlUrl;
 
   UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);

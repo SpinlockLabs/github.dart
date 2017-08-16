@@ -164,7 +164,7 @@ class GitTree {
   /// GitHub's maximum limit.
   final bool truncated;
 
-  @JsonKey("tree")
+  @JsonKey(name: "tree")
   final List<GitTreeEntry> entries;
 
   GitTree(this.sha, this.url, this.truncated, this.entries);
