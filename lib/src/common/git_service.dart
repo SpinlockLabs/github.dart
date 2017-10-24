@@ -151,4 +151,13 @@ class GitService extends Service {
         statusCode: StatusCodes.CREATED,
         body: tree.toJSON()) as Future<GitTree>;
   }
+
+  Future<BranchProtection> getBranchProtection(
+      RepositorySlug slug, String branchName) {
+    return _github.getJSON(
+        '/repos/${slug.fullName}/branches/$branchName/protection',
+        statusCode: StatusCodes.OK,
+        preview: 'application/vnd.github.loki-preview+json',
+        convert: BranchProtection.fromJSON) as Future<BranchProtection>;
+  }
 }
