@@ -412,6 +412,52 @@ class Branch {
   }
 }
 
+class BranchProtection {
+  RequiredStatusChecks requiredStatusChecks;
+
+  static BranchProtection fromJSON(Map<String, dynamic> input) {
+    var branchProtection = new BranchProtection()
+      ..requiredStatusChecks = RequiredStatusChecks
+          .fromJSON(input['required_status_checks'] as Map<String, dynamic>);
+    return branchProtection;
+  }
+}
+
+class Restrictions {
+  Map<String, dynamic> toMap() {
+    return {
+      'restrictions': {}
+    };
+  }
+}
+
+class RequiredStatusChecks {
+  List<String> contexts = <String>[];
+  bool strict;
+  bool includeAdmins;
+
+  static RequiredStatusChecks fromJSON(Map<String, dynamic> input) {
+    var requiredStatusChecks = new RequiredStatusChecks()
+      ..strict = input['strict']
+      ..includeAdmins = input['include_admins']
+      ..contexts = input['contexts'] as List<String>;
+
+    return requiredStatusChecks;
+  }
+
+  Map toMap() {
+    return {
+      'required_status_checks': {
+        'strict': strict,
+        'include_admins': includeAdmins,
+        'contexts': contexts
+      }
+    };
+  }
+
+  String toJson() => JSON.encode(toMap());
+}
+
 /// A Breakdown of the Languages a repository uses.
 class LanguageBreakdown {
   final Map<String, int> _data;
