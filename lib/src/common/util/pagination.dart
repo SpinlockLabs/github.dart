@@ -1,7 +1,7 @@
 part of github.common;
 
 /// Internal Helper for dealing with GitHub Pagination.
-class PaginationHelper<T> {
+class PaginationHelper {
   final GitHub github;
 
   PaginationHelper(this.github);
@@ -84,7 +84,7 @@ class PaginationHelper<T> {
     }
   }
 
-  Stream<T> objects(String method, String path, JSONConverter<T> converter,
+  Stream<T> objects<T>(String method, String path, JSONConverter<T> converter,
       {int pages,
       Map<String, String> headers,
       Map<String, dynamic> params,

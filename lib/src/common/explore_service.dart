@@ -10,10 +10,10 @@ class ExploreService extends Service {
       {String language, String since: "daily"}) {
     var url = "https://github.com/trending";
 
-    if (language != null) url += "?l=${language}";
+    if (language != null) url += "?l=$language";
 
     if (since != null)
-      url += language == null ? "?since=${since}" : "&since=${since}";
+      url += language == null ? "?since=$since" : "&since=$since";
 
     var controller = new StreamController<TrendingRepository>();
 
@@ -71,7 +71,7 @@ class ExploreService extends Service {
       for (var repo in repos) {
         var repoTitle = repo.querySelector(".collection-repo-title");
         var path = repoTitle.querySelector("a").attributes['href'];
-        var url = "https://githb.com${path}";
+        var url = "https://githb.com$path";
         var name = path.substring(1);
 
         var item = new ShowcaseItem();

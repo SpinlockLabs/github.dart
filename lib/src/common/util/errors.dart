@@ -10,7 +10,7 @@ class GitHubError implements Exception {
   GitHubError(this.github, this.message, {this.apiUrl, this.source});
 
   @override
-  String toString() => "GitHub Error: ${message}";
+  String toString() => "GitHub Error: $message";
 }
 
 /// GitHub Entity was not found
@@ -25,29 +25,29 @@ class BadRequest extends GitHubError {
 /// GitHub Repository was not found
 class RepositoryNotFound extends NotFound {
   RepositoryNotFound(GitHub github, String repo)
-      : super(github, "Repository Not Found: ${repo}");
+      : super(github, "Repository Not Found: $repo");
 }
 
 /// GitHub User was not found
 class UserNotFound extends NotFound {
   UserNotFound(GitHub github, String user)
-      : super(github, "User Not Found: ${user}");
+      : super(github, "User Not Found: $user");
 }
 
 /// GitHub Organization was not found
 class OrganizationNotFound extends NotFound {
   OrganizationNotFound(GitHub github, String organization)
-      : super(github, "Organization Not Found: ${organization}");
+      : super(github, "Organization Not Found: $organization");
 }
 
 /// GitHub Team was not found
 class TeamNotFound extends NotFound {
-  TeamNotFound(GitHub github, int id) : super(github, "Team Not Found: ${id}");
+  TeamNotFound(GitHub github, int id) : super(github, "Team Not Found: $id");
 }
 
 /// Access was forbidden to a resource
 class AccessForbidden extends GitHubError {
-  AccessForbidden(GitHub github) : super(github, "Access Forbbidden");
+  AccessForbidden(GitHub github) : super(github, "Access Forbidden");
 }
 
 /// Client hit the rate limit.

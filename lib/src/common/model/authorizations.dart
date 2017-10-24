@@ -22,7 +22,8 @@ class Authorization {
       ..id = input['id']
       ..scopes = input['scopes'] as List<String>
       ..token = input['token']
-      ..app = AuthorizationApplication.fromJSON(input['app'] as Map<String, dynamic>)
+      ..app = AuthorizationApplication
+          .fromJSON(input['app'] as Map<String, dynamic>)
       ..note = input['note']
       ..noteUrl = input['note_url']
       ..createdAt = parseDateTime(input['created_at'])
@@ -63,7 +64,7 @@ class CreateAuthorization {
   CreateAuthorization(this.note);
 
   String toJSON() {
-    var map = <String, dynamic> {};
+    var map = <String, dynamic>{};
     putValue("note", note, map);
     putValue("note_url", noteUrl, map);
     putValue("client_id", clientID, map);

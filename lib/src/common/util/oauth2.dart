@@ -80,7 +80,7 @@ class OAuth2Flow {
     });
 
     return (github == null ? new http.Client() : github.client)
-        .post("${baseUrl}/access_token", body: body, headers: headers)
+        .post("$baseUrl/access_token", body: body, headers: headers)
         .then((response) {
       var json = JSON.decode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
