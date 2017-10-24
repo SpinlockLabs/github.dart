@@ -9,7 +9,7 @@ class BenchmarkHelper {
       int total =
           result.map((it) => it.elapsedMilliseconds).reduce((a, b) => a + b);
       num avg = total / result.length;
-      print("  - ${name}:");
+      print("  - $name:");
       print("    - Average: ${avg}ms");
       print("    - Times:");
 

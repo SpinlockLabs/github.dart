@@ -204,12 +204,12 @@ class GitHub {
   /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
-  Future<dynamic> getJSON(String path,
+  Future<T> getJSON<T>(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
-      JSONConverter convert,
+      JSONConverter<T> convert,
       String preview}) async {
     if (headers == null) headers = {};
 
@@ -222,6 +222,14 @@ class GitHub {
     }
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+
+    if (auth.isToken) {
+      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+    } else if (auth.isBasic) {
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
+    }
 
     var response = await request("GET", path,
         headers: headers, params: params, statusCode: statusCode, fail: fail);
@@ -273,6 +281,14 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
+    if (auth.isToken) {
+      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+    } else if (auth.isBasic) {
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
+    }
+
     var response = await request("POST", path,
         headers: headers,
         params: params,
@@ -310,7 +326,7 @@ class GitHub {
       case 422:
         var buff = new StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: ${message}");
+        buff.writeln("  Message: $message");
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -318,9 +334,9 @@ class GitHub {
             var field = error['field'];
             var code = error['code'];
             buff
-              ..writeln("    Resource: ${resource}")
-              ..writeln("    Field ${field}")
-              ..write("    Code: ${code}");
+              ..writeln("    Resource: $resource")
+              ..writeln("    Field $field")
+              ..write("    Code: $code");
           }
         }
         throw new ValidationFailed(this, buff.toString());
@@ -354,7 +370,7 @@ class GitHub {
     } else if (auth.isBasic) {
       var userAndPass =
           BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     if (method == "PUT" && body == null) {

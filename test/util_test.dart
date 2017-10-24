@@ -1,9 +1,9 @@
 library github.test.util_test;
 
-import "helper.dart";
-
 import "package:github/src/common.dart";
 import "package:test/test.dart";
+
+import "helper.dart";
 
 void main() {
   group("slugFromAPIUrl()", () {
