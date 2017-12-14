@@ -237,10 +237,13 @@ class GitHub {
     var json = jsonDecode(response.body);
 
     if (convert == null) {
+      _applyExpandos(json, response);
       return json;
     }
 
-    return convert(json);
+    final returnValue = convert(json);
+    _applyExpandos(returnValue, response);
+    return returnValue;
   }
 
   /// Handles Post Requests that respond with JSO

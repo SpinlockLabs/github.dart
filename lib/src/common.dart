@@ -9,6 +9,7 @@ import "dart:convert"
 import "package:html/dom.dart" as html;
 import "package:html/parser.dart" as html_parser;
 import "package:http/http.dart" as http;
+import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:quiver/async.dart" show FutureGroup;
 import "package:json_annotation/json_annotation.dart";
 import "package:xml/xml.dart" as xml;
@@ -63,3 +64,14 @@ part "common/util/oauth2.dart";
 part "common/util/pagination.dart";
 part "common/util/service.dart";
 part "common/util/utils.dart";
+
+void _applyExpandos(Object target, http.Response response) {
+  _etagExpando[target] = response.headers['etag'];
+  _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']);
+}
+
+final _etagExpando = new Expando<String>('etag');
+final _dateExpando = new Expando<DateTime>('date');
+
+String getResponseEtag(Object obj) => _etagExpando[obj];
+DateTime getResponseDate(Object obj) => _dateExpando[obj];
