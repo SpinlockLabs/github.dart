@@ -7,10 +7,26 @@ part of github.common;
 class PullRequestsService extends Service {
   PullRequestsService(GitHub github) : super(github);
 
-  Stream<PullRequest> list(RepositorySlug slug, {int pages}) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/pulls", PullRequest.fromJSON,
-        pages: pages);
+  /// Fetches several pull requests.
+  ///
+  /// API docs: https://developer.github.com/v3/pulls/#list-pull-requests
+  Stream<PullRequest> list(RepositorySlug slug,
+      {int pages,
+      String base,
+      String direction: 'desc',
+      String head,
+      String sort: 'created',
+      String state: 'open'}) {
+    var params = <String, String>{};
+    putValue("base", base, params);
+    putValue("direction", direction, params);
+    putValue("head", head, params);
+    putValue("sort", sort, params);
+    putValue("state", state, params);
+
+    return new PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/pulls?state=${state}", PullRequest.fromJSON,
+        pages: pages, params: params);
   }
 
   /// Fetches a single pull request.
