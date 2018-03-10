@@ -258,7 +258,7 @@ class PullRequestComment {
       ..updatedAt = parseDateTime(input['updated_at'])
       ..url = input['html_url']
       ..pullRequestUrl = input['pull_request_url']
-      ..links = Links.fromJSON(input['_links'] as Map<String, dynamic>);
+      ..links = new Links.fromJson(input['_links'] as Map<String, dynamic>);
   }
 }
 
