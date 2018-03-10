@@ -91,3 +91,102 @@ Branch _$BranchFromJson(Map<String, dynamic> json) {
           ? null
           : new CommitData.fromJson(json['commit'] as Map<String, dynamic>));
 }
+
+LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) {
+  return new LicenseDetails(
+      name: json['name'] as String,
+      path: json['path'] as String,
+      sha: json['sha'] as String,
+      size: json['size'] as int,
+      url: json['url'] == null ? null : Uri.parse(json['url'] as String),
+      htmlUrl: json['html_url'] == null
+          ? null
+          : Uri.parse(json['html_url'] as String),
+      gitUrl:
+          json['git_url'] == null ? null : Uri.parse(json['git_url'] as String),
+      downloadUrl: json['download_url'] == null
+          ? null
+          : Uri.parse(json['download_url'] as String),
+      type: json['type'] as String,
+      content: json['content'] as String,
+      encoding: json['encoding'] as String,
+      links: json['_links'] == null
+          ? null
+          : new Links.fromJson(json['_links'] as Map<String, dynamic>),
+      license: json['license'] == null
+          ? null
+          : new LicenseKind.fromJson(json['license'] as Map<String, dynamic>));
+}
+
+abstract class _$LicenseDetailsSerializerMixin {
+  String get name;
+  String get path;
+  String get sha;
+  int get size;
+  Uri get url;
+  Uri get htmlUrl;
+  Uri get gitUrl;
+  Uri get downloadUrl;
+  String get type;
+  String get content;
+  String get encoding;
+  Links get links;
+  LicenseKind get license;
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'name': name,
+        'path': path,
+        'sha': sha,
+        'size': size,
+        'url': url?.toString(),
+        'html_url': htmlUrl?.toString(),
+        'git_url': gitUrl?.toString(),
+        'download_url': downloadUrl?.toString(),
+        'type': type,
+        'content': content,
+        'encoding': encoding,
+        '_links': links,
+        'license': license
+      };
+}
+
+LicenseKind _$LicenseKindFromJson(Map<String, dynamic> json) {
+  return new LicenseKind(
+      key: json['key'] as String,
+      name: json['name'] as String,
+      spdxId: json['spdx_id'] as String,
+      url: json['url'] == null ? null : Uri.parse(json['url'] as String),
+      nodeId: json['node_id'] as String);
+}
+
+abstract class _$LicenseKindSerializerMixin {
+  String get key;
+  String get name;
+  String get spdxId;
+  Uri get url;
+  String get nodeId;
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'key': key,
+        'name': name,
+        'spdx_id': spdxId,
+        'url': url?.toString(),
+        'node_id': nodeId
+      };
+}
+
+Links _$LinksFromJson(Map<String, dynamic> json) {
+  return new Links(
+      git: json['git'] == null ? null : Uri.parse(json['git'] as String),
+      self: json['self'] == null ? null : Uri.parse(json['self'] as String),
+      html: json['html'] == null ? null : Uri.parse(json['html'] as String));
+}
+
+abstract class _$LinksSerializerMixin {
+  Uri get self;
+  Uri get git;
+  Uri get html;
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'self': self?.toString(),
+        'git': git?.toString(),
+        'html': html?.toString()
+      };
+}

@@ -64,33 +64,23 @@ class GitHubFile {
       ..sha = input['sha']
       ..gitUrl = input['git_url']
       ..htmlUrl = input['html_url']
-      ..links = Links.fromJSON(input['_links'] as Map<String, dynamic>)
+      ..links = new Links.fromJson(input['_links'] as Map<String, dynamic>)
       ..sourceRepository = slug;
   }
 }
 
-/// File links.
-class Links {
-  /// Git Link
-  @ApiName("git")
-  String git;
+@JsonSerializable()
+class Links extends Object with _$LinksSerializerMixin {
+  final Uri self;
+  final Uri git;
+  final Uri html;
 
-  /// Self Link
-  @ApiName("self")
-  String self;
+  Links({this.git, this.self, this.html});
 
-  /// HTML Link
-  @ApiName("html")
-  String html;
-
-  static Links fromJSON(Map<String, dynamic> input) {
+  factory Links.fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var links = new Links();
-    links.git = input['git'];
-    links.self = input['self'];
-    links.html = input['html'];
-    return links;
+    return _$LinksFromJson(input);
   }
 }
 

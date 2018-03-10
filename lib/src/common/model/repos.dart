@@ -453,3 +453,64 @@ class LanguageBreakdown {
     return buffer.toString();
   }
 }
+
+@JsonSerializable()
+class LicenseDetails extends Object with _$LicenseDetailsSerializerMixin {
+  final String name;
+  final String path;
+  final String sha;
+  final int size;
+  final Uri url;
+
+  @JsonKey(name: 'html_url')
+  final Uri htmlUrl;
+  @JsonKey(name: 'git_url')
+  final Uri gitUrl;
+  @JsonKey(name: 'download_url')
+  final Uri downloadUrl;
+
+  final String type;
+  final String content;
+  final String encoding;
+
+  @JsonKey(name: '_links')
+  final Links links;
+
+  final LicenseKind license;
+
+  LicenseDetails(
+      {this.name,
+      this.path,
+      this.sha,
+      this.size,
+      this.url,
+      this.htmlUrl,
+      this.gitUrl,
+      this.downloadUrl,
+      this.type,
+      this.content,
+      this.encoding,
+      this.links,
+      this.license});
+
+  factory LicenseDetails.fromJson(Map<String, dynamic> json) =>
+      _$LicenseDetailsFromJson(json);
+}
+
+@JsonSerializable()
+class LicenseKind extends Object with _$LicenseKindSerializerMixin {
+  final String key;
+  final String name;
+
+  @JsonKey(name: 'spdx_id')
+  final String spdxId;
+  final Uri url;
+
+  @JsonKey(name: 'node_id')
+  final String nodeId;
+
+  LicenseKind({this.key, this.name, this.spdxId, this.url, this.nodeId});
+
+  factory LicenseKind.fromJson(Map<String, dynamic> json) =>
+      _$LicenseKindFromJson(json);
+}

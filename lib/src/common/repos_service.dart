@@ -89,6 +89,10 @@ class RepositoriesService extends Service {
     }
   }
 
+  Future<LicenseDetails> getLicense(RepositorySlug slug) =>
+      _github.getJSON("/repos/${slug.owner}/${slug.name}/license",
+          convert: (json) => new LicenseDetails.fromJson(json));
+
   /// Fetches the repository specified by the [slug].
   ///
   /// API docs: https://developer.github.com/v3/repos/#get
