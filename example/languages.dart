@@ -9,6 +9,7 @@ DivElement tableDiv;
 LanguageBreakdown breakdown;
 
 void main() {
+  // FIXME `initGitHub` is not found
   initGitHub();
   init("languages.dart", onReady: () {
     tableDiv = querySelector("#table");
@@ -77,5 +78,6 @@ String generateMarkdown(int accuracy) {
       "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
     });
   });
+  // FIXME the function `table` isn't defined
   return markdown.table(tableData);
 }

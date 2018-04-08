@@ -1,6 +1,7 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+// Fixme `dates.dart` is not found
 import "package:github/dates.dart";
 
 import "common.dart";
@@ -55,6 +56,7 @@ void updateRepos(List<Repository> repos,
   repos.sort(compare);
   for (var repo in repos) {
     repositoriesDiv.appendHtml(
+      // FIXME `friendlyDateTime` is not found since dates.dart is not found
         """
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>

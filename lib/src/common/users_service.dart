@@ -36,7 +36,7 @@ class UsersService extends Service {
 
     return _github.postJSON("/user",
         // TODO: map probably needs to be JSON encoded.
-        body: map,
+        body: JSON.encode(map),
         statusCode: 200,
         convert: CurrentUser.fromJSON) as Future<CurrentUser>;
   }

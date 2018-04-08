@@ -18,5 +18,5 @@ void loadReadme() {
       .getReadme(new RepositorySlug("DirectMyFile", "github.dart"))
       .then((file) => github.misc.renderMarkdown(file.content))
       .then((html) =>
-          readmeDiv.appendHtml(html, validator: NodeTreeSanitizer.trusted));
+          readmeDiv.appendHtml(html, treeSanitizer: NodeTreeSanitizer.trusted));
 }

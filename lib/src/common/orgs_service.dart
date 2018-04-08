@@ -73,8 +73,7 @@ class OrganizationsService extends Service {
     return _github.postJSON("/orgs/$org",
         statusCode: 200,
         convert: Organization.fromJSON,
-        // TODO: This is probably wrong. Map needs to be json encoded?
-        body: map);
+        body: JSON.encode(map));
   }
 
   /// Lists all of the teams for the specified organization.
@@ -108,8 +107,7 @@ class OrganizationsService extends Service {
     return _github.postJSON("/orgs/$org/teams",
         statusCode: 201,
         convert: Team.fromJSON,
-        // TODO: This is probably wrong, map needs to be json encoded?
-        body: map) as Future<Team>;
+        body: JSON.encode(map)) as Future<Team>;
   }
 
   /// Edits a Team.
@@ -123,8 +121,7 @@ class OrganizationsService extends Service {
     return _github.postJSON("/teams/$teamId",
         statusCode: 200,
         convert: Team.fromJSON,
-        // TODO: This is probably wrong, map needs to be json encoded?
-        body: map) as Future<Team>;
+        body: JSON.encode(map)) as Future<Team>;
   }
 
   /// Deletes the team specified by the [teamId]

@@ -1,6 +1,7 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+// FIXME `dates.dart` is not found
 import "package:github/dates.dart";
 
 import "common.dart";
@@ -36,6 +37,7 @@ void loadUsers() {
 
       buff
         ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")
+        // FIXME `friendlyDateTime` is not found since `dates.dart` is not found
         ..writeln("Created: ${friendlyDateTime(user.createdAt)}")
         ..writeln("Updated: ${friendlyDateTime(user.updatedAt)}");
 

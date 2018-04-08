@@ -145,7 +145,7 @@ class RepositoriesService extends Service {
     });
     return _github.postJSON("/repos/${repo.fullName}",
         // TODO: data probably needs to be json encoded?
-        body: data,
+        body: JSON.encode(data),
         statusCode: 200) as Future<Repository>;
   }
 
@@ -365,7 +365,7 @@ class RepositoriesService extends Service {
 
     return _github.postJSON("/repos/${slug.fullName}/contents/$path",
         // TODO: map probably needs to be json encoded
-        body: map,
+        body: JSON.encode(map),
         statusCode: 200,
         convert: ContentCreation.fromJSON) as Future<ContentCreation>;
   }

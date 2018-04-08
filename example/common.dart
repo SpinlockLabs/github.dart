@@ -1,6 +1,7 @@
 import "dart:html";
 
 import "package:github/browser.dart";
+// FIXME `github/markdown.dart` is not found
 import "package:github/markdown.dart" as markdown;
 
 void init(String script, {void onReady()}) {
@@ -30,6 +31,7 @@ void init(String script, {void onReady()}) {
     }
 
     window.addEventListener("message", (event) {
+      // FIXME: the getter 'data' isn't defined in Event
       if (event.data['command'] == "ready") {
         ready = true;
         if (fetched) {

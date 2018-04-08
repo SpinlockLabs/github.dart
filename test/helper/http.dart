@@ -2,7 +2,7 @@ part of github.test.helper;
 
 final MockHTTPClient httpClient = new MockHTTPClient();
 
-typedef http.Response ResponseCreator(http.BaseRequest request);
+typedef http.StreamedResponse ResponseCreator(http.BaseRequest request);
 
 class MockHTTPClient extends http.BaseClient {
   final Map<Pattern, ResponseCreator> responses = <Pattern, ResponseCreator>{};
