@@ -2,37 +2,25 @@ part of github.common;
 
 typedef http.Client ClientCreator();
 
-/**
- * The Main GitHub Client
- *
- * ## Example
- *
- *      var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
- *      // Use the Client
- */
+///  The Main GitHub Client
+///
+///  ## Example
+///
+///       var github = new GitHub(auth: new Authentication.withToken("SomeToken"));
+///       // Use the Client
+///
 class GitHub {
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
-  /**
-   * Default Client Creator
-   */
-  static ClientCreator defaultClient;
-
-  /**
-   * Authentication Information
-   */
+  /// Authentication Information
   Authentication auth;
 
-  /**
-   * API Endpoint
-   */
+  /// API Endpoint
   final String endpoint;
 
-  /**
-   * HTTP Client
-   */
+  /// HTTP Client
   final http.Client client;
 
   ActivityService _activity;
@@ -49,6 +37,17 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
+
+  /// Creates a new [GitHub] instance.
+  ///
+  /// [endpoint] is the api endpoint to use
+  /// [auth] is the authentication information
+  GitHub(
+      {Authentication auth,
+      this.endpoint: "https://api.github.com",
+      http.Client client})
+      : this.auth = auth == null ? new Authentication.anonymous() : auth,
+        this.client = client == null ? new http.Client() : client;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -76,20 +75,6 @@ class GitHub {
           isUtc: true);
 
   int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
-
-  /**
-   * Creates a new [GitHub] instance.
-   *
-   * [fetcher] is the HTTP Transporter to use
-   * [endpoint] is the api endpoint to use
-   * [auth] is the authentication information
-   */
-  GitHub(
-      {Authentication auth,
-      this.endpoint: "https://api.github.com",
-      http.Client client})
-      : this.auth = auth == null ? new Authentication.anonymous() : auth,
-        this.client = client == null ? defaultClient() : client;
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
@@ -206,32 +191,25 @@ class GitHub {
     return _users;
   }
 
-  /**
-   * Handles Get Requests that respond with JSON
-   *
-   * [path] can either be a path like '/repos' or a full url.
-   *
-   * [statusCode] is the expected status code. If it is null, it is ignored.
-   * If the status code that the response returns is not the status code you provide
-   * then the [fail] function will be called with the HTTP Response.
-   * If you don't throw an error or break out somehow, it will go into some error checking
-   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
-   * for errors, it throws an Unknown Error.
-   *
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   *
-   * [params] are query string parameters.
-   *
-   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
-   * The future will pass the object returned from this function to the then method.
-   * The default [convert] function returns the input object.
-   */
-  Future<dynamic> getJSON(String path,
+  /// Handles Get Requests that respond with JSON
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [statusCode] is the expected status code. If it is null, it is ignored.
+  /// If the status code that the response returns is not the status code you provide
+  /// then the [fail] function will be called with the HTTP Response.
+  /// If you don't throw an error or break out somehow, it will go into some error checking
+  /// that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+  /// for errors, it throws an Unknown Error.
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+  /// The future will pass the object returned from this function to the then method.
+  /// The default [convert] function returns the input object.
+  Future<T> getJSON<T>(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
-      JSONConverter convert,
+      JSONConverter<T> convert,
       String preview}) async {
     if (headers == null) headers = {};
 
@@ -245,6 +223,14 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
+    if (auth.isToken) {
+      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+    } else if (auth.isBasic) {
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
+    }
+
     var response = await request("GET", path,
         headers: headers, params: params, statusCode: statusCode, fail: fail);
 
@@ -257,36 +243,32 @@ class GitHub {
     return convert(json);
   }
 
-  /**
-   * Handles Post Requests that respond with JSON
-   *
-   * [path] can either be a path like '/repos' or a full url.
-   *
-   * [statusCode] is the expected status code. If it is null, it is ignored.
-   * If the status code that the response returns is not the status code you provide
-   * then the [fail] function will be called with the HTTP Response.
-   * If you don't throw an error or break out somehow, it will go into some error checking
-   * that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
-   * for errors, it throws an Unknown Error.
-   *
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   *
-   * [params] are query string parameters.
-   *
-   * [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
-   * The future will pass the object returned from this function to the then method.
-   * The default [convert] function returns the input object.
-   *
-   * [body] is the data to send to the server.
-   */
+  /// Handles Post Requests that respond with JSO
+  ///
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [statusCode] is the expected status code. If it is null, it is ignored.
+  /// If the status code that the response returns is not the status code you provide
+  /// then the [fail] function will be called with the HTTP Response.
+  ///
+  /// If you don't throw an error or break out somehow, it will go into some error checking
+  /// that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+  /// for errors, it throws an Unknown Error.
+  ///
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+  ///
+  /// The future will pass the object returned from this function to the then method.
+  /// The default [convert] function returns the input object.
+  /// [body] is the data to send to the server.
   Future<dynamic> postJSON(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
       JSONConverter convert,
-      body,
-      String preview}) {
+      String body,
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -299,26 +281,33 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    return request("POST", path,
+    if (auth.isToken) {
+      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+    } else if (auth.isBasic) {
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
+    }
+
+    var response = await request("POST", path,
         headers: headers,
         params: params,
         body: body,
         statusCode: statusCode,
-        fail: fail).then((response) {
-      return convert(JSON.decode(response.body));
-    });
+        fail: fail);
+    return convert(JSON.decode(response.body));
   }
 
-  /**
-   * Internal method to handle status codes
-   */
+  ///
+  /// Internal method to handle status codes
+  ///
   void handleStatusCode(http.Response response) {
     String message;
-    List<String> errors;
+    List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
-      var json = response.asJSON();
+      var json = JSON.decode(response.body);
       message = json['message'];
-      errors = json['errors'];
+      errors = json['errors'] as List<Map<String, String>>;
     }
     switch (response.statusCode) {
       case 404:
@@ -331,12 +320,13 @@ class GitHub {
           throw new InvalidJSON(this, message);
         } else if (message == "Body should be a JSON Hash") {
           throw new InvalidJSON(this, message);
-        } else throw new BadRequest(this);
+        } else
+          throw new BadRequest(this);
         break;
       case 422:
         var buff = new StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: ${message}");
+        buff.writeln("  Message: $message");
         if (errors != null) {
           buff.writeln("  Errors:");
           for (Map<String, String> error in errors) {
@@ -344,9 +334,9 @@ class GitHub {
             var field = error['field'];
             var code = error['code'];
             buff
-              ..writeln("    Resource: ${resource}")
-              ..writeln("    Field ${field}")
-              ..write("    Code: ${code}");
+              ..writeln("    Resource: $resource")
+              ..writeln("    Field $field")
+              ..write("    Code: $code");
           }
         }
         throw new ValidationFailed(this, buff.toString());
@@ -354,22 +344,21 @@ class GitHub {
     throw new UnknownError(this, message);
   }
 
-  /**
-   * Handles Authenticated Requests in an easy to understand way.
-   *
-   * [method] is the HTTP method.
-   * [path] can either be a path like '/repos' or a full url.
-   * [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
-   * [params] are query string parameters.
-   * [body] is the body content of requests that take content.
-   */
+  /// Handles Authenticated Requests in an easy to understand way.
+  ///
+  /// [method] is the HTTP method.
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [body] is the body content of requests that take content.
+  ///
   Future<http.Response> request(String method, String path,
       {Map<String, String> headers,
       Map<String, dynamic> params,
       String body,
       int statusCode,
       void fail(http.Response response),
-      String preview}) {
+      String preview}) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -379,8 +368,9 @@ class GitHub {
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
-      var userAndPass = utf8ToBase64('${auth.username}:${auth.password}');
-      headers.putIfAbsent("Authorization", () => "basic ${userAndPass}");
+      var userAndPass =
+          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     if (method == "PUT" && body == null) {
@@ -407,24 +397,27 @@ class GitHub {
       url.write(queryString);
     }
 
-    return client
-        .request(new http.Request(url.toString(),
-            method: method, headers: headers, body: body))
-        .then((response) {
-      _updateRateLimit(response.headers);
-      if (statusCode != null && statusCode != response.statusCode) {
-        fail != null ? fail(response) : null;
-        handleStatusCode(response);
-        return null;
-      } else return response;
-    });
+    var request = new http.Request(method, Uri.parse(url.toString()));
+    request.headers.addAll(headers);
+    if (body != null) {
+      request.body = body;
+    }
+
+    var streamedResponse = await client.send(request);
+
+    var response = await http.Response.fromStream(streamedResponse);
+
+    _updateRateLimit(response.headers);
+    if (statusCode != null && statusCode != response.statusCode) {
+      fail != null ? fail(response) : null;
+      handleStatusCode(response);
+      return null;
+    } else
+      return response;
   }
 
-  /**
-   * Disposes of this GitHub Instance.
-   *
-   * No other methods on this instance should be called after this method is called.
-   */
+  /// Disposes of this GitHub Instance.
+  /// No other methods on this instance should be called after this method is called.
   void dispose() {
     // Destroy the Authentication Information
     // This is needed for security reasons.

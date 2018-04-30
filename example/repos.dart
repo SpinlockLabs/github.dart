@@ -5,7 +5,7 @@ import "package:github/dates.dart";
 
 import "common.dart";
 
-DivElement $repos;
+DivElement repositoriesDiv;
 List<Repository> repos;
 
 Map<String, Comparator<Repository>> sorts = {
@@ -21,7 +21,7 @@ void main() {
   var stopwatch = new Stopwatch();
   stopwatch.start();
 
-  $repos = querySelector("#repos");
+  repositoriesDiv = querySelector("#repos");
 
   document.onReadyStateChange.listen((event) {
     if (document.readyState == ReadyState.COMPLETE) {
@@ -54,7 +54,7 @@ void updateRepos(List<Repository> repos,
   document.querySelector("#repos").children.clear();
   repos.sort(compare);
   for (var repo in repos) {
-    $repos.appendHtml(
+    repositoriesDiv.appendHtml(
         """
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>

@@ -11,7 +11,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
   Future<User> getUser(String name) =>
-      _github.getJSON("/users/${name}", convert: User.fromJSON);
+      _github.getJSON("/users/$name", convert: User.fromJSON);
 
   /// Updates the Current User.
   ///
@@ -35,12 +35,15 @@ class UsersService extends Service {
     });
 
     return _github.postJSON("/user",
-        body: map, statusCode: 200, convert: CurrentUser.fromJSON);
+        // TODO: map probably needs to be JSON encoded.
+        body: map,
+        statusCode: 200,
+        convert: CurrentUser.fromJSON) as Future<CurrentUser>;
   }
 
   /// Fetches a list of users specified by [names].
   Stream<User> getUsers(List<String> names, {int pages}) {
-    var controller = new StreamController();
+    var controller = new StreamController<User>();
 
     var group = new FutureGroup();
 
@@ -62,18 +65,17 @@ class UsersService extends Service {
   /// Throws [AccessForbidden] if we are not authenticated.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-the-authenticated-user
-  Future<CurrentUser> getCurrentUser() {
-    return _github.getJSON("/user", statusCode: StatusCodes.OK,
-        fail: (http.Response response) {
-      if (response.statusCode == StatusCodes.FORBIDDEN) {
-        throw new AccessForbidden(_github);
-      }
-    }, convert: CurrentUser.fromJSON);
-  }
+  Future<CurrentUser> getCurrentUser() =>
+      _github.getJSON("/user", statusCode: StatusCodes.OK,
+          fail: (http.Response response) {
+        if (response.statusCode == StatusCodes.FORBIDDEN) {
+          throw new AccessForbidden(_github);
+        }
+      }, convert: CurrentUser.fromJSON);
 
   /// Checks if a user exists.
   Future<bool> isUser(String name) => _github
-      .request("GET", "/users/${name}")
+      .request("GET", "/users/$name")
       .then((resp) => resp.statusCode == StatusCodes.OK);
 
   // TODO: Implement editUser: https://developer.github.com/v3/users/#update-the-authenticated-user
@@ -111,25 +113,24 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listUserFollowers(String user) => new PaginationHelper(_github)
-      .objects("GET", "/users/${user}/followers", User.fromJSON,
-          statusCode: 200);
+      .objects("GET", "/users/$user/followers", User.fromJSON, statusCode: 200);
 
   /// Check if the current user is following the specified user.
   Future<bool> isFollowingUser(String user) =>
-      _github.request("GET", "/user/following/${user}").then((response) {
+      _github.request("GET", "/user/following/$user").then((response) {
         return response.statusCode == 204;
       });
 
   /// Check if the specified user is following target.
   Future<bool> isUserFollowing(String user, String target) =>
-      _github.request("GET", "/users/${user}/following/${target}").then((x) {
+      _github.request("GET", "/users/$user/following/$target").then((x) {
         return x.statusCode == 204;
       });
 
   /// Follows a user.
   Future<bool> followUser(String user) {
     return _github
-        .request("POST", "/user/following/${user}", statusCode: 204)
+        .request("POST", "/user/following/$user", statusCode: 204)
         .then((response) {
       return response.statusCode == 204;
     });
@@ -138,7 +139,7 @@ class UsersService extends Service {
   /// Unfollows a user.
   Future<bool> unfollowUser(String user) {
     return _github
-        .request("DELETE", "/user/following/${user}", statusCode: 204)
+        .request("DELETE", "/user/following/$user", statusCode: 204)
         .then((response) {
       return response.statusCode == 204;
     });
@@ -156,7 +157,7 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/keys/#list-public-keys-for-a-user
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
-    var path = userLogin == null ? "/user/keys" : "/users/${userLogin}/keys";
+    var path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
     return new PaginationHelper(_github)
         .objects("GET", path, PublicKey.fromJSON);
   }
@@ -167,7 +168,8 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/keys/#create-a-public-key
   Future<PublicKey> createPublicKey(CreatePublicKey key) {
-    return _github.postJSON("/user/keys", body: key.toJSON());
+    return _github.postJSON("/user/keys", body: key.toJSON())
+        as Future<PublicKey>;
   }
 
   // TODO: Implement updatePublicKey: https://developer.github.com/v3/users/keys/#update-a-public-key

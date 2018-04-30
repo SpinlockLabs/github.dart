@@ -1,4 +1,4 @@
-import "package:github/common.dart";
+import "package:github/src/common.dart";
 
 void main() {
   print(slugFromAPIUrl("https://api.github.com/repos/DirectMyFile/irc.dart"));

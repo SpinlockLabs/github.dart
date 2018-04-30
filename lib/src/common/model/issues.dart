@@ -58,10 +58,10 @@ class Issue {
   @ApiName("closed_by")
   User closedBy;
 
-  static Issue fromJSON(input) {
+  static Issue fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var labels = input['labels'];
+    var labels = input['labels'] as List<Map<String, dynamic>>;
     if (labels == null) labels = [];
 
     return new Issue()
@@ -71,16 +71,18 @@ class Issue {
       ..number = input['number']
       ..state = input['state']
       ..title = input['title']
-      ..user = User.fromJSON(input['user'])
+      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
       ..labels = labels.map(IssueLabel.fromJSON).toList(growable: false)
-      ..assignee = User.fromJSON(input['assignee'])
-      ..milestone = Milestone.fromJSON(input['milestone'])
+      ..assignee = User.fromJSON(input['assignee'] as Map<String, dynamic>)
+      ..milestone =
+          Milestone.fromJSON(input['milestone'] as Map<String, dynamic>)
       ..commentsCount = input['comments']
-      ..pullRequest = IssuePullRequest.fromJSON(input['pull_request'])
+      ..pullRequest = IssuePullRequest
+          .fromJSON(input['pull_request'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..closedAt = parseDateTime(input['closed_at'])
-      ..closedBy = User.fromJSON(input['closed_by'])
+      ..closedBy = User.fromJSON(input['closed_by'] as Map<String, dynamic>)
       ..body = input['body'];
   }
 
@@ -100,7 +102,7 @@ class IssueRequest {
   IssueRequest();
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("labels", labels, map);
@@ -125,7 +127,7 @@ class IssuePullRequest {
   @ApiName("patch_url")
   String patchUrl;
 
-  static IssuePullRequest fromJSON(input) {
+  static IssuePullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new IssuePullRequest()
@@ -155,13 +157,13 @@ class IssueComment {
   @ApiName("issue_url")
   String issueUrl;
 
-  static IssueComment fromJSON(input) {
+  static IssueComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new IssueComment()
       ..id = input['id']
       ..body = input['body']
-      ..user = User.fromJSON(input['user'])
+      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..url = input['url']
@@ -178,14 +180,18 @@ class IssueLabel {
   /// Label Color
   String color;
 
-  static IssueLabel fromJSON(input) {
+  static IssueLabel fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
+
+    assert(input['name'] != null);
+    assert(input['color'] != null);
 
     return new IssueLabel()
       ..name = input['name']
       ..color = input['color'];
   }
 
+  @override
   String toString() => 'IssueLabel: $name';
 }
 
@@ -229,7 +235,7 @@ class Milestone {
   @ApiName("due_on")
   DateTime dueOn;
 
-  static Milestone fromJSON(input) {
+  static Milestone fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Milestone()
@@ -238,7 +244,7 @@ class Milestone {
       ..state = input['state']
       ..title = input['title']
       ..description = input['description']
-      ..creator = User.fromJSON(input['creator'])
+      ..creator = User.fromJSON(input['creator'] as Map<String, dynamic>)
       ..openIssuesCount = input['open_issues']
       ..closedIssuesCount = input['closed_issues']
       ..createdAt = parseDateTime(input['created_at'])
@@ -258,7 +264,7 @@ class CreateMilestone {
   CreateMilestone(this.title);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("state", state, map);
     putValue(description, description, map);

@@ -15,7 +15,7 @@ GitHub github;
 
 void main() {
   int times = 10;
-  github = createGitHubClient(auth: new Authentication.withToken(TOKEN));
+  github = createGitHubClient(auth: new Authentication.withToken(token));
   runBenchmarks(times, {
     "Fetch Repository": fetchRepository,
     "Fetch Commits": fetchCommits

@@ -1,10 +1,13 @@
 library github.test.integration.git_integration_test;
 
+import 'dart:convert';
+
+import 'dart:io';
 import 'package:github/server.dart';
 
 import 'package:test/test.dart';
 
-main() {
+void main() {
   String firstCommitSha;
   String firstCommitTreeSha;
 
@@ -15,9 +18,9 @@ main() {
   RepositorySlug slug;
 
   setUpAll(() {
-    var authToken = '<some token>';
-    var repoOwner = '<some user/org>';
-    var repoName = '<some repo>';
+    var authToken = Platform.environment['GITHUB_API_TOKEN'];
+    var repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
+    var repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
 
     github = createGitHubClient(auth: new Authentication.withToken(authToken));
     slug = new RepositorySlug(repoOwner, repoName);
@@ -31,11 +34,11 @@ main() {
   test('get last commit of master', () async {
     var branch = await github.repositories.getBranch(slug, 'master');
     firstCommitSha = branch.commit.sha;
-    firstCommitTreeSha = branch.commit.tree.sha;
+    firstCommitTreeSha = branch.commit.commit.sha;
   });
 
   test('create and get a new blob', () async {
-    CreateGitBlob newBlob = new CreateGitBlob('bbb', 'utf-8');
+    var newBlob = new CreateGitBlob('bbb', 'utf-8');
 
     // createBlob()
     var createdBlob = await github.git.createBlob(slug, newBlob);
@@ -43,12 +46,14 @@ main() {
 
     var fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
 
-    expect(base64ToUtf8(fetchedBlob.content), equals('bbb'));
+    var base64Decoded = BASE64.decode(fetchedBlob.content);
+
+    expect(UTF8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
     expect(
         fetchedBlob.url,
         equals(
-            'https://api.github.com/repos/${slug.fullName}/git/blobs/${createdBlobSha}'));
+            'https://api.github.com/repos/${slug.fullName}/git/blobs/$createdBlobSha'));
     expect(fetchedBlob.sha, equals(createdBlobSha));
     expect(fetchedBlob.size, equals(3));
   });

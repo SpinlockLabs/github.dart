@@ -9,7 +9,7 @@ class PublicKey {
   String key;
   String title;
 
-  static PublicKey fromJSON(input) {
+  static PublicKey fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new PublicKey()
@@ -27,7 +27,7 @@ class CreatePublicKey {
   CreatePublicKey(this.title, this.key);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("key", key, map);
     return JSON.encode(map);

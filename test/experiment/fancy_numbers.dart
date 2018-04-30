@@ -1,4 +1,4 @@
-import "package:github/common.dart";
+import "package:github/src/util.dart";
 
 void main() {
   test("1k", 1000);
@@ -13,8 +13,8 @@ void main() {
 void test(String input, int expect) {
   var out = parseFancyNumber(input);
   if (out != expect) {
-    print("ERROR: ${input} was parsed as ${out} but we expected ${expect}");
+    print("ERROR: $input was parsed as $out but we expected $expect");
   } else {
-    print("${input} => ${expect}");
+    print("$input => $expect");
   }
 }

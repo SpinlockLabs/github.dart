@@ -5,7 +5,7 @@ class TrendingRepository {
   html.Element titleObject;
   String get title => titleObject.text;
 
-  String get url => "https://github.com/${title}";
+  String get url => "https://github.com/$title";
   String description;
 }
 

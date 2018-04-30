@@ -1,6 +1,11 @@
-part of github.server;
+import "dart:async";
+import "dart:convert";
+import "dart:io";
+
+import "../common.dart";
 
 class HookMiddleware {
+  // TODO: Close this, but where?
   final StreamController<HookEvent> _eventController =
       new StreamController<HookEvent>();
   Stream<HookEvent> get onEvent => _eventController.stream;
@@ -22,7 +27,8 @@ class HookMiddleware {
 
     request.transform(const Utf8Decoder()).join().then((content) {
       _eventController.add(new HookEvent.fromJSON(
-          request.headers.value("X-GitHub-Event"), JSON.decode(content)));
+          request.headers.value("X-GitHub-Event"),
+          JSON.decode(content) as Map<String, dynamic>));
       request.response
         ..write(JSON.encode({"handled": _eventController.hasListener}))
         ..close();
@@ -89,8 +95,9 @@ class RepositoryEvent extends HookEvent {
   static RepositoryEvent fromJSON(Map<String, dynamic> json) {
     return new RepositoryEvent()
       ..action = json["action"]
-      ..repository = Repository.fromJSON(json["repository"])
-      ..sender = User.fromJSON(json["sender"]);
+      ..repository =
+          Repository.fromJSON(json["repository"] as Map<String, dynamic>)
+      ..sender = User.fromJSON(json["sender"] as Map<String, dynamic>);
   }
 }
 
@@ -102,8 +109,9 @@ class IssueCommentEvent extends HookEvent {
   static IssueCommentEvent fromJSON(Map<String, dynamic> json) {
     return new IssueCommentEvent()
       ..action = json["action"]
-      ..issue = Issue.fromJSON(json["issue"])
-      ..comment = IssueComment.fromJSON(json["comment"]);
+      ..issue = Issue.fromJSON(json["issue"] as Map<String, dynamic>)
+      ..comment =
+          IssueComment.fromJSON(json["comment"] as Map<String, dynamic>);
   }
 }
 
@@ -113,8 +121,8 @@ class ForkEvent extends HookEvent {
 
   static ForkEvent fromJSON(Map<String, dynamic> json) {
     return new ForkEvent()
-      ..forkee = Repository.fromJSON(json["forkee"])
-      ..sender = User.fromJSON(json["sender"]);
+      ..forkee = Repository.fromJSON(json["forkee"] as Map<String, dynamic>)
+      ..sender = User.fromJSON(json["sender"] as Map<String, dynamic>);
   }
 }
 
@@ -129,11 +137,12 @@ class IssueEvent extends HookEvent {
   static IssueEvent fromJSON(Map<String, dynamic> json) {
     return new IssueEvent()
       ..action = json["action"]
-      ..assignee = User.fromJSON(json["assignee"])
-      ..label = IssueLabel.fromJSON(json["label"])
-      ..issue = Issue.fromJSON(json["issue"])
-      ..repository = Repository.fromJSON(json["repository"])
-      ..sender = User.fromJSON(json["sender"]);
+      ..assignee = User.fromJSON(json["assignee"] as Map<String, dynamic>)
+      ..label = IssueLabel.fromJSON(json["label"] as Map<String, dynamic>)
+      ..issue = Issue.fromJSON(json["issue"] as Map<String, dynamic>)
+      ..repository =
+          Repository.fromJSON(json["repository"] as Map<String, dynamic>)
+      ..sender = User.fromJSON(json["sender"] as Map<String, dynamic>);
   }
 }
 
@@ -148,8 +157,10 @@ class PullRequestEvent extends HookEvent {
     return new PullRequestEvent()
       ..action = json["action"]
       ..number = json["number"]
-      ..repository = Repository.fromJSON(json["repository"])
-      ..pullRequest = PullRequest.fromJSON(json["pull_request"])
-      ..sender = User.fromJSON(json["sender"]);
+      ..repository =
+          Repository.fromJSON(json["repository"] as Map<String, dynamic>)
+      ..pullRequest =
+          PullRequest.fromJSON(json["pull_request"] as Map<String, dynamic>)
+      ..sender = User.fromJSON(json["sender"] as Map<String, dynamic>);
   }
 }

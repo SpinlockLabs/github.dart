@@ -11,7 +11,7 @@ class CreateMerge {
   CreateMerge(this.base, this.head);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("base", base, map);
     putValue("head", head, map);
     putValue("commit_message", commitMessage, map);

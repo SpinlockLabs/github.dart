@@ -12,24 +12,24 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    return _github.getJSON("/emojis", statusCode: StatusCodes.OK);
+    return _github.getJSON("/emojis", statusCode: StatusCodes.OK)
+        as Future<Map<String, String>>;
   }
 
   /// Lists available .gitignore template names.
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
   Future<List<String>> listGitignoreTemplates() {
-    return _github.getJSON("/gitignore/templates");
+    return _github.getJSON("/gitignore/templates") as Future<List<String>>;
   }
 
   /// Gets a .gitignore template by [name].
   /// All template names can be fetched using [listGitignoreTemplates].
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
-  Future<GitignoreTemplate> getGitignoreTemplate(String name) {
-    return _github.getJSON("/gitignore/templates/${name}",
-        convert: GitignoreTemplate.fromJSON);
-  }
+  Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
+      _github.getJSON("/gitignore/templates/$name",
+          convert: GitignoreTemplate.fromJSON);
 
   /// Renders Markdown from the [input].
   ///
@@ -62,30 +62,29 @@ class MiscService extends Service {
   }
 
   /// Gets the GitHub API Status.
-  Future<APIStatus> getApiStatus() {
-    return _github.getJSON("https://status.github.com/api/status.json",
-        statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
-  }
+  Future<APIStatus> getApiStatus() =>
+      _github.getJSON("https://status.github.com/api/status.json",
+          statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
 
   /// Returns a stream of Octocats from Octodex.
   ///
   /// See: https://octodex.github.com/
   Stream<Octocat> listOctodex({bool cors: false}) {
-    var controller = new StreamController();
+    var controller = new StreamController<Octocat>();
 
     var u = "http://feeds.feedburner.com/Octocats.xml";
 
     _github.client
-        .request(new http.Request(
-            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}"))
+        .get(
+            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}")
         .then((response) {
-      var document = htmlParser.parse(response.body);
+      var document = html_parser.parse(response.body);
       document.querySelectorAll("entry").forEach((entry) {
         var name = entry.querySelector("title").text;
         var c = "<html><body>" +
             entry.querySelector("content").innerHtml +
             "</body></html>";
-        var content = htmlParser.parse(c);
+        var content = html_parser.parse(c);
         var image = content.querySelector("a img").attributes['src'];
         var url = entry.querySelector("link").attributes['href'];
 
@@ -102,7 +101,7 @@ class MiscService extends Service {
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {
-    var params = {};
+    var params = <String, String>{};
 
     if (text != null) {
       params["s"] = text;

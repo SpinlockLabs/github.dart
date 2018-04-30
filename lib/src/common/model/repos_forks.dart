@@ -7,7 +7,7 @@ class CreateFork {
   CreateFork([this.organization]);
 
   String toJSON() {
-    var map = {};
+    var map = <String, dynamic>{};
     putValue("organization", organization, map);
     return JSON.encode(map);
   }

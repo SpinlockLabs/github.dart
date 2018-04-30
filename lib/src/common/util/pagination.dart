@@ -1,7 +1,7 @@
 part of github.common;
 
 /// Internal Helper for dealing with GitHub Pagination.
-class PaginationHelper<T> {
+class PaginationHelper {
   final GitHub github;
 
   PaginationHelper(this.github);
@@ -76,7 +76,7 @@ class PaginationHelper<T> {
         params: params,
         body: body,
         statusCode: statusCode)) {
-      var json = response.asJSON() as List;
+      var json = JSON.decode(response.body) as List;
 
       for (var item in json) {
         yield item;
@@ -84,7 +84,7 @@ class PaginationHelper<T> {
     }
   }
 
-  Stream<T> objects(String method, String path, JSONConverter<T> converter,
+  Stream<T> objects<T>(String method, String path, JSONConverter<T> converter,
       {int pages,
       Map<String, String> headers,
       Map<String, dynamic> params,
@@ -92,11 +92,12 @@ class PaginationHelper<T> {
       int statusCode: 200,
       String preview}) {
     return jsonObjects(method, path,
-        pages: pages,
-        headers: headers,
-        params: params,
-        body: body,
-        statusCode: statusCode,
-        preview: preview).map(converter);
+            pages: pages,
+            headers: headers,
+            params: params,
+            body: body,
+            statusCode: statusCode,
+            preview: preview)
+        .map(converter);
   }
 }

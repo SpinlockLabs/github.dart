@@ -55,7 +55,7 @@ class Organization {
   @ApiName("updated_at")
   DateTime updatedAt;
 
-  static Organization fromJSON(input) {
+  static Organization fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Organization()
@@ -82,11 +82,12 @@ class OrganizationMembership {
   String state;
   Organization organization;
 
-  static OrganizationMembership fromJSON(input) {
+  static OrganizationMembership fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new OrganizationMembership()
-      ..organization = Organization.fromJSON(input['organization'])
+      ..organization =
+          Organization.fromJSON(input['organization'] as Map<String, dynamic>)
       ..state = input['state'];
   }
 }
@@ -113,7 +114,7 @@ class Team {
   /// Organization
   Organization organization;
 
-  static Team fromJSON(input) {
+  static Team fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new Team()
@@ -121,7 +122,8 @@ class Team {
       ..id = input['id']
       ..membersCount = input['members_count']
       ..reposCount = input['repos_count']
-      ..organization = Organization.fromJSON(input['organization']);
+      ..organization =
+          Organization.fromJSON(input['organization'] as Map<String, dynamic>);
   }
 }
 
@@ -159,7 +161,7 @@ class TeamMember {
   @ApiName("html_url")
   String htmlUrl;
 
-  static TeamMember fromJSON(input) {
+  static TeamMember fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     var member = new TeamMember();
@@ -178,7 +180,7 @@ class TeamRepository extends Repository {
   /// Repository Permissions.
   TeamRepositoryPermissions permissions;
 
-  static TeamRepository fromJSON(input) {
+  static TeamRepository fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new TeamRepository()
@@ -204,9 +206,10 @@ class TeamRepository extends Repository {
       ..forksCount = input['forks_count']
       ..createdAt = parseDateTime(input['created_at'])
       ..pushedAt = parseDateTime(input['pushed_at'])
-      ..owner = UserInformation.fromJSON(input['owner'])
+      ..owner = UserInformation.fromJSON(input['owner'] as Map<String, dynamic>)
       ..isPrivate = input['private']
-      ..permissions = TeamRepositoryPermissions.fromJSON(input['permissions']);
+      ..permissions = TeamRepositoryPermissions
+          .fromJSON(input['permissions'] as Map<String, dynamic>);
   }
 }
 
@@ -221,7 +224,7 @@ class TeamRepositoryPermissions {
   /// Pull Access
   bool pull;
 
-  static TeamRepositoryPermissions fromJSON(input) {
+  static TeamRepositoryPermissions fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new TeamRepositoryPermissions()

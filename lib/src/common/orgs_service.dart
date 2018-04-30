@@ -24,19 +24,17 @@ class OrganizationsService extends Service {
   /// Fetches the organization specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/orgs/#get-an-organization
-  Future<Organization> get(String name) {
-    return _github.getJSON("/orgs/${name}",
-        convert: Organization.fromJSON,
-        statusCode: StatusCodes.OK, fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        throw new OrganizationNotFound(_github, name);
-      }
-    });
-  }
+  Future<Organization> get(String name) => _github.getJSON("/orgs/$name",
+          convert: Organization.fromJSON,
+          statusCode: StatusCodes.OK, fail: (http.Response response) {
+        if (response.statusCode == 404) {
+          throw new OrganizationNotFound(_github, name);
+        }
+      });
 
   /// Fetches the organizations specified by [names].
   Stream<Organization> getMulti(List<String> names) {
-    var controller = new StreamController();
+    var controller = new StreamController<Organization>();
 
     var group = new FutureGroup();
 
@@ -72,8 +70,11 @@ class OrganizationsService extends Service {
       "description": description
     });
 
-    return _github.postJSON("/orgs/${org}",
-        statusCode: 200, convert: Organization.fromJSON, body: map);
+    return _github.postJSON("/orgs/$org",
+        statusCode: 200,
+        convert: Organization.fromJSON,
+        // TODO: This is probably wrong. Map needs to be json encoded?
+        body: map);
   }
 
   /// Lists all of the teams for the specified organization.
@@ -81,15 +82,15 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
   Stream<Team> listTeams(String orgName) {
     return new PaginationHelper(_github)
-        .objects("GET", "/orgs/${orgName}/teams", Team.fromJSON);
+        .objects("GET", "/orgs/$orgName/teams", Team.fromJSON);
   }
 
   /// Gets the team specified by the [teamId].
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
   Future<Team> getTeam(int teamId) {
-    return _github.getJSON("/teams/${teamId}",
-        convert: Organization.fromJSON, statusCode: 200);
+    return _github.getJSON("/teams/$teamId",
+        convert: Organization.fromJSON, statusCode: 200) as Future<Team>;
   }
 
   /// Creates a Team.
@@ -104,8 +105,11 @@ class OrganizationsService extends Service {
       "permission": permission
     });
 
-    return _github.postJSON("/orgs/${org}/teams",
-        statusCode: 201, convert: Team.fromJSON, body: map);
+    return _github.postJSON("/orgs/$org/teams",
+        statusCode: 201,
+        convert: Team.fromJSON,
+        // TODO: This is probably wrong, map needs to be json encoded?
+        body: map) as Future<Team>;
   }
 
   /// Edits a Team.
@@ -116,15 +120,18 @@ class OrganizationsService extends Service {
     var map = createNonNullMap(
         {"name": name, "description": description, "permission": permission});
 
-    return _github.postJSON("/teams/${teamId}",
-        statusCode: 200, convert: Team.fromJSON, body: map);
+    return _github.postJSON("/teams/$teamId",
+        statusCode: 200,
+        convert: Team.fromJSON,
+        // TODO: This is probably wrong, map needs to be json encoded?
+        body: map) as Future<Team>;
   }
 
   /// Deletes the team specified by the [teamId]
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
   Future<bool> deleteTeam(int teamId) {
-    return _github.request("DELETE", "/teams/${teamId}").then((response) {
+    return _github.request("DELETE", "/teams/$teamId").then((response) {
       return response.statusCode == 204;
     });
   }
@@ -134,11 +141,11 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-members
   Stream<TeamMember> listTeamMembers(int teamId) {
     return new PaginationHelper(_github)
-        .objects("GET", "/teams/${teamId}/members", TeamMember.fromJSON);
+        .objects("GET", "/teams/$teamId/members", TeamMember.fromJSON);
   }
 
   Future<bool> getTeamMemberStatus(int teamId, String user) {
-    return _github.getJSON("/teams/${teamId}/memberships/${user}").then((json) {
+    return _github.getJSON("/teams/$teamId/memberships/$user").then((json) {
       return json["state"];
     });
   }
@@ -149,7 +156,7 @@ class OrganizationsService extends Service {
   @deprecated
   Future<bool> addTeamMember(int teamId, String user) {
     return _github
-        .request("PUT", "/teams/${teamId}/members/${user}")
+        .request("PUT", "/teams/$teamId/members/$user")
         .then((response) {
       return response.statusCode == 204;
     });
@@ -161,7 +168,7 @@ class OrganizationsService extends Service {
   @deprecated
   Future<bool> removeMember(int teamId, String user) {
     return _github
-        .request("DELETE", "/teams/${teamId}/members/${user}")
+        .request("DELETE", "/teams/$teamId/members/$user")
         .then((response) {
       return response.statusCode == 204;
     });
@@ -171,16 +178,19 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future<TeamMembershipState> getTeamMembership(int teamId, String user) {
-    var completer = new Completer();
+    var completer = new Completer<TeamMembershipState>();
 
-    _github.getJSON("/teams/${teamId}/memberships/${user}", statusCode: 200,
+    _github
+        .getJSON("/teams/$teamId/memberships/$user",
+            statusCode: 200,
             fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        completer.complete(new TeamMembershipState(null));
-      } else {
-        _github.handleStatusCode(response);
-      }
-    }, convert: (json) => new TeamMembershipState(json['state']))
+              if (response.statusCode == 404) {
+                completer.complete(new TeamMembershipState(null));
+              } else {
+                _github.handleStatusCode(response);
+              }
+            },
+            convert: (json) => new TeamMembershipState(json['state']))
         .then(completer.complete);
 
     return completer.future;
@@ -190,17 +200,18 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future<TeamMembershipState> addTeamMembership(int teamId, String user) {
-    var completer = new Completer();
+    var completer = new Completer<TeamMembershipState>();
 
-    _github.request("POST", "/teams/${teamId}/memberships/${user}",
-        statusCode: 200, fail: (http.Response response) {
+    _github.request("POST", "/teams/$teamId/memberships/$user", statusCode: 200,
+        fail: (http.Response response) {
       if (response.statusCode == 404) {
         completer.complete(new TeamMembershipState(null));
       } else {
         _github.handleStatusCode(response);
       }
     }).then((response) {
-      return new TeamMembershipState(response.asJSON()["state"]);
+      return new TeamMembershipState(JSON.decode(response.body)["state"]);
+      // TODO: Not sure what should go here.
     }).then(completer.complete);
 
     return completer.future;
@@ -210,7 +221,7 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future removeTeamMembership(int teamId, String user) {
-    return _github.request("DELETE", "/teams/${teamId}/memberships/${user}",
+    return _github.request("DELETE", "/teams/$teamId/memberships/$user",
         statusCode: 204);
   }
 
@@ -219,7 +230,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
   Stream<Repository> listTeamRepositories(int teamId) {
     return new PaginationHelper(_github)
-        .objects("GET", "/teams/${teamId}/repos", Repository.fromJSON);
+        .objects("GET", "/teams/$teamId/repos", Repository.fromJSON);
   }
 
   /// Checks if a team manages the specified repository.
@@ -227,7 +238,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-repo
   Future<bool> isTeamRepository(int teamId, RepositorySlug slug) {
     return _github
-        .request("GET", "/teams/${teamId}/repos/${slug.fullName}")
+        .request("GET", "/teams/$teamId/repos/${slug.fullName}")
         .then((response) {
       return response.statusCode == 204;
     });
@@ -238,7 +249,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#add-team-repo
   Future<bool> addTeamRepository(int teamId, RepositorySlug slug) {
     return _github
-        .request("PUT", "/teams/${teamId}/repos/${slug.fullName}")
+        .request("PUT", "/teams/$teamId/repos/${slug.fullName}")
         .then((response) {
       return response.statusCode == 204;
     });
@@ -249,7 +260,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#remove-team-repo
   Future<bool> removeTeamRepository(int teamId, RepositorySlug slug) {
     return _github
-        .request("DELETE", "/teams/${teamId}/repos/${slug.fullName}")
+        .request("DELETE", "/teams/$teamId/repos/${slug.fullName}")
         .then((response) {
       return response.statusCode == 204;
     });
@@ -267,24 +278,24 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
   Stream<Hook> listHooks(String org) {
-    return new PaginationHelper(_github).objects(
-        "GET", "/orgs/${org}/hooks", (input) => Hook.fromJSON(org, input));
+    return new PaginationHelper(_github).objects("GET", "/orgs/$org/hooks",
+        (Map<String, dynamic> input) => Hook.fromJSON(org, input));
   }
 
   /// Fetches a single hook by [id].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
-  Future<Hook> getHook(String org, int id) {
-    return _github.getJSON("/orgs/${org}/hooks/${id}",
-        convert: (i) => Hook.fromJSON(org, i));
-  }
+  Future<Hook> getHook(String org, int id) =>
+      _github.getJSON("/orgs/$org/hooks/$id",
+          convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i));
 
   /// Creates an organization hook based on the specified [hook].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
   Future<Hook> createHook(String org, CreateHook hook) {
-    return _github.postJSON("/orgs/${org}/hooks",
-        convert: (i) => Hook.fromJSON(org, i), body: hook.toJSON());
+    return _github.postJSON("/orgs/$org/hooks",
+        convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i),
+        body: hook.toJSON()) as Future<Hook>;
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
@@ -294,15 +305,13 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#ping-a-hook
   Future<bool> pingHook(String org, int id) {
     return _github
-        .request("POST", "/orgs/${org}/hooks/${id}/pings")
+        .request("POST", "/orgs/$org/hooks/$id/pings")
         .then((response) => response.statusCode == 204);
   }
 
   /// Deletes the specified hook.
   Future<bool> deleteHook(String org, int id) {
-    return _github
-        .request("DELETE", "/orgs/${org}/hooks/${id}")
-        .then((response) {
+    return _github.request("DELETE", "/orgs/$org/hooks/$id").then((response) {
       return response.statusCode == 204;
     });
   }

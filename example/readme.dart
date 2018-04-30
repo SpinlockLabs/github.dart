@@ -4,11 +4,11 @@ import "package:github/browser.dart";
 
 import "common.dart";
 
-DivElement $readme;
+DivElement readmeDiv;
 
 void main() {
   init("readme.dart", onReady: () {
-    $readme = querySelector("#readme");
+    readmeDiv = querySelector("#readme");
     loadReadme();
   });
 }
@@ -18,5 +18,5 @@ void loadReadme() {
       .getReadme(new RepositorySlug("DirectMyFile", "github.dart"))
       .then((file) => github.misc.renderMarkdown(file.content))
       .then((html) =>
-          $readme.appendHtml(html, validator: NodeTreeSanitizer.trusted));
+          readmeDiv.appendHtml(html, validator: NodeTreeSanitizer.trusted));
 }

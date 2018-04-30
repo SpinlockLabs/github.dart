@@ -33,7 +33,7 @@ void loadUser() {
       <b>Name</b>: ${user.name}
       """);
 
-      void append(String name, value) {
+      void append(String name, dynamic value) {
         if (value != null) {
           info.appendHtml("""
             <br/>
@@ -41,6 +41,7 @@ void loadUser() {
           """);
         }
       }
+
       append("Biography", user.bio);
       append("Company", user.company);
       append("Email", user.email);

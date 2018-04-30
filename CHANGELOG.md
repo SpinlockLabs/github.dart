@@ -1,3 +1,19 @@
+## v4.0.0
+
+- Make fields in many objects read-only.
+- Initial support for comparing commits.
+
+## v3.0.0
+
+- *BREAKING* Removed a number of top-level methods from the public API.
+- *BREAKING* Removed `markdown.dart` library – use the `markdown` package instead.
+- *BREAKING* Removed the `dates.dart` library.
+
+## v2.3.2
+
+- Automatically attempt to find GitHub user information in the process environment when running on the standalone VM. 
+- Add `ref` parameter to `getReadme` method for the repository service.
+
 ## v2.3.1
 
 - Cache base64 decoded `text` property in `GitHubFile`

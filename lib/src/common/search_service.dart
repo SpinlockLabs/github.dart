@@ -17,7 +17,7 @@ class SearchService extends Service {
       params["sort"] = sort;
     }
 
-    var controller = new StreamController();
+    var controller = new StreamController<Repository>();
 
     var isFirst = true;
 
@@ -41,7 +41,9 @@ class SearchService extends Service {
 
       List<dynamic> items = input['items'];
 
-      items.map((item) => Repository.fromJSON(item)).forEach(controller.add);
+      items
+          .map((Map<String, dynamic> item) => Repository.fromJSON(item))
+          .forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -110,9 +112,9 @@ class SearchService extends Service {
       params["sort"] = sort;
     }
 
-    params["per_page"] = perPage;
+    params["per_page"] = perPage.toString();
 
-    var controller = new StreamController();
+    var controller = new StreamController<User>();
 
     var isFirst = true;
 
@@ -135,7 +137,9 @@ class SearchService extends Service {
 
       List<dynamic> items = input['items'];
 
-      items.map((item) => User.fromJSON(item)).forEach(controller.add);
+      items
+          .map((Map<String, dynamic> item) => User.fromJSON(item))
+          .forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;

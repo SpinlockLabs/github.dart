@@ -1,11 +1,12 @@
+import 'dart:async';
 import "package:github/server.dart";
 
 import "package:quiver/async.dart";
 
-main() async {
+Future main() async {
   var github = createGitHubClient();
-  
-  github.organizations.get("DirectMyFile").then((organization) {
+
+  await github.organizations.get("DirectMyFile").then((organization) {
     return github.organizations.listTeams(organization.name).toList();
   }).then((teams) {
     var group = new FutureGroup();

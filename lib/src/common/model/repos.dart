@@ -1,5 +1,42 @@
 part of github.common;
 
+@JsonSerializable(createToJson: false)
+class GitHubComparison {
+  final String url;
+
+  final String status;
+
+  @JsonKey(name: 'ahead_by')
+  final int aheadBy;
+
+  @JsonKey(name: 'behind_by')
+  final int behindBy;
+
+  @JsonKey(name: 'total_commits')
+  final int totalCommits;
+
+  GitHubComparison(
+      this.url, this.status, this.aheadBy, this.behindBy, this.totalCommits);
+
+  factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
+      _$GitHubComparisonFromJson(json);
+
+  String toString() {
+    switch (status) {
+      case 'identical':
+        return "GitHubComparison: identical";
+      case 'behind':
+        return "GitHubComparison: behind ($behindBy)";
+      case 'diverged':
+        return "GitHubComparison: diverged";
+      case 'ahead':
+        return "GitHubComparison: ahead ($aheadBy)";
+      default:
+        return "Huh??? - $status";
+    }
+  }
+}
+
 /// Model class for a repository.
 class Repository {
   /// Repository Name
@@ -90,7 +127,8 @@ class Repository {
   @ApiName("pushed_at")
   DateTime pushedAt;
 
-  static Repository fromJSON(input, [Repository instance]) {
+  static Repository fromJSON(Map<String, dynamic> input,
+      [Repository instance]) {
     if (input == null) return null;
 
     if (instance == null) instance = new Repository();
@@ -119,12 +157,14 @@ class Repository {
       ..createdAt = parseDateTime(input['created_at'])
       ..pushedAt = parseDateTime(input['pushed_at'])
       ..isPrivate = input['private']
-      ..owner = UserInformation.fromJSON(input['owner']);
+      ..owner =
+          UserInformation.fromJSON(input['owner'] as Map<String, dynamic>);
   }
 
   /// Gets the Repository Slug (Full Name).
   RepositorySlug slug() => new RepositorySlug(owner.login, name);
 
+  @override
   String toString() => 'Repository: ${owner.login}/$name';
 }
 
@@ -150,7 +190,7 @@ class CloneUrls {
   /// https://github.com/user/repo
   String svn;
 
-  static CloneUrls fromJSON(input) {
+  static CloneUrls fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new CloneUrls()
@@ -161,66 +201,98 @@ class CloneUrls {
   }
 }
 
+@JsonSerializable(createToJson: false)
 class Tag {
-  String name;
-  CommitInfo commit;
-  String zipUrl;
-  String tarUrl;
+  final String name;
+  final CommitInfo commit;
 
-  static Tag fromJSON(input) {
-    if (input == null) {
-      return null;
-    }
+  @JsonKey(name: 'zipball_url')
+  final String zipUrl;
+  @JsonKey(name: 'tarball_url')
+  final String tarUrl;
 
-    return new Tag()
-      ..name = input['name']
-      ..commit = CommitInfo.fromJson(input['commit'])
-      ..tarUrl = input['tarball_url']
-      ..zipUrl = input['zipball_url'];
-  }
+  Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 
+  factory Tag.fromJson(Map<String, dynamic> input) =>
+      input == null ? null : _$TagFromJson(input);
+
+  @override
   String toString() => 'Tag: $name';
 }
 
+@JsonSerializable(createToJson: false)
+class CommitData {
+  final String sha;
+  final GitCommit commit;
+
+  @JsonKey(name: "url")
+  final String url;
+
+  @JsonKey(name: "html_url")
+  final String htmlUrl;
+
+  @JsonKey(name: "comments_url")
+  final String commentsUrl;
+
+  final CommitDataUser author, committer;
+  final List<Map<String, dynamic>> parents;
+
+  CommitData(this.sha, this.commit, this.url, this.htmlUrl, this.commentsUrl,
+      this.author, this.committer, this.parents);
+
+  factory CommitData.fromJson(Map<String, dynamic> json) =>
+      _$CommitDataFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class CommitDataUser {
+  final String login, type;
+
+  final int id;
+
+  CommitDataUser(this.login, this.id, this.type);
+
+  factory CommitDataUser.fromJson(Map<String, dynamic> json) =>
+      _$CommitDataUserFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
 class CommitInfo {
-  String sha;
-  GitTree tree;
+  final String sha;
+  final GitTree tree;
 
-  static CommitInfo fromJson(input) {
-    if (input == null) {
-      return null;
-    }
+  CommitInfo(this.sha, this.tree);
 
-    return new CommitInfo()
-      ..sha = input['sha']
-      ..tree = GitTree.fromJSON(input['commit']['tree']);
-  }
+  factory CommitInfo.fromJson(Map<String, dynamic> json) =>
+      _$CommitInfoFromJson(json);
 }
 
 /// User Information
+@JsonSerializable(createToJson: false)
 class UserInformation {
   /// Owner Username
-  String login;
+  final String login;
 
   /// Owner ID
-  int id;
+  final int id;
 
   /// Avatar Url
-  @ApiName("avatar_url")
-  String avatarUrl;
+  @JsonKey(name: "avatar_url")
+  final String avatarUrl;
 
   /// Url to the user's GitHub Profile
-  @ApiName("html_url")
-  String htmlUrl;
+  @JsonKey(name: "html_url")
+  final String htmlUrl;
 
-  static UserInformation fromJSON(input) {
+  UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);
+
+  factory UserInformation.fromJson(Map<String, dynamic> json) =>
+      _$UserInformationFromJson(json);
+
+  static UserInformation fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new UserInformation()
-      ..login = input['login']
-      ..id = input['id']
-      ..avatarUrl = input['avatar_url']
-      ..htmlUrl = input['html_url'];
+    return new UserInformation.fromJson(input);
   }
 }
 
@@ -245,15 +317,17 @@ class RepositorySlug {
   /// The Full Name of the Repository
   ///
   /// Example: owner/name
-  String get fullName => "${owner}/${name}";
+  String get fullName => "$owner/$name";
 
+  @override
   bool operator ==(Object obj) =>
       obj is RepositorySlug && obj.fullName == fullName;
 
+  @override
   int get hashCode => fullName.hashCode;
 
   @override
-  String toString() => "${owner}/${name}";
+  String toString() => "$owner/$name";
 }
 
 /// Model class for a new repository to be created.
@@ -319,21 +393,22 @@ class CreateRepository {
 }
 
 /// Model class for a branch.
+@JsonSerializable(createToJson: false)
 class Branch {
   /// The name of the branch.
-  String name;
+  final String name;
 
   /// Commit Information
-  CommitInfo commit;
+  final CommitData commit;
 
-  static Branch fromJSON(input) {
+  Branch(this.name, this.commit);
+
+  factory Branch.fromJson(Map<String, dynamic> json) => _$BranchFromJson(json);
+
+  static Branch fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var branch = new Branch()
-      ..name = input['name']
-      ..commit = CommitInfo.fromJson(input['commit']);
-
-    return branch;
+    return new Branch.fromJson(input);
   }
 }
 
@@ -362,7 +437,7 @@ class LanguageBreakdown {
 
   /// Creates a list of lists with a tuple of the language name and the bytes.
   List<List<dynamic>> toList() {
-    var out = [];
+    var out = <List<dynamic>>[];
     for (var key in info.keys) {
       out.add([key, info[key]]);
     }
@@ -373,7 +448,7 @@ class LanguageBreakdown {
   String toString() {
     var buffer = new StringBuffer();
     _data.forEach((key, value) {
-      buffer.writeln("${key}: ${value}");
+      buffer.writeln("$key: $value");
     });
     return buffer.toString();
   }
