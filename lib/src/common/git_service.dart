@@ -21,7 +21,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/blobs',
         convert: GitBlob.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: blob.toJSON()) as Future<GitBlob>;
+        body: blob.toJSON());
   }
 
   /// Fetches a commit from [slug] for a given [sha].
@@ -38,7 +38,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/commits',
         convert: GitCommit.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: commit.toJSON()) as Future<GitCommit>;
+        body: commit.toJSON());
   }
 
   /// Fetches a reference from a repository for the given [ref].
@@ -78,7 +78,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/refs',
         convert: GitReference.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: JSON.encode({'ref': ref, 'sha': sha})) as Future<GitReference>;
+        body: JSON.encode({'ref': ref, 'sha': sha}));
   }
 
   /// Updates a reference in a repository.
@@ -149,6 +149,6 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/trees',
         convert: (j) => new GitTree.fromJson(j),
         statusCode: StatusCodes.CREATED,
-        body: tree.toJSON()) as Future<GitTree>;
+        body: tree.toJSON());
   }
 }

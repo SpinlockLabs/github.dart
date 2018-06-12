@@ -204,12 +204,12 @@ class GitHub {
   /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
-  Future<T> getJSON<T>(String path,
+  Future<T> getJSON<S, T>(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
-      JSONConverter<T> convert,
+      JSONConverter<S, T> convert,
       String preview}) async {
     if (headers == null) headers = {};
 
@@ -218,7 +218,7 @@ class GitHub {
     }
 
     if (convert == null) {
-      convert = (input) => input;
+      convert = (input) => input as T;
     }
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
@@ -261,12 +261,12 @@ class GitHub {
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
   /// [body] is the data to send to the server.
-  Future<dynamic> postJSON(String path,
+  Future<T> postJSON<S, T>(String path,
       {int statusCode,
       void fail(http.Response response),
       Map<String, String> headers,
       Map<String, String> params,
-      JSONConverter convert,
+      JSONConverter<S, T> convert,
       String body,
       String preview}) async {
     if (headers == null) headers = {};
@@ -276,7 +276,7 @@ class GitHub {
     }
 
     if (convert == null) {
-      convert = (input) => input;
+      convert = (input) => input as T;
     }
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");

@@ -68,9 +68,7 @@ class GistsService extends Service {
     map["files"] = f;
 
     return _github.postJSON("/gists",
-        statusCode: 201,
-        body: JSON.encode(map),
-        convert: Gist.fromJSON) as Future<Gist>;
+        statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
   /// Deletes the specified Gist.
@@ -102,9 +100,7 @@ class GistsService extends Service {
     }
 
     return _github.postJSON("/gists/$id",
-        statusCode: 200,
-        body: JSON.encode(map),
-        convert: Gist.fromJSON) as Future<Gist>;
+        statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
@@ -164,8 +160,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return _github.postJSON("/gists/$gistId/comments",
-        body: request.toJSON(),
-        convert: GistComment.fromJSON) as Future<GistComment>;
+        body: request.toJSON(), convert: GistComment.fromJSON);
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment

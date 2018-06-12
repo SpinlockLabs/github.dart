@@ -42,8 +42,7 @@ class PullRequestsService extends Service {
   Future<PullRequestInformation> create(
       RepositorySlug slug, CreatePullRequest request) {
     return _github.postJSON("/repos/${slug.fullName}/pulls",
-        convert: PullRequestInformation.fromJSON,
-        body: request.toJSON()) as Future<PullRequestInformation>;
+        convert: PullRequestInformation.fromJSON, body: request.toJSON());
   }
 
   /// Edit a pull request.

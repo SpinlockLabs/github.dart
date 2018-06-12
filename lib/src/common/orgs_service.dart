@@ -109,7 +109,7 @@ class OrganizationsService extends Service {
         statusCode: 201,
         convert: Team.fromJSON,
         // TODO: This is probably wrong, map needs to be json encoded?
-        body: map) as Future<Team>;
+        body: map);
   }
 
   /// Edits a Team.
@@ -124,7 +124,7 @@ class OrganizationsService extends Service {
         statusCode: 200,
         convert: Team.fromJSON,
         // TODO: This is probably wrong, map needs to be json encoded?
-        body: map) as Future<Team>;
+        body: map);
   }
 
   /// Deletes the team specified by the [teamId]
@@ -295,7 +295,7 @@ class OrganizationsService extends Service {
   Future<Hook> createHook(String org, CreateHook hook) {
     return _github.postJSON("/orgs/$org/hooks",
         convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i),
-        body: hook.toJSON()) as Future<Hook>;
+        body: hook.toJSON());
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
