@@ -21,11 +21,9 @@ void loadCat() {
     var index = random.nextInt(cats.length);
     var cat = cats[index];
     print("Selected Octocat at ${index} (${cat.name})");
-    $octocat.appendHtml(
-        """
+    $octocat.appendHtml("""
     <h2>${cat.name}</h2>
     <a class="center" href="${cat.url}"><img src="${cat.image}"></img></a>
-    """,
-        treeSanitizer: NodeTreeSanitizer.trusted);
+    """, treeSanitizer: NodeTreeSanitizer.trusted);
   });
 }
