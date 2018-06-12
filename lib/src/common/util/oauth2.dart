@@ -72,7 +72,7 @@ class OAuth2Flow {
       headers['Origin'] = origin;
     }
 
-    var body = JSON.encode({
+    var body = jsonEncode({
       "client_id": clientId,
       "client_secret": clientSecret,
       "code": code,
@@ -82,7 +82,7 @@ class OAuth2Flow {
     return (github == null ? new http.Client() : github.client)
         .post("$baseUrl/access_token", body: body, headers: headers)
         .then((response) {
-      var json = JSON.decode(response.body) as Map<String, dynamic>;
+      var json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
         throw json;
       }

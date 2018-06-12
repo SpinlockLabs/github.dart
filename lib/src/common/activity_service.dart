@@ -147,7 +147,7 @@ class ActivityService extends Service {
     if (lastRead != null) data["last_read_at"] = lastRead.toIso8601String();
 
     return _github
-        .request("PUT", "/notifications", body: JSON.encode(data))
+        .request("PUT", "/notifications", body: jsonEncode(data))
         .then((response) {
       return response.statusCode == 205;
     });
@@ -165,7 +165,7 @@ class ActivityService extends Service {
 
     return _github
         .request("PUT", "/repos/${slug.fullName}/notifications",
-            body: JSON.encode(data))
+            body: jsonEncode(data))
         .then((response) {
       return response.statusCode == 205;
     });
@@ -280,7 +280,7 @@ class ActivityService extends Service {
     return _github.postJSON("/repos/${slug.fullName}/subscription",
         statusCode: StatusCodes.OK,
         convert: RepositorySubscription.fromJSON,
-        body: map);
+        body: jsonEncode(map));
   }
 
   /// Deletes a Repository Subscription
@@ -326,7 +326,7 @@ class EventPoller {
 
       _lastFetched = response.headers['ETag'];
 
-      var json = JSON.decode(response.body) as List<Map<String, dynamic>>;
+      var json = jsonDecode(response.body) as List<Map<String, dynamic>>;
 
       if (!(onlyNew && _timer == null)) {
         for (var item in json) {

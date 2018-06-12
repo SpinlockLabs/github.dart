@@ -129,7 +129,7 @@ class IssuesService extends Service {
         .request("PATCH", '/repos/${slug.fullName}/issues/$issueNumber',
             body: issue.toJSON())
         .then((response) {
-      return Issue.fromJSON(JSON.decode(response.body) as Map<String, dynamic>)
+      return Issue.fromJSON(jsonDecode(response.body) as Map<String, dynamic>)
           as Future<Issue>;
     });
   }
@@ -154,7 +154,7 @@ class IssuesService extends Service {
       throw new GitHubError(_github, response.body);
     }
 
-    return Issue.fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+    return Issue.fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   /// Lists all available assignees (owners and collaborators) to which issues
@@ -206,7 +206,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/comments/#create-a-comment
   Future<IssueComment> createComment(
       RepositorySlug slug, int issueNumber, String body) {
-    var it = JSON.encode({"body": body});
+    var it = jsonEncode({"body": body});
     return _github.postJSON(
         '/repos/${slug.fullName}/issues/$issueNumber/comments',
         body: it,
@@ -248,7 +248,7 @@ class IssuesService extends Service {
   Future<IssueLabel> createLabel(
       RepositorySlug slug, String name, String color) {
     return _github.postJSON("/repos/${slug.fullName}/labels",
-        body: JSON.encode({"name": name, "color": color}),
+        body: jsonEncode({"name": name, "color": color}),
         convert: IssueLabel.fromJSON);
   }
 
@@ -257,7 +257,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
     return _github.postJSON("/repos/${slug.fullName}/labels/$name",
-        body: JSON.encode({"name": name, "color": color}),
+        body: jsonEncode({"name": name, "color": color}),
         convert: IssueLabel.fromJSON);
   }
 
@@ -288,7 +288,7 @@ class IssuesService extends Service {
       RepositorySlug slug, int issueNumber, List<String> labels) {
     return _github.postJSON(
             "/repos/${slug.fullName}/issues/$issueNumber/labels",
-            body: JSON.encode(labels),
+            body: jsonEncode(labels),
             convert: (input) =>
                 input.map((Map<String, dynamic> it) => IssueLabel.fromJSON(it)))
         as Future<List<IssueLabel>>;
@@ -301,10 +301,9 @@ class IssuesService extends Service {
       RepositorySlug slug, int issueNumber, List<String> labels) {
     return _github
         .request("PUT", "/repos/${slug.fullName}/issues/$issueNumber/labels",
-            body: JSON.encode(labels))
+            body: jsonEncode(labels))
         .then((response) {
-      return JSON
-          .decode(response.body)
+      return jsonDecode(response.body)
           .map((Map<String, dynamic> it) => IssueLabel.fromJSON(it));
     });
   }
@@ -347,7 +346,7 @@ class IssuesService extends Service {
   Future<Milestone> createMilestone(
       RepositorySlug slug, CreateMilestone request) {
     return _github.postJSON("/repos/${slug.fullName}/milestones",
-        body: JSON.encode(request.toJSON()), convert: Milestone.fromJSON);
+        body: jsonEncode(request.toJSON()), convert: Milestone.fromJSON);
   }
 
   // TODO: Implement editMilestone: https://developer.github.com/v3/issues/milestones/#update-a-milestone

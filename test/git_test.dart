@@ -1,7 +1,7 @@
 library github.test.git_test;
 
 import 'dart:async';
-import 'dart:convert' show JSON;
+import 'dart:convert' show jsonEncode, jsonDecode;
 
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
@@ -116,7 +116,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/refs',
           convert: GitReference.fromJSON,
           statusCode: StatusCodes.CREATED,
-          body: JSON.encode({'ref': someRef, 'sha': someSha})));
+          body: jsonEncode({'ref': someRef, 'sha': someSha})));
     });
 
     test('creates valid JSON body', () {
@@ -160,7 +160,7 @@ void main() {
               body: captureAny, headers: typed(captureAny, named: 'headers')))
           .captured;
 
-      var body = JSON.decode(captured[0]);
+      var body = jsonDecode(captured[0]);
       var headers = captured[1];
 
       expect(body['sha'], equals(someSha));
@@ -296,6 +296,6 @@ Map<String, dynamic> captureSentBody(MockGitHub github) {
       .captured
       .single;
 
-  var body = JSON.decode(bodyString) as Map<String, dynamic>;
+  var body = jsonDecode(bodyString) as Map<String, dynamic>;
   return body;
 }

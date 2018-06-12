@@ -46,9 +46,9 @@ void main() {
 
     var fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
 
-    var base64Decoded = BASE64.decode(fetchedBlob.content);
+    var base64Decoded = base64Decode(fetchedBlob.content);
 
-    expect(UTF8.decode(base64Decoded), equals('bbb'));
+    expect(utf8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
     expect(
         fetchedBlob.url,

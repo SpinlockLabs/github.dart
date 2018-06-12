@@ -43,11 +43,11 @@ void warmup() {
 }
 
 Future<Map<String, List<Stopwatch>>> runBenchmarks(
-    int times, Map<String, Benchmark> benchmarks) {
+    int times, Map<String, Benchmark> benchmarks) async {
   warmup();
 
   var group = new FutureGroup();
-  var results = {};
+  var results = <String, List<Stopwatch>>{};
   benchmarks.forEach((String name, Benchmark benchmark) {
     results[name] = [];
     for (var i = 0; i < times; i++) {
@@ -57,7 +57,7 @@ Future<Map<String, List<Stopwatch>>> runBenchmarks(
     }
   });
 
-  return group.future.then((_) {
-    return results;
-  });
+  await group.future;
+
+  return results;
 }

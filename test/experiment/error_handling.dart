@@ -8,7 +8,7 @@ import '../helper.dart';
 void main() {
   var github = createGitHubClient();
   var response = new MockResponse(
-      JSON.encode({
+      jsonEncode({
         "message": "Invalid Entity",
         "errors": [
           {"resource": "Issue", "field": "body", "code": "not_found"}

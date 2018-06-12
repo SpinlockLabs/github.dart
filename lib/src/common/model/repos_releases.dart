@@ -160,6 +160,6 @@ class CreateRelease {
     putValue("body", body, map);
     putValue("draft", draft, map);
     putValue("release", release, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

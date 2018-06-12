@@ -67,7 +67,7 @@ class RepositoriesService extends Service {
     return new PaginationHelper(_github)
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
         .expand((http.Response response) {
-      var list = JSON.decode(response.body) as List<Map<String, dynamic>>;
+      var list = jsonDecode(response.body) as List<Map<String, dynamic>>;
 
       return list.map((Map<String, dynamic> it) => Repository.fromJSON(it));
     });
@@ -142,9 +142,7 @@ class RepositoriesService extends Service {
       "default_branch": "defaultBranch"
     });
     return _github.postJSON("/repos/${repo.fullName}",
-        // TODO: data probably needs to be json encoded?
-        body: data,
-        statusCode: 200) as Future<Repository>;
+        body: jsonEncode(data), statusCode: 200) as Future<Repository>;
   }
 
   /// Deletes a repository.
@@ -348,7 +346,7 @@ class RepositoriesService extends Service {
             body: file.toJSON())
         .then((response) {
       return ContentCreation
-          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -362,8 +360,7 @@ class RepositoriesService extends Service {
         {"message": message, "content": content, "sha": sha, "branch": branch});
 
     return _github.postJSON("/repos/${slug.fullName}/contents/$path",
-        // TODO: map probably needs to be json encoded
-        body: map,
+        body: jsonEncode(map),
         statusCode: 200,
         convert: ContentCreation.fromJSON);
   }
@@ -378,10 +375,10 @@ class RepositoriesService extends Service {
 
     return _github
         .request("DELETE", "/repos/${slug.fullName}/contents/$path",
-            body: JSON.encode(map), statusCode: 200)
+            body: jsonEncode(map), statusCode: 200)
         .then((response) {
       return ContentCreation
-          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

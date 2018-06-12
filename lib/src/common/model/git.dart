@@ -30,7 +30,7 @@ class CreateGitBlob {
   CreateGitBlob(this.content, this.encoding);
 
   String toJSON() {
-    return JSON.encode({"content": content, "encoding": encoding});
+    return jsonEncode({"content": content, "encoding": encoding});
   }
 }
 
@@ -123,7 +123,7 @@ class CreateGitCommit {
       putValue('author', author.toMap(), map);
     }
 
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 
@@ -216,7 +216,7 @@ class CreateGitTree {
           'tree', entries.map((e) => e.toMap()).toList(growable: false), map);
     }
 
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 
@@ -302,7 +302,7 @@ class CreateGitTag {
     putValue('type', type, map);
     putValue('tagger', tagger.toMap(), map);
 
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 

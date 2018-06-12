@@ -3,7 +3,8 @@
 library github.common;
 
 import "dart:async";
-import "dart:convert" show BASE64, JSON, UTF8, LineSplitter;
+import "dart:convert"
+    show base64Decode, base64Encode, jsonEncode, jsonDecode, LineSplitter, utf8;
 
 import "package:html/dom.dart" as html;
 import "package:html/parser.dart" as html_parser;

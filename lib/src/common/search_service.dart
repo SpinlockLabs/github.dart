@@ -33,7 +33,7 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = JSON.decode(response.body);
+      var input = jsonDecode(response.body);
 
       if (input['items'] == null) {
         return;
@@ -79,7 +79,7 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = JSON.decode(response.body);
+      var input = jsonDecode(response.body);
 
       if (input['items'] == null) {
         return;

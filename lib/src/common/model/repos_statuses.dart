@@ -65,6 +65,6 @@ class CreateStatus {
     putValue("target_url", targetUrl, map);
     putValue("description", description, map);
     putValue("context", context, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

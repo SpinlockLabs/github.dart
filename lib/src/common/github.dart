@@ -227,14 +227,14 @@ class GitHub {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
       var userAndPass =
-          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
     var response = await request("GET", path,
         headers: headers, params: params, statusCode: statusCode, fail: fail);
 
-    var json = JSON.decode(response.body);
+    var json = jsonDecode(response.body);
 
     if (convert == null) {
       return json;
@@ -285,7 +285,7 @@ class GitHub {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
       var userAndPass =
-          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 
@@ -295,7 +295,7 @@ class GitHub {
         body: body,
         statusCode: statusCode,
         fail: fail);
-    return convert(JSON.decode(response.body));
+    return convert(jsonDecode(response.body));
   }
 
   ///
@@ -305,7 +305,7 @@ class GitHub {
     String message;
     List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
-      var json = JSON.decode(response.body);
+      var json = jsonDecode(response.body);
       message = json['message'];
       errors = json['errors'] as List<Map<String, String>>;
     }
@@ -369,7 +369,7 @@ class GitHub {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
       var userAndPass =
-          BASE64.encode(UTF8.encode('${auth.username}:${auth.password}'));
+          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
 

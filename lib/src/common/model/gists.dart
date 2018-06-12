@@ -172,6 +172,6 @@ class CreateGistComment {
   String toJSON() {
     var map = <String, dynamic>{};
     map['body'] = body;
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

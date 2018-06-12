@@ -30,6 +30,6 @@ class CreatePublicKey {
     var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("key", key, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

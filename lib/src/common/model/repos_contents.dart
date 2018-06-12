@@ -38,7 +38,7 @@ class GitHubFile {
   /// Text Content
   String get text {
     if (_text == null) {
-      _text = UTF8.decode(BASE64.decode(content));
+      _text = utf8.decode(base64Decode(content));
     }
     return _text;
   }
@@ -121,7 +121,7 @@ class CreateFile {
     putValue("content", content, map);
     putValue("branch", branch, map);
     putValue("committer", committer != null ? committer.toMap() : null, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 
