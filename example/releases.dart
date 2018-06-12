@@ -19,13 +19,11 @@ void loadReleases() {
       .toList()
       .then((releases) {
     for (var release in releases) {
-      releasesDiv.appendHtml(
-          """
+      releasesDiv.appendHtml("""
       <div class="repo box" id="release-${release.id}">
         <h1>${release.name}</h1>
       </div>
-      """,
-          treeSanitizer: NodeTreeSanitizer.trusted);
+      """, treeSanitizer: NodeTreeSanitizer.trusted);
       var rel = releasesDiv.querySelector("#release-${release.id}");
       void append(String key, String value) {
         if (value == null) return;
