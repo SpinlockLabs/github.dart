@@ -84,7 +84,8 @@ class PaginationHelper {
     }
   }
 
-  Stream<T> objects<T>(String method, String path, JSONConverter<T> converter,
+  Stream<T> objects<S, T>(
+      String method, String path, JSONConverter<S, T> converter,
       {int pages,
       Map<String, String> headers,
       Map<String, dynamic> params,

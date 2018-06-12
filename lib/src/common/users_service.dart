@@ -38,7 +38,7 @@ class UsersService extends Service {
         // TODO: map probably needs to be JSON encoded.
         body: map,
         statusCode: 200,
-        convert: CurrentUser.fromJSON) as Future<CurrentUser>;
+        convert: CurrentUser.fromJSON);
   }
 
   /// Fetches a list of users specified by [names].

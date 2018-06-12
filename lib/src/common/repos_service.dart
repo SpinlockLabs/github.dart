@@ -82,12 +82,10 @@ class RepositoriesService extends Service {
       {String org}) {
     if (org != null) {
       return _github.postJSON('/orgs/$org/repos',
-          body: repository.toJSON(),
-          convert: TeamRepository.fromJSON) as Future<Repository>;
+          body: repository.toJSON(), convert: TeamRepository.fromJSON);
     } else {
       return _github.postJSON('/user/repos',
-          body: repository.toJSON(),
-          convert: Repository.fromJSON) as Future<Repository>;
+          body: repository.toJSON(), convert: Repository.fromJSON);
     }
   }
 
@@ -183,7 +181,7 @@ class RepositoriesService extends Service {
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages",
           statusCode: StatusCodes.OK,
-          convert: (Map<String, int> input) => new LanguageBreakdown(input));
+          convert: (input) => new LanguageBreakdown(input));
 
   /// Lists the tags of the specified repository.
   ///
@@ -367,7 +365,7 @@ class RepositoriesService extends Service {
         // TODO: map probably needs to be json encoded
         body: map,
         statusCode: 200,
-        convert: ContentCreation.fromJSON) as Future<ContentCreation>;
+        convert: ContentCreation.fromJSON);
   }
 
   /// Deletes the specified file.
@@ -413,8 +411,7 @@ class RepositoriesService extends Service {
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) {
     if (fork == null) fork = new CreateFork();
     return _github.postJSON("/repos/${slug.fullName}/forks",
-        body: fork.toJSON(),
-        convert: Repository.fromJSON) as Future<Repository>;
+        body: fork.toJSON(), convert: Repository.fromJSON);
   }
 
   /// Lists the hooks of the specified repository.
@@ -440,7 +437,7 @@ class RepositoriesService extends Service {
   Future<Hook> createHook(RepositorySlug slug, CreateHook hook) {
     return _github.postJSON("/repos/${slug.fullName}/hooks",
         convert: (Map<String, dynamic> i) => Hook.fromJSON(slug.fullName, i),
-        body: hook.toJSON()) as Future<Hook>;
+        body: hook.toJSON());
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/repos/hooks/#edit-a-hook
@@ -501,7 +498,7 @@ class RepositoriesService extends Service {
     return _github.postJSON("/repos/${slug.fullName}/merges",
         body: merge.toJSON(),
         convert: RepositoryCommit.fromJSON,
-        statusCode: 201) as Future<RepositoryCommit>;
+        statusCode: 201);
   }
 
   /// Fetches the GitHub pages information for the specified repository.
@@ -625,8 +622,7 @@ class RepositoriesService extends Service {
   Future<RepositoryStatus> createStatus(
       RepositorySlug slug, String ref, CreateStatus request) {
     return _github.postJSON("/repos/${slug.fullName}/statuses/$ref",
-        body: request.toJSON(),
-        convert: RepositoryStatus.fromJSON) as Future<RepositoryStatus>;
+        body: request.toJSON(), convert: RepositoryStatus.fromJSON);
   }
 
   /// Gets a Combined Status for the specified repository and ref.

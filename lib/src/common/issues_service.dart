@@ -211,7 +211,7 @@ class IssuesService extends Service {
         '/repos/${slug.fullName}/issues/$issueNumber/comments',
         body: it,
         convert: IssueComment.fromJSON,
-        statusCode: StatusCodes.CREATED) as Future<IssueComment>;
+        statusCode: StatusCodes.CREATED);
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/issues/comments/#edit-a-comment
@@ -249,7 +249,7 @@ class IssuesService extends Service {
       RepositorySlug slug, String name, String color) {
     return _github.postJSON("/repos/${slug.fullName}/labels",
         body: JSON.encode({"name": name, "color": color}),
-        convert: IssueLabel.fromJSON) as Future<IssueLabel>;
+        convert: IssueLabel.fromJSON);
   }
 
   /// Edits a label.
@@ -258,7 +258,7 @@ class IssuesService extends Service {
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
     return _github.postJSON("/repos/${slug.fullName}/labels/$name",
         body: JSON.encode({"name": name, "color": color}),
-        convert: IssueLabel.fromJSON) as Future<IssueLabel>;
+        convert: IssueLabel.fromJSON);
   }
 
   /// Deletes a label.
@@ -347,8 +347,7 @@ class IssuesService extends Service {
   Future<Milestone> createMilestone(
       RepositorySlug slug, CreateMilestone request) {
     return _github.postJSON("/repos/${slug.fullName}/milestones",
-        body: JSON.encode(request.toJSON()),
-        convert: Milestone.fromJSON) as Future<Milestone>;
+        body: JSON.encode(request.toJSON()), convert: Milestone.fromJSON);
   }
 
   // TODO: Implement editMilestone: https://developer.github.com/v3/issues/milestones/#update-a-milestone

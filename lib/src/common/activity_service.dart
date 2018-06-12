@@ -280,7 +280,7 @@ class ActivityService extends Service {
     return _github.postJSON("/repos/${slug.fullName}/subscription",
         statusCode: StatusCodes.OK,
         convert: RepositorySubscription.fromJSON,
-        body: map) as Future<RepositorySubscription>;
+        body: map);
   }
 
   /// Deletes a Repository Subscription
