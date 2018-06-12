@@ -1,11 +1,5 @@
-build/
+.dart_tool
+.packages
 .pub
 packages
 pubspec.lock
-.packages
-.idea/
-.settings
-.buildlog
-out/
-*.iml
-.c9*
