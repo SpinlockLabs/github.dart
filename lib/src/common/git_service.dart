@@ -78,7 +78,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/refs',
         convert: GitReference.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: JSON.encode({'ref': ref, 'sha': sha}));
+        body: jsonEncode({'ref': ref, 'sha': sha}));
   }
 
   /// Updates a reference in a repository.
@@ -87,7 +87,7 @@ class GitService extends Service {
   Future<GitReference> editReference(
       RepositorySlug slug, String ref, String sha,
       {bool force: false}) {
-    String body = JSON.encode({'sha': sha, 'force': force});
+    String body = jsonEncode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
     var headers = {'content-length': body.length.toString()};
 
@@ -96,7 +96,7 @@ class GitService extends Service {
             body: body, headers: headers)
         .then((response) {
       return GitReference
-          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

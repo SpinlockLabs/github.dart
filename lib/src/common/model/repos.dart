@@ -376,7 +376,7 @@ class CreateRepository {
   CreateRepository(this.name);
 
   String toJSON() {
-    return JSON.encode({
+    return jsonEncode({
       "name": name,
       "description": description,
       "homepage": homepage,

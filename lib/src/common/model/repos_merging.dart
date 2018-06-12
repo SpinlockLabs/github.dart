@@ -15,6 +15,6 @@ class CreateMerge {
     putValue("base", base, map);
     putValue("head", head, map);
     putValue("commit_message", commitMessage, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

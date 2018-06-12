@@ -35,10 +35,7 @@ class UsersService extends Service {
     });
 
     return _github.postJSON("/user",
-        // TODO: map probably needs to be JSON encoded.
-        body: map,
-        statusCode: 200,
-        convert: CurrentUser.fromJSON);
+        body: jsonEncode(map), statusCode: 200, convert: CurrentUser.fromJSON);
   }
 
   /// Fetches a list of users specified by [names].
@@ -99,14 +96,14 @@ class UsersService extends Service {
   Stream<UserEmail> addEmails(List<String> emails) =>
       new PaginationHelper(_github).objects(
           "POST", "/user/emails", UserEmail.fromJSON,
-          statusCode: 201, body: JSON.encode(emails));
+          statusCode: 201, body: jsonEncode(emails));
 
   /// Delete Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#delete-email-addresses
   Future<bool> deleteEmails(List<String> emails) => _github
       .request("DELETE", "/user/emails",
-          body: JSON.encode(emails), statusCode: 204)
+          body: jsonEncode(emails), statusCode: 204)
       .then((x) => x.statusCode == 204);
 
   /// List user followers.

@@ -2,6 +2,8 @@
 
 - Make fields in many objects read-only.
 - Initial support for comparing commits.
+- Require at least Dart `2.0.0-dev.36`.
+- Fix a number of type issues dealing with JSON.
 
 ## v3.0.0
 

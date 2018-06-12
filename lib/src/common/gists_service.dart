@@ -68,7 +68,7 @@ class GistsService extends Service {
     map["files"] = f;
 
     return _github.postJSON("/gists",
-        statusCode: 201, body: JSON.encode(map), convert: Gist.fromJSON);
+        statusCode: 201, body: jsonEncode(map), convert: Gist.fromJSON);
   }
 
   /// Deletes the specified Gist.
@@ -100,7 +100,7 @@ class GistsService extends Service {
     }
 
     return _github.postJSON("/gists/$id",
-        statusCode: 200, body: JSON.encode(map), convert: Gist.fromJSON);
+        statusCode: 200, body: jsonEncode(map), convert: Gist.fromJSON);
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
@@ -139,7 +139,7 @@ class GistsService extends Service {
     return _github
         .request("POST", "/gists/$id/forks", statusCode: 201)
         .then((response) {
-      return Gist.fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+      return Gist.fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

@@ -64,7 +64,7 @@ class CreateHook {
       {this.events: const ["push"], this.active: true});
 
   String toJSON() {
-    return JSON.encode(
+    return jsonEncode(
         {"name": name, "config": config, "events": events, "active": active});
   }
 }

@@ -202,7 +202,7 @@ class CreatePullRequest {
     putValue("head", head, map);
     putValue("base", base, map);
     putValue("body", body, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 
@@ -281,7 +281,7 @@ class CreatePullRequestComment {
     putValue("commit_id", commitId, map);
     putValue("path", path, map);
     putValue("position", position, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 

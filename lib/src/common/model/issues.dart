@@ -109,7 +109,7 @@ class IssueRequest {
     putValue("assignee", assignee, map);
     putValue("state", state, map);
     putValue("milestone", milestone, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }
 
@@ -269,6 +269,6 @@ class CreateMilestone {
     putValue("state", state, map);
     putValue(description, description, map);
     putValue("due_on", dateToGitHubIso8601(dueOn), map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

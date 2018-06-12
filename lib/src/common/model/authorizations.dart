@@ -69,6 +69,6 @@ class CreateAuthorization {
     putValue("note_url", noteUrl, map);
     putValue("client_id", clientID, map);
     putValue("client_secret", clientSecret, map);
-    return JSON.encode(map);
+    return jsonEncode(map);
   }
 }

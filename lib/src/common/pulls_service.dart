@@ -25,7 +25,7 @@ class PullRequestsService extends Service {
     putValue("state", state, params);
 
     return new PaginationHelper(_github).objects("GET",
-        "/repos/${slug.fullName}/pulls?state=${state}", PullRequest.fromJSON,
+        "/repos/${slug.fullName}/pulls?state=$state", PullRequest.fromJSON,
         pages: pages, params: params);
   }
 
@@ -57,10 +57,10 @@ class PullRequestsService extends Service {
 
     return _github
         .request("POST", '/repos/${slug.fullName}/pulls/$number',
-            body: JSON.encode(map))
+            body: jsonEncode(map))
         .then((response) {
       return PullRequest
-          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -102,10 +102,10 @@ class PullRequestsService extends Service {
 
     return _github
         .request("PUT", "/repos/${slug.fullName}/pulls/$number/merge",
-            body: JSON.encode(json))
+            body: jsonEncode(json))
         .then((response) {
       return PullRequestMerge
-          .fromJSON(JSON.decode(response.body) as Map<String, dynamic>);
+          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
