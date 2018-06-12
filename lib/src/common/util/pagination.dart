@@ -57,7 +57,7 @@ class PaginationHelper {
     } while (true);
   }
 
-  Stream jsonObjects(String method, String path,
+  Stream<T> jsonObjects<T>(String method, String path,
       {int pages,
       Map<String, String> headers,
       Map<String, dynamic> params,
@@ -79,7 +79,7 @@ class PaginationHelper {
       var json = jsonDecode(response.body) as List;
 
       for (var item in json) {
-        yield item;
+        yield item as T;
       }
     }
   }

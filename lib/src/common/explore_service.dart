@@ -61,7 +61,7 @@ class ExploreService extends Service {
       var description = page.querySelector(".collection-description");
 
       // TODO: This is most likely wrong
-      showcase.description = description;
+      showcase.description = description.text;
       showcase.lastUpdated = lastUpdated;
       showcase.title = title;
       showcase.items = [];
