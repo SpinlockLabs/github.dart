@@ -3,7 +3,7 @@
 part of github.common;
 
 // **************************************************************************
-// Generator: JsonSerializableGenerator
+// JsonSerializableGenerator
 // **************************************************************************
 
 GitTree _$GitTreeFromJson(Map<String, dynamic> json) {
