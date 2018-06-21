@@ -333,8 +333,8 @@ class RepositoriesService extends Service {
         }
         contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
       } else {
-        contents.tree = (input as List<Map<String, dynamic>>)
-            .map((Map<String, dynamic> it) => GitHubFile.fromJSON(it))
+        contents.tree = (input as List)
+            .map((it) => GitHubFile.fromJSON(it))
             .toList();
       }
       return contents;

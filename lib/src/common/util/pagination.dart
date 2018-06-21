@@ -92,7 +92,7 @@ class PaginationHelper {
       String body,
       int statusCode: 200,
       String preview}) {
-    return jsonObjects(method, path,
+    return jsonObjects<S>(method, path,
             pages: pages,
             headers: headers,
             params: params,
