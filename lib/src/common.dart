@@ -10,7 +10,6 @@ import "package:html/dom.dart" as html;
 import "package:html/parser.dart" as html_parser;
 import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
-import "package:quiver/async.dart" show FutureGroup;
 import "package:json_annotation/json_annotation.dart";
 import "package:xml/xml.dart" as xml;
 

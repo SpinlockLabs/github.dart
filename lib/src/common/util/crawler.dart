@@ -7,29 +7,19 @@ class RepositoryCrawler {
 
   RepositoryCrawler(this.github, this.slug);
 
-  Stream<GitHubFile> crawl() {
-    var controller = new StreamController<GitHubFile>();
+  Stream<GitHubFile> crawl() async* {
+    Stream<GitHubFile> scan(String path) async* {
+      var contents = await github.repositories.getContents(slug, path);
 
-    var group = new FutureGroup();
-
-    void scan(String path) {
-      group.add(github.repositories.getContents(slug, path).then((contents) {
-        contents.tree.where((it) => it.type != "dir").forEach(controller.add);
-
-        contents.tree.where((it) {
-          return it.type == "dir";
-        }).forEach((file) {
-          scan(file.path);
-        });
-      }));
+      for (var content in contents.tree) {
+        if (content.type == 'dir') {
+          yield* scan(content.path);
+        } else {
+          yield content;
+        }
+      }
     }
 
-    group.future.then((_) {
-      return controller.close();
-    });
-
-    scan("/");
-
-    return controller.stream;
+    yield* scan("/");
   }
 }

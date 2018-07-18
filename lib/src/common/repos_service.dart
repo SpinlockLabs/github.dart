@@ -106,22 +106,11 @@ class RepositoriesService extends Service {
       });
 
   /// Fetches a list of repositories specified by [slugs].
-  Stream<Repository> getRepositories(List<RepositorySlug> slugs) {
-    var controller = new StreamController<Repository>();
-
-    var group = new FutureGroup();
-
+  Stream<Repository> getRepositories(List<RepositorySlug> slugs) async* {
     for (var slug in slugs) {
-      group.add(getRepository(slug).then((repo) {
-        controller.add(repo);
-      }));
+      var repo = await getRepository(slug);
+      yield repo;
     }
-
-    group.future.then((_) {
-      controller.close();
-    });
-
-    return controller.stream;
   }
 
   /// Edit a Repository.
@@ -333,9 +322,8 @@ class RepositoriesService extends Service {
         }
         contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
       } else {
-        contents.tree = (input as List)
-            .map((it) => GitHubFile.fromJSON(it))
-            .toList();
+        contents.tree =
+            (input as List).map((it) => GitHubFile.fromJSON(it)).toList();
       }
       return contents;
     });
@@ -349,8 +337,8 @@ class RepositoriesService extends Service {
         .request("PUT", "/repos/${slug.fullName}/contents/${file.path}",
             body: file.toJSON())
         .then((response) {
-      return ContentCreation
-          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return ContentCreation.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -381,8 +369,8 @@ class RepositoriesService extends Service {
         .request("DELETE", "/repos/${slug.fullName}/contents/$path",
             body: jsonEncode(map), statusCode: 200)
         .then((response) {
-      return ContentCreation
-          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return ContentCreation.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

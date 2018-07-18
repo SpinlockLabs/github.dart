@@ -33,22 +33,11 @@ class OrganizationsService extends Service {
       });
 
   /// Fetches the organizations specified by [names].
-  Stream<Organization> getMulti(List<String> names) {
-    var controller = new StreamController<Organization>();
-
-    var group = new FutureGroup();
-
+  Stream<Organization> getMulti(List<String> names) async* {
     for (var name in names) {
-      group.add(get(name).then((org) {
-        controller.add(org);
-      }));
+      var org = await get(name);
+      yield org;
     }
-
-    group.future.then((_) {
-      controller.close();
-    });
-
-    return controller.stream;
   }
 
   /// Edits an Organization
