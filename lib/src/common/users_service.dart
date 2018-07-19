@@ -39,22 +39,11 @@ class UsersService extends Service {
   }
 
   /// Fetches a list of users specified by [names].
-  Stream<User> getUsers(List<String> names, {int pages}) {
-    var controller = new StreamController<User>();
-
-    var group = new FutureGroup();
-
+  Stream<User> getUsers(List<String> names, {int pages}) async* {
     for (var name in names) {
-      group.add(getUser(name).then((user) {
-        controller.add(user);
-      }));
+      var user = await getUser(name);
+      yield user;
     }
-
-    group.future.then((_) {
-      controller.close();
-    });
-
-    return controller.stream;
   }
 
   /// Fetches the currently authenticated user.
