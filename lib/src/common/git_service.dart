@@ -95,8 +95,8 @@ class GitService extends Service {
         .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',
             body: body, headers: headers)
         .then((response) {
-      return GitReference
-          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return GitReference.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

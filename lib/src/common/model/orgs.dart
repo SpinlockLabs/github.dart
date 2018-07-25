@@ -208,8 +208,8 @@ class TeamRepository extends Repository {
       ..pushedAt = parseDateTime(input['pushed_at'])
       ..owner = UserInformation.fromJSON(input['owner'] as Map<String, dynamic>)
       ..isPrivate = input['private']
-      ..permissions = TeamRepositoryPermissions
-          .fromJSON(input['permissions'] as Map<String, dynamic>);
+      ..permissions = TeamRepositoryPermissions.fromJSON(
+          input['permissions'] as Map<String, dynamic>);
   }
 }
 

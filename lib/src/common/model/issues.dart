@@ -77,8 +77,8 @@ class Issue {
       ..milestone =
           Milestone.fromJSON(input['milestone'] as Map<String, dynamic>)
       ..commentsCount = input['comments']
-      ..pullRequest = IssuePullRequest
-          .fromJSON(input['pull_request'] as Map<String, dynamic>)
+      ..pullRequest = IssuePullRequest.fromJSON(
+          input['pull_request'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..closedAt = parseDateTime(input['closed_at'])
