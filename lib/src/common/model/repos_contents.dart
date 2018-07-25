@@ -70,7 +70,7 @@ class GitHubFile {
 }
 
 @JsonSerializable()
-class Links extends Object with _$LinksSerializerMixin {
+class Links {
   final Uri self;
   final Uri git;
   final Uri html;
@@ -82,6 +82,8 @@ class Links extends Object with _$LinksSerializerMixin {
 
     return _$LinksFromJson(input);
   }
+
+  Map<String, dynamic> toJson() => _$LinksToJson(this);
 }
 
 /// Model class for a file or directory.

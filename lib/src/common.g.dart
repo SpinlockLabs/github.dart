@@ -118,36 +118,22 @@ LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) {
           : new LicenseKind.fromJson(json['license'] as Map<String, dynamic>));
 }
 
-abstract class _$LicenseDetailsSerializerMixin {
-  String get name;
-  String get path;
-  String get sha;
-  int get size;
-  Uri get url;
-  Uri get htmlUrl;
-  Uri get gitUrl;
-  Uri get downloadUrl;
-  String get type;
-  String get content;
-  String get encoding;
-  Links get links;
-  LicenseKind get license;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'name': name,
-        'path': path,
-        'sha': sha,
-        'size': size,
-        'url': url?.toString(),
-        'html_url': htmlUrl?.toString(),
-        'git_url': gitUrl?.toString(),
-        'download_url': downloadUrl?.toString(),
-        'type': type,
-        'content': content,
-        'encoding': encoding,
-        '_links': links,
-        'license': license
-      };
-}
+Map<String, dynamic> _$LicenseDetailsToJson(LicenseDetails instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'path': instance.path,
+      'sha': instance.sha,
+      'size': instance.size,
+      'url': instance.url?.toString(),
+      'html_url': instance.htmlUrl?.toString(),
+      'git_url': instance.gitUrl?.toString(),
+      'download_url': instance.downloadUrl?.toString(),
+      'type': instance.type,
+      'content': instance.content,
+      'encoding': instance.encoding,
+      '_links': instance.links,
+      'license': instance.license
+    };
 
 LicenseKind _$LicenseKindFromJson(Map<String, dynamic> json) {
   return new LicenseKind(
@@ -158,20 +144,14 @@ LicenseKind _$LicenseKindFromJson(Map<String, dynamic> json) {
       nodeId: json['node_id'] as String);
 }
 
-abstract class _$LicenseKindSerializerMixin {
-  String get key;
-  String get name;
-  String get spdxId;
-  Uri get url;
-  String get nodeId;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'key': key,
-        'name': name,
-        'spdx_id': spdxId,
-        'url': url?.toString(),
-        'node_id': nodeId
-      };
-}
+Map<String, dynamic> _$LicenseKindToJson(LicenseKind instance) =>
+    <String, dynamic>{
+      'key': instance.key,
+      'name': instance.name,
+      'spdx_id': instance.spdxId,
+      'url': instance.url?.toString(),
+      'node_id': instance.nodeId
+    };
 
 Links _$LinksFromJson(Map<String, dynamic> json) {
   return new Links(
@@ -180,13 +160,8 @@ Links _$LinksFromJson(Map<String, dynamic> json) {
       html: json['html'] == null ? null : Uri.parse(json['html'] as String));
 }
 
-abstract class _$LinksSerializerMixin {
-  Uri get self;
-  Uri get git;
-  Uri get html;
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'self': self?.toString(),
-        'git': git?.toString(),
-        'html': html?.toString()
-      };
-}
+Map<String, dynamic> _$LinksToJson(Links instance) => <String, dynamic>{
+      'self': instance.self?.toString(),
+      'git': instance.git?.toString(),
+      'html': instance.html?.toString()
+    };
