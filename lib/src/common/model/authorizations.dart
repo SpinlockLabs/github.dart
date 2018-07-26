@@ -22,8 +22,8 @@ class Authorization {
       ..id = input['id']
       ..scopes = input['scopes'] as List<String>
       ..token = input['token']
-      ..app = AuthorizationApplication
-          .fromJSON(input['app'] as Map<String, dynamic>)
+      ..app = AuthorizationApplication.fromJSON(
+          input['app'] as Map<String, dynamic>)
       ..note = input['note']
       ..noteUrl = input['note_url']
       ..createdAt = parseDateTime(input['created_at'])

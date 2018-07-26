@@ -455,7 +455,7 @@ class LanguageBreakdown {
 }
 
 @JsonSerializable()
-class LicenseDetails extends Object with _$LicenseDetailsSerializerMixin {
+class LicenseDetails {
   final String name;
   final String path;
   final String sha;
@@ -495,10 +495,12 @@ class LicenseDetails extends Object with _$LicenseDetailsSerializerMixin {
 
   factory LicenseDetails.fromJson(Map<String, dynamic> json) =>
       _$LicenseDetailsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LicenseDetailsToJson(this);
 }
 
 @JsonSerializable()
-class LicenseKind extends Object with _$LicenseKindSerializerMixin {
+class LicenseKind {
   final String key;
   final String name;
 
@@ -513,4 +515,6 @@ class LicenseKind extends Object with _$LicenseKindSerializerMixin {
 
   factory LicenseKind.fromJson(Map<String, dynamic> json) =>
       _$LicenseKindFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LicenseKindToJson(this);
 }

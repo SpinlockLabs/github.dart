@@ -59,8 +59,8 @@ class PullRequestsService extends Service {
         .request("POST", '/repos/${slug.fullName}/pulls/$number',
             body: jsonEncode(map))
         .then((response) {
-      return PullRequest
-          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return PullRequest.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
@@ -104,8 +104,8 @@ class PullRequestsService extends Service {
         .request("PUT", "/repos/${slug.fullName}/pulls/$number/merge",
             body: jsonEncode(json))
         .then((response) {
-      return PullRequestMerge
-          .fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return PullRequestMerge.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
