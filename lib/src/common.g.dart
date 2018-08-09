@@ -7,19 +7,19 @@ part of github.common;
 // **************************************************************************
 
 GitTree _$GitTreeFromJson(Map<String, dynamic> json) {
-  return new GitTree(
+  return GitTree(
       json['sha'] as String,
       json['url'] as String,
       json['truncated'] as bool,
       (json['tree'] as List)
           ?.map((e) => e == null
               ? null
-              : new GitTreeEntry.fromJson(e as Map<String, dynamic>))
+              : GitTreeEntry.fromJson(e as Map<String, dynamic>))
           ?.toList());
 }
 
 GitTreeEntry _$GitTreeEntryFromJson(Map<String, dynamic> json) {
-  return new GitTreeEntry(
+  return GitTreeEntry(
       json['path'] as String,
       json['mode'] as String,
       json['type'] as String,
@@ -29,7 +29,7 @@ GitTreeEntry _$GitTreeEntryFromJson(Map<String, dynamic> json) {
 }
 
 GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
-  return new GitHubComparison(
+  return GitHubComparison(
       json['url'] as String,
       json['status'] as String,
       json['ahead_by'] as int,
@@ -38,62 +38,61 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
 }
 
 Tag _$TagFromJson(Map<String, dynamic> json) {
-  return new Tag(
+  return Tag(
       json['name'] as String,
       json['commit'] == null
           ? null
-          : new CommitInfo.fromJson(json['commit'] as Map<String, dynamic>),
+          : CommitInfo.fromJson(json['commit'] as Map<String, dynamic>),
       json['zipball_url'] as String,
       json['tarball_url'] as String);
 }
 
 CommitData _$CommitDataFromJson(Map<String, dynamic> json) {
-  return new CommitData(
+  return CommitData(
       json['sha'] as String,
-      json['commit'] == null ? null : new GitCommit.fromJson(json['commit']),
+      json['commit'] == null ? null : GitCommit.fromJson(json['commit']),
       json['url'] as String,
       json['html_url'] as String,
       json['comments_url'] as String,
       json['author'] == null
           ? null
-          : new CommitDataUser.fromJson(json['author'] as Map<String, dynamic>),
+          : CommitDataUser.fromJson(json['author'] as Map<String, dynamic>),
       json['committer'] == null
           ? null
-          : new CommitDataUser.fromJson(
-              json['committer'] as Map<String, dynamic>),
+          : CommitDataUser.fromJson(json['committer'] as Map<String, dynamic>),
       (json['parents'] as List)
           ?.map((e) => e as Map<String, dynamic>)
           ?.toList());
 }
 
 CommitDataUser _$CommitDataUserFromJson(Map<String, dynamic> json) {
-  return new CommitDataUser(
+  return CommitDataUser(
       json['login'] as String, json['id'] as int, json['type'] as String);
 }
 
 CommitInfo _$CommitInfoFromJson(Map<String, dynamic> json) {
-  return new CommitInfo(
+  return CommitInfo(
       json['sha'] as String,
       json['tree'] == null
           ? null
-          : new GitTree.fromJson(json['tree'] as Map<String, dynamic>));
+          : GitTree.fromJson(json['tree'] as Map<String, dynamic>));
 }
 
 UserInformation _$UserInformationFromJson(Map<String, dynamic> json) {
-  return new UserInformation(json['login'] as String, json['id'] as int,
+  return UserInformation(json['login'] as String, json['id'] as int,
       json['avatar_url'] as String, json['html_url'] as String);
 }
 
 Branch _$BranchFromJson(Map<String, dynamic> json) {
-  return new Branch(
+  return Branch(
       json['name'] as String,
       json['commit'] == null
           ? null
-          : new CommitData.fromJson(json['commit'] as Map<String, dynamic>));
+          : CommitData.fromJson(json['commit'] as Map<String, dynamic>));
 }
 
 LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) {
-  return new LicenseDetails(
+  return LicenseDetails(
       name: json['name'] as String,
       path: json['path'] as String,
       sha: json['sha'] as String,
@@ -112,10 +111,10 @@ LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) {
       encoding: json['encoding'] as String,
       links: json['_links'] == null
           ? null
-          : new Links.fromJson(json['_links'] as Map<String, dynamic>),
+          : Links.fromJson(json['_links'] as Map<String, dynamic>),
       license: json['license'] == null
           ? null
-          : new LicenseKind.fromJson(json['license'] as Map<String, dynamic>));
+          : LicenseKind.fromJson(json['license'] as Map<String, dynamic>));
 }
 
 Map<String, dynamic> _$LicenseDetailsToJson(LicenseDetails instance) =>
@@ -136,7 +135,7 @@ Map<String, dynamic> _$LicenseDetailsToJson(LicenseDetails instance) =>
     };
 
 LicenseKind _$LicenseKindFromJson(Map<String, dynamic> json) {
-  return new LicenseKind(
+  return LicenseKind(
       key: json['key'] as String,
       name: json['name'] as String,
       spdxId: json['spdx_id'] as String,
@@ -154,7 +153,7 @@ Map<String, dynamic> _$LicenseKindToJson(LicenseKind instance) =>
     };
 
 Links _$LinksFromJson(Map<String, dynamic> json) {
-  return new Links(
+  return Links(
       git: json['git'] == null ? null : Uri.parse(json['git'] as String),
       self: json['self'] == null ? null : Uri.parse(json['self'] as String),
       html: json['html'] == null ? null : Uri.parse(json['html'] as String));
