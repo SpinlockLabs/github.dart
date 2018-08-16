@@ -1,18 +1,11 @@
 part of github.common;
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class GitHubComparison {
   final String url;
-
   final String status;
-
-  @JsonKey(name: 'ahead_by')
   final int aheadBy;
-
-  @JsonKey(name: 'behind_by')
   final int behindBy;
-
-  @JsonKey(name: 'total_commits')
   final int totalCommits;
 
   GitHubComparison(
@@ -205,7 +198,6 @@ class CloneUrls {
 class Tag {
   final String name;
   final CommitInfo commit;
-
   @JsonKey(name: 'zipball_url')
   final String zipUrl;
   @JsonKey(name: 'tarball_url')
@@ -220,18 +212,12 @@ class Tag {
   String toString() => 'Tag: $name';
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class CommitData {
   final String sha;
   final GitCommit commit;
-
-  @JsonKey(name: "url")
   final String url;
-
-  @JsonKey(name: "html_url")
   final String htmlUrl;
-
-  @JsonKey(name: "comments_url")
   final String commentsUrl;
 
   final CommitDataUser author, committer;
@@ -268,7 +254,7 @@ class CommitInfo {
 }
 
 /// User Information
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class UserInformation {
   /// Owner Username
   final String login;
@@ -277,11 +263,9 @@ class UserInformation {
   final int id;
 
   /// Avatar Url
-  @JsonKey(name: "avatar_url")
   final String avatarUrl;
 
   /// Url to the user's GitHub Profile
-  @JsonKey(name: "html_url")
   final String htmlUrl;
 
   UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);
@@ -454,7 +438,7 @@ class LanguageBreakdown {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class LicenseDetails {
   final String name;
   final String path;
@@ -462,11 +446,8 @@ class LicenseDetails {
   final int size;
   final Uri url;
 
-  @JsonKey(name: 'html_url')
   final Uri htmlUrl;
-  @JsonKey(name: 'git_url')
   final Uri gitUrl;
-  @JsonKey(name: 'download_url')
   final Uri downloadUrl;
 
   final String type;
@@ -499,16 +480,12 @@ class LicenseDetails {
   Map<String, dynamic> toJson() => _$LicenseDetailsToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class LicenseKind {
   final String key;
   final String name;
-
-  @JsonKey(name: 'spdx_id')
   final String spdxId;
   final Uri url;
-
-  @JsonKey(name: 'node_id')
   final String nodeId;
 
   LicenseKind({this.key, this.name, this.spdxId, this.url, this.nodeId});

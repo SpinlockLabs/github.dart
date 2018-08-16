@@ -133,8 +133,7 @@ void main() {
       // given
       http.Response expectedResponse = new http.Response('{}', 200);
 
-      when(github.request(any, any,
-              body: any, headers: typed(any, named: 'headers')))
+      when(github.request(any, any, body: any, headers: any))
           .thenReturn(new Future.value(expectedResponse));
 
       // when
@@ -142,22 +141,21 @@ void main() {
 
       // then
       verify(github.request('PATCH', '/repos/o/n/git/refs/heads/b',
-          headers: typed(any, named: 'headers'), body: any));
+          headers: any, body: any));
     });
 
     test('creates valid JSON body', () {
       // given
       http.Response expectedResponse = new http.Response('{}', 200);
-      when(github.request(any, any,
-              body: any, headers: typed(any, named: 'headers')))
+      when(github.request(any, any, body: any, headers: any))
           .thenReturn(new Future.value(expectedResponse));
 
       // when
       git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
-      var captured = verify(github.request(any, any,
-              body: captureAny, headers: typed(captureAny, named: 'headers')))
+      var captured = verify(
+              github.request(any, any, body: captureAny, headers: captureAny))
           .captured;
 
       var body = jsonDecode(captured[0]);
