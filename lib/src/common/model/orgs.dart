@@ -176,60 +176,31 @@ class TeamMember {
 }
 
 /// Model class for a team repository.
+@JsonSerializable(createToJson: false)
 class TeamRepository extends Repository {
   /// Repository Permissions.
   TeamRepositoryPermissions permissions;
 
   static TeamRepository fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-
-    return new TeamRepository()
-      ..name = input['name']
-      ..id = input['id']
-      ..fullName = input['full_name']
-      ..isFork = input['fork']
-      ..htmlUrl = input['html_url']
-      ..description = input['description']
-      ..cloneUrls = CloneUrls.fromJSON(input)
-      ..homepage = input['homepage']
-      ..size = input['size']
-      ..stargazersCount = input['stargazers_count']
-      ..watchersCount = input['watchers_count']
-      ..language = input['language']
-      ..hasIssues = input['has_issues']
-      ..hasDownloads = input['has_downloads']
-      ..hasWiki = input['has_wiki']
-      ..defaultBranch = input['default_branch']
-      ..openIssuesCount = input['open_issues_count']
-      ..networkCount = input['network_count']
-      ..subscribersCount = input['subscribers_count']
-      ..forksCount = input['forks_count']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..pushedAt = parseDateTime(input['pushed_at'])
-      ..owner = UserInformation.fromJSON(input['owner'] as Map<String, dynamic>)
-      ..isPrivate = input['private']
-      ..permissions = TeamRepositoryPermissions.fromJSON(
-          input['permissions'] as Map<String, dynamic>);
+    return _$TeamRepositoryFromJson(input);
   }
 }
 
 /// Model class for team repository permissions.
+@JsonSerializable(createToJson: false)
 class TeamRepositoryPermissions {
   /// Administrative Access
-  bool admin;
+  final bool admin;
 
   /// Push Access
-  bool push;
+  final bool push;
 
   /// Pull Access
-  bool pull;
+  final bool pull;
 
-  static TeamRepositoryPermissions fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  TeamRepositoryPermissions(this.admin, this.push, this.pull);
 
-    return new TeamRepositoryPermissions()
-      ..admin = input['admin']
-      ..push = input['push']
-      ..pull = input['pull'];
-  }
+  factory TeamRepositoryPermissions.fromJson(Map<String, dynamic> json) =>
+      _$TeamRepositoryPermissionsFromJson(json);
 }

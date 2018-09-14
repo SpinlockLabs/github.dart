@@ -27,16 +27,3 @@ class SearchResults<T> {
     return results;
   }
 }
-
-abstract class SearchResult {
-  int score;
-}
-
-class RepositorySearchResult extends Repository with SearchResult {
-  static RepositorySearchResult fromJSON(Map<String, dynamic> input) {
-    var result = new RepositorySearchResult();
-    Repository.fromJSON(input, result);
-    result.score = input['score'];
-    return result;
-  }
-}

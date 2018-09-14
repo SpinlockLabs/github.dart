@@ -31,6 +31,7 @@ class GitHubComparison {
 }
 
 /// Model class for a repository.
+@JsonSerializable(createToJson: false)
 class Repository {
   /// Repository Name
   String name;
@@ -120,38 +121,9 @@ class Repository {
   @JsonKey(name: "pushed_at")
   DateTime pushedAt;
 
-  static Repository fromJSON(Map<String, dynamic> input,
-      [Repository instance]) {
+  static Repository fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-
-    if (instance == null) instance = new Repository();
-
-    return instance
-      ..name = input['name']
-      ..id = input['id']
-      ..fullName = input['full_name']
-      ..isFork = input['fork']
-      ..htmlUrl = input['html_url']
-      ..description = input['description']
-      ..cloneUrls = CloneUrls.fromJSON(input)
-      ..homepage = input['homepage']
-      ..size = input['size']
-      ..stargazersCount = input['stargazers_count']
-      ..watchersCount = input['watchers_count']
-      ..language = input['language']
-      ..hasIssues = input['has_issues']
-      ..hasDownloads = input['has_downloads']
-      ..hasWiki = input['has_wiki']
-      ..defaultBranch = input['default_branch']
-      ..openIssuesCount = input['open_issues_count']
-      ..networkCount = input['network_count']
-      ..subscribersCount = input['subscribers_count']
-      ..forksCount = input['forks_count']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..pushedAt = parseDateTime(input['pushed_at'])
-      ..isPrivate = input['private']
-      ..owner =
-          UserInformation.fromJSON(input['owner'] as Map<String, dynamic>);
+    return _$RepositoryFromJson(input);
   }
 
   /// Gets the Repository Slug (Full Name).
@@ -162,36 +134,32 @@ class Repository {
 }
 
 /// Repository Clone Urls
+@JsonSerializable(createToJson: false)
 class CloneUrls {
   /// Git Protocol
   ///
   /// git://github.com/user/repo.git
-  String git;
+  final String git;
 
   /// SSH Protocol
   ///
   /// git@github.com:user/repo.git
-  String ssh;
+  final String ssh;
 
   /// HTTPS Protocol
   ///
   /// https://github.com/user/repo.git
-  String https;
+  final String https;
 
   /// Subversion Protocol
   ///
   /// https://github.com/user/repo
-  String svn;
+  final String svn;
 
-  static CloneUrls fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  CloneUrls(this.git, this.ssh, this.https, this.svn);
 
-    return new CloneUrls()
-      ..git = input['git_url']
-      ..ssh = input['ssh_url']
-      ..https = input['clone_url']
-      ..svn = input['svn_url'];
-  }
+  factory CloneUrls.fromJson(Map<String, dynamic> json) =>
+      _$CloneUrlsFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -272,12 +240,6 @@ class UserInformation {
 
   factory UserInformation.fromJson(Map<String, dynamic> json) =>
       _$UserInformationFromJson(json);
-
-  static UserInformation fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return new UserInformation.fromJson(input);
-  }
 }
 
 /// A Repository Slug
