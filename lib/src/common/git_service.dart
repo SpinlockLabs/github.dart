@@ -21,7 +21,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/blobs',
         convert: GitBlob.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: blob.toJSON());
+        body: jsonEncode(blob));
   }
 
   /// Fetches a commit from [slug] for a given [sha].
@@ -38,7 +38,7 @@ class GitService extends Service {
     return _github.postJSON('/repos/${slug.fullName}/git/commits',
         convert: GitCommit.fromJSON,
         statusCode: StatusCodes.CREATED,
-        body: commit.toJSON());
+        body: jsonEncode(commit));
   }
 
   /// Fetches a reference from a repository for the given [ref].

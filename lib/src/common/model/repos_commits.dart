@@ -53,7 +53,7 @@ class RepositoryCommit {
 
     if (input['parents'] != null) {
       commit.parents = (input['parents'] as List<Map<String, dynamic>>)
-          .map((parent) => GitCommit.fromJSON(parent))
+          .map((parent) => GitCommit.fromJson(parent))
           .toList();
     }
 
