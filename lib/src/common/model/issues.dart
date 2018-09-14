@@ -8,7 +8,7 @@ class Issue {
   String url;
 
   /// Url to the Issue Page
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Issue Number
@@ -33,29 +33,29 @@ class Issue {
   Milestone milestone;
 
   /// Number of Comments
-  @ApiName("comments")
+  @JsonKey(name: "comments")
   int commentsCount;
 
   /// A Pull Request
-  @ApiName("pull_request")
+  @JsonKey(name: "pull_request")
   IssuePullRequest pullRequest;
 
   /// Time that the issue was created at
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The time that the issue was closed at
-  @ApiName("closed_at")
+  @JsonKey(name: "closed_at")
   DateTime closedAt;
 
   /// The time that the issue was updated at
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   String body;
 
   /// The user who closed the issue
-  @ApiName("closed_by")
+  @JsonKey(name: "closed_by")
   User closedBy;
 
   static Issue fromJSON(Map<String, dynamic> input) {
@@ -116,15 +116,15 @@ class IssueRequest {
 /// Model class for a pull request for an issue.
 class IssuePullRequest {
   /// Url to the Page for this Issue Pull Request
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Diff Url
-  @ApiName("diff_url")
+  @JsonKey(name: "diff_url")
   String diffUrl;
 
   /// Patch Url
-  @ApiName("patch_url")
+  @JsonKey(name: "patch_url")
   String patchUrl;
 
   static IssuePullRequest fromJSON(Map<String, dynamic> input) {
@@ -151,10 +151,10 @@ class IssueComment {
 
   String url;
 
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
-  @ApiName("issue_url")
+  @JsonKey(name: "issue_url")
   String issueUrl;
 
   static IssueComment fromJSON(Map<String, dynamic> input) {
@@ -216,23 +216,23 @@ class Milestone {
   User creator;
 
   /// Number of Open Issues
-  @ApiName("open_issues")
+  @JsonKey(name: "open_issues")
   int openIssuesCount;
 
   /// Number of Closed Issues
-  @ApiName("closed_issues")
+  @JsonKey(name: "closed_issues")
   int closedIssuesCount;
 
   /// Time the milestone was created at
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The last time the milestone was updated at
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   /// The due date for this milestone
-  @ApiName("due_on")
+  @JsonKey(name: "due_on")
   DateTime dueOn;
 
   static Milestone fromJSON(Map<String, dynamic> input) {

@@ -6,7 +6,7 @@ class Hook {
   List<String> events;
 
   /// Content Type
-  @ApiName("config/content_type")
+  @JsonKey(name: "config/content_type")
   String contentType;
 
   /// If the hook is active
@@ -19,11 +19,11 @@ class Hook {
   String name;
 
   /// The time the hook was created
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The last time the hook was updated
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   /// The Repository Name

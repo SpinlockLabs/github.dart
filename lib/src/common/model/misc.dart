@@ -43,13 +43,13 @@ class RateLimit {
 class APIStatus {
   String status;
 
-  @ApiName("last_updated")
+  @JsonKey(name: "last_updated")
   DateTime lastUpdatedAt;
 
-  @ApiName("created_on")
+  @JsonKey(name: "created_on")
   DateTime createdOn;
 
-  @ApiName("body")
+  @JsonKey(name: "body")
   String message;
 
   static APIStatus fromJSON(Map<String, dynamic> input) {

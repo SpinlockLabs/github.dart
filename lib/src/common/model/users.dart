@@ -11,15 +11,15 @@ class User {
   int id;
 
   /// Avatar URL
-  @ApiName("avatar_url")
+  @JsonKey(name: "avatar_url")
   String avatarUrl;
 
   /// Url to this user's profile.
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// If the user is a site administrator
-  @ApiName("site_admin")
+  @JsonKey(name: "site_admin")
   bool siteAdmin;
 
   /// User's Name
@@ -44,27 +44,27 @@ class User {
   String bio;
 
   /// Number of public repositories that this user has
-  @ApiName("public_repos")
+  @JsonKey(name: "public_repos")
   int publicReposCount;
 
   /// Number of public gists that this user has
-  @ApiName("public_gists")
+  @JsonKey(name: "public_gists")
   int publicGistsCount;
 
   /// Number of followers that this user has
-  @ApiName("followers")
+  @JsonKey(name: "followers")
   int followersCount;
 
   /// Number of Users that this user follows
-  @ApiName("following")
+  @JsonKey(name: "following")
   int followingCount;
 
   /// The time this [User] was created.
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// Last time this [User] was updated.
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   static User fromJSON(Map<String, dynamic> input) {
@@ -101,15 +101,15 @@ class User {
 /// The Currently Authenticated User
 class CurrentUser extends User {
   /// Number of Private Repositories
-  @ApiName("total_private_repos")
+  @JsonKey(name: "total_private_repos")
   int privateReposCount;
 
   /// Number of Owned Private Repositories that the user owns
-  @ApiName("owned_private_repos")
+  @JsonKey(name: "owned_private_repos")
   int ownedPrivateReposCount;
 
   /// The User's Disk Usage
-  @ApiName("disk_usage")
+  @JsonKey(name: "disk_usage")
   int diskUsage;
 
   /// The User's GitHub Plan
@@ -153,11 +153,11 @@ class UserPlan {
   int space;
 
   // Number of Private Repositories
-  @ApiName("private_repos")
+  @JsonKey(name: "private_repos")
   int privateReposCount;
 
   // Number of Collaborators
-  @ApiName("collaborators")
+  @JsonKey(name: "collaborators")
   int collaboratorsCount;
 
   static UserPlan fromJSON(Map<String, dynamic> input) {

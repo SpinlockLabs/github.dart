@@ -47,7 +47,7 @@ class GitCommit {
   GitTree tree;
   List<GitCommit> parents;
 
-  @ApiName('comment_count')
+  @JsonKey(name: 'comment_count')
   int commentCount;
 
   GitCommit();
@@ -197,11 +197,11 @@ class CreateGitTree {
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
-  @ApiName("base_tree")
+  @JsonKey(name: "base_tree")
   String baseTree;
 
   /// The Objects specifying a tree structure.
-  @ApiName("tree")
+  @JsonKey(name: "tree")
   final List<CreateGitTreeEntry> entries;
 
   CreateGitTree(this.entries);

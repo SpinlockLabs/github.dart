@@ -8,10 +8,10 @@ class Notification {
   String reason;
   bool unread;
 
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
-  @ApiName("last_read_at")
+  @JsonKey(name: "last_read_at")
   DateTime lastReadAt;
 
   static Notification fromJSON(Map<String, dynamic> input) {

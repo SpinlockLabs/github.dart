@@ -9,11 +9,11 @@ class Organization {
   int id;
 
   /// Url to Organization Profile
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Url to the Organization Avatar
-  @ApiName("avatar_url")
+  @JsonKey(name: "avatar_url")
   String avatarUrl;
 
   /// Organization Name
@@ -32,27 +32,27 @@ class Organization {
   String email;
 
   /// Number of Public Repositories
-  @ApiName("public_repos")
+  @JsonKey(name: "public_repos")
   int publicReposCount;
 
   /// Number of Public Gists
-  @ApiName("public_gists")
+  @JsonKey(name: "public_gists")
   int publicGistsCount;
 
   /// Number of Followers
-  @ApiName("followers")
+  @JsonKey(name: "followers")
   int followersCount;
 
   /// Number of People this Organization is Following
-  @ApiName("following")
+  @JsonKey(name: "following")
   int followingCount;
 
   /// Time this organization was created
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// Time this organization was updated
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   static Organization fromJSON(Map<String, dynamic> input) {
@@ -104,11 +104,11 @@ class Team {
   String permission;
 
   /// Number of Members
-  @ApiName("members_count")
+  @JsonKey(name: "members_count")
   int membersCount;
 
   /// Number of Repositories
-  @ApiName("repos_count")
+  @JsonKey(name: "repos_count")
   int reposCount;
 
   /// Organization
@@ -147,18 +147,18 @@ class TeamMember {
   int id;
 
   /// Url to Member Avatar
-  @ApiName("avatar_url")
+  @JsonKey(name: "avatar_url")
   String avatarUrl;
 
   /// Member Type
   String type;
 
   /// If the member is a site administrator
-  @ApiName("site_admin")
+  @JsonKey(name: "site_admin")
   bool siteAdmin;
 
   /// Profile of the Member
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   static TeamMember fromJSON(Map<String, dynamic> input) {

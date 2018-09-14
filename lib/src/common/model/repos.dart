@@ -39,29 +39,29 @@ class Repository {
   int id;
 
   /// Full Repository Name
-  @ApiName("full_name")
+  @JsonKey(name: "full_name")
   String fullName;
 
   /// Repository Owner
   UserInformation owner;
 
   /// If the Repository is Private
-  @ApiName("private")
+  @JsonKey(name: "private")
   bool isPrivate;
 
   /// If the Repository is a fork
-  @ApiName("fork")
+  @JsonKey(name: "fork")
   bool isFork;
 
   /// Url to the GitHub Repository Page
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Repository Description
   String description;
 
   /// Repository Clone Urls
-  @ApiName("clone_urls")
+  @JsonKey(name: "clone_urls")
   CloneUrls cloneUrls;
 
   /// Url to the Repository Homepage
@@ -71,53 +71,53 @@ class Repository {
   int size;
 
   /// Repository Stars
-  @ApiName("stargazers_count")
+  @JsonKey(name: "stargazers_count")
   int stargazersCount;
 
   /// Repository Watchers
-  @ApiName("watchers_count")
+  @JsonKey(name: "watchers_count")
   int watchersCount;
 
   /// Repository Language
   String language;
 
   /// If the Repository has Issues Enabled
-  @ApiName("has_issues")
+  @JsonKey(name: "has_issues")
   bool hasIssues;
 
   /// If the Repository has the Wiki Enabled
-  @ApiName("has_wiki")
+  @JsonKey(name: "has_wiki")
   bool hasWiki;
 
   /// If the Repository has any Downloads
-  @ApiName("has_downloads")
+  @JsonKey(name: "has_downloads")
   bool hasDownloads;
 
   /// Number of Forks
-  @ApiName("forks_count")
+  @JsonKey(name: "forks_count")
   int forksCount;
 
   /// Number of Open Issues
-  @ApiName("open_issues_count")
+  @JsonKey(name: "open_issues_count")
   int openIssuesCount;
 
   /// Repository Default Branch
   String defaultBranch;
 
   /// Number of Subscribers
-  @ApiName("subscribers_count")
+  @JsonKey(name: "subscribers_count")
   int subscribersCount;
 
   /// Number of users in the network
-  @ApiName("network_count")
+  @JsonKey(name: "network_count")
   int networkCount;
 
   /// The time the repository was created at
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The last time the repository was pushed at
-  @ApiName("pushed_at")
+  @JsonKey(name: "pushed_at")
   DateTime pushedAt;
 
   static Repository fromJSON(Map<String, dynamic> input,
@@ -329,24 +329,24 @@ class CreateRepository {
   bool private = false;
 
   /// If the repository should have issues enabled.
-  @ApiName("has_issues")
+  @JsonKey(name: "has_issues")
   bool hasIssues = true;
 
   /// If the repository should have the wiki enabled.
-  @ApiName("has_wiki")
+  @JsonKey(name: "has_wiki")
   bool hasWiki = true;
 
   /// If the repository should have downloads enabled.
-  @ApiName("has_downloads")
+  @JsonKey(name: "has_downloads")
   bool hasDownloads = true;
 
   /// The Team ID (Only for Creating a Repository for an Organization)
   @OnlyWhen("Creating a repository for an organization")
-  @ApiName("team_id")
+  @JsonKey(name: "team_id")
   int teamID;
 
   /// If GitHub should auto initialize the repository.
-  @ApiName("auto_init")
+  @JsonKey(name: "auto_init")
   bool autoInit = false;
 
   /// .gitignore template (only when [autoInit] is true)

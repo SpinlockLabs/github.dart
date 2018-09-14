@@ -1,10 +1,10 @@
 part of github.common;
 
 class SearchResults<T> {
-  @ApiName("total_count")
+  @JsonKey(name: "total_count")
   int totalCount;
 
-  @ApiName("incomplete_results")
+  @JsonKey(name: "incomplete_results")
   bool incompleteResults;
 
   List<T> items;

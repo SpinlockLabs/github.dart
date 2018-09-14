@@ -3,26 +3,26 @@ part of github.common;
 /// Model class for a release.
 class Release {
   /// Url to this Release
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Tarball of the Repository Tree at the commit of this release.
-  @ApiName("tarball_url")
+  @JsonKey(name: "tarball_url")
   String tarballUrl;
 
   /// ZIP of the Repository Tree at the commit of this release.
-  @ApiName("zipball_url")
+  @JsonKey(name: "zipball_url")
   String zipballUrl;
 
   /// Release ID
   int id;
 
   /// Release Tag Name
-  @ApiName("tag_name")
+  @JsonKey(name: "tag_name")
   String tagName;
 
   /// Target Commit
-  @ApiName("target_commitish")
+  @JsonKey(name: "target_commitish")
   String targetCommitsh;
 
   /// Release Name
@@ -41,11 +41,11 @@ class Release {
   bool prerelease;
 
   /// The time this release was created at.
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The time this release was published at.
-  @ApiName("published_at")
+  @JsonKey(name: "published_at")
   DateTime publishedAt;
 
   /// The author of this release.
@@ -80,7 +80,7 @@ class Release {
 /// Model class for a release asset.
 class ReleaseAsset {
   /// Url to download the asset.
-  @ApiName("browser_download_url")
+  @JsonKey(name: "browser_download_url")
   String browserDownloadUrl;
 
   /// Asset ID
@@ -96,22 +96,22 @@ class ReleaseAsset {
   String state;
 
   /// Asset Content Type
-  @ApiName("content_type")
+  @JsonKey(name: "content_type")
   String contentType;
 
   /// Size of Asset
   int size;
 
   /// Number of Downloads
-  @ApiName("download_count")
+  @JsonKey(name: "download_count")
   int downloadCount;
 
   /// Time the asset was created at
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// Time the asset was last updated
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   static ReleaseAsset fromJSON(Map<String, dynamic> input) {

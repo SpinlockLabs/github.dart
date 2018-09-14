@@ -8,7 +8,7 @@ class Event {
 
   Organization org;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   String id;
@@ -46,7 +46,7 @@ class RepositorySubscription {
   bool ignored;
   String reason;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   RepositorySubscription();

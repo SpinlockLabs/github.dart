@@ -51,7 +51,7 @@ class RepositoryStatus {
 class CreateStatus {
   final String state;
 
-  @ApiName("target_url")
+  @JsonKey(name: "target_url")
   String targetUrl;
 
   String description;

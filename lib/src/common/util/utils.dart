@@ -8,14 +8,6 @@ class NotReadyYet {
   const NotReadyYet(this.message);
 }
 
-/// Specifies the original API Field Name
-class ApiName {
-  /// Original API Field Name
-  final String name;
-
-  const ApiName(this.name);
-}
-
 /// Specifies that something should be only used when the specified condition is met.
 class OnlyWhen {
   /// Condition

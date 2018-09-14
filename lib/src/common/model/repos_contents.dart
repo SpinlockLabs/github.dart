@@ -24,15 +24,15 @@ class GitHubFile {
   String sha;
 
   /// Url to file
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Git Url
-  @ApiName("git_url")
+  @JsonKey(name: "git_url")
   String gitUrl;
 
   /// Links
-  @ApiName("_links")
+  @JsonKey(name: "_links")
   Links links;
 
   /// Text Content
