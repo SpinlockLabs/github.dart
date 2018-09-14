@@ -14,9 +14,11 @@ import "package:json_annotation/json_annotation.dart";
 import "package:xml/xml.dart" as xml;
 
 import 'common/model/users.dart';
+import "common/util/pagination.dart";
 import 'util.dart';
 
 export "common/model/users.dart";
+export "common/util/pagination.dart";
 
 part "common.g.dart";
 part "common/activity_service.dart";
@@ -62,7 +64,6 @@ part "common/util/crawler.dart";
 part "common/util/errors.dart";
 part "common/util/json.dart";
 part "common/util/oauth2.dart";
-part "common/util/pagination.dart";
 part "common/util/service.dart";
 part "common/util/utils.dart";
 
