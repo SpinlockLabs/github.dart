@@ -1,4 +1,4 @@
-import 'package:github/src/util.dart';
+import 'package:github/src/common/util/pagination.dart';
 
 void main() {
   var it = parseLinkHeader(

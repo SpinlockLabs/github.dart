@@ -13,7 +13,12 @@ import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
 import "package:xml/xml.dart" as xml;
 
+import 'common/model/users.dart';
+import "common/util/pagination.dart";
 import 'util.dart';
+
+export "common/model/users.dart";
+export "common/util/pagination.dart";
 
 part "common.g.dart";
 part "common/activity_service.dart";
@@ -48,7 +53,6 @@ part "common/model/repos_releases.dart";
 part "common/model/repos_stats.dart";
 part "common/model/repos_statuses.dart";
 part "common/model/search.dart";
-part "common/model/users.dart";
 part "common/orgs_service.dart";
 part "common/pulls_service.dart";
 part "common/repos_service.dart";
@@ -60,7 +64,6 @@ part "common/util/crawler.dart";
 part "common/util/errors.dart";
 part "common/util/json.dart";
 part "common/util/oauth2.dart";
-part "common/util/pagination.dart";
 part "common/util/service.dart";
 part "common/util/utils.dart";
 

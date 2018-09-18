@@ -5,7 +5,7 @@ class CreateMerge {
   final String base;
   final String head;
 
-  @ApiName("commit_message")
+  @JsonKey(name: "commit_message")
   String commitMessage;
 
   CreateMerge(this.base, this.head);

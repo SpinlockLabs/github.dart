@@ -1,10 +1,10 @@
 part of github.common;
 
 class SearchResults<T> {
-  @ApiName("total_count")
+  @JsonKey(name: "total_count")
   int totalCount;
 
-  @ApiName("incomplete_results")
+  @JsonKey(name: "incomplete_results")
   bool incompleteResults;
 
   List<T> items;
@@ -25,18 +25,5 @@ class SearchResults<T> {
     }
 
     return results;
-  }
-}
-
-abstract class SearchResult {
-  int score;
-}
-
-class RepositorySearchResult extends Repository with SearchResult {
-  static RepositorySearchResult fromJSON(Map<String, dynamic> input) {
-    var result = new RepositorySearchResult();
-    Repository.fromJSON(input, result);
-    result.score = input['score'];
-    return result;
   }
 }

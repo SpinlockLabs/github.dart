@@ -6,6 +6,71 @@ part of github.common;
 // JsonSerializableGenerator
 // **************************************************************************
 
+Map<String, dynamic> _$CreateGitBlobToJson(CreateGitBlob instance) =>
+    <String, dynamic>{
+      'content': instance.content,
+      'encoding': instance.encoding
+    };
+
+GitCommit _$GitCommitFromJson(Map<String, dynamic> json) {
+  return GitCommit()
+    ..sha = json['sha'] as String
+    ..url = json['url'] as String
+    ..author = json['author'] == null
+        ? null
+        : GitCommitUser.fromJson(json['author'] as Map<String, dynamic>)
+    ..committer = json['committer'] == null
+        ? null
+        : GitCommitUser.fromJson(json['committer'] as Map<String, dynamic>)
+    ..message = json['message'] as String
+    ..tree = json['tree'] == null
+        ? null
+        : GitTree.fromJson(json['tree'] as Map<String, dynamic>)
+    ..parents = (json['parents'] as List)
+        ?.map((e) =>
+            e == null ? null : GitCommit.fromJson(e as Map<String, dynamic>))
+        ?.toList()
+    ..commentCount = json['comment_count'] as int;
+}
+
+Map<String, dynamic> _$CreateGitCommitToJson(CreateGitCommit instance) {
+  var val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('message', instance.message);
+  writeNotNull('tree', instance.tree);
+  writeNotNull('parents', instance.parents);
+  writeNotNull('committer', instance.committer);
+  writeNotNull('author', instance.author);
+  return val;
+}
+
+GitCommitUser _$GitCommitUserFromJson(Map<String, dynamic> json) {
+  return GitCommitUser(json['name'] as String, json['email'] as String,
+      json['date'] == null ? null : DateTime.parse(json['date'] as String));
+}
+
+Map<String, dynamic> _$GitCommitUserToJson(GitCommitUser instance) {
+  var val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('name', instance.name);
+  writeNotNull('email', instance.email);
+  writeNotNull('date',
+      instance.date == null ? null : dateToGitHubIso8601(instance.date));
+  return val;
+}
+
 GitTree _$GitTreeFromJson(Map<String, dynamic> json) {
   return GitTree(
       json['sha'] as String,
@@ -28,6 +93,80 @@ GitTreeEntry _$GitTreeEntryFromJson(Map<String, dynamic> json) {
       json['url'] as String);
 }
 
+GitReference _$GitReferenceFromJson(Map<String, dynamic> json) {
+  return GitReference()
+    ..ref = json['ref'] as String
+    ..url = json['url'] as String
+    ..object = json['object'] == null
+        ? null
+        : GitObject.fromJson(json['object'] as Map<String, dynamic>);
+}
+
+GitTag _$GitTagFromJson(Map<String, dynamic> json) {
+  return GitTag()
+    ..tag = json['tag'] as String
+    ..sha = json['sha'] as String
+    ..url = json['url'] as String
+    ..message = json['message'] as String
+    ..tagger = json['tagger'] == null
+        ? null
+        : GitCommitUser.fromJson(json['tagger'] as Map<String, dynamic>)
+    ..object = json['object'] == null
+        ? null
+        : GitObject.fromJson(json['object'] as Map<String, dynamic>);
+}
+
+GitObject _$GitObjectFromJson(Map<String, dynamic> json) {
+  return GitObject(
+      json['type'] as String, json['sha'] as String, json['url'] as String);
+}
+
+TeamRepository _$TeamRepositoryFromJson(Map<String, dynamic> json) {
+  return TeamRepository()
+    ..name = json['name'] as String
+    ..id = json['id'] as int
+    ..fullName = json['full_name'] as String
+    ..owner = json['owner'] == null
+        ? null
+        : UserInformation.fromJson(json['owner'] as Map<String, dynamic>)
+    ..isPrivate = json['private'] as bool
+    ..isFork = json['fork'] as bool
+    ..htmlUrl = json['html_url'] as String
+    ..description = json['description'] as String
+    ..cloneUrls = json['clone_urls'] == null
+        ? null
+        : CloneUrls.fromJson(json['clone_urls'] as Map<String, dynamic>)
+    ..homepage = json['homepage'] as String
+    ..size = json['size'] as int
+    ..stargazersCount = json['stargazers_count'] as int
+    ..watchersCount = json['watchers_count'] as int
+    ..language = json['language'] as String
+    ..hasIssues = json['has_issues'] as bool
+    ..hasWiki = json['has_wiki'] as bool
+    ..hasDownloads = json['has_downloads'] as bool
+    ..forksCount = json['forks_count'] as int
+    ..openIssuesCount = json['open_issues_count'] as int
+    ..defaultBranch = json['defaultBranch'] as String
+    ..subscribersCount = json['subscribers_count'] as int
+    ..networkCount = json['network_count'] as int
+    ..createdAt = json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at'] as String)
+    ..pushedAt = json['pushed_at'] == null
+        ? null
+        : DateTime.parse(json['pushed_at'] as String)
+    ..permissions = json['permissions'] == null
+        ? null
+        : TeamRepositoryPermissions.fromJson(
+            json['permissions'] as Map<String, dynamic>);
+}
+
+TeamRepositoryPermissions _$TeamRepositoryPermissionsFromJson(
+    Map<String, dynamic> json) {
+  return TeamRepositoryPermissions(
+      json['admin'] as bool, json['push'] as bool, json['pull'] as bool);
+}
+
 GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
   return GitHubComparison(
       json['url'] as String,
@@ -35,6 +174,47 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
       json['ahead_by'] as int,
       json['behind_by'] as int,
       json['total_commits'] as int);
+}
+
+Repository _$RepositoryFromJson(Map<String, dynamic> json) {
+  return Repository()
+    ..name = json['name'] as String
+    ..id = json['id'] as int
+    ..fullName = json['full_name'] as String
+    ..owner = json['owner'] == null
+        ? null
+        : UserInformation.fromJson(json['owner'] as Map<String, dynamic>)
+    ..isPrivate = json['private'] as bool
+    ..isFork = json['fork'] as bool
+    ..htmlUrl = json['html_url'] as String
+    ..description = json['description'] as String
+    ..cloneUrls = json['clone_urls'] == null
+        ? null
+        : CloneUrls.fromJson(json['clone_urls'] as Map<String, dynamic>)
+    ..homepage = json['homepage'] as String
+    ..size = json['size'] as int
+    ..stargazersCount = json['stargazers_count'] as int
+    ..watchersCount = json['watchers_count'] as int
+    ..language = json['language'] as String
+    ..hasIssues = json['has_issues'] as bool
+    ..hasWiki = json['has_wiki'] as bool
+    ..hasDownloads = json['has_downloads'] as bool
+    ..forksCount = json['forks_count'] as int
+    ..openIssuesCount = json['open_issues_count'] as int
+    ..defaultBranch = json['defaultBranch'] as String
+    ..subscribersCount = json['subscribers_count'] as int
+    ..networkCount = json['network_count'] as int
+    ..createdAt = json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at'] as String)
+    ..pushedAt = json['pushed_at'] == null
+        ? null
+        : DateTime.parse(json['pushed_at'] as String);
+}
+
+CloneUrls _$CloneUrlsFromJson(Map<String, dynamic> json) {
+  return CloneUrls(json['git'] as String, json['ssh'] as String,
+      json['https'] as String, json['svn'] as String);
 }
 
 Tag _$TagFromJson(Map<String, dynamic> json) {
@@ -50,7 +230,9 @@ Tag _$TagFromJson(Map<String, dynamic> json) {
 CommitData _$CommitDataFromJson(Map<String, dynamic> json) {
   return CommitData(
       json['sha'] as String,
-      json['commit'] == null ? null : GitCommit.fromJson(json['commit']),
+      json['commit'] == null
+          ? null
+          : GitCommit.fromJson(json['commit'] as Map<String, dynamic>),
       json['url'] as String,
       json['html_url'] as String,
       json['comments_url'] as String,

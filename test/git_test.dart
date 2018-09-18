@@ -40,7 +40,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/blobs',
           convert: GitBlob.fromJSON,
           statusCode: StatusCodes.CREATED,
-          body: blob.toJSON()));
+          body: jsonEncode(blob)));
     });
 
     test('creates valid JSON body', () {
@@ -70,7 +70,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/commits',
           convert: GitCommit.fromJSON,
           statusCode: StatusCodes.CREATED,
-          body: commit.toJSON()));
+          body: jsonEncode(commit)));
     });
 
     test('creates valid JSON body', () {

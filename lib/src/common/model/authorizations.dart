@@ -38,7 +38,7 @@ class AuthorizationApplication {
   String url;
   String name;
 
-  @ApiName("client_id")
+  @JsonKey(name: "client_id")
   String clientID;
 
   AuthorizationApplication();

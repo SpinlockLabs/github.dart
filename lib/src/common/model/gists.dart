@@ -9,22 +9,22 @@ class Gist {
   User user;
   List<GistFile> files;
 
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
-  @ApiName("comments")
+  @JsonKey(name: "comments")
   int commentsCount;
 
-  @ApiName("git_pull_url")
+  @JsonKey(name: "git_pull_url")
   String gitPullUrl;
 
-  @ApiName("git_push_url")
+  @JsonKey(name: "git_push_url")
   String gitPushUrl;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   static Gist fromJSON(Map<String, dynamic> input) {
@@ -64,7 +64,7 @@ class GistFile {
   String name;
   int size;
 
-  @ApiName("raw_url")
+  @JsonKey(name: "raw_url")
   String rawUrl;
   String type;
   String language;
@@ -90,10 +90,10 @@ class GistFork {
   User user;
   int id;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   static GistFork fromJSON(Map<String, dynamic> input) {
@@ -113,16 +113,16 @@ class GistHistoryEntry {
 
   User user;
 
-  @ApiName("change_status/deletions")
+  @JsonKey(name: "change_status/deletions")
   int deletions;
 
-  @ApiName("change_status/additions")
+  @JsonKey(name: "change_status/additions")
   int additions;
 
-  @ApiName("change_status/total")
+  @JsonKey(name: "change_status/total")
   int totalChanges;
 
-  @ApiName("committed_at")
+  @JsonKey(name: "committed_at")
   DateTime committedAt;
 
   static GistHistoryEntry fromJSON(Map<String, dynamic> input) {
@@ -143,10 +143,10 @@ class GistComment {
   int id;
   User user;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   String body;

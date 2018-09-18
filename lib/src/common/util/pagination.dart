@@ -1,4 +1,9 @@
-part of github.common;
+import "dart:async";
+import "dart:convert" show jsonDecode;
+
+import "package:http/http.dart" as http;
+
+import '../../common.dart';
 
 /// Internal Helper for dealing with GitHub Pagination.
 class PaginationHelper {
@@ -101,4 +106,22 @@ class PaginationHelper {
             preview: preview)
         .map(converter);
   }
+}
+
+//TODO(kevmoo): use regex here.
+Map<String, String> parseLinkHeader(String input) {
+  var out = <String, String>{};
+  var parts = input.split(", ");
+  for (var part in parts) {
+    if (part[0] != "<") {
+      throw new FormatException("Invalid Link Header");
+    }
+    var kv = part.split("; ");
+    var url = kv[0].substring(1);
+    url = url.substring(0, url.length - 1);
+    var key = kv[1];
+    key = key.replaceAll('"', "").substring(4);
+    out[key] = url;
+  }
+  return out;
 }

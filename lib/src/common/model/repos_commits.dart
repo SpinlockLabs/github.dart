@@ -13,11 +13,11 @@ class RepositoryCommit {
   String sha;
 
   /// Url to Commit Page
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Comments url.
-  @ApiName("comments_url")
+  @JsonKey(name: "comments_url")
   String commentsUrl;
 
   /// A reference to the raw [GitCommit].
@@ -53,7 +53,7 @@ class RepositoryCommit {
 
     if (input['parents'] != null) {
       commit.parents = (input['parents'] as List<Map<String, dynamic>>)
-          .map((parent) => GitCommit.fromJSON(parent))
+          .map((parent) => GitCommit.fromJson(parent))
           .toList();
     }
 
@@ -90,7 +90,7 @@ class CommitStats {
 
 /// Model class of a file that was changed in a commit.
 class CommitFile {
-  @ApiName("filename")
+  @JsonKey(name: "filename")
   String name;
 
   int additions;
@@ -98,10 +98,10 @@ class CommitFile {
   int changes;
   String status;
 
-  @ApiName("raw_url")
+  @JsonKey(name: "raw_url")
   String rawUrl;
 
-  @ApiName("blob_url")
+  @JsonKey(name: "blob_url")
   String blobUrl;
 
   String patch;

@@ -9,7 +9,7 @@ class RepositoryPages {
   String status;
 
   /// If the repo has a custom 404
-  @ApiName("custom_404")
+  @JsonKey(name: "custom_404")
   bool hasCustom404;
 
   static RepositoryPages fromJSON(Map<String, dynamic> input) {

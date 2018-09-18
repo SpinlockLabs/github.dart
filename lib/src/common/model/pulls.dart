@@ -6,15 +6,15 @@ class PullRequestInformation {
   final bool isCompletePullRequest;
 
   /// Url to the Pull Request Page
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String htmlUrl;
 
   /// Url to the diff for this Pull Request
-  @ApiName("diff_url")
+  @JsonKey(name: "diff_url")
   String diffUrl;
 
   /// Url to the patch for this Pull Request
-  @ApiName("patch_url")
+  @JsonKey(name: "patch_url")
   String patchUrl;
 
   /// Pull Request Number
@@ -30,19 +30,19 @@ class PullRequestInformation {
   String body;
 
   /// Time the pull request was created
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// Time the pull request was updated
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   /// Time the pull request was closed
-  @ApiName("closed_at")
+  @JsonKey(name: "closed_at")
   DateTime closedAt;
 
   /// Time the pull request was merged
-  @ApiName("merged_at")
+  @JsonKey(name: "merged_at")
   DateTime mergedAt;
 
   /// The Pull Request Head
@@ -81,7 +81,7 @@ class PullRequestInformation {
 
 /// Model class for a Complete Pull Request.
 class PullRequest extends PullRequestInformation {
-  @ApiName("merge_commit_sha")
+  @JsonKey(name: "merge_commit_sha")
   String mergeCommitSha;
 
   /// If the pull request was merged
@@ -91,7 +91,7 @@ class PullRequest extends PullRequestInformation {
   bool mergeable;
 
   /// The user who merged the pull request
-  @ApiName("merged_by")
+  @JsonKey(name: "merged_by")
   User mergedBy;
 
   /// Number of comments
@@ -209,36 +209,36 @@ class CreatePullRequest {
 /// Model class for a pull request comment.
 class PullRequestComment {
   int id;
-  @ApiName("diff_hunk")
+  @JsonKey(name: "diff_hunk")
   String diffHunk;
   String path;
   int position;
 
-  @ApiName("original_position")
+  @JsonKey(name: "original_position")
   int originalPosition;
 
-  @ApiName("commit_id")
+  @JsonKey(name: "commit_id")
   String commitID;
 
-  @ApiName("original_commit_id")
+  @JsonKey(name: "original_commit_id")
   String originalCommitID;
 
   User user;
   String body;
 
-  @ApiName("created_at")
+  @JsonKey(name: "created_at")
   DateTime createdAt;
 
-  @ApiName("updated_at")
+  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
-  @ApiName("html_url")
+  @JsonKey(name: "html_url")
   String url;
 
-  @ApiName("pull_request_url")
+  @JsonKey(name: "pull_request_url")
   String pullRequestUrl;
 
-  @ApiName("_links")
+  @JsonKey(name: "_links")
   Links links;
 
   static PullRequestComment fromJSON(Map<String, dynamic> input) {
@@ -266,7 +266,7 @@ class PullRequestComment {
 class CreatePullRequestComment {
   String body;
 
-  @ApiName("commit_id")
+  @JsonKey(name: "commit_id")
   String commitId;
 
   String path;
@@ -289,11 +289,11 @@ class PullRequestFile {
   String sha;
   String filename;
   String status;
-  @ApiName("additions")
+  @JsonKey(name: "additions")
   int additionsCount;
-  @ApiName("deletions")
+  @JsonKey(name: "deletions")
   int deletionsCount;
-  @ApiName("changes")
+  @JsonKey(name: "changes")
   int changesCount;
   String blobUrl;
   String rawUrl;
