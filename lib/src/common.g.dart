@@ -146,7 +146,7 @@ TeamRepository _$TeamRepositoryFromJson(Map<String, dynamic> json) {
     ..hasDownloads = json['has_downloads'] as bool
     ..forksCount = json['forks_count'] as int
     ..openIssuesCount = json['open_issues_count'] as int
-    ..defaultBranch = json['defaultBranch'] as String
+    ..defaultBranch = json['default_branch'] as String
     ..subscribersCount = json['subscribers_count'] as int
     ..networkCount = json['network_count'] as int
     ..createdAt = json['created_at'] == null
@@ -201,7 +201,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
     ..hasDownloads = json['has_downloads'] as bool
     ..forksCount = json['forks_count'] as int
     ..openIssuesCount = json['open_issues_count'] as int
-    ..defaultBranch = json['defaultBranch'] as String
+    ..defaultBranch = json['default_branch'] as String
     ..subscribersCount = json['subscribers_count'] as int
     ..networkCount = json['network_count'] as int
     ..createdAt = json['created_at'] == null
