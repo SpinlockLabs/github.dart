@@ -103,6 +103,7 @@ class Repository {
   int openIssuesCount;
 
   /// Repository Default Branch
+  @JsonKey(name: 'default_branch')
   String defaultBranch;
 
   /// Number of Subscribers
