@@ -6,6 +6,7 @@
 - Fix a number of type issues dealing with JSON.
 - *BREAKING* Removed `ExploreService` – `GitHub.explore`.
 - *BREAKING* Removed `MiscService.listOctodex`.
+- *BREAKING* Removed `BlogService` - `GitHub.blog`.
 
 ## v3.0.0
 

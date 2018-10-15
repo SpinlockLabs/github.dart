@@ -25,7 +25,6 @@ class GitHub {
 
   ActivityService _activity;
   AuthorizationsService _authorizations;
-  BlogService _blog;
   GistsService _gists;
   GitService _git;
   IssuesService _issues;
@@ -92,14 +91,6 @@ class GitHub {
       _authorizations = new AuthorizationsService(this);
     }
     return _authorizations;
-  }
-
-  /// Service to retrieve blog posts.
-  BlogService get blog {
-    if (_blog == null) {
-      _blog = new BlogService(this);
-    }
-    return _blog;
   }
 
   /// Service for gist related methods of the GitHub API.
