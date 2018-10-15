@@ -4,6 +4,8 @@
 - Initial support for comparing commits.
 - Require at least Dart `2.0.0-dev.36`.
 - Fix a number of type issues dealing with JSON.
+- *BREAKING* Removed `ExploreService` – `GitHub.explore`.
+- *BREAKING* Removed `MiscService.listOctodex`.
 
 ## v3.0.0
 

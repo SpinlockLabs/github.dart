@@ -65,39 +65,6 @@ class MiscService extends Service {
       _github.getJSON("https://status.github.com/api/status.json",
           statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
 
-  /// Returns a stream of Octocats from Octodex.
-  ///
-  /// See: https://octodex.github.com/
-  Stream<Octocat> listOctodex({bool cors: false}) {
-    var controller = new StreamController<Octocat>();
-
-    var u = "http://feeds.feedburner.com/Octocats.xml";
-
-    _github.client
-        .get(
-            "${cors ? "http://whateverorigin.org/get?url=" : ""}${cors ? Uri.encodeComponent(u) : u}")
-        .then((response) {
-      var document = html_parser.parse(response.body);
-      document.querySelectorAll("entry").forEach((entry) {
-        var name = entry.querySelector("title").text;
-        var c = "<html><body>" +
-            entry.querySelector("content").innerHtml +
-            "</body></html>";
-        var content = html_parser.parse(c);
-        var image = content.querySelector("a img").attributes['src'];
-        var url = entry.querySelector("link").attributes['href'];
-
-        controller.add(new Octocat()
-          ..image = image
-          ..name = name
-          ..url = url);
-      });
-      return controller.close();
-    });
-
-    return controller.stream;
-  }
-
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {
     var params = <String, String>{};
