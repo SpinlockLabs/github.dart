@@ -26,7 +26,6 @@ class GitHub {
   ActivityService _activity;
   AuthorizationsService _authorizations;
   BlogService _blog;
-  ExploreService _explore;
   GistsService _gists;
   GitService _git;
   IssuesService _issues;
@@ -101,14 +100,6 @@ class GitHub {
       _blog = new BlogService(this);
     }
     return _blog;
-  }
-
-  /// Service to explore GitHub.
-  ExploreService get explore {
-    if (_explore == null) {
-      _explore = new ExploreService(this);
-    }
-    return _explore;
   }
 
   /// Service for gist related methods of the GitHub API.

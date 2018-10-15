@@ -6,8 +6,6 @@ import "dart:async";
 import "dart:convert"
     show base64Decode, base64Encode, jsonEncode, jsonDecode, LineSplitter, utf8;
 
-import "package:html/dom.dart" as html;
-import "package:html/parser.dart" as html_parser;
 import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
@@ -24,7 +22,6 @@ part "common.g.dart";
 part "common/activity_service.dart";
 part "common/authorizations_service.dart";
 part "common/blog_service.dart";
-part "common/explore_service.dart";
 part "common/gists_service.dart";
 part "common/git_service.dart";
 part "common/github.dart";
@@ -33,7 +30,6 @@ part "common/misc_service.dart";
 part "common/model/activity.dart";
 part "common/model/authorizations.dart";
 part "common/model/blog.dart";
-part "common/model/explore.dart";
 part "common/model/gists.dart";
 part "common/model/git.dart";
 part "common/model/issues.dart";
