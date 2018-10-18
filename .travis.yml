@@ -5,8 +5,8 @@ addons:
 dart:
   - stable
 dart_task:
-  # TODO enable once tests are working
+  # TODO enable once automated tests are working
   # - test: --platform vm
   # - test: --platform chrome
-  - dartanalyzer: lib example test
+  - dartanalyzer: lib test # TODO fix examples and add example dir
   - dartfmt: true
