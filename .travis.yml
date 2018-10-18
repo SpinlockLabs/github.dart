@@ -1,0 +1,11 @@
+language: dart
+sudo: required
+addons:
+  chrome: stable
+dart:
+  - stable
+dart_task:
+  - test: --platform vm
+  - test: --platform chrome
+  - dartanalyzer: lib example test
+  - dartfmt: true
