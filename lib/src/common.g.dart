@@ -34,7 +34,7 @@ GitCommit _$GitCommitFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$CreateGitCommitToJson(CreateGitCommit instance) {
-  var val = <String, dynamic>{};
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {
@@ -56,7 +56,7 @@ GitCommitUser _$GitCommitUserFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$GitCommitUserToJson(GitCommitUser instance) {
-  var val = <String, dynamic>{};
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {
