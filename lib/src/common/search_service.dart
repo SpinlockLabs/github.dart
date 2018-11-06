@@ -47,6 +47,10 @@ class SearchService extends Service {
     return controller.stream;
   }
 
+  /// Search through code for a given [query]
+  /// Supports optional conditions of [language], [filename], and [user]
+  ///
+  /// https://developer.github.com/v3/search/#search-code
   Stream code(String query,
       {String language,
       String filename,
@@ -98,7 +102,6 @@ class SearchService extends Service {
     return controller.stream;
   }
 
-  // TODO: Implement code: https://developer.github.com/v3/search/#search-code
   // TODO: Implement issues: https://developer.github.com/v3/search/#search-issues
 
   /// Search for users using [query].
