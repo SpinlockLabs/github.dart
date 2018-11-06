@@ -47,9 +47,12 @@ class SearchService extends Service {
     return controller.stream;
   }
 
-  Stream code(String query, {String language, String filename, String user,
-    int pages: 2, int perPage: 30}) {
-
+  Stream code(String query,
+      {String language,
+      String filename,
+      String user,
+      int pages: 2,
+      int perPage: 30}) {
     var params = {"q": query};
 
     if (language != null) {
@@ -64,7 +67,7 @@ class SearchService extends Service {
       params['user'] = user;
     }
 
-    params["per_page"] = perPage;
+    params["per_page"] = perPage?.toString();
 
     var controller = new StreamController();
 
@@ -81,7 +84,7 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = JSON.decode(response.body);
+      var input = json.decode(response.body);
 
       if (input['items'] == null) {
         return;
