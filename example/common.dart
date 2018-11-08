@@ -1,7 +1,6 @@
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:github/markdown.dart" as markdown;
 
 void init(String script, {void onReady()}) {
   var stopwatch = new Stopwatch();
@@ -30,10 +29,12 @@ void init(String script, {void onReady()}) {
     }
 
     window.addEventListener("message", (event) {
-      if (event.data['command'] == "ready") {
-        ready = true;
-        if (fetched) {
-          sendCode();
+      if (event is MessageEvent) {
+        if (event.data['command'] == "ready") {
+          ready = true;
+          if (fetched) {
+            sendCode();
+          }
         }
       }
     });
@@ -52,7 +53,6 @@ Map<String, String> queryString =
     Uri.parse(window.location.href).queryParameters;
 
 GitHub _createGitHub() {
-  initGitHub();
   return new GitHub(
       auth: queryString["token"] != null
           ? new Authentication.withToken(queryString["token"])

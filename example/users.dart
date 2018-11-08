@@ -1,7 +1,6 @@
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:github/dates.dart";
 
 import "common.dart";
 
@@ -36,8 +35,8 @@ void loadUsers() {
 
       buff
         ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")
-        ..writeln("Created: ${friendlyDateTime(user.createdAt)}")
-        ..writeln("Updated: ${friendlyDateTime(user.updatedAt)}");
+        ..writeln("Created: ${user.createdAt}")
+        ..writeln("Updated: ${user.updatedAt}");
 
       if (user.company != null && user.company.isNotEmpty) {
         buff.writeln("Company: ${user.company}");
@@ -51,7 +50,7 @@ void loadUsers() {
 
       m.append(h);
 
-      usersDiv.querySelector("#${column}");
+      usersDiv.querySelector("#$column");
 
       if (column == "left") {
         column = "right";

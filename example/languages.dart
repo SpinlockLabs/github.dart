@@ -1,7 +1,7 @@
 import "dart:html";
 
-import 'markdown.dart' as markdown;
 import "package:github/browser.dart";
+import "package:markdown/markdown.dart" as markdown;
 import "common.dart";
 
 DivElement tableDiv;
@@ -9,7 +9,6 @@ DivElement tableDiv;
 LanguageBreakdown breakdown;
 
 void main() {
-  initGitHub();
   init("languages.dart", onReady: () {
     tableDiv = querySelector("#table");
     loadRepository();
@@ -30,7 +29,7 @@ void loadRepository() {
     reponame = params["repo"];
   }
 
-  document.getElementById("name").setInnerHtml("${user}/${reponame}");
+  document.getElementById("name").setInnerHtml("$user/$reponame");
 
   github.repositories
       .listLanguages(new RepositorySlug(user, reponame))
@@ -63,19 +62,22 @@ String generateMarkdown(int accuracy) {
   int total = totalBytes(breakdown);
   var data = breakdown.toList();
 
-  var tableData = [];
-
+  // var tableData = [];
+  String md = 'Name|Bytes|Percentage\n';
   data.sort((a, b) => b[1].compareTo(a[1]));
 
   data.forEach((info) {
     String name = info[0];
     int bytes = info[1];
     num percentage = ((bytes / total) * 100);
-    tableData.add({
-      "Name": name,
-      "Bytes": bytes,
-      "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
-    });
+    md += '$name|$bytes|$percentage\n';
+    // tableData.add({
+    //   "Name": name,
+    //   "Bytes": bytes,
+    //   "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
+    // });
   });
-  return markdown.table(tableData);
+
+  // markdown.markdownToHtml(tableData);
+  // return markdown.table(tableData);
 }

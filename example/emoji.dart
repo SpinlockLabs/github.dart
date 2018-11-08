@@ -27,7 +27,7 @@ void loadEmojis() {
       h.style.textAlign = "center";
       h.append(new ImageElement(src: url, width: 64, height: 64)
         ..classes.add("emoji"));
-      h.append(new ParagraphElement()..text = ":${name}:");
+      h.append(new ParagraphElement()..text = ":$name:");
       emojiDiv.append(h);
     });
   });

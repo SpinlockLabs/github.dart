@@ -24,7 +24,7 @@ void loadStars() {
     repo = queryString["repo"];
   }
 
-  querySelector("#title").appendText(" for ${user}/${repo}");
+  querySelector("#title").appendText(" for $user/$repo");
 
   github.activity
       .listStargazers(new RepositorySlug(user, repo))

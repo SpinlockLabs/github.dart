@@ -1,7 +1,6 @@
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:github/dates.dart";
 
 import "common.dart";
 
@@ -36,7 +35,7 @@ void main() {
   });
 
   sorts.keys.forEach((name) {
-    querySelector("#sort-${name}").onClick.listen((event) {
+    querySelector("#sort-$name").onClick.listen((event) {
       if (_reposCache == null) {
         loadRepos(sorts[name]);
       }
@@ -67,7 +66,7 @@ void updateRepos(List<Repository> repos,
           <br/>
           <b>Forks</b>: ${repo.forksCount}
           <br/>
-          <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
+          <b>Created</b>: ${repo.createdAt}
           <br/>
           <b>Size</b>: ${repo.size} bytes
           <p></p>
