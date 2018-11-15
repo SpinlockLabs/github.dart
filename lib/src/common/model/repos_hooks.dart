@@ -35,7 +35,7 @@ class Hook {
     if (input == null) return null;
 
     return new Hook()
-      ..events = input['events'] as List<String>
+      ..events = input['events']?.cast<String>()
       ..active = input['active']
       ..name = input['name']
       ..id = input['id']
