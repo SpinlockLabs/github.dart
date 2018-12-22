@@ -61,8 +61,9 @@ class Issue {
   static Issue fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var labels = input['labels'] as List<Map<String, dynamic>>;
-    if (labels == null) labels = [];
+    List<Map<String, Object>> labels =
+        input['labels'].cast<Map<String, dynamic>>();
+    if (labels == null) labels = <Map<String, dynamic>>[];
 
     return new Issue()
       ..id = input['id']
