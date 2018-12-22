@@ -1,5 +1,8 @@
 # GitHub for Dart
 
+[![Build Status](https://travis-ci.org/DirectMyFile/github.dart.svg?branch=master)](https://travis-ci.org/DirectMyFile/github.dart)
+[![Pub](https://img.shields.io/pub/v/github.svg)](https://pub.dartlang.org/packages/github)
+
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
 
 Please submit issues and pull requests, join my IRC channel (#directcode on irc.esper.net), help out, or just give me encouragement.
