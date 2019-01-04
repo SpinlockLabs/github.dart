@@ -1,3 +1,7 @@
+## v4.0.1
+
+- Fix cast errors in event and issue queries.
+
 ## v4.0.0
 
 - Make fields in many objects read-only.
