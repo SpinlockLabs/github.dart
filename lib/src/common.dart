@@ -62,7 +62,9 @@ part "common/util/utils.dart";
 
 void _applyExpandos(Object target, http.Response response) {
   _etagExpando[target] = response.headers['etag'];
-  _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']);
+  if (response.headers['date'] != null) {
+    _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']);
+  }
 }
 
 final _etagExpando = new Expando<String>('etag');

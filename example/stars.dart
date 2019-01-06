@@ -5,11 +5,10 @@ import "common.dart";
 
 DivElement $stars;
 
-void main() {
-  init("stars.dart", onReady: () {
-    $stars = querySelector("#stars");
-    loadStars();
-  });
+Future<void> main() async {
+  await initViewSourceButton("stars.dart");
+  $stars = querySelector("#stars");
+  loadStars();
 }
 
 void loadStars() {
@@ -24,7 +23,7 @@ void loadStars() {
     repo = queryString["repo"];
   }
 
-  querySelector("#title").appendText(" for ${user}/${repo}");
+  querySelector("#title").appendText(" for $user/$repo");
 
   github.activity
       .listStargazers(new RepositorySlug(user, repo))

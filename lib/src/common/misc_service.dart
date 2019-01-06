@@ -12,8 +12,10 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    return _github.getJSON("/emojis", statusCode: StatusCodes.OK)
-        as Future<Map<String, String>>;
+    var r = _github.getJSON<Map, Map<String, String>>("/emojis",
+        statusCode: StatusCodes.OK,
+        convert: (Map json) => json.cast<String, String>());
+    return r;
   }
 
   /// Lists available .gitignore template names.

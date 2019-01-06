@@ -6,28 +6,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub - User Information</title>
-  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://www.corsproxy.com/github.directcode.org/octicons/octicons.css">
 </head>
 
 <body>
   <div class="header">
     <h1>GitHub User Information</h1>
 
-    <p>Gets information about you from GitHub. Input a personal token that has the 'user' permission. This token is not stored.</p>
+    <p>Gets information about you from GitHub. Input a personal token that has the 'user' permission. This token is not
+      stored.</p>
 
-    <input class="input-box" id="token" type="text"/>
+    Github Token: <input class="input-box" id="token" type="text" />
     &nbsp;
-    <div class="btn" id="load">Load Information</div>
-    <div class="btn" id="view-source">View the Source</div>
-    <p/>
+    <button id="load">Load Information</button>
+    <button id="view-source">View the Source</button>
+    <p />
   </div>
 
   <div id="info" hidden></div>
 
-  <script type="application/dart" src="user_info.dart"></script>
-  <script src="packages/browser/dart.js"></script>
+  <script defer src="user_info.dart.js"></script>
+
 </body>
 
 </html>

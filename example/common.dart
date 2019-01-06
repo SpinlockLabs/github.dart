@@ -1,24 +1,16 @@
+import "dart:async";
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:github/markdown.dart" as markdown;
 
-void init(String script, {void onReady()}) {
-  var stopwatch = new Stopwatch();
-
-  if (onReady != null) {
-    document.onReadyStateChange.listen((event) {
-      if (document.readyState == ReadyState.COMPLETE) {
-        stopwatch.stop();
-        print(
-            "Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
-        onReady();
-      }
-    });
-  }
-
-  document.querySelector("#view-source").onClick.listen((_) {
-    var popup = window.open("view_source.html", "View Source");
+/// Wires up a listener to a button with an id of view-source,
+/// if it exists, to show the script source
+/// If you don't care about showing the source, or don't have a
+/// view source button, then you don't need to call this method
+Future<void> initViewSourceButton(String script) async {
+  // query the DOM for the view source button, handle clicks
+  document.querySelector("#view-source")?.onClick?.listen((_) {
+    var popup = window.open("view_source.html?script=$script", "View Source");
     String code;
 
     var fetched = false;
@@ -30,10 +22,12 @@ void init(String script, {void onReady()}) {
     }
 
     window.addEventListener("message", (event) {
-      if (event.data['command'] == "ready") {
-        ready = true;
-        if (fetched) {
-          sendCode();
+      if (event is MessageEvent) {
+        if (event.data['command'] == "ready") {
+          ready = true;
+          if (fetched) {
+            sendCode();
+          }
         }
       }
     });
@@ -51,11 +45,15 @@ void init(String script, {void onReady()}) {
 Map<String, String> queryString =
     Uri.parse(window.location.href).queryParameters;
 
+/// Gets the github token from the "token" query string param,
+/// falling back to getting it from session storage.
+/// If it is not in either, it will be null
+String token = queryString["token"] ?? window.sessionStorage['token'];
+
 GitHub _createGitHub() {
-  initGitHub();
   return new GitHub(
-      auth: queryString["token"] != null
-          ? new Authentication.withToken(queryString["token"])
+      auth: token != null
+          ? new Authentication.withToken(token)
           : new Authentication.anonymous());
 }
 
