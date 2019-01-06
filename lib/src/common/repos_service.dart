@@ -520,7 +520,8 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
   Future<Hook> createRelease(RepositorySlug slug, CreateRelease release) {
     return _github.postJSON("/repos/${slug.fullName}/releases",
-        convert: Release.fromJson, body: jsonEncode(release.toJson())) as Future<Hook>;
+        convert: Release.fromJson,
+        body: jsonEncode(release.toJson())) as Future<Hook>;
   }
 
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release

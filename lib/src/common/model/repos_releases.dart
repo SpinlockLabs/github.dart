@@ -69,7 +69,8 @@ class Release {
     return _$ReleaseFromJson(input)..json = input;
   }
 
-  static List<Map<String, dynamic>> _assetsToJson(List<ReleaseAsset> value) => value.map((asset) => asset.toJson()).toList();
+  static List<Map<String, dynamic>> _assetsToJson(List<ReleaseAsset> value) =>
+      value.map((asset) => asset.toJson()).toList();
 
   static Map<String, dynamic> _authorToJson(User value) => value.toJson();
 

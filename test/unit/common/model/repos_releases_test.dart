@@ -30,7 +30,8 @@ void main() {
 
   group('CreateRelease', () {
     test('fromJson', () {
-      expect(() => CreateRelease.fromJson(createReleasePayload), returnsNormally);
+      expect(
+          () => CreateRelease.fromJson(createReleasePayload), returnsNormally);
     });
 
     test('toJson', () {
