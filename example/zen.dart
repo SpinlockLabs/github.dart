@@ -1,15 +1,8 @@
 import "dart:html";
 import "common.dart";
 
-DivElement $zen;
-
-void main() {
-  init("zen.dart", onReady: () {
-    $zen = querySelector("#zen");
-    loadZen();
-  });
-}
-
-void loadZen() {
-  github.misc.getZen().then((zen) => $zen.appendText(zen));
+Future<void> main() async {
+  await initViewSourceButton("zen.dart");
+  String msg = await github.misc.getZen();
+  querySelector("#zen").text = msg;
 }

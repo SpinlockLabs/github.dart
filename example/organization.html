@@ -3,22 +3,20 @@
 
 <head>
   <title>GitHub Organization</title>
-
-  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://github.directcode.org/octicons/octicons.css">
 </head>
 
 <body class="demo-org">
   <div class="header">
     <h1>GitHub Organization</h1>
-    <div class="btn" id="view-source"><span class="octicon octicon-file-code"></span> View the Source</div>
+    <button id="view-source">View the Source</button><br />
+    <input type="text" id="input" value="DirectMyFile" />
+    <button id="submit">Load Organization</button>
   </div>
 
-  <div id="org"></div>
+  <div id="output"></div>
 
-  <script type="application/dart" src="organization.dart"></script>
-  <script src="packages/browser/dart.js"></script>
+  <script defer src="organization.dart.js"></script>
+
 </body>
 
 </html>

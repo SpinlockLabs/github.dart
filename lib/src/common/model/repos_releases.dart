@@ -1,7 +1,14 @@
-part of github.common;
+import 'package:github/src/common/model/users.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'repos_releases.g.dart';
 
 /// Model class for a release.
+@JsonSerializable()
 class Release {
+  @JsonKey(ignore: true)
+  Map json;
+
   /// Url to this Release
   @JsonKey(name: "html_url")
   String htmlUrl;
@@ -37,7 +44,7 @@ class Release {
   /// If the release is a draft.
   bool draft;
 
-  /// If the release is a pre release.
+  /// If the release is a pre-release.
   bool prerelease;
 
   /// The time this release was created at.
@@ -49,36 +56,35 @@ class Release {
   DateTime publishedAt;
 
   /// The author of this release.
+  @JsonKey(toJson: _authorToJson)
   User author;
 
   /// Release Assets
+  @JsonKey(toJson: _assetsToJson)
   List<ReleaseAsset> assets;
 
-  static Release fromJSON(Map<String, dynamic> input) {
+  static Release fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Release()
-      ..htmlUrl = input['html_url']
-      ..tarballUrl = input['tarball_url']
-      ..zipballUrl = input['zipball_url']
-      ..id = input['id']
-      ..tagName = input['tag_name']
-      ..targetCommitsh = input['target_commitish']
-      ..body = input['body']
-      ..description = input['description']
-      ..draft = input['draft']
-      ..prerelease = input['prelease']
-      ..author = input['author']
-      ..assets = new List.from(input['assets']
-          .map((Map<String, dynamic> it) => ReleaseAsset.fromJSON(it)))
-      ..name = input['name']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..publishedAt = parseDateTime(input['published_at']);
+    return _$ReleaseFromJson(input)..json = input;
+  }
+
+  static List<Map<String, dynamic>> _assetsToJson(List<ReleaseAsset> value) =>
+      value.map((asset) => asset.toJson()).toList();
+
+  static Map<String, dynamic> _authorToJson(User value) => value.toJson();
+
+  Map<String, dynamic> toJson() {
+    return _$ReleaseToJson(this);
   }
 }
 
 /// Model class for a release asset.
+@JsonSerializable()
 class ReleaseAsset {
+  @JsonKey(ignore: true)
+  Map json;
+
   /// Url to download the asset.
   @JsonKey(name: "browser_download_url")
   String browserDownloadUrl;
@@ -114,29 +120,28 @@ class ReleaseAsset {
   @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
-  static ReleaseAsset fromJSON(Map<String, dynamic> input) {
+  static ReleaseAsset fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new ReleaseAsset()
-      ..browserDownloadUrl = input['browser_download_url']
-      ..name = input['name']
-      ..id = input['id']
-      ..label = input['label']
-      ..state = input['state']
-      ..contentType = input['content_type']
-      ..size = input['size']
-      ..downloadCount = input['download_count']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
+    return _$ReleaseAssetFromJson(input)..json = input;
+  }
+
+  Map<String, dynamic> toJson() {
+    return _$ReleaseAssetToJson(this);
   }
 }
 
 /// Model class for a new release to be created.
+@JsonSerializable()
 class CreateRelease {
+  Map<String, dynamic> json;
+
   /// Tag Name to Base off of
+  @JsonKey(name: 'tag_name')
   final String tagName;
 
   /// Commit to Target
+  @JsonKey(name: 'target_commitish')
   String targetCommitish;
 
   /// Release Name
@@ -149,17 +154,17 @@ class CreateRelease {
   bool draft;
 
   /// If the release should actually be released.
-  bool release;
+  bool prerelease;
 
   CreateRelease(this.tagName);
 
-  String toJSON() {
-    var map = <String, dynamic>{};
-    putValue("tag_name", tagName, map);
-    putValue("name", name, map);
-    putValue("body", body, map);
-    putValue("draft", draft, map);
-    putValue("release", release, map);
-    return jsonEncode(map);
+  static CreateRelease fromJson(Map<String, dynamic> input) {
+    if (input == null) return null;
+
+    return _$CreateReleaseFromJson(input)..json = input;
+  }
+
+  Map<String, dynamic> toJson() {
+    return _$CreateReleaseToJson(this);
   }
 }

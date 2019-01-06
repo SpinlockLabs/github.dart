@@ -32,6 +32,27 @@ User _$UserFromJson(Map<String, dynamic> json) {
         : DateTime.parse(json['updated_at'] as String);
 }
 
+Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
+      'login': instance.login,
+      'id': instance.id,
+      'avatar_url': instance.avatarUrl,
+      'html_url': instance.htmlUrl,
+      'site_admin': instance.siteAdmin,
+      'name': instance.name,
+      'company': instance.company,
+      'blog': instance.blog,
+      'location': instance.location,
+      'email': instance.email,
+      'hirable': instance.hirable,
+      'bio': instance.bio,
+      'public_repos': instance.publicReposCount,
+      'public_gists': instance.publicGistsCount,
+      'followers': instance.followersCount,
+      'following': instance.followingCount,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String()
+    };
+
 CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
   return CurrentUser()
     ..login = json['login'] as String

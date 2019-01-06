@@ -34,8 +34,8 @@ class Gist {
       ..id = input['id']
       ..description = input['description']
       ..public = input['public']
-      ..owner = User.fromJSON(input['owner'] as Map<String, dynamic>)
-      ..user = User.fromJSON(input['user'] as Map<String, dynamic>);
+      ..owner = User.fromJson(input['owner'] as Map<String, dynamic>)
+      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
 
     if (input['files'] != null) {
       gist.files = [];
@@ -43,7 +43,7 @@ class Gist {
       for (var key in input['files'].keys) {
         var map = copyOf(input['files'][key]) as Map<String, dynamic>;
         map['name'] = key;
-        gist.files.add(GistFile.fromJSON(map));
+        gist.files.add(GistFile.fromJson(map));
       }
     }
 
@@ -71,7 +71,7 @@ class GistFile {
   bool truncated;
   String content;
 
-  static GistFile fromJSON(Map<String, dynamic> input) {
+  static GistFile fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GistFile()
@@ -96,11 +96,11 @@ class GistFork {
   @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
-  static GistFork fromJSON(Map<String, dynamic> input) {
+  static GistFork fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return new GistFork()
-      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
+      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..id = input['id']
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at']);
@@ -130,7 +130,7 @@ class GistHistoryEntry {
 
     return new GistHistoryEntry()
       ..version = input['version']
-      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
+      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..deletions = input['change_status']['deletions']
       ..additions = input['change_status']['additions']
       ..totalChanges = input['change_status']['total']
@@ -156,7 +156,7 @@ class GistComment {
 
     return new GistComment()
       ..id = input['id']
-      ..user = User.fromJSON(input['user'] as Map<String, dynamic>)
+      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..body = input['body'];

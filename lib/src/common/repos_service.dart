@@ -154,7 +154,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-contributors
   Stream<Tag> listContributors(RepositorySlug slug, {bool anon: false}) {
     return new PaginationHelper(_github).objects(
-        'GET', '/repos/${slug.fullName}/contributors', User.fromJSON,
+        'GET', '/repos/${slug.fullName}/contributors', User.fromJson,
         params: {"anon": anon.toString()}) as Stream<Tag>;
   }
 
@@ -172,7 +172,8 @@ class RepositoriesService extends Service {
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages",
           statusCode: StatusCodes.OK,
-          convert: (input) => new LanguageBreakdown(input));
+          convert: (Map<String, dynamic> input) =>
+              new LanguageBreakdown(input.cast<String, int>()));
 
   /// Lists the tags of the specified repository.
   ///
@@ -202,7 +203,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
   Stream<User> listCollaborators(RepositorySlug slug) {
     return new PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/collaborators", User.fromJSON);
+        .objects("GET", "/repos/${slug.fullName}/collaborators", User.fromJson);
   }
 
   Future<bool> isCollaborator(RepositorySlug slug, String user) {
@@ -505,7 +506,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
   Stream<Release> listReleases(RepositorySlug slug) {
     return new PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/releases", Release.fromJSON);
+        .objects("GET", "/repos/${slug.fullName}/releases", Release.fromJson);
   }
 
   /// Fetches a single release.
@@ -513,14 +514,15 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
   Future<Release> getRelease(RepositorySlug slug, int id) =>
       _github.getJSON("/repos/${slug.fullName}/releases/$id",
-          convert: Release.fromJSON);
+          convert: Release.fromJson);
 
   /// Creates a Release based on the specified [release].
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
   Future<Hook> createRelease(RepositorySlug slug, CreateRelease release) {
     return _github.postJSON("/repos/${slug.fullName}/releases",
-        convert: Release.fromJSON, body: release.toJSON()) as Future<Hook>;
+        convert: Release.fromJson,
+        body: jsonEncode(release.toJson())) as Future<Hook>;
   }
 
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release

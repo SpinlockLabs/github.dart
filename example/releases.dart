@@ -6,11 +6,10 @@ import "common.dart";
 
 DivElement releasesDiv;
 
-void main() {
-  init("releases.dart", onReady: () {
-    releasesDiv = querySelector("#releases");
-    loadReleases();
-  });
+Future<void> main() async {
+  await initViewSourceButton("releases.dart");
+  releasesDiv = querySelector("#releases");
+  loadReleases();
 }
 
 void loadReleases() {
@@ -27,7 +26,7 @@ void loadReleases() {
       var rel = releasesDiv.querySelector("#release-${release.id}");
       void append(String key, String value) {
         if (value == null) return;
-        rel.appendHtml("<br/><b>${key}</b>: ${value}",
+        rel.appendHtml("<br/><b>$key</b>: $value",
             treeSanitizer: NodeTreeSanitizer.trusted);
       }
 

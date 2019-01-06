@@ -47,8 +47,8 @@ class RepositoryCommit {
       ..htmlUrl = input['html_url']
       ..commentsUrl = input['comments_url']
       ..commit = GitCommit.fromJSON(input['commit'] as Map<String, dynamic>)
-      ..author = User.fromJSON(input['author'] as Map<String, dynamic>)
-      ..committer = User.fromJSON(input['committer'] as Map<String, dynamic>)
+      ..author = User.fromJson(input['author'] as Map<String, dynamic>)
+      ..committer = User.fromJson(input['committer'] as Map<String, dynamic>)
       ..stats = CommitStats.fromJSON(input['stats'] as Map<String, dynamic>);
 
     if (input['parents'] != null) {
