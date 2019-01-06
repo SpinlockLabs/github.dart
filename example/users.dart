@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:html";
 
 import "package:github/browser.dart";
@@ -6,29 +7,22 @@ import "common.dart";
 
 DivElement usersDiv;
 
-void main() {
-  init("users.dart", onReady: () {
-    usersDiv = querySelector("#users");
-    loadUsers();
-  });
+Future<void> main() async {
+  await initViewSourceButton("users.dart");
+  usersDiv = querySelector("#users");
+  loadUsers();
 }
 
 void loadUsers() {
-  String column = "left";
-
   github.users.listUsers(pages: 2).take(12).listen((User baseUser) {
     github.users.getUser(baseUser.login).then((user) {
-      var m = new DivElement();
-
-      m.classes.addAll(["box", "user", "middle", "center"]);
-
-      var h = new DivElement()..classes.add("middle");
+      var userDiv = new DivElement();
 
       for (int i = 1; i <= 2; i++) {
-        h.append(new BRElement());
+        userDiv.append(new BRElement());
       }
 
-      h.append(
+      userDiv.append(
           GitHubBrowserHelper.createAvatarImage(user, width: 64, height: 64)
             ..classes.add("avatar"));
       var buff = new StringBuffer();
@@ -44,19 +38,11 @@ void loadUsers() {
 
       buff.writeln("Followers: ${user.followersCount}");
 
-      h.append(new ParagraphElement()
+      userDiv.append(new ParagraphElement()
         ..appendHtml(buff.toString().replaceAll("\n", "<br/>"),
             treeSanitizer: NodeTreeSanitizer.trusted));
 
-      m.append(h);
-
-      usersDiv.querySelector("#$column");
-
-      if (column == "left") {
-        column = "right";
-      } else {
-        column = "left";
-      }
+      usersDiv.append(userDiv);
     });
   });
 }

@@ -8,16 +8,15 @@ DivElement tableDiv;
 
 LanguageBreakdown breakdown;
 
-void main() {
-  init("languages.dart", onReady: () {
-    tableDiv = querySelector("#table");
-    loadRepository();
-  });
+Future<void> main() async {
+  await initViewSourceButton("languages.dart");
+  tableDiv = querySelector("#table");
+  await loadRepository();
 }
 
-void loadRepository() {
+Future<void> loadRepository() async {
   var user = "dart-lang";
-  var reponame = "bleeding_edge";
+  var reponame = "sdk";
 
   var params = queryString;
 
@@ -31,12 +30,9 @@ void loadRepository() {
 
   document.getElementById("name").setInnerHtml("$user/$reponame");
 
-  github.repositories
-      .listLanguages(new RepositorySlug(user, reponame))
-      .then((b) {
-    breakdown = b;
-    reloadTable();
-  });
+  var repo = new RepositorySlug(user, reponame);
+  breakdown = await github.repositories.listLanguages(repo);
+  reloadTable();
 }
 
 bool isReloadingTable = false;
@@ -47,8 +43,8 @@ void reloadTable({int accuracy: 4}) {
   }
 
   isReloadingTable = true;
-
-  github.misc.renderMarkdown(generateMarkdown(accuracy)).then((html) {
+  String md = generateMarkdown(accuracy);
+  github.misc.renderMarkdown(md).then((html) {
     tableDiv.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
   });
@@ -62,22 +58,15 @@ String generateMarkdown(int accuracy) {
   int total = totalBytes(breakdown);
   var data = breakdown.toList();
 
-  // var tableData = [];
-  String md = 'Name|Bytes|Percentage\n';
+  String md = '|Name|Bytes|Percentage|\n';
+  md += '|-----|-----|-----|\n';
   data.sort((a, b) => b[1].compareTo(a[1]));
 
   data.forEach((info) {
     String name = info[0];
     int bytes = info[1];
     num percentage = ((bytes / total) * 100);
-    md += '$name|$bytes|$percentage\n';
-    // tableData.add({
-    //   "Name": name,
-    //   "Bytes": bytes,
-    //   "Percentage": "${percentage.toStringAsFixed(accuracy)}%"
-    // });
+    md += '|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|\n';
   });
-
-  // markdown.markdownToHtml(tableData);
-  // return markdown.table(tableData);
+  return md;
 }

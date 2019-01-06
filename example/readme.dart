@@ -6,11 +6,10 @@ import "common.dart";
 
 DivElement readmeDiv;
 
-void main() {
-  init("readme.dart", onReady: () {
-    readmeDiv = querySelector("#readme");
-    loadReadme();
-  });
+Future<void> main() async {
+  await initViewSourceButton("readme.dart");
+  readmeDiv = querySelector("#readme");
+  loadReadme();
 }
 
 void loadReadme() {

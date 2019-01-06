@@ -172,7 +172,8 @@ class RepositoriesService extends Service {
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/languages",
           statusCode: StatusCodes.OK,
-          convert: (input) => new LanguageBreakdown(input));
+          convert: (Map<String, dynamic> input) =>
+              new LanguageBreakdown(input.cast<String, int>()));
 
   /// Lists the tags of the specified repository.
   ///

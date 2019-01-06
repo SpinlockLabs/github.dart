@@ -6,23 +6,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitHub for Dart - Demos</title>
-  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://www.corsproxy.com/github.directcode.org/octicons/octicons.css">
+  <style>
+    a {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 
 <body>
   <h1>GitHub for Dart - Demos</h1>
+  <div>
+    These demos will work without a github token, but it is easy to exhaust the rate limit
+    without specifying a token. The demos will stop working when that happens. To use a
+    personal github token, enter it in the input below. It will be saved in session storage,
+    which goes away when you close your browser. Alternatively, you can add a
+    querystring parameter to specify your token on any of the examples like
+    <b><code>?token=[yourtoken]</code></b>
 
-  <a href="repos.html"><h3>Repositories</h3></a>
-  <a href="organization.html"><h3>Organization</h3></a>
-  <a href="users.html"><h3>Users</h3></a>
-  <a href="user_info.html"><h3>User Information</h3></a>
-  <a href="languages.html"><h3>Language Breakdown</h3></a>
-  <a href="releases.html"><h3>Releases</h3></a>
-  <a href="stars.html"><h3>Stars</h3></a>
-  <a href="emoji.html"><h3>Emoji</h3></a>
-  <a href="zen.html"><h3>Zen</h3></a>
+    <p>Github Token: <input type="text" id="token" size="50"></p>
+
+    <a href="repos.html">Repositories</a>
+    <a href="organization.html">Organization</a>
+    <a href="users.html">Users</a>
+    <a href="user_info.html">User Information</a>
+    <a href="languages.html">Language Breakdown</a>
+    <a href="releases.html">Releases</a>
+    <a href="stars.html">Stars</a>
+    <a href="emoji.html">Emoji</a>
+    <a href="zen.html">Zen</a>
+
+    <script defer src="index.dart.js"></script>
 </body>
 
 </html>
