@@ -45,6 +45,9 @@ Future<void> initViewSourceButton(String script) async {
 Map<String, String> queryString =
     Uri.parse(window.location.href).queryParameters;
 
+/// Gets the github token from the "token" query string param,
+/// falling back to getting it from session storage.
+/// If it is not in either, it will be null
 String token = queryString["token"] ?? window.sessionStorage['token'];
 
 GitHub _createGitHub() {

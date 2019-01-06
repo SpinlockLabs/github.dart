@@ -16,22 +16,17 @@ Future<void> main() async {
 }
 
 Future<void> loadEmojis() async {
-  try {
-    var emojis = await github.misc.listEmojis();
+  var emojis = await github.misc.listEmojis();
 
-    emojis.forEach((name, url) {
-      var h = new DivElement();
-      h.className = 'emojibox';
-      h.style.textAlign = "center";
-      h.append(new ImageElement(src: url.toString(), width: 64, height: 64)
-        ..classes.add("emoji"));
-      h.append(new ParagraphElement()..text = ":$name:");
-      emojiDiv.append(h);
-    });
-  } catch (x, stack) {
-    print(x);
-    print(stack);
-  }
+  emojis.forEach((name, url) {
+    var h = new DivElement();
+    h.className = 'emojibox';
+    h.style.textAlign = "center";
+    h.append(new ImageElement(src: url, width: 64, height: 64)
+      ..classes.add("emoji"));
+    h.append(new ParagraphElement()..text = ":$name:");
+    emojiDiv.append(h);
+  });
 }
 
 String lastQuery;
