@@ -5,11 +5,10 @@ import "common.dart";
 
 DivElement info;
 
-void main() {
-  init("user_info.dart", onReady: () {
-    info = document.getElementById("info");
-    loadUser();
-  });
+Future<void> main() async {
+  await initViewSourceButton("user_info.dart");
+  info = document.getElementById("info");
+  loadUser();
 }
 
 GitHub createClient(String token) {
@@ -17,14 +16,16 @@ GitHub createClient(String token) {
 }
 
 void loadUser() {
-  var token = document.getElementById("token") as InputElement;
-  document.getElementById("load").onClick.listen((event) {
-    if (token.value == null || token.value.isEmpty) {
+  var localToken = document.getElementById("token") as InputElement;
+
+  var loadBtn = document.getElementById("load");
+  loadBtn.onClick.listen((event) {
+    if (localToken.value == null || localToken.value.isEmpty) {
       window.alert("Please Enter a Token");
       return;
     }
 
-    github = createClient(token.value);
+    github = createClient(localToken.value);
 
     github.users.getCurrentUser().then((CurrentUser user) {
       info.children.clear();
@@ -58,4 +59,9 @@ void loadUser() {
       }
     });
   });
+
+  if (token != null) {
+    localToken.value = token;
+    loadBtn.click();
+  }
 }

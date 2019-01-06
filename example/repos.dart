@@ -1,7 +1,7 @@
+import "dart:async";
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:github/dates.dart";
 
 import "common.dart";
 
@@ -17,19 +17,12 @@ Map<String, Comparator<Repository>> sorts = {
   "size": (Repository a, Repository b) => b.size.compareTo(a.size)
 };
 
-void main() {
-  var stopwatch = new Stopwatch();
-  stopwatch.start();
+Future<void> main() async {
+  await initViewSourceButton('repos.dart');
 
   repositoriesDiv = querySelector("#repos");
 
-  document.onReadyStateChange.listen((event) {
-    if (document.readyState == ReadyState.COMPLETE) {
-      stopwatch.stop();
-      print("Document Finished Loading in ${stopwatch.elapsedMilliseconds}ms");
-      loadRepos();
-    }
-  });
+  loadRepos();
 
   querySelector("#reload").onClick.listen((event) {
     loadRepos();
@@ -43,8 +36,6 @@ void main() {
       updateRepos(_reposCache, sorts[name]);
     });
   });
-
-  init("repos.dart");
 }
 
 List<Repository> _reposCache;
@@ -67,7 +58,7 @@ void updateRepos(List<Repository> repos,
           <br/>
           <b>Forks</b>: ${repo.forksCount}
           <br/>
-          <b>Created</b>: ${friendlyDateTime(repo.createdAt)}
+          <b>Created</b>: ${repo.createdAt}
           <br/>
           <b>Size</b>: ${repo.size} bytes
           <p></p>

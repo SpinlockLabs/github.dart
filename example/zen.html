@@ -3,25 +3,19 @@
 
 <head>
   <title>GitHub Zen</title>
-
-  <link rel="stylesheet/less" type="text/css" href="styles/main.less" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.4/less.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="http://www.corsproxy.com/github.directcode.org/octicons/octicons.css">
 </head>
 
 <body class="demo-users">
   <div class="header">
     <h1>GitHub Zen</h1>
-    <div class="btn" id="view-source"><span class="octicon octicon-file-code"></span> View the Source</div>
+    <button id="view-source"><span class="octicon octicon-file-code"></span> View the Source</button>
     <p></p>
   </div>
 
-  <div id="zen-container">
-    <h1 class="center" id="zen"></h1>
-  </div>
+  <h1 id="zen">Loading...</h1>
 
-  <script type="application/dart" src="zen.dart"></script>
-  <script src="packages/browser/dart.js"></script>
+  <script defer src="zen.dart.js"></script>
+
 </body>
 
 </html>
