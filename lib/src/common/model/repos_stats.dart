@@ -15,7 +15,7 @@ class ContributorStatistics {
     if (input == null) return null;
 
     return new ContributorStatistics()
-      ..author = User.fromJSON(input['author'] as Map<String, dynamic>)
+      ..author = User.fromJson(input['author'] as Map<String, dynamic>)
       ..total = input['total']
       ..weeks = (input['weeks'] as List<Map<String, dynamic>>)
           .map((it) => ContributorWeekStatistics.fromJSON(it));

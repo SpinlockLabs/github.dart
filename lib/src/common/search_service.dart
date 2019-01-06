@@ -87,7 +87,7 @@ class SearchService extends Service {
 
       var items = input['items'] as List;
 
-      items.map((item) => User.fromJSON(item)).forEach(controller.add);
+      items.map((item) => User.fromJson(item)).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;

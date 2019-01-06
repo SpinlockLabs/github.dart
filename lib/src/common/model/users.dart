@@ -3,7 +3,7 @@ import "package:json_annotation/json_annotation.dart";
 part 'users.g.dart';
 
 /// Model class for a user.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class User {
   @JsonKey(ignore: true)
   Map json;
@@ -71,15 +71,18 @@ class User {
   @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
-  static User fromJSON(Map<String, dynamic> input) {
+  static User fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
     if (input['avatar_url'] == null) {
-      print(input);
       return null;
     }
 
     return _$UserFromJson(input)..json = input;
+  }
+
+  Map<String, dynamic> toJson() {
+    return _$UserToJson(this);
   }
 }
 
