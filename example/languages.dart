@@ -1,7 +1,6 @@
 import "dart:html";
 
 import "package:github/browser.dart";
-import "package:markdown/markdown.dart" as markdown;
 import "common.dart";
 
 DivElement tableDiv;
