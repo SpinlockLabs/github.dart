@@ -1,8 +1,8 @@
 import "dart:html";
 
-import 'markdown.dart' as markdown;
 import "package:github/browser.dart";
 import "common.dart";
+import 'markdown.dart' as markdown;
 
 DivElement tableDiv;
 
@@ -30,7 +30,7 @@ void loadRepository() {
     reponame = params["repo"];
   }
 
-  document.getElementById("name").setInnerHtml("${user}/${reponame}");
+  document.getElementById("name").setInnerHtml("$user/$reponame");
 
   github.repositories
       .listLanguages(new RepositorySlug(user, reponame))

@@ -10,10 +10,12 @@ import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
 
+import 'common/model/repos_releases.dart';
 import 'common/model/users.dart';
 import "common/util/pagination.dart";
 import 'util.dart';
 
+export 'common/model/repos_releases.dart';
 export "common/model/users.dart";
 export "common/util/pagination.dart";
 
@@ -42,7 +44,6 @@ part "common/model/repos_forks.dart";
 part "common/model/repos_hooks.dart";
 part "common/model/repos_merging.dart";
 part "common/model/repos_pages.dart";
-part "common/model/repos_releases.dart";
 part "common/model/repos_stats.dart";
 part "common/model/repos_statuses.dart";
 part "common/model/search.dart";

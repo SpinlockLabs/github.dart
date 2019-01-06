@@ -51,7 +51,7 @@ void loadUsers() {
 
       m.append(h);
 
-      usersDiv.querySelector("#${column}");
+      usersDiv.querySelector("#$column");
 
       if (column == "left") {
         column = "right";

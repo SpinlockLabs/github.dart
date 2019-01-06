@@ -35,13 +35,10 @@ const List<String> COMMON_GITHUB_TOKEN_ENV_KEYS = const [
 /// If the above fails, the GITHUB_USERNAME and GITHUB_PASSWORD keys will be checked.
 Authentication findAuthenticationFromEnvironment() {
   if (Platform.isMacOS) {
-    try {
-      var result = Process.runSync("security",
-          const ["find-internet-password", "-g", "-s", "github.com"]);
+    var result = Process.runSync("security",
+        const ["find-internet-password", "-g", "-s", "github.com"]);
 
-      if (result.exitCode != 0) {
-        throw "Don't use keychain.";
-      }
+    if (result.exitCode == 0) {
       String out = result.stdout.toString();
 
       String username = out.split('"acct"<blob>="')[1];
@@ -50,8 +47,6 @@ Authentication findAuthenticationFromEnvironment() {
       String password = result.stderr.toString().split("password:")[1].trim();
       password = password.substring(1, password.length - 1);
       return new Authentication.basic(username.trim(), password.trim());
-    } catch (e) {
-      print(e);
     }
   }
 

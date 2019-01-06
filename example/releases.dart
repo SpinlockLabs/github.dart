@@ -27,7 +27,7 @@ void loadReleases() {
       var rel = releasesDiv.querySelector("#release-${release.id}");
       void append(String key, String value) {
         if (value == null) return;
-        rel.appendHtml("<br/><b>${key}</b>: ${value}",
+        rel.appendHtml("<br/><b>$key</b>: $value",
             treeSanitizer: NodeTreeSanitizer.trusted);
       }
 

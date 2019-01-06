@@ -20,7 +20,7 @@ void loadCat() {
     print("${cats.length} octocats");
     var index = random.nextInt(cats.length);
     var cat = cats[index];
-    print("Selected Octocat at ${index} (${cat.name})");
+    print("Selected Octocat at $index (${cat.name})");
     $octocat.appendHtml("""
     <h2>${cat.name}</h2>
     <a class="center" href="${cat.url}"><img src="${cat.image}"></img></a>

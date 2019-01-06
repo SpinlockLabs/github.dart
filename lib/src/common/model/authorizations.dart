@@ -29,7 +29,7 @@ class Authorization {
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..json = input
-      ..user = User.fromJSON(input['user'] as Map<String, dynamic>);
+      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
   }
 }
 

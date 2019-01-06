@@ -188,7 +188,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
   Stream<User> listStargazers(RepositorySlug slug) {
     return new PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/stargazers", User.fromJSON);
+        .objects("GET", "/repos/${slug.fullName}/stargazers", User.fromJson);
   }
 
   /// Lists all the repos starred by a user.
@@ -243,7 +243,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/watching/#list-watchers
   Stream<User> listWatchers(RepositorySlug slug) {
     return new PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/subscribers", User.fromJSON);
+        .objects("GET", "/repos/${slug.fullName}/subscribers", User.fromJson);
   }
 
   /// Lists the repositories the specified user is watching.

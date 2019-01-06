@@ -37,7 +37,7 @@ void loadUser() {
         if (value != null) {
           info.appendHtml("""
             <br/>
-            <b>${name}</b>: ${value.toString()}
+            <b>$name</b>: ${value.toString()}
           """);
         }
       }

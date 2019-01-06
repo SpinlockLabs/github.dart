@@ -1,5 +1,6 @@
-import "common.dart";
 import "package:github/browser.dart";
+
+import "common.dart";
 
 void main() {
   init("markdown.dart", onReady: () {

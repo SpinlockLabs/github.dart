@@ -36,7 +36,7 @@ void main() {
   });
 
   sorts.keys.forEach((name) {
-    querySelector("#sort-${name}").onClick.listen((event) {
+    querySelector("#sort-$name").onClick.listen((event) {
       if (_reposCache == null) {
         loadRepos(sorts[name]);
       }

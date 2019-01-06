@@ -33,7 +33,7 @@ class Event {
       ..org = Organization.fromJSON(input['org'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])
       ..id = input['id']
-      ..actor = User.fromJSON(input['actor'] as Map<String, dynamic>)
+      ..actor = User.fromJson(input['actor'] as Map<String, dynamic>)
       ..payload = input['payload'] as Map<String, dynamic>;
 
     return event;

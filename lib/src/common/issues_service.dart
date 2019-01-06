@@ -163,7 +163,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
   Stream<User> listAssignees(RepositorySlug slug) {
     return new PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/assignees", User.fromJSON);
+        .objects("GET", "/repos/${slug.fullName}/assignees", User.fromJson);
   }
 
   /// Checks if a user is an assignee for the specified repository.
