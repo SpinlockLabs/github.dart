@@ -1,11 +1,11 @@
-import "dart:html";
+import 'dart:html';
 import 'package:github/browser.dart';
-import "common.dart";
+import 'common.dart';
 
 Future<void> main() async {
-  await initViewSourceButton("search.dart");
+  await initViewSourceButton('search.dart');
 
-  var searchBtn = querySelector("#submit");
+  var searchBtn = querySelector('#submit');
   searchBtn.onClick.listen(search);
 }
 
@@ -27,9 +27,9 @@ Future<void> search(_) async {
     pages: int.tryParse(val('pages')),
   );
 
-  querySelector("#nresults").text =
+  querySelector('#nresults').text =
       '${results.totalCount} result${results.totalCount == 1 ? "" : "s"}';
-  DivElement resultsDiv = querySelector("#results");
+  DivElement resultsDiv = querySelector('#results');
   resultsDiv.innerHtml = '';
   for (Map item in results.items) {
     var url = item['html_url'];
