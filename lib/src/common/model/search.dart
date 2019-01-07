@@ -7,7 +7,7 @@ class SearchResults<T> {
   @JsonKey(name: "incomplete_results")
   bool incompleteResults;
 
-  List<T> items;
+  List<T> items = <T>[];
 
   static SearchResults fromJSON(
       Map<String, dynamic> input, JSONConverter resultConverter) {

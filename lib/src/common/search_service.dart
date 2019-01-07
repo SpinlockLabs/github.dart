@@ -48,35 +48,58 @@ class SearchService extends Service {
   }
 
   /// Search through code for a given [query]
-  /// Supports optional conditions of [language], [filename], and [user]
+  /// You can include any github qualifiers in the query directly
+  /// or you can set some of the optional params to set the qualifiers
+  /// For example, these do the same thing:
+  /// code('awesome language:dart') and
+  /// code('awesome', language: 'dart')
   ///
   /// https://developer.github.com/v3/search/#search-code
-  Stream code(String query,
+  Future<SearchResults> code(String query,
       {String language,
       String filename,
+      String extension,
       String user,
+      String org,
+      String repo,
+      String fork,
+      String path,
+      String size,
+      bool inFile: true,
+      bool inPath: false,
       int pages: 2,
-      int perPage: 30}) {
-    var params = {"q": query};
-
-    if (language != null) {
-      params['language'] = language;
+      int perPage: 30}) async {
+    query += _searchQualifier('language', language);
+    query += _searchQualifier('filename', filename);
+    query += _searchQualifier('extension', extension);
+    query += _searchQualifier('user', user);
+    query += _searchQualifier('org', org);
+    query += _searchQualifier('repo', repo);
+    query += _searchQualifier('fork', fork);
+    query += _searchQualifier('path', path);
+    query += _searchQualifier('size', size);
+    String _in = '';
+    if (inFile) {
+      _in = 'file';
     }
-
-    if (filename != null) {
-      params['filename'] = filename;
+    if (inPath) {
+      if (_in.isEmpty) {
+        _in = 'path';
+      } else {
+        _in = 'file,path';
+      }
     }
-
-    if (user != null) {
-      params['user'] = user;
+    if (_in.isNotEmpty) {
+      query += ' in:$_in';
     }
-
-    params["per_page"] = perPage?.toString();
+    var params = <String, dynamic>{};
+    params['q'] = query;
+    params['per_page'] = perPage?.toString();
 
     var controller = new StreamController();
 
     var isFirst = true;
-
+    SearchResults results = SearchResults();
     new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages)
         .listen((response) {
@@ -85,23 +108,27 @@ class SearchService extends Service {
           isFirst) {
         throw new RateLimitHit(_github);
       }
-
       isFirst = false;
-
       var input = json.decode(response.body);
 
+      results.totalCount = input['total_count'] ?? 0;
       if (input['items'] == null) {
         return;
       }
 
-      List<dynamic> items = input['items'];
-
-      items.forEach(controller.add);
+      input['items'].forEach(controller.add);
     }).onDone(controller.close);
 
-    return controller.stream;
+    results.items = await controller.stream.toList();
+    return results;
   }
 
+  String _searchQualifier(String key, String value) {
+    if (value != null && value.isNotEmpty) {
+      return ' $key:$value';
+    }
+    return '';
+  }
   // TODO: Implement issues: https://developer.github.com/v3/search/#search-issues
 
   /// Search for users using [query].
