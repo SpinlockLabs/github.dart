@@ -98,24 +98,19 @@ class SearchService extends Service {
 
     var controller = new StreamController();
 
-    var isFirst = true;
     SearchResults results = SearchResults();
     new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages)
-        .listen((response) {
-      if (response.statusCode == 403 &&
-          response.body.contains("rate limit") &&
-          isFirst) {
+        .handleError((err) {
+      if (err != null && err.toString().contains('rate limit exceeded')) {
         throw new RateLimitHit(_github);
       }
-      isFirst = false;
+    }).listen((response) {
       var input = json.decode(response.body);
-
       results.totalCount = input['total_count'] ?? 0;
       if (input['items'] == null) {
         return;
       }
-
       input['items'].forEach(controller.add);
     }).onDone(controller.close);
 

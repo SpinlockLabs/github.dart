@@ -8,5 +8,8 @@ void main() {
   tokenInput.onKeyUp.listen((_) {
     window.localStorage['token'] = tokenInput.value;
   });
-  removeTokenBtn.onClick.listen((_) => window.localStorage.remove('token'));
+  removeTokenBtn.onClick.listen((_) {
+    window.localStorage.remove('token');
+    tokenInput.value = '';
+  });
 }
