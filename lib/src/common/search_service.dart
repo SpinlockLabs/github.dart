@@ -69,6 +69,11 @@ class SearchService extends Service {
       bool inPath: false,
       int pages: 2,
       int perPage: 30}) async {
+    // Add qualifiers to the query
+    // Known Issue: If a query already has a qualifier and the same
+    // qualifier parameter is passed in, it will be duplicated.
+    // Example: code('example repo:ex', repo: 'ex') will result in
+    // a query of "example repo:ex repo:ex"
     query += _searchQualifier('language', language);
     query += _searchQualifier('filename', filename);
     query += _searchQualifier('extension', extension);
@@ -78,6 +83,8 @@ class SearchService extends Service {
     query += _searchQualifier('fork', fork);
     query += _searchQualifier('path', path);
     query += _searchQualifier('size', size);
+
+    // build up the in: qualifier based on the 2 booleans
     String _in = '';
     if (inFile) {
       _in = 'file';
@@ -96,7 +103,8 @@ class SearchService extends Service {
     params['q'] = query;
     params['per_page'] = perPage?.toString();
 
-    var controller = new StreamController<CodeSearchResults>();
+    var results = <CodeSearchResults>[];
+    Completer<CodeSearchResults> c = new Completer<CodeSearchResults>();
 
     Stream<http.Response> responseStream = new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages);
@@ -112,17 +120,19 @@ class SearchService extends Service {
       if (input['items'] == null) {
         return;
       }
-      var r = CodeSearchResults.fromJson(input);
-      controller.add(r);
-    }).onDone(controller.close);
-
-    var results = await controller.stream.toList();
-    if (results.length > 1) {
-      for (int i = 1; i < results.length; i++) {
-        results[0].items.addAll(results[i].items);
+      results.add(CodeSearchResults.fromJson(input));
+    }).onDone(() {
+      // Once we're done, combine all of the items from each page response
+      // into the first CodeSearchResults and complete with the combined results
+      if (results.length > 1) {
+        for (int i = 1; i < results.length; i++) {
+          results[0].items.addAll(results[i].items);
+        }
       }
-    }
-    return results.first;
+      c.complete(results.first);
+    });
+
+    return c.future;
   }
 
   String _searchQualifier(String key, String value) {
