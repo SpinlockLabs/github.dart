@@ -28,7 +28,7 @@ Future<void> search(_) async {
   );
 
   querySelector('#nresults').text =
-      '${results.totalCount} result${results.totalCount == 1 ? "" : "s"}';
+      '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing ${results.items.length})';
   DivElement resultsDiv = querySelector('#results');
   resultsDiv.innerHtml = '';
   for (CodeSearchItem item in results.items) {

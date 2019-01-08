@@ -96,19 +96,33 @@ class SearchService extends Service {
     params['q'] = query;
     params['per_page'] = perPage?.toString();
 
-    CodeSearchResults results;
-    var response = await new PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/code", params: params, pages: pages)
-        .handleError((err) {
+    var controller = new StreamController<CodeSearchResults>();
+
+    Stream<http.Response> responseStream = new PaginationHelper(_github)
+        .fetchStreamed("GET", "/search/code", params: params, pages: pages);
+
+    responseStream.handleError((err) {
       if (err != null && err.toString().contains('rate limit exceeded')) {
         throw new RateLimitHit(_github);
       }
-    }).toList();
+    });
 
-    var input = json.decode(response[0].body);
-    results = CodeSearchResults.fromJson(input);
+    responseStream.listen((response) {
+      var input = json.decode(response.body);
+      if (input['items'] == null) {
+        return;
+      }
+      var r = CodeSearchResults.fromJson(input);
+      controller.add(r);
+    }).onDone(controller.close);
 
-    return results;
+    var results = await controller.stream.toList();
+    if (results.length > 1) {
+      for (int i = 1; i < results.length; i++) {
+        results[0].items.addAll(results[i].items);
+      }
+    }
+    return results.first;
   }
 
   String _searchQualifier(String key, String value) {
