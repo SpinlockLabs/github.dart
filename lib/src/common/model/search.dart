@@ -1,29 +1,67 @@
 part of github.common;
 
-class SearchResults<T> {
+abstract class SearchResults<T> {
+  int totalCount;
+  bool incompleteResults;
+  List<T> items;
+}
+
+@JsonSerializable(generateToJsonFunction: false, createToJson: false)
+class CodeSearchResults implements SearchResults<CodeSearchItem> {
   @JsonKey(name: "total_count")
   int totalCount;
 
   @JsonKey(name: "incomplete_results")
   bool incompleteResults;
 
-  List<T> items = <T>[];
+  @JsonKey(fromJson: CodeSearchItem.fromJsonList)
+  List<CodeSearchItem> items;
 
-  static SearchResults fromJSON(
-      Map<String, dynamic> input, JSONConverter resultConverter) {
-    var results = new SearchResults();
-    results
-      ..totalCount = input['total_count']
-      ..incompleteResults = input['incomplete_results'];
+  static CodeSearchResults fromJson(Map<String, dynamic> input) =>
+      _$CodeSearchResultsFromJson(input);
+}
 
-    var itemList = input['items'];
+@JsonSerializable(generateToJsonFunction: false, createToJson: false)
+class CodeSearchItem {
+  @JsonKey()
+  String name;
 
-    results.items = [];
+  @JsonKey()
+  String path;
 
-    for (var item in itemList) {
-      results.items.add(resultConverter(item));
+  @JsonKey()
+  String sha;
+
+  @JsonKey(fromJson: Uri.parse)
+  Uri url;
+
+  @JsonKey(name: 'git_url', fromJson: Uri.parse)
+  Uri gitUrl;
+
+  @JsonKey(name: 'html_url', fromJson: Uri.parse)
+  Uri htmlUrl;
+
+  @JsonKey(fromJson: Repository.fromJSON)
+  Repository repository;
+
+  static CodeSearchItem fromJson(Map<String, dynamic> input) {
+    return _$CodeSearchItemFromJson(input);
+  }
+
+  static List<CodeSearchItem> fromJsonList(List<dynamic> input) {
+    var result = <CodeSearchItem>[];
+    for (var item in input) {
+      if (item is Map<String, dynamic>) {
+        result.add(CodeSearchItem.fromJson(item));
+      }
     }
-
-    return results;
+    return result;
   }
 }
+
+// TODO: Issue Search
+// @JsonSerializable(generateToJsonFunction: false, createToJson: false)
+// class IssueSearchResults extends SearchResults<IssueSearchItem> {}
+
+// @JsonSerializable(generateToJsonFunction: false, createToJson: false)
+// class IssueSearchItem {}

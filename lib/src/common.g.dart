@@ -346,3 +346,27 @@ Map<String, dynamic> _$LinksToJson(Links instance) => <String, dynamic>{
       'git': instance.git?.toString(),
       'html': instance.html?.toString()
     };
+
+CodeSearchResults _$CodeSearchResultsFromJson(Map<String, dynamic> json) {
+  return CodeSearchResults()
+    ..totalCount = json['total_count'] as int
+    ..incompleteResults = json['incomplete_results'] as bool
+    ..items = json['items'] == null
+        ? null
+        : CodeSearchItem.fromJsonList(json['items'] as List);
+}
+
+CodeSearchItem _$CodeSearchItemFromJson(Map<String, dynamic> json) {
+  return CodeSearchItem()
+    ..name = json['name'] as String
+    ..path = json['path'] as String
+    ..sha = json['sha'] as String
+    ..url = json['url'] == null ? null : Uri.parse(json['url'] as String)
+    ..gitUrl =
+        json['git_url'] == null ? null : Uri.parse(json['git_url'] as String)
+    ..htmlUrl =
+        json['html_url'] == null ? null : Uri.parse(json['html_url'] as String)
+    ..repository = json['repository'] == null
+        ? null
+        : Repository.fromJSON(json['repository'] as Map<String, dynamic>);
+}

@@ -55,7 +55,7 @@ class SearchService extends Service {
   /// code('awesome', language: 'dart')
   ///
   /// https://developer.github.com/v3/search/#search-code
-  Future<SearchResults> code(String query,
+  Future<CodeSearchResults> code(String query,
       {String language,
       String filename,
       String extension,
@@ -96,25 +96,18 @@ class SearchService extends Service {
     params['q'] = query;
     params['per_page'] = perPage?.toString();
 
-    var controller = new StreamController();
-
-    SearchResults results = SearchResults();
-    new PaginationHelper(_github)
+    CodeSearchResults results;
+    var response = await new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages)
         .handleError((err) {
       if (err != null && err.toString().contains('rate limit exceeded')) {
         throw new RateLimitHit(_github);
       }
-    }).listen((response) {
-      var input = json.decode(response.body);
-      results.totalCount = input['total_count'] ?? 0;
-      if (input['items'] == null) {
-        return;
-      }
-      input['items'].forEach(controller.add);
-    }).onDone(controller.close);
+    }).toList();
 
-    results.items = await controller.stream.toList();
+    var input = json.decode(response[0].body);
+    results = CodeSearchResults.fromJson(input);
+
     return results;
   }
 
