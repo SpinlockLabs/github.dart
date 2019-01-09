@@ -48,7 +48,7 @@ Map<String, String> queryString =
 /// Gets the github token from the "token" query string param,
 /// falling back to getting it from session storage.
 /// If it is not in either, it will be null
-String token = queryString["token"] ?? window.localStorage['token'];
+String token = queryString["token"] ?? window.sessionStorage['token'];
 
 GitHub _createGitHub() {
   return new GitHub(

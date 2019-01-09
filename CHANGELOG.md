@@ -9,6 +9,8 @@
   - Made associated classes `ContributorStatistics` and 
     `ContributorWeekStatistics` immutable. Since these classes are only meant as
     return values, we're not treating this as a breaking change.
+- Added `Stream<CodeSearchResults> github.search.code(...)` search API
+  - Made `CodeSearchResults` class to hold search results
 
 ## v4.0.1
 

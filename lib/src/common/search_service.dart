@@ -61,8 +61,8 @@ class SearchService extends Service {
   /// https://developer.github.com/v3/search/#search-code
   Stream<CodeSearchResults> code(
     String query, {
-    @meta.required int pages,
-    @meta.required int perPage,
+    int pages,
+    int perPage,
     String language,
     String filename,
     String extension,
@@ -105,9 +105,12 @@ class SearchService extends Service {
     if (_in.isNotEmpty) {
       query += ' in:$_in';
     }
+
     var params = <String, dynamic>{};
-    params['q'] = query;
-    params['per_page'] = perPage?.toString();
+    params['q'] = query ?? '';
+    if (perPage != null) {
+      params['per_page'] = perPage.toString();
+    }
 
     var controller = new StreamController<CodeSearchResults>();
     Stream<http.Response> responseStream = new PaginationHelper(_github)
