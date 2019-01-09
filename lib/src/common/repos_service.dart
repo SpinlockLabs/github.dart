@@ -533,29 +533,27 @@ class RepositoriesService extends Service {
 
   /// Lists repository contributor statistics.
   ///
+  /// It's possible that this API will throw [NotReady] in which case you should
+  /// try the call again later.
+  ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#contributors
-  Future<List<ContributorStatistics>> listContributorStats(RepositorySlug slug,
-      {int limit: 30}) {
-    var completer = new Completer<List<ContributorStatistics>>();
+  Future<List<ContributorStatistics>> listContributorStats(
+    RepositorySlug slug,
+  ) async {
     var path = "/repos/${slug.fullName}/stats/contributors";
-    var handle;
-    handle = (json) {
-      if (json is Map) {
-        new Future.delayed(new Duration(milliseconds: 200), () {
-          _github.getJSON(path,
-              statusCode: 200,
-              convert: handle,
-              params: {"per_page": limit.toString()});
-        });
-        return null;
-      } else {
-        completer.complete(json.map(
-            (Map<String, dynamic> it) => ContributorStatistics.fromJSON(it)));
-      }
-    };
-    _github
-        .getJSON(path, convert: handle, params: {"per_page": limit.toString()});
-    return completer.future;
+    var response = await _github.request('GET', path,
+        headers: {"Accept": "application/vnd.github.v3+json"});
+
+    if (response.statusCode == 200) {
+      return (jsonDecode(response.body) as List)
+          .map((e) => ContributorStatistics.fromJson(e))
+          .toList();
+    } else if (response.statusCode == 202) {
+      throw NotReady(_github, path);
+    }
+    _github.handleStatusCode(response);
+    // will never get here!
+    return null;
   }
 
   /// Fetches commit counts for the past year.

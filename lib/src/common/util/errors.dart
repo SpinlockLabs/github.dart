@@ -13,6 +13,11 @@ class GitHubError implements Exception {
   String toString() => "GitHub Error: $message";
 }
 
+class NotReady extends GitHubError {
+  NotReady(GitHub github, String path)
+      : super(github, 'Not ready. Try again later', apiUrl: path);
+}
+
 /// GitHub Entity was not found
 class NotFound extends GitHubError {
   NotFound(GitHub github, String msg) : super(github, msg);

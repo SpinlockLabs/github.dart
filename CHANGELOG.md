@@ -2,6 +2,13 @@
 
 - Fix return type of `RepositoriesService.listContributors`.
 - Fix return type of `RepositoriesService.createRelease`.
+- Fixed `RepositoriesService.listContributorStats`.
+  - Removed unsupported `limit` parameter.
+  - Removed flaky retry logic. Instead, `NotReady` is thrown, which can be used
+    to decide to retry at the call site.
+  - Made associated classes `ContributorStatistics` and 
+    `ContributorWeekStatistics` immutable. Since these classes are only meant as
+    return values, we're not treating this as a breaking change.
 
 ## v4.0.1
 
