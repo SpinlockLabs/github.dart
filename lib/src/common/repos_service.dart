@@ -135,7 +135,7 @@ class RepositoriesService extends Service {
       "default_branch": "defaultBranch"
     });
     return _github.postJSON("/repos/${repo.fullName}",
-        body: jsonEncode(data), statusCode: 200) as Future<Repository>;
+        body: jsonEncode(data), statusCode: 200);
   }
 
   /// Deletes a repository.
@@ -474,8 +474,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#create
   Future<PublicKey> createDeployKey(RepositorySlug slug, CreatePublicKey key) {
-    return _github.postJSON("/repos/${slug.fullName}/keys", body: key.toJSON())
-        as Future<PublicKey>;
+    return _github.postJSON("/repos/${slug.fullName}/keys", body: key.toJSON());
   }
 
   // TODO: Implement editDeployKey: https://developer.github.com/v3/repos/keys/#edit
@@ -519,10 +518,9 @@ class RepositoriesService extends Service {
   /// Creates a Release based on the specified [release].
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
-  Future<Hook> createRelease(RepositorySlug slug, CreateRelease release) {
+  Future<Release> createRelease(RepositorySlug slug, CreateRelease release) {
     return _github.postJSON("/repos/${slug.fullName}/releases",
-        convert: Release.fromJson,
-        body: jsonEncode(release.toJson())) as Future<Hook>;
+        convert: Release.fromJson, body: jsonEncode(release.toJson()));
   }
 
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release
