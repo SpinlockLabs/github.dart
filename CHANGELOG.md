@@ -1,6 +1,7 @@
 ## v4.0.2
 
 - Fix return type of `RepositoriesService.listContributors`.
+- Fix return type of `RepositoriesService.createRelease`.
 
 ## v4.0.1
 
