@@ -152,10 +152,10 @@ class RepositoriesService extends Service {
   /// Lists the contributors of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-contributors
-  Stream<Tag> listContributors(RepositorySlug slug, {bool anon: false}) {
+  Stream<User> listContributors(RepositorySlug slug, {bool anon: false}) {
     return new PaginationHelper(_github).objects(
         'GET', '/repos/${slug.fullName}/contributors', User.fromJson,
-        params: {"anon": anon.toString()}) as Stream<Tag>;
+        params: {"anon": anon.toString()});
   }
 
   /// Lists the teams of the specified repository.

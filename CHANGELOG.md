@@ -1,3 +1,7 @@
+## v4.0.2
+
+- Fix return type of `RepositoriesService.listContributors`.
+
 ## v4.0.1
 
 - Fix cast errors in event and issue queries.
