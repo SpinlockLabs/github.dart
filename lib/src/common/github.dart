@@ -267,53 +267,6 @@ class GitHub {
     return convert(jsonDecode(response.body));
   }
 
-  ///
-  /// Internal method to handle status codes
-  ///
-  @meta.alwaysThrows
-  void handleStatusCode(http.Response response) {
-    String message;
-    List<Map<String, String>> errors;
-    if (response.headers['content-type'].contains('application/json')) {
-      var json = jsonDecode(response.body);
-      message = json['message'];
-      errors = json['errors'] as List<Map<String, String>>;
-    }
-    switch (response.statusCode) {
-      case 404:
-        throw new NotFound(this, "Requested Resource was Not Found");
-        break;
-      case 401:
-        throw new AccessForbidden(this);
-      case 400:
-        if (message == "Problems parsing JSON") {
-          throw new InvalidJSON(this, message);
-        } else if (message == "Body should be a JSON Hash") {
-          throw new InvalidJSON(this, message);
-        } else
-          throw new BadRequest(this);
-        break;
-      case 422:
-        var buff = new StringBuffer();
-        buff.writeln();
-        buff.writeln("  Message: $message");
-        if (errors != null) {
-          buff.writeln("  Errors:");
-          for (Map<String, String> error in errors) {
-            var resource = error['resource'];
-            var field = error['field'];
-            var code = error['code'];
-            buff
-              ..writeln("    Resource: $resource")
-              ..writeln("    Field $field")
-              ..write("    Code: $code");
-          }
-        }
-        throw new ValidationFailed(this, buff.toString());
-    }
-    throw new UnknownError(this, message);
-  }
-
   /// Handles Authenticated Requests in an easy to understand way.
   ///
   /// [method] is the HTTP method.
@@ -383,6 +336,53 @@ class GitHub {
       handleStatusCode(response);
     } else
       return response;
+  }
+
+  ///
+  /// Internal method to handle status codes
+  ///
+  @meta.alwaysThrows
+  void handleStatusCode(http.Response response) {
+    String message;
+    List<Map<String, String>> errors;
+    if (response.headers['content-type'].contains('application/json')) {
+      var json = jsonDecode(response.body);
+      message = json['message'];
+      errors = json['errors'] as List<Map<String, String>>;
+    }
+    switch (response.statusCode) {
+      case 404:
+        throw new NotFound(this, "Requested Resource was Not Found");
+        break;
+      case 401:
+        throw new AccessForbidden(this);
+      case 400:
+        if (message == "Problems parsing JSON") {
+          throw new InvalidJSON(this, message);
+        } else if (message == "Body should be a JSON Hash") {
+          throw new InvalidJSON(this, message);
+        } else
+          throw new BadRequest(this);
+        break;
+      case 422:
+        var buff = new StringBuffer();
+        buff.writeln();
+        buff.writeln("  Message: $message");
+        if (errors != null) {
+          buff.writeln("  Errors:");
+          for (Map<String, String> error in errors) {
+            var resource = error['resource'];
+            var field = error['field'];
+            var code = error['code'];
+            buff
+              ..writeln("    Resource: $resource")
+              ..writeln("    Field $field")
+              ..write("    Code: $code");
+          }
+        }
+        throw new ValidationFailed(this, buff.toString());
+    }
+    throw new UnknownError(this, message);
   }
 
   /// Disposes of this GitHub Instance.
