@@ -10,7 +10,7 @@ Future<void> main() async {
 }
 
 Future<void> search(_) async {
-  CodeSearchResults results = await github.search.code(
+  Stream<CodeSearchResults> resultsStream = github.search.code(
     val('query'),
     language: val('language'),
     filename: val('filename'),
@@ -26,7 +26,7 @@ Future<void> search(_) async {
     perPage: int.tryParse(val('perpage')),
     pages: int.tryParse(val('pages')),
   );
-
+  var results = await resultsStream.first;
   querySelector('#nresults').text =
       '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing ${results.items.length})';
   DivElement resultsDiv = querySelector('#results');

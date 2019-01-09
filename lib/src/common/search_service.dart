@@ -47,7 +47,11 @@ class SearchService extends Service {
     return controller.stream;
   }
 
-  /// Search through code for a given [query]
+  /// Search through code for a given [query].
+  /// [pages] and [perPage] are required named parameters so that you
+  /// are in control of how many results you get. If you want all
+  /// results no matter how many pages, set pages to a very high number.
+  ///
   /// You can include any github qualifiers in the query directly
   /// or you can set some of the optional params to set the qualifiers
   /// For example, these do the same thing:
@@ -55,20 +59,22 @@ class SearchService extends Service {
   /// code('awesome', language: 'dart')
   ///
   /// https://developer.github.com/v3/search/#search-code
-  Future<CodeSearchResults> code(String query,
-      {String language,
-      String filename,
-      String extension,
-      String user,
-      String org,
-      String repo,
-      String fork,
-      String path,
-      String size,
-      bool inFile: true,
-      bool inPath: false,
-      int pages: 2,
-      int perPage: 30}) async {
+  Stream<CodeSearchResults> code(
+    String query, {
+    @required int pages,
+    @required int perPage,
+    String language,
+    String filename,
+    String extension,
+    String user,
+    String org,
+    String repo,
+    String fork,
+    String path,
+    String size,
+    bool inFile: true,
+    bool inPath: false,
+  }) {
     // Add qualifiers to the query
     // Known Issue: If a query already has a qualifier and the same
     // qualifier parameter is passed in, it will be duplicated.
@@ -103,9 +109,7 @@ class SearchService extends Service {
     params['q'] = query;
     params['per_page'] = perPage?.toString();
 
-    var results = <CodeSearchResults>[];
-    Completer<CodeSearchResults> c = new Completer<CodeSearchResults>();
-
+    var controller = new StreamController<CodeSearchResults>();
     Stream<http.Response> responseStream = new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages);
 
@@ -120,19 +124,10 @@ class SearchService extends Service {
       if (input['items'] == null) {
         return;
       }
-      results.add(CodeSearchResults.fromJson(input));
-    }).onDone(() {
-      // Once we're done, combine all of the items from each page response
-      // into the first CodeSearchResults and complete with the combined results
-      if (results.length > 1) {
-        for (int i = 1; i < results.length; i++) {
-          results[0].items.addAll(results[i].items);
-        }
-      }
-      c.complete(results.first);
-    });
+      controller.add(CodeSearchResults.fromJson(input));
+    }).onDone(controller.close);
 
-    return c.future;
+    return controller.stream;
   }
 
   String _searchQualifier(String key, String value) {

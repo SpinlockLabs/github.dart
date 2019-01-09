@@ -5,9 +5,9 @@ Future<void> main() async {
   print('Searching ...');
   GitHub github = new GitHub();
 
-  CodeSearchResults results = await github.search
-      .code('github', repo: 'DirectMyFile/github.dart', perPage: 5, pages: 3);
-
+  Stream<CodeSearchResults> resultsStream = github.search
+      .code('github', repo: 'DirectMyFile/github.dart', perPage: 5, pages: 1);
+  var results = await resultsStream.first;
   print('${results.totalCount} results');
   int k = 1;
   for (var i in results.items) {
