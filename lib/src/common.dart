@@ -9,6 +9,7 @@ import "dart:convert"
 import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
+import 'package:meta/meta.dart' as meta show alwaysThrows;
 
 import 'common/model/repos_releases.dart';
 import 'common/model/users.dart';
