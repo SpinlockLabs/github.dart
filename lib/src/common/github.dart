@@ -187,38 +187,19 @@ class GitHub {
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
   Future<T> getJSON<S, T>(String path,
-      {int statusCode,
-      void fail(http.Response response),
-      Map<String, String> headers,
-      Map<String, String> params,
-      JSONConverter<S, T> convert,
-      String preview}) async {
-    if (headers == null) headers = {};
-
-    if (preview != null) {
-      headers["Accept"] = preview;
-    }
-
-    if (convert == null) {
-      convert = (input) => input as T;
-    }
-
-    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
-
-    var response = await request("GET", path,
-        headers: headers, params: params, statusCode: statusCode, fail: fail);
-
-    var json = jsonDecode(response.body);
-
-    if (convert == null) {
-      _applyExpandos(json, response);
-      return json;
-    }
-
-    final returnValue = convert(json);
-    _applyExpandos(returnValue, response);
-    return returnValue;
-  }
+          {int statusCode,
+          void fail(http.Response response),
+          Map<String, String> headers,
+          Map<String, String> params,
+          JSONConverter<S, T> convert,
+          String preview}) =>
+      _requestJson('GET', path,
+          statusCode: statusCode,
+          fail: fail,
+          headers: headers,
+          params: params,
+          convert: convert,
+          preview: preview);
 
   /// Handles Post Requests that respond with JSO
   ///
@@ -239,32 +220,59 @@ class GitHub {
   /// The default [convert] function returns the input object.
   /// [body] is the data to send to the server.
   Future<T> postJSON<S, T>(String path,
-      {int statusCode,
-      void fail(http.Response response),
-      Map<String, String> headers,
-      Map<String, String> params,
-      JSONConverter<S, T> convert,
-      String body,
-      String preview}) async {
-    if (headers == null) headers = {};
+          {int statusCode,
+          void fail(http.Response response),
+          Map<String, String> headers,
+          Map<String, String> params,
+          JSONConverter<S, T> convert,
+          String body,
+          String preview}) =>
+      _requestJson('POST', path,
+          statusCode: statusCode,
+          fail: fail,
+          headers: headers,
+          params: params,
+          convert: convert,
+          body: body,
+          preview: preview);
+
+  Future<T> _requestJson<S, T>(
+    String method,
+    String path, {
+    int statusCode,
+    void fail(http.Response response),
+    Map<String, String> headers,
+    Map<String, String> params,
+    JSONConverter<S, T> convert,
+    String body,
+    String preview,
+  }) async {
+    convert ??= (input) => input as T;
+    headers ??= {};
 
     if (preview != null) {
       headers["Accept"] = preview;
     }
 
-    if (convert == null) {
-      convert = (input) => input as T;
-    }
-
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    var response = await request("POST", path,
+    var response = await request(method, path,
         headers: headers,
         params: params,
         body: body,
         statusCode: statusCode,
         fail: fail);
-    return convert(jsonDecode(response.body));
+
+    var json = jsonDecode(response.body);
+
+    if (convert == null) {
+      _applyExpandos(json, response);
+      return json;
+    }
+
+    final returnValue = convert(json);
+    _applyExpandos(returnValue, response);
+    return returnValue;
   }
 
   /// Handles Authenticated Requests in an easy to understand way.
