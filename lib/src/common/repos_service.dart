@@ -552,8 +552,6 @@ class RepositoriesService extends Service {
       throw NotReady(_github, path);
     }
     _github.handleStatusCode(response);
-    // will never get here!
-    return null;
   }
 
   /// Fetches commit counts for the past year.
