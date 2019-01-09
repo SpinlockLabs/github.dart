@@ -1,51 +1,51 @@
 part of github.common;
 
 /// Model class for a contributor's statistics for a repository.
+@JsonSerializable(createToJson: false)
 class ContributorStatistics {
   /// The Author
-  User author;
+  final User author;
 
   /// Total Commits
-  int total;
+  final int total;
 
   /// Weekly Statistics
-  List<ContributorWeekStatistics> weeks;
+  final List<ContributorWeekStatistics> weeks;
 
-  static ContributorStatistics fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  ContributorStatistics(this.author, this.total, this.weeks);
 
-    return new ContributorStatistics()
-      ..author = User.fromJson(input['author'] as Map<String, dynamic>)
-      ..total = input['total']
-      ..weeks = (input['weeks'] as List<Map<String, dynamic>>)
-          .map((it) => ContributorWeekStatistics.fromJSON(it));
-  }
+  factory ContributorStatistics.fromJson(Map<String, dynamic> json) =>
+      _$ContributorStatisticsFromJson(json);
 }
 
 /// Model class to represent the number of additions, deletions and commits
 /// a contributor made in a given week.
+@JsonSerializable(createToJson: false)
 class ContributorWeekStatistics {
   /// Beginning of the Week (As a Unix Timestamp)
-  String start;
+  @JsonKey(name: 'w')
+  final int start;
 
   /// Number of Additions
-  int additions;
+  @JsonKey(name: 'a')
+  final int additions;
 
   /// Number of Deletions
-  int deletions;
+  @JsonKey(name: 'd')
+  final int deletions;
 
   /// Number of Commits
-  int commits;
+  @JsonKey(name: 'c')
+  final int commits;
 
-  static ContributorWeekStatistics fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  ContributorWeekStatistics(
+      this.start, this.additions, this.deletions, this.commits);
 
-    return new ContributorWeekStatistics()
-      ..additions = input['a']
-      ..deletions = input['d']
-      ..commits = input['c']
-      ..start = input['w'];
-  }
+  factory ContributorWeekStatistics.fromJson(Map<String, dynamic> json) =>
+      _$ContributorWeekStatisticsFromJson(json);
+
+  String toString() =>
+      'ContributorWeekStatistics(start: $start, commits: $commits, additions: $additions, deletions: $deletions)';
 }
 
 /// Model class for contributor participation.
