@@ -135,7 +135,7 @@ class RepositoriesService extends Service {
       "default_branch": "defaultBranch"
     });
     return _github.postJSON("/repos/${repo.fullName}",
-        body: jsonEncode(data), statusCode: 200) as Future<Repository>;
+        body: jsonEncode(data), statusCode: 200);
   }
 
   /// Deletes a repository.
@@ -152,10 +152,10 @@ class RepositoriesService extends Service {
   /// Lists the contributors of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-contributors
-  Stream<Tag> listContributors(RepositorySlug slug, {bool anon: false}) {
+  Stream<User> listContributors(RepositorySlug slug, {bool anon: false}) {
     return new PaginationHelper(_github).objects(
         'GET', '/repos/${slug.fullName}/contributors', User.fromJson,
-        params: {"anon": anon.toString()}) as Stream<Tag>;
+        params: {"anon": anon.toString()});
   }
 
   /// Lists the teams of the specified repository.
@@ -474,8 +474,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#create
   Future<PublicKey> createDeployKey(RepositorySlug slug, CreatePublicKey key) {
-    return _github.postJSON("/repos/${slug.fullName}/keys", body: key.toJSON())
-        as Future<PublicKey>;
+    return _github.postJSON("/repos/${slug.fullName}/keys", body: key.toJSON());
   }
 
   // TODO: Implement editDeployKey: https://developer.github.com/v3/repos/keys/#edit
@@ -519,10 +518,9 @@ class RepositoriesService extends Service {
   /// Creates a Release based on the specified [release].
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
-  Future<Hook> createRelease(RepositorySlug slug, CreateRelease release) {
+  Future<Release> createRelease(RepositorySlug slug, CreateRelease release) {
     return _github.postJSON("/repos/${slug.fullName}/releases",
-        convert: Release.fromJson,
-        body: jsonEncode(release.toJson())) as Future<Hook>;
+        convert: Release.fromJson, body: jsonEncode(release.toJson()));
   }
 
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release
@@ -535,29 +533,25 @@ class RepositoriesService extends Service {
 
   /// Lists repository contributor statistics.
   ///
+  /// It's possible that this API will throw [NotReady] in which case you should
+  /// try the call again later.
+  ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#contributors
-  Future<List<ContributorStatistics>> listContributorStats(RepositorySlug slug,
-      {int limit: 30}) {
-    var completer = new Completer<List<ContributorStatistics>>();
+  Future<List<ContributorStatistics>> listContributorStats(
+    RepositorySlug slug,
+  ) async {
     var path = "/repos/${slug.fullName}/stats/contributors";
-    var handle;
-    handle = (json) {
-      if (json is Map) {
-        new Future.delayed(new Duration(milliseconds: 200), () {
-          _github.getJSON(path,
-              statusCode: 200,
-              convert: handle,
-              params: {"per_page": limit.toString()});
-        });
-        return null;
-      } else {
-        completer.complete(json.map(
-            (Map<String, dynamic> it) => ContributorStatistics.fromJSON(it)));
-      }
-    };
-    _github
-        .getJSON(path, convert: handle, params: {"per_page": limit.toString()});
-    return completer.future;
+    var response = await _github.request('GET', path,
+        headers: {"Accept": "application/vnd.github.v3+json"});
+
+    if (response.statusCode == 200) {
+      return (jsonDecode(response.body) as List)
+          .map((e) => ContributorStatistics.fromJson(e))
+          .toList();
+    } else if (response.statusCode == 202) {
+      throw NotReady(_github, path);
+    }
+    _github.handleStatusCode(response);
   }
 
   /// Fetches commit counts for the past year.

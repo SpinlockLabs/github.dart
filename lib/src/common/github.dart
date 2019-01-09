@@ -286,6 +286,7 @@ class GitHub {
   ///
   /// Internal method to handle status codes
   ///
+  @meta.alwaysThrows
   void handleStatusCode(http.Response response) {
     String message;
     List<Map<String, String>> errors;
@@ -396,7 +397,6 @@ class GitHub {
     if (statusCode != null && statusCode != response.statusCode) {
       fail != null ? fail(response) : null;
       handleStatusCode(response);
-      return null;
     } else
       return response;
   }

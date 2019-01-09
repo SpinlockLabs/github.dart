@@ -61,8 +61,8 @@ class SearchService extends Service {
   /// https://developer.github.com/v3/search/#search-code
   Stream<CodeSearchResults> code(
     String query, {
-    @required int pages,
-    @required int perPage,
+    @meta.required int pages,
+    @meta.required int perPage,
     String language,
     String filename,
     String extension,
