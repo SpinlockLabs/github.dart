@@ -4,7 +4,14 @@ library github.common;
 
 import "dart:async";
 import "dart:convert"
-    show base64Decode, base64Encode, jsonEncode, jsonDecode, LineSplitter, utf8;
+    show
+        base64Decode,
+        base64Encode,
+        jsonEncode,
+        jsonDecode,
+        LineSplitter,
+        utf8,
+        json;
 
 import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;

@@ -47,7 +47,82 @@ class SearchService extends Service {
     return controller.stream;
   }
 
-  // TODO: Implement code: https://developer.github.com/v3/search/#search-code
+  /// Search through code for a given [query].
+  /// By default you will get all search results if you consume all
+  /// events on the returned stream. To limit results, set the
+  /// [pages] and [perPage] parameters.
+  ///
+  /// You can include any github qualifiers in the query directly
+  /// or you can set some of the optional params to set the qualifiers
+  /// For example, these do the same thing:
+  /// code('awesome language:dart') and
+  /// code('awesome', language: 'dart')
+  ///
+  /// https://developer.github.com/v3/search/#search-code
+  Stream<CodeSearchResults> code(
+    String query, {
+    int pages,
+    int perPage,
+    String language,
+    String filename,
+    String extension,
+    String user,
+    String org,
+    String repo,
+    String fork,
+    String path,
+    String size,
+    bool inFile: true,
+    bool inPath: false,
+  }) {
+    // Add qualifiers to the query
+    // Known Issue: If a query already has a qualifier and the same
+    // qualifier parameter is passed in, it will be duplicated.
+    // Example: code('example repo:ex', repo: 'ex') will result in
+    // a query of "example repo:ex repo:ex"
+    query += _searchQualifier('language', language);
+    query += _searchQualifier('filename', filename);
+    query += _searchQualifier('extension', extension);
+    query += _searchQualifier('user', user);
+    query += _searchQualifier('org', org);
+    query += _searchQualifier('repo', repo);
+    query += _searchQualifier('fork', fork);
+    query += _searchQualifier('path', path);
+    query += _searchQualifier('size', size);
+
+    // build up the in: qualifier based on the 2 booleans
+    String _in = '';
+    if (inFile) {
+      _in = 'file';
+    }
+    if (inPath) {
+      if (_in.isEmpty) {
+        _in = 'path';
+      } else {
+        _in = 'file,path';
+      }
+    }
+    if (_in.isNotEmpty) {
+      query += ' in:$_in';
+    }
+
+    var params = <String, dynamic>{};
+    params['q'] = query ?? '';
+    if (perPage != null) {
+      params['per_page'] = perPage.toString();
+    }
+
+    return new PaginationHelper(_github)
+        .fetchStreamed("GET", "/search/code", params: params, pages: pages)
+        .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
+  }
+
+  String _searchQualifier(String key, String value) {
+    if (value != null && value.isNotEmpty) {
+      return ' $key:$value';
+    }
+    return '';
+  }
   // TODO: Implement issues: https://developer.github.com/v3/search/#search-issues
 
   /// Search for users using [query].
