@@ -31,7 +31,6 @@ Future<void> search(_) async {
 
   int count = 0;
   await for (var results in resultsStream) {
-    print(count);
     count += results.items.length;
     querySelector('#nresults').text =
         '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing $count)';

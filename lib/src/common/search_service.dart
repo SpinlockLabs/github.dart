@@ -48,9 +48,9 @@ class SearchService extends Service {
   }
 
   /// Search through code for a given [query].
-  /// [pages] and [perPage] are required named parameters so that you
-  /// are in control of how many results you get. If you want all
-  /// results no matter how many pages, set pages to a very high number.
+  /// By default you will get all search results if you consume all
+  /// events on the returned stream. To limit results, set the
+  /// [pages] and [perPage] parameters.
   ///
   /// You can include any github qualifiers in the query directly
   /// or you can set some of the optional params to set the qualifiers
@@ -112,16 +112,8 @@ class SearchService extends Service {
       params['per_page'] = perPage.toString();
     }
 
-    Stream<http.Response> responseStream = new PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/code", params: params, pages: pages);
-
-    responseStream.handleError((err) {
-      if (err != null && err.toString().contains('rate limit exceeded')) {
-        throw new RateLimitHit(_github);
-      }
-    });
-
-    return responseStream
+    return new PaginationHelper(_github)
+        .fetchStreamed("GET", "/search/code", params: params, pages: pages)
         .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
   }
 

@@ -11,6 +11,8 @@
     return values, we're not treating this as a breaking change.
 - Added `Stream<CodeSearchResults> github.search.code(...)` search API
   - Made `CodeSearchResults` class to hold search results
+  - Made `CodeSearchItem` class to hold each search result item
+  - Added a code search example
 
 ## v4.0.1
 
