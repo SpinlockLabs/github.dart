@@ -112,7 +112,6 @@ class SearchService extends Service {
       params['per_page'] = perPage.toString();
     }
 
-    var controller = new StreamController<CodeSearchResults>();
     Stream<http.Response> responseStream = new PaginationHelper(_github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages);
 
@@ -122,15 +121,8 @@ class SearchService extends Service {
       }
     });
 
-    responseStream.listen((response) {
-      var input = json.decode(response.body);
-      if (input['items'] == null) {
-        return;
-      }
-      controller.add(CodeSearchResults.fromJson(input));
-    }).onDone(controller.close);
-
-    return controller.stream;
+    return responseStream
+        .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
   }
 
   String _searchQualifier(String key, String value) {

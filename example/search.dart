@@ -26,18 +26,24 @@ Future<void> search(_) async {
     perPage: int.tryParse(val('perpage')),
     pages: int.tryParse(val('pages')),
   );
-  var results = await resultsStream.first;
-  querySelector('#nresults').text =
-      '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing ${results.items.length})';
   DivElement resultsDiv = querySelector('#results');
   resultsDiv.innerHtml = '';
-  for (CodeSearchItem item in results.items) {
-    var url = item.htmlUrl;
-    var path = item.path;
-    resultsDiv.append(DivElement()
-      ..append(AnchorElement(href: url.toString())
-        ..text = path
-        ..target = '_blank'));
+
+  int count = 0;
+  await for (var results in resultsStream) {
+    print(count);
+    count += results.items.length;
+    querySelector('#nresults').text =
+        '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing $count)';
+
+    for (CodeSearchItem item in results.items) {
+      var url = item.htmlUrl;
+      var path = item.path;
+      resultsDiv.append(DivElement()
+        ..append(AnchorElement(href: url.toString())
+          ..text = path
+          ..target = '_blank'));
+    }
   }
 }
 
