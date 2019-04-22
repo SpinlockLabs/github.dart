@@ -1,3 +1,7 @@
+## v4.1.1
+
+- Require at least Dart `2.1.0`.
+
 ## v4.1.0
 
 - Fix return type of `RepositoriesService.listContributors`.
