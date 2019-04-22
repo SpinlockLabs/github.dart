@@ -1,3 +1,10 @@
+## v5.0.0
+
+- **BREAKING** `RepositoriesService.listCollaborators` now returns 
+  `Stream<Collaborator>` instead of `Stream<User>`.
+    -  `Collaborator` is a new type that includes collaborator-specific
+       information.
+
 ## v4.1.1
 
 - Require at least Dart `2.1.0`.

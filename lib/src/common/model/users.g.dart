@@ -53,6 +53,18 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'updated_at': instance.updatedAt?.toIso8601String()
     };
 
+Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) {
+  return Collaborator(
+      json['login'] as String,
+      json['id'] as int,
+      json['html_url'] as String,
+      json['type'] as String,
+      json['site_admin'] as bool,
+      (json['permissions'] as Map<String, dynamic>)?.map(
+        (k, e) => MapEntry(k, e as bool),
+      ));
+}
+
 CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
   return CurrentUser()
     ..login = json['login'] as String
