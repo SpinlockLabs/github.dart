@@ -51,10 +51,10 @@ Map<String, String> queryString =
 String token = queryString["token"] ?? window.sessionStorage['token'];
 
 GitHub _createGitHub() {
-  return new GitHub(
+  return GitHub(
       auth: token != null
-          ? new Authentication.withToken(token)
-          : new Authentication.anonymous());
+          ? Authentication.withToken(token)
+          : Authentication.anonymous());
 }
 
 GitHub github = _createGitHub();

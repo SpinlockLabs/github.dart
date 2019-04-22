@@ -11,7 +11,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/users/$username/gists", Gist.fromJSON);
   }
 
@@ -20,15 +20,14 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return new PaginationHelper(_github)
-        .objects("GET", "/gists", Gist.fromJSON);
+    return PaginationHelper(_github).objects("GET", "/gists", Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's public gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/gists/public", Gist.fromJSON);
   }
 
@@ -36,7 +35,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/gists/starred", Gist.fromJSON);
   }
 
@@ -50,7 +49,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
   Future<Gist> createGist(Map<String, String> files,
-      {String description, bool public: false}) {
+      {String description, bool public = false}) {
     var map = <String, dynamic>{"files": {}};
 
     if (description != null) {
@@ -149,7 +148,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/gists/$gistId/comments", GistComment.fromJSON);
   }
 

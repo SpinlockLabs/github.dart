@@ -40,7 +40,7 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
   Future<String> renderMarkdown(String input,
-      {String mode: "markdown", String context}) {
+      {String mode = "markdown", String context}) {
     return _github
         .request("POST", "/markdown",
             body: jsonEncode({"text": input, "mode": mode, "context": context}))

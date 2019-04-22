@@ -1,8 +1,9 @@
 part of github.test.helper;
 
-final MockHTTPClient httpClient = new MockHTTPClient();
+final MockHTTPClient httpClient = MockHTTPClient();
 
-typedef http.StreamedResponse ResponseCreator(http.BaseRequest request);
+typedef ResponseCreator = http.StreamedResponse Function(
+    http.BaseRequest request);
 
 class MockHTTPClient extends http.BaseClient {
   final Map<Pattern, ResponseCreator> responses = <Pattern, ResponseCreator>{};
@@ -14,7 +15,7 @@ class MockHTTPClient extends http.BaseClient {
         orElse: () => null);
     var creator = responses[matchingUrlCreatorKey];
     if (creator == null) {
-      throw new Exception("No Response Configured");
+      throw Exception("No Response Configured");
     }
 
     return creator(request);
@@ -40,6 +41,6 @@ class MockResponse extends http.Response {
       actualBody = body.toString();
     }
 
-    return new MockResponse(actualBody, headers, statusCode);
+    return MockResponse(actualBody, headers, statusCode);
   }
 }

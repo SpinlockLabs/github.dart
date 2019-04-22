@@ -41,7 +41,7 @@ class RepositoryCommit {
   static RepositoryCommit fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var commit = new RepositoryCommit()
+    var commit = RepositoryCommit()
       ..url = input['url']
       ..sha = input['sha']
       ..htmlUrl = input['html_url']
@@ -81,7 +81,7 @@ class CommitStats {
   static CommitStats fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new CommitStats()
+    return CommitStats()
       ..additions = input['additions']
       ..deletions = input['deletions']
       ..total = input['total'];
@@ -111,7 +111,7 @@ class CommitFile {
   static CommitFile fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new CommitFile()
+    return CommitFile()
       ..name = input['filename']
       ..additions = input['additions']
       ..deletions = input['deletions']

@@ -60,7 +60,7 @@ class PullRequestInformation {
       [PullRequestInformation into]) {
     if (input == null) return null;
 
-    var pr = into != null ? into : new PullRequestInformation();
+    var pr = into != null ? into : PullRequestInformation();
     pr.head = PullRequestHead.fromJSON(input['head'] as Map<String, dynamic>);
     pr.base = PullRequestHead.fromJSON(input['base'] as Map<String, dynamic>);
     pr.htmlUrl = input['html_url'];
@@ -117,7 +117,7 @@ class PullRequest extends PullRequestInformation {
   static PullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    PullRequest pr = PullRequestInformation.fromJSON(input, new PullRequest());
+    PullRequest pr = PullRequestInformation.fromJSON(input, PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
     pr.id = input['id'];
@@ -143,7 +143,7 @@ class PullRequestMerge {
   static PullRequestMerge fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new PullRequestMerge()
+    return PullRequestMerge()
       ..merged = input['merged']
       ..sha = input['sha']
       ..message = input['message'];
@@ -170,7 +170,7 @@ class PullRequestHead {
   static PullRequestHead fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var head = new PullRequestHead();
+    var head = PullRequestHead();
     head.label = input['label'];
     head.ref = input['ref'];
     head.sha = input['sha'];
@@ -244,7 +244,7 @@ class PullRequestComment {
   static PullRequestComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new PullRequestComment()
+    return PullRequestComment()
       ..id = input['id']
       ..diffHunk = input['diff_hunk']
       ..path = input['path']
@@ -258,7 +258,7 @@ class PullRequestComment {
       ..updatedAt = parseDateTime(input['updated_at'])
       ..url = input['html_url']
       ..pullRequestUrl = input['pull_request_url']
-      ..links = new Links.fromJson(input['_links'] as Map<String, dynamic>);
+      ..links = Links.fromJson(input['_links'] as Map<String, dynamic>);
   }
 }
 
@@ -300,7 +300,7 @@ class PullRequestFile {
   String patch;
 
   static PullRequestFile fromJSON(Map<String, dynamic> input) {
-    var file = new PullRequestFile();
+    var file = PullRequestFile();
     file.sha = input['sha'];
     file.filename = input['filename'];
     file.status = input['status'];

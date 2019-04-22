@@ -34,7 +34,7 @@ class Hook {
   static Hook fromJSON(String repoName, Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Hook()
+    return Hook()
       ..events = input['events']?.cast<String>()
       ..active = input['active']
       ..name = input['name']
@@ -61,7 +61,7 @@ class CreateHook {
   final bool active;
 
   CreateHook(this.name, this.config,
-      {this.events: const ["push"], this.active: true});
+      {this.events = const ["push"], this.active = true});
 
   String toJSON() {
     return jsonEncode(

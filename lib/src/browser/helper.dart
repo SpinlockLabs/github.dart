@@ -11,7 +11,7 @@ class GitHubBrowserHelper {
   ///  [github] is the GitHub instance to use.
   ///  [selector] is the selector to use to find markdown elements.
   ///  [indent] is the indent that needs to be stripped out.
-  static void renderMarkdown(GitHub github, String selector, {int indent: 4}) {
+  static void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
     ElementList elements = document.querySelectorAll(selector);
 
     elements.removeWhere((Element it) => it.attributes.containsKey("rendered"));
@@ -34,7 +34,7 @@ class GitHubBrowserHelper {
 
   /// Creates an Image Element from a User that has the user's avatar.
   static ImageElement createAvatarImage(User user,
-      {int width: 128, int height: 128}) {
-    return new ImageElement(src: user.avatarUrl, width: width, height: height);
+      {int width = 128, int height = 128}) {
+    return ImageElement(src: user.avatarUrl, width: width, height: height);
   }
 }

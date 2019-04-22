@@ -28,7 +28,7 @@ RepositorySlug slugFromAPIUrl(String url) {
   var split = url.split("/");
   var i = split.indexOf("repos") + 1;
   var parts = split.sublist(i, i + 2);
-  return new RepositorySlug(parts[0], parts[1]);
+  return RepositorySlug(parts[0], parts[1]);
 }
 
 abstract class StatusCodes {

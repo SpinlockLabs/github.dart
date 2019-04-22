@@ -16,13 +16,13 @@ class PaginationHelper {
       Map<String, String> headers,
       Map<String, dynamic> params,
       String body,
-      int statusCode: 200}) async* {
+      int statusCode = 200}) async* {
     int count = 0;
 
     if (params == null) {
       params = {};
     } else {
-      params = new Map.from(params);
+      params = Map.from(params);
     }
     assert(!params.containsKey('page'));
 
@@ -67,7 +67,7 @@ class PaginationHelper {
       Map<String, String> headers,
       Map<String, dynamic> params,
       String body,
-      int statusCode: 200,
+      int statusCode = 200,
       String preview}) async* {
     if (headers == null) headers = {};
     if (preview != null) {
@@ -95,7 +95,7 @@ class PaginationHelper {
       Map<String, String> headers,
       Map<String, dynamic> params,
       String body,
-      int statusCode: 200,
+      int statusCode = 200,
       String preview}) {
     return jsonObjects<S>(method, path,
             pages: pages,
@@ -114,7 +114,7 @@ Map<String, String> parseLinkHeader(String input) {
   var parts = input.split(", ");
   for (var part in parts) {
     if (part[0] != "<") {
-      throw new FormatException("Invalid Link Header");
+      throw FormatException("Invalid Link Header");
     }
     var kv = part.split("; ");
     var url = kv[0].substring(1);

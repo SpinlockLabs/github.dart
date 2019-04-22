@@ -10,7 +10,7 @@ DivElement readmeDiv;
 Future<void> main() async {
   await initViewSourceButton("readme.dart");
   readmeDiv = querySelector("#readme");
-  var repo = new RepositorySlug("DirectMyFile", "github.dart");
+  var repo = RepositorySlug("DirectMyFile", "github.dart");
   var readme = await github.repositories.getReadme(repo);
   String markdown = readme.content;
   if (readme.encoding == 'base64') {

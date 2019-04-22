@@ -33,7 +33,7 @@ void main() {
   test('License round-trip', () {
     var licenseJson = jsonDecode(_licenseJson) as Map<String, dynamic>;
 
-    var instance = new LicenseDetails.fromJson(licenseJson);
+    var instance = LicenseDetails.fromJson(licenseJson);
 
     var toJson = instance.toJson();
 

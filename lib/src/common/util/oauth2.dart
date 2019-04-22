@@ -36,10 +36,10 @@ class OAuth2Flow {
 
   OAuth2Flow(this.clientId, this.clientSecret,
       {String redirectUri,
-      this.scopes: const [],
+      this.scopes = const [],
       this.state,
       this.github,
-      this.baseUrl: "https://github.com/login/oauth"})
+      this.baseUrl = "https://github.com/login/oauth"})
       : this.redirectUri =
             redirectUri == null ? null : _checkRedirectUri(redirectUri);
 
@@ -79,14 +79,14 @@ class OAuth2Flow {
       "redirect_uri": redirectUri
     });
 
-    return (github == null ? new http.Client() : github.client)
+    return (github == null ? http.Client() : github.client)
         .post("$baseUrl/access_token", body: body, headers: headers)
         .then((response) {
       var json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
         throw json;
       }
-      return new ExchangeResponse(json['access_token'], json['token_type'],
+      return ExchangeResponse(json['access_token'], json['token_type'],
           (json['scope'] as String).split(","));
     });
   }

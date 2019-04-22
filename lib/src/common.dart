@@ -76,8 +76,8 @@ void _applyExpandos(Object target, http.Response response) {
   }
 }
 
-final _etagExpando = new Expando<String>('etag');
-final _dateExpando = new Expando<DateTime>('date');
+final _etagExpando = Expando<String>('etag');
+final _dateExpando = Expando<DateTime>('date');
 
 String getResponseEtag(Object obj) => _etagExpando[obj];
 DateTime getResponseDate(Object obj) => _dateExpando[obj];

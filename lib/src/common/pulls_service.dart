@@ -13,10 +13,10 @@ class PullRequestsService extends Service {
   Stream<PullRequest> list(RepositorySlug slug,
       {int pages,
       String base,
-      String direction: 'desc',
+      String direction = 'desc',
       String head,
-      String sort: 'created',
-      String state: 'open'}) {
+      String sort = 'created',
+      String state = 'open'}) {
     var params = <String, String>{};
     putValue("base", base, params);
     putValue("direction", direction, params);
@@ -24,7 +24,7 @@ class PullRequestsService extends Service {
     putValue("sort", sort, params);
     putValue("state", state, params);
 
-    return new PaginationHelper(_github).objects("GET",
+    return PaginationHelper(_github).objects("GET",
         "/repos/${slug.fullName}/pulls?state=$state", PullRequest.fromJSON,
         pages: pages, params: params);
   }
@@ -68,14 +68,14 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
   Stream<RepositoryCommit> listCommits(RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         '/repos/${slug.fullName}/pulls/$number/commits',
         RepositoryCommit.fromJSON);
   }
 
   Stream<RepositoryCommit> listFiles(RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         '/repos/${slug.fullName}/pulls/$number/files',
         PullRequestFile.fromJSON) as Stream<RepositoryCommit>;
@@ -114,7 +114,7 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
   Stream<PullRequestComment> listCommentsByPullRequest(
       RepositorySlug slug, int number) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/pulls/$number/comments",
         PullRequestComment.fromJSON);
@@ -124,7 +124,7 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
   Stream<PullRequestComment> listComments(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects("GET",
+    return PaginationHelper(_github).objects("GET",
         "/repos/${slug.fullName}/pulls/comments", PullRequestComment.fromJSON);
   }
 

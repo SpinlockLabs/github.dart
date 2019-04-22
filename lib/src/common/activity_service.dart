@@ -10,8 +10,8 @@ class ActivityService extends Service {
   /// Lists public events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events
-  Stream<Event> listPublicEvents({int pages: 2}) {
-    return new PaginationHelper(_github)
+  Stream<Event> listPublicEvents({int pages = 2}) {
+    return PaginationHelper(_github)
         .objects("GET", "/events", Event.fromJSON, pages: pages);
   }
 
@@ -19,8 +19,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-a-network-of-repositories
   Stream<Event> listRepositoryNetworkEvents(RepositorySlug slug,
-      {int pages: 2}) {
-    return new PaginationHelper(_github).objects(
+      {int pages = 2}) {
+    return PaginationHelper(_github).objects(
         "GET", "/networks/${slug.fullName}/events", Event.fromJSON,
         pages: pages);
   }
@@ -29,19 +29,19 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-a-network-of-repositories
   EventPoller pollRepositoryNetworkEvents(RepositorySlug slug) =>
-      new EventPoller(_github, "/networks/${slug.fullName}/events");
+      EventPoller(_github, "/networks/${slug.fullName}/events");
 
   /// Returns an [EventPoller] for repository issue events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   EventPoller pollRepositoryIssueEvents(RepositorySlug slug) =>
-      new EventPoller(_github, "/repos/${slug.fullName}/issues/events");
+      EventPoller(_github, "/repos/${slug.fullName}/issues/events");
 
   /// Lists repository issue events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   Stream<Event> listRepositoryIssueEvents(RepositorySlug slug, {int pages}) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/issues/events", Event.fromJSON,
         pages: pages);
   }
@@ -49,13 +49,13 @@ class ActivityService extends Service {
   /// Returns an [EventPoller] for public events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events
-  EventPoller pollPublicEvents() => new EventPoller(_github, "/events");
+  EventPoller pollPublicEvents() => EventPoller(_github, "/events");
 
   /// Lists repository events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   Stream<Event> listRepositoryEvents(RepositorySlug slug, {int pages}) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/events", Event.fromJSON,
         pages: pages);
   }
@@ -64,13 +64,13 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
   EventPoller pollRepositoryEvents(RepositorySlug slug) =>
-      new EventPoller(_github, "/repos/${slug.fullName}/events");
+      EventPoller(_github, "/repos/${slug.fullName}/events");
 
   /// Lists public events for an organization.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
   Stream<Event> listEventsForOrganization(String name, {int pages}) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/orgs/$name/events", Event.fromJSON, pages: pages);
   }
 
@@ -78,25 +78,25 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
   EventPoller pollEventsForOrganization(String name) =>
-      new EventPoller(_github, "/orgs/$name/events");
+      EventPoller(_github, "/orgs/$name/events");
 
   /// Returns an [EventPoller] for events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-that-a-user-has-received
   EventPoller pollEventsReceivedByUser(String user) =>
-      new EventPoller(_github, "/users/$user/events");
+      EventPoller(_github, "/users/$user/events");
 
   /// Returns an [EventPoller] for events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-that-a-user-has-received
   EventPoller pollPublicEventsReceivedByUser(String user) =>
-      new EventPoller(_github, "/repos/$user/events/public");
+      EventPoller(_github, "/repos/$user/events/public");
 
   /// Lists the events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
   Stream<Event> listEventsPerformedByUser(String username, {int pages}) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/users/$username/events", Event.fromJSON,
         pages: pages);
   }
@@ -105,7 +105,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-performed-by-a-user
   Stream<Event> listPublicEventsPerformedByUser(String username, {int pages}) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/users/$username/events/public", Event.fromJSON,
         pages: pages);
   }
@@ -114,7 +114,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-for-an-organization
   EventPoller pollUserEventsForOrganization(String user, String organization) =>
-      new EventPoller(_github, "/users/$user/events/orgs/$organization");
+      EventPoller(_github, "/users/$user/events/orgs/$organization");
 
   // TODO: Implement listFeeds: https://developer.github.com/v3/activity/feeds/#list-feeds
 
@@ -122,8 +122,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#list-your-notifications
   Stream<Notification> listNotifications(
-      {bool all: false, bool participating: false}) {
-    return new PaginationHelper(_github).objects(
+      {bool all = false, bool participating = false}) {
+    return PaginationHelper(_github).objects(
         "GET", '/notifications', Notification.fromJSON,
         params: {"all": all, "participating": participating});
   }
@@ -132,8 +132,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#list-your-notifications-in-a-repository
   Stream<Notification> listRepositoryNotifications(RepositorySlug repository,
-      {bool all: false, bool participating: false}) {
-    return new PaginationHelper(_github).objects("GET",
+      {bool all = false, bool participating = false}) {
+    return PaginationHelper(_github).objects("GET",
         '/repos/${repository.fullName}/notifications', Notification.fromJSON,
         params: {"all": all, "participating": participating});
   }
@@ -187,7 +187,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
   Stream<User> listStargazers(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/stargazers", User.fromJson);
   }
 
@@ -195,7 +195,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
   Stream<Repository> listStarredByUser(String user) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/users/$user/starred", Repository.fromJSON);
   }
 
@@ -203,7 +203,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
   Stream<Repository> listStarred() {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/user/starred", Repository.fromJSON);
   }
 
@@ -242,7 +242,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-watchers
   Stream<User> listWatchers(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/subscribers", User.fromJson);
   }
 
@@ -250,7 +250,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
   Stream<Repository> listWatchedByUser(String user) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", '/users/$user/subscriptions', Repository.fromJSON);
   }
 
@@ -258,7 +258,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
   Stream<Repository> listWatched() {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", '/user/subscriptions', Repository.fromJSON);
   }
 
@@ -306,14 +306,14 @@ class EventPoller {
 
   EventPoller(this.github, this.path);
 
-  Stream<Event> start({bool onlyNew: false, int interval, DateTime after}) {
+  Stream<Event> start({bool onlyNew = false, int interval, DateTime after}) {
     if (_timer != null) {
-      throw new Exception("Polling already started.");
+      throw Exception("Polling already started.");
     }
 
     if (after != null) after = after.toUtc();
 
-    _controller = new StreamController<Event>();
+    _controller = StreamController<Event>();
 
     void handleEvent(http.Response response) {
       if (interval == null) {
@@ -347,7 +347,7 @@ class EventPoller {
       }
 
       if (_timer == null) {
-        _timer = new Timer.periodic(new Duration(seconds: interval), (timer) {
+        _timer = Timer.periodic(Duration(seconds: interval), (timer) {
           var headers = <String, String>{};
 
           if (_lastFetched != null) {
@@ -372,7 +372,7 @@ class EventPoller {
 
   Future stop() {
     if (_timer == null) {
-      throw new Exception("Polling not started.");
+      throw Exception("Polling not started.");
     }
 
     _timer.cancel();

@@ -18,7 +18,7 @@ class Authorization {
   static Authorization fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Authorization()
+    return Authorization()
       ..id = input['id']
       ..scopes = input['scopes'] as List<String>
       ..token = input['token']
@@ -46,7 +46,7 @@ class AuthorizationApplication {
   static AuthorizationApplication fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new AuthorizationApplication()
+    return AuthorizationApplication()
       ..url = input['url']
       ..name = input['name']
       ..clientID = input['client_id'];

@@ -128,7 +128,7 @@ class Repository {
   }
 
   /// Gets the Repository Slug (Full Name).
-  RepositorySlug slug() => new RepositorySlug(owner.login, name);
+  RepositorySlug slug() => RepositorySlug(owner.login, name);
 
   @override
   String toString() => 'Repository: ${owner.login}/$name';
@@ -258,7 +258,7 @@ class RepositorySlug {
     var split = f.split("/");
     var o = split[0];
     var n = (split..removeAt(0)).join("/");
-    return new RepositorySlug(o, n);
+    return RepositorySlug(o, n);
   }
 
   /// The Full Name of the Repository
@@ -355,7 +355,7 @@ class Branch {
   static Branch fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Branch.fromJson(input);
+    return Branch.fromJson(input);
   }
 }
 
@@ -393,7 +393,7 @@ class LanguageBreakdown {
 
   @override
   String toString() {
-    var buffer = new StringBuffer();
+    var buffer = StringBuffer();
     _data.forEach((key, value) {
       buffer.writeln("$key: $value");
     });

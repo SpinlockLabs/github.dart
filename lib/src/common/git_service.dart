@@ -63,7 +63,7 @@ class GitService extends Service {
       path += '/$type';
     }
 
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects('GET', path, GitReference.fromJSON);
   }
 
@@ -86,7 +86,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#update-a-reference
   Future<GitReference> editReference(
       RepositorySlug slug, String ref, String sha,
-      {bool force: false}) {
+      {bool force = false}) {
     String body = jsonEncode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
     var headers = {'content-length': body.length.toString()};
@@ -132,14 +132,14 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/trees/#get-a-tree
   /// and https://developer.github.com/v3/git/trees/#get-a-tree-recursively
   Future<GitTree> getTree(RepositorySlug slug, String sha,
-      {bool recursive: false}) {
+      {bool recursive = false}) {
     var path = '/repos/${slug.fullName}/git/trees/$sha';
     if (recursive) {
       path += '?recursive=1';
     }
 
     return _github.getJSON(path,
-        convert: (j) => new GitTree.fromJson(j), statusCode: StatusCodes.OK);
+        convert: (j) => GitTree.fromJson(j), statusCode: StatusCodes.OK);
   }
 
   /// Creates a new tree in a repository.
@@ -147,7 +147,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/trees/#create-a-tree
   Future<GitTree> createTree(RepositorySlug slug, CreateGitTree tree) {
     return _github.postJSON('/repos/${slug.fullName}/git/trees',
-        convert: (j) => new GitTree.fromJson(j),
+        convert: (j) => GitTree.fromJson(j),
         statusCode: StatusCodes.CREATED,
         body: tree.toJSON());
   }
