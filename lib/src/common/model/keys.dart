@@ -12,7 +12,7 @@ class PublicKey {
   static PublicKey fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new PublicKey()
+    return PublicKey()
       ..id = input['id']
       ..key = input['key']
       ..title = input['title'];

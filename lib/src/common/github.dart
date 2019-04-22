@@ -1,6 +1,6 @@
 part of github.common;
 
-typedef http.Client ClientCreator();
+typedef ClientCreator = http.Client Function();
 
 ///  The Main GitHub Client
 ///
@@ -42,10 +42,10 @@ class GitHub {
   /// [auth] is the authentication information
   GitHub(
       {Authentication auth,
-      this.endpoint: "https://api.github.com",
+      this.endpoint = "https://api.github.com",
       http.Client client})
-      : this.auth = auth == null ? new Authentication.anonymous() : auth,
-        this.client = client == null ? new http.Client() : client;
+      : this.auth = auth == null ? Authentication.anonymous() : auth,
+        this.client = client == null ? http.Client() : client;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -69,7 +69,7 @@ class GitHub {
   /// Will be `null` if no requests have been made yet.
   DateTime get rateLimitReset => _rateLimitReset == null
       ? null
-      : new DateTime.fromMillisecondsSinceEpoch(_rateLimitReset * 1000,
+      : DateTime.fromMillisecondsSinceEpoch(_rateLimitReset * 1000,
           isUtc: true);
 
   int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
@@ -77,7 +77,7 @@ class GitHub {
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
     if (_activity == null) {
-      _activity = new ActivityService(this);
+      _activity = ActivityService(this);
     }
     return _activity;
   }
@@ -88,7 +88,7 @@ class GitHub {
   /// username and password, not tokens.
   AuthorizationsService get authorizations {
     if (_authorizations == null) {
-      _authorizations = new AuthorizationsService(this);
+      _authorizations = AuthorizationsService(this);
     }
     return _authorizations;
   }
@@ -96,7 +96,7 @@ class GitHub {
   /// Service for gist related methods of the GitHub API.
   GistsService get gists {
     if (_gists == null) {
-      _gists = new GistsService(this);
+      _gists = GistsService(this);
     }
     return _gists;
   }
@@ -104,7 +104,7 @@ class GitHub {
   /// Service for git data related methods of the GitHub API.
   GitService get git {
     if (_git == null) {
-      _git = new GitService(this);
+      _git = GitService(this);
     }
     return _git;
   }
@@ -112,7 +112,7 @@ class GitHub {
   /// Service for issues related methods of the GitHub API.
   IssuesService get issues {
     if (_issues == null) {
-      _issues = new IssuesService(this);
+      _issues = IssuesService(this);
     }
     return _issues;
   }
@@ -120,7 +120,7 @@ class GitHub {
   /// Service for misc related methods of the GitHub API.
   MiscService get misc {
     if (_misc == null) {
-      _misc = new MiscService(this);
+      _misc = MiscService(this);
     }
     return _misc;
   }
@@ -128,7 +128,7 @@ class GitHub {
   /// Service for organization related methods of the GitHub API.
   OrganizationsService get organizations {
     if (_organizations == null) {
-      _organizations = new OrganizationsService(this);
+      _organizations = OrganizationsService(this);
     }
     return _organizations;
   }
@@ -136,7 +136,7 @@ class GitHub {
   /// Service for pull requests related methods of the GitHub API.
   PullRequestsService get pullRequests {
     if (_pullRequests == null) {
-      _pullRequests = new PullRequestsService(this);
+      _pullRequests = PullRequestsService(this);
     }
     return _pullRequests;
   }
@@ -144,7 +144,7 @@ class GitHub {
   /// Service for repository related methods of the GitHub API.
   RepositoriesService get repositories {
     if (_repositories == null) {
-      _repositories = new RepositoriesService(this);
+      _repositories = RepositoriesService(this);
     }
     return _repositories;
   }
@@ -152,7 +152,7 @@ class GitHub {
   /// Service for search related methods of the GitHub API.
   SearchService get search {
     if (_search == null) {
-      _search = new SearchService(this);
+      _search = SearchService(this);
     }
     return _search;
   }
@@ -160,7 +160,7 @@ class GitHub {
   /// Service to provide a handy method to access GitHub's url shortener.
   UrlShortenerService get urlShortener {
     if (_urlShortener == null) {
-      _urlShortener = new UrlShortenerService(this);
+      _urlShortener = UrlShortenerService(this);
     }
     return _urlShortener;
   }
@@ -168,7 +168,7 @@ class GitHub {
   /// Service for user related methods of the GitHub API.
   UsersService get users {
     if (_users == null) {
-      _users = new UsersService(this);
+      _users = UsersService(this);
     }
     return _users;
   }
@@ -314,7 +314,7 @@ class GitHub {
       queryString = buildQueryString(params);
     }
 
-    var url = new StringBuffer();
+    var url = StringBuffer();
 
     if (path.startsWith("http://") || path.startsWith("https://")) {
       url.write(path);
@@ -328,7 +328,7 @@ class GitHub {
       url.write(queryString);
     }
 
-    var request = new http.Request(method, Uri.parse(url.toString()));
+    var request = http.Request(method, Uri.parse(url.toString()));
     request.headers.addAll(headers);
     if (body != null) {
       request.body = body;
@@ -360,20 +360,20 @@ class GitHub {
     }
     switch (response.statusCode) {
       case 404:
-        throw new NotFound(this, "Requested Resource was Not Found");
+        throw NotFound(this, "Requested Resource was Not Found");
         break;
       case 401:
-        throw new AccessForbidden(this);
+        throw AccessForbidden(this);
       case 400:
         if (message == "Problems parsing JSON") {
-          throw new InvalidJSON(this, message);
+          throw InvalidJSON(this, message);
         } else if (message == "Body should be a JSON Hash") {
-          throw new InvalidJSON(this, message);
+          throw InvalidJSON(this, message);
         } else
-          throw new BadRequest(this);
+          throw BadRequest(this);
         break;
       case 422:
-        var buff = new StringBuffer();
+        var buff = StringBuffer();
         buff.writeln();
         buff.writeln("  Message: $message");
         if (errors != null) {
@@ -388,9 +388,9 @@ class GitHub {
               ..write("    Code: $code");
           }
         }
-        throw new ValidationFailed(this, buff.toString());
+        throw ValidationFailed(this, buff.toString());
     }
-    throw new UnknownError(this, message);
+    throw UnknownError(this, message);
   }
 
   /// Disposes of this GitHub Instance.

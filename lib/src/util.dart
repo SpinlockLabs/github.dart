@@ -1,7 +1,7 @@
-final RegExp githubDateRemoveRegExp = new RegExp(r'\.\d*');
+final RegExp githubDateRemoveRegExp = RegExp(r'\.\d*');
 
 String buildQueryString(Map<String, dynamic> params) {
-  var queryString = new StringBuffer();
+  var queryString = StringBuffer();
 
   if (params.isNotEmpty && !params.values.every((value) => value == null)) {
     queryString.write("?");
@@ -23,9 +23,9 @@ String buildQueryString(Map<String, dynamic> params) {
 
 dynamic copyOf(dynamic input) {
   if (input is Iterable) {
-    return new List.from(input);
+    return List.from(input);
   } else if (input is Map) {
-    return new Map.from(input);
+    return Map.from(input);
   } else {
     throw "type could not be copied";
   }
@@ -42,7 +42,7 @@ void putValue(String name, dynamic value, Map<String, dynamic> map) {
 List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
   var out = <MapEntry<dynamic, dynamic>>[];
   for (var key in input.keys) {
-    out.add(new MapEntry<dynamic, dynamic>(key, input[key]));
+    out.add(MapEntry<dynamic, dynamic>(key, input[key]));
   }
   return out;
 }

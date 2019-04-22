@@ -14,7 +14,7 @@ Future<void> main() async {
 
 void loadReleases() {
   github.repositories
-      .listReleases(new RepositorySlug("twbs", "bootstrap"))
+      .listReleases(RepositorySlug("twbs", "bootstrap"))
       .toList()
       .then((releases) {
     for (var release in releases) {

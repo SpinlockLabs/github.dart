@@ -30,7 +30,7 @@ class Gist {
   static Gist fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var gist = new Gist()
+    var gist = Gist()
       ..id = input['id']
       ..description = input['description']
       ..public = input['public']
@@ -74,7 +74,7 @@ class GistFile {
   static GistFile fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GistFile()
+    return GistFile()
       ..name = input['name']
       ..size = input['size']
       ..rawUrl = input['raw_url']
@@ -99,7 +99,7 @@ class GistFork {
   static GistFork fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GistFork()
+    return GistFork()
       ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..id = input['id']
       ..createdAt = parseDateTime(input['created_at'])
@@ -128,7 +128,7 @@ class GistHistoryEntry {
   static GistHistoryEntry fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GistHistoryEntry()
+    return GistHistoryEntry()
       ..version = input['version']
       ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..deletions = input['change_status']['deletions']
@@ -154,7 +154,7 @@ class GistComment {
   static GistComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GistComment()
+    return GistComment()
       ..id = input['id']
       ..user = User.fromJson(input['user'] as Map<String, dynamic>)
       ..createdAt = parseDateTime(input['created_at'])

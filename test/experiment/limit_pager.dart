@@ -11,22 +11,21 @@ const int ACCURACY_RANGE = 5;
 /// Solves the most efficient way to fetch the number of objects [limit] with the least requests.
 PaginationInformation solve(int limit) {
   if (limit < 0) {
-    throw new RangeError("limit cannot be less than zero (was $limit)");
+    throw RangeError("limit cannot be less than zero (was $limit)");
   }
 
   if (limit < MAX_PER_PAGE) {
-    return new PaginationInformation(limit, 1, limit);
+    return PaginationInformation(limit, 1, limit);
   }
 
   if ((limit % MAX_PER_PAGE) == 0) {
-    return new PaginationInformation(
-        limit, limit ~/ MAX_PER_PAGE, MAX_PER_PAGE);
+    return PaginationInformation(limit, limit ~/ MAX_PER_PAGE, MAX_PER_PAGE);
   }
 
   int itemsPerPage = 100;
   int pages = (limit / itemsPerPage).ceil();
 
-  return new PaginationInformation(limit, pages, itemsPerPage);
+  return PaginationInformation(limit, pages, itemsPerPage);
 }
 
 class PaginationInformation {

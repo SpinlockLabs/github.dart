@@ -19,8 +19,7 @@ GitHub _makeGitHubClient() {
 
   if (Platform.environment.containsKey("GITHUB_TOKEN")) {
     g = createGitHubClient(
-        auth:
-            new Authentication.withToken(Platform.environment["GITHUB_TOKEN"]));
+        auth: Authentication.withToken(Platform.environment["GITHUB_TOKEN"]));
   } else {
     g = createGitHubClient();
   }

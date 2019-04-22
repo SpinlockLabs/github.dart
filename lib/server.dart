@@ -12,15 +12,15 @@ export "src/server/hooks.dart";
 /// If [auth] is not specified, then it will be automatically configured
 /// from the environment as per [findAuthenticationFromEnvironment].
 GitHub createGitHubClient(
-    {Authentication auth, String endpoint: "https://api.github.com"}) {
+    {Authentication auth, String endpoint = "https://api.github.com"}) {
   if (auth == null) {
     auth = findAuthenticationFromEnvironment();
   }
 
-  return new GitHub(auth: auth, endpoint: endpoint);
+  return GitHub(auth: auth, endpoint: endpoint);
 }
 
-const List<String> COMMON_GITHUB_TOKEN_ENV_KEYS = const [
+const List<String> COMMON_GITHUB_TOKEN_ENV_KEYS = [
   "GITHUB_ADMIN_TOKEN",
   "GITHUB_DART_TOKEN",
   "GITHUB_API_TOKEN",
@@ -46,7 +46,7 @@ Authentication findAuthenticationFromEnvironment() {
       username = username.substring(0, username.length - 1);
       String password = result.stderr.toString().split("password:")[1].trim();
       password = password.substring(1, password.length - 1);
-      return new Authentication.basic(username.trim(), password.trim());
+      return Authentication.basic(username.trim(), password.trim());
     }
   }
 
@@ -54,14 +54,13 @@ Authentication findAuthenticationFromEnvironment() {
 
   for (String key in COMMON_GITHUB_TOKEN_ENV_KEYS) {
     if (env[key] is String) {
-      return new Authentication.withToken(env[key]);
+      return Authentication.withToken(env[key]);
     }
   }
 
   if (env["GITHUB_USERNAME"] is String && env["GITHUB_PASSWORD"] is String) {
-    return new Authentication.basic(
-        env["GITHUB_USERNAME"], env["GITHUB_PASSWORD"]);
+    return Authentication.basic(env["GITHUB_USERNAME"], env["GITHUB_PASSWORD"]);
   }
 
-  return new Authentication.anonymous();
+  return Authentication.anonymous();
 }

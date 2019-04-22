@@ -26,16 +26,16 @@ void loadStars() {
   querySelector("#title").appendText(" for $user/$repo");
 
   github.activity
-      .listStargazers(new RepositorySlug(user, repo))
+      .listStargazers(RepositorySlug(user, repo))
       .listen((stargazer) {
-    var h = new DivElement();
+    var h = DivElement();
     h.classes.add("box");
     h.classes.add("user");
     h.style.textAlign = "center";
-    h.append(new ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)
+    h.append(ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)
       ..classes.add("avatar"));
-    h.append(new AnchorElement(href: stargazer.htmlUrl)
-      ..append(new ParagraphElement()..text = stargazer.login));
+    h.append(AnchorElement(href: stargazer.htmlUrl)
+      ..append(ParagraphElement()..text = stargazer.login));
     $stars.append(h);
   }).onDone(() {
     querySelector("#total")

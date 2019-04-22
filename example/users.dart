@@ -16,16 +16,16 @@ Future<void> main() async {
 void loadUsers() {
   github.users.listUsers(pages: 2).take(12).listen((User baseUser) {
     github.users.getUser(baseUser.login).then((user) {
-      var userDiv = new DivElement();
+      var userDiv = DivElement();
 
       for (int i = 1; i <= 2; i++) {
-        userDiv.append(new BRElement());
+        userDiv.append(BRElement());
       }
 
       userDiv.append(
           GitHubBrowserHelper.createAvatarImage(user, width: 64, height: 64)
             ..classes.add("avatar"));
-      var buff = new StringBuffer();
+      var buff = StringBuffer();
 
       buff
         ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")
@@ -38,7 +38,7 @@ void loadUsers() {
 
       buff.writeln("Followers: ${user.followersCount}");
 
-      userDiv.append(new ParagraphElement()
+      userDiv.append(ParagraphElement()
         ..appendHtml(buff.toString().replaceAll("\n", "<br/>"),
             treeSanitizer: NodeTreeSanitizer.trusted));
 

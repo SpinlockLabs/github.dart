@@ -11,7 +11,7 @@ class GitignoreTemplate {
   static GitignoreTemplate fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GitignoreTemplate()
+    return GitignoreTemplate()
       ..name = input['name']
       ..source = input['source'];
   }
@@ -33,9 +33,9 @@ class RateLimit {
   static RateLimit fromHeaders(Map<String, String> headers) {
     var limit = int.parse(headers['x-ratelimit-limit']);
     var remaining = int.parse(headers['x-ratelimit-remaining']);
-    var resets = new DateTime.fromMillisecondsSinceEpoch(
+    var resets = DateTime.fromMillisecondsSinceEpoch(
         int.parse(headers['x-ratelimit-reset']) * 1000);
-    return new RateLimit(limit, remaining, resets);
+    return RateLimit(limit, remaining, resets);
   }
 }
 
@@ -55,7 +55,7 @@ class APIStatus {
   static APIStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new APIStatus()
+    return APIStatus()
       ..status = input['status']
       ..message = input['body']
       ..lastUpdatedAt = parseDateTime(input['last_updated'])

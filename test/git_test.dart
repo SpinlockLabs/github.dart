@@ -18,9 +18,9 @@ void main() {
   var someSha = 'someSHA';
 
   setUp(() {
-    github = new MockGitHub();
-    git = new GitService(github);
-    repo = new RepositorySlug('o', 'n');
+    github = MockGitHub();
+    git = GitService(github);
+    repo = RepositorySlug('o', 'n');
   });
 
   group('getBlob()', () {
@@ -34,7 +34,7 @@ void main() {
 
   group('createBlob()', () {
     test('constructs correct path', () {
-      CreateGitBlob blob = new CreateGitBlob('bbb', 'utf-8');
+      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
       verify(github.postJSON('/repos/o/n/git/blobs',
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('creates valid JSON body', () {
-      CreateGitBlob blob = new CreateGitBlob('bbb', 'utf-8');
+      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
 
       git.createBlob(repo, blob);
       var body = captureSentBody(github);
@@ -64,7 +64,7 @@ void main() {
 
   group('createCommit()', () {
     test('constructs correct path', () {
-      CreateGitCommit commit = new CreateGitCommit('aMessage', 'aTreeSha');
+      CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
       verify(github.postJSON('/repos/o/n/git/commits',
@@ -77,10 +77,10 @@ void main() {
       // given
       String date = '2014-10-02T15:21:29Z';
 
-      CreateGitCommit commit = new CreateGitCommit('aMessage', 'aTreeSha')
+      CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha')
         ..parents = ['parentSha1', 'parentSha2']
-        ..committer = new GitCommitUser('cName', 'cEmail', parseDateTime(date))
-        ..author = new GitCommitUser('aName', 'aEmail', parseDateTime(date));
+        ..committer = GitCommitUser('cName', 'cEmail', parseDateTime(date))
+        ..author = GitCommitUser('aName', 'aEmail', parseDateTime(date));
 
       // when
       git.createCommit(repo, commit);
@@ -131,10 +131,10 @@ void main() {
   group('editReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response expectedResponse = new http.Response('{}', 200);
+      http.Response expectedResponse = http.Response('{}', 200);
 
       when(github.request(any, any, body: any, headers: any))
-          .thenReturn(new Future.value(expectedResponse));
+          .thenReturn(Future.value(expectedResponse));
 
       // when
       git.editReference(repo, 'heads/b', someSha);
@@ -146,9 +146,9 @@ void main() {
 
     test('creates valid JSON body', () {
       // given
-      http.Response expectedResponse = new http.Response('{}', 200);
+      http.Response expectedResponse = http.Response('{}', 200);
       when(github.request(any, any, body: any, headers: any))
-          .thenReturn(new Future.value(expectedResponse));
+          .thenReturn(Future.value(expectedResponse));
 
       // when
       git.editReference(repo, 'heads/b', someSha, force: true);
@@ -170,9 +170,8 @@ void main() {
   group('deleteReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response expectedResponse = new http.Response('{}', 200);
-      when(github.request(any, any))
-          .thenReturn(new Future.value(expectedResponse));
+      http.Response expectedResponse = http.Response('{}', 200);
+      when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
@@ -192,8 +191,8 @@ void main() {
   });
 
   group('createTag()', () {
-    var createGitTag = new CreateGitTag('v0.0.1', 'a message', someSha,
-        'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now()));
+    var createGitTag = CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
+        GitCommitUser('aName', 'aEmail', DateTime.now()));
 
     test('constructs correct path', () {
       git.createTag(repo, createGitTag);
@@ -221,7 +220,7 @@ void main() {
       git.getTree(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: (j) => new GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
@@ -230,27 +229,27 @@ void main() {
       git.getTree(repo, 'sh', recursive: true);
 
       verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: (j) => new GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
   group('createTree()', () {
     test('constructs correct path', () {
-      var createGitTree = new CreateGitTree([]);
+      var createGitTree = CreateGitTree([]);
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
-          convert: (j) => new GitTree.fromJson(j),
+          convert: (j) => GitTree.fromJson(j),
           statusCode: StatusCodes.CREATED,
           body: createGitTree.toJSON()));
     });
 
     test('with sha creates valid JSON body', () {
       // given
-      var treeEntry = new CreateGitTreeEntry('file.rb', '100644', 'blob',
+      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           sha: '44b4fc6d56897b048c772eb4087f854f46256132');
 
-      var tree = new CreateGitTree([treeEntry]);
+      var tree = CreateGitTree([treeEntry]);
 
       // when
       git.createTree(repo, tree);
@@ -268,10 +267,10 @@ void main() {
 
     test('with content creates valid JSON body', () {
       // given
-      var treeEntry = new CreateGitTreeEntry('file.rb', '100644', 'blob',
+      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           content: 'some file content');
 
-      var tree = new CreateGitTree([treeEntry]);
+      var tree = CreateGitTree([treeEntry]);
 
       // when
       git.createTree(repo, tree);

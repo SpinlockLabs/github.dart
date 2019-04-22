@@ -52,7 +52,7 @@ class GitHubFile {
       [RepositorySlug slug]) {
     if (input == null) return null;
 
-    return new GitHubFile()
+    return GitHubFile()
       ..type = input['type']
       ..encoding = input['encoding']
       ..size = input['size']
@@ -64,7 +64,7 @@ class GitHubFile {
       ..sha = input['sha']
       ..gitUrl = input['git_url']
       ..htmlUrl = input['html_url']
-      ..links = new Links.fromJson(input['_links'] as Map<String, dynamic>)
+      ..links = Links.fromJson(input['_links'] as Map<String, dynamic>)
       ..sourceRepository = slug;
   }
 }
@@ -144,7 +144,7 @@ class ContentCreation {
   static ContentCreation fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new ContentCreation(
+    return ContentCreation(
         RepositoryCommit.fromJSON(input['commit'] as Map<String, dynamic>),
         GitHubFile.fromJSON(input['content'] as Map<String, dynamic>));
   }

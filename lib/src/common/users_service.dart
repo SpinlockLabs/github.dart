@@ -55,7 +55,7 @@ class UsersService extends Service {
       _github.getJSON("/user", statusCode: StatusCodes.OK,
           fail: (http.Response response) {
         if (response.statusCode == StatusCodes.FORBIDDEN) {
-          throw new AccessForbidden(_github);
+          throw AccessForbidden(_github);
         }
       }, convert: CurrentUser.fromJSON);
 
@@ -70,21 +70,20 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-all-users
   Stream<User> listUsers({int pages, int since}) =>
-      new PaginationHelper(_github).objects("GET", "/users", User.fromJson,
+      PaginationHelper(_github).objects("GET", "/users", User.fromJson,
           pages: pages, params: {"since": since});
 
   /// Lists all email addresses for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
-  Stream<UserEmail> listEmails() => new PaginationHelper(_github)
+  Stream<UserEmail> listEmails() => PaginationHelper(_github)
       .objects("GET", "/user/emails", UserEmail.fromJSON);
 
   /// Add Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
-  Stream<UserEmail> addEmails(List<String> emails) =>
-      new PaginationHelper(_github).objects(
-          "POST", "/user/emails", UserEmail.fromJSON,
+  Stream<UserEmail> addEmails(List<String> emails) => PaginationHelper(_github)
+      .objects("POST", "/user/emails", UserEmail.fromJSON,
           statusCode: 201, body: jsonEncode(emails));
 
   /// Delete Emails
@@ -98,7 +97,7 @@ class UsersService extends Service {
   /// List user followers.
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
-  Stream<User> listUserFollowers(String user) => new PaginationHelper(_github)
+  Stream<User> listUserFollowers(String user) => PaginationHelper(_github)
       .objects("GET", "/users/$user/followers", User.fromJson, statusCode: 200);
 
   /// Check if the current user is following the specified user.
@@ -134,7 +133,7 @@ class UsersService extends Service {
   /// List current user followers.
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
-  Stream<User> listCurrentUserFollowers() => new PaginationHelper(_github)
+  Stream<User> listCurrentUserFollowers() => PaginationHelper(_github)
       .objects("GET", "/user/followers", User.fromJson, statusCode: 200);
 
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
@@ -144,8 +143,7 @@ class UsersService extends Service {
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
     var path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
-    return new PaginationHelper(_github)
-        .objects("GET", path, PublicKey.fromJSON);
+    return PaginationHelper(_github).objects("GET", path, PublicKey.fromJSON);
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key

@@ -29,14 +29,14 @@ Future<void> loadRepository() async {
 
   document.getElementById("name").setInnerHtml("$user/$reponame");
 
-  var repo = new RepositorySlug(user, reponame);
+  var repo = RepositorySlug(user, reponame);
   breakdown = await github.repositories.listLanguages(repo);
   reloadTable();
 }
 
 bool isReloadingTable = false;
 
-void reloadTable({int accuracy: 4}) {
+void reloadTable({int accuracy = 4}) {
   if (isReloadingTable) {
     return;
   }

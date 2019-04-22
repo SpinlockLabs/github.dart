@@ -3,7 +3,7 @@ import 'package:github/server.dart';
 
 Future<void> main() async {
   print('Searching ...');
-  GitHub github = new GitHub();
+  GitHub github = GitHub();
 
   Stream<CodeSearchResults> resultsStream = github.search
       .code('github', repo: 'DirectMyFile/github.dart', perPage: 5, pages: 1);

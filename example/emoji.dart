@@ -19,12 +19,12 @@ Future<void> loadEmojis() async {
   var emojis = await github.misc.listEmojis();
 
   emojis.forEach((name, url) {
-    var h = new DivElement();
+    var h = DivElement();
     h.className = 'emojibox';
     h.style.textAlign = "center";
-    h.append(new ImageElement(src: url, width: 64, height: 64)
-      ..classes.add("emoji"));
-    h.append(new ParagraphElement()..text = ":$name:");
+    h.append(
+        ImageElement(src: url, width: 64, height: 64)..classes.add("emoji"));
+    h.append(ParagraphElement()..text = ":$name:");
     emojiDiv.append(h);
   });
 }

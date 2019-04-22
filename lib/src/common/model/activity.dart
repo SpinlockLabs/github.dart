@@ -22,7 +22,7 @@ class Event {
   static Event fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var event = new Event();
+    var event = Event();
 
     event.json = input;
 
@@ -54,7 +54,7 @@ class RepositorySubscription {
   static RepositorySubscription fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new RepositorySubscription()
+    return RepositorySubscription()
       ..subscribed = input['subscribed']
       ..ignored = input['ignored']
       ..reason = input['reason']

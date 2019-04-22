@@ -12,7 +12,7 @@ Future<void> main() async {
 }
 
 GitHub createClient(String token) {
-  return new GitHub(auth: new Authentication.withToken(token));
+  return GitHub(auth: Authentication.withToken(token));
 }
 
 void loadUser() {

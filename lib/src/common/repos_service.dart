@@ -11,12 +11,12 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-your-repositories
   Stream<Repository> listRepositories(
-      {String type: "owner",
-      String sort: "full_name",
-      String direction: "asc"}) {
+      {String type = "owner",
+      String sort = "full_name",
+      String direction = "asc"}) {
     var params = {"type": type, "sort": sort, "direction": direction};
 
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/user/repos", Repository.fromJSON, params: params);
   }
 
@@ -24,12 +24,12 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
   Stream<Repository> listUserRepositories(String user,
-      {String type: "owner",
-      String sort: "full_name",
-      String direction: "asc"}) {
+      {String type = "owner",
+      String sort = "full_name",
+      String direction = "asc"}) {
     var params = {"type": type, "sort": sort, "direction": direction};
 
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/users/$user/repos", Repository.fromJSON,
         params: params);
   }
@@ -38,12 +38,12 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
   Stream<Repository> listOrganizationRepositories(String org,
-      {String type: "all"}) {
+      {String type = "all"}) {
     var params = {
       "type": type,
     };
 
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/orgs/$org/repos", Repository.fromJSON,
         params: params);
   }
@@ -55,7 +55,7 @@ class RepositoriesService extends Service {
   /// If [limit] is null, it will fetch ALL the repositories on GitHub.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-all-public-repositories
-  Stream<Repository> listPublicRepositories({int limit: 50, DateTime since}) {
+  Stream<Repository> listPublicRepositories({int limit = 50, DateTime since}) {
     var params = <String, String>{};
 
     if (since != null) {
@@ -64,7 +64,7 @@ class RepositoriesService extends Service {
 
     var pages = limit != null ? (limit / 30).ceil() : null;
 
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
         .expand((http.Response response) {
       var list = jsonDecode(response.body) as List<Map<String, dynamic>>;
@@ -91,7 +91,7 @@ class RepositoriesService extends Service {
 
   Future<LicenseDetails> getLicense(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.owner}/${slug.name}/license",
-          convert: (json) => new LicenseDetails.fromJson(json));
+          convert: (json) => LicenseDetails.fromJson(json));
 
   /// Fetches the repository specified by the [slug].
   ///
@@ -101,7 +101,7 @@ class RepositoriesService extends Service {
           convert: Repository.fromJSON,
           statusCode: StatusCodes.OK, fail: (http.Response response) {
         if (response.statusCode == 404) {
-          throw new RepositoryNotFound(_github, slug.fullName);
+          throw RepositoryNotFound(_github, slug.fullName);
         }
       });
 
@@ -152,8 +152,8 @@ class RepositoriesService extends Service {
   /// Lists the contributors of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-contributors
-  Stream<User> listContributors(RepositorySlug slug, {bool anon: false}) {
-    return new PaginationHelper(_github).objects(
+  Stream<User> listContributors(RepositorySlug slug, {bool anon = false}) {
+    return PaginationHelper(_github).objects(
         'GET', '/repos/${slug.fullName}/contributors', User.fromJson,
         params: {"anon": anon.toString()});
   }
@@ -162,7 +162,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-teams
   Stream<Team> listTeams(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects('GET', '/repos/${slug.fullName}/teams', Team.fromJSON);
   }
 
@@ -173,21 +173,21 @@ class RepositoriesService extends Service {
       _github.getJSON("/repos/${slug.fullName}/languages",
           statusCode: StatusCodes.OK,
           convert: (Map<String, dynamic> input) =>
-              new LanguageBreakdown(input.cast<String, int>()));
+              LanguageBreakdown(input.cast<String, int>()));
 
   /// Lists the tags of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-tags
   Stream<Tag> listTags(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
-        'GET', '/repos/${slug.fullName}/tags', (j) => new Tag.fromJson(j));
+    return PaginationHelper(_github)
+        .objects('GET', '/repos/${slug.fullName}/tags', (j) => Tag.fromJson(j));
   }
 
   /// Lists the branches of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-branches
   Stream<Branch> listBranches(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects('GET', '/repos/${slug.fullName}/branches', Branch.fromJSON);
   }
 
@@ -202,7 +202,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
   Stream<User> listCollaborators(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/collaborators", User.fromJson);
   }
 
@@ -241,7 +241,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
   Stream<RepositoryCommit> listCommits(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET", "/repos/${slug.fullName}/commits", RepositoryCommit.fromJSON);
   }
 
@@ -259,7 +259,7 @@ class RepositoriesService extends Service {
   Future<GitHubComparison> compareCommits(
           RepositorySlug slug, String refBase, String refHead) =>
       _github.getJSON("/repos/${slug.fullName}/compare/$refBase...$refHead",
-          convert: (j) => new GitHubComparison.fromJson(j));
+          convert: (j) => GitHubComparison.fromJson(j));
 
   /// Fetches the readme file for a repository.
   ///
@@ -281,7 +281,7 @@ class RepositoriesService extends Service {
         statusCode: StatusCodes.OK,
         fail: (http.Response response) {
           if (response.statusCode == 404) {
-            throw new NotFound(_github, response.body);
+            throw NotFound(_github, response.body);
           }
         },
         convert: (Map<String, dynamic> input) =>
@@ -312,13 +312,13 @@ class RepositoriesService extends Service {
     }
 
     return _github.getJSON(url, convert: (input) {
-      var contents = new RepositoryContents();
+      var contents = RepositoryContents();
       if (input is Map) {
         // Weird one-off. If the content of `input` is JSON w/ a message
         // it was likely a 404 – but we don't have the status code here
         // But we can guess an the JSON content
         if (input.containsKey('message')) {
-          throw new GitHubError(_github, input['message'],
+          throw GitHubError(_github, input['message'],
               apiUrl: input['documentation_url']);
         }
         contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
@@ -379,7 +379,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
   Future<String> getArchiveLink(RepositorySlug slug, String ref,
-      {String format: "tarball"}) {
+      {String format = "tarball"}) {
     return _github
         .request("GET", "/repos/${slug.fullName}/$format/$ref", statusCode: 302)
         .then((response) {
@@ -391,7 +391,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/forks/#list-forks
   Stream<Repository> listForks(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/forks", Repository.fromJSON);
   }
 
@@ -399,7 +399,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/forks/#create-a-fork
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) {
-    if (fork == null) fork = new CreateFork();
+    if (fork == null) fork = CreateFork();
     return _github.postJSON("/repos/${slug.fullName}/forks",
         body: fork.toJSON(), convert: Repository.fromJSON);
   }
@@ -408,7 +408,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/hooks/#list-hooks
   Stream<Hook> listHooks(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/hooks",
         (Map<String, dynamic> input) => Hook.fromJSON(slug.fullName, input));
@@ -464,7 +464,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#list
   Stream<PublicKey> listDeployKeys(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/keys", PublicKey.fromJSON);
   }
 
@@ -504,7 +504,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
   Stream<Release> listReleases(RepositorySlug slug) {
-    return new PaginationHelper(_github)
+    return PaginationHelper(_github)
         .objects("GET", "/repos/${slug.fullName}/releases", Release.fromJson);
   }
 
@@ -558,7 +558,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#commit-activity
   Stream<YearCommitCountWeek> listCommitActivity(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/commit_activity",
         YearCommitCountWeek.fromJSON);
@@ -568,7 +568,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#code-frequency
   Stream<WeeklyChangesCount> listCodeFrequency(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/code_frequency",
         WeeklyChangesCount.fromJSON);
@@ -585,7 +585,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#punch-card
   Stream<PunchcardEntry> listPunchcard(RepositorySlug slug) {
-    return new PaginationHelper(_github).objects("GET",
+    return PaginationHelper(_github).objects("GET",
         "/repos/${slug.fullName}/stats/punchcard", PunchcardEntry.fromJSON);
   }
 
@@ -594,7 +594,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statuses/#list-statuses-for-a-specific-ref
   Stream<RepositoryStatus> listStatuses(RepositorySlug slug, String ref) {
-    return new PaginationHelper(_github).objects(
+    return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/commits/$ref/statuses",
         RepositoryStatus.fromJSON);

@@ -65,7 +65,7 @@ class Issue {
         input['labels'].cast<Map<String, dynamic>>();
     if (labels == null) labels = <Map<String, dynamic>>[];
 
-    return new Issue()
+    return Issue()
       ..id = input['id']
       ..url = input['url']
       ..htmlUrl = input['html_url']
@@ -131,7 +131,7 @@ class IssuePullRequest {
   static IssuePullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new IssuePullRequest()
+    return IssuePullRequest()
       ..htmlUrl = input['html_url']
       ..diffUrl = input['diff_url']
       ..patchUrl = input['patch_url'];
@@ -161,7 +161,7 @@ class IssueComment {
   static IssueComment fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new IssueComment()
+    return IssueComment()
       ..id = input['id']
       ..body = input['body']
       ..user = User.fromJson(input['user'] as Map<String, dynamic>)
@@ -187,7 +187,7 @@ class IssueLabel {
     assert(input['name'] != null);
     assert(input['color'] != null);
 
-    return new IssueLabel()
+    return IssueLabel()
       ..name = input['name']
       ..color = input['color'];
   }
@@ -239,7 +239,7 @@ class Milestone {
   static Milestone fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Milestone()
+    return Milestone()
       ..id = input['id']
       ..number = input['number']
       ..state = input['state']

@@ -11,7 +11,7 @@ class GitBlob {
   static GitBlob fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GitBlob()
+    return GitBlob()
       ..content = (input['content'] as String)?.trim() // includes newline?
       ..encoding = input['encoding']
       ..url = input['url']
@@ -58,7 +58,7 @@ class GitCommit {
   static GitCommit fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new GitCommit.fromJson(input);
+    return GitCommit.fromJson(input);
   }
 }
 

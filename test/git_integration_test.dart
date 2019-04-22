@@ -22,8 +22,8 @@ void main() {
     var repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
     var repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
 
-    github = createGitHubClient(auth: new Authentication.withToken(authToken));
-    slug = new RepositorySlug(repoOwner, repoName);
+    github = createGitHubClient(auth: Authentication.withToken(authToken));
+    slug = RepositorySlug(repoOwner, repoName);
   });
 
   tearDownAll(() {
@@ -38,7 +38,7 @@ void main() {
   });
 
   test('create and get a new blob', () async {
-    var newBlob = new CreateGitBlob('bbb', 'utf-8');
+    var newBlob = CreateGitBlob('bbb', 'utf-8');
 
     // createBlob()
     var createdBlob = await github.git.createBlob(slug, newBlob);
@@ -59,12 +59,12 @@ void main() {
   });
 
   test('create and get a new tree', () async {
-    var entry1 = new CreateGitTreeEntry('README.md', '100644', 'blob',
+    var entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
         content: 'This is a repository for integration tests.');
-    var entry2 = new CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
+    var entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
         content: 'Some file in a folder.');
 
-    var newTree = new CreateGitTree([entry1, entry2])
+    var newTree = CreateGitTree([entry1, entry2])
       ..baseTree = firstCommitTreeSha;
 
     // createTree()
@@ -79,7 +79,7 @@ void main() {
   });
 
   test('create and get a new commit', () async {
-    var newCommit = new CreateGitCommit('My test commit', createdTreeSha)
+    var newCommit = CreateGitCommit('My test commit', createdTreeSha)
       ..parents = [firstCommitSha];
 
     // createCommit()
@@ -113,8 +113,8 @@ void main() {
   test('create and get a new tag', () async {
     var tagName = 'v${_randomGitName()}';
 
-    var newTag = new CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
-        'commit', new GitCommitUser('aName', 'aEmail', new DateTime.now()));
+    var newTag = CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
+        'commit', GitCommitUser('aName', 'aEmail', DateTime.now()));
 
     // createTag()
     var createdTag = await github.git.createTag(slug, newTag);
@@ -138,7 +138,7 @@ void main() {
 
       var count = issues.length;
 
-      var issueRequest = new IssueRequest()
+      var issueRequest = IssueRequest()
         ..title = 'new issue - ${_randomGitName()}';
 
       await github.issues.create(slug, issueRequest);
@@ -157,7 +157,7 @@ void main() {
 }
 
 String _randomGitName() {
-  var now = new DateTime.now().toIso8601String().replaceAll(':', '_');
+  var now = DateTime.now().toIso8601String().replaceAll(':', '_');
 
   return now.toString();
 }

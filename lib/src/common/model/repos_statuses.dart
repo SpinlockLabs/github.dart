@@ -13,7 +13,7 @@ class CombinedRepositoryStatus {
   static CombinedRepositoryStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new CombinedRepositoryStatus()
+    return CombinedRepositoryStatus()
       ..state = input["state"]
       ..sha = input["sha"]
       ..totalCount = input["total_count"]
@@ -37,7 +37,7 @@ class RepositoryStatus {
   static RepositoryStatus fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new RepositoryStatus()
+    return RepositoryStatus()
       ..createdAt = parseDateTime(input['created_at'])
       ..updatedAt = parseDateTime(input['updated_at'])
       ..state = input['state']

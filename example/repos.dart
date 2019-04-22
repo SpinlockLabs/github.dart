@@ -70,7 +70,7 @@ void updateRepos(List<Repository> repos,
 void loadRepos([int compare(Repository a, Repository b)]) {
   var title = querySelector("#title");
   if (title.text.contains("(")) {
-    title.replaceWith(new HeadingElement.h2()
+    title.replaceWith(HeadingElement.h2()
       ..text = "GitHub for Dart - Repositories"
       ..id = "title");
   }

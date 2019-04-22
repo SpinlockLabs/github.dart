@@ -17,7 +17,7 @@ class Notification {
   static Notification fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Notification()
+    return Notification()
       ..id = input['id']
       ..repository =
           Repository.fromJSON(input['repository'] as Map<String, dynamic>)
@@ -38,7 +38,7 @@ class NotificationSubject {
   static NotificationSubject fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new NotificationSubject()
+    return NotificationSubject()
       ..title = input['title']
       ..type = input['type'];
   }

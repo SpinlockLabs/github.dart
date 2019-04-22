@@ -58,7 +58,7 @@ class Organization {
   static Organization fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Organization()
+    return Organization()
       ..login = input['login']
       ..id = input['id']
       ..htmlUrl = input['html_url']
@@ -85,7 +85,7 @@ class OrganizationMembership {
   static OrganizationMembership fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new OrganizationMembership()
+    return OrganizationMembership()
       ..organization =
           Organization.fromJSON(input['organization'] as Map<String, dynamic>)
       ..state = input['state'];
@@ -117,7 +117,7 @@ class Team {
   static Team fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return new Team()
+    return Team()
       ..name = input['name']
       ..id = input['id']
       ..membersCount = input['members_count']
@@ -164,7 +164,7 @@ class TeamMember {
   static TeamMember fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var member = new TeamMember();
+    var member = TeamMember();
     member.login = input['login'];
     member.id = input['id'];
     member.avatarUrl = input['avatar_url'];
