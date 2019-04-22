@@ -86,6 +86,30 @@ class User {
   }
 }
 
+/// The response from listing collaborators on a repo.
+// https://developer.github.com/v3/repos/collaborators/#response
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Collaborator {
+  final String login;
+  final int id;
+  final String htmlUrl;
+  final String type;
+  final bool siteAdmin;
+  final Map<String, bool> permissions;
+
+  Collaborator(
+    this.login,
+    this.id,
+    this.htmlUrl,
+    this.type,
+    this.siteAdmin,
+    this.permissions,
+  );
+
+  factory Collaborator.fromJson(Map<String, dynamic> json) =>
+      _$CollaboratorFromJson(json);
+}
+
 /// The Currently Authenticated User
 @JsonSerializable(createToJson: false)
 class CurrentUser extends User {

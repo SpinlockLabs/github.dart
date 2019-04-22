@@ -201,10 +201,12 @@ class RepositoriesService extends Service {
   /// Lists the users that have access to the repository identified by [slug].
   ///
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
-  Stream<User> listCollaborators(RepositorySlug slug) {
-    return PaginationHelper(_github)
-        .objects("GET", "/repos/${slug.fullName}/collaborators", User.fromJson);
-  }
+  Stream<Collaborator> listCollaborators(RepositorySlug slug) =>
+      PaginationHelper(_github).objects(
+        "GET",
+        "/repos/${slug.fullName}/collaborators",
+        (json) => Collaborator.fromJson(json),
+      );
 
   Future<bool> isCollaborator(RepositorySlug slug, String user) {
     return _github
