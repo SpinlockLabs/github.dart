@@ -178,23 +178,11 @@ class OrganizationsService extends Service {
 
   /// Invites a user to the specified team.
   ///
-  /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
-  Future<TeamMembershipState> addTeamMembership(int teamId, String user) {
-    var completer = Completer<TeamMembershipState>();
-
-    _github.request("POST", "/teams/$teamId/memberships/$user", statusCode: 200,
-        fail: (http.Response response) {
-      if (response.statusCode == 404) {
-        completer.complete(TeamMembershipState(null));
-      } else {
-        _github.handleStatusCode(response);
-      }
-    }).then((response) {
-      return TeamMembershipState(jsonDecode(response.body)["state"]);
-      // TODO: Not sure what should go here.
-    }).then(completer.complete);
-
-    return completer.future;
+  /// API docs: https://developer.github.com/v3/teams/members/#add-or-update-team-membership
+  Future<TeamMembershipState> addTeamMembership(int teamId, String user) async {
+    final response = await _github
+        .request("PUT", "/teams/$teamId/memberships/$user", statusCode: 200);
+    return TeamMembershipState(jsonDecode(response.body)["state"]);
   }
 
   /// Removes a user from the specified team.
