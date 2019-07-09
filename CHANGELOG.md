@@ -1,3 +1,7 @@
+## v5.0.1
+  - Fixed a runtime exception (https://github.com/DirectMyFile/github.dart/issues/139)
+  - Added an optional `base` argument when editing a PR (https://github.com/DirectMyFile/github.dart/pull/145)
+
 ## v5.0.0
 
 - **BREAKING** `RepositoriesService.listCollaborators` now returns 
