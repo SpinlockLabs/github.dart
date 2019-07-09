@@ -342,8 +342,9 @@ class GitHub {
     if (statusCode != null && statusCode != response.statusCode) {
       fail != null ? fail(response) : null;
       handleStatusCode(response);
-    } else
+    } else {
       return response;
+    }
   }
 
   ///
@@ -369,8 +370,9 @@ class GitHub {
           throw InvalidJSON(this, message);
         } else if (message == "Body should be a JSON Hash") {
           throw InvalidJSON(this, message);
-        } else
+        } else {
           throw BadRequest(this);
+        }
         break;
       case 422:
         var buff = StringBuffer();
