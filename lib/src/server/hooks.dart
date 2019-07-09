@@ -25,7 +25,7 @@ class HookMiddleware {
       return;
     }
 
-    request.transform(const Utf8Decoder()).join().then((content) {
+    const Utf8Decoder().bind(request).join().then((content) {
       _eventController.add(HookEvent.fromJSON(
           request.headers.value("X-GitHub-Event"),
           jsonDecode(content) as Map<String, dynamic>));
