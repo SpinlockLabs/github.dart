@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// VERSION OF 2019-06-30T14:13:12.668020
+// VERSION OF 2019-07-09T09:46:59.065183
 
-Map<String, String> languagesColor = <String, String>{
+const languagesColor = <String, String>{
   '1C Enterprise': '#814CCC',
   'ABAP': '#E8274B',
   'ABNF': '#000000',
