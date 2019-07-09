@@ -49,11 +49,12 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
   Future<PullRequest> edit(RepositorySlug slug, int number,
-      {String title, String body, String state}) {
+      {String title, String body, String state, String base}) {
     var map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("state", state, map);
+    putValue("base", base, map);
 
     return _github
         .request("POST", '/repos/${slug.fullName}/pulls/$number',
