@@ -1,3 +1,6 @@
+## v5.0.2
+  - Fixed pollPublicEventsReceivedByUser to use the correct API URL https://github.com/DirectMyFile/github.dart/pull/150
+
 ## v5.0.1
   - Fixed a runtime exception (https://github.com/DirectMyFile/github.dart/issues/139)
   - Added an optional `base` argument when editing a PR (https://github.com/DirectMyFile/github.dart/pull/145)
