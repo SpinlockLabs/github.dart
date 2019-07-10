@@ -90,7 +90,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-that-a-user-has-received
   EventPoller pollPublicEventsReceivedByUser(String user) =>
-      EventPoller(_github, "/repos/$user/events/public");
+      EventPoller(_github, "/repos/$user/received_events/public");
 
   /// Lists the events performed by a user.
   ///
