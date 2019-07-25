@@ -50,19 +50,20 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'followers': instance.followersCount,
       'following': instance.followingCount,
       'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String()
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) {
   return Collaborator(
-      json['login'] as String,
-      json['id'] as int,
-      json['html_url'] as String,
-      json['type'] as String,
-      json['site_admin'] as bool,
-      (json['permissions'] as Map<String, dynamic>)?.map(
-        (k, e) => MapEntry(k, e as bool),
-      ));
+    json['login'] as String,
+    json['id'] as int,
+    json['html_url'] as String,
+    json['type'] as String,
+    json['site_admin'] as bool,
+    (json['permissions'] as Map<String, dynamic>)?.map(
+      (k, e) => MapEntry(k, e as bool),
+    ),
+  );
 }
 
 CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
