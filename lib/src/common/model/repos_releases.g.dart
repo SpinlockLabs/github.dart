@@ -48,12 +48,8 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'prerelease': instance.prerelease,
       'created_at': instance.createdAt?.toIso8601String(),
       'published_at': instance.publishedAt?.toIso8601String(),
-      'author': instance.author == null
-          ? null
-          : Release._authorToJson(instance.author),
-      'assets': instance.assets == null
-          ? null
-          : Release._assetsToJson(instance.assets)
+      'author': Release._authorToJson(instance.author),
+      'assets': Release._assetsToJson(instance.assets),
     };
 
 ReleaseAsset _$ReleaseAssetFromJson(Map<String, dynamic> json) {
@@ -85,11 +81,13 @@ Map<String, dynamic> _$ReleaseAssetToJson(ReleaseAsset instance) =>
       'size': instance.size,
       'download_count': instance.downloadCount,
       'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String()
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) {
-  return CreateRelease(json['tag_name'] as String)
+  return CreateRelease(
+    json['tag_name'] as String,
+  )
     ..json = json['json'] as Map<String, dynamic>
     ..targetCommitish = json['target_commitish'] as String
     ..name = json['name'] as String
@@ -106,5 +104,5 @@ Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
       'name': instance.name,
       'body': instance.body,
       'draft': instance.draft,
-      'prerelease': instance.prerelease
+      'prerelease': instance.prerelease,
     };
