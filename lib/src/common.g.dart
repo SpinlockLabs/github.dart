@@ -161,6 +161,12 @@ TeamRepository _$TeamRepositoryFromJson(Map<String, dynamic> json) {
     ..pushedAt = json['pushed_at'] == null
         ? null
         : DateTime.parse(json['pushed_at'] as String)
+    ..updatedAt = json['updated_at'] == null
+        ? null
+        : DateTime.parse(json['updated_at'] as String)
+    ..license = json['license'] == null
+        ? null
+        : LicenseKind.fromJson(json['license'] as Map<String, dynamic>)
     ..permissions = json['permissions'] == null
         ? null
         : TeamRepositoryPermissions.fromJson(
@@ -219,7 +225,13 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
         : DateTime.parse(json['created_at'] as String)
     ..pushedAt = json['pushed_at'] == null
         ? null
-        : DateTime.parse(json['pushed_at'] as String);
+        : DateTime.parse(json['pushed_at'] as String)
+    ..updatedAt = json['updated_at'] == null
+        ? null
+        : DateTime.parse(json['updated_at'] as String)
+    ..license = json['license'] == null
+        ? null
+        : LicenseKind.fromJson(json['license'] as Map<String, dynamic>);
 }
 
 CloneUrls _$CloneUrlsFromJson(Map<String, dynamic> json) {

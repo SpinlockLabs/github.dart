@@ -1,3 +1,7 @@
+## v5.0.3
+
+- `Repository`: added `updatedAt` and `license` fields.
+
 ## v5.0.2
   - Fixed pollPublicEventsReceivedByUser to use the correct API URL https://github.com/DirectMyFile/github.dart/pull/150
 

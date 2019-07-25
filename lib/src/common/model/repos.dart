@@ -122,6 +122,11 @@ class Repository {
   @JsonKey(name: "pushed_at")
   DateTime pushedAt;
 
+  @JsonKey(name: 'updated_at')
+  DateTime updatedAt;
+
+  LicenseKind license;
+
   static Repository fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return _$RepositoryFromJson(input);
