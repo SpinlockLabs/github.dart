@@ -140,8 +140,6 @@ class SearchService extends Service {
 
     params["per_page"] = perPage.toString();
 
-    var controller = StreamController<User>();
-
     var isFirst = true;
     final stream = PaginationHelper(_github)
         .fetchStreamed("GET", "/search/users", params: params, pages: pages);
