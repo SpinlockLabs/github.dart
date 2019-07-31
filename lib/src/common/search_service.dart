@@ -20,11 +20,14 @@ class SearchService extends Service {
     var controller = StreamController<Repository>();
 
     var isFirst = true;
+    final stream = PaginationHelper(_github).fetchStreamed(
+      "GET",
+      "/search/repositories",
+      params: params,
+      pages: pages,
+    );
 
-    PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/repositories",
-            params: params, pages: pages)
-        .listen((response) {
+    return stream.expand((response) {
       if (response.statusCode == 403 &&
           response.body.contains("rate limit") &&
           isFirst) {
@@ -36,15 +39,13 @@ class SearchService extends Service {
       var input = jsonDecode(response.body);
 
       if (input['items'] == null) {
-        return;
+        return [];
       }
 
       var items = input['items'] as List;
 
-      items.map((item) => Repository.fromJSON(item)).forEach(controller.add);
-    }).onDone(controller.close);
-
-    return controller.stream;
+      return items.map((item) => Repository.fromJSON(item));
+    });
   }
 
   /// Search through code for a given [query].
@@ -142,10 +143,10 @@ class SearchService extends Service {
     var controller = StreamController<User>();
 
     var isFirst = true;
+    final stream = PaginationHelper(_github)
+        .fetchStreamed("GET", "/search/users", params: params, pages: pages);
 
-    PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/users", params: params, pages: pages)
-        .listen((response) {
+    return stream.expand((response) {
       if (response.statusCode == 403 &&
           response.body.contains("rate limit") &&
           isFirst) {
@@ -157,14 +158,11 @@ class SearchService extends Service {
       var input = jsonDecode(response.body);
 
       if (input['items'] == null) {
-        return;
+        return [];
       }
 
       var items = input['items'] as List;
-
-      items.map((item) => User.fromJson(item)).forEach(controller.add);
-    }).onDone(controller.close);
-
-    return controller.stream;
+      return items.map((item) => User.fromJson(item));
+    });
   }
 }

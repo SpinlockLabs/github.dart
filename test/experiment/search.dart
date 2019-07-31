@@ -1,10 +1,16 @@
 import "package:github/server.dart";
 
-void main() {
+void main() async {
   var github = createGitHubClient();
 
-  github.search.repositories("github").listen((repo) {
-    print(
-        "${repo.fullName}: ${repo.description.isNotEmpty ? repo.description : "No Description"}");
-  }).onDone(() => github.dispose());
+  try {
+    for (var i = 0; i < 10; i++) {
+      // keep executing until we reach the rate limiter
+      final stream = github.search.repositories("github");
+      final all = await stream.toList();
+      print(all.length);
+    }
+  } catch (e) {
+    print(e);
+  }
 }
