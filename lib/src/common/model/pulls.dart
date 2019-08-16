@@ -112,6 +112,9 @@ class PullRequest extends PullRequestInformation {
   /// Pull Request ID
   int id;
 
+  /// Pull Request Labels
+  List<IssueLabel> labels;
+
   PullRequest() : super(true);
 
   static PullRequest fromJSON(Map<String, dynamic> input) {
@@ -128,6 +131,8 @@ class PullRequest extends PullRequestInformation {
     pr.additionsCount = input['additions'];
     pr.deletionsCount = input['deletions'];
     pr.changedFilesCount = input['changed_files'];
+    pr.labels =
+        input['labels'].cast<Map<String, dynamic>>().map<IssueLabel>(IssueLabel.fromJSON).toList();
     return pr;
   }
 }
