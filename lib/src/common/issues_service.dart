@@ -286,12 +286,12 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#add-labels-to-an-issue
   Future<List<IssueLabel>> addLabelsToIssue(
       RepositorySlug slug, int issueNumber, List<String> labels) {
-    return _github.postJSON(
-            "/repos/${slug.fullName}/issues/$issueNumber/labels",
-            body: jsonEncode(labels),
-            convert: (input) =>
-                input.map((Map<String, dynamic> it) => IssueLabel.fromJSON(it)))
-        as Future<List<IssueLabel>>;
+    return _github.postJSON<List<dynamic>, List<IssueLabel>>(
+      "/repos/${slug.fullName}/issues/$issueNumber/labels",
+      body: jsonEncode(labels),
+      convert: (input) =>
+          input.cast<Map<String, dynamic>>().map(IssueLabel.fromJSON).toList(),
+    );
   }
 
   /// Replaces all labels for an issue.
