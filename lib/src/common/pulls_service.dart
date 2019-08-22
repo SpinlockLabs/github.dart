@@ -75,11 +75,14 @@ class PullRequestsService extends Service {
         RepositoryCommit.fromJSON);
   }
 
-  Stream<RepositoryCommit> listFiles(RepositorySlug slug, int number) {
+  /// Lists the files in a pull request.
+  ///
+  /// API docs: https://developer.github.com/v3/pulls/#list-pull-requests-files
+  Stream<PullRequestFile> listFiles(RepositorySlug slug, int number) {
     return PaginationHelper(_github).objects(
         "GET",
         '/repos/${slug.fullName}/pulls/$number/files',
-        PullRequestFile.fromJSON) as Stream<RepositoryCommit>;
+        PullRequestFile.fromJSON);
   }
 
   Future<bool> isMerged(RepositorySlug slug, int number) {
