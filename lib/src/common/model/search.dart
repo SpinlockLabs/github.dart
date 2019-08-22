@@ -6,7 +6,7 @@ abstract class SearchResults<T> {
   List<T> items;
 }
 
-@JsonSerializable(generateToJsonFunction: false, createToJson: false)
+@JsonSerializable(createToJson: false)
 class CodeSearchResults implements SearchResults<CodeSearchItem> {
   @JsonKey(name: "total_count")
   int totalCount;
@@ -21,7 +21,7 @@ class CodeSearchResults implements SearchResults<CodeSearchItem> {
       _$CodeSearchResultsFromJson(input);
 }
 
-@JsonSerializable(generateToJsonFunction: false, createToJson: false)
+@JsonSerializable(createToJson: false)
 class CodeSearchItem {
   @JsonKey()
   String name;
@@ -60,8 +60,8 @@ class CodeSearchItem {
 }
 
 // TODO: Issue Search
-// @JsonSerializable(generateToJsonFunction: false, createToJson: false)
+// @JsonSerializable(createToJson: false)
 // class IssueSearchResults extends SearchResults<IssueSearchItem> {}
 
-// @JsonSerializable(generateToJsonFunction: false, createToJson: false)
+// @JsonSerializable(createToJson: false)
 // class IssueSearchItem {}
