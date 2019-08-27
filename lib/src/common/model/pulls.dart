@@ -297,6 +297,7 @@ class PullRequestFile {
   int changesCount;
   String blobUrl;
   String rawUrl;
+  String contentsUrl;
   String patch;
 
   static PullRequestFile fromJSON(Map<String, dynamic> input) {
@@ -309,6 +310,7 @@ class PullRequestFile {
     file.changesCount = input['changes'];
     file.blobUrl = input['blob_url'];
     file.rawUrl = input['raw_url'];
+    file.contentsUrl = input['contents_url'];
     file.patch = input['patch'];
     return file;
   }
