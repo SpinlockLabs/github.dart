@@ -354,7 +354,7 @@ class RepositoriesService extends Service {
     var map = createNonNullMap(
         {"message": message, "content": content, "sha": sha, "branch": branch});
 
-    return _github.postJSON("/repos/${slug.fullName}/contents/$path",
+    return _github.putJSON("/repos/${slug.fullName}/contents/$path",
         body: jsonEncode(map),
         statusCode: 200,
         convert: ContentCreation.fromJSON);
