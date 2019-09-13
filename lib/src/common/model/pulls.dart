@@ -54,6 +54,9 @@ class PullRequestInformation {
   /// The User who created the Pull Request
   User user;
 
+  /// Whether or not the pull request is a draft
+  bool draft;
+
   PullRequestInformation([this.isCompletePullRequest = false]);
 
   static PullRequestInformation fromJSON(Map<String, dynamic> input,
@@ -75,6 +78,7 @@ class PullRequestInformation {
     pr.closedAt = parseDateTime(input['closed_at']);
     pr.mergedAt = parseDateTime(input['merged_at']);
     pr.user = User.fromJson(input['user'] as Map<String, dynamic>);
+    pr.draft = input['draft'] ?? false;
     return pr;
   }
 }
