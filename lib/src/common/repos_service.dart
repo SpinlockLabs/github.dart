@@ -518,6 +518,14 @@ class RepositoriesService extends Service {
   /// Fetches a single release by the release ID.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
+  @Deprecated(
+      'Use getReleaseById or for getting a release using a tag name, use getReleaseByTagName')
+  Future<Release> getRelease(RepositorySlug slug, int id) =>
+      getReleaseById(slug, id);
+
+  /// Fetches a single release by the release ID.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
   Future<Release> getReleaseById(RepositorySlug slug, int id) =>
       _github.getJSON("/repos/${slug.fullName}/releases/$id",
           convert: Release.fromJson);
@@ -577,6 +585,7 @@ class RepositoriesService extends Service {
     }
     return releaseAssets;
   }
+
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release
   // TODO: Implement deleteRelease: https://developer.github.com/v3/repos/releases/#delete-a-release
   // TODO: Implement listReleaseAssets: https://developer.github.com/v3/repos/releases/#list-assets-for-a-release

@@ -64,6 +64,13 @@ class Release {
   @JsonKey(name: "draft")
   bool isDraft;
 
+  @Deprecated('Use isDraft')
+  bool get draft => isDraft;
+
+  /// If the release is a pre-release.
+  @Deprecated('Use isPrerelease')
+  bool get prerelease => isPrerelease;
+
   /// If the release is a pre-release.
   @JsonKey(name: "prerelease")
   bool isPrerelease;
@@ -155,9 +162,7 @@ class ReleaseAsset {
     return _$ReleaseAssetFromJson(input)..json = input;
   }
 
-  Map<String, dynamic> toJson() {
-    return _$ReleaseAssetToJson(this);
-  }
+  Map<String, dynamic> toJson() => _$ReleaseAssetToJson(this);
 }
 
 /// Model class for a new release to be created.
@@ -179,10 +184,19 @@ class CreateRelease {
   /// Release Body
   String body;
 
+  @Deprecated('Use isDraft')
+  bool get draft => isDraft;
+
   /// If the release is a draft
   bool isDraft;
 
-  /// If the release should actually be released.
+  @Deprecated('Use isPrerelease')
+  bool get prerelease => isPrerelease;
+
+  set prerelease(bool prerelease) => isPrerelease = prerelease;
+
+  /// true to identify the release as a prerelease.
+  /// false to identify the release as a full release. Default: false
   bool isPrerelease;
 
   CreateRelease(this.tagName);
@@ -196,15 +210,34 @@ class CreateRelease {
     this.body,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateRelease &&
+          runtimeType == other.runtimeType &&
+          tagName == other.tagName &&
+          targetCommitish == other.targetCommitish &&
+          name == other.name &&
+          body == other.body &&
+          isDraft == other.isDraft &&
+          isPrerelease == other.isPrerelease;
+
+  @override
+  int get hashCode =>
+      tagName.hashCode ^
+      targetCommitish.hashCode ^
+      name.hashCode ^
+      body.hashCode ^
+      isDraft.hashCode ^
+      isPrerelease.hashCode;
+
   static CreateRelease fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return _$CreateReleaseFromJson(input)..json = input;
   }
 
-  Map<String, dynamic> toJson() {
-    return _$CreateReleaseToJson(this);
-  }
+  Map<String, dynamic> toJson() => _$CreateReleaseToJson(this);
 }
 
 class CreateReleaseAsset {
