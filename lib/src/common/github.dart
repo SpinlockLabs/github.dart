@@ -40,11 +40,11 @@ class GitHub {
   ///
   /// [endpoint] is the api endpoint to use
   /// [auth] is the authentication information
-  GitHub(
-      {Authentication auth,
-      this.endpoint = "https://api.github.com",
-      http.Client client})
-      : this.auth = auth == null ? Authentication.anonymous() : auth,
+  GitHub({
+    Authentication auth,
+    this.endpoint = "https://api.github.com",
+    http.Client client,
+  })  : this.auth = auth == null ? Authentication.anonymous() : auth,
         this.client = client == null ? http.Client() : client;
 
   /// The maximum number of requests that the consumer is permitted to make per
@@ -219,22 +219,29 @@ class GitHub {
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
   /// [body] is the data to send to the server.
-  Future<T> postJSON<S, T>(String path,
-          {int statusCode,
-          void fail(http.Response response),
-          Map<String, String> headers,
-          Map<String, String> params,
-          JSONConverter<S, T> convert,
-          String body,
-          String preview}) =>
-      _requestJson('POST', path,
-          statusCode: statusCode,
-          fail: fail,
-          headers: headers,
-          params: params,
-          convert: convert,
-          body: body,
-          preview: preview);
+  /// [S] represents the input type.
+  /// [T] represents the type return from this function after conversion
+  Future<T> postJSON<S, T>(
+    String path, {
+    int statusCode,
+    void fail(http.Response response),
+    Map<String, String> headers,
+    Map<String, String> params,
+    JSONConverter<S, T> convert,
+    dynamic body,
+    String preview,
+  }) =>
+      _requestJson(
+        'POST',
+        path,
+        statusCode: statusCode,
+        fail: fail,
+        headers: headers,
+        params: params,
+        convert: convert,
+        body: body,
+        preview: preview,
+      );
 
   Future<T> _requestJson<S, T>(
     String method,
@@ -244,7 +251,7 @@ class GitHub {
     Map<String, String> headers,
     Map<String, String> params,
     JSONConverter<S, T> convert,
-    String body,
+    dynamic body,
     String preview,
   }) async {
     convert ??= (input) => input as T;
@@ -256,12 +263,15 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    var response = await request(method, path,
-        headers: headers,
-        params: params,
-        body: body,
-        statusCode: statusCode,
-        fail: fail);
+    var response = await request(
+      method,
+      path,
+      headers: headers,
+      params: params,
+      body: body,
+      statusCode: statusCode,
+      fail: fail,
+    );
 
     var json = jsonDecode(response.body);
 
@@ -283,13 +293,16 @@ class GitHub {
   /// [params] are query string parameters.
   /// [body] is the body content of requests that take content.
   ///
-  Future<http.Response> request(String method, String path,
-      {Map<String, String> headers,
-      Map<String, dynamic> params,
-      String body,
-      int statusCode,
-      void fail(http.Response response),
-      String preview}) async {
+  Future<http.Response> request(
+    String method,
+    String path, {
+    Map<String, String> headers,
+    Map<String, dynamic> params,
+    dynamic body,
+    int statusCode,
+    void fail(http.Response response),
+    String preview,
+  }) async {
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -331,7 +344,11 @@ class GitHub {
     var request = http.Request(method, Uri.parse(url.toString()));
     request.headers.addAll(headers);
     if (body != null) {
-      request.body = body;
+      if (body is String) {
+        request.body = body;
+      } else {
+        request.bodyBytes = body;
+      }
     }
 
     var streamedResponse = await client.send(request);

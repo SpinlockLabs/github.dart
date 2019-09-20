@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 
 part 'repos_releases.g.dart';
 
@@ -21,8 +24,16 @@ class Release {
   @JsonKey(name: "zipball_url")
   String zipballUrl;
 
+  /// The endpoint for uploading release assets.
+  /// This key is a hypermedia resource. https://developer.github.com/v3/#hypermedia
+  @JsonKey(name: "upload_url")
+  String uploadUrl;
+
   /// Release ID
   int id;
+
+  @JsonKey(name: "node_id")
+  String nodeId;
 
   /// Release Tag Name
   @JsonKey(name: "tag_name")
@@ -50,10 +61,12 @@ class Release {
   String description;
 
   /// If the release is a draft.
-  bool draft;
+  @JsonKey(name: "draft")
+  bool isDraft;
 
   /// If the release is a pre-release.
-  bool prerelease;
+  @JsonKey(name: "prerelease")
+  bool isPrerelease;
 
   /// The time this release was created at.
   @JsonKey(name: "created_at")
@@ -85,6 +98,14 @@ class Release {
   Map<String, dynamic> toJson() {
     return _$ReleaseToJson(this);
   }
+
+  String getUploadUrlFor(String name, [String label]) =>
+      "${uploadUrl.substring(0, uploadUrl.indexOf('{'))}?name=$name${label != null ? ",$label" : ""}";
+
+  bool get hasErrors =>
+      json['errors'] != null && (json['errors'] as List).isNotEmpty;
+
+  List get errors => json['errors'];
 }
 
 /// Model class for a release asset.
@@ -159,12 +180,21 @@ class CreateRelease {
   String body;
 
   /// If the release is a draft
-  bool draft;
+  bool isDraft;
 
   /// If the release should actually be released.
-  bool prerelease;
+  bool isPrerelease;
 
   CreateRelease(this.tagName);
+
+  CreateRelease.from({
+    @required this.tagName,
+    @required this.name,
+    @required this.targetCommitish,
+    @required this.isDraft,
+    @required this.isPrerelease,
+    this.body,
+  });
 
   static CreateRelease fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
@@ -175,4 +205,31 @@ class CreateRelease {
   Map<String, dynamic> toJson() {
     return _$CreateReleaseToJson(this);
   }
+}
+
+class CreateReleaseAsset {
+  /// The file name of the asset.
+  String name;
+
+  /// An alternate short description of the asset. Used in place of the filename.
+  String label;
+
+  /// The media type of the asset.
+  ///
+  /// For a list of media types,
+  /// see [Media Types](https://www.iana.org/assignments/media-types/media-types.xhtml).
+  /// For example: application/zip
+  String contentType;
+
+  /// The raw binary data for the asset being uploaded.
+  ///
+  /// GitHub expects the asset data in its raw binary form, rather than JSON.
+  Uint8List assetData;
+
+  CreateReleaseAsset({
+    @required this.name,
+    @required this.contentType,
+    @required this.assetData,
+    this.label,
+  });
 }

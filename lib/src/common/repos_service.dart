@@ -505,6 +505,8 @@ class RepositoriesService extends Service {
   // TODO: Implement listPagesBuilds: https://developer.github.com/v3/repos/pages/#list-pages-builds
   // TODO: Implement getLatestPagesBuild: https://developer.github.com/v3/repos/pages/#list-latest-pages-build
 
+  // Releases
+
   /// Lists releases for the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
@@ -513,28 +515,74 @@ class RepositoriesService extends Service {
         .objects("GET", "/repos/${slug.fullName}/releases", Release.fromJson);
   }
 
-  /// Fetches a single release.
+  /// Fetches a single release by the release ID.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
-  Future<Release> getRelease(RepositorySlug slug, int id) =>
+  Future<Release> getReleaseById(RepositorySlug slug, int id) =>
       _github.getJSON("/repos/${slug.fullName}/releases/$id",
           convert: Release.fromJson);
 
-  /// Creates a Release based on the specified [release].
+  /// Fetches a single release by the release tag name.
   ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
+  Future<Release> getReleaseByTagName(RepositorySlug slug, String tagName) =>
+      _github.getJSON("/repos/${slug.fullName}/releases/tags/$tagName",
+          convert: Release.fromJson);
+
+  /// Creates a Release based on the specified [createRelease].
+  ///
+  /// If [getIfExists] is true, this returns an already existing release instead of an error.
+  /// Defaults to true.
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
-  Future<Release> createRelease(RepositorySlug slug, CreateRelease release) {
-    return _github.postJSON("/repos/${slug.fullName}/releases",
-        convert: Release.fromJson, body: jsonEncode(release.toJson()));
+  Future<Release> createRelease(
+    RepositorySlug slug,
+    CreateRelease createRelease, {
+    bool getIfExists = true,
+  }) async {
+    Release release = await _github.postJSON("/repos/${slug.fullName}/releases",
+        convert: Release.fromJson, body: jsonEncode(createRelease.toJson()));
+    if (release.hasErrors) {
+      var alreadyExistsErrorCode = release.errors.firstWhere(
+          (error) => error['code'] == 'already_exists',
+          orElse: () => null);
+      if (alreadyExistsErrorCode != null) {
+        var field = alreadyExistsErrorCode['field'];
+        if (field == "tag_name") {
+          return getReleaseByTagName(slug, createRelease.tagName);
+        }
+      } else {
+        print(
+            "Unexpected response from the API. Returning response. \n Errors: ${release.errors}");
+      }
+    }
+    return release;
   }
 
+  Future<List<ReleaseAsset>> uploadReleaseAssets(
+    Release release,
+    Iterable<CreateReleaseAsset> createReleaseAssets,
+  ) async {
+    List<ReleaseAsset> releaseAssets = [];
+    for (final createReleaseAsset in createReleaseAssets) {
+      final headers = {'Content-Type': createReleaseAsset.contentType};
+      final releaseAsset = await _github.postJSON(
+          release.getUploadUrlFor(
+            createReleaseAsset.name,
+            createReleaseAsset.label,
+          ),
+          headers: headers,
+          body: createReleaseAsset.assetData,
+          convert: ReleaseAsset.fromJson);
+      releaseAssets.add(releaseAsset);
+    }
+    return releaseAssets;
+  }
   // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release
   // TODO: Implement deleteRelease: https://developer.github.com/v3/repos/releases/#delete-a-release
   // TODO: Implement listReleaseAssets: https://developer.github.com/v3/repos/releases/#list-assets-for-a-release
   // TODO: Implement getReleaseAssets: https://developer.github.com/v3/repos/releases/#get-a-single-release-asset
   // TODO: Implement editReleaseAssets: https://developer.github.com/v3/repos/releases/#edit-a-release-asset
   // TODO: Implement deleteReleaseAssets: https://developer.github.com/v3/repos/releases/#delete-a-release-asset
-  // TODO: Implement uploadReleaseAsset: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
 
   /// Lists repository contributor statistics.
   ///
