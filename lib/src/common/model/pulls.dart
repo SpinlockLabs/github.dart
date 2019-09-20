@@ -59,7 +59,8 @@ class PullRequestInformation {
 
   PullRequestInformation([this.isCompletePullRequest = false]);
 
-  static PullRequestInformation fromJSON(Map<String, dynamic> input, [PullRequestInformation into]) {
+  static PullRequestInformation fromJSON(Map<String, dynamic> input,
+      [PullRequestInformation into]) {
     if (input == null) return null;
 
     var pr = into != null ? into : PullRequestInformation();
@@ -134,7 +135,10 @@ class PullRequest extends PullRequestInformation {
     pr.additionsCount = input['additions'];
     pr.deletionsCount = input['deletions'];
     pr.changedFilesCount = input['changed_files'];
-    pr.labels = input['labels']?.cast<Map<String, dynamic>>()?.map<IssueLabel>(IssueLabel.fromJSON)?.toList();
+    pr.labels = input['labels']
+        ?.cast<Map<String, dynamic>>()
+        ?.map<IssueLabel>(IssueLabel.fromJSON)
+        ?.toList();
     return pr;
   }
 }
