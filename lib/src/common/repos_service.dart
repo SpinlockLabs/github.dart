@@ -354,10 +354,13 @@ class RepositoriesService extends Service {
     var map = createNonNullMap(
         {"message": message, "content": content, "sha": sha, "branch": branch});
 
-    return _github.postJSON("/repos/${slug.fullName}/contents/$path",
-        body: jsonEncode(map),
-        statusCode: 200,
-        convert: ContentCreation.fromJSON);
+    return _github
+        .request("PUT", "/repos/${slug.fullName}/contents/$path",
+            body: jsonEncode(map))
+        .then((response) {
+      return ContentCreation.fromJSON(
+          jsonDecode(response.body) as Map<String, dynamic>);
+    });
   }
 
   /// Deletes the specified file.

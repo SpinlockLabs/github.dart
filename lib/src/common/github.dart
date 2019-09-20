@@ -201,7 +201,7 @@ class GitHub {
           convert: convert,
           preview: preview);
 
-  /// Handles Post Requests that respond with JSO
+  /// Handles Post Requests that respond with JSON
   ///
   /// [path] can either be a path like '/repos' or a full url.
   /// [statusCode] is the expected status code. If it is null, it is ignored.
