@@ -136,9 +136,9 @@ class PullRequest extends PullRequestInformation {
     pr.deletionsCount = input['deletions'];
     pr.changedFilesCount = input['changed_files'];
     pr.labels = input['labels']
-        .cast<Map<String, dynamic>>()
-        .map<IssueLabel>(IssueLabel.fromJSON)
-        .toList();
+        ?.cast<Map<String, dynamic>>()
+        ?.map<IssueLabel>(IssueLabel.fromJSON)
+        ?.toList();
     return pr;
   }
 }
