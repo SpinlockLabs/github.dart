@@ -1,7 +1,7 @@
 name: github
-version: 5.1.0
+version: 5.2.0
 author: Kenneth Endfinger <kaendfinger@gmail.com>
-description: GitHub API Client Library
+description: A high-level GitHub API Client Library that uses Github's v3 API
 homepage: https://github.com/DirectMyFile/github.dart
 
 environment:

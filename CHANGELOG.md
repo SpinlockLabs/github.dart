@@ -1,3 +1,8 @@
+## v5.2.0
+ - Add access to labels on Pull Requests https://github.com/DirectMyFile/github.dart/pull/163
+ - Adding draft property to PR model https://github.com/DirectMyFile/github.dart/pull/162
+ - updateFile request must be a PUT https://github.com/DirectMyFile/github.dart/pull/160
+ 
 ## v5.1.0
 
  - `Repository`: added `updatedAt` and `license` fields.
