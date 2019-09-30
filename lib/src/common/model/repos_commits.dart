@@ -7,119 +7,153 @@ part of github.common;
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
 class RepositoryCommit {
   /// API url.
-  String url;
+  final String url;
 
   /// Commit SHA
-  String sha;
+  final String sha;
 
   /// Url to Commit Page
   @JsonKey(name: "html_url")
-  String htmlUrl;
+  final String htmlUrl;
 
   /// Comments url.
   @JsonKey(name: "comments_url")
-  String commentsUrl;
+  final String commentsUrl;
 
   /// A reference to the raw [GitCommit].
-  GitCommit commit;
+  final GitCommit commit;
 
   /// Commit Author
-  User author;
+  final User author;
 
   /// Commit Committer.
-  User committer;
+  final User committer;
 
   /// Commit parents.
-  List<GitCommit> parents;
+  final List<GitCommit> parents;
 
   /// Commit statistics.
-  CommitStats stats;
+  final CommitStats stats;
 
   /// The files changed in this commit.
-  List<CommitFile> files;
+  final List<CommitFile> files;
 
-  static RepositoryCommit fromJSON(Map<String, dynamic> input) {
+  RepositoryCommit._({
+    @required this.url,
+    @required this.sha,
+    @required this.htmlUrl,
+    @required this.commentsUrl,
+    @required this.commit,
+    @required this.author,
+    @required this.committer,
+    @required this.stats,
+    @required this.files,
+    @required this.parents,
+  });
+
+  factory RepositoryCommit.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var commit = RepositoryCommit()
-      ..url = input['url']
-      ..sha = input['sha']
-      ..htmlUrl = input['html_url']
-      ..commentsUrl = input['comments_url']
-      ..commit = GitCommit.fromJSON(input['commit'] as Map<String, dynamic>)
-      ..author = User.fromJson(input['author'] as Map<String, dynamic>)
-      ..committer = User.fromJson(input['committer'] as Map<String, dynamic>)
-      ..stats = CommitStats.fromJSON(input['stats'] as Map<String, dynamic>);
+    final List<GitCommit> parents = input['parents'] != null
+        ? (input['parents'] as List<dynamic>)
+            .map((parent) => GitCommit.fromJson(parent))
+            .toList()
+        : null;
 
-    if (input['parents'] != null) {
-      commit.parents = (input['parents'] as List<dynamic>)
-          .map((parent) => GitCommit.fromJson(parent))
-          .toList();
-    }
+    final List<CommitFile> files = input['files'] != null
+        ? (input['files'] as List<dynamic>)
+            .map((file) => CommitFile.fromJSON(file))
+            .toList()
+        : null;
 
-    if (input['files'] != null) {
-      commit.files = (input['files'] as List<dynamic>)
-          .map((file) => CommitFile.fromJSON(file))
-          .toList();
-    }
-
-    return commit;
+    return RepositoryCommit._(
+      url: input['url'],
+      sha: input['sha'],
+      htmlUrl: input['html_url'],
+      commentsUrl: input['comments_url'],
+      commit: GitCommit.fromJSON(input['commit'] as Map<String, dynamic>),
+      author: User.fromJson(input['author'] as Map<String, dynamic>),
+      committer: User.fromJson(input['committer'] as Map<String, dynamic>),
+      stats: CommitStats.fromJSON(input['stats'] as Map<String, dynamic>),
+      parents: parents,
+      files: files,
+    );
   }
 }
 
 /// Model class for commit statistics.
 class CommitStats {
   /// Number of Additions.
-  int additions;
+  final int additions;
 
   /// Number of Deletions.
-  int deletions;
+  final int deletions;
 
   /// Total changes.
-  int total;
+  final int total;
 
-  static CommitStats fromJSON(Map<String, dynamic> input) {
+  CommitStats._({
+    @required this.additions,
+    @required this.deletions,
+    @required this.total,
+  });
+
+  factory CommitStats.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return CommitStats()
-      ..additions = input['additions']
-      ..deletions = input['deletions']
-      ..total = input['total'];
+    return CommitStats._(
+      additions: input['additions'],
+      deletions: input['deletions'],
+      total: input['total'],
+    );
   }
 }
 
 /// Model class of a file that was changed in a commit.
 class CommitFile {
   @JsonKey(name: "filename")
-  String name;
+  final String name;
 
-  int additions;
-  int deletions;
-  int changes;
-  String status;
+  final int additions;
+  final int deletions;
+  final int changes;
+  final String status;
 
   @JsonKey(name: "raw_url")
-  String rawUrl;
+  final String rawUrl;
 
   @JsonKey(name: "blob_url")
-  String blobUrl;
+  final String blobUrl;
 
-  String patch;
+  final String patch;
 
-  Map<String, dynamic> json;
+  final Map<String, dynamic> json;
 
-  static CommitFile fromJSON(Map<String, dynamic> input) {
+  CommitFile._({
+    @required this.name,
+    @required this.additions,
+    @required this.deletions,
+    @required this.changes,
+    @required this.status,
+    @required this.rawUrl,
+    @required this.blobUrl,
+    @required this.patch,
+    @required this.json,
+  });
+
+  factory CommitFile.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return CommitFile()
-      ..name = input['filename']
-      ..additions = input['additions']
-      ..deletions = input['deletions']
-      ..changes = input['changes']
-      ..status = input['status']
-      ..rawUrl = input['raw_url']
-      ..blobUrl = input['blob_url']
-      ..patch = input['patch']
-      ..json = input;
+    return CommitFile._(
+      name: input['filename'],
+      additions: input['additions'],
+      deletions: input['deletions'],
+      changes: input['changes'],
+      status: input['status'],
+      rawUrl: input['raw_url'],
+      blobUrl: input['blob_url'],
+      patch: input['patch'],
+      json: input,
+    );
   }
 }

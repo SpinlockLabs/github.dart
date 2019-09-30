@@ -51,80 +51,104 @@ class ContributorWeekStatistics {
 /// Model class for contributor participation.
 class ContributorParticipation {
   /// Commit Counts for All Users
-  List<int> all;
+  final List<int> all;
 
   /// Commit Counts for the Owner
-  List<int> owner;
+  final List<int> owner;
 
-  static ContributorParticipation fromJSON(Map<String, dynamic> input) {
+  ContributorParticipation._({
+    @required this.all,
+    @required this.owner,
+  });
+
+  factory ContributorParticipation.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return ContributorParticipation()
-      ..all = input['all'] as List<int>
-      ..owner = input['owner'] as List<int>;
+    return ContributorParticipation._(
+      all: input['all'] as List<int>,
+      owner: input['owner'] as List<int>,
+    );
   }
 }
 
 /// Model class for a week in a full year commit count.
 class YearCommitCountWeek {
   /// Commit Counts for each day (starting with Sunday)
-  List<int> days;
+  final List<int> days;
 
   /// Total Commit Count
-  int total;
+  final int total;
 
   /// Timestamp for Beginning of Week
-  int timestamp;
+  final int timestamp;
 
-  static YearCommitCountWeek fromJSON(Map<String, dynamic> input) {
+  YearCommitCountWeek._({
+    @required this.days,
+    @required this.total,
+    @required this.timestamp,
+  });
+
+  factory YearCommitCountWeek.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var c = YearCommitCountWeek();
-    c.days = input["days"] as List<int>;
-    c.total = input["total"];
-    c.timestamp = input["week"];
-    return c;
+    return YearCommitCountWeek._(
+      days: input["days"] as List<int>,
+      total: input["total"],
+      timestamp: input["week"],
+    );
   }
 }
 
 /// Model class for a weekly change count.
 class WeeklyChangesCount {
   /// Timestamp for Beginning of Week
-  int timestamp;
+  final int timestamp;
 
   /// Number of Additions
-  int additions;
+  final int additions;
 
   /// Number of Deletions
-  int deletions;
+  final int deletions;
 
-  static WeeklyChangesCount fromJSON(Map<String, dynamic> input) {
+  WeeklyChangesCount._({
+    @required this.timestamp,
+    @required this.additions,
+    @required this.deletions,
+  });
+
+  factory WeeklyChangesCount.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-    var c = WeeklyChangesCount();
-    c.timestamp = input[0];
-    c.additions = input[1];
-    c.deletions = input[2];
-    return c;
+    return WeeklyChangesCount._(
+      timestamp: input[0],
+      additions: input[1],
+      deletions: input[2],
+    );
   }
 }
 
 /// Model Class for a Punchcard Entry
 class PunchcardEntry {
   /// Weekday (With 0 as Sunday and 6 as Saturday)
-  int weekday;
+  final int weekday;
 
   /// Hour of Day
-  int hour;
+  final int hour;
 
   /// Number of Commits
-  int commits;
+  final int commits;
 
-  static PunchcardEntry fromJSON(Map<String, dynamic> input) {
+  PunchcardEntry._({
+    @required this.weekday,
+    @required this.hour,
+    @required this.commits,
+  });
+
+  factory PunchcardEntry.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-    var c = PunchcardEntry();
-    c.weekday = input[0];
-    c.hour = input[1];
-    c.commits = input[2];
-    return c;
+    return PunchcardEntry._(
+      weekday: input[0],
+      hour: input[1],
+      commits: input[2],
+    );
   }
 }

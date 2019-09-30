@@ -3,37 +3,37 @@ part of github.common;
 /// Model class for a file on GitHub.
 class GitHubFile {
   /// Type of File
-  String type;
+  final String type;
 
   /// File Encoding
-  String encoding;
+  final String encoding;
 
   /// File Size
-  int size;
+  final int size;
 
   /// File Name
-  String name;
+  final String name;
 
   /// File Path
-  String path;
+  final String path;
 
   /// File Content
-  String content;
+  final String content;
 
   /// SHA
-  String sha;
+  final String sha;
 
   /// Url to file
   @JsonKey(name: "html_url")
-  String htmlUrl;
+  final String htmlUrl;
 
   /// Git Url
   @JsonKey(name: "git_url")
-  String gitUrl;
+  final String gitUrl;
 
   /// Links
   @JsonKey(name: "_links")
-  Links links;
+  final Links links;
 
   /// Text Content
   String get text {
@@ -46,26 +46,41 @@ class GitHubFile {
   String _text;
 
   /// Source Repository
-  RepositorySlug sourceRepository;
+  final RepositorySlug sourceRepository;
 
-  static GitHubFile fromJSON(Map<String, dynamic> input,
+  GitHubFile._({
+    @required this.type,
+    @required this.encoding,
+    @required this.size,
+    @required this.name,
+    @required this.path,
+    @required this.content,
+    @required this.sha,
+    @required this.gitUrl,
+    @required this.htmlUrl,
+    @required this.links,
+    @required this.sourceRepository,
+  });
+
+  factory GitHubFile.fromJSON(Map<String, dynamic> input,
       [RepositorySlug slug]) {
     if (input == null) return null;
 
-    return GitHubFile()
-      ..type = input['type']
-      ..encoding = input['encoding']
-      ..size = input['size']
-      ..name = input['name']
-      ..path = input['path']
-      ..content = input['content'] == null
+    return GitHubFile._(
+      type: input['type'],
+      encoding: input['encoding'],
+      size: input['size'],
+      name: input['name'],
+      path: input['path'],
+      content: input['content'] == null
           ? null
-          : LineSplitter.split(input['content']).join()
-      ..sha = input['sha']
-      ..gitUrl = input['git_url']
-      ..htmlUrl = input['html_url']
-      ..links = Links.fromJson(input['_links'] as Map<String, dynamic>)
-      ..sourceRepository = slug;
+          : LineSplitter.split(input['content']).join(),
+      sha: input['sha'],
+      gitUrl: input['git_url'],
+      htmlUrl: input['html_url'],
+      links: Links.fromJson(input['_links'] as Map<String, dynamic>),
+      sourceRepository: slug,
+    );
   }
 }
 

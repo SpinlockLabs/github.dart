@@ -72,7 +72,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(_github).objects(
         "GET",
         '/repos/${slug.fullName}/pulls/$number/commits',
-        RepositoryCommit.fromJSON);
+        (s) => RepositoryCommit.fromJSON(s));
   }
 
   /// Lists the files in a pull request.

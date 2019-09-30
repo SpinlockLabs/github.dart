@@ -3,46 +3,60 @@ part of github.common;
 /// Model class for a repository hook.
 class Hook {
   /// Events to Subscribe to
-  List<String> events;
+  final List<String> events;
 
   /// Content Type
   @JsonKey(name: "config/content_type")
-  String contentType;
+  final String contentType;
 
   /// If the hook is active
-  bool active;
+  final bool active;
 
   /// Hook ID
-  int id;
+  final int id;
 
   /// Hook Name
-  String name;
+  final String name;
 
   /// The time the hook was created
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
   /// The last time the hook was updated
   @JsonKey(name: "updated_at")
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
   /// The Repository Name
-  String repoName;
+  final String repoName;
 
-  Map<String, dynamic> config;
+  final Map<String, dynamic> config;
 
-  static Hook fromJSON(String repoName, Map<String, dynamic> input) {
+  Hook._({
+    @required this.events,
+    @required this.active,
+    @required this.name,
+    @required this.id,
+    @required this.repoName,
+    @required this.updatedAt,
+    @required this.createdAt,
+    @required this.config,
+    @required this.contentType,
+  });
+
+  factory Hook.fromJSON(String repoName, Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return Hook()
-      ..events = input['events']?.cast<String>()
-      ..active = input['active']
-      ..name = input['name']
-      ..id = input['id']
-      ..repoName = repoName
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..createdAt = parseDateTime(input['created_at'])
-      ..config = input['config'] as Map<String, dynamic>;
+    return Hook._(
+      contentType: null,
+      events: input['events']?.cast<String>(),
+      active: input['active'],
+      name: input['name'],
+      id: input['id'],
+      repoName: repoName,
+      updatedAt: parseDateTime(input['updated_at']),
+      createdAt: parseDateTime(input['created_at']),
+      config: input['config'] as Map<String, dynamic>,
+    );
   }
 }
 

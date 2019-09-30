@@ -3,22 +3,28 @@ part of github.common;
 /// GitHub Pages Information
 class RepositoryPages {
   /// Pages CNAME
-  String cname;
+  final String cname;
 
   /// Pages Status
-  String status;
+  final String status;
 
   /// If the repo has a custom 404
   @JsonKey(name: "custom_404")
-  bool hasCustom404;
+  final bool hasCustom404;
+
+  RepositoryPages._({
+    @required this.cname,
+    @required this.status,
+    @required this.hasCustom404,
+  });
 
   static RepositoryPages fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var pages = RepositoryPages();
-    pages.cname = input['cname'];
-    pages.status = input['status'];
-    pages.hasCustom404 = input['custom_404'];
-    return pages;
+    return RepositoryPages._(
+      cname: input['cname'],
+      status: input['status'],
+      hasCustom404: input['custom_404'],
+    );
   }
 }

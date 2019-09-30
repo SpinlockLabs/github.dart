@@ -243,8 +243,8 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
   Stream<RepositoryCommit> listCommits(RepositorySlug slug) {
-    return PaginationHelper(_github).objects(
-        "GET", "/repos/${slug.fullName}/commits", RepositoryCommit.fromJSON);
+    return PaginationHelper(_github).objects("GET",
+        "/repos/${slug.fullName}/commits", (i) => RepositoryCommit.fromJSON(i));
   }
 
   /// Fetches the specified commit.
@@ -252,7 +252,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/commits/#get-a-single-commit
   Future<RepositoryCommit> getCommit(RepositorySlug slug, String sha) =>
       _github.getJSON("/repos/${slug.fullName}/commits/$sha",
-          convert: RepositoryCommit.fromJSON);
+          convert: (i) => RepositoryCommit.fromJSON(i));
 
   /// [refBase] and [refHead] can be the same value for a branch, commit, or ref
   /// in [slug] or specify other repositories by using `repo:ref` syntax.
@@ -491,7 +491,7 @@ class RepositoriesService extends Service {
   Future<RepositoryCommit> merge(RepositorySlug slug, CreateMerge merge) {
     return _github.postJSON("/repos/${slug.fullName}/merges",
         body: merge.toJSON(),
-        convert: RepositoryCommit.fromJSON,
+        convert: (i) => RepositoryCommit.fromJSON(i),
         statusCode: 201);
   }
 
@@ -566,7 +566,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/commit_activity",
-        YearCommitCountWeek.fromJSON);
+        (i) => YearCommitCountWeek.fromJSON(i));
   }
 
   /// Fetches weekly addition and deletion counts.
@@ -576,7 +576,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/stats/code_frequency",
-        WeeklyChangesCount.fromJSON);
+        (i) => WeeklyChangesCount.fromJSON(i));
   }
 
   /// Fetches Participation Breakdowns.
@@ -584,14 +584,17 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#participation
   Future<ContributorParticipation> getParticipation(RepositorySlug slug) =>
       _github.getJSON("/repos/${slug.fullName}/stats/participation",
-          statusCode: 200, convert: ContributorParticipation.fromJSON);
+          statusCode: 200,
+          convert: (i) => ContributorParticipation.fromJSON(i));
 
   /// Fetches Punchcard.
   ///
   /// API docs: https://developer.github.com/v3/repos/statistics/#punch-card
   Stream<PunchcardEntry> listPunchcard(RepositorySlug slug) {
-    return PaginationHelper(_github).objects("GET",
-        "/repos/${slug.fullName}/stats/punchcard", PunchcardEntry.fromJSON);
+    return PaginationHelper(_github).objects(
+        "GET",
+        "/repos/${slug.fullName}/stats/punchcard",
+        (i) => PunchcardEntry.fromJSON(i));
   }
 
   /// Lists the statuses of a repository at the specified reference.
@@ -602,7 +605,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects(
         "GET",
         "/repos/${slug.fullName}/commits/$ref/statuses",
-        RepositoryStatus.fromJSON);
+        (i) => RepositoryStatus.fromJSON(i));
   }
 
   /// Creates a new status for a repository at the specified reference.
@@ -612,7 +615,7 @@ class RepositoriesService extends Service {
   Future<RepositoryStatus> createStatus(
       RepositorySlug slug, String ref, CreateStatus request) {
     return _github.postJSON("/repos/${slug.fullName}/statuses/$ref",
-        body: request.toJSON(), convert: RepositoryStatus.fromJSON);
+        body: request.toJSON(), convert: (i) => RepositoryStatus.fromJSON(i));
   }
 
   /// Gets a Combined Status for the specified repository and ref.
