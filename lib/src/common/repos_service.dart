@@ -242,8 +242,7 @@ class RepositoriesService extends Service {
   /// * [line]: **Deprecated**. Use position parameter instead. Line number in the file to comment on.
   ///
   /// https://developer.github.com/v3/repos/comments/#create-a-commit-comment
-  // TODO: convert the JSON returned by the API
-  Future<dynamic> createCommitComment(
+  Future<CommitComment> createCommitComment(
       RepositorySlug slug, RepositoryCommit commit,
       {@required String body,
       String path,
@@ -256,9 +255,11 @@ class RepositoriesService extends Service {
       'line': line,
     });
     return _github.postJSON(
-        "/repos/${slug.fullName}/commits/${commit.sha}/comments",
-        body: jsonEncode(data),
-        statusCode: 201);
+      "/repos/${slug.fullName}/commits/${commit.sha}/comments",
+      body: jsonEncode(data),
+      statusCode: 201,
+      convert: (i) => CommitComment.fromJSON(i),
+    );
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/repos/comments/#get-a-single-commit-comment
