@@ -239,14 +239,21 @@ class RepositoriesService extends Service {
   /// * [body]: The contents of the comment.
   /// * [path]: Relative path of the file to comment on.
   /// * [position]: Line index in the diff to comment on.
+  /// * [line]: **Deprecated**. Use position parameter instead. Line number in the file to comment on.
   ///
   /// https://developer.github.com/v3/repos/comments/#create-a-commit-comment
-  Future<bool> createCommitComment(RepositorySlug slug, RepositoryCommit commit,
-      {@required String body, String path, int position}) {
+  // TODO: convert the JSON returned by the API
+  Future<dynamic> createCommitComment(
+      RepositorySlug slug, RepositoryCommit commit,
+      {@required String body,
+      String path,
+      int position,
+      @Deprecated('Use position parameter instead') int line}) {
     final Map<String, dynamic> data = createNonNullMap({
       'body': body,
       'path': path,
       'position': position,
+      'line': line,
     });
     return _github.postJSON(
         "/repos/${slug.fullName}/commits/${commit.sha}/comments",
