@@ -274,29 +274,29 @@ class RepositoriesService extends Service {
   /// Returns a list of all comments for a specific commit.
   ///
   /// https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
-  Future<List<CommitComment>> listComments(
+  Stream<CommitComment> listComments(
     RepositorySlug slug,
     RepositoryCommit commit,
-  ) async {
-    return _github.getJSON<List<dynamic>, List<CommitComment>>(
+  ) {
+    return PaginationHelper(_github)
+        .objects<Map<String, dynamic>, CommitComment>(
+      "GET",
       "/repos/${slug.fullName}/commits/${commit.sha}/comments",
-      statusCode: 200,
-      convert: (input) => List.castFrom<dynamic, Map<String, dynamic>>(input)
-          .map((i) => CommitComment.fromJSON(i))
-          .toList(),
+      (i) => CommitComment.fromJSON(i),
+      statusCode: StatusCodes.OK,
     );
   }
 
   /// Returns a list of all commit comments in a repository.
   ///
   /// https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
-  Future<List<CommitComment>> listCommitComments(RepositorySlug slug) async {
-    return _github.getJSON<List<dynamic>, List<CommitComment>>(
+  Stream<CommitComment> listCommitComments(RepositorySlug slug) {
+    return PaginationHelper(_github)
+        .objects<Map<String, dynamic>, CommitComment>(
+      "GET",
       "repos/${slug.fullName}/comments",
-      statusCode: 200,
-      convert: (input) => List.castFrom<dynamic, Map<String, dynamic>>(input)
-          .map((i) => CommitComment.fromJSON(i))
-          .toList(),
+      (i) => CommitComment.fromJSON(i),
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -561,7 +561,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/forks/#create-a-fork
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) async {
     if (fork == null) fork = CreateFork();
-    return await _github.postJSON<Map<String, dynamic>, Repository>(
+    return _github.postJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.fullName}/forks",
       body: fork.toJSON(),
       convert: (i) => Repository.fromJSON(i),
@@ -583,7 +583,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/hooks/#get-single-hook
   Future<Hook> getHook(RepositorySlug slug, int id) async =>
-      await _github.getJSON<Map<String, dynamic>, Hook>(
+      _github.getJSON<Map<String, dynamic>, Hook>(
         "/repos/${slug.fullName}/hooks/$id",
         convert: (i) => Hook.fromJSON(slug.fullName, i),
       );
@@ -592,14 +592,30 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/hooks/#create-a-hook
   Future<Hook> createHook(RepositorySlug slug, CreateHook hook) async {
-    return await _github.postJSON<Map<String, dynamic>, Hook>(
+    return _github.postJSON<Map<String, dynamic>, Hook>(
       "/repos/${slug.fullName}/hooks",
       convert: (i) => Hook.fromJSON(slug.fullName, i),
       body: hook.toJSON(),
     );
   }
 
-  // TODO: Implement editHook: https://developer.github.com/v3/repos/hooks/#edit-a-hook
+  /// Edits a hook.
+  /// Returns the edited hook.
+  ///
+  /// https://developer.github.com/v3/repos/hooks/#edit-a-hook
+  // TODO implement methods in Hook class to edit some fields
+  Future<Hook> editHook(RepositorySlug slug, Hook editedHook) async {
+    return _github.postJSON<Map<String, dynamic>, Hook>(
+      "/repos/${slug.fullName}/hooks/${editedHook.id.toString()}",
+      statusCode: StatusCodes.OK,
+      convert: (i) => Hook.fromJSON(slug.fullName, i),
+      body: jsonEncode(<String, dynamic>{
+        "config": editedHook.config,
+        "events": editedHook.events,
+        "active": editedHook.active,
+      }),
+    );
+  }
 
   /// Triggers a hook with the latest push.
   ///
@@ -608,7 +624,7 @@ class RepositoriesService extends Service {
     await _github.request(
       "POST",
       "/repos/${slug.fullName}/hooks/$id/tests",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -619,7 +635,7 @@ class RepositoriesService extends Service {
     await _github.request(
       "POST",
       "/repos/${slug.fullName}/hooks/$id/pings",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -627,7 +643,7 @@ class RepositoriesService extends Service {
     await _github.request(
       "DELETE",
       "/repos/${slug.fullName}/hooks/$id",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -644,33 +660,57 @@ class RepositoriesService extends Service {
     );
   }
 
-  // TODO: Implement getDeployKey: https://developer.github.com/v3/repos/keys/#get
-
-  /// Adds a deploy key for a repository.
+  /// Get a deploy key.
+  /// * [id]: id of the key to retrieve.
   ///
-  /// API docs: https://developer.github.com/v3/repos/keys/#create
-  Future<PublicKey> createDeployKey(
-      RepositorySlug slug, CreatePublicKey key) async {
-    return await _github.postJSON<Map<String, dynamic>, PublicKey>(
-      "/repos/${slug.fullName}/keys",
-      body: key.toJSON(),
-      statusCode: 201,
+  /// https://developer.github.com/v3/repos/keys/#get
+  Future<PublicKey> getDeployKey(RepositorySlug slug,
+      {@required int id}) async {
+    return _github.getJSON<Map<String, dynamic>, PublicKey>(
+      "/repos/${slug.fullName}/keys/${id.toString()}",
+      statusCode: StatusCodes.OK,
       convert: (i) => PublicKey.fromJSON(i),
     );
   }
 
-  // TODO: Implement editDeployKey: https://developer.github.com/v3/repos/keys/#edit
-  // TODO: Implement deleteDeployKey: https://developer.github.com/v3/repos/keys/#delete
+  /// Adds a deploy key for a repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/keys/#create
+  // TODO add to Changelog new args
+  Future<PublicKey> createDeployKey(RepositorySlug slug,
+      {@required String title, @required String key}) async {
+    assert(title != null && key != null);
+    return _github.postJSON<Map<String, dynamic>, PublicKey>(
+      "/repos/${slug.fullName}/keys",
+      body: jsonEncode(<String, dynamic>{
+        "title": title,
+        "key": key,
+      }),
+      statusCode: StatusCodes.CREATED,
+      convert: (i) => PublicKey.fromJSON(i),
+    );
+  }
+
+  /// Delete a deploy key.
+  ///
+  /// https://developer.github.com/v3/repos/keys/#delete
+  Future<void> deleteDeployKey({RepositorySlug slug, PublicKey key}) async {
+    await _github.request(
+      "DELETE",
+      "/repos/${slug.fullName}/keys/${key.id}",
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+  }
 
   /// Merges a branch in the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/merging/#perform-a-merge
   Future<RepositoryCommit> merge(RepositorySlug slug, CreateMerge merge) async {
-    return await _github.postJSON<Map<String, dynamic>, RepositoryCommit>(
+    return _github.postJSON<Map<String, dynamic>, RepositoryCommit>(
       "/repos/${slug.fullName}/merges",
       body: merge.toJSON(),
       convert: (i) => RepositoryCommit.fromJSON(i),
-      statusCode: 201,
+      statusCode: StatusCodes.CREATED,
     );
   }
 
@@ -678,14 +718,34 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/pages/#get-information-about-a-pages-site
   Future<RepositoryPages> getPagesInfo(RepositorySlug slug) async =>
-      await _github.getJSON<Map<String, dynamic>, RepositoryPages>(
+      _github.getJSON<Map<String, dynamic>, RepositoryPages>(
         "/repos/${slug.fullName}/pages",
-        statusCode: 200,
-        convert: RepositoryPages.fromJSON,
+        statusCode: StatusCodes.OK,
+        convert: (i) => RepositoryPages.fromJSON(i),
       );
 
-  // TODO: Implement listPagesBuilds: https://developer.github.com/v3/repos/pages/#list-pages-builds
-  // TODO: Implement getLatestPagesBuild: https://developer.github.com/v3/repos/pages/#list-latest-pages-build
+  /// List Pages builds.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/pages/#list-pages-builds
+  Stream<PageBuild> listPagesBuilds(RepositorySlug slug) {
+    return PaginationHelper(_github).objects<Map<String, dynamic>, PageBuild>(
+      "GET",
+      "/repos/${slug.fullName}/pages/builds",
+      (i) => PageBuild._fromJSON(i),
+      statusCode: StatusCodes.OK,
+    );
+  }
+
+  /// Get latest Pages build.
+  /// 
+  /// API docs: https://developer.github.com/v3/repos/pages/#list-latest-pages-build
+  Future<PageBuild> getLatestPagesBuild(RepositorySlug slug) async {
+    return _github.getJSON(
+      "/repos/${slug.fullName}/pages/builds/latest",
+      convert: (i) => PageBuild._fromJSON(i),
+      statusCode: StatusCodes.OK,
+    );
+  }
 
   /// Lists releases for the specified repository.
   ///
@@ -702,7 +762,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
   Future<Release> getRelease(RepositorySlug slug, int id) async =>
-      await _github.getJSON<Map<String, dynamic>, Release>(
+      _github.getJSON<Map<String, dynamic>, Release>(
         "/repos/${slug.fullName}/releases/$id",
         convert: (i) => Release.fromJson(i),
       );
@@ -712,7 +772,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
   Future<Release> createRelease(
       RepositorySlug slug, CreateRelease release) async {
-    return await _github.postJSON<Map<String, dynamic>, Release>(
+    return _github.postJSON<Map<String, dynamic>, Release>(
       "/repos/${slug.fullName}/releases",
       convert: (i) => Release.fromJson(i),
       body: jsonEncode(release.toJson()),
@@ -736,15 +796,15 @@ class RepositoriesService extends Service {
   Future<List<ContributorStatistics>> listContributorStats(
     RepositorySlug slug,
   ) async {
-    var path = "/repos/${slug.fullName}/stats/contributors";
-    var response = await _github.request('GET', path,
+    final String path = "/repos/${slug.fullName}/stats/contributors";
+    final Response response = await _github.request('GET', path,
         headers: {"Accept": "application/vnd.github.v3+json"});
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == StatusCodes.OK) {
       return (jsonDecode(response.body) as List)
           .map((e) => ContributorStatistics.fromJson(e))
           .toList();
-    } else if (response.statusCode == 202) {
+    } else if (response.statusCode == StatusCodes.ACCEPTED) {
       throw NotReady(_github, path);
     }
     _github.handleStatusCode(response);
@@ -779,7 +839,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#participation
   Future<ContributorParticipation> getParticipation(
           RepositorySlug slug) async =>
-      await _github.getJSON(
+      _github.getJSON(
         "/repos/${slug.fullName}/stats/participation",
         statusCode: 200,
         convert: (i) => ContributorParticipation.fromJSON(i),
@@ -816,7 +876,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statuses/#create-a-status
   Future<RepositoryStatus> createStatus(
       RepositorySlug slug, String ref, CreateStatus request) async {
-    return await _github.postJSON<Map<String, dynamic>, RepositoryStatus>(
+    return _github.postJSON<Map<String, dynamic>, RepositoryStatus>(
       "/repos/${slug.fullName}/statuses/$ref",
       body: request.toJSON(),
       convert: (i) => RepositoryStatus.fromJSON(i),
@@ -828,9 +888,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statuses/#get-the-combined-status-for-a-specific-ref
   Future<CombinedRepositoryStatus> getCombinedStatus(
           RepositorySlug slug, String ref) async =>
-      await _github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
+      _github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
         "/repos/${slug.fullName}/commits/$ref/status",
         convert: CombinedRepositoryStatus.fromJSON,
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
       );
 }
