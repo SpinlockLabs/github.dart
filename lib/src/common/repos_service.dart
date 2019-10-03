@@ -232,8 +232,34 @@ class RepositoriesService extends Service {
     });
   }
 
-  // TODO: Implement listComments: https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
-  // TODO: Implement listCommitComments: https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
+  /// Returns a list of all comments for a specific commit.
+  ///
+  /// https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
+  Future<List<CommitComment>> listComments(
+    RepositorySlug slug,
+    RepositoryCommit commit,
+  ) {
+    return _github.getJSON<List<dynamic>, List<CommitComment>>(
+      "/repos/${slug.fullName}/commits/${commit.sha}/comments",
+      statusCode: 200,
+      convert: (input) => List.castFrom<dynamic, Map<String, dynamic>>(input)
+          .map((i) => CommitComment.fromJSON(i))
+          .toList(),
+    );
+  }
+
+  /// Returns a list of all commit comments in a repository.
+  ///
+  /// https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
+  Future<List<CommitComment>> listCommitComments(RepositorySlug slug) async {
+    return await _github.getJSON<List<dynamic>, List<CommitComment>>(
+      "repos/${slug.fullName}/comments",
+      statusCode: 200,
+      convert: (input) => List.castFrom<dynamic, Map<String, dynamic>>(input)
+          .map((i) => CommitComment.fromJSON(i))
+          .toList(),
+    );
+  }
 
   /// Create a comment for a commit using its sha.
   /// * [body]: The contents of the comment.
@@ -247,14 +273,14 @@ class RepositoriesService extends Service {
       {@required String body,
       String path,
       int position,
-      @Deprecated('Use position parameter instead') int line}) {
+      @Deprecated('Use position parameter instead') int line}) async {
     final Map<String, dynamic> data = createNonNullMap({
       'body': body,
       'path': path,
       'position': position,
       'line': line,
     });
-    return _github.postJSON(
+    return await _github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/commits/${commit.sha}/comments",
       body: jsonEncode(data),
       statusCode: 201,
@@ -262,9 +288,48 @@ class RepositoriesService extends Service {
     );
   }
 
-  // TODO: Implement getComment: https://developer.github.com/v3/repos/comments/#get-a-single-commit-comment
-  // TODO: Implement updateComment: https://developer.github.com/v3/repos/comments/#update-a-commit-comment
-  // TODO: Implement deleteComment: https://developer.github.com/v3/repos/comments/#delete-a-commit-comment
+  /// Retrieve a commit comment by its id.
+  ///
+  /// https://developer.github.com/v3/repos/comments/#get-a-single-commit-comment
+  Future<CommitComment> getCommitComment(RepositorySlug slug,
+      {@required int id}) async {
+    return await _github.getJSON<Map<String, dynamic>, CommitComment>(
+      "/repos/${slug.fullName}/comments/id",
+      statusCode: 200,
+      convert: (i) => CommitComment.fromJSON(i),
+    );
+  }
+
+  /// Update a commit comment
+  /// * [id]: id of the comment to update.
+  /// * [body]: new body of the comment.
+  ///
+  /// Returns the updated commit comment.
+  ///
+  /// https://developer.github.com/v3/repos/comments/#update-a-commit-comment
+  Future<CommitComment> updateCommitComment(RepositorySlug slug,
+      {@required int id, @required String body}) async {
+    assert(body != null);
+    return await _github.postJSON<Map<String, dynamic>, CommitComment>(
+      "/repos/${slug.fullName}/comments/${id.toString()}",
+      body: jsonEncode(createNonNullMap({'body': body})),
+      statusCode: 200,
+      convert: (i) => CommitComment.fromJSON(i),
+    );
+  }
+
+  /// Delete a commit comment.
+  /// *[id]: id of the comment to delete.
+  ///
+  /// https://developer.github.com/v3/repos/comments/#delete-a-commit-comment
+  Future<void> deleteCommitComment(RepositorySlug slug,
+      {@required int id}) async {
+    await _github.request(
+      "DELETE",
+      "/repos/${slug.fullName}/comments/${id.toString()}",
+      statusCode: 204,
+    );
+  }
 
   /// Lists the commits of the provided repository [slug].
   ///
@@ -413,7 +478,8 @@ class RepositoriesService extends Service {
   Future<String> getArchiveLink(RepositorySlug slug, String ref,
       {String format = "tarball"}) {
     return _github
-        .request("GET", "/repos/${slug.fullName}/$format/$ref", statusCode: 302)
+        .request("GET", "/repos/${slug.fullName}/$format/$ref",
+            statusCode: 302)
         .then((response) {
       return response.headers["Location"];
     });
