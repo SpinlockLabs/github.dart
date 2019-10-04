@@ -14,7 +14,6 @@ import "dart:convert"
         json;
 
 import "package:http/http.dart" as http;
-import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
 import 'package:meta/meta.dart';

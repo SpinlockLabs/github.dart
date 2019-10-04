@@ -485,7 +485,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/contents/#create-a-file
   Future<ContentCreation> createFile(
       RepositorySlug slug, CreateFile file) async {
-    final Response response = await _github.request(
+    final http.Response response = await _github.request(
       "PUT",
       "/repos/${slug.fullName}/contents/${file.path}",
       body: file.toJSON(),
@@ -506,7 +506,7 @@ class RepositoriesService extends Service {
       "sha": sha,
       "branch": branch,
     });
-    final Response response = await _github.request(
+    final http.Response response = await _github.request(
       "PUT",
       "/repos/${slug.fullName}/contents/$path",
       body: jsonEncode(map),
@@ -522,7 +522,7 @@ class RepositoriesService extends Service {
       String message, String sha, String branch) async {
     final Map<String, dynamic> map =
         createNonNullMap({"message": message, "sha": sha, "branch": branch});
-    final Response response = await _github.request(
+    final http.Response response = await _github.request(
       "DELETE",
       "/repos/${slug.fullName}/contents/$path",
       body: jsonEncode(map),
@@ -537,7 +537,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/contents/#get-archive-link
   Future<String> getArchiveLink(RepositorySlug slug, String ref,
       {String format = "tarball"}) async {
-    final Response response = await _github.request(
+    final http.Response response = await _github.request(
       "GET",
       "/repos/${slug.fullName}/$format/$ref",
       statusCode: 302,
@@ -926,7 +926,7 @@ class RepositoriesService extends Service {
     RepositorySlug slug,
   ) async {
     final String path = "/repos/${slug.fullName}/stats/contributors";
-    final Response response = await _github.request('GET', path,
+    final http.Response response = await _github.request('GET', path,
         headers: {"Accept": "application/vnd.github.v3+json"});
 
     if (response.statusCode == StatusCodes.OK) {
