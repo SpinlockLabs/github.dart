@@ -2,7 +2,7 @@ include: package:pedantic/analysis_options.yaml
 linter:
   rules:
     - always_declare_return_types
-#    - annotate_overrides
+#   - annotate_overrides
 #   - avoid_as
     - avoid_empty_else
     - avoid_init_to_null
@@ -11,7 +11,7 @@ linter:
     - camel_case_types
     - close_sinks
     - comment_references
-#    - constant_identifier_names
+#   - constant_identifier_names
     - control_flow_in_finally
     - directives_ordering
     - empty_catches
@@ -28,13 +28,7 @@ linter:
     - package_api_docs
     - package_names
     - package_prefixed_library_names
-#    - prefer_constructors_over_static_methods
-#    - prefer_const_declarations
-#    - prefer_const_literals_to_create_immutables
     - prefer_equal_for_default_values
-#    - prefer_final_fields
-#    - prefer_final_in_for_each
-#    - prefer_final_locals
     - prefer_generic_function_type_aliases
     - prefer_is_not_empty
     - slash_for_doc_comments
@@ -44,11 +38,9 @@ linter:
     - type_annotate_public_apis
     - type_init_formals
     - unawaited_futures
-#    - unnecessary_await_in_return
     - unnecessary_brace_in_string_interps
     - unnecessary_const
     - unnecessary_getters_setters
     - unnecessary_new
     - unrelated_type_equality_checks
     - valid_regexps
-#    - void_checks
