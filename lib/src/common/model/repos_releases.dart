@@ -30,7 +30,7 @@ class Release {
 
   /// Target Commit
   @JsonKey(name: "target_commitish")
-  String targetCommitsh;
+  String targetCommitish;
 
   /// Release Name
   String name;

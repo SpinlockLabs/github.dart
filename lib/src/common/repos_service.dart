@@ -600,20 +600,51 @@ class RepositoriesService extends Service {
   }
 
   /// Edits a hook.
+  /// * [configUrl]: The URL to which the payloads will be delivered.
+  /// * [configContentType]: The media type used to serialize the payloads. Supported values include json and form. The default is form.
+  /// * [configSecret]: If provided, the secret will be used as the key to generate the HMAC hex digest value in the X-Hub-Signature header.
+  /// * [configInsecureSsl]: Determines whether the SSL certificate of the host for url will be verified when delivering payloads. We strongly recommend not setting this to true as you are subject to man-in-the-middle and other attacks.
+  /// * [events]: Determines what events the hook is triggered for. This replaces the entire array of events. Default: ["push"].
+  /// * [addEvents]: Determines a list of events to be added to the list of events that the Hook triggers for.
+  /// * [removeEvents]: Determines a list of events to be removed from the list of events that the Hook triggers for.
+  /// * [active]: Determines if notifications are sent when the webhook is triggered. Set to true to send notifications.
+  ///
+  /// Leave blank the unedited fields.
   /// Returns the edited hook.
   ///
   /// https://developer.github.com/v3/repos/hooks/#edit-a-hook
-  // TODO implement methods in Hook class to edit some fields
-  Future<Hook> editHook(RepositorySlug slug, Hook editedHook) async {
+  Future<Hook> editHook(
+    RepositorySlug slug,
+    Hook hookToEdit, {
+    String configUrl,
+    String configContentType,
+    String configSecret,
+    bool configInsecureSsl,
+    List<String> events,
+    List<String> addEvents,
+    List<String> removeEvents,
+    bool active,
+  }) async {
+    assert(configUrl != null || hookToEdit.config['url'] != null);
+    assert(configContentType == 'json' || configContentType == 'form');
     return _github.postJSON<Map<String, dynamic>, Hook>(
-      "/repos/${slug.fullName}/hooks/${editedHook.id.toString()}",
+      "/repos/${slug.fullName}/hooks/${hookToEdit.id.toString()}",
       statusCode: StatusCodes.OK,
       convert: (i) => Hook.fromJSON(slug.fullName, i),
-      body: jsonEncode(<String, dynamic>{
-        "config": editedHook.config,
-        "events": editedHook.events,
-        "active": editedHook.active,
-      }),
+      body: jsonEncode(createNonNullMap(<String, dynamic>{
+        "active": active ?? hookToEdit.active,
+        "events": events ?? hookToEdit.events,
+        "add_events": addEvents,
+        "remove_events": removeEvents,
+        "config": <String, dynamic>{
+          "url": configUrl ?? hookToEdit.config["url"],
+          "content_type":
+              configContentType ?? hookToEdit.config["content_type"],
+          "secret": configSecret ?? hookToEdit.config["secret"],
+          "insecure_ssl":
+              configInsecureSsl == null || !configInsecureSsl ? "0" : "1",
+        },
+      })),
     );
   }
 
@@ -676,7 +707,6 @@ class RepositoriesService extends Service {
   /// Adds a deploy key for a repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#create
-  // TODO add to Changelog new args
   Future<PublicKey> createDeployKey(RepositorySlug slug,
       {@required String title, @required String key}) async {
     assert(title != null && key != null);
@@ -737,7 +767,7 @@ class RepositoriesService extends Service {
   }
 
   /// Get latest Pages build.
-  /// 
+  ///
   /// API docs: https://developer.github.com/v3/repos/pages/#list-latest-pages-build
   Future<PageBuild> getLatestPagesBuild(RepositorySlug slug) async {
     return _github.getJSON(
@@ -779,12 +809,111 @@ class RepositoriesService extends Service {
     );
   }
 
-  // TODO: Implement editRelease: https://developer.github.com/v3/repos/releases/#edit-a-release
-  // TODO: Implement deleteRelease: https://developer.github.com/v3/repos/releases/#delete-a-release
-  // TODO: Implement listReleaseAssets: https://developer.github.com/v3/repos/releases/#list-assets-for-a-release
-  // TODO: Implement getReleaseAssets: https://developer.github.com/v3/repos/releases/#get-a-single-release-asset
-  // TODO: Implement editReleaseAssets: https://developer.github.com/v3/repos/releases/#edit-a-release-asset
-  // TODO: Implement deleteReleaseAssets: https://developer.github.com/v3/repos/releases/#delete-a-release-asset
+  /// Edits the given release with new fields.
+  /// * [tagName]: The name of the tag.
+  /// * [targetCommitish]: Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA. Unused if the Git tag already exists. Default: the repository's default branch (usually master).
+  /// * [name]: The name of the release.
+  /// * [body]: Text describing the contents of the tag.
+  /// * [draft]: true makes the release a draft, and false publishes the release.
+  /// * [preRelease]: true to identify the release as a prerelease, false to identify the release as a full release.
+  ///
+  /// Leave blank the fields you don't want to edit.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#edit-a-release
+  Future<Release> editRelease(
+    RepositorySlug slug,
+    Release releaseToEdit, {
+    String tagName,
+    String targetCommitish,
+    String name,
+    String body,
+    bool draft,
+    bool preRelease,
+  }) async {
+    return _github.postJSON<Map<String, dynamic>, Release>(
+      "/repos/${slug.fullName}/releases/${releaseToEdit.id.toString()}",
+      body: jsonEncode(createNonNullMap(<String, dynamic>{
+        "tag_name": tagName ?? releaseToEdit.tagName,
+        "target_commitish": targetCommitish ?? releaseToEdit.targetCommitish,
+        "name": name ?? releaseToEdit.name,
+        "body": body ?? releaseToEdit.body,
+        "draft": draft ?? releaseToEdit.draft,
+        "prerelease": preRelease ?? releaseToEdit.prerelease,
+      })),
+      statusCode: StatusCodes.OK,
+      convert: (i) => Release.fromJson(i),
+    );
+  }
+
+  /// Delete the release.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#delete-a-release
+  Future<void> deleteRelease(RepositorySlug slug, Release release) async {
+    await _github.request(
+      "DELETE",
+      "/repos/${slug.fullName}/releases/${release.id.toString}",
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+  }
+
+  /// Lists assets for a release.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#list-assets-for-a-release
+  Stream<ReleaseAsset> listReleaseAssets(RepositorySlug slug, Release release) {
+    return PaginationHelper(_github)
+        .objects<Map<String, dynamic>, ReleaseAsset>(
+      "GET",
+      "/repos/${slug.fullName}/releases/${release.id.toString()}/assets",
+      (i) => ReleaseAsset.fromJson(i),
+      statusCode: StatusCodes.OK,
+    );
+  }
+
+  /// Get a single release asset.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release-asset
+  // TODO: implement a way to retrieve the asset's binary content
+  Future<ReleaseAsset> getReleaseAsset(RepositorySlug slug, Release release,
+      {@required int assetId}) async {
+    return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
+      "/repos/${slug.fullName}/releases/assets/${assetId.toString()}",
+      statusCode: StatusCodes.OK,
+      convert: (i) => ReleaseAsset.fromJson(i),
+    );
+  }
+
+  /// Edits a release asset.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#edit-a-release-asset
+  Future<ReleaseAsset> editReleaseAsset(
+    RepositorySlug slug,
+    ReleaseAsset assetToEdit, {
+    String name,
+    String label,
+  }) async {
+    return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
+      "/repos/${slug.fullName}/releases/assets/${assetToEdit.id.toString()}",
+      statusCode: StatusCodes.OK,
+      convert: (i) => ReleaseAsset.fromJson(i),
+      body: jsonEncode(createNonNullMap(<String, dynamic>{
+        "name": name ?? assetToEdit.name,
+        "label": label ?? assetToEdit.label,
+      })),
+    );
+  }
+
+  /// Delete a release asset.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#delete-a-release-asset
+  Future<void> deleteReleaseAsset(
+      RepositorySlug slug, ReleaseAsset asset) async {
+    await _github.request(
+      "DELETE",
+      "/repos/${slug.fullName}/releases/assets/${asset.id.toString()}",
+      statusCode: 204,
+    );
+  }
+
   // TODO: Implement uploadReleaseAsset: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
 
   /// Lists repository contributor statistics.

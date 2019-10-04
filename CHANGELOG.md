@@ -1,3 +1,8 @@
+## v.6.0.0
+ - **BREAKING**: methods `deleteRepository`, `isCollaborator`, `addCollaborator`, `removeCollaborator`, `testPushHook`, `pingHook`, and `deleteHook` now return a `Future<void>` instead of a `Future<bool>`.
+ - **BREAKING**: parameters of method `createDeployKey` have been modified.
+ - New methods in `repos_service.dart`.
+
 ## v5.2.0
  - Add access to labels on Pull Requests https://github.com/DirectMyFile/github.dart/pull/163
  - Adding draft property to PR model https://github.com/DirectMyFile/github.dart/pull/162
