@@ -30,7 +30,15 @@ class Release {
 
   /// Target Commit
   @JsonKey(name: "target_commitish")
-  String targetCommitsh;
+  String targetCommitish;
+
+  /// Target Commit (Deprecated)
+  ///
+  /// `targetCommitsh` was a typo in previous versions and has been corrected.
+  /// Use `targetCommitish` instead.
+  /// This will be removed in the next major release
+  @deprecated
+  String get targetCommitsh => targetCommitish;
 
   /// Release Name
   String name;
