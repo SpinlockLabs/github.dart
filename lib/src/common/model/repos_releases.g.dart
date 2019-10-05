@@ -13,7 +13,7 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
     ..zipballUrl = json['zipball_url'] as String
     ..id = json['id'] as int
     ..tagName = json['tag_name'] as String
-    ..targetCommitsh = json['target_commitish'] as String
+    ..targetCommitish = json['target_commitish'] as String
     ..name = json['name'] as String
     ..body = json['body'] as String
     ..description = json['description'] as String
@@ -40,7 +40,7 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'zipball_url': instance.zipballUrl,
       'id': instance.id,
       'tag_name': instance.tagName,
-      'target_commitish': instance.targetCommitsh,
+      'target_commitish': instance.targetCommitish,
       'name': instance.name,
       'body': instance.body,
       'description': instance.description,
