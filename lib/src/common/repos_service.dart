@@ -450,7 +450,23 @@ class RepositoriesService extends Service {
     return _github.getJSON<Map<String, dynamic>, RepositoryCommit>(
       "/repos/${slug.fullName}/commits/$sha",
       convert: (i) => RepositoryCommit.fromJSON(i),
+      statusCode: StatusCodes.OK,
     );
+  }
+
+  Future<String> getCommitDiff(RepositorySlug slug, String sha) async {
+    ArgumentError.checkNotNull(slug);
+    ArgumentError.checkNotNull(sha);
+    return _github
+        .request(
+          "GET",
+          "/repos/${slug.fullName}/commits/$sha",
+          headers: <String, String>{
+            "Accept": "application/vnd.github.VERSION.diff"
+          },
+          statusCode: StatusCodes.OK,
+        )
+        .then((r) => r.body);
   }
 
   /// [refBase] and [refHead] can be the same value for a branch, commit, or ref
