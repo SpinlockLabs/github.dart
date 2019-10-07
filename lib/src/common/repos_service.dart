@@ -255,12 +255,23 @@ class RepositoriesService extends Service {
         (json) => Collaborator.fromJson(json),
       );
 
-  Future<void> isCollaborator(RepositorySlug slug, String user) async {
-    return _github.request(
-      "GET",
-      "/repos/${slug.fullName}/collaborators/$user",
-      statusCode: 204,
-    );
+  Future<bool> isCollaborator(RepositorySlug slug, String user) async {
+    bool catchError = false;
+    http.Response response;
+    try {
+      response = await _github.request(
+        "GET",
+        "/repos/${slug.fullName}/collaborators/$user",
+        statusCode: StatusCodes.NO_CONTENT,
+        fail: (response) {
+          if (response.statusCode == StatusCodes.NOT_FOUND) catchError = true;
+        },
+      );
+      if (response.statusCode == StatusCodes.NO_CONTENT) return true;
+    } catch (e) {
+      if (!catchError) rethrow;
+    }
+    return false;
   }
 
   Future<void> addCollaborator(RepositorySlug slug, String user) async {

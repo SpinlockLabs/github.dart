@@ -1,5 +1,5 @@
 ## v.6.0.0
- - **BREAKING**: methods `deleteRepository`, `isCollaborator`, `addCollaborator`, `removeCollaborator`, `testPushHook`, `pingHook`, and `deleteHook` now return a `Future<void>` instead of a `Future<bool>`.
+ - **BREAKING**: methods `deleteRepository`, `addCollaborator`, `removeCollaborator`, `testPushHook`, `pingHook`, and `deleteHook` now return a `Future<void>` instead of a `Future<bool>`.
  - **BREAKING**: parameters of method `createDeployKey` have been modified.
 
 ## v5.3.0
