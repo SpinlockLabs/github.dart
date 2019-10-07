@@ -22,9 +22,12 @@ class SearchService extends Service {
     var isFirst = true;
 
     PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/repositories", params: params, pages: pages)
+        .fetchStreamed("GET", "/search/repositories",
+            params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 && response.body.contains("rate limit") && isFirst) {
+      if (response.statusCode == 403 &&
+          response.body.contains("rate limit") &&
+          isFirst) {
         throw RateLimitHit(_github);
       }
 
@@ -137,7 +140,9 @@ class SearchService extends Service {
     PaginationHelper(_github)
         .fetchStreamed("GET", "/search/issues", params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 && response.body.contains("rate limit") && isFirst) {
+      if (response.statusCode == 403 &&
+          response.body.contains("rate limit") &&
+          isFirst) {
         throw RateLimitHit(_github);
       }
 
@@ -161,7 +166,8 @@ class SearchService extends Service {
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   ///
   /// API docs: https://developer.github.com/v3/search/#search-users
-  Stream<User> users(String query, {String sort, int pages = 2, int perPage = 30}) {
+  Stream<User> users(String query,
+      {String sort, int pages = 2, int perPage = 30}) {
     var params = {"q": query};
 
     if (sort != null) {
@@ -177,7 +183,9 @@ class SearchService extends Service {
     PaginationHelper(_github)
         .fetchStreamed("GET", "/search/users", params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 && response.body.contains("rate limit") && isFirst) {
+      if (response.statusCode == 403 &&
+          response.body.contains("rate limit") &&
+          isFirst) {
         throw RateLimitHit(_github);
       }
 
