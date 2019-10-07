@@ -1,8 +1,9 @@
 ## v.6.0.0
  - **BREAKING**: methods `deleteRepository`, `isCollaborator`, `addCollaborator`, `removeCollaborator`, `testPushHook`, `pingHook`, and `deleteHook` now return a `Future<void>` instead of a `Future<bool>`.
  - **BREAKING**: parameters of method `createDeployKey` have been modified.
- - **BREAKING**: parameter `targetCommitsh` in `Release` class has been renamed as `targetCommitish`
- - New methods in `repos_service.dart`.
+
+## v5.3.0
+ - Release.targetCommitsh is now deprecated. Use targetCommitish instead.
 
 ## v5.2.0
  - Add access to labels on Pull Requests https://github.com/DirectMyFile/github.dart/pull/163
