@@ -17,4 +17,4 @@ jobs:
     - name: Dart Analyzer
       run: dartanalyzer .
     - name: Check Dart Format
-      run: dartfmt -n --set-exit-if-changed
+      run: dartfmt -n --set-exit-if-changed .
