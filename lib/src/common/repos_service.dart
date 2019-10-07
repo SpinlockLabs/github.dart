@@ -200,8 +200,7 @@ class RepositoriesService extends Service {
       'GET',
       '/repos/${slug.fullName}/contributors',
       (i) => User.fromJson(i),
-      // TODO add type
-      params: {"anon": anon.toString()},
+      params: <String, dynamic>{"anon": anon.toString()},
     );
   }
 
