@@ -9,4 +9,4 @@ dart_task:
   # - test: --platform vm
   # - test: --platform chrome
   - dartanalyzer: lib test # TODO fix examples and add example dir
-  - dartfmt: true
+  - dartfmt
