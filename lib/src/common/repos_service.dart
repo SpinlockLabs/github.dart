@@ -369,7 +369,7 @@ class RepositoriesService extends Service {
   /// https://developer.github.com/v3/repos/comments/#update-a-commit-comment
   Future<CommitComment> updateCommitComment(RepositorySlug slug,
       {@required int id, @required String body}) async {
-    assert(body != null);
+    ArgumentError.checkNotNull(body);
     return _github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/comments/$id",
       body: jsonEncode(createNonNullMap({'body': body})),
@@ -644,8 +644,10 @@ class RepositoriesService extends Service {
     List<String> removeEvents,
     bool active,
   }) async {
-    assert(configUrl != null || hookToEdit.config['url'] != null);
-    assert(configContentType == 'json' || configContentType == 'form');
+    ArgumentError.checkNotNull(configUrl ?? hookToEdit.config['url']);
+    if (configContentType != 'json' && configContentType != 'form') {
+      throw ArgumentError.value(configContentType, 'configContentType');
+    }
     return _github.postJSON<Map<String, dynamic>, Hook>(
       "/repos/${slug.fullName}/hooks/${hookToEdit.id.toString()}",
       statusCode: StatusCodes.OK,
@@ -728,7 +730,8 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/keys/#create
   Future<PublicKey> createDeployKey(RepositorySlug slug,
       {@required String title, @required String key}) async {
-    assert(title != null && key != null);
+    ArgumentError.checkNotNull(title);
+    ArgumentError.checkNotNull(key);
     return _github.postJSON<Map<String, dynamic>, PublicKey>(
       "/repos/${slug.fullName}/keys",
       body: jsonEncode(<String, dynamic>{
@@ -910,6 +913,7 @@ class RepositoriesService extends Service {
     String name,
     String label,
   }) async {
+    ArgumentError.checkNotNull(assetToEdit);
     return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
       "/repos/${slug.fullName}/releases/assets/${assetToEdit.id}",
       statusCode: StatusCodes.OK,
