@@ -292,8 +292,8 @@ class RepositoriesService extends Service {
 
   /// Returns a list of all comments for a specific commit.
   ///
-  /// https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
-  Stream<CommitComment> listComments(
+  /// https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
+  Stream<CommitComment> listSingleCommitComments(
     RepositorySlug slug,
     RepositoryCommit commit,
   ) {
@@ -308,7 +308,7 @@ class RepositoriesService extends Service {
 
   /// Returns a list of all commit comments in a repository.
   ///
-  /// https://developer.github.com/v3/repos/comments/#list-comments-for-a-single-commit
+  /// https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
   Stream<CommitComment> listCommitComments(RepositorySlug slug) {
     return PaginationHelper(_github)
         .objects<Map<String, dynamic>, CommitComment>(
