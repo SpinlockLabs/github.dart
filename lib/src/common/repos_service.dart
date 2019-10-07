@@ -14,7 +14,11 @@ class RepositoriesService extends Service {
       {String type = "owner",
       String sort = "full_name",
       String direction = "asc"}) {
-    final params = <String, dynamic>{"type": type, "sort": sort, "direction": direction};
+    final params = <String, dynamic>{
+      "type": type,
+      "sort": sort,
+      "direction": direction,
+    };
 
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
@@ -31,7 +35,11 @@ class RepositoriesService extends Service {
       {String type = "owner",
       String sort = "full_name",
       String direction = "asc"}) {
-    final params = <String, dynamic>{"type": type, "sort": sort, "direction": direction};
+    final params = <String, dynamic>{
+      "type": type,
+      "sort": sort,
+      "direction": direction
+    };
 
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
@@ -876,7 +884,7 @@ class RepositoriesService extends Service {
   Future<ReleaseAsset> getReleaseAsset(RepositorySlug slug, Release release,
       {@required int assetId}) async {
     return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
-      "/repos/${slug.fullName}/releases/assets/${assetId}",
+      "/repos/${slug.fullName}/releases/assets/$assetId",
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
     );
