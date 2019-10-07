@@ -14,7 +14,7 @@ class RepositoriesService extends Service {
       {String type = "owner",
       String sort = "full_name",
       String direction = "asc"}) {
-    final params = {"type": type, "sort": sort, "direction": direction};
+    final params = <String, dynamic>{"type": type, "sort": sort, "direction": direction};
 
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
@@ -31,7 +31,7 @@ class RepositoriesService extends Service {
       {String type = "owner",
       String sort = "full_name",
       String direction = "asc"}) {
-    final params = {"type": type, "sort": sort, "direction": direction};
+    final params = <String, dynamic>{"type": type, "sort": sort, "direction": direction};
 
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
@@ -46,7 +46,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
   Stream<Repository> listOrganizationRepositories(String org,
       {String type = "all"}) {
-    final params = {"type": type};
+    final params = <String, dynamic>{"type": type};
 
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
@@ -64,7 +64,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-all-public-repositories
   Stream<Repository> listPublicRepositories({int limit = 50, DateTime since}) {
-    final params = <String, String>{};
+    final params = <String, dynamic>{};
 
     if (since != null) {
       params['since'] = since.toIso8601String();
@@ -213,7 +213,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects<Map<String, dynamic>, Tag>(
       'GET',
       '/repos/${slug.fullName}/tags',
-      (j) => Tag.fromJson(j),
+      (i) => Tag.fromJson(i),
     );
   }
 
@@ -335,7 +335,7 @@ class RepositoriesService extends Service {
   Future<CommitComment> getCommitComment(RepositorySlug slug,
       {@required int id}) async {
     return _github.getJSON<Map<String, dynamic>, CommitComment>(
-      "/repos/${slug.fullName}/comments/id",
+      "/repos/${slug.fullName}/comments/$id",
       statusCode: 200,
       convert: (i) => CommitComment.fromJSON(i),
     );
@@ -352,7 +352,7 @@ class RepositoriesService extends Service {
       {@required int id, @required String body}) async {
     assert(body != null);
     return _github.postJSON<Map<String, dynamic>, CommitComment>(
-      "/repos/${slug.fullName}/comments/${id.toString()}",
+      "/repos/${slug.fullName}/comments/$id",
       body: jsonEncode(createNonNullMap({'body': body})),
       statusCode: 200,
       convert: (i) => CommitComment.fromJSON(i),
@@ -367,7 +367,7 @@ class RepositoriesService extends Service {
       {@required int id}) async {
     await _github.request(
       "DELETE",
-      "/repos/${slug.fullName}/comments/${id.toString()}",
+      "/repos/${slug.fullName}/comments/$id",
       statusCode: 204,
     );
   }
@@ -698,7 +698,7 @@ class RepositoriesService extends Service {
   Future<PublicKey> getDeployKey(RepositorySlug slug,
       {@required int id}) async {
     return _github.getJSON<Map<String, dynamic>, PublicKey>(
-      "/repos/${slug.fullName}/keys/${id.toString()}",
+      "/repos/${slug.fullName}/keys/$id",
       statusCode: StatusCodes.OK,
       convert: (i) => PublicKey.fromJSON(i),
     );
@@ -851,7 +851,7 @@ class RepositoriesService extends Service {
   Future<void> deleteRelease(RepositorySlug slug, Release release) async {
     await _github.request(
       "DELETE",
-      "/repos/${slug.fullName}/releases/${release.id.toString}",
+      "/repos/${slug.fullName}/releases/${release.id}",
       statusCode: StatusCodes.NO_CONTENT,
     );
   }
@@ -863,7 +863,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github)
         .objects<Map<String, dynamic>, ReleaseAsset>(
       "GET",
-      "/repos/${slug.fullName}/releases/${release.id.toString()}/assets",
+      "/repos/${slug.fullName}/releases/${release.id}/assets",
       (i) => ReleaseAsset.fromJson(i),
       statusCode: StatusCodes.OK,
     );
@@ -876,7 +876,7 @@ class RepositoriesService extends Service {
   Future<ReleaseAsset> getReleaseAsset(RepositorySlug slug, Release release,
       {@required int assetId}) async {
     return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
-      "/repos/${slug.fullName}/releases/assets/${assetId.toString()}",
+      "/repos/${slug.fullName}/releases/assets/${assetId}",
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
     );
@@ -892,7 +892,7 @@ class RepositoriesService extends Service {
     String label,
   }) async {
     return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
-      "/repos/${slug.fullName}/releases/assets/${assetToEdit.id.toString()}",
+      "/repos/${slug.fullName}/releases/assets/${assetToEdit.id}",
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
       body: jsonEncode(createNonNullMap(<String, dynamic>{
@@ -909,7 +909,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, ReleaseAsset asset) async {
     await _github.request(
       "DELETE",
-      "/repos/${slug.fullName}/releases/assets/${asset.id.toString()}",
+      "/repos/${slug.fullName}/releases/assets/${asset.id}",
       statusCode: 204,
     );
   }
