@@ -278,7 +278,7 @@ class RepositoriesService extends Service {
     return _github.request(
       "PUT",
       "/repos/${slug.fullName}/collaborators/$user",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -286,7 +286,7 @@ class RepositoriesService extends Service {
     return _github.request(
       "DELETE",
       "/repos/${slug.fullName}/collaborators/$user",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -343,7 +343,7 @@ class RepositoriesService extends Service {
     return _github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/commits/${commit.sha}/comments",
       body: jsonEncode(data),
-      statusCode: 201,
+      statusCode: StatusCodes.CREATED,
       convert: (i) => CommitComment.fromJSON(i),
     );
   }
@@ -355,7 +355,7 @@ class RepositoriesService extends Service {
       {@required int id}) async {
     return _github.getJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/comments/$id",
-      statusCode: 200,
+      statusCode: StatusCodes.OK,
       convert: (i) => CommitComment.fromJSON(i),
     );
   }
@@ -373,7 +373,7 @@ class RepositoriesService extends Service {
     return _github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/comments/$id",
       body: jsonEncode(createNonNullMap({'body': body})),
-      statusCode: 200,
+      statusCode: StatusCodes.OK,
       convert: (i) => CommitComment.fromJSON(i),
     );
   }
@@ -387,7 +387,7 @@ class RepositoriesService extends Service {
     await _github.request(
       "DELETE",
       "/repos/${slug.fullName}/comments/$id",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -446,7 +446,7 @@ class RepositoriesService extends Service {
       headers: headers,
       statusCode: StatusCodes.OK,
       fail: (http.Response response) {
-        if (response.statusCode == 404) {
+        if (response.statusCode == StatusCodes.NOT_FOUND) {
           throw NotFound(_github, response.body);
         }
       },
@@ -545,7 +545,7 @@ class RepositoriesService extends Service {
       "DELETE",
       "/repos/${slug.fullName}/contents/$path",
       body: jsonEncode(map),
-      statusCode: 200,
+      statusCode: StatusCodes.OK,
     );
     return ContentCreation.fromJSON(
         jsonDecode(response.body) as Map<String, dynamic>);
@@ -559,7 +559,7 @@ class RepositoriesService extends Service {
     final http.Response response = await _github.request(
       "GET",
       "/repos/${slug.fullName}/$format/$ref",
-      statusCode: 302,
+      statusCode: StatusCodes.FOUND,
     );
     return response.headers["Location"];
   }
@@ -929,7 +929,7 @@ class RepositoriesService extends Service {
     await _github.request(
       "DELETE",
       "/repos/${slug.fullName}/releases/assets/${asset.id}",
-      statusCode: 204,
+      statusCode: StatusCodes.NO_CONTENT,
     );
   }
 
@@ -989,7 +989,7 @@ class RepositoriesService extends Service {
           RepositorySlug slug) async =>
       _github.getJSON(
         "/repos/${slug.fullName}/stats/participation",
-        statusCode: 200,
+        statusCode: StatusCodes.OK,
         convert: (i) => ContributorParticipation.fromJSON(i),
       );
 
