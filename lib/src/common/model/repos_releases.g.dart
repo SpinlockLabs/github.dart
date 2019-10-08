@@ -52,8 +52,8 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'prerelease': instance.isPrerelease,
       'created_at': instance.createdAt?.toIso8601String(),
       'published_at': instance.publishedAt?.toIso8601String(),
-      'author': instance.author,
-      'assets': instance.assets,
+      'author': Release._authorToJson(instance.author),
+      'assets': Release._assetsToJson(instance.assets),
     };
 
 ReleaseAsset _$ReleaseAssetFromJson(Map<String, dynamic> json) {

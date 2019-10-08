@@ -64,14 +64,30 @@ class Release {
   @JsonKey(name: "draft")
   bool isDraft;
 
+  /// Deprecated: Use isDraft instead
   @Deprecated('Use isDraft')
+  @JsonKey(ignore: true)
   bool get draft => isDraft;
 
+  /// Deprecated: Use isDraft instead
+  @Deprecated('Use isDraft')
+  @JsonKey(ignore: true)
+  set draft(bool b) => isDraft = b;
+
   /// If the release is a pre-release.
+  /// Deprecated: Use isPrerelease instead
   @Deprecated('Use isPrerelease')
+  @JsonKey(ignore: true)
   bool get prerelease => isPrerelease;
 
   /// If the release is a pre-release.
+  /// Deprecated: Use isPrerelease instead
+  @Deprecated('Use isPrerelease')
+  @JsonKey(ignore: true)
+  set prerelease(bool pr) => isPrerelease = pr;
+
+  /// If the release is a pre-release.
+  /// Deprecated: Use isPrerelease instead
   @JsonKey(name: "prerelease")
   bool isPrerelease;
 
@@ -184,16 +200,28 @@ class CreateRelease {
   /// Release Body
   String body;
 
+  /// Deprecated: Use isDraft instead
   @Deprecated('Use isDraft')
+  @JsonKey(ignore: true)
   bool get draft => isDraft;
+
+  /// Deprecated: Use isDraft instead
+  @Deprecated('Use isDraft')
+  @JsonKey(ignore: true)
+  set draft(bool d) => isDraft = d;
 
   /// If the release is a draft
   bool isDraft;
 
+  /// Deprecated: Use isPrerelease instead
   @Deprecated('Use isPrerelease')
+  @JsonKey(ignore: true)
   bool get prerelease => isPrerelease;
 
-  set prerelease(bool prerelease) => isPrerelease = prerelease;
+  /// Deprecated: Use isPrerelease instead
+  @Deprecated('Use isPrerelease')
+  @JsonKey(ignore: true)
+  set prerelease(bool pr) => isPrerelease = pr;
 
   /// true to identify the release as a prerelease.
   /// false to identify the release as a full release. Default: false
