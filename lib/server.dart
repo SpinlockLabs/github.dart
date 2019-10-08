@@ -11,8 +11,10 @@ export "src/server/hooks.dart";
 /// Creates a GitHub Client.
 /// If [auth] is not specified, then it will be automatically configured
 /// from the environment as per [findAuthenticationFromEnvironment].
-GitHub createGitHubClient(
-    {Authentication auth, String endpoint = "https://api.github.com"}) {
+GitHub createGitHubClient({
+  Authentication auth,
+  String endpoint = "https://api.github.com",
+}) {
   if (auth == null) {
     auth = findAuthenticationFromEnvironment();
   }
