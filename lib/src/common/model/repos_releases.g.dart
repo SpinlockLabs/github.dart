@@ -11,14 +11,16 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
     ..htmlUrl = json['html_url'] as String
     ..tarballUrl = json['tarball_url'] as String
     ..zipballUrl = json['zipball_url'] as String
+    ..uploadUrl = json['upload_url'] as String
     ..id = json['id'] as int
+    ..nodeId = json['node_id'] as String
     ..tagName = json['tag_name'] as String
     ..targetCommitish = json['target_commitish'] as String
     ..name = json['name'] as String
     ..body = json['body'] as String
     ..description = json['description'] as String
-    ..draft = json['draft'] as bool
-    ..prerelease = json['prerelease'] as bool
+    ..isDraft = json['draft'] as bool
+    ..isPrerelease = json['prerelease'] as bool
     ..createdAt = json['created_at'] == null
         ? null
         : DateTime.parse(json['created_at'] as String)
@@ -38,14 +40,16 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'html_url': instance.htmlUrl,
       'tarball_url': instance.tarballUrl,
       'zipball_url': instance.zipballUrl,
+      'upload_url': instance.uploadUrl,
       'id': instance.id,
+      'node_id': instance.nodeId,
       'tag_name': instance.tagName,
       'target_commitish': instance.targetCommitish,
       'name': instance.name,
       'body': instance.body,
       'description': instance.description,
-      'draft': instance.draft,
-      'prerelease': instance.prerelease,
+      'draft': instance.isDraft,
+      'prerelease': instance.isPrerelease,
       'created_at': instance.createdAt?.toIso8601String(),
       'published_at': instance.publishedAt?.toIso8601String(),
       'author': Release._authorToJson(instance.author),
@@ -92,8 +96,8 @@ CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) {
     ..targetCommitish = json['target_commitish'] as String
     ..name = json['name'] as String
     ..body = json['body'] as String
-    ..draft = json['draft'] as bool
-    ..prerelease = json['prerelease'] as bool;
+    ..isDraft = json['isDraft'] as bool
+    ..isPrerelease = json['isPrerelease'] as bool;
 }
 
 Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
@@ -103,6 +107,6 @@ Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
       'target_commitish': instance.targetCommitish,
       'name': instance.name,
       'body': instance.body,
-      'draft': instance.draft,
-      'prerelease': instance.prerelease,
+      'isDraft': instance.isDraft,
+      'isPrerelease': instance.isPrerelease,
     };
