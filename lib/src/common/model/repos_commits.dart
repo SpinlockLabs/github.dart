@@ -123,3 +123,65 @@ class CommitFile {
       ..json = input;
   }
 }
+
+/// Model class for a commit comment.
+///
+/// See https://developer.github.com/v3/repos/comments
+class CommitComment {
+  /// Id of the comment
+  final int id;
+
+  /// Relative path of the file on which the comment has been posted
+  final String path;
+
+  /// Line on file
+  final int line;
+
+  /// Position on the diff
+  final int position;
+
+  /// SHA of the commit where the comment has been made
+  final String commitId;
+
+  final DateTime createdAt;
+
+  /// Can be equals to [createdAt]
+  final DateTime updatedAt;
+
+  /// https://github.com/...
+  final String htmlUrl;
+
+  /// https://api.github.com/...
+  final String apiUrl;
+
+  /// Content of the comment
+  final String body;
+
+  const CommitComment._({
+    @required this.id,
+    @required this.line,
+    @required this.position,
+    @required this.path,
+    @required this.apiUrl,
+    @required this.commitId,
+    @required this.createdAt,
+    @required this.htmlUrl,
+    @required this.updatedAt,
+    @required this.body,
+  });
+
+  factory CommitComment.fromJSON(Map<String, dynamic> input) {
+    return CommitComment._(
+      id: input['id'],
+      htmlUrl: input['html_url'],
+      apiUrl: input['url'],
+      body: input['body'],
+      path: input['path'],
+      position: input['position'],
+      line: input['line'],
+      commitId: input['commit_id'],
+      createdAt: DateTime.parse(input['created_at']),
+      updatedAt: DateTime.parse(input['updated_at']),
+    );
+  }
+}
