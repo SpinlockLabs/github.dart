@@ -218,7 +218,7 @@ class GitHub {
   ///
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
-  /// [body] is the data to send to the server.
+  /// [body] is the data to send to the server. Pass in a List<int> if you want to post binary body data. Everything else will have .toString() called on it and set as text content
   /// [S] represents the input type.
   /// [T] represents the type return from this function after conversion
   Future<T> postJSON<S, T>(
@@ -291,7 +291,7 @@ class GitHub {
   /// [path] can either be a path like '/repos' or a full url.
   /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
   /// [params] are query string parameters.
-  /// [body] is the body content of requests that take content.
+  /// [body] is the body content of requests that take content. Pass in a List<int> if you want to post binary body data. Everything else will have .toString() called on it and set as text content
   ///
   Future<http.Response> request(
     String method,
@@ -344,10 +344,10 @@ class GitHub {
     var request = http.Request(method, Uri.parse(url.toString()));
     request.headers.addAll(headers);
     if (body != null) {
-      if (body is String) {
-        request.body = body;
-      } else {
+      if (body is List<int>) {
         request.bodyBytes = body;
+      } else {
+        request.body = body.toString();
       }
     }
 
