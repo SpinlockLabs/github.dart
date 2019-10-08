@@ -901,6 +901,8 @@ class RepositoriesService extends Service {
     );
   }
 
+  // Releases
+
   /// Lists releases for the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
@@ -913,10 +915,18 @@ class RepositoriesService extends Service {
     );
   }
 
-  /// Fetches a single release.
+  /// Fetches a single release by the release ID.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
-  Future<Release> getRelease(RepositorySlug slug, int id) async {
+  @Deprecated(
+      'Use getReleaseById or for getting a release using a tag name, use getReleaseByTagName')
+  Future<Release> getRelease(RepositorySlug slug, int id) =>
+      getReleaseById(slug, id);
+
+  /// Fetches a single release by the release ID.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
+  Future<Release> getReleaseById(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
     return _github.getJSON<Map<String, dynamic>, Release>(
@@ -925,18 +935,47 @@ class RepositoriesService extends Service {
     );
   }
 
-  /// Creates a Release based on the specified [release].
+  /// Fetches a single release by the release tag name.
   ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
+  Future<Release> getReleaseByTagName(RepositorySlug slug, String tagName) =>
+      _github.getJSON("/repos/${slug.fullName}/releases/tags/$tagName",
+          convert: Release.fromJson);
+
+  /// Creates a Release based on the specified [createRelease].
+  ///
+  /// If [getIfExists] is true, this returns an already existing release instead of an error.
+  /// Defaults to true.
   /// API docs: https://developer.github.com/v3/repos/releases/#create-a-release
   Future<Release> createRelease(
-      RepositorySlug slug, CreateRelease release) async {
+    RepositorySlug slug,
+    CreateRelease createRelease, {
+    bool getIfExists = true,
+  }) async {
     ArgumentError.checkNotNull(slug);
-    ArgumentError.checkNotNull(release);
-    return _github.postJSON<Map<String, dynamic>, Release>(
+    ArgumentError.checkNotNull(createRelease);
+    final Release release =
+        await _github.postJSON<Map<String, dynamic>, Release>(
       "/repos/${slug.fullName}/releases",
       convert: (i) => Release.fromJson(i),
-      body: jsonEncode(release.toJson()),
+      body: jsonEncode(createRelease.toJson()),
     );
+    if (release.hasErrors) {
+      final alreadyExistsErrorCode = release.errors.firstWhere(
+        (error) => error['code'] == 'already_exists',
+        orElse: () => null,
+      );
+      if (alreadyExistsErrorCode != null) {
+        final field = alreadyExistsErrorCode['field'];
+        if (field == "tag_name") {
+          return getReleaseByTagName(slug, createRelease.tagName);
+        }
+      } else {
+        print(
+            "Unexpected response from the API. Returning response. \n Errors: ${release.errors}");
+      }
+    }
+    return release;
   }
 
   /// Edits the given release with new fields.
@@ -969,8 +1008,8 @@ class RepositoriesService extends Service {
         "target_commitish": targetCommitish ?? releaseToEdit.targetCommitish,
         "name": name ?? releaseToEdit.name,
         "body": body ?? releaseToEdit.body,
-        "draft": draft ?? releaseToEdit.draft,
-        "prerelease": preRelease ?? releaseToEdit.prerelease,
+        "draft": draft ?? releaseToEdit.isDraft,
+        "prerelease": preRelease ?? releaseToEdit.isPrerelease,
       })),
       statusCode: StatusCodes.OK,
       convert: (i) => Release.fromJson(i),
@@ -1056,7 +1095,25 @@ class RepositoriesService extends Service {
     );
   }
 
-  // TODO: Implement uploadReleaseAsset: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
+  Future<List<ReleaseAsset>> uploadReleaseAssets(
+    Release release,
+    Iterable<CreateReleaseAsset> createReleaseAssets,
+  ) async {
+    final List<ReleaseAsset> releaseAssets = [];
+    for (final createReleaseAsset in createReleaseAssets) {
+      final headers = {'Content-Type': createReleaseAsset.contentType};
+      final releaseAsset = await _github.postJSON(
+          release.getUploadUrlFor(
+            createReleaseAsset.name,
+            createReleaseAsset.label,
+          ),
+          headers: headers,
+          body: createReleaseAsset.assetData,
+          convert: ReleaseAsset.fromJson);
+      releaseAssets.add(releaseAsset);
+    }
+    return releaseAssets;
+  }
 
   /// Lists repository contributor statistics.
   ///

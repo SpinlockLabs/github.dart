@@ -5,9 +5,9 @@
 
 This is a Client Library for GitHub in Dart. I wrote this out of necessity, and then when I got a great reaction from the Dart community, I decided to put a lot of effort into it.
 
-Please submit issues and pull requests, join my IRC channel (#directcode on irc.esper.net), help out, or just give me encouragement.
+Please submit issues and pull requests, help out, or just give me encouragement.
 
-**Notice**: We are looking for major contributors. Contact us by email or on IRC!
+**Notice**: We are looking for contributors. If you're interested, join us in https://gitter.im/SpinlockLabs/community
 
 ## Links
 
@@ -79,4 +79,4 @@ var github = createGitHubClient(auth: new Authentication.withToken("YourTokenHer
 
 ## Contacting Us
 
-You can find us on `irc.esper.net and irc.freenode.net` at `#directcode`.
+Join our Gitter chat at https://gitter.im/SpinlockLabs/community
