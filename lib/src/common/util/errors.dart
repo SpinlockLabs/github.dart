@@ -60,6 +60,12 @@ class RateLimitHit extends GitHubError {
   RateLimitHit(GitHub github) : super(github, "Rate Limit Hit");
 }
 
+/// A GitHub Server Error
+class ServerError extends GitHubError {
+  ServerError(GitHub github, int statusCode, String message)
+      : super(github, "${message ?? 'Server Error'} ($statusCode)");
+}
+
 /// An Unknown Error
 class UnknownError extends GitHubError {
   UnknownError(GitHub github, [String message])

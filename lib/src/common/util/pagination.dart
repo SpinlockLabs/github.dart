@@ -18,6 +18,9 @@ class PaginationHelper {
       String body,
       int statusCode = 200}) async* {
     int count = 0;
+    const Duration serverErrorBackOff = Duration(seconds: 10);
+    const int maxServerErrors = 10;
+    int serverErrors = 0;
 
     if (params == null) {
       params = {};
@@ -27,8 +30,21 @@ class PaginationHelper {
     assert(!params.containsKey('page'));
 
     do {
-      var response = await github.request(method, path,
-          headers: headers, params: params, body: body, statusCode: statusCode);
+      http.Response response;
+      try {
+        response = await github.request(method, path,
+            headers: headers,
+            params: params,
+            body: body,
+            statusCode: statusCode);
+      } on ServerError {
+        serverErrors += 1;
+        if (serverErrors >= maxServerErrors) {
+          break;
+        }
+        await Future.delayed(serverErrorBackOff);
+        continue;
+      }
 
       yield response;
 
