@@ -15,7 +15,7 @@ class RepositoryPages {
   static RepositoryPages fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var pages = RepositoryPages();
+    final pages = RepositoryPages();
     pages.cname = input['cname'];
     pages.status = input['status'];
     pages.hasCustom404 = input['custom_404'];

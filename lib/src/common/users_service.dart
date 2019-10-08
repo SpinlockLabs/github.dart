@@ -24,7 +24,7 @@ class UsersService extends Service {
       String location,
       bool hireable,
       String bio}) {
-    var map = createNonNullMap({
+    final map = createNonNullMap(<String, dynamic>{
       "name": name,
       "email": email,
       "blog": blog,
@@ -34,14 +34,18 @@ class UsersService extends Service {
       "bio": bio
     });
 
-    return _github.postJSON("/user",
-        body: jsonEncode(map), statusCode: 200, convert: CurrentUser.fromJSON);
+    return _github.postJSON(
+      "/user",
+      body: jsonEncode(map),
+      statusCode: 200,
+      convert: CurrentUser.fromJSON,
+    );
   }
 
   /// Fetches a list of users specified by [names].
   Stream<User> getUsers(List<String> names, {int pages}) async* {
-    for (var name in names) {
-      var user = await getUser(name);
+    for (final name in names) {
+      final user = await getUser(name);
       yield user;
     }
   }
@@ -142,7 +146,7 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/keys/#list-public-keys-for-a-user
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
-    var path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
+    final path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
     return PaginationHelper(_github).objects("GET", path, PublicKey.fromJSON);
   }
 

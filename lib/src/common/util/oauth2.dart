@@ -63,7 +63,7 @@ class OAuth2Flow {
 
   /// Exchanges the given [code] for a token.
   Future<ExchangeResponse> exchange(String code, [String origin]) {
-    var headers = {
+    final headers = <String, String>{
       "Accept": "application/json",
       "content-type": "application/json"
     };
@@ -72,7 +72,7 @@ class OAuth2Flow {
       headers['Origin'] = origin;
     }
 
-    var body = jsonEncode({
+    final body = jsonEncode(<String, dynamic>{
       "client_id": clientId,
       "client_secret": clientSecret,
       "code": code,
@@ -82,7 +82,7 @@ class OAuth2Flow {
     return (github == null ? http.Client() : github.client)
         .post("$baseUrl/access_token", body: body, headers: headers)
         .then((response) {
-      var json = jsonDecode(response.body) as Map<String, dynamic>;
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
         throw json;
       }

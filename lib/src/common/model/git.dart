@@ -28,7 +28,7 @@ class CreateGitBlob {
   final String content;
   final String encoding;
 
-  CreateGitBlob(this.content, this.encoding);
+  const CreateGitBlob(this.content, this.encoding);
 
   Map<String, dynamic> toJson() => _$CreateGitBlobToJson(this);
 }
@@ -96,7 +96,7 @@ class GitCommitUser {
   @JsonKey(toJson: dateToGitHubIso8601)
   final DateTime date;
 
-  GitCommitUser(this.name, this.email, this.date);
+  const GitCommitUser(this.name, this.email, this.date);
 
   factory GitCommitUser.fromJson(Map<String, dynamic> json) =>
       _$GitCommitUserFromJson(json);
@@ -157,7 +157,7 @@ class CreateGitTree {
   CreateGitTree(this.entries);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
 
     putValue('base_tree', baseTree, map);
 
@@ -180,10 +180,16 @@ class CreateGitTreeEntry {
 
   /// Constructor.
   /// Either [sha] or [content] must be defined.
-  CreateGitTreeEntry(this.path, this.mode, this.type, {this.sha, this.content});
+  const CreateGitTreeEntry(
+    this.path,
+    this.mode,
+    this.type, {
+    this.sha,
+    this.content,
+  });
 
   Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
 
     putValue('path', path, map);
     putValue('mode', mode, map);
@@ -235,7 +241,7 @@ class CreateGitTag {
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
 
     putValue('tag', tag, map);
     putValue('message', message, map);

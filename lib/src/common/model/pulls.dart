@@ -63,7 +63,7 @@ class PullRequestInformation {
       [PullRequestInformation into]) {
     if (input == null) return null;
 
-    var pr = into != null ? into : PullRequestInformation();
+    final pr = into != null ? into : PullRequestInformation();
     pr.head = PullRequestHead.fromJSON(input['head'] as Map<String, dynamic>);
     pr.base = PullRequestHead.fromJSON(input['base'] as Map<String, dynamic>);
     pr.htmlUrl = input['html_url'];
@@ -124,7 +124,7 @@ class PullRequest extends PullRequestInformation {
   static PullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    PullRequest pr = PullRequestInformation.fromJSON(input, PullRequest());
+    final PullRequest pr = PullRequestInformation.fromJSON(input, PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
     pr.id = input['id'];
@@ -181,7 +181,7 @@ class PullRequestHead {
   static PullRequestHead fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var head = PullRequestHead();
+    final head = PullRequestHead();
     head.label = input['label'];
     head.ref = input['ref'];
     head.sha = input['sha'];
@@ -208,7 +208,7 @@ class CreatePullRequest {
   CreatePullRequest(this.title, this.head, this.base, {this.body});
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("head", head, map);
     putValue("base", base, map);
@@ -287,7 +287,7 @@ class CreatePullRequestComment {
   CreatePullRequestComment(this.body, this.commitId, this.path, this.position);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("body", body, map);
     putValue("commit_id", commitId, map);
     putValue("path", path, map);
@@ -312,7 +312,7 @@ class PullRequestFile {
   String patch;
 
   static PullRequestFile fromJSON(Map<String, dynamic> input) {
-    var file = PullRequestFile();
+    final file = PullRequestFile();
     file.sha = input['sha'];
     file.filename = input['filename'];
     file.status = input['status'];

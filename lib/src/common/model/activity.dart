@@ -22,7 +22,7 @@ class Event {
   static Event fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var event = Event();
+    final event = Event();
 
     event.json = input;
 

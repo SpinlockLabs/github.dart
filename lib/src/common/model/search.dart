@@ -49,8 +49,8 @@ class CodeSearchItem {
   }
 
   static List<CodeSearchItem> fromJsonList(List<dynamic> input) {
-    var result = <CodeSearchItem>[];
-    for (var item in input) {
+    final result = <CodeSearchItem>[];
+    for (final item in input) {
       if (item is Map<String, dynamic>) {
         result.add(CodeSearchItem.fromJson(item));
       }

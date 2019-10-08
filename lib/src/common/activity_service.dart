@@ -142,7 +142,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-as-read
   Future<bool> markNotificationsRead({DateTime lastRead}) {
-    var data = {};
+    final data = {};
 
     if (lastRead != null) data["last_read_at"] = lastRead.toIso8601String();
 
@@ -157,9 +157,11 @@ class ActivityService extends Service {
   /// read.
   ///
   /// API docs:https://developer.github.com/v3/activity/notifications/#mark-notifications-as-read-in-a-repository
-  Future<bool> markRepositoryNotificationsRead(RepositorySlug slug,
-      {DateTime lastRead}) {
-    var data = {};
+  Future<bool> markRepositoryNotificationsRead(
+    RepositorySlug slug, {
+    DateTime lastRead,
+  }) {
+    final data = {};
 
     if (lastRead != null) data["last_read_at"] = lastRead.toIso8601String();
 
@@ -273,14 +275,20 @@ class ActivityService extends Service {
   /// Sets the Repository Subscription Status
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#set-a-repository-subscription
-  Future<RepositorySubscription> setRepositorySubscription(RepositorySlug slug,
-      {bool subscribed, bool ignored}) {
-    var map = createNonNullMap({"subscribed": subscribed, "ignored": ignored});
+  Future<RepositorySubscription> setRepositorySubscription(
+    RepositorySlug slug, {
+    bool subscribed,
+    bool ignored,
+  }) {
+    final map =
+        createNonNullMap({"subscribed": subscribed, "ignored": ignored});
 
-    return _github.postJSON("/repos/${slug.fullName}/subscription",
-        statusCode: StatusCodes.OK,
-        convert: RepositorySubscription.fromJSON,
-        body: jsonEncode(map));
+    return _github.postJSON(
+      "/repos/${slug.fullName}/subscription",
+      statusCode: StatusCodes.OK,
+      convert: RepositorySubscription.fromJSON,
+      body: jsonEncode(map),
+    );
   }
 
   /// Deletes a Repository Subscription
@@ -326,11 +334,11 @@ class EventPoller {
 
       _lastFetched = response.headers['ETag'];
 
-      var json = jsonDecode(response.body) as List<Map<String, dynamic>>;
+      final json = jsonDecode(response.body) as List<Map<String, dynamic>>;
 
       if (!(onlyNew && _timer == null)) {
-        for (var item in json) {
-          var event = Event.fromJSON(item);
+        for (final item in json) {
+          final event = Event.fromJSON(item);
 
           if (after == null ? false : event.createdAt.toUtc().isBefore(after)) {
             continue;
@@ -348,7 +356,7 @@ class EventPoller {
 
       if (_timer == null) {
         _timer = Timer.periodic(Duration(seconds: interval), (timer) {
-          var headers = <String, String>{};
+          final headers = <String, String>{};
 
           if (_lastFetched != null) {
             headers['If-None-Match'] = _lastFetched;
@@ -359,7 +367,7 @@ class EventPoller {
       }
     }
 
-    var headers = <String, String>{};
+    final headers = <String, String>{};
 
     if (_lastFetched != null) {
       headers['If-None-Match'] = _lastFetched;
@@ -376,7 +384,7 @@ class EventPoller {
     }
 
     _timer.cancel();
-    var future = _controller.close();
+    final future = _controller.close();
 
     _timer = null;
     _controller = null;

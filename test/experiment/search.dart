@@ -1,7 +1,7 @@
 import "package:github/server.dart";
 
 void main() {
-  var github = createGitHubClient();
+  final github = createGitHubClient();
 
   github.search.repositories("github").listen((repo) {
     print(

@@ -48,9 +48,12 @@ class GistsService extends Service {
   /// Creates a Gist
   ///
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
-  Future<Gist> createGist(Map<String, String> files,
-      {String description, bool public = false}) {
-    var map = <String, dynamic>{"files": {}};
+  Future<Gist> createGist(
+    Map<String, String> files, {
+    String description,
+    bool public = false,
+  }) {
+    final map = <String, dynamic>{"files": {}};
 
     if (description != null) {
       map["description"] = description;
@@ -58,16 +61,20 @@ class GistsService extends Service {
 
     map["public"] = public;
 
-    var f = {};
+    final f = {};
 
-    for (var key in files.keys) {
+    for (final key in files.keys) {
       f[key] = {"content": files[key]};
     }
 
     map["files"] = f;
 
-    return _github.postJSON("/gists",
-        statusCode: 201, body: jsonEncode(map), convert: Gist.fromJSON);
+    return _github.postJSON(
+      "/gists",
+      statusCode: 201,
+      body: jsonEncode(map),
+      convert: Gist.fromJSON,
+    );
   }
 
   /// Deletes the specified Gist.
@@ -82,24 +89,31 @@ class GistsService extends Service {
   /// Edits a Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
-  Future<Gist> editGist(String id,
-      {String description, Map<String, String> files}) {
-    var map = <String, dynamic>{};
+  Future<Gist> editGist(
+    String id, {
+    String description,
+    Map<String, String> files,
+  }) {
+    final map = <String, dynamic>{};
 
     if (description != null) {
       map["description"] = description;
     }
 
     if (files != null) {
-      var f = {};
-      for (var key in files.keys) {
+      final f = <String, dynamic>{};
+      for (final key in files.keys) {
         f[key] = files[key] == null ? null : {"content": files[key]};
       }
       map["files"] = f;
     }
 
-    return _github.postJSON("/gists/$id",
-        statusCode: 200, body: jsonEncode(map), convert: Gist.fromJSON);
+    return _github.postJSON(
+      "/gists/$id",
+      statusCode: 200,
+      body: jsonEncode(map),
+      convert: Gist.fromJSON,
+    );
   }
 
   // TODO: Implement listGistCommits: https://developer.github.com/v3/gists/#list-gist-commits
