@@ -22,7 +22,8 @@ Future main() async {
   final languages = map.keys.cast<String>().toList(growable: false)..sort();
 
   for (String language in languages) {
-    final color = map[language]['color']?.toString()?.toUpperCase() ?? '#000000';
+    final color =
+        map[language]['color']?.toString()?.toUpperCase() ?? '#000000';
 
     language = language.replaceAll("'", "\\'");
 

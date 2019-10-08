@@ -124,7 +124,8 @@ class PullRequest extends PullRequestInformation {
   static PullRequest fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    final PullRequest pr = PullRequestInformation.fromJSON(input, PullRequest());
+    final PullRequest pr =
+        PullRequestInformation.fromJSON(input, PullRequest());
     pr.mergeable = input['mergeable'];
     pr.merged = input['merged'];
     pr.id = input['id'];
