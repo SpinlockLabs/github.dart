@@ -831,13 +831,6 @@ class RepositoriesService extends Service {
     );
   }
 
-  /// Adds a deploy key for a repository by passing in the title and key as strings.
-  ///
-  /// API docs: https://developer.github.com/v3/repos/keys/#create
-  Future<PublicKey> createDeployKeyFromStrings(RepositorySlug slug,
-          {@required String title, @required String key}) async =>
-      createDeployKey(slug, CreatePublicKey(title, key));
-
   /// Adds a deploy key for a repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#create
