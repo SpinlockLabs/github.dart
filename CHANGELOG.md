@@ -1,5 +1,5 @@
 ## v5.4.0
-
+- Implement rate-limiting https://github.com/SpinlockLabs/github.dart/pull/172
 - All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented. `isCollaborator`, `listSingleCommitComments`, `listCommitComments`, `createCommitComment`, `getComment`, `updateComment`, `deleteComment`
 
 
