@@ -1,0 +1,29 @@
+name: Triage Issues
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  assignRob:
+    name: Assign Rob
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Assign Rob
+        uses: actions/github@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: assign @robrbecker
+      - name: Apply triage label
+        uses: actions/github@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: label triage
+      - name: Comment On New Issues
+        uses: actions/github@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: comment "Thanks for submitting an issue! @robrbecker will take a look soon!"
