@@ -303,6 +303,13 @@ class GitHub {
     void fail(http.Response response),
     String preview,
   }) async {
+    if (rateLimitRemaining != null && rateLimitRemaining <= 0) {
+      assert(rateLimitReset != null);
+      var now = DateTime.now();
+      var waitTime = rateLimitReset.difference(now);
+      await Future.delayed(waitTime);
+    }
+
     if (headers == null) headers = {};
 
     if (preview != null) {
