@@ -181,13 +181,15 @@ class RepositoriesService extends Service {
   /// Returns true if it was successfully deleted.
   ///
   /// API docs: https://developer.github.com/v3/repos/#delete-a-repository
-  Future<void> deleteRepository(RepositorySlug slug) async {
+  Future<bool> deleteRepository(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    await _github.request(
-      'DELETE',
-      '/repos/${slug.fullName}',
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          'DELETE',
+          '/repos/${slug.fullName}',
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Lists the contributors of the specified repository.
@@ -297,24 +299,28 @@ class RepositoriesService extends Service {
     return false;
   }
 
-  Future<void> addCollaborator(RepositorySlug slug, String user) async {
+  Future<bool> addCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
-    return _github.request(
-      "PUT",
-      "/repos/${slug.fullName}/collaborators/$user",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "PUT",
+          "/repos/${slug.fullName}/collaborators/$user",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
-  Future<void> removeCollaborator(RepositorySlug slug, String user) async {
+  Future<bool> removeCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
-    return _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/collaborators/$user",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/collaborators/$user",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Returns a list of all comments for a specific commit.
@@ -418,14 +424,16 @@ class RepositoriesService extends Service {
   /// *[id]: id of the comment to delete.
   ///
   /// https://developer.github.com/v3/repos/comments/#delete-a-commit-comment
-  Future<void> deleteCommitComment(RepositorySlug slug,
+  Future<bool> deleteCommitComment(RepositorySlug slug,
       {@required int id}) async {
     ArgumentError.checkNotNull(slug);
-    await _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/comments/$id",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/comments/$id",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Lists the commits of the provided repository [slug].
@@ -755,37 +763,43 @@ class RepositoriesService extends Service {
   /// Triggers a hook with the latest push.
   ///
   /// API docs: https://developer.github.com/v3/repos/hooks/#test-a-push-hook
-  Future<void> testPushHook(RepositorySlug slug, int id) async {
+  Future<bool> testPushHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    await _github.request(
-      "POST",
-      "/repos/${slug.fullName}/hooks/$id/tests",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "POST",
+          "/repos/${slug.fullName}/hooks/$id/tests",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Pings the hook.
   ///
   /// API docs: https://developer.github.com/v3/repos/hooks/#ping-a-hook
-  Future<void> pingHook(RepositorySlug slug, int id) async {
+  Future<bool> pingHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    await _github.request(
-      "POST",
-      "/repos/${slug.fullName}/hooks/$id/pings",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "POST",
+          "/repos/${slug.fullName}/hooks/$id/pings",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
-  Future<void> deleteHook(RepositorySlug slug, int id) async {
+  Future<bool> deleteHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    await _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/hooks/$id",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/hooks/$id",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   // TODO: Implement other hook methods: https://developer.github.com/v3/repos/hooks/
@@ -820,17 +834,13 @@ class RepositoriesService extends Service {
   /// Adds a deploy key for a repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/keys/#create
-  Future<PublicKey> createDeployKey(RepositorySlug slug,
-      {@required String title, @required String key}) async {
+  Future<PublicKey> createDeployKey(
+      RepositorySlug slug, CreatePublicKey key) async {
     ArgumentError.checkNotNull(slug);
-    ArgumentError.checkNotNull(title);
     ArgumentError.checkNotNull(key);
     return _github.postJSON<Map<String, dynamic>, PublicKey>(
       "/repos/${slug.fullName}/keys",
-      body: jsonEncode(<String, dynamic>{
-        "title": title,
-        "key": key,
-      }),
+      body: key.toJSON(),
       statusCode: StatusCodes.CREATED,
       convert: (i) => PublicKey.fromJSON(i),
     );
@@ -839,15 +849,17 @@ class RepositoriesService extends Service {
   /// Delete a deploy key.
   ///
   /// https://developer.github.com/v3/repos/keys/#delete
-  Future<void> deleteDeployKey(
+  Future<bool> deleteDeployKey(
       {@required RepositorySlug slug, @required PublicKey key}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(key);
-    await _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/keys/${key.id}",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/keys/${key.id}",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Merges a branch in the specified repository.
@@ -1019,14 +1031,16 @@ class RepositoriesService extends Service {
   /// Delete the release.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#delete-a-release
-  Future<void> deleteRelease(RepositorySlug slug, Release release) async {
+  Future<bool> deleteRelease(RepositorySlug slug, Release release) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(release);
-    await _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/releases/${release.id}",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/releases/${release.id}",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Lists assets for a release.
@@ -1084,15 +1098,17 @@ class RepositoriesService extends Service {
   /// Delete a release asset.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#delete-a-release-asset
-  Future<void> deleteReleaseAsset(
+  Future<bool> deleteReleaseAsset(
       RepositorySlug slug, ReleaseAsset asset) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(asset);
-    await _github.request(
-      "DELETE",
-      "/repos/${slug.fullName}/releases/assets/${asset.id}",
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return _github
+        .request(
+          "DELETE",
+          "/repos/${slug.fullName}/releases/assets/${asset.id}",
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   Future<List<ReleaseAsset>> uploadReleaseAssets(
