@@ -16,7 +16,6 @@ import "dart:convert"
 import "package:http/http.dart" as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
 import "package:json_annotation/json_annotation.dart";
-import 'package:meta/meta.dart' as meta show alwaysThrows;
 import 'package:meta/meta.dart';
 
 import 'common/model/repos_releases.dart';
@@ -28,7 +27,6 @@ export 'common/model/repos_releases.dart';
 export "common/model/users.dart";
 export "common/util/pagination.dart";
 
-part "common.g.dart";
 part "common/activity_service.dart";
 part "common/authorizations_service.dart";
 part "common/gists_service.dart";
@@ -69,6 +67,7 @@ part "common/util/json.dart";
 part "common/util/oauth2.dart";
 part "common/util/service.dart";
 part "common/util/utils.dart";
+part "common.g.dart";
 
 void _applyExpandos(Object target, http.Response response) {
   _etagExpando[target] = response.headers['etag'];

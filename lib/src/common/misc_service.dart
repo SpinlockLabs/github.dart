@@ -12,9 +12,11 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    var r = _github.getJSON<Map, Map<String, String>>("/emojis",
-        statusCode: StatusCodes.OK,
-        convert: (Map json) => json.cast<String, String>());
+    final r = _github.getJSON<Map, Map<String, String>>(
+      "/emojis",
+      statusCode: StatusCodes.OK,
+      convert: (Map json) => json.cast<String, String>(),
+    );
     return r;
   }
 
@@ -69,7 +71,7 @@ class MiscService extends Service {
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {
-    var params = <String, String>{};
+    final params = <String, dynamic>{};
 
     if (text != null) {
       params["s"] = text;

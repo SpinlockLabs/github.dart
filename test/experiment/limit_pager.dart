@@ -22,8 +22,8 @@ PaginationInformation solve(int limit) {
     return PaginationInformation(limit, limit ~/ MAX_PER_PAGE, MAX_PER_PAGE);
   }
 
-  int itemsPerPage = 100;
-  int pages = (limit / itemsPerPage).ceil();
+  const int itemsPerPage = 100;
+  final int pages = (limit / itemsPerPage).ceil();
 
   return PaginationInformation(limit, pages, itemsPerPage);
 }

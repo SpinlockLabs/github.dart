@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:test/test.dart';
 import 'package:github/server.dart';
 
-final _licenseJson = r'''  {
+const _licenseJson = r'''  {
   "name": "LICENSE",
   "path": "LICENSE",
   "sha": "68bcabfb39b7af5a1f5efbb8f651d51e16d60398",
@@ -31,11 +31,11 @@ final _licenseJson = r'''  {
 
 void main() {
   test('License round-trip', () {
-    var licenseJson = jsonDecode(_licenseJson) as Map<String, dynamic>;
+    final licenseJson = jsonDecode(_licenseJson) as Map<String, dynamic>;
 
-    var instance = LicenseDetails.fromJson(licenseJson);
+    final instance = LicenseDetails.fromJson(licenseJson);
 
-    var toJson = instance.toJson();
+    final toJson = instance.toJson();
 
     expect(_prettyEncode(toJson), _prettyEncode(licenseJson));
   });

@@ -103,7 +103,7 @@ class IssueRequest {
   IssueRequest();
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("labels", labels, map);
@@ -265,7 +265,7 @@ class CreateMilestone {
   CreateMilestone(this.title);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("state", state, map);
     putValue(description, description, map);

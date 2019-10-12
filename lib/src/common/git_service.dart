@@ -5,7 +5,7 @@ part of github.common;
 ///
 /// API docs: https://developer.github.com/v3/git/blobs/
 class GitService extends Service {
-  GitService(GitHub github) : super(github);
+  const GitService(GitHub github) : super(github);
 
   /// Fetches a blob from [slug] for a given [sha].
   ///
@@ -85,11 +85,14 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#update-a-reference
   Future<GitReference> editReference(
-      RepositorySlug slug, String ref, String sha,
-      {bool force = false}) {
-    String body = jsonEncode({'sha': sha, 'force': force});
+    RepositorySlug slug,
+    String ref,
+    String sha, {
+    bool force = false,
+  }) {
+    final String body = jsonEncode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
-    var headers = {'content-length': body.length.toString()};
+    final headers = {'content-length': body.length.toString()};
 
     return _github
         .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',

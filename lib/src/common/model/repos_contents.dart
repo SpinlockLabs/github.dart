@@ -122,7 +122,7 @@ class CreateFile {
   CreateFile(this.path, this.content, this.message);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("path", path, map);
     putValue("message", message, map);
     putValue("content", content, map);
@@ -140,7 +140,7 @@ class CommitUser {
   CommitUser(this.name, this.email);
 
   Map<String, dynamic> toMap() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
 
     putValue('name', name, map);
     putValue('email', email, map);

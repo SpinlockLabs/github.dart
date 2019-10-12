@@ -9,9 +9,9 @@ class RepositoryCrawler {
 
   Stream<GitHubFile> crawl() async* {
     Stream<GitHubFile> scan(String path) async* {
-      var contents = await github.repositories.getContents(slug, path);
+      final contents = await github.repositories.getContents(slug, path);
 
-      for (var content in contents.tree) {
+      for (final content in contents.tree) {
         if (content.type == 'dir') {
           yield* scan(content.path);
         } else {

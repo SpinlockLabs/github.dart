@@ -164,7 +164,7 @@ class TeamMember {
   static TeamMember fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var member = TeamMember();
+    final member = TeamMember();
     member.login = input['login'];
     member.id = input['id'];
     member.avatarUrl = input['avatar_url'];

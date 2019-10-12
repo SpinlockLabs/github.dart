@@ -1,0 +1,20 @@
+name: Dart CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    container:
+      image:  google/dart:latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install dependencies
+      run: pub get
+    - name: Dart Analyzer
+      run: dartanalyzer .
+    - name: Check Dart Format
+      run: dartfmt -n --set-exit-if-changed .

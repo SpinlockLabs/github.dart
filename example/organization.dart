@@ -24,8 +24,8 @@ Future<void> main() async {
 
 Future<void> loadOrganization(String orgToLoad) async {
   try {
-    Organization org = await github.organizations.get(orgToLoad);
-    String html = '''
+    final Organization org = await github.organizations.get(orgToLoad);
+    final String html = '''
 <br/>Name: ${org.name}
 <br/>Id: ${org.id}
 <br/>Company: ${org.company}

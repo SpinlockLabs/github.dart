@@ -16,7 +16,7 @@ Future<void> main() async {
 void loadUsers() {
   github.users.listUsers(pages: 2).take(12).listen((User baseUser) {
     github.users.getUser(baseUser.login).then((user) {
-      var userDiv = DivElement();
+      final userDiv = DivElement();
 
       for (int i = 1; i <= 2; i++) {
         userDiv.append(BRElement());
@@ -25,7 +25,7 @@ void loadUsers() {
       userDiv.append(
           GitHubBrowserHelper.createAvatarImage(user, width: 64, height: 64)
             ..classes.add("avatar"));
-      var buff = StringBuffer();
+      final buff = StringBuffer();
 
       buff
         ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")

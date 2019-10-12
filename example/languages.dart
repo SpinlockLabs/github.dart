@@ -17,7 +17,7 @@ Future<void> loadRepository() async {
   var user = "dart-lang";
   var reponame = "sdk";
 
-  var params = queryString;
+  final params = queryString;
 
   if (params.containsKey("user")) {
     user = params["user"];
@@ -29,7 +29,7 @@ Future<void> loadRepository() async {
 
   document.getElementById("name").setInnerHtml("$user/$reponame");
 
-  var repo = RepositorySlug(user, reponame);
+  final repo = RepositorySlug(user, reponame);
   breakdown = await github.repositories.listLanguages(repo);
   reloadTable();
 }
@@ -42,7 +42,7 @@ void reloadTable({int accuracy = 4}) {
   }
 
   isReloadingTable = true;
-  String md = generateMarkdown(accuracy);
+  final String md = generateMarkdown(accuracy);
   github.misc.renderMarkdown(md).then((html) {
     tableDiv.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
@@ -54,17 +54,17 @@ int totalBytes(LanguageBreakdown breakdown) {
 }
 
 String generateMarkdown(int accuracy) {
-  int total = totalBytes(breakdown);
-  var data = breakdown.toList();
+  final int total = totalBytes(breakdown);
+  final data = breakdown.toList();
 
   String md = '|Name|Bytes|Percentage|\n';
   md += '|-----|-----|-----|\n';
   data.sort((a, b) => b[1].compareTo(a[1]));
 
   data.forEach((info) {
-    String name = info[0];
-    int bytes = info[1];
-    num percentage = ((bytes / total) * 100);
+    final String name = info[0];
+    final int bytes = info[1];
+    final num percentage = ((bytes / total) * 100);
     md += '|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|\n';
   });
   return md;

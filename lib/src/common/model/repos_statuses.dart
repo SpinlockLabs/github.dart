@@ -81,7 +81,7 @@ class CreateStatus {
         this.context = null;
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("state", state, map);
     putValue("target_url", targetUrl, map);
     putValue("description", description, map);

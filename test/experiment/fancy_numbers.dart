@@ -11,7 +11,7 @@ void main() {
 }
 
 void test(String input, int expect) {
-  var out = parseFancyNumber(input);
+  final out = parseFancyNumber(input);
   if (out != expect) {
     print("ERROR: $input was parsed as $out but we expected $expect");
   } else {

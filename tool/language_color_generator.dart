@@ -9,20 +9,21 @@ const _url = 'https://raw.githubusercontent.com/'
     'github/linguist/master/lib/linguist/languages.yml';
 
 Future main() async {
-  var response = await http.Client().get(_url);
+  final response = await http.Client().get(_url);
 
-  var yaml = loadYaml(response.body) as YamlMap;
-  var stringBuffer = StringBuffer()
+  final yaml = loadYaml(response.body) as YamlMap;
+  final stringBuffer = StringBuffer()
     ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
     ..writeln('// VERSION OF ${DateTime.now().toIso8601String()}')
     ..writeln()
     ..writeln('const languagesColor = <String, String>{');
 
-  var map = yaml.value as YamlMap;
-  var languages = map.keys.cast<String>().toList(growable: false)..sort();
+  final map = yaml.value as YamlMap;
+  final languages = map.keys.cast<String>().toList(growable: false)..sort();
 
-  for (var language in languages) {
-    var color = map[language]['color']?.toString()?.toUpperCase() ?? '#000000';
+  for (String language in languages) {
+    final color =
+        map[language]['color']?.toString()?.toUpperCase() ?? '#000000';
 
     language = language.replaceAll("'", "\\'");
 
