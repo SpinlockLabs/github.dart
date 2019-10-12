@@ -1,14 +1,15 @@
-## v.6.0.0
- - All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented.
- - **BREAKING**: methods `deleteRepository`, `addCollaborator`, `removeCollaborator`, `testPushHook`, `pingHook`, and `deleteHook` now return a `Future<void>` instead of a `Future<bool>`.
- - **BREAKING**: parameters of method `createDeployKey` have been modified.
- - `targetCommitsh` field in `Release` class is deprecated. Use the new `targetCommitish` instead.
+## v5.4.0
+
+- All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented. `isCollaborator`, `listSingleCommitComments`, `listCommitComments`, `createCommitComment`, `getComment`, `updateComment`, `deleteComment`
+
 
 ## v5.3.0
-- Add the ability to upload release assets.
-- Add the ability to get an existing release by tag name. 
 
-Deprecations: 
+- Add the ability to upload release assets.
+- Add the ability to get an existing release by tag name.
+
+Deprecations:
+
 - The `draft` and `prerelease` properties in the CreateRelease and Release 
 - classes have been renamed to `isDraft` and `isPrerelease` for clarity.
 - Release.targetCommitsh has been renamed to Release.targetCommitish. 
@@ -17,6 +18,7 @@ has been renamed to `createRelease`.
 - `RepositoriesService.getRelease` has been renamed to `RepositoriesService.getReleaseById`
 
 ## v5.2.0
+
  - Add access to labels on Pull Requests https://github.com/DirectMyFile/github.dart/pull/163
  - Adding draft property to PR model https://github.com/DirectMyFile/github.dart/pull/162
  - updateFile request must be a PUT https://github.com/DirectMyFile/github.dart/pull/160
