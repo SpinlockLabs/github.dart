@@ -4,5 +4,5 @@ part of github.common;
 abstract class Service {
   final GitHub _github;
 
-  Service(this._github);
+  const Service(this._github);
 }

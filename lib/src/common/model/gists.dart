@@ -30,7 +30,7 @@ class Gist {
   static Gist fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var gist = Gist()
+    final gist = Gist()
       ..id = input['id']
       ..description = input['description']
       ..public = input['public']
@@ -40,8 +40,8 @@ class Gist {
     if (input['files'] != null) {
       gist.files = [];
 
-      for (var key in input['files'].keys) {
-        var map = copyOf(input['files'][key]) as Map<String, dynamic>;
+      for (final key in input['files'].keys) {
+        final map = copyOf(input['files'][key]) as Map<String, dynamic>;
         map['name'] = key;
         gist.files.add(GistFile.fromJson(map));
       }
@@ -170,8 +170,7 @@ class CreateGistComment {
   CreateGistComment(this.body);
 
   String toJSON() {
-    var map = <String, dynamic>{};
-    map['body'] = body;
+    final map = <String, dynamic>{'body': body};
     return jsonEncode(map);
   }
 }

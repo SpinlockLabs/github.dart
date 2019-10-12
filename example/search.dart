@@ -5,12 +5,12 @@ import 'common.dart';
 Future<void> main() async {
   await initViewSourceButton('search.dart');
 
-  var searchBtn = querySelector('#submit');
+  final searchBtn = querySelector('#submit');
   searchBtn.onClick.listen(search);
 }
 
 Future<void> search(_) async {
-  Stream<CodeSearchResults> resultsStream = github.search.code(
+  final Stream<CodeSearchResults> resultsStream = github.search.code(
     val('query'),
     language: val('language'),
     filename: val('filename'),
@@ -26,18 +26,18 @@ Future<void> search(_) async {
     perPage: int.tryParse(val('perpage')),
     pages: int.tryParse(val('pages')),
   );
-  DivElement resultsDiv = querySelector('#results');
+  final DivElement resultsDiv = querySelector('#results');
   resultsDiv.innerHtml = '';
 
   int count = 0;
-  await for (var results in resultsStream) {
+  await for (final results in resultsStream) {
     count += results.items.length;
     querySelector('#nresults').text =
         '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing $count)';
 
-    for (CodeSearchItem item in results.items) {
-      var url = item.htmlUrl;
-      var path = item.path;
+    for (final CodeSearchItem item in results.items) {
+      final url = item.htmlUrl;
+      final path = item.path;
       resultsDiv.append(DivElement()
         ..append(AnchorElement(href: url.toString())
           ..text = path

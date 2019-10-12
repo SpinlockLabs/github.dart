@@ -41,7 +41,7 @@ class RepositoryCommit {
   static RepositoryCommit fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var commit = RepositoryCommit()
+    final commit = RepositoryCommit()
       ..url = input['url']
       ..sha = input['sha']
       ..htmlUrl = input['html_url']

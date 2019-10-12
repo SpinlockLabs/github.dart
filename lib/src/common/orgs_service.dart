@@ -34,8 +34,8 @@ class OrganizationsService extends Service {
 
   /// Fetches the organizations specified by [names].
   Stream<Organization> getMulti(List<String> names) async* {
-    for (var name in names) {
-      var org = await get(name);
+    for (final name in names) {
+      final org = await get(name);
       yield org;
     }
   }
@@ -50,7 +50,7 @@ class OrganizationsService extends Service {
       String location,
       String name,
       String description}) {
-    var map = createNonNullMap({
+    final map = createNonNullMap(<String, dynamic>{
       "billing_email": billingEmail,
       "company": company,
       "email": email,
@@ -84,7 +84,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#create-team
   Future<Team> createTeam(String org, String name,
       {String description, List<String> repos, String permission}) {
-    var map = createNonNullMap({
+    final map = createNonNullMap(<String, dynamic>{
       "name": name,
       "description": description,
       "repo_names": repos,
@@ -100,11 +100,18 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#edit-team
   Future<Team> editTeam(int teamId, String name,
       {String description, String permission}) {
-    var map = createNonNullMap(
-        {"name": name, "description": description, "permission": permission});
+    final map = createNonNullMap(<String, dynamic>{
+      "name": name,
+      "description": description,
+      "permission": permission,
+    });
 
-    return _github.postJSON("/teams/$teamId",
-        statusCode: 200, convert: Team.fromJSON, body: jsonEncode(map));
+    return _github.postJSON(
+      "/teams/$teamId",
+      statusCode: 200,
+      convert: Team.fromJSON,
+      body: jsonEncode(map),
+    );
   }
 
   /// Deletes the team specified by the [teamId]
@@ -158,19 +165,21 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future<TeamMembershipState> getTeamMembership(int teamId, String user) {
-    var completer = Completer<TeamMembershipState>();
+    final completer = Completer<TeamMembershipState>();
 
     _github
-        .getJSON("/teams/$teamId/memberships/$user",
-            statusCode: 200,
-            fail: (http.Response response) {
-              if (response.statusCode == 404) {
-                completer.complete(TeamMembershipState(null));
-              } else {
-                _github.handleStatusCode(response);
-              }
-            },
-            convert: (json) => TeamMembershipState(json['state']))
+        .getJSON(
+          "/teams/$teamId/memberships/$user",
+          statusCode: 200,
+          fail: (http.Response response) {
+            if (response.statusCode == 404) {
+              completer.complete(TeamMembershipState(null));
+            } else {
+              _github.handleStatusCode(response);
+            }
+          },
+          convert: (json) => TeamMembershipState(json['state']),
+        )
         .then(completer.complete);
 
     return completer.future;

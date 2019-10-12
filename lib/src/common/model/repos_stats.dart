@@ -79,7 +79,7 @@ class YearCommitCountWeek {
   static YearCommitCountWeek fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    var c = YearCommitCountWeek();
+    final c = YearCommitCountWeek();
     c.days = input["days"] as List<int>;
     c.total = input["total"];
     c.timestamp = input["week"];
@@ -100,7 +100,7 @@ class WeeklyChangesCount {
 
   static WeeklyChangesCount fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-    var c = WeeklyChangesCount();
+    final c = WeeklyChangesCount();
     c.timestamp = input[0];
     c.additions = input[1];
     c.deletions = input[2];
@@ -121,7 +121,7 @@ class PunchcardEntry {
 
   static PunchcardEntry fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-    var c = PunchcardEntry();
+    final c = PunchcardEntry();
     c.weekday = input[0];
     c.hour = input[1];
     c.commits = input[2];

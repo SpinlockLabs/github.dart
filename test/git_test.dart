@@ -15,12 +15,12 @@ void main() {
   MockGitHub github;
   GitService git;
   RepositorySlug repo;
-  var someSha = 'someSHA';
+  const someSha = 'someSHA';
 
   setUp(() {
     github = MockGitHub();
     git = GitService(github);
-    repo = RepositorySlug('o', 'n');
+    repo = const RepositorySlug('o', 'n');
   });
 
   group('getBlob()', () {
@@ -34,20 +34,22 @@ void main() {
 
   group('createBlob()', () {
     test('constructs correct path', () {
-      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      const CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
-      verify(github.postJSON('/repos/o/n/git/blobs',
-          convert: GitBlob.fromJSON,
-          statusCode: StatusCodes.CREATED,
-          body: jsonEncode(blob)));
+      verify(github.postJSON(
+        '/repos/o/n/git/blobs',
+        convert: GitBlob.fromJSON,
+        statusCode: StatusCodes.CREATED,
+        body: jsonEncode(blob),
+      ));
     });
 
     test('creates valid JSON body', () {
-      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      const CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
 
       git.createBlob(repo, blob);
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['content'], equals('bbb'));
       expect(body['encoding'], equals('utf-8'));
     });
@@ -64,20 +66,22 @@ void main() {
 
   group('createCommit()', () {
     test('constructs correct path', () {
-      CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha');
+      final CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
-      verify(github.postJSON('/repos/o/n/git/commits',
-          convert: GitCommit.fromJSON,
-          statusCode: StatusCodes.CREATED,
-          body: jsonEncode(commit)));
+      verify(github.postJSON(
+        '/repos/o/n/git/commits',
+        convert: GitCommit.fromJSON,
+        statusCode: StatusCodes.CREATED,
+        body: jsonEncode(commit),
+      ));
     });
 
     test('creates valid JSON body', () {
       // given
-      String date = '2014-10-02T15:21:29Z';
+      const String date = '2014-10-02T15:21:29Z';
 
-      CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha')
+      final CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha')
         ..parents = ['parentSha1', 'parentSha2']
         ..committer = GitCommitUser('cName', 'cEmail', parseDateTime(date))
         ..author = GitCommitUser('aName', 'aEmail', parseDateTime(date));
@@ -86,7 +90,7 @@ void main() {
       git.createCommit(repo, commit);
 
       // then
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['message'], equals('aMessage'));
       expect(body['tree'], equals('aTreeSha'));
       expect(body['parents'], equals(['parentSha1', 'parentSha2']));
@@ -109,7 +113,7 @@ void main() {
   });
 
   group('createReference()', () {
-    var someRef = 'refs/heads/b';
+    const someRef = 'refs/heads/b';
     test('constructs correct path', () {
       git.createReference(repo, someRef, someSha);
 
@@ -122,7 +126,7 @@ void main() {
     test('creates valid JSON body', () {
       git.createReference(repo, someRef, someSha);
 
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['ref'], equals(someRef));
       expect(body['sha'], equals(someSha));
     });
@@ -131,7 +135,7 @@ void main() {
   group('editReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response expectedResponse = http.Response('{}', 200);
+      final http.Response expectedResponse = http.Response('{}', 200);
 
       when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
@@ -146,7 +150,7 @@ void main() {
 
     test('creates valid JSON body', () {
       // given
-      http.Response expectedResponse = http.Response('{}', 200);
+      final http.Response expectedResponse = http.Response('{}', 200);
       when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
@@ -154,12 +158,15 @@ void main() {
       git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
-      var captured = verify(
-              github.request(any, any, body: captureAny, headers: captureAny))
-          .captured;
+      final List<dynamic> captured = verify(github.request(
+        any,
+        any,
+        body: captureAny,
+        headers: captureAny,
+      )).captured;
 
-      var body = jsonDecode(captured[0]);
-      var headers = captured[1];
+      final body = jsonDecode(captured[0]);
+      final headers = captured[1];
 
       expect(body['sha'], equals(someSha));
       expect(body['force'], equals(true));
@@ -170,7 +177,7 @@ void main() {
   group('deleteReference()', () {
     test('constructs correct path', () {
       // given
-      http.Response expectedResponse = http.Response('{}', 200);
+      final http.Response expectedResponse = http.Response('{}', 200);
       when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
 
       // when
@@ -191,7 +198,7 @@ void main() {
   });
 
   group('createTag()', () {
-    var createGitTag = CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
+    final createGitTag = CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
         GitCommitUser('aName', 'aEmail', DateTime.now()));
 
     test('constructs correct path', () {
@@ -206,7 +213,7 @@ void main() {
     test('creates valid JSON body', () {
       git.createTag(repo, createGitTag);
 
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['tag'], equals('v0.0.1'));
       expect(body['message'], equals('a message'));
       expect(body['object'], equals(someSha));
@@ -235,7 +242,7 @@ void main() {
 
   group('createTree()', () {
     test('constructs correct path', () {
-      var createGitTree = CreateGitTree([]);
+      final createGitTree = CreateGitTree([]);
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
@@ -246,16 +253,16 @@ void main() {
 
     test('with sha creates valid JSON body', () {
       // given
-      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
+      const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           sha: '44b4fc6d56897b048c772eb4087f854f46256132');
 
-      var tree = CreateGitTree([treeEntry]);
+      final tree = CreateGitTree([treeEntry]);
 
       // when
       git.createTree(repo, tree);
 
       // then
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -267,16 +274,16 @@ void main() {
 
     test('with content creates valid JSON body', () {
       // given
-      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
+      const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           content: 'some file content');
 
-      var tree = CreateGitTree([treeEntry]);
+      final tree = CreateGitTree([treeEntry]);
 
       // when
       git.createTree(repo, tree);
 
       // then
-      var body = captureSentBody(github);
+      final body = captureSentBody(github);
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -288,11 +295,13 @@ void main() {
 }
 
 Map<String, dynamic> captureSentBody(MockGitHub github) {
-  var bodyString = verify(
-          github.postJSON(any, convert: any, statusCode: any, body: captureAny))
-      .captured
-      .single;
+  final bodyString = verify(github.postJSON(
+    any,
+    convert: any,
+    statusCode: any,
+    body: captureAny,
+  )).captured.single;
 
-  var body = jsonDecode(bodyString) as Map<String, dynamic>;
+  final body = jsonDecode(bodyString) as Map<String, dynamic>;
   return body;
 }

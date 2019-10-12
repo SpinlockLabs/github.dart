@@ -9,17 +9,17 @@ Future<void> main() async {
   await initViewSourceButton("emoji.dart");
   emojiDiv = querySelector("#emojis");
   await loadEmojis();
-  var searchBox = querySelector("#search-box") as InputElement;
+  final searchBox = querySelector("#search-box") as InputElement;
   searchBox.onKeyUp.listen((event) {
     filter(searchBox.value);
   });
 }
 
 Future<void> loadEmojis() async {
-  var emojis = await github.misc.listEmojis();
+  final emojis = await github.misc.listEmojis();
 
   emojis.forEach((name, url) {
-    var h = DivElement();
+    final h = DivElement();
     h.className = 'emojibox';
     h.style.textAlign = "center";
     h.append(
@@ -36,11 +36,11 @@ void filter(String query) {
     return;
   }
   lastQuery = query;
-  var boxes = emojiDiv.children;
-  for (var box in boxes) {
-    var boxName = box.querySelector("p");
-    var t = boxName.text;
-    var name = t.substring(1, t.length - 1);
+  final boxes = emojiDiv.children;
+  for (final box in boxes) {
+    final boxName = box.querySelector("p");
+    final t = boxName.text;
+    final name = t.substring(1, t.length - 1);
     if (name.contains(query)) {
       box.style.display = "inline";
     } else {

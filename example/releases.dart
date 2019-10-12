@@ -14,16 +14,16 @@ Future<void> main() async {
 
 void loadReleases() {
   github.repositories
-      .listReleases(RepositorySlug("twbs", "bootstrap"))
+      .listReleases(const RepositorySlug("twbs", "bootstrap"))
       .toList()
       .then((releases) {
-    for (var release in releases) {
+    for (final release in releases) {
       releasesDiv.appendHtml("""
       <div class="repo box" id="release-${release.id}">
         <h1>${release.name}</h1>
       </div>
       """, treeSanitizer: NodeTreeSanitizer.trusted);
-      var rel = releasesDiv.querySelector("#release-${release.id}");
+      final Element rel = releasesDiv.querySelector("#release-${release.id}");
       void append(String key, String value) {
         if (value == null) return;
         rel.appendHtml("<br/><b>$key</b>: $value",
