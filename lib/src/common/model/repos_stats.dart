@@ -1,6 +1,7 @@
 part of github.common;
 
 /// Model class for a contributor's statistics for a repository.
+@immutable
 @JsonSerializable(createToJson: false)
 class ContributorStatistics {
   /// The Author
@@ -12,7 +13,7 @@ class ContributorStatistics {
   /// Weekly Statistics
   final List<ContributorWeekStatistics> weeks;
 
-  ContributorStatistics(this.author, this.total, this.weeks);
+  const ContributorStatistics(this.author, this.total, this.weeks);
 
   factory ContributorStatistics.fromJson(Map<String, dynamic> json) =>
       _$ContributorStatisticsFromJson(json);
@@ -20,6 +21,7 @@ class ContributorStatistics {
 
 /// Model class to represent the number of additions, deletions and commits
 /// a contributor made in a given week.
+@immutable
 @JsonSerializable(createToJson: false)
 class ContributorWeekStatistics {
   /// Beginning of the Week (As a Unix Timestamp)
@@ -38,8 +40,12 @@ class ContributorWeekStatistics {
   @JsonKey(name: 'c')
   final int commits;
 
-  ContributorWeekStatistics(
-      this.start, this.additions, this.deletions, this.commits);
+  const ContributorWeekStatistics(
+    this.start,
+    this.additions,
+    this.deletions,
+    this.commits,
+  );
 
   factory ContributorWeekStatistics.fromJson(Map<String, dynamic> json) =>
       _$ContributorWeekStatisticsFromJson(json);
@@ -49,6 +55,7 @@ class ContributorWeekStatistics {
 }
 
 /// Model class for contributor participation.
+@immutable
 class ContributorParticipation {
   /// Commit Counts for All Users
   final List<int> all;
@@ -56,7 +63,7 @@ class ContributorParticipation {
   /// Commit Counts for the Owner
   final List<int> owner;
 
-  ContributorParticipation._({
+  const ContributorParticipation._({
     @required this.all,
     @required this.owner,
   });
@@ -72,6 +79,7 @@ class ContributorParticipation {
 }
 
 /// Model class for a week in a full year commit count.
+@immutable
 class YearCommitCountWeek {
   /// Commit Counts for each day (starting with Sunday)
   final List<int> days;
@@ -82,7 +90,7 @@ class YearCommitCountWeek {
   /// Timestamp for Beginning of Week
   final int timestamp;
 
-  YearCommitCountWeek._({
+  const YearCommitCountWeek._({
     @required this.days,
     @required this.total,
     @required this.timestamp,
@@ -100,6 +108,7 @@ class YearCommitCountWeek {
 }
 
 /// Model class for a weekly change count.
+@immutable
 class WeeklyChangesCount {
   /// Timestamp for Beginning of Week
   final int timestamp;
@@ -110,7 +119,7 @@ class WeeklyChangesCount {
   /// Number of Deletions
   final int deletions;
 
-  WeeklyChangesCount._({
+  const WeeklyChangesCount._({
     @required this.timestamp,
     @required this.additions,
     @required this.deletions,
@@ -127,6 +136,7 @@ class WeeklyChangesCount {
 }
 
 /// Model Class for a Punchcard Entry
+@immutable
 class PunchcardEntry {
   /// Weekday (With 0 as Sunday and 6 as Saturday)
   final int weekday;
@@ -137,7 +147,7 @@ class PunchcardEntry {
   /// Number of Commits
   final int commits;
 
-  PunchcardEntry._({
+  const PunchcardEntry._({
     @required this.weekday,
     @required this.hour,
     @required this.commits,

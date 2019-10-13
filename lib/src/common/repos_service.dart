@@ -552,7 +552,8 @@ class RepositoriesService extends Service {
     return _github.getJSON(
       url,
       convert: (input) {
-        final contents = RepositoryContents();
+        GitHubFile file;
+        List<GitHubFile> tree;
         if (input is Map) {
           // Weird one-off. If the content of `input` is JSON w/ a message
           // it was likely a 404 – but we don't have the status code here
@@ -561,12 +562,11 @@ class RepositoriesService extends Service {
             throw GitHubError(_github, input['message'],
                 apiUrl: input['documentation_url']);
           }
-          contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
+          file = GitHubFile.fromJSON(input as Map<String, dynamic>);
         } else {
-          contents.tree =
-              (input as List).map((it) => GitHubFile.fromJSON(it)).toList();
+          tree = (input as List).map((it) => GitHubFile.fromJSON(it)).toList();
         }
-        return contents;
+        return RepositoryContents(file: file, tree: tree);
       },
     );
   }
@@ -662,7 +662,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/forks/#create-a-fork
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) async {
     ArgumentError.checkNotNull(slug);
-    if (fork == null) fork = CreateFork();
+    if (fork == null) fork = const CreateFork();
     return _github.postJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.fullName}/forks",
       body: fork.toJSON(),
@@ -1246,7 +1246,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(ref);
     return _github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
       "/repos/${slug.fullName}/commits/$ref/status",
-      convert: CombinedRepositoryStatus.fromJSON,
+      convert: (i) => CombinedRepositoryStatus.fromJSON(i),
       statusCode: StatusCodes.OK,
     );
   }

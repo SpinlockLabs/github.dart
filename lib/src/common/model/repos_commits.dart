@@ -5,6 +5,7 @@ part of github.common;
 /// Note: The [RepositoryCommit] wraps a [GitCommit], so author/committer
 /// information is in two places, but contain different details about them:
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
+@immutable
 class RepositoryCommit {
   /// API url.
   final String url;
@@ -38,7 +39,7 @@ class RepositoryCommit {
   /// The files changed in this commit.
   final List<CommitFile> files;
 
-  RepositoryCommit._({
+  const RepositoryCommit._({
     @required this.url,
     @required this.sha,
     @required this.htmlUrl,
@@ -82,6 +83,7 @@ class RepositoryCommit {
 }
 
 /// Model class for commit statistics.
+@immutable
 class CommitStats {
   /// Number of Additions.
   final int additions;
@@ -92,7 +94,7 @@ class CommitStats {
   /// Total changes.
   final int total;
 
-  CommitStats._({
+  const CommitStats._({
     @required this.additions,
     @required this.deletions,
     @required this.total,
@@ -110,6 +112,7 @@ class CommitStats {
 }
 
 /// Model class of a file that was changed in a commit.
+@immutable
 class CommitFile {
   @JsonKey(name: "filename")
   final String name;
@@ -129,7 +132,7 @@ class CommitFile {
 
   final Map<String, dynamic> json;
 
-  CommitFile._({
+  const CommitFile._({
     @required this.name,
     @required this.additions,
     @required this.deletions,
@@ -161,6 +164,7 @@ class CommitFile {
 /// Model class for a commit comment.
 ///
 /// See https://developer.github.com/v3/repos/comments
+@immutable
 class CommitComment {
   /// Id of the comment
   final int id;

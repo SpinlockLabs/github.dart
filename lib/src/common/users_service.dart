@@ -147,7 +147,11 @@ class UsersService extends Service {
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
   Stream<PublicKey> listPublicKeys([String userLogin]) {
     final path = userLogin == null ? "/user/keys" : "/users/$userLogin/keys";
-    return PaginationHelper(_github).objects("GET", path, PublicKey.fromJSON);
+    return PaginationHelper(_github).objects(
+      "GET",
+      path,
+      (i) => PublicKey.fromJSON(i),
+    );
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key

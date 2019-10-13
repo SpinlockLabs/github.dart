@@ -1,137 +1,176 @@
 part of github.common;
 
 /// Model class for a GitHub organization.
+@immutable
 class Organization {
   /// Organization Login
-  String login;
+  final String login;
 
   /// Organization ID
-  int id;
+  final int id;
 
   /// Url to Organization Profile
   @JsonKey(name: "html_url")
-  String htmlUrl;
+  final String htmlUrl;
 
   /// Url to the Organization Avatar
   @JsonKey(name: "avatar_url")
-  String avatarUrl;
+  final String avatarUrl;
 
   /// Organization Name
-  String name;
+  final String name;
 
   /// Organization Company
-  String company;
+  final String company;
 
   /// Organization Blog
-  String blog;
+  final String blog;
 
   /// Organization Location
-  String location;
+  final String location;
 
   /// Organization Email
-  String email;
+  final String email;
 
   /// Number of Public Repositories
   @JsonKey(name: "public_repos")
-  int publicReposCount;
+  final int publicReposCount;
 
   /// Number of Public Gists
   @JsonKey(name: "public_gists")
-  int publicGistsCount;
+  final int publicGistsCount;
 
   /// Number of Followers
   @JsonKey(name: "followers")
-  int followersCount;
+  final int followersCount;
 
   /// Number of People this Organization is Following
   @JsonKey(name: "following")
-  int followingCount;
+  final int followingCount;
 
   /// Time this organization was created
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
   /// Time this organization was updated
   @JsonKey(name: "updated_at")
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  static Organization fromJSON(Map<String, dynamic> input) {
+  const Organization._({
+    @required this.avatarUrl,
+    @required this.blog,
+    @required this.company,
+    @required this.createdAt,
+    @required this.email,
+    @required this.followersCount,
+    @required this.followingCount,
+    @required this.htmlUrl,
+    @required this.id,
+    @required this.location,
+    @required this.login,
+    @required this.name,
+    @required this.publicGistsCount,
+    @required this.publicReposCount,
+    @required this.updatedAt,
+  });
+
+  factory Organization.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return Organization()
-      ..login = input['login']
-      ..id = input['id']
-      ..htmlUrl = input['html_url']
-      ..avatarUrl = input['avatar_url']
-      ..name = input['name']
-      ..company = input['company']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..publicGistsCount = input['public_gists']
-      ..publicReposCount = input['public_repos']
-      ..followersCount = input['followers']
-      ..followingCount = input['following']
-      ..email = input['email']
-      ..blog = input['blog']
-      ..location = input['location'];
+    return Organization._(
+      login: input['login'],
+      id: input['id'],
+      htmlUrl: input['html_url'],
+      avatarUrl: input['avatar_url'],
+      name: input['name'],
+      company: input['company'],
+      createdAt: parseDateTime(input['created_at']),
+      updatedAt: parseDateTime(input['updated_at']),
+      publicGistsCount: input['public_gists'],
+      publicReposCount: input['public_repos'],
+      followersCount: input['followers'],
+      followingCount: input['following'],
+      email: input['email'],
+      blog: input['blog'],
+      location: input['location'],
+    );
   }
 }
 
 /// Model class for organization membership.
+@immutable
 class OrganizationMembership {
-  String state;
-  Organization organization;
+  final String state;
+  final Organization organization;
 
-  static OrganizationMembership fromJSON(Map<String, dynamic> input) {
+  const OrganizationMembership._({
+    @required this.state,
+    @required this.organization,
+  });
+
+  factory OrganizationMembership.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return OrganizationMembership()
-      ..organization =
-          Organization.fromJSON(input['organization'] as Map<String, dynamic>)
-      ..state = input['state'];
+    return OrganizationMembership._(
+      organization:
+          Organization.fromJSON(input['organization'] as Map<String, dynamic>),
+      state: input['state'],
+    );
   }
 }
 
 /// Model class for a GitHub team.
+@immutable
 class Team {
   /// Team Name
-  String name;
+  final String name;
 
   /// Team ID
-  int id;
+  final int id;
 
   /// Team Permission
-  String permission;
+  final String permission;
 
   /// Number of Members
   @JsonKey(name: "members_count")
-  int membersCount;
+  final int membersCount;
 
   /// Number of Repositories
   @JsonKey(name: "repos_count")
-  int reposCount;
+  final int reposCount;
 
   /// Organization
-  Organization organization;
+  final Organization organization;
 
-  static Team fromJSON(Map<String, dynamic> input) {
+  const Team._({
+    @required this.id,
+    @required this.membersCount,
+    @required this.name,
+    @required this.organization,
+    @required this.permission,
+    @required this.reposCount,
+  });
+
+  factory Team.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return Team()
-      ..name = input['name']
-      ..id = input['id']
-      ..membersCount = input['members_count']
-      ..reposCount = input['repos_count']
-      ..organization =
-          Organization.fromJSON(input['organization'] as Map<String, dynamic>);
+    return Team._(
+      name: input['name'],
+      id: input['id'],
+      membersCount: input['members_count'],
+      reposCount: input['repos_count'],
+      organization:
+          Organization.fromJSON(input['organization'] as Map<String, dynamic>),
+    );
   }
 }
 
 /// Model class for the team membership state.
+@immutable
 class TeamMembershipState {
   final String name;
 
-  TeamMembershipState(this.name);
+  const TeamMembershipState(this.name);
 
   bool get isPending => name == "pending";
   bool get isActive => name == "active";
@@ -139,43 +178,54 @@ class TeamMembershipState {
 }
 
 /// Model class for a team member.
+@immutable
 class TeamMember {
   /// Member Username
-  String login;
+  final String login;
 
   /// Member ID
-  int id;
+  final int id;
 
   /// Url to Member Avatar
   @JsonKey(name: "avatar_url")
-  String avatarUrl;
+  final String avatarUrl;
 
   /// Member Type
-  String type;
+  final String type;
 
   /// If the member is a site administrator
   @JsonKey(name: "site_admin")
-  bool siteAdmin;
+  final bool siteAdmin;
 
   /// Profile of the Member
   @JsonKey(name: "html_url")
-  String htmlUrl;
+  final String htmlUrl;
 
-  static TeamMember fromJSON(Map<String, dynamic> input) {
+  const TeamMember._({
+    @required this.avatarUrl,
+    @required this.htmlUrl,
+    @required this.id,
+    @required this.login,
+    @required this.siteAdmin,
+    @required this.type,
+  });
+
+  factory TeamMember.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    final member = TeamMember();
-    member.login = input['login'];
-    member.id = input['id'];
-    member.avatarUrl = input['avatar_url'];
-    member.type = input['type'];
-    member.siteAdmin = input['site_admin'];
-    member.htmlUrl = input['html_url'];
-    return member;
+    return TeamMember._(
+      login: input['login'],
+      id: input['id'],
+      avatarUrl: input['avatar_url'],
+      type: input['type'],
+      siteAdmin: input['site_admin'],
+      htmlUrl: input['html_url'],
+    );
   }
 }
 
 /// Model class for a team repository.
+@immutable
 @JsonSerializable(createToJson: false)
 class TeamRepository extends Repository {
   /// Repository Permissions.
@@ -188,6 +238,7 @@ class TeamRepository extends Repository {
 }
 
 /// Model class for team repository permissions.
+@immutable
 @JsonSerializable(createToJson: false)
 class TeamRepositoryPermissions {
   /// Administrative Access
@@ -199,7 +250,7 @@ class TeamRepositoryPermissions {
   /// Pull Access
   final bool pull;
 
-  TeamRepositoryPermissions(this.admin, this.push, this.pull);
+  const TeamRepositoryPermissions(this.admin, this.push, this.pull);
 
   factory TeamRepositoryPermissions.fromJson(Map<String, dynamic> json) =>
       _$TeamRepositoryPermissionsFromJson(json);

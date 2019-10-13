@@ -1,6 +1,7 @@
 part of github.common;
 
 /// Model class for the combined status of a repository.
+@immutable
 class CombinedRepositoryStatus {
   final String state;
   final String sha;
@@ -8,7 +9,7 @@ class CombinedRepositoryStatus {
   final List<RepositoryStatus> statuses;
   final Repository repository;
 
-  CombinedRepositoryStatus._({
+  const CombinedRepositoryStatus._({
     @required this.state,
     @required this.sha,
     @required this.totalCount,
@@ -16,7 +17,7 @@ class CombinedRepositoryStatus {
     @required this.repository,
   });
 
-  static CombinedRepositoryStatus fromJSON(Map<String, dynamic> input) {
+  factory CombinedRepositoryStatus.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return CombinedRepositoryStatus._(
@@ -33,6 +34,7 @@ class CombinedRepositoryStatus {
 }
 
 /// Model class for the status of a repository at a particular reference.
+@immutable
 class RepositoryStatus {
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -41,7 +43,7 @@ class RepositoryStatus {
   final String description;
   final String context;
 
-  RepositoryStatus._({
+  const RepositoryStatus._({
     @required this.createdAt,
     @required this.updatedAt,
     @required this.state,
@@ -66,6 +68,7 @@ class RepositoryStatus {
 
 /// Model class for a new repository status to be created.
 // TODO: this class is unused
+@immutable
 class CreateStatus {
   final String state;
 
@@ -75,7 +78,7 @@ class CreateStatus {
   final String description;
   final String context;
 
-  CreateStatus(this.state)
+  const CreateStatus(this.state)
       : this.targetUrl = null,
         this.description = null,
         this.context = null;

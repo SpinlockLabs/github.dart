@@ -1,5 +1,6 @@
 part of github.common;
 
+@immutable
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class GitHubComparison {
   final String url;
@@ -8,8 +9,13 @@ class GitHubComparison {
   final int behindBy;
   final int totalCommits;
 
-  GitHubComparison(
-      this.url, this.status, this.aheadBy, this.behindBy, this.totalCommits);
+  const GitHubComparison(
+    this.url,
+    this.status,
+    this.aheadBy,
+    this.behindBy,
+    this.totalCommits,
+  );
 
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);
@@ -31,6 +37,7 @@ class GitHubComparison {
 }
 
 /// Model class for a repository.
+@immutable
 @JsonSerializable(createToJson: false)
 class Repository {
   /// Repository Name
@@ -127,7 +134,10 @@ class Repository {
 
   LicenseKind license;
 
-  static Repository fromJSON(Map<String, dynamic> input) {
+  @deprecated
+  Repository();
+
+  factory Repository.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return _$RepositoryFromJson(input);
   }
@@ -140,6 +150,7 @@ class Repository {
 }
 
 /// Repository Clone Urls
+@immutable
 @JsonSerializable(createToJson: false)
 class CloneUrls {
   /// Git Protocol
@@ -162,12 +173,18 @@ class CloneUrls {
   /// https://github.com/user/repo
   final String svn;
 
-  CloneUrls(this.git, this.ssh, this.https, this.svn);
+  const CloneUrls(
+    this.git,
+    this.ssh,
+    this.https,
+    this.svn,
+  );
 
   factory CloneUrls.fromJson(Map<String, dynamic> json) =>
       _$CloneUrlsFromJson(json);
 }
 
+@immutable
 @JsonSerializable(createToJson: false)
 class Tag {
   final String name;
@@ -177,7 +194,12 @@ class Tag {
   @JsonKey(name: 'tarball_url')
   final String tarUrl;
 
-  Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
+  const Tag(
+    this.name,
+    this.commit,
+    this.zipUrl,
+    this.tarUrl,
+  );
 
   factory Tag.fromJson(Map<String, dynamic> input) =>
       input == null ? null : _$TagFromJson(input);
@@ -186,6 +208,7 @@ class Tag {
   String toString() => 'Tag: $name';
 }
 
+@immutable
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class CommitData {
   final String sha;
@@ -197,37 +220,48 @@ class CommitData {
   final CommitDataUser author, committer;
   final List<Map<String, dynamic>> parents;
 
-  CommitData(this.sha, this.commit, this.url, this.htmlUrl, this.commentsUrl,
-      this.author, this.committer, this.parents);
+  const CommitData(
+    this.sha,
+    this.commit,
+    this.url,
+    this.htmlUrl,
+    this.commentsUrl,
+    this.author,
+    this.committer,
+    this.parents,
+  );
 
   factory CommitData.fromJson(Map<String, dynamic> json) =>
       _$CommitDataFromJson(json);
 }
 
+@immutable
 @JsonSerializable(createToJson: false)
 class CommitDataUser {
   final String login, type;
 
   final int id;
 
-  CommitDataUser(this.login, this.id, this.type);
+  const CommitDataUser(this.login, this.id, this.type);
 
   factory CommitDataUser.fromJson(Map<String, dynamic> json) =>
       _$CommitDataUserFromJson(json);
 }
 
+@immutable
 @JsonSerializable(createToJson: false)
 class CommitInfo {
   final String sha;
   final GitTree tree;
 
-  CommitInfo(this.sha, this.tree);
+  const CommitInfo(this.sha, this.tree);
 
   factory CommitInfo.fromJson(Map<String, dynamic> json) =>
       _$CommitInfoFromJson(json);
 }
 
 /// User Information
+@immutable
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class UserInformation {
   /// Owner Username
@@ -242,13 +276,14 @@ class UserInformation {
   /// Url to the user's GitHub Profile
   final String htmlUrl;
 
-  UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);
+  const UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);
 
   factory UserInformation.fromJson(Map<String, dynamic> json) =>
       _$UserInformationFromJson(json);
 }
 
 /// A Repository Slug
+@immutable
 class RepositorySlug {
   /// Repository Owner
   final String owner;
@@ -283,6 +318,7 @@ class RepositorySlug {
 }
 
 /// Model class for a new repository to be created.
+@immutable
 class CreateRepository {
   /// Repository Name
   final String name;
@@ -345,6 +381,7 @@ class CreateRepository {
 }
 
 /// Model class for a branch.
+@immutable
 @JsonSerializable(createToJson: false)
 class Branch {
   /// The name of the branch.
@@ -353,22 +390,20 @@ class Branch {
   /// Commit Information
   final CommitData commit;
 
-  Branch(this.name, this.commit);
+  const Branch(this.name, this.commit);
 
-  factory Branch.fromJson(Map<String, dynamic> json) => _$BranchFromJson(json);
-
-  static Branch fromJSON(Map<String, dynamic> input) {
+  factory Branch.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-
-    return Branch.fromJson(input);
+    return _$BranchFromJson(input);
   }
 }
 
 /// A Breakdown of the Languages a repository uses.
+@immutable
 class LanguageBreakdown {
   final Map<String, int> _data;
 
-  LanguageBreakdown(Map<String, int> data) : _data = data;
+  const LanguageBreakdown(Map<String, int> data) : _data = data;
 
   /// The Primary Language
   String get primary {
@@ -406,6 +441,7 @@ class LanguageBreakdown {
   }
 }
 
+@immutable
 @JsonSerializable(fieldRename: FieldRename.snake)
 class LicenseDetails {
   final String name;
@@ -427,20 +463,21 @@ class LicenseDetails {
 
   final LicenseKind license;
 
-  LicenseDetails(
-      {this.name,
-      this.path,
-      this.sha,
-      this.size,
-      this.url,
-      this.htmlUrl,
-      this.gitUrl,
-      this.downloadUrl,
-      this.type,
-      this.content,
-      this.encoding,
-      this.links,
-      this.license});
+  const LicenseDetails({
+    this.name,
+    this.path,
+    this.sha,
+    this.size,
+    this.url,
+    this.htmlUrl,
+    this.gitUrl,
+    this.downloadUrl,
+    this.type,
+    this.content,
+    this.encoding,
+    this.links,
+    this.license,
+  });
 
   factory LicenseDetails.fromJson(Map<String, dynamic> json) =>
       _$LicenseDetailsFromJson(json);
@@ -448,6 +485,7 @@ class LicenseDetails {
   Map<String, dynamic> toJson() => _$LicenseDetailsToJson(this);
 }
 
+@immutable
 @JsonSerializable(fieldRename: FieldRename.snake)
 class LicenseKind {
   final String key;
@@ -456,7 +494,13 @@ class LicenseKind {
   final Uri url;
   final String nodeId;
 
-  LicenseKind({this.key, this.name, this.spdxId, this.url, this.nodeId});
+  const LicenseKind({
+    this.key,
+    this.name,
+    this.spdxId,
+    this.url,
+    this.nodeId,
+  });
 
   factory LicenseKind.fromJson(Map<String, dynamic> json) =>
       _$LicenseKindFromJson(json);

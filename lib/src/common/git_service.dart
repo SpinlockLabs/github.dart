@@ -10,16 +10,18 @@ class GitService extends Service {
   /// Fetches a blob from [slug] for a given [sha].
   ///
   /// API docs: https://developer.github.com/v3/git/blobs/#get-a-blob
-  Future<GitBlob> getBlob(RepositorySlug slug, String sha) =>
-      _github.getJSON('/repos/${slug.fullName}/git/blobs/$sha',
-          convert: GitBlob.fromJSON, statusCode: StatusCodes.OK);
+  Future<GitBlob> getBlob(RepositorySlug slug, String sha) => _github.getJSON(
+        '/repos/${slug.fullName}/git/blobs/$sha',
+        convert: (i) => GitBlob.fromJSON(i),
+        statusCode: StatusCodes.OK,
+      );
 
   /// Creates a blob with specified [blob] content.
   ///
   /// API docs: https://developer.github.com/v3/git/blobs/#create-a-blob
   Future<GitBlob> createBlob(RepositorySlug slug, CreateGitBlob blob) {
     return _github.postJSON('/repos/${slug.fullName}/git/blobs',
-        convert: GitBlob.fromJSON,
+        convert: (i) => GitBlob.fromJSON(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(blob));
   }

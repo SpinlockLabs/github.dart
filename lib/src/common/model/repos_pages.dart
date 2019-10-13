@@ -1,6 +1,7 @@
 part of github.common;
 
 /// GitHub Pages Information
+@immutable
 class RepositoryPages {
   /// Pages CNAME
   final String cname;
@@ -12,13 +13,13 @@ class RepositoryPages {
   @JsonKey(name: "custom_404")
   final bool hasCustom404;
 
-  RepositoryPages._({
+  const RepositoryPages._({
     @required this.cname,
     @required this.status,
     @required this.hasCustom404,
   });
 
-  static RepositoryPages fromJSON(Map<String, dynamic> input) {
+  factory RepositoryPages.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return RepositoryPages._(
@@ -29,6 +30,7 @@ class RepositoryPages {
   }
 }
 
+@immutable
 class PageBuild {
   final String url;
   final String status;
@@ -39,7 +41,7 @@ class PageBuild {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  PageBuild._({
+  const PageBuild._({
     @required this.url,
     @required this.status,
     @required this.error,
@@ -60,12 +62,13 @@ class PageBuild {
           PageBuildPusher._fromJSON(input["pusher"] as Map<String, dynamic>),
       commit: input["commit"],
       duration: input["duration"],
-      createdAt: DateTime.tryParse(input["created_at"]),
-      updatedAt: DateTime.tryParse(input["updated_at"]),
+      createdAt: parseDateTime(input["created_at"]),
+      updatedAt: parseDateTime(input["updated_at"]),
     );
   }
 }
 
+@immutable
 class PageBuildPusher {
   final String login;
   final int id;
@@ -74,7 +77,7 @@ class PageBuildPusher {
   final String type;
   final bool siteAdmin;
 
-  PageBuildPusher._({
+  const PageBuildPusher._({
     @required this.login,
     @required this.id,
     @required this.apiUrl,
@@ -96,9 +99,10 @@ class PageBuildPusher {
   }
 }
 
+@immutable
 class PageBuildError {
   final String message;
-  PageBuildError._({@required this.message});
+  const PageBuildError._({@required this.message});
 
   factory PageBuildError._fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;

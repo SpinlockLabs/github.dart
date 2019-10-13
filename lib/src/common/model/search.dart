@@ -41,8 +41,10 @@ class CodeSearchItem {
   @JsonKey(name: 'html_url', fromJson: Uri.parse)
   Uri htmlUrl;
 
-  @JsonKey(fromJson: Repository.fromJSON)
+  @JsonKey(fromJson: _repoFromJson)
   Repository repository;
+
+  static dynamic _repoFromJson(dynamic input) => Repository.fromJSON(input);
 
   static CodeSearchItem fromJson(Map<String, dynamic> input) {
     return _$CodeSearchItemFromJson(input);

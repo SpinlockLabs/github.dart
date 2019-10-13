@@ -1,23 +1,31 @@
 part of github.common;
 
 /// Model class for a Gitignore Template.
+@immutable
 class GitignoreTemplate {
   /// Template Name
-  String name;
+  final String name;
 
   /// Template Source
-  String source;
+  final String source;
 
-  static GitignoreTemplate fromJSON(Map<String, dynamic> input) {
+  const GitignoreTemplate._({
+    @required this.name,
+    @required this.source,
+  });
+
+  factory GitignoreTemplate.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GitignoreTemplate()
-      ..name = input['name']
-      ..source = input['source'];
+    return GitignoreTemplate._(
+      name: input['name'],
+      source: input['source'],
+    );
   }
 }
 
 /// Model class for GitHub Rate Limit Information.
+@immutable
 class RateLimit {
   /// Maximum number of requests
   final int limit;
@@ -28,9 +36,9 @@ class RateLimit {
   /// Time when the limit expires
   final DateTime resets;
 
-  RateLimit(this.limit, this.remaining, this.resets);
+  const RateLimit(this.limit, this.remaining, this.resets);
 
-  static RateLimit fromHeaders(Map<String, String> headers) {
+  factory RateLimit.fromHeaders(Map<String, String> headers) {
     final limit = int.parse(headers['x-ratelimit-limit']);
     final remaining = int.parse(headers['x-ratelimit-remaining']);
     final resets = DateTime.fromMillisecondsSinceEpoch(
@@ -40,25 +48,34 @@ class RateLimit {
 }
 
 /// Model class for the GitHub api status.
+@immutable
 class APIStatus {
-  String status;
+  final String status;
 
   @JsonKey(name: "last_updated")
-  DateTime lastUpdatedAt;
+  final DateTime lastUpdatedAt;
 
   @JsonKey(name: "created_on")
-  DateTime createdOn;
+  final DateTime createdOn;
 
   @JsonKey(name: "body")
-  String message;
+  final String message;
 
-  static APIStatus fromJSON(Map<String, dynamic> input) {
+  const APIStatus._({
+    @required this.createdOn,
+    @required this.lastUpdatedAt,
+    @required this.message,
+    @required this.status,
+  });
+
+  factory APIStatus.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return APIStatus()
-      ..status = input['status']
-      ..message = input['body']
-      ..lastUpdatedAt = parseDateTime(input['last_updated'])
-      ..createdOn = parseDateTime(input['created_on']);
+    return APIStatus._(
+      status: input['status'],
+      message: input['body'],
+      lastUpdatedAt: parseDateTime(input['last_updated']),
+      createdOn: parseDateTime(input['created_on']),
+    );
   }
 }

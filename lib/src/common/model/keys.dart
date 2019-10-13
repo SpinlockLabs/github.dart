@@ -4,27 +4,36 @@ part of github.common;
 ///
 /// Note: [PublicKey] is used both by the repositories' deploy keys and by the
 /// users' public keys.
+@immutable
 class PublicKey {
-  int id;
-  String key;
-  String title;
+  final int id;
+  final String key;
+  final String title;
 
-  static PublicKey fromJSON(Map<String, dynamic> input) {
+  const PublicKey._({
+    @required this.id,
+    @required this.key,
+    @required this.title,
+  });
+
+  factory PublicKey.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return PublicKey()
-      ..id = input['id']
-      ..key = input['key']
-      ..title = input['title'];
+    return PublicKey._(
+      id: input['id'],
+      key: input['key'],
+      title: input['title'],
+    );
   }
 }
 
 /// Model class for a new public key to be created.
+@immutable
 class CreatePublicKey {
   final String title;
   final String key;
 
-  CreatePublicKey(this.title, this.key);
+  const CreatePublicKey(this.title, this.key);
 
   String toJSON() {
     final map = <String, dynamic>{};

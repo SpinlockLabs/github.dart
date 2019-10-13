@@ -1,173 +1,229 @@
 part of github.common;
 
 /// Model class for gists.
+@immutable
 class Gist {
-  String id;
-  String description;
-  bool public;
-  User owner;
-  User user;
-  List<GistFile> files;
+  final String id;
+  final String description;
+  final bool public;
+  final User owner;
+  final User user;
+  final List<GistFile> files;
 
   @JsonKey(name: "html_url")
-  String htmlUrl;
+  final String htmlUrl;
 
   @JsonKey(name: "comments")
-  int commentsCount;
+  final int commentsCount;
 
   @JsonKey(name: "git_pull_url")
-  String gitPullUrl;
+  final String gitPullUrl;
 
   @JsonKey(name: "git_push_url")
-  String gitPushUrl;
+  final String gitPushUrl;
 
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: "updated_at")
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  static Gist fromJSON(Map<String, dynamic> input) {
+  const Gist._({
+    @required this.commentsCount,
+    @required this.createdAt,
+    @required this.description,
+    @required this.files,
+    @required this.gitPullUrl,
+    @required this.gitPushUrl,
+    @required this.htmlUrl,
+    @required this.id,
+    @required this.owner,
+    @required this.public,
+    @required this.updatedAt,
+    @required this.user,
+  });
+
+  factory Gist.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    final gist = Gist()
-      ..id = input['id']
-      ..description = input['description']
-      ..public = input['public']
-      ..owner = User.fromJson(input['owner'] as Map<String, dynamic>)
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
-
-    if (input['files'] != null) {
-      gist.files = [];
-
+    final List<GistFile> files = input['files'] != null ? [] : null;
+    if (files != null) {
       for (final key in input['files'].keys) {
         final map = copyOf(input['files'][key]) as Map<String, dynamic>;
         map['name'] = key;
-        gist.files.add(GistFile.fromJson(map));
+        files.add(GistFile.fromJson(map));
       }
     }
 
-    gist
-      ..htmlUrl = input['html_url']
-      ..commentsCount = input['comments']
-      ..gitPullUrl = input['git_pull_url']
-      ..gitPushUrl = input['git_push_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
-
-    return gist;
+    return Gist._(
+      id: input['id'],
+      description: input['description'],
+      public: input['public'],
+      owner: User.fromJson(input['owner'] as Map<String, dynamic>),
+      user: User.fromJson(input['user'] as Map<String, dynamic>),
+      htmlUrl: input['html_url'],
+      commentsCount: input['comments'],
+      gitPullUrl: input['git_pull_url'],
+      gitPushUrl: input['git_push_url'],
+      createdAt: parseDateTime(input['created_at']),
+      updatedAt: parseDateTime(input['updated_at']),
+      files: files,
+    );
   }
 }
 
 /// Model class for a gist file.
+@immutable
 class GistFile {
-  String name;
-  int size;
+  final String name;
+  final int size;
 
   @JsonKey(name: "raw_url")
-  String rawUrl;
-  String type;
-  String language;
-  bool truncated;
-  String content;
+  final String rawUrl;
+  final String type;
+  final String language;
+  final bool truncated;
+  final String content;
 
-  static GistFile fromJson(Map<String, dynamic> input) {
+  const GistFile._({
+    @required this.content,
+    @required this.language,
+    @required this.name,
+    @required this.rawUrl,
+    @required this.size,
+    @required this.truncated,
+    @required this.type,
+  });
+
+  factory GistFile.fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GistFile()
-      ..name = input['name']
-      ..size = input['size']
-      ..rawUrl = input['raw_url']
-      ..type = input['type']
-      ..language = input['language']
-      ..truncated = input['truncated']
-      ..content = input['content'];
+    return GistFile._(
+      name: input['name'],
+      size: input['size'],
+      rawUrl: input['raw_url'],
+      type: input['type'],
+      language: input['language'],
+      truncated: input['truncated'],
+      content: input['content'],
+    );
   }
 }
 
 /// Model class for a gist fork.
+@immutable
 class GistFork {
-  User user;
-  int id;
+  final User user;
+  final int id;
 
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: "updated_at")
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  static GistFork fromJson(Map<String, dynamic> input) {
+  const GistFork._({
+    @required this.createdAt,
+    @required this.id,
+    @required this.updatedAt,
+    @required this.user,
+  });
+
+  factory GistFork.fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GistFork()
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..id = input['id']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
+    return GistFork._(
+      user: User.fromJson(input['user'] as Map<String, dynamic>),
+      id: input['id'],
+      createdAt: parseDateTime(input['created_at']),
+      updatedAt: parseDateTime(input['updated_at']),
+    );
   }
 }
 
 /// Model class for a gits history entry.
+@immutable
 class GistHistoryEntry {
-  String version;
+  final String version;
 
-  User user;
+  final User user;
 
   @JsonKey(name: "change_status/deletions")
-  int deletions;
+  final int deletions;
 
   @JsonKey(name: "change_status/additions")
-  int additions;
+  final int additions;
 
   @JsonKey(name: "change_status/total")
-  int totalChanges;
+  final int totalChanges;
 
   @JsonKey(name: "committed_at")
-  DateTime committedAt;
+  final DateTime committedAt;
 
-  static GistHistoryEntry fromJSON(Map<String, dynamic> input) {
+  const GistHistoryEntry._({
+    @required this.additions,
+    @required this.committedAt,
+    @required this.deletions,
+    @required this.totalChanges,
+    @required this.user,
+    @required this.version,
+  });
+
+  factory GistHistoryEntry.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GistHistoryEntry()
-      ..version = input['version']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..deletions = input['change_status']['deletions']
-      ..additions = input['change_status']['additions']
-      ..totalChanges = input['change_status']['total']
-      ..committedAt = parseDateTime(input['committed_at']);
+    return GistHistoryEntry._(
+      version: input['version'],
+      user: User.fromJson(input['user'] as Map<String, dynamic>),
+      deletions: input['change_status']['deletions'],
+      additions: input['change_status']['additions'],
+      totalChanges: input['change_status']['total'],
+      committedAt: parseDateTime(input['committed_at']),
+    );
   }
 }
 
 /// Model class for gist comments.
+@immutable
 class GistComment {
-  int id;
-  User user;
+  final int id;
+  final User user;
 
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: "updated_at")
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  String body;
+  final String body;
 
-  static GistComment fromJSON(Map<String, dynamic> input) {
+  const GistComment._({
+    @required this.body,
+    @required this.createdAt,
+    @required this.id,
+    @required this.updatedAt,
+    @required this.user,
+  });
+
+  factory GistComment.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GistComment()
-      ..id = input['id']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..body = input['body'];
+    return GistComment._(
+      id: input['id'],
+      user: User.fromJson(input['user'] as Map<String, dynamic>),
+      createdAt: parseDateTime(input['created_at']),
+      updatedAt: parseDateTime(input['updated_at']),
+      body: input['body'],
+    );
   }
 }
 
 /// Model class for a new gist comment to be created.
+@immutable
 class CreateGistComment {
   final String body;
 
-  CreateGistComment(this.body);
+  const CreateGistComment(this.body);
 
   String toJSON() {
     final map = <String, dynamic>{'body': body};

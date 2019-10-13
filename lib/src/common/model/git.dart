@@ -1,28 +1,39 @@
 part of github.common;
 
 /// Model class for a blob.
+@immutable
 class GitBlob {
-  String content;
-  String encoding;
-  String url;
-  String sha;
-  int size;
+  final String content;
+  final String encoding;
+  final String url;
+  final String sha;
+  final int size;
 
-  static GitBlob fromJSON(Map<String, dynamic> input) {
+  const GitBlob._({
+    @required this.content,
+    @required this.encoding,
+    @required this.sha,
+    @required this.size,
+    @required this.url,
+  });
+
+  factory GitBlob.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return GitBlob()
-      ..content = (input['content'] as String)?.trim() // includes newline?
-      ..encoding = input['encoding']
-      ..url = input['url']
-      ..sha = input['sha']
-      ..size = input['size'];
+    return GitBlob._(
+      content: (input['content'] as String)?.trim(), // includes newline?
+      encoding: input['encoding'],
+      url: input['url'],
+      sha: input['sha'],
+      size: input['size'],
+    );
   }
 }
 
 /// Model class for a new blob to be created.
 ///
 /// The [encoding] can be either 'utf-8' or 'base64'.
+@immutable
 @JsonSerializable(createFactory: false)
 class CreateGitBlob {
   final String content;
@@ -37,6 +48,7 @@ class CreateGitBlob {
 ///
 /// Note: This is the raw [GitCommit]. The [RepositoryCommit] is a repository
 /// commit containing GitHub-specific information.
+@immutable
 @JsonSerializable(createToJson: false)
 class GitCommit {
   String sha;
@@ -63,6 +75,7 @@ class GitCommit {
 }
 
 /// Model class for a new commit to be created.
+@immutable
 @JsonSerializable(includeIfNull: false, createFactory: false)
 class CreateGitCommit {
   /// The commit message.
@@ -88,6 +101,7 @@ class CreateGitCommit {
 
 /// Model class for an author or committer of a commit. The [GitCommitUser] may
 /// not correspond to a GitHub [User].
+@immutable
 @JsonSerializable(includeIfNull: false)
 class GitCommitUser {
   final String name;
@@ -105,6 +119,7 @@ class GitCommitUser {
 }
 
 /// Model class for a GitHub tree.
+@immutable
 @JsonSerializable(createToJson: false)
 class GitTree {
   final String sha;
@@ -117,7 +132,7 @@ class GitTree {
   @JsonKey(name: "tree")
   final List<GitTreeEntry> entries;
 
-  GitTree(this.sha, this.url, this.truncated, this.entries);
+  const GitTree(this.sha, this.url, this.truncated, this.entries);
 
   factory GitTree.fromJson(Map<String, dynamic> json) =>
       json == null ? null : _$GitTreeFromJson(json);
@@ -126,6 +141,7 @@ class GitTree {
 /// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
+@immutable
 @JsonSerializable(createToJson: false)
 class GitTreeEntry {
   final String path;
@@ -135,26 +151,31 @@ class GitTreeEntry {
   final String sha;
   final String url;
 
-  GitTreeEntry(this.path, this.mode, this.type, this.size, this.sha, this.url);
+  const GitTreeEntry(
+      this.path, this.mode, this.type, this.size, this.sha, this.url);
 
   factory GitTreeEntry.fromJson(Map<String, dynamic> json) =>
       _$GitTreeEntryFromJson(json);
 }
 
 /// Model class for a new tree to be created.
+@immutable
 class CreateGitTree {
   /// The SHA1 of the tree you want to update with new data.
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
   @JsonKey(name: "base_tree")
-  String baseTree;
+  final String baseTree;
 
   /// The Objects specifying a tree structure.
   @JsonKey(name: "tree")
   final List<CreateGitTreeEntry> entries;
 
-  CreateGitTree(this.entries);
+  const CreateGitTree({
+    @required this.entries,
+    this.baseTree,
+  });
 
   String toJSON() {
     final map = <String, dynamic>{};
@@ -171,6 +192,7 @@ class CreateGitTree {
 }
 
 /// Model class for a new tree entry to be created.
+@immutable
 class CreateGitTreeEntry {
   final String path;
   final String mode;
@@ -202,6 +224,7 @@ class CreateGitTreeEntry {
 }
 
 /// Model class for a reference.
+@immutable
 @JsonSerializable(createToJson: false)
 class GitReference {
   String ref;
@@ -215,6 +238,7 @@ class GitReference {
 }
 
 /// Model class for a tag.
+@immutable
 @JsonSerializable(createToJson: false)
 class GitTag {
   String tag;
@@ -231,14 +255,15 @@ class GitTag {
 }
 
 /// Model class for a new tag to be created.
+@immutable
 class CreateGitTag {
   final String tag;
   final String message;
-  String object;
-  String type;
+  final String object;
+  final String type;
   final GitCommitUser tagger;
 
-  CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
+  const CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
   String toJSON() {
     final map = <String, dynamic>{};
@@ -254,13 +279,14 @@ class CreateGitTag {
 }
 
 /// Model class for an object referenced by [GitReference] and [GitTag].
+@immutable
 @JsonSerializable(createToJson: false)
 class GitObject {
   final String type;
   final String sha;
   final String url;
 
-  GitObject(this.type, this.sha, this.url);
+  const GitObject(this.type, this.sha, this.url);
 
   factory GitObject.fromJson(Map<String, dynamic> json) =>
       _$GitObjectFromJson(json);

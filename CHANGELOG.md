@@ -1,3 +1,8 @@
+## v6.0.0
+
+- All 'models' classes are now immutable. 
+- Some static methods to create instances have been replaced by factory constructors.
+
 ## v5.4.0
 
 - All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented. `isCollaborator`, `listSingleCommitComments`, `listCommitComments`, `createCommitComment`, `getComment`, `updateComment`, `deleteComment`

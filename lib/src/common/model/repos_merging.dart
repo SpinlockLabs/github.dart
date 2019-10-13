@@ -1,14 +1,19 @@
 part of github.common;
 
 /// Model class for a new merge to be created.
+@immutable
 class CreateMerge {
   final String base;
   final String head;
 
   @JsonKey(name: "commit_message")
-  String commitMessage;
+  final String commitMessage;
 
-  CreateMerge(this.base, this.head);
+  const CreateMerge({
+    @required this.base,
+    @required this.head,
+    @required this.commitMessage,
+  });
 
   String toJSON() {
     final map = <String, dynamic>{};

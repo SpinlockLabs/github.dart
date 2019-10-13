@@ -1,6 +1,7 @@
 part of github.common;
 
 /// Model class for a file on GitHub.
+@immutable
 class GitHubFile {
   /// Type of File
   final String type;
@@ -36,14 +37,7 @@ class GitHubFile {
   final Links links;
 
   /// Text Content
-  String get text {
-    if (_text == null) {
-      _text = utf8.decode(base64Decode(content));
-    }
-    return _text;
-  }
-
-  String _text;
+  final String text;
 
   /// Source Repository
   final RepositorySlug sourceRepository;
@@ -60,7 +54,8 @@ class GitHubFile {
     @required this.htmlUrl,
     @required this.links,
     @required this.sourceRepository,
-  });
+    @required text,
+  }) : this.text = text == null ? utf8.decode(base64Decode(content)) : text;
 
   factory GitHubFile.fromJSON(Map<String, dynamic> input,
       [RepositorySlug slug]) {
@@ -84,13 +79,14 @@ class GitHubFile {
   }
 }
 
+@immutable
 @JsonSerializable()
 class Links {
   final Uri self;
   final Uri git;
   final Uri html;
 
-  Links({this.git, this.self, this.html});
+  const Links({this.git, this.self, this.html});
 
   factory Links.fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
@@ -102,24 +98,34 @@ class Links {
 }
 
 /// Model class for a file or directory.
+@immutable
 class RepositoryContents {
-  GitHubFile file;
-  List<GitHubFile> tree;
+  final GitHubFile file;
+  final List<GitHubFile> tree;
+
+  const RepositoryContents({@required this.file, @required this.tree});
 
   bool get isFile => file != null;
   bool get isDirectory => tree != null;
 }
 
 /// Model class for a new file to be created.
+@immutable
 class CreateFile {
   final String path;
   final String message;
   final String content;
 
-  String branch;
-  CommitUser committer;
+  final String branch;
+  final CommitUser committer;
 
-  CreateFile(this.path, this.content, this.message);
+  const CreateFile({
+    @required this.path,
+    @required this.content,
+    @required this.message,
+    this.branch,
+    this.committer,
+  });
 
   String toJSON() {
     final map = <String, dynamic>{};
@@ -133,11 +139,12 @@ class CreateFile {
 }
 
 /// Model class for a committer of a commit.
+@immutable
 class CommitUser {
   final String name;
   final String email;
 
-  CommitUser(this.name, this.email);
+  const CommitUser(this.name, this.email);
 
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{};
@@ -150,17 +157,19 @@ class CommitUser {
 }
 
 /// Model class for the response of a content creation.
+@immutable
 class ContentCreation {
   final RepositoryCommit commit;
   final GitHubFile content;
 
-  ContentCreation(this.commit, this.content);
+  const ContentCreation(this.commit, this.content);
 
-  static ContentCreation fromJSON(Map<String, dynamic> input) {
+  factory ContentCreation.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
     return ContentCreation(
-        RepositoryCommit.fromJSON(input['commit'] as Map<String, dynamic>),
-        GitHubFile.fromJSON(input['content'] as Map<String, dynamic>));
+      RepositoryCommit.fromJSON(input['commit'] as Map<String, dynamic>),
+      GitHubFile.fromJSON(input['content'] as Map<String, dynamic>),
+    );
   }
 }

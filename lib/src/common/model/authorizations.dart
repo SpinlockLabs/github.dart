@@ -1,67 +1,101 @@
 part of github.common;
 
 /// Model class for an authorization.
+@immutable
 class Authorization {
-  int id;
+  final int id;
 
-  List<String> scopes;
-  String token;
-  AuthorizationApplication app;
-  String note;
-  String noteUrl;
-  DateTime createdAt;
-  DateTime updatedAt;
-  User user;
+  final List<String> scopes;
+  final String token;
+  final AuthorizationApplication app;
+  final String note;
+  final String noteUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final User user;
 
-  Map<String, dynamic> json;
+  final Map<String, dynamic> json;
 
-  static Authorization fromJSON(Map<String, dynamic> input) {
+  const Authorization._({
+    @required this.app,
+    @required this.createdAt,
+    @required this.id,
+    @required this.json,
+    @required this.note,
+    @required this.noteUrl,
+    @required this.scopes,
+    @required this.token,
+    @required this.updatedAt,
+    @required this.user,
+  });
+
+  factory Authorization.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return Authorization()
-      ..id = input['id']
-      ..scopes = input['scopes'] as List<String>
-      ..token = input['token']
-      ..app = AuthorizationApplication.fromJSON(
-          input['app'] as Map<String, dynamic>)
-      ..note = input['note']
-      ..noteUrl = input['note_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..json = input
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
+    return Authorization._(
+      id: input['id'],
+      scopes: input['scopes'] as List<String>,
+      token: input['token'],
+      app: AuthorizationApplication.fromJSON(
+          input['app'] as Map<String, dynamic>),
+      note: input['note'],
+      noteUrl: input['note_url'],
+      createdAt: parseDateTime(input['created_at']),
+      updatedAt: parseDateTime(input['updated_at']),
+      json: input,
+      user: User.fromJson(input['user'] as Map<String, dynamic>),
+    );
   }
 }
 
 /// Model class for an application of an [Authorization].
+@immutable
 class AuthorizationApplication {
-  String url;
-  String name;
+  final String url;
+  final String name;
 
   @JsonKey(name: "client_id")
-  String clientID;
+  final String clientID;
 
-  AuthorizationApplication();
+  @deprecated
+  const AuthorizationApplication()
+      : url = null,
+        name = null,
+        clientID = null;
 
-  static AuthorizationApplication fromJSON(Map<String, dynamic> input) {
+  const AuthorizationApplication._({
+    @required this.url,
+    @required this.name,
+    @required this.clientID,
+  });
+
+  factory AuthorizationApplication.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return AuthorizationApplication()
-      ..url = input['url']
-      ..name = input['name']
-      ..clientID = input['client_id'];
+    return AuthorizationApplication._(
+      url: input['url'],
+      name: input['name'],
+      clientID: input['client_id'],
+    );
   }
 }
 
+@immutable
 class CreateAuthorization {
   final String note;
 
-  List<String> scopes;
-  String noteUrl;
-  String clientID;
-  String clientSecret;
+  final List<String> scopes;
+  final String noteUrl;
+  final String clientID;
+  final String clientSecret;
 
-  CreateAuthorization(this.note);
+  const CreateAuthorization({
+    @required this.note,
+    @required this.noteUrl,
+    @required this.clientID,
+    @required this.clientSecret,
+    @required this.scopes,
+  });
 
   String toJSON() {
     final map = <String, dynamic>{};

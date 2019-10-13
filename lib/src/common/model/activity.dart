@@ -1,63 +1,84 @@
 part of github.common;
 
 /// Model class for an event.
+@immutable
 class Event {
-  Repository repo;
+  final Repository repo;
 
-  User actor;
+  final User actor;
 
-  Organization org;
+  final Organization org;
 
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
-  String id;
+  final String id;
 
-  String type;
+  final String type;
 
-  Map<String, dynamic> json;
+  final Map<String, dynamic> json;
 
-  Map<String, dynamic> payload;
+  final Map<String, dynamic> payload;
 
-  static Event fromJSON(Map<String, dynamic> input) {
+  const Event._({
+    @required this.actor,
+    @required this.createdAt,
+    @required this.id,
+    @required this.json,
+    @required this.org,
+    @required this.payload,
+    @required this.repo,
+    @required this.type,
+  });
+
+  factory Event.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    final event = Event();
-
-    event.json = input;
-
-    event.type = input['type'];
-
-    event
-      ..repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>)
-      ..org = Organization.fromJSON(input['org'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..id = input['id']
-      ..actor = User.fromJson(input['actor'] as Map<String, dynamic>)
-      ..payload = input['payload'] as Map<String, dynamic>;
-
-    return event;
+    return Event._(
+      json: input,
+      type: input['type'],
+      repo: Repository.fromJSON(input['repo'] as Map<String, dynamic>),
+      org: Organization.fromJSON(input['org'] as Map<String, dynamic>),
+      createdAt: parseDateTime(input['created_at']),
+      id: input['id'],
+      actor: User.fromJson(input['actor'] as Map<String, dynamic>),
+      payload: input['payload'] as Map<String, dynamic>,
+    );
   }
 }
 
 /// Model class for a repository subscription.
+@immutable
 class RepositorySubscription {
-  bool subscribed;
-  bool ignored;
-  String reason;
+  final bool subscribed;
+  final bool ignored;
+  final String reason;
 
   @JsonKey(name: "created_at")
-  DateTime createdAt;
+  final DateTime createdAt;
 
-  RepositorySubscription();
+  @deprecated
+  const RepositorySubscription()
+      : subscribed = null,
+        createdAt = null,
+        ignored = null,
+        reason = null;
 
-  static RepositorySubscription fromJSON(Map<String, dynamic> input) {
+  const RepositorySubscription._({
+    @required this.createdAt,
+    @required this.ignored,
+    @required this.reason,
+    @required this.subscribed,
+  });
+
+  factory RepositorySubscription.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
 
-    return RepositorySubscription()
-      ..subscribed = input['subscribed']
-      ..ignored = input['ignored']
-      ..reason = input['reason']
-      ..createdAt = parseDateTime(input['created_at']);
+    return RepositorySubscription._(
+      subscribed: input['subscribed'],
+      ignored: input['ignored'],
+      reason: input['reason'],
+      createdAt: parseDateTime(input['created_at']),
+    );
   }
 }

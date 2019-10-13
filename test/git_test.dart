@@ -27,8 +27,11 @@ void main() {
     test('constructs correct path', () {
       git.getBlob(repo, 'sh');
 
-      verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: GitBlob.fromJSON, statusCode: StatusCodes.OK));
+      verify(github.getJSON(
+        '/repos/o/n/git/blobs/sh',
+        convert: (i) => GitBlob.fromJSON(i),
+        statusCode: StatusCodes.OK,
+      ));
     });
   });
 
@@ -39,7 +42,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/blobs',
-        convert: GitBlob.fromJSON,
+        convert: (i) => GitBlob.fromJSON(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(blob),
       ));
@@ -242,7 +245,7 @@ void main() {
 
   group('createTree()', () {
     test('constructs correct path', () {
-      final createGitTree = CreateGitTree([]);
+      const createGitTree = CreateGitTree(entries: [], baseTree: null);
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
@@ -256,7 +259,7 @@ void main() {
       const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           sha: '44b4fc6d56897b048c772eb4087f854f46256132');
 
-      final tree = CreateGitTree([treeEntry]);
+      const tree = CreateGitTree(entries: [treeEntry]);
 
       // when
       git.createTree(repo, tree);
@@ -277,7 +280,7 @@ void main() {
       const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           content: 'some file content');
 
-      final tree = CreateGitTree([treeEntry]);
+      const tree = CreateGitTree(entries: [treeEntry]);
 
       // when
       git.createTree(repo, tree);

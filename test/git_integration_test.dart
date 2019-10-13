@@ -64,8 +64,10 @@ void main() {
     const entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
         content: 'Some file in a folder.');
 
-    final newTree = CreateGitTree([entry1, entry2])
-      ..baseTree = firstCommitTreeSha;
+    final newTree = CreateGitTree(
+      entries: const [entry1, entry2],
+      baseTree: firstCommitTreeSha,
+    );
 
     // createTree()
     final createdTree = await github.git.createTree(slug, newTree);
@@ -138,8 +140,14 @@ void main() {
 
       final count = issues.length;
 
-      final issueRequest = IssueRequest()
-        ..title = 'new issue - ${_randomGitName()}';
+      final issueRequest = IssueRequest(
+        title: 'new issue - ${_randomGitName()}',
+        assignee: null,
+        state: null,
+        milestone: null,
+        body: null,
+        labels: null,
+      );
 
       await github.issues.create(slug, issueRequest);
 

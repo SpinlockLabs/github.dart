@@ -1,6 +1,7 @@
 part of github.common;
 
 /// Model class for a repository hook.
+@immutable
 class Hook {
   /// Events to Subscribe to
   final List<String> events;
@@ -31,7 +32,7 @@ class Hook {
 
   final Map<String, dynamic> config;
 
-  Hook._({
+  const Hook._({
     @required this.events,
     @required this.active,
     @required this.name,
@@ -61,6 +62,7 @@ class Hook {
 }
 
 /// Model class for a new hook to be created.
+@immutable
 class CreateHook {
   /// Hook Name
   final String name;
@@ -74,8 +76,12 @@ class CreateHook {
   /// If the Hook should be active.
   final bool active;
 
-  CreateHook(this.name, this.config,
-      {this.events = const ["push"], this.active = true});
+  const CreateHook(
+    this.name,
+    this.config, {
+    this.events = const ["push"],
+    this.active = true,
+  });
 
   String toJSON() {
     return jsonEncode(

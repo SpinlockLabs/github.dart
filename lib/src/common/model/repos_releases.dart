@@ -7,6 +7,7 @@ import 'package:meta/meta.dart';
 part 'repos_releases.g.dart';
 
 /// Model class for a release.
+@immutable
 @JsonSerializable()
 class Release {
   @JsonKey(ignore: true)
@@ -48,7 +49,7 @@ class Release {
   /// `targetCommitsh` was a typo in previous versions and has been corrected.
   /// Use `targetCommitish` instead.
   /// This will be removed in the next major release
-  @deprecated
+  @Deprecated("Use [targetCommitish] instead")
   String get targetCommitsh => targetCommitish;
 
   /// Release Name
@@ -132,6 +133,7 @@ class Release {
 }
 
 /// Model class for a release asset.
+@immutable
 @JsonSerializable()
 class ReleaseAsset {
   @JsonKey(ignore: true)
@@ -182,6 +184,7 @@ class ReleaseAsset {
 }
 
 /// Model class for a new release to be created.
+@immutable
 @JsonSerializable()
 class CreateRelease {
   Map<String, dynamic> json;
@@ -268,26 +271,27 @@ class CreateRelease {
   Map<String, dynamic> toJson() => _$CreateReleaseToJson(this);
 }
 
+@immutable
 class CreateReleaseAsset {
   /// The file name of the asset.
-  String name;
+  final String name;
 
   /// An alternate short description of the asset. Used in place of the filename.
-  String label;
+  final String label;
 
   /// The media type of the asset.
   ///
   /// For a list of media types,
   /// see [Media Types](https://www.iana.org/assignments/media-types/media-types.xhtml).
   /// For example: application/zip
-  String contentType;
+  final String contentType;
 
   /// The raw binary data for the asset being uploaded.
   ///
   /// GitHub expects the asset data in its raw binary form, rather than JSON.
-  Uint8List assetData;
+  final Uint8List assetData;
 
-  CreateReleaseAsset({
+  const CreateReleaseAsset({
     @required this.name,
     @required this.contentType,
     @required this.assetData,

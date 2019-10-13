@@ -1,4 +1,5 @@
 import "package:json_annotation/json_annotation.dart";
+import 'package:meta/meta.dart';
 
 part 'users.g.dart';
 
@@ -88,6 +89,7 @@ class User {
 
 /// The response from listing collaborators on a repo.
 // https://developer.github.com/v3/repos/collaborators/#response
+@immutable
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Collaborator {
   final String login;
@@ -97,7 +99,7 @@ class Collaborator {
   final bool siteAdmin;
   final Map<String, bool> permissions;
 
-  Collaborator(
+  const Collaborator(
     this.login,
     this.id,
     this.htmlUrl,
