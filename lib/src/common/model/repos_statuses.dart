@@ -67,7 +67,6 @@ class RepositoryStatus {
 }
 
 /// Model class for a new repository status to be created.
-// TODO: this class is unused
 @immutable
 class CreateStatus {
   final String state;

@@ -1226,7 +1226,10 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/statuses/#create-a-status
   Future<RepositoryStatus> createStatus(
-      RepositorySlug slug, String ref, CreateStatus request) async {
+    RepositorySlug slug,
+    String ref,
+    CreateStatus request,
+  ) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
     ArgumentError.checkNotNull(request);

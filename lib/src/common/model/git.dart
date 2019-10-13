@@ -263,7 +263,13 @@ class CreateGitTag {
   final String type;
   final GitCommitUser tagger;
 
-  const CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
+  const CreateGitTag(
+    this.tag,
+    this.message,
+    this.object,
+    this.type,
+    this.tagger,
+  );
 
   String toJSON() {
     final map = <String, dynamic>{};
