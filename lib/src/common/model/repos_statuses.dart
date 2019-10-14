@@ -76,15 +76,12 @@ class CreateStatus {
   String description;
   String context;
 
-  CreateStatus({
-    @required this.state,
-    @required this.description,
-    @required this.context,
-    @required this.targetUrl,
+  CreateStatus(
+    this.state, {
+    this.description,
+    this.context,
+    this.targetUrl,
   });
-
-  @deprecated
-  CreateStatus(this.state);
 
   String toJSON() {
     final map = <String, dynamic>{};
