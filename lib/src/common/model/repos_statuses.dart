@@ -67,20 +67,24 @@ class RepositoryStatus {
 }
 
 /// Model class for a new repository status to be created.
-@immutable
 class CreateStatus {
   final String state;
 
   @JsonKey(name: "target_url")
-  final String targetUrl;
+  String targetUrl;
 
-  final String description;
-  final String context;
+  String description;
+  String context;
 
-  const CreateStatus(this.state)
-      : this.targetUrl = null,
-        this.description = null,
-        this.context = null;
+  CreateStatus({
+    @required this.state,
+    @required this.description,
+    @required this.context,
+    @required this.targetUrl,
+  });
+
+  @deprecated
+  CreateStatus(this.state);
 
   String toJSON() {
     final map = <String, dynamic>{};
