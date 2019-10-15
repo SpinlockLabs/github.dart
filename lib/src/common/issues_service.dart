@@ -128,7 +128,8 @@ class IssuesService extends Service {
   /// Edit an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/#edit-an-issue
-  Future<Issue> edit(RepositorySlug slug, int issueNumber, IssueRequest issue) {
+  Future<Issue> edit(
+      RepositorySlug slug, int issueNumber, IssueRequest issue) async {
     return _github
         .request("PATCH", '/repos/${slug.fullName}/issues/$issueNumber',
             body: issue.toJSON())
