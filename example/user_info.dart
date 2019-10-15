@@ -16,9 +16,9 @@ GitHub createClient(String token) {
 }
 
 void loadUser() {
-  var localToken = document.getElementById("token") as InputElement;
+  final localToken = document.getElementById("token") as InputElement;
 
-  var loadBtn = document.getElementById("load");
+  final loadBtn = document.getElementById("load");
   loadBtn.onClick.listen((event) {
     if (localToken.value == null || localToken.value.isEmpty) {
       window.alert("Please Enter a Token");
@@ -27,7 +27,7 @@ void loadUser() {
 
     github = createClient(localToken.value);
 
-    github.users.getCurrentUser().then((CurrentUser user) {
+    github.users.getCurrentUser().then((final CurrentUser user) {
       info.children.clear();
       info.hidden = false;
       info.appendHtml("""

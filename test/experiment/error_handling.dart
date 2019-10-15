@@ -6,16 +6,21 @@ import 'package:github/server.dart';
 import '../helper.dart';
 
 void main() {
-  var github = createGitHubClient();
-  var response = MockResponse(
-      jsonEncode({
-        "message": "Invalid Entity",
-        "errors": [
-          {"resource": "Issue", "field": "body", "code": "not_found"}
-        ]
-      }),
-      {},
-      422);
+  final github = createGitHubClient();
+  final response = MockResponse(
+    jsonEncode(<String, dynamic>{
+      "message": "Invalid Entity",
+      "errors": [
+        {
+          "resource": "Issue",
+          "field": "body",
+          "code": "not_found",
+        }
+      ]
+    }),
+    {},
+    422,
+  );
 
   try {
     github.handleStatusCode(response);

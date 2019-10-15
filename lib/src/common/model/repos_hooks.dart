@@ -29,6 +29,7 @@ class Hook {
   /// The Repository Name
   String repoName;
 
+  // TODO create a HookConfig class and implement a getter that returns the Map type
   Map<String, dynamic> config;
 
   static Hook fromJSON(String repoName, Map<String, dynamic> input) {

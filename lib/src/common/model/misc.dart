@@ -31,9 +31,9 @@ class RateLimit {
   RateLimit(this.limit, this.remaining, this.resets);
 
   static RateLimit fromHeaders(Map<String, String> headers) {
-    var limit = int.parse(headers['x-ratelimit-limit']);
-    var remaining = int.parse(headers['x-ratelimit-remaining']);
-    var resets = DateTime.fromMillisecondsSinceEpoch(
+    final limit = int.parse(headers['x-ratelimit-limit']);
+    final remaining = int.parse(headers['x-ratelimit-remaining']);
+    final resets = DateTime.fromMillisecondsSinceEpoch(
         int.parse(headers['x-ratelimit-reset']) * 1000);
     return RateLimit(limit, remaining, resets);
   }

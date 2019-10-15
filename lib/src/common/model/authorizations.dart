@@ -64,7 +64,7 @@ class CreateAuthorization {
   CreateAuthorization(this.note);
 
   String toJSON() {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("note", note, map);
     putValue("note_url", noteUrl, map);
     putValue("client_id", clientID, map);

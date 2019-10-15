@@ -80,7 +80,7 @@ class IssuesService extends Service {
       DateTime since,
       int perPage,
       List<String> labels) {
-    var params = <String, String>{};
+    final params = <String, dynamic>{};
 
     if (perPage != null) {
       params['per_page'] = perPage.toString();
@@ -117,8 +117,12 @@ class IssuesService extends Service {
       params['labels'] = labels.join(',');
     }
 
-    return PaginationHelper(_github)
-        .objects("GET", pathSegment, Issue.fromJSON, params: params);
+    return PaginationHelper(_github).objects(
+      "GET",
+      pathSegment,
+      Issue.fromJSON,
+      params: params,
+    );
   }
 
   /// Edit an issue.
@@ -145,9 +149,11 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/#create-an-issue
   Future<Issue> create(RepositorySlug slug, IssueRequest issue) async {
-    var response = await _github.request(
-        "POST", '/repos/${slug.fullName}/issues',
-        body: issue.toJSON());
+    final response = await _github.request(
+      "POST",
+      '/repos/${slug.fullName}/issues',
+      body: issue.toJSON(),
+    );
 
     if (StatusCodes.isClientError(response.statusCode)) {
       //TODO: throw a more friendly error – better this than silent failure
@@ -206,12 +212,13 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/comments/#create-a-comment
   Future<IssueComment> createComment(
       RepositorySlug slug, int issueNumber, String body) {
-    var it = jsonEncode({"body": body});
+    final it = jsonEncode({"body": body});
     return _github.postJSON(
-        '/repos/${slug.fullName}/issues/$issueNumber/comments',
-        body: it,
-        convert: IssueComment.fromJSON,
-        statusCode: StatusCodes.CREATED);
+      '/repos/${slug.fullName}/issues/$issueNumber/comments',
+      body: it,
+      convert: IssueComment.fromJSON,
+      statusCode: StatusCodes.CREATED,
+    );
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/issues/comments/#edit-a-comment
@@ -265,7 +272,7 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#delete-a-label
   Future<bool> deleteLabel(RepositorySlug slug, String name) async {
-    var response =
+    final response =
         await _github.request("DELETE", "/repos/${slug.fullName}/labels/$name");
 
     return response.statusCode == StatusCodes.NO_CONTENT;
@@ -313,7 +320,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#remove-a-label-from-an-issue
   Future<bool> removeLabelForIssue(
       RepositorySlug slug, int issueNumber, String label) async {
-    var response = await _github.request(
+    final response = await _github.request(
         "DELETE", "/repos/${slug.fullName}/issues/$issueNumber/labels/$label");
 
     return response.statusCode == StatusCodes.OK;

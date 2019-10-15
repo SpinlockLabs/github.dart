@@ -18,9 +18,9 @@ void main() {
   RepositorySlug slug;
 
   setUpAll(() {
-    var authToken = Platform.environment['GITHUB_API_TOKEN'];
-    var repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
-    var repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
+    final authToken = Platform.environment['GITHUB_API_TOKEN'];
+    final repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
+    final repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
 
     github = createGitHubClient(auth: Authentication.withToken(authToken));
     slug = RepositorySlug(repoOwner, repoName);
@@ -32,21 +32,21 @@ void main() {
 
   // Test definitions.
   test('get last commit of master', () async {
-    var branch = await github.repositories.getBranch(slug, 'master');
+    final branch = await github.repositories.getBranch(slug, 'master');
     firstCommitSha = branch.commit.sha;
     firstCommitTreeSha = branch.commit.commit.sha;
   });
 
   test('create and get a new blob', () async {
-    var newBlob = CreateGitBlob('bbb', 'utf-8');
+    const newBlob = CreateGitBlob('bbb', 'utf-8');
 
     // createBlob()
-    var createdBlob = await github.git.createBlob(slug, newBlob);
-    var createdBlobSha = createdBlob.sha;
+    final createdBlob = await github.git.createBlob(slug, newBlob);
+    final createdBlobSha = createdBlob.sha;
 
-    var fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
+    final fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
 
-    var base64Decoded = base64Decode(fetchedBlob.content);
+    final base64Decoded = base64Decode(fetchedBlob.content);
 
     expect(utf8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
@@ -59,35 +59,35 @@ void main() {
   });
 
   test('create and get a new tree', () async {
-    var entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
+    const entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
         content: 'This is a repository for integration tests.');
-    var entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
+    const entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
         content: 'Some file in a folder.');
 
-    var newTree = CreateGitTree([entry1, entry2])
+    final newTree = CreateGitTree([entry1, entry2])
       ..baseTree = firstCommitTreeSha;
 
     // createTree()
-    var createdTree = await github.git.createTree(slug, newTree);
+    final createdTree = await github.git.createTree(slug, newTree);
     createdTreeSha = createdTree.sha;
 
     // getTree()
-    var fetchedTree = await github.git.getTree(slug, createdTreeSha);
+    final fetchedTree = await github.git.getTree(slug, createdTreeSha);
 
     expect(fetchedTree.sha, equals(createdTreeSha));
     expect(fetchedTree.entries.length, equals(2));
   });
 
   test('create and get a new commit', () async {
-    var newCommit = CreateGitCommit('My test commit', createdTreeSha)
+    final newCommit = CreateGitCommit('My test commit', createdTreeSha)
       ..parents = [firstCommitSha];
 
     // createCommit()
-    var createdCommit = await github.git.createCommit(slug, newCommit);
+    final createdCommit = await github.git.createCommit(slug, newCommit);
     createdCommitSha = createdCommit.sha;
 
     // getCommit()
-    var fetchedCommit = await github.git.getCommit(slug, createdCommitSha);
+    final fetchedCommit = await github.git.getCommit(slug, createdCommitSha);
     expect(fetchedCommit.sha, equals(createdCommitSha));
     expect(fetchedCommit.message, equals('My test commit'));
     expect(fetchedCommit.tree.sha, equals(createdTreeSha));
@@ -99,29 +99,29 @@ void main() {
   });
 
   test('create and get a new reference (branch)', () async {
-    var branchName = _randomGitName();
+    final branchName = _randomGitName();
 
     await github.git
         .createReference(slug, 'refs/heads/$branchName', createdCommitSha);
 
-    var fetchedRef = await github.git.getReference(slug, 'heads/$branchName');
+    final fetchedRef = await github.git.getReference(slug, 'heads/$branchName');
     expect(fetchedRef.ref, equals('refs/heads/$branchName'));
     expect(fetchedRef.object.type, equals('commit'));
     expect(fetchedRef.object.sha, equals(createdCommitSha));
   });
 
   test('create and get a new tag', () async {
-    var tagName = 'v${_randomGitName()}';
+    final tagName = 'v${_randomGitName()}';
 
-    var newTag = CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
+    final newTag = CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
         'commit', GitCommitUser('aName', 'aEmail', DateTime.now()));
 
     // createTag()
-    var createdTag = await github.git.createTag(slug, newTag);
-    var createdTagSha = createdTag.sha;
+    final createdTag = await github.git.createTag(slug, newTag);
+    final createdTagSha = createdTag.sha;
 
     // getTag()
-    var fetchedTag = await github.git.getTag(slug, createdTagSha);
+    final fetchedTag = await github.git.getTag(slug, createdTagSha);
     expect(fetchedTag.tag, equals(tagName));
     expect(fetchedTag.sha, equals(createdTagSha));
     expect(fetchedTag.message, equals('Version 0.0.1'));
@@ -136,9 +136,9 @@ void main() {
     test('query issues', () async {
       var issues = await github.issues.listByRepo(slug).toList();
 
-      var count = issues.length;
+      final count = issues.length;
 
-      var issueRequest = IssueRequest()
+      final issueRequest = IssueRequest()
         ..title = 'new issue - ${_randomGitName()}';
 
       await github.issues.create(slug, issueRequest);
@@ -149,7 +149,7 @@ void main() {
 
       expect(issues, hasLength(count + 1));
 
-      var issue = issues.first;
+      final issue = issues.first;
 
       expect(issue.title, issueRequest.title);
     });
@@ -157,7 +157,7 @@ void main() {
 }
 
 String _randomGitName() {
-  var now = DateTime.now().toIso8601String().replaceAll(':', '_');
+  final now = DateTime.now().toIso8601String().replaceAll(':', '_');
 
   return now.toString();
 }

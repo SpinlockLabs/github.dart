@@ -263,7 +263,7 @@ class GitHub {
 
     headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
 
-    var response = await request(
+    final response = await request(
       method,
       path,
       headers: headers,
@@ -273,7 +273,7 @@ class GitHub {
       fail: fail,
     );
 
-    var json = jsonDecode(response.body);
+    final json = jsonDecode(response.body);
 
     if (convert == null) {
       _applyExpandos(json, response);
@@ -303,6 +303,13 @@ class GitHub {
     void fail(http.Response response),
     String preview,
   }) async {
+    if (rateLimitRemaining != null && rateLimitRemaining <= 0) {
+      assert(rateLimitReset != null);
+      var now = DateTime.now();
+      var waitTime = rateLimitReset.difference(now);
+      await Future.delayed(waitTime);
+    }
+
     if (headers == null) headers = {};
 
     if (preview != null) {
@@ -312,7 +319,7 @@ class GitHub {
     if (auth.isToken) {
       headers.putIfAbsent("Authorization", () => "token ${auth.token}");
     } else if (auth.isBasic) {
-      var userAndPass =
+      final userAndPass =
           base64Encode(utf8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent("Authorization", () => "basic $userAndPass");
     }
@@ -327,7 +334,7 @@ class GitHub {
       queryString = buildQueryString(params);
     }
 
-    var url = StringBuffer();
+    final url = StringBuffer();
 
     if (path.startsWith("http://") || path.startsWith("https://")) {
       url.write(path);
@@ -341,7 +348,7 @@ class GitHub {
       url.write(queryString);
     }
 
-    var request = http.Request(method, Uri.parse(url.toString()));
+    final request = http.Request(method, Uri.parse(url.toString()));
     request.headers.addAll(headers);
     if (body != null) {
       if (body is List<int>) {
@@ -351,9 +358,9 @@ class GitHub {
       }
     }
 
-    var streamedResponse = await client.send(request);
+    final streamedResponse = await client.send(request);
 
-    var response = await http.Response.fromStream(streamedResponse);
+    final response = await http.Response.fromStream(streamedResponse);
 
     _updateRateLimit(response.headers);
     if (statusCode != null && statusCode != response.statusCode) {
@@ -367,12 +374,12 @@ class GitHub {
   ///
   /// Internal method to handle status codes
   ///
-  @meta.alwaysThrows
+  @alwaysThrows
   void handleStatusCode(http.Response response) {
     String message;
     List<Map<String, String>> errors;
     if (response.headers['content-type'].contains('application/json')) {
-      var json = jsonDecode(response.body);
+      final json = jsonDecode(response.body);
       message = json['message'];
       errors = json['errors'] as List<Map<String, String>>;
     }
@@ -392,15 +399,15 @@ class GitHub {
         }
         break;
       case 422:
-        var buff = StringBuffer();
+        final buff = StringBuffer();
         buff.writeln();
         buff.writeln("  Message: $message");
         if (errors != null) {
           buff.writeln("  Errors:");
-          for (Map<String, String> error in errors) {
-            var resource = error['resource'];
-            var field = error['field'];
-            var code = error['code'];
+          for (final Map<String, String> error in errors) {
+            final resource = error['resource'];
+            final field = error['field'];
+            final code = error['code'];
             buff
               ..writeln("    Resource: $resource")
               ..writeln("    Field $field")

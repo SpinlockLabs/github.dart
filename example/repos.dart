@@ -40,11 +40,13 @@ Future<void> main() async {
 
 List<Repository> _reposCache;
 
-void updateRepos(List<Repository> repos,
-    [int compare(Repository a, Repository b)]) {
+void updateRepos(
+  List<Repository> repos, [
+  int compare(Repository a, Repository b),
+]) {
   document.querySelector("#repos").children.clear();
   repos.sort(compare);
-  for (var repo in repos) {
+  for (final repo in repos) {
     repositoriesDiv.appendHtml("""
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
@@ -68,7 +70,7 @@ void updateRepos(List<Repository> repos,
 }
 
 void loadRepos([int compare(Repository a, Repository b)]) {
-  var title = querySelector("#title");
+  final title = querySelector("#title");
   if (title.text.contains("(")) {
     title.replaceWith(HeadingElement.h2()
       ..text = "GitHub for Dart - Repositories"
@@ -82,7 +84,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
   }
 
   if (queryString.containsKey("sort") && compare == null) {
-    var sorter = queryString['sort'];
+    final sorter = queryString['sort'];
     if (sorts.containsKey(sorter)) {
       compare = sorts[sorter];
     }

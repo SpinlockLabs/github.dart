@@ -28,7 +28,7 @@ void loadStars() {
   github.activity
       .listStargazers(RepositorySlug(user, repo))
       .listen((stargazer) {
-    var h = DivElement();
+    final h = DivElement();
     h.classes.add("box");
     h.classes.add("user");
     h.style.textAlign = "center";

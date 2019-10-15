@@ -256,13 +256,13 @@ class RepositorySlug {
   /// Repository Name
   final String name;
 
-  RepositorySlug(this.owner, this.name);
+  const RepositorySlug(this.owner, this.name);
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {
-    var split = f.split("/");
-    var o = split[0];
-    var n = (split..removeAt(0)).join("/");
+    final split = f.split("/");
+    final o = split[0];
+    final n = (split..removeAt(0)).join("/");
     return RepositorySlug(o, n);
   }
 
@@ -372,7 +372,7 @@ class LanguageBreakdown {
 
   /// The Primary Language
   String get primary {
-    var list = mapToList(_data);
+    final list = mapToList(_data);
     list.sort((a, b) {
       return a.value.compareTo(b.value);
     });
@@ -389,8 +389,8 @@ class LanguageBreakdown {
 
   /// Creates a list of lists with a tuple of the language name and the bytes.
   List<List<dynamic>> toList() {
-    var out = <List<dynamic>>[];
-    for (var key in info.keys) {
+    final out = <List<dynamic>>[];
+    for (final key in info.keys) {
       out.add([key, info[key]]);
     }
     return out;
@@ -398,7 +398,7 @@ class LanguageBreakdown {
 
   @override
   String toString() {
-    var buffer = StringBuffer();
+    final buffer = StringBuffer();
     _data.forEach((key, value) {
       buffer.writeln("$key: $value");
     });

@@ -1,7 +1,7 @@
 import "package:github/server.dart";
 
 void main() {
-  var github = createGitHubClient();
+  final github = createGitHubClient();
 
   github.repositories.listPublicRepositories(limit: 50).listen((repo) {
     print("-> ${repo.fullName}");

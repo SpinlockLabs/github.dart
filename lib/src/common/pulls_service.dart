@@ -10,14 +10,16 @@ class PullRequestsService extends Service {
   /// Fetches several pull requests.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#list-pull-requests
-  Stream<PullRequest> list(RepositorySlug slug,
-      {int pages,
-      String base,
-      String direction = 'desc',
-      String head,
-      String sort = 'created',
-      String state = 'open'}) {
-    var params = <String, String>{};
+  Stream<PullRequest> list(
+    RepositorySlug slug, {
+    int pages,
+    String base,
+    String direction = 'desc',
+    String head,
+    String sort = 'created',
+    String state = 'open',
+  }) {
+    final params = <String, dynamic>{};
     putValue("base", base, params);
     putValue("direction", direction, params);
     putValue("head", head, params);
@@ -50,7 +52,7 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
   Future<PullRequest> edit(RepositorySlug slug, int number,
       {String title, String body, String state, String base}) {
-    var map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     putValue("title", title, map);
     putValue("body", body, map);
     putValue("state", state, map);
@@ -96,9 +98,12 @@ class PullRequestsService extends Service {
   /// Merge a pull request (Merge Button).
   ///
   /// API docs: https://developer.github.com/v3/pulls/#merge-a-pull-request-merge-button
-  Future<PullRequestMerge> merge(RepositorySlug slug, int number,
-      {String message}) {
-    var json = {};
+  Future<PullRequestMerge> merge(
+    RepositorySlug slug,
+    int number, {
+    String message,
+  }) {
+    final json = <String, dynamic>{};
 
     if (message != null) {
       json['commit_message'] = message;

@@ -12,14 +12,14 @@ class SearchService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/search/#search-repositories
   Stream<Repository> repositories(String query, {String sort, int pages = 2}) {
-    var params = {"q": query};
+    final params = <String, dynamic>{"q": query};
     if (sort != null) {
       params["sort"] = sort;
     }
 
-    var controller = StreamController<Repository>();
+    final controller = StreamController<Repository>();
 
-    var isFirst = true;
+    bool isFirst = true;
 
     PaginationHelper(_github)
         .fetchStreamed("GET", "/search/repositories",
@@ -33,13 +33,13 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = jsonDecode(response.body);
+      final input = jsonDecode(response.body);
 
       if (input['items'] == null) {
         return;
       }
 
-      var items = input['items'] as List;
+      final items = input['items'] as List;
 
       items.map((item) => Repository.fromJSON(item)).forEach(controller.add);
     }).onDone(controller.close);
@@ -106,7 +106,7 @@ class SearchService extends Service {
       query += ' in:$_in';
     }
 
-    var params = <String, dynamic>{};
+    final params = <String, dynamic>{};
     params['q'] = query ?? '';
     if (perPage != null) {
       params['per_page'] = perPage.toString();
@@ -128,12 +128,12 @@ class SearchService extends Service {
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   /// API docs: https://developer.github.com/v3/search/#search-issues
   Stream<Issue> issues(String query, {String sort, int pages = 2}) {
-    var params = {"q": query};
+    final params = <String, dynamic>{"q": query};
     if (sort != null) {
       params["sort"] = sort;
     }
 
-    var controller = StreamController<Issue>();
+    final controller = StreamController<Issue>();
 
     var isFirst = true;
 
@@ -148,13 +148,13 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = jsonDecode(response.body);
+      final input = jsonDecode(response.body);
 
       if (input['items'] == null) {
         return;
       }
 
-      var items = input['items'] as List;
+      final items = input['items'] as List;
 
       items.map((item) => Issue.fromJSON(item)).forEach(controller.add);
     }).onDone(controller.close);
@@ -166,9 +166,13 @@ class SearchService extends Service {
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   ///
   /// API docs: https://developer.github.com/v3/search/#search-users
-  Stream<User> users(String query,
-      {String sort, int pages = 2, int perPage = 30}) {
-    var params = {"q": query};
+  Stream<User> users(
+    String query, {
+    String sort,
+    int pages = 2,
+    int perPage = 30,
+  }) {
+    final params = <String, dynamic>{"q": query};
 
     if (sort != null) {
       params["sort"] = sort;
@@ -176,7 +180,7 @@ class SearchService extends Service {
 
     params["per_page"] = perPage.toString();
 
-    var controller = StreamController<User>();
+    final controller = StreamController<User>();
 
     var isFirst = true;
 
@@ -191,13 +195,13 @@ class SearchService extends Service {
 
       isFirst = false;
 
-      var input = jsonDecode(response.body);
+      final input = jsonDecode(response.body);
 
       if (input['items'] == null) {
         return;
       }
 
-      var items = input['items'] as List;
+      final items = input['items'] as List;
 
       items.map((item) => User.fromJson(item)).forEach(controller.add);
     }).onDone(controller.close);
