@@ -133,9 +133,8 @@ class IssuesService extends Service {
     return _github
         .request("PATCH", '/repos/${slug.fullName}/issues/$issueNumber',
             body: issue.toJSON())
-        .then((response) {
-      return Issue.fromJSON(jsonDecode(response.body) as Map<String, dynamic>)
-          as Future<Issue>;
+        .then<Issue>((response) {
+      return Issue.fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
