@@ -1,7 +1,8 @@
 ## v5.4.0
 - Implement rate-limiting https://github.com/SpinlockLabs/github.dart/pull/172
+- Back off when server fails (HTTP 50x) https://github.com/SpinlockLabs/github.dart/pull/173
 - All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented. `isCollaborator`, `listSingleCommitComments`, `listCommitComments`, `createCommitComment`, `getComment`, `updateComment`, `deleteComment`
-
+- Fixed issues.get to correctly return Future<Issue> https://github.com/SpinlockLabs/github.dart/pull/180
 
 ## v5.3.0
 
