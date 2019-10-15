@@ -415,6 +415,10 @@ class GitHub {
           }
         }
         throw ValidationFailed(this, buff.toString());
+      case 500:
+      case 502:
+      case 504:
+        throw ServerError(this, response.statusCode, message);
     }
     throw UnknownError(this, message);
   }
