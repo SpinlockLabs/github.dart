@@ -279,7 +279,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
   Stream<Collaborator> listCollaborators(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(github).objects(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Collaborator>(
       'GET',
       '/repos/${slug.fullName}/collaborators',
       (json) => Collaborator.fromJson(json),

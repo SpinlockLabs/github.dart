@@ -50,6 +50,7 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
+  ChecksService _checks;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -79,67 +80,53 @@ class GitHub {
   int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
 
   /// Service for activity related methods of the GitHub API.
-  ActivityService get activity {
-    return _activity ??= ActivityService(this);
-  }
+  ActivityService get activity => _activity ??= ActivityService(this);
 
   /// Service for autorizations related methods of the GitHub API.
   ///
   /// Note: You can only access this API via Basic Authentication using your
   /// username and password, not tokens.
-  AuthorizationsService get authorizations {
-    return _authorizations ??= AuthorizationsService(this);
-  }
+  AuthorizationsService get authorizations =>
+      _authorizations ??= AuthorizationsService(this);
 
   /// Service for gist related methods of the GitHub API.
-  GistsService get gists {
-    return _gists ??= GistsService(this);
-  }
+  GistsService get gists => _gists ??= GistsService(this);
 
   /// Service for git data related methods of the GitHub API.
-  GitService get git {
-    return _git ??= GitService(this);
-  }
+  GitService get git => _git ??= GitService(this);
 
   /// Service for issues related methods of the GitHub API.
-  IssuesService get issues {
-    return _issues ??= IssuesService(this);
-  }
+  IssuesService get issues => _issues ??= IssuesService(this);
 
   /// Service for misc related methods of the GitHub API.
-  MiscService get misc {
-    return _misc ??= MiscService(this);
-  }
+  MiscService get misc => _misc ??= MiscService(this);
 
   /// Service for organization related methods of the GitHub API.
-  OrganizationsService get organizations {
-    return _organizations ??= OrganizationsService(this);
-  }
+  OrganizationsService get organizations =>
+      _organizations ??= OrganizationsService(this);
 
   /// Service for pull requests related methods of the GitHub API.
-  PullRequestsService get pullRequests {
-    return _pullRequests ??= PullRequestsService(this);
-  }
+  PullRequestsService get pullRequests =>
+      _pullRequests ??= PullRequestsService(this);
 
   /// Service for repository related methods of the GitHub API.
-  RepositoriesService get repositories {
-    return _repositories ??= RepositoriesService(this);
-  }
+  RepositoriesService get repositories =>
+      _repositories ??= RepositoriesService(this);
 
   /// Service for search related methods of the GitHub API.
-  SearchService get search {
-    return _search ??= SearchService(this);
-  }
+  SearchService get search => _search ??= SearchService(this);
 
   /// Service to provide a handy method to access GitHub's url shortener.
-  UrlShortenerService get urlShortener {
-    return _urlShortener ??= UrlShortenerService(this);
-  }
+  UrlShortenerService get urlShortener =>
+      _urlShortener ??= UrlShortenerService(this);
 
   /// Service for user related methods of the GitHub API.
-  UsersService get users {
-    return _users ??= UsersService(this);
-  }
+  UsersService get users => _users ??= UsersService(this);
+
+  /// Service containing methods to interact with the Checks API.
+  ///
+  /// See https://developer.github.com/v3/checks/
+  ChecksService get checks => _checks ??= ChecksService(this);
 
   /// Handles Get Requests that respond with JSON
   /// [path] can either be a path like '/repos' or a full url.
@@ -154,20 +141,25 @@ class GitHub {
   /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
   /// The future will pass the object returned from this function to the then method.
   /// The default [convert] function returns the input object.
-  Future<T> getJSON<S, T>(String path,
-          {int statusCode,
-          void Function(http.Response response) fail,
-          Map<String, String> headers,
-          Map<String, dynamic> params,
-          JSONConverter<S, T> convert,
-          String preview}) =>
-      _requestJson('GET', path,
-          statusCode: statusCode,
-          fail: fail,
-          headers: headers,
-          params: params,
-          convert: convert,
-          preview: preview);
+  Future<T> getJSON<S, T>(
+    String path, {
+    int statusCode,
+    void Function(http.Response response) fail,
+    Map<String, String> headers,
+    Map<String, String> params,
+    JSONConverter<S, T> convert,
+    String preview,
+  }) =>
+      requestJson(
+        'GET',
+        path,
+        statusCode: statusCode,
+        fail: fail,
+        headers: headers,
+        params: params,
+        convert: convert,
+        preview: preview,
+      );
 
   /// Handles Post Requests that respond with JSON
   ///
@@ -199,7 +191,7 @@ class GitHub {
     dynamic body,
     String preview,
   }) =>
-      _requestJson(
+      requestJson(
         'POST',
         path,
         statusCode: statusCode,
@@ -241,7 +233,7 @@ class GitHub {
     dynamic body,
     String preview,
   }) =>
-      _requestJson(
+      requestJson(
         'PUT',
         path,
         statusCode: statusCode,
@@ -253,7 +245,7 @@ class GitHub {
         preview: preview,
       );
 
-  Future<T> _requestJson<S, T>(
+  Future<T> requestJson<S, T>(
     String method,
     String path, {
     int statusCode,

@@ -21,6 +21,7 @@ class OnlyWhen {
 ///
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
 String dateToGitHubIso8601(DateTime date) {
+  if (date == null) return null;
   // Regex removes the milliseconds.
   return date.toUtc().toIso8601String().replaceAll(githubDateRemoveRegExp, '');
 }
