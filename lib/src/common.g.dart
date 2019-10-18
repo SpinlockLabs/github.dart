@@ -6,6 +6,42 @@ part of github.common;
 // JsonSerializableGenerator
 // **************************************************************************
 
+Event _$EventFromJson(Map<String, dynamic> json) {
+  return Event()
+    ..repo = json['repo'] == null
+        ? null
+        : Repository.fromJson(json['repo'] as Map<String, dynamic>)
+    ..actor = json['actor'] == null
+        ? null
+        : Actor.fromJson(json['actor'] as Map<String, dynamic>)
+    ..org = json['org'] == null
+        ? null
+        : Organization.fromJson(json['org'] as Map<String, dynamic>)
+    ..createdAt = json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at'] as String)
+    ..id = json['id'] as String
+    ..type = json['type'] as String
+    ..payload = json['payload'] as Map<String, dynamic>;
+}
+
+Actor _$ActorFromJson(Map<String, dynamic> json) {
+  return Actor()
+    ..id = json['id'] as int
+    ..login = json['login'] as String
+    ..displayLogin = json['display_login'] as String
+    ..url = json['url'] as String
+    ..avatarUrl = json['avatar_url'] as String;
+}
+
+Map<String, dynamic> _$ActorToJson(Actor instance) => <String, dynamic>{
+      'id': instance.id,
+      'login': instance.login,
+      'display_login': instance.displayLogin,
+      'url': instance.url,
+      'avatar_url': instance.avatarUrl,
+    };
+
 Map<String, dynamic> _$CreateGitBlobToJson(CreateGitBlob instance) =>
     <String, dynamic>{
       'content': instance.content,
@@ -125,6 +161,29 @@ GitObject _$GitObjectFromJson(Map<String, dynamic> json) {
     json['sha'] as String,
     json['url'] as String,
   );
+}
+
+Organization _$OrganizationFromJson(Map<String, dynamic> json) {
+  return Organization()
+    ..login = json['login'] as String
+    ..id = json['id'] as int
+    ..htmlUrl = json['html_url'] as String
+    ..avatarUrl = json['avatar_url'] as String
+    ..name = json['name'] as String
+    ..company = json['company'] as String
+    ..blog = json['blog'] as String
+    ..location = json['location'] as String
+    ..email = json['email'] as String
+    ..publicReposCount = json['public_repos'] as int
+    ..publicGistsCount = json['public_gists'] as int
+    ..followersCount = json['followers'] as int
+    ..followingCount = json['following'] as int
+    ..createdAt = json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at'] as String)
+    ..updatedAt = json['updated_at'] == null
+        ? null
+        : DateTime.parse(json['updated_at'] as String);
 }
 
 TeamRepository _$TeamRepositoryFromJson(Map<String, dynamic> json) {
@@ -424,6 +483,7 @@ CodeSearchItem _$CodeSearchItemFromJson(Map<String, dynamic> json) {
     ..url = Uri.parse(json['url'] as String)
     ..gitUrl = Uri.parse(json['git_url'] as String)
     ..htmlUrl = Uri.parse(json['html_url'] as String)
-    ..repository =
-        Repository.fromJSON(json['repository'] as Map<String, dynamic>);
+    ..repository = json['repository'] == null
+        ? null
+        : Repository.fromJson(json['repository'] as Map<String, dynamic>);
 }

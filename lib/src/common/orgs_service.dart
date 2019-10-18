@@ -207,7 +207,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
   Stream<Repository> listTeamRepositories(int teamId) {
     return PaginationHelper(_github)
-        .objects("GET", "/teams/$teamId/repos", Repository.fromJSON);
+        .objects("GET", "/teams/$teamId/repos", Repository.fromJson);
   }
 
   /// Checks if a team manages the specified repository.

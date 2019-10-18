@@ -41,7 +41,7 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => Repository.fromJSON(item)).forEach(controller.add);
+      items.map((item) => Repository.fromJson(item)).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;

@@ -23,7 +23,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/user/repos",
-      (i) => Repository.fromJSON(i),
+      (i) => Repository.fromJson(i),
       params: params,
     );
   }
@@ -45,7 +45,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/users/$user/repos",
-      (i) => Repository.fromJSON(i),
+      (i) => Repository.fromJson(i),
       params: params,
     );
   }
@@ -61,7 +61,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/orgs/$org/repos",
-      (i) => Repository.fromJSON(i),
+      (i) => Repository.fromJson(i),
       params: params,
     );
   }
@@ -87,7 +87,7 @@ class RepositoriesService extends Service {
         .expand<Repository>((http.Response response) {
       final list = jsonDecode(response.body) as List<Map<String, dynamic>>;
 
-      return list.map((Map<String, dynamic> it) => Repository.fromJSON(it));
+      return list.map((Map<String, dynamic> it) => Repository.fromJson(it));
     });
   }
 
@@ -109,7 +109,7 @@ class RepositoriesService extends Service {
       return _github.postJSON<Map<String, dynamic>, Repository>(
         '/user/repos',
         body: repository.toJSON(),
-        convert: (i) => Repository.fromJSON(i),
+        convert: (i) => Repository.fromJson(i),
       );
     }
   }
@@ -129,7 +129,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     return _github.getJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.owner}/${slug.name}",
-      convert: (i) => Repository.fromJSON(i),
+      convert: (i) => Repository.fromJson(i),
       statusCode: StatusCodes.OK,
       fail: (http.Response response) {
         if (response.statusCode == 404) {
@@ -653,7 +653,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/repos/${slug.fullName}/forks",
-      (i) => Repository.fromJSON(i),
+      (i) => Repository.fromJson(i),
     );
   }
 
@@ -666,7 +666,7 @@ class RepositoriesService extends Service {
     return _github.postJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.fullName}/forks",
       body: fork.toJSON(),
-      convert: (i) => Repository.fromJSON(i),
+      convert: (i) => Repository.fromJson(i),
     );
   }
 

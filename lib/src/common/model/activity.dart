@@ -1,42 +1,51 @@
 part of github.common;
 
 /// Model class for an event.
+@JsonSerializable(createToJson: false)
 class Event {
+  @JsonKey()
   Repository repo;
 
-  User actor;
+  @JsonKey()
+  Actor actor;
 
+  @JsonKey()
   Organization org;
 
   @JsonKey(name: "created_at")
   DateTime createdAt;
 
+  @JsonKey()
   String id;
 
+  @JsonKey()
   String type;
 
+  @JsonKey(ignore: true)
   Map<String, dynamic> json;
 
+  @JsonKey()
   Map<String, dynamic> payload;
 
-  static Event fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  Event();
 
-    final event = Event();
+  static Event fromJson(Map<String, dynamic> input) {
+    return _$EventFromJson(input)..json = input;
+  }
+}
 
-    event.json = input;
-
-    event.type = input['type'];
-
-    event
-      ..repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>)
-      ..org = Organization.fromJSON(input['org'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..id = input['id']
-      ..actor = User.fromJson(input['actor'] as Map<String, dynamic>)
-      ..payload = input['payload'] as Map<String, dynamic>;
-
-    return event;
+@JsonSerializable()
+class Actor {
+  int id;
+  String login;
+  @JsonKey(name: 'display_login')
+  String displayLogin;
+  String url;
+  @JsonKey(name: 'avatar_url')
+  String avatarUrl;
+  Actor();
+  factory Actor.fromJson(Map<String, dynamic> input) {
+    return _$ActorFromJson(input);
   }
 }
 

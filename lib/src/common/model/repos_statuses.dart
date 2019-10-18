@@ -21,7 +21,7 @@ class CombinedRepositoryStatus {
           .map((it) => RepositoryStatus.fromJSON(it))
           .toList()
       ..repository =
-          Repository.fromJSON(input["repository"] as Map<String, dynamic>);
+          Repository.fromJson(input["repository"] as Map<String, dynamic>);
   }
 }
 

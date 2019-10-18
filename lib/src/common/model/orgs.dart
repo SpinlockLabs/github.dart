@@ -1,6 +1,7 @@
 part of github.common;
 
 /// Model class for a GitHub organization.
+@JsonSerializable(createToJson: false)
 class Organization {
   /// Organization Login
   String login;
@@ -55,25 +56,15 @@ class Organization {
   @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
+  Organization();
+
+  factory Organization.fromJson(Map<String, dynamic> input) {
+    return _$OrganizationFromJson(input);
+  }
+
   static Organization fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
-
-    return Organization()
-      ..login = input['login']
-      ..id = input['id']
-      ..htmlUrl = input['html_url']
-      ..avatarUrl = input['avatar_url']
-      ..name = input['name']
-      ..company = input['company']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..publicGistsCount = input['public_gists']
-      ..publicReposCount = input['public_repos']
-      ..followersCount = input['followers']
-      ..followingCount = input['following']
-      ..email = input['email']
-      ..blog = input['blog']
-      ..location = input['location'];
+    return Organization.fromJson(input);
   }
 }
 

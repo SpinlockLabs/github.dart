@@ -127,7 +127,7 @@ class Repository {
 
   LicenseKind license;
 
-  static Repository fromJSON(Map<String, dynamic> input) {
+  static Repository fromJson(Map<String, dynamic> input) {
     if (input == null) return null;
     return _$RepositoryFromJson(input);
   }
