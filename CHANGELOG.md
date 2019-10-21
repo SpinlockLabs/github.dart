@@ -1,4 +1,9 @@
+## v5.5.0
+
+- Provide a single platform independent import `import 'package:github/githb.dart';`
+
 ## v5.4.0
+
 - Implement rate-limiting https://github.com/SpinlockLabs/github.dart/pull/172
 - Back off when server fails (HTTP 50x) https://github.com/SpinlockLabs/github.dart/pull/173
 - All remaining methods in repos_service.dart (accessible via the getter `repositories` from `GitHub` client class) have been implemented. `isCollaborator`, `listSingleCommitComments`, `listCommitComments`, `createCommitComment`, `getComment`, `updateComment`, `deleteComment`
