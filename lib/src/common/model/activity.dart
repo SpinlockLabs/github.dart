@@ -4,7 +4,7 @@ part of github.common;
 @JsonSerializable(createToJson: false)
 class Event {
   @JsonKey()
-  Repository repo;
+  Repository repository;
 
   @JsonKey()
   Actor actor;

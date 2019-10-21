@@ -8,9 +8,9 @@ part of github.common;
 
 Event _$EventFromJson(Map<String, dynamic> json) {
   return Event()
-    ..repo = json['repo'] == null
+    ..repository = json['repository'] == null
         ? null
-        : Repository.fromJson(json['repo'] as Map<String, dynamic>)
+        : Repository.fromJson(json['repository'] as Map<String, dynamic>)
     ..actor = json['actor'] == null
         ? null
         : Actor.fromJson(json['actor'] as Map<String, dynamic>)
