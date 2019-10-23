@@ -183,10 +183,14 @@ class ActivityService extends Service {
   /// Mark the specified notification thread as read.
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
-  Future<bool> markThreadRead(String threadId) =>
-      _github.request("PATCH", "/notifications/threads/$threadId").then((response) {
-        return response.statusCode == StatusCodes.RESET_CONTENT;
-      });
+  Future<bool> markThreadRead(String threadId) {
+    return _github
+        .request("PATCH", "/notifications/threads/$threadId")
+        .then((response) {
+      return response.statusCode == 205;
+    });
+  }
+
 
   // TODO: Implement getThreadSubscription: https://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
   // TODO: Implement setThreadSubscription: https://developer.github.com/v3/activity/notifications/#set-a-thread-subscription
