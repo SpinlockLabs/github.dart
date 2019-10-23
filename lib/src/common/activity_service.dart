@@ -184,7 +184,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
   Future<bool> markThreadRead(String threadId) =>
-      _github.request("PATCH", "/notifications/thread/$threadId").then((response) {
+      _github.request("PATCH", "/notifications/threads/$threadId").then((response) {
         return response.statusCode == StatusCodes.RESET_CONTENT;
       });
 
