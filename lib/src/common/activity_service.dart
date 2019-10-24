@@ -187,7 +187,7 @@ class ActivityService extends Service {
     return _github
         .request("PATCH", "/notifications/threads/$threadId")
         .then((response) {
-      return response.statusCode == 205;
+      return response.statusCode == StatusCodes.RESET_CONTENT;
     });
   }
 
