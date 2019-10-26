@@ -344,7 +344,7 @@ class EventPoller {
 
       _lastFetched = response.headers['ETag'];
 
-      final json = jsonDecode(response.body) as List<Map<String, dynamic>>;
+      final json = List<Map<String, dynamic>>.from(jsonDecode(response.body));
 
       if (!(onlyNew && _timer == null)) {
         for (final item in json) {
