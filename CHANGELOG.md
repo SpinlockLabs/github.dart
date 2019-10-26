@@ -1,6 +1,8 @@
 ## v5.5.0
 
 - Provide a single platform independent import `import 'package:github/githb.dart';`
+- Implement markThreadRead https://github.com/SpinlockLabs/github.dart/pull/185
+- Fix for activity service https://github.com/SpinlockLabs/github.dart/issues/187
 
 ## v5.4.0
 
