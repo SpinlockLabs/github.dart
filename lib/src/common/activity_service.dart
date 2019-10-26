@@ -80,17 +80,17 @@ class ActivityService extends Service {
   EventPoller pollEventsForOrganization(String name) =>
       EventPoller(_github, "/orgs/$name/events");
 
-  /// Returns an [EventPoller] for events performed by a user.
+  /// Returns an [EventPoller] for events received by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-that-a-user-has-received
   EventPoller pollEventsReceivedByUser(String user) =>
-      EventPoller(_github, "/users/$user/events");
+      EventPoller(_github, "/users/$user/received_events");
 
-  /// Returns an [EventPoller] for events performed by a user.
+  /// Returns an [EventPoller] for public events received by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-that-a-user-has-received
   EventPoller pollPublicEventsReceivedByUser(String user) =>
-      EventPoller(_github, "/repos/$user/received_events/public");
+      EventPoller(_github, "/users/$user/received_events/public");
 
   /// Lists the events performed by a user.
   ///
@@ -190,7 +190,6 @@ class ActivityService extends Service {
       return response.statusCode == StatusCodes.RESET_CONTENT;
     });
   }
-
 
   // TODO: Implement getThreadSubscription: https://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
   // TODO: Implement setThreadSubscription: https://developer.github.com/v3/activity/notifications/#set-a-thread-subscription
