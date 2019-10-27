@@ -1,6 +1,6 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'orgs.g.dart';
 
@@ -13,11 +13,11 @@ class Organization {
   int id;
 
   /// Url to Organization Profile
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Url to the Organization Avatar
-  @JsonKey(name: "avatar_url")
+  @JsonKey(name: 'avatar_url')
   String avatarUrl;
 
   /// Organization Name
@@ -36,27 +36,27 @@ class Organization {
   String email;
 
   /// Number of Public Repositories
-  @JsonKey(name: "public_repos")
+  @JsonKey(name: 'public_repos')
   int publicReposCount;
 
   /// Number of Public Gists
-  @JsonKey(name: "public_gists")
+  @JsonKey(name: 'public_gists')
   int publicGistsCount;
 
   /// Number of Followers
-  @JsonKey(name: "followers")
+  @JsonKey(name: 'followers')
   int followersCount;
 
   /// Number of People this Organization is Following
-  @JsonKey(name: "following")
+  @JsonKey(name: 'following')
   int followingCount;
 
   /// Time this organization was created
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// Time this organization was updated
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   static Organization fromJSON(Map<String, dynamic> input) {
@@ -108,11 +108,11 @@ class Team {
   String permission;
 
   /// Number of Members
-  @JsonKey(name: "members_count")
+  @JsonKey(name: 'members_count')
   int membersCount;
 
   /// Number of Repositories
-  @JsonKey(name: "repos_count")
+  @JsonKey(name: 'repos_count')
   int reposCount;
 
   /// Organization
@@ -137,8 +137,8 @@ class TeamMembershipState {
 
   TeamMembershipState(this.name);
 
-  bool get isPending => name == "pending";
-  bool get isActive => name == "active";
+  bool get isPending => name == 'pending';
+  bool get isActive => name == 'active';
   bool get isInactive => name == null;
 }
 
@@ -151,18 +151,18 @@ class TeamMember {
   int id;
 
   /// Url to Member Avatar
-  @JsonKey(name: "avatar_url")
+  @JsonKey(name: 'avatar_url')
   String avatarUrl;
 
   /// Member Type
   String type;
 
   /// If the member is a site administrator
-  @JsonKey(name: "site_admin")
+  @JsonKey(name: 'site_admin')
   bool siteAdmin;
 
   /// Profile of the Member
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   static TeamMember fromJSON(Map<String, dynamic> input) {

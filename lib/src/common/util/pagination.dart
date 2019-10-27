@@ -1,7 +1,7 @@
-import "dart:async";
-import "dart:convert" show jsonDecode;
+import 'dart:async';
+import 'dart:convert' show jsonDecode;
 
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 
 import '../../common.dart';
 
@@ -90,9 +90,9 @@ class PaginationHelper {
   }) async* {
     if (headers == null) headers = {};
     if (preview != null) {
-      headers["Accept"] = preview;
+      headers['Accept'] = preview;
     }
-    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+    headers.putIfAbsent('Accept', () => 'application/vnd.github.v3+json');
 
     await for (final response in fetchStreamed(method, path,
         pages: pages,
@@ -130,16 +130,16 @@ class PaginationHelper {
 //TODO(kevmoo): use regex here.
 Map<String, String> parseLinkHeader(String input) {
   final out = <String, String>{};
-  final parts = input.split(", ");
+  final parts = input.split(', ');
   for (final part in parts) {
-    if (part[0] != "<") {
-      throw const FormatException("Invalid Link Header");
+    if (part[0] != '<') {
+      throw const FormatException('Invalid Link Header');
     }
-    final kv = part.split("; ");
+    final kv = part.split('; ');
     String url = kv[0].substring(1);
     url = url.substring(0, url.length - 1);
     String key = kv[1];
-    key = key.replaceAll('"', "").substring(4);
+    key = key.replaceAll('"', '').substring(4);
     out[key] = url;
   }
   return out;

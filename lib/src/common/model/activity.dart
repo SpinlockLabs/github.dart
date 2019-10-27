@@ -1,7 +1,7 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for an event.
 class Event {
@@ -11,7 +11,7 @@ class Event {
 
   Organization org;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   String id;
@@ -49,7 +49,7 @@ class RepositorySubscription {
   bool ignored;
   String reason;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   RepositorySubscription();

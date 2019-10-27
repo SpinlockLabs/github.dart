@@ -1,6 +1,6 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'repos_stats.g.dart';
 
@@ -84,9 +84,9 @@ class YearCommitCountWeek {
     if (input == null) return null;
 
     final c = YearCommitCountWeek();
-    c.days = input["days"] as List<int>;
-    c.total = input["total"];
-    c.timestamp = input["week"];
+    c.days = input['days'] as List<int>;
+    c.total = input['total'];
+    c.timestamp = input['week'];
     return c;
   }
 }

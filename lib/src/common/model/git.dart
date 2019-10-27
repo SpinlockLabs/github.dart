@@ -1,8 +1,8 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'git.g.dart';
 
@@ -120,7 +120,7 @@ class GitTree {
   /// GitHub's maximum limit.
   final bool truncated;
 
-  @JsonKey(name: "tree")
+  @JsonKey(name: 'tree')
   final List<GitTreeEntry> entries;
 
   GitTree(this.sha, this.url, this.truncated, this.entries);
@@ -153,11 +153,11 @@ class CreateGitTree {
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
-  @JsonKey(name: "base_tree")
+  @JsonKey(name: 'base_tree')
   String baseTree;
 
   /// The Objects specifying a tree structure.
-  @JsonKey(name: "tree")
+  @JsonKey(name: 'tree')
   final List<CreateGitTreeEntry> entries;
 
   CreateGitTree(this.entries);

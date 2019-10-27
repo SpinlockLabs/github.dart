@@ -5,7 +5,7 @@ void main() {
 
   final crawler = RepositoryCrawler(
     github,
-    RepositorySlug.full("SpinlockLabs/github.dart"),
+    RepositorySlug.full('SpinlockLabs/github.dart'),
   );
 
   crawler.crawl().listen((file) {

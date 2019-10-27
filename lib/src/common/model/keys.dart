@@ -1,4 +1,4 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/util.dart';
 
 /// Model class for a public key.
@@ -29,8 +29,8 @@ class CreatePublicKey {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("key", key, map);
+    putValue('title', title, map);
+    putValue('key', key, map);
     return jsonEncode(map);
   }
 }

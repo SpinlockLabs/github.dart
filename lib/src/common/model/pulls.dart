@@ -1,8 +1,8 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for a Pull Request.
 class PullRequestInformation {
@@ -10,15 +10,15 @@ class PullRequestInformation {
   final bool isCompletePullRequest;
 
   /// Url to the Pull Request Page
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Url to the diff for this Pull Request
-  @JsonKey(name: "diff_url")
+  @JsonKey(name: 'diff_url')
   String diffUrl;
 
   /// Url to the patch for this Pull Request
-  @JsonKey(name: "patch_url")
+  @JsonKey(name: 'patch_url')
   String patchUrl;
 
   /// Pull Request Number
@@ -34,19 +34,19 @@ class PullRequestInformation {
   String body;
 
   /// Time the pull request was created
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// Time the pull request was updated
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   /// Time the pull request was closed
-  @JsonKey(name: "closed_at")
+  @JsonKey(name: 'closed_at')
   DateTime closedAt;
 
   /// Time the pull request was merged
-  @JsonKey(name: "merged_at")
+  @JsonKey(name: 'merged_at')
   DateTime mergedAt;
 
   /// The Pull Request Head
@@ -89,7 +89,7 @@ class PullRequestInformation {
 
 /// Model class for a Complete Pull Request.
 class PullRequest extends PullRequestInformation {
-  @JsonKey(name: "merge_commit_sha")
+  @JsonKey(name: 'merge_commit_sha')
   String mergeCommitSha;
 
   /// If the pull request was merged
@@ -99,7 +99,7 @@ class PullRequest extends PullRequestInformation {
   bool mergeable;
 
   /// The user who merged the pull request
-  @JsonKey(name: "merged_by")
+  @JsonKey(name: 'merged_by')
   User mergedBy;
 
   /// Number of comments
@@ -214,10 +214,10 @@ class CreatePullRequest {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("head", head, map);
-    putValue("base", base, map);
-    putValue("body", body, map);
+    putValue('title', title, map);
+    putValue('head', head, map);
+    putValue('base', base, map);
+    putValue('body', body, map);
     return jsonEncode(map);
   }
 }
@@ -225,36 +225,36 @@ class CreatePullRequest {
 /// Model class for a pull request comment.
 class PullRequestComment {
   int id;
-  @JsonKey(name: "diff_hunk")
+  @JsonKey(name: 'diff_hunk')
   String diffHunk;
   String path;
   int position;
 
-  @JsonKey(name: "original_position")
+  @JsonKey(name: 'original_position')
   int originalPosition;
 
-  @JsonKey(name: "commit_id")
+  @JsonKey(name: 'commit_id')
   String commitID;
 
-  @JsonKey(name: "original_commit_id")
+  @JsonKey(name: 'original_commit_id')
   String originalCommitID;
 
   User user;
   String body;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String url;
 
-  @JsonKey(name: "pull_request_url")
+  @JsonKey(name: 'pull_request_url')
   String pullRequestUrl;
 
-  @JsonKey(name: "_links")
+  @JsonKey(name: '_links')
   Links links;
 
   static PullRequestComment fromJSON(Map<String, dynamic> input) {
@@ -282,7 +282,7 @@ class PullRequestComment {
 class CreatePullRequestComment {
   String body;
 
-  @JsonKey(name: "commit_id")
+  @JsonKey(name: 'commit_id')
   String commitId;
 
   String path;
@@ -293,10 +293,10 @@ class CreatePullRequestComment {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("body", body, map);
-    putValue("commit_id", commitId, map);
-    putValue("path", path, map);
-    putValue("position", position, map);
+    putValue('body', body, map);
+    putValue('commit_id', commitId, map);
+    putValue('path', path, map);
+    putValue('position', position, map);
     return jsonEncode(map);
   }
 }
@@ -305,11 +305,11 @@ class PullRequestFile {
   String sha;
   String filename;
   String status;
-  @JsonKey(name: "additions")
+  @JsonKey(name: 'additions')
   int additionsCount;
-  @JsonKey(name: "deletions")
+  @JsonKey(name: 'deletions')
   int deletionsCount;
-  @JsonKey(name: "changes")
+  @JsonKey(name: 'changes')
   int changesCount;
   String blobUrl;
   String rawUrl;

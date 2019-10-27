@@ -3,7 +3,7 @@ import 'dart:convert' show jsonEncode, jsonDecode;
 
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 

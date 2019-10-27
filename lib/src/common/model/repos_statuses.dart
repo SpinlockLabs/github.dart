@@ -1,7 +1,7 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for the combined status of a repository.
 class CombinedRepositoryStatus {
@@ -17,14 +17,14 @@ class CombinedRepositoryStatus {
     if (input == null) return null;
 
     return CombinedRepositoryStatus()
-      ..state = input["state"]
-      ..sha = input["sha"]
-      ..totalCount = input["total_count"]
-      ..statuses = (input["statuses"] as List<Map<String, dynamic>>)
+      ..state = input['state']
+      ..sha = input['sha']
+      ..totalCount = input['total_count']
+      ..statuses = (input['statuses'] as List<Map<String, dynamic>>)
           .map((it) => RepositoryStatus.fromJSON(it))
           .toList()
       ..repository =
-          Repository.fromJSON(input["repository"] as Map<String, dynamic>);
+          Repository.fromJSON(input['repository'] as Map<String, dynamic>);
   }
 }
 
@@ -54,7 +54,7 @@ class RepositoryStatus {
 class CreateStatus {
   final String state;
 
-  @JsonKey(name: "target_url")
+  @JsonKey(name: 'target_url')
   String targetUrl;
 
   String description;
@@ -64,10 +64,10 @@ class CreateStatus {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("state", state, map);
-    putValue("target_url", targetUrl, map);
-    putValue("description", description, map);
-    putValue("context", context, map);
+    putValue('state', state, map);
+    putValue('target_url', targetUrl, map);
+    putValue('description', description, map);
+    putValue('context', context, map);
     return jsonEncode(map);
   }
 }

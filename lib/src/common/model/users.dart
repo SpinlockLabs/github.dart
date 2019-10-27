@@ -1,4 +1,4 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'users.g.dart';
 
@@ -15,15 +15,15 @@ class User {
   int id;
 
   /// Avatar URL
-  @JsonKey(name: "avatar_url")
+  @JsonKey(name: 'avatar_url')
   String avatarUrl;
 
   /// Url to this user's profile.
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// If the user is a site administrator
-  @JsonKey(name: "site_admin")
+  @JsonKey(name: 'site_admin')
   bool siteAdmin;
 
   /// User's Name
@@ -48,27 +48,27 @@ class User {
   String bio;
 
   /// Number of public repositories that this user has
-  @JsonKey(name: "public_repos")
+  @JsonKey(name: 'public_repos')
   int publicReposCount;
 
   /// Number of public gists that this user has
-  @JsonKey(name: "public_gists")
+  @JsonKey(name: 'public_gists')
   int publicGistsCount;
 
   /// Number of followers that this user has
-  @JsonKey(name: "followers")
+  @JsonKey(name: 'followers')
   int followersCount;
 
   /// Number of Users that this user follows
-  @JsonKey(name: "following")
+  @JsonKey(name: 'following')
   int followingCount;
 
   /// The time this [User] was created.
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// Last time this [User] was updated.
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   static User fromJson(Map<String, dynamic> input) {
@@ -114,15 +114,15 @@ class Collaborator {
 @JsonSerializable(createToJson: false)
 class CurrentUser extends User {
   /// Number of Private Repositories
-  @JsonKey(name: "total_private_repos")
+  @JsonKey(name: 'total_private_repos')
   int privateReposCount;
 
   /// Number of Owned Private Repositories that the user owns
-  @JsonKey(name: "owned_private_repos")
+  @JsonKey(name: 'owned_private_repos')
   int ownedPrivateReposCount;
 
   /// The User's Disk Usage
-  @JsonKey(name: "disk_usage")
+  @JsonKey(name: 'disk_usage')
   int diskUsage;
 
   /// The User's GitHub Plan
@@ -155,11 +155,11 @@ class UserPlan {
   int space;
 
   // Number of Private Repositories
-  @JsonKey(name: "private_repos")
+  @JsonKey(name: 'private_repos')
   int privateReposCount;
 
   // Number of Collaborators
-  @JsonKey(name: "collaborators")
+  @JsonKey(name: 'collaborators')
   int collaboratorsCount;
 }
 

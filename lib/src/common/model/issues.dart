@@ -1,8 +1,8 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for an issue on the tracker.
 class Issue {
@@ -12,7 +12,7 @@ class Issue {
   String url;
 
   /// Url to the Issue Page
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Issue Number
@@ -37,29 +37,29 @@ class Issue {
   Milestone milestone;
 
   /// Number of Comments
-  @JsonKey(name: "comments")
+  @JsonKey(name: 'comments')
   int commentsCount;
 
   /// A Pull Request
-  @JsonKey(name: "pull_request")
+  @JsonKey(name: 'pull_request')
   IssuePullRequest pullRequest;
 
   /// Time that the issue was created at
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The time that the issue was closed at
-  @JsonKey(name: "closed_at")
+  @JsonKey(name: 'closed_at')
   DateTime closedAt;
 
   /// The time that the issue was updated at
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   String body;
 
   /// The user who closed the issue
-  @JsonKey(name: "closed_by")
+  @JsonKey(name: 'closed_by')
   User closedBy;
 
   static Issue fromJSON(Map<String, dynamic> input) {
@@ -91,8 +91,8 @@ class Issue {
       ..body = input['body'];
   }
 
-  bool get isOpen => state == "open";
-  bool get isClosed => state == "closed";
+  bool get isOpen => state == 'open';
+  bool get isClosed => state == 'closed';
 }
 
 /// Model class for a request to create/edit an issue.
@@ -108,12 +108,12 @@ class IssueRequest {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("body", body, map);
-    putValue("labels", labels, map);
-    putValue("assignee", assignee, map);
-    putValue("state", state, map);
-    putValue("milestone", milestone, map);
+    putValue('title', title, map);
+    putValue('body', body, map);
+    putValue('labels', labels, map);
+    putValue('assignee', assignee, map);
+    putValue('state', state, map);
+    putValue('milestone', milestone, map);
     return jsonEncode(map);
   }
 }
@@ -121,15 +121,15 @@ class IssueRequest {
 /// Model class for a pull request for an issue.
 class IssuePullRequest {
   /// Url to the Page for this Issue Pull Request
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Diff Url
-  @JsonKey(name: "diff_url")
+  @JsonKey(name: 'diff_url')
   String diffUrl;
 
   /// Patch Url
-  @JsonKey(name: "patch_url")
+  @JsonKey(name: 'patch_url')
   String patchUrl;
 
   static IssuePullRequest fromJSON(Map<String, dynamic> input) {
@@ -156,10 +156,10 @@ class IssueComment {
 
   String url;
 
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
-  @JsonKey(name: "issue_url")
+  @JsonKey(name: 'issue_url')
   String issueUrl;
 
   static IssueComment fromJSON(Map<String, dynamic> input) {
@@ -221,23 +221,23 @@ class Milestone {
   User creator;
 
   /// Number of Open Issues
-  @JsonKey(name: "open_issues")
+  @JsonKey(name: 'open_issues')
   int openIssuesCount;
 
   /// Number of Closed Issues
-  @JsonKey(name: "closed_issues")
+  @JsonKey(name: 'closed_issues')
   int closedIssuesCount;
 
   /// Time the milestone was created at
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The last time the milestone was updated at
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   /// The due date for this milestone
-  @JsonKey(name: "due_on")
+  @JsonKey(name: 'due_on')
   DateTime dueOn;
 
   static Milestone fromJSON(Map<String, dynamic> input) {
@@ -270,10 +270,10 @@ class CreateMilestone {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("state", state, map);
+    putValue('title', title, map);
+    putValue('state', state, map);
     putValue(description, description, map);
-    putValue("due_on", dateToGitHubIso8601(dueOn), map);
+    putValue('due_on', dateToGitHubIso8601(dueOn), map);
     return jsonEncode(map);
   }
 }

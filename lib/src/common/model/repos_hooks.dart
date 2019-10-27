@@ -1,6 +1,6 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for a repository hook.
 class Hook {
@@ -8,7 +8,7 @@ class Hook {
   List<String> events;
 
   /// Content Type
-  @JsonKey(name: "config/content_type")
+  @JsonKey(name: 'config/content_type')
   String contentType;
 
   /// If the hook is active
@@ -21,11 +21,11 @@ class Hook {
   String name;
 
   /// The time the hook was created
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The last time the hook was updated
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   /// The Repository Name
@@ -64,10 +64,10 @@ class CreateHook {
   final bool active;
 
   CreateHook(this.name, this.config,
-      {this.events = const ["push"], this.active = true});
+      {this.events = const ['push'], this.active = true});
 
   String toJSON() {
     return jsonEncode(
-        {"name": name, "config": config, "events": events, "active": active});
+        {'name': name, 'config': config, 'events': events, 'active': active});
   }
 }

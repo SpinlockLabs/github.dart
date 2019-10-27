@@ -13,34 +13,34 @@ class Release {
   Map json;
 
   /// Url to this Release
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Tarball of the Repository Tree at the commit of this release.
-  @JsonKey(name: "tarball_url")
+  @JsonKey(name: 'tarball_url')
   String tarballUrl;
 
   /// ZIP of the Repository Tree at the commit of this release.
-  @JsonKey(name: "zipball_url")
+  @JsonKey(name: 'zipball_url')
   String zipballUrl;
 
   /// The endpoint for uploading release assets.
   /// This key is a hypermedia resource. https://developer.github.com/v3/#hypermedia
-  @JsonKey(name: "upload_url")
+  @JsonKey(name: 'upload_url')
   String uploadUrl;
 
   /// Release ID
   int id;
 
-  @JsonKey(name: "node_id")
+  @JsonKey(name: 'node_id')
   String nodeId;
 
   /// Release Tag Name
-  @JsonKey(name: "tag_name")
+  @JsonKey(name: 'tag_name')
   String tagName;
 
   /// Target Commit
-  @JsonKey(name: "target_commitish")
+  @JsonKey(name: 'target_commitish')
   String targetCommitish;
 
   /// Target Commit (Deprecated)
@@ -61,7 +61,7 @@ class Release {
   String description;
 
   /// If the release is a draft.
-  @JsonKey(name: "draft")
+  @JsonKey(name: 'draft')
   bool isDraft;
 
   /// Deprecated: Use isDraft instead
@@ -88,15 +88,15 @@ class Release {
 
   /// If the release is a pre-release.
   /// Deprecated: Use isPrerelease instead
-  @JsonKey(name: "prerelease")
+  @JsonKey(name: 'prerelease')
   bool isPrerelease;
 
   /// The time this release was created at.
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The time this release was published at.
-  @JsonKey(name: "published_at")
+  @JsonKey(name: 'published_at')
   DateTime publishedAt;
 
   /// The author of this release.
@@ -138,7 +138,7 @@ class ReleaseAsset {
   Map json;
 
   /// Url to download the asset.
-  @JsonKey(name: "browser_download_url")
+  @JsonKey(name: 'browser_download_url')
   String browserDownloadUrl;
 
   /// Asset ID
@@ -154,22 +154,22 @@ class ReleaseAsset {
   String state;
 
   /// Asset Content Type
-  @JsonKey(name: "content_type")
+  @JsonKey(name: 'content_type')
   String contentType;
 
   /// Size of Asset
   int size;
 
   /// Number of Downloads
-  @JsonKey(name: "download_count")
+  @JsonKey(name: 'download_count')
   int downloadCount;
 
   /// Time the asset was created at
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// Time the asset was last updated
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   static ReleaseAsset fromJson(Map<String, dynamic> input) {

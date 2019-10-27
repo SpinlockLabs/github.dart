@@ -1,5 +1,5 @@
 import 'package:github/src/common.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'search.g.dart';
 
@@ -11,10 +11,10 @@ abstract class SearchResults<T> {
 
 @JsonSerializable(createToJson: false)
 class CodeSearchResults implements SearchResults<CodeSearchItem> {
-  @JsonKey(name: "total_count")
+  @JsonKey(name: 'total_count')
   int totalCount;
 
-  @JsonKey(name: "incomplete_results")
+  @JsonKey(name: 'incomplete_results')
   bool incompleteResults;
 
   @JsonKey(fromJson: CodeSearchItem.fromJsonList)

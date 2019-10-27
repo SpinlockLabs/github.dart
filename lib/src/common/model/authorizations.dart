@@ -1,8 +1,8 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for an authorization.
 class Authorization {
@@ -42,7 +42,7 @@ class AuthorizationApplication {
   String url;
   String name;
 
-  @JsonKey(name: "client_id")
+  @JsonKey(name: 'client_id')
   String clientID;
 
   AuthorizationApplication();
@@ -69,10 +69,10 @@ class CreateAuthorization {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("note", note, map);
-    putValue("note_url", noteUrl, map);
-    putValue("client_id", clientID, map);
-    putValue("client_secret", clientSecret, map);
+    putValue('note', note, map);
+    putValue('note_url', noteUrl, map);
+    putValue('client_id', clientID, map);
+    putValue('client_secret', clientSecret, map);
     return jsonEncode(map);
   }
 }

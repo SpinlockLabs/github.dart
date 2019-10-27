@@ -1,14 +1,14 @@
-import "dart:async";
-import "dart:convert";
+import 'dart:async';
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 
 /// OAuth2 Flow Helper
 ///
 /// **Example**:
 ///
-///      var flow = new OAuth2Flow("ClientID", "ClientSecret");
+///      var flow = new OAuth2Flow('ClientID', 'ClientSecret');
 ///      var authUrl = flow.createAuthorizationURL();
 ///      // Display to the User and handle the redirect URI, and also get the code.
 ///      flow.exchange(code).then((response) {
@@ -43,12 +43,12 @@ class OAuth2Flow {
       this.scopes = const [],
       this.state,
       this.github,
-      this.baseUrl = "https://github.com/login/oauth"})
+      this.baseUrl = 'https://github.com/login/oauth'})
       : this.redirectUri =
             redirectUri == null ? null : _checkRedirectUri(redirectUri);
 
   static String _checkRedirectUri(String uri) {
-    return uri.contains("?") ? uri.substring(0, uri.indexOf("?")) : uri;
+    return uri.contains('?') ? uri.substring(0, uri.indexOf('?')) : uri;
   }
 
   /// Generates an Authorization URL
@@ -56,20 +56,20 @@ class OAuth2Flow {
   /// This should be displayed to the user.
   String createAuthorizeUrl() {
     return baseUrl +
-        "/authorize" +
+        '/authorize' +
         buildQueryString({
-          "client_id": clientId,
-          "scope": scopes.join(","),
-          "redirect_uri": redirectUri,
-          "state": state
+          'client_id': clientId,
+          'scope': scopes.join(','),
+          'redirect_uri': redirectUri,
+          'state': state
         });
   }
 
   /// Exchanges the given [code] for a token.
   Future<ExchangeResponse> exchange(String code, [String origin]) {
     final headers = <String, String>{
-      "Accept": "application/json",
-      "content-type": "application/json"
+      'Accept': 'application/json',
+      'content-type': 'application/json'
     };
 
     if (origin != null) {
@@ -77,21 +77,21 @@ class OAuth2Flow {
     }
 
     final body = jsonEncode(<String, dynamic>{
-      "client_id": clientId,
-      "client_secret": clientSecret,
-      "code": code,
-      "redirect_uri": redirectUri
+      'client_id': clientId,
+      'client_secret': clientSecret,
+      'code': code,
+      'redirect_uri': redirectUri
     });
 
     return (github == null ? http.Client() : github.client)
-        .post("$baseUrl/access_token", body: body, headers: headers)
+        .post('$baseUrl/access_token', body: body, headers: headers)
         .then((response) {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
         throw json;
       }
       return ExchangeResponse(json['access_token'], json['token_type'],
-          (json['scope'] as String).split(","));
+          (json['scope'] as String).split(','));
     });
   }
 }

@@ -1,8 +1,8 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for gists.
 class Gist {
@@ -13,22 +13,22 @@ class Gist {
   User user;
   List<GistFile> files;
 
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
-  @JsonKey(name: "comments")
+  @JsonKey(name: 'comments')
   int commentsCount;
 
-  @JsonKey(name: "git_pull_url")
+  @JsonKey(name: 'git_pull_url')
   String gitPullUrl;
 
-  @JsonKey(name: "git_push_url")
+  @JsonKey(name: 'git_push_url')
   String gitPushUrl;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   static Gist fromJSON(Map<String, dynamic> input) {
@@ -68,7 +68,7 @@ class GistFile {
   String name;
   int size;
 
-  @JsonKey(name: "raw_url")
+  @JsonKey(name: 'raw_url')
   String rawUrl;
   String type;
   String language;
@@ -94,10 +94,10 @@ class GistFork {
   User user;
   int id;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   static GistFork fromJson(Map<String, dynamic> input) {
@@ -117,16 +117,16 @@ class GistHistoryEntry {
 
   User user;
 
-  @JsonKey(name: "change_status/deletions")
+  @JsonKey(name: 'change_status/deletions')
   int deletions;
 
-  @JsonKey(name: "change_status/additions")
+  @JsonKey(name: 'change_status/additions')
   int additions;
 
-  @JsonKey(name: "change_status/total")
+  @JsonKey(name: 'change_status/total')
   int totalChanges;
 
-  @JsonKey(name: "committed_at")
+  @JsonKey(name: 'committed_at')
   DateTime committedAt;
 
   static GistHistoryEntry fromJSON(Map<String, dynamic> input) {
@@ -147,10 +147,10 @@ class GistComment {
   int id;
   User user;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   String body;

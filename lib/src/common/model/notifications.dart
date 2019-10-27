@@ -1,6 +1,6 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for notifications.
 class Notification {
@@ -10,10 +10,10 @@ class Notification {
   String reason;
   bool unread;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
-  @JsonKey(name: "last_read_at")
+  @JsonKey(name: 'last_read_at')
   DateTime lastReadAt;
 
   static Notification fromJSON(Map<String, dynamic> input) {

@@ -17,7 +17,7 @@ class MockHTTPClient extends http.BaseClient {
         orElse: () => null);
     final creator = responses[matchingUrlCreatorKey];
     if (creator == null) {
-      throw Exception("No Response Configured");
+      throw Exception('No Response Configured');
     }
 
     return creator(request);
@@ -30,7 +30,7 @@ class MockResponse extends http.Response {
 
   factory MockResponse.fromAsset(String name) {
     final Map<String, dynamic> responseData =
-        jsonDecode(asset("responses/$name.json").readAsStringSync())
+        jsonDecode(asset('responses/$name.json').readAsStringSync())
             as Map<String, dynamic>;
     final Map<String, String> headers =
         responseData['headers'] as Map<String, String>;

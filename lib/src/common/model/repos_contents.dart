@@ -1,7 +1,7 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 part 'repos_contents.g.dart';
 
@@ -29,15 +29,15 @@ class GitHubFile {
   String sha;
 
   /// Url to file
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Git Url
-  @JsonKey(name: "git_url")
+  @JsonKey(name: 'git_url')
   String gitUrl;
 
   /// Links
-  @JsonKey(name: "_links")
+  @JsonKey(name: '_links')
   Links links;
 
   /// Text Content
@@ -113,11 +113,11 @@ class CreateFile {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("path", path, map);
-    putValue("message", message, map);
-    putValue("content", content, map);
-    putValue("branch", branch, map);
-    putValue("committer", committer != null ? committer.toMap() : null, map);
+    putValue('path', path, map);
+    putValue('message', message, map);
+    putValue('content', content, map);
+    putValue('branch', branch, map);
+    putValue('committer', committer != null ? committer.toMap() : null, map);
     return jsonEncode(map);
   }
 }

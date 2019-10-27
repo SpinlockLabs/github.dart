@@ -1,5 +1,5 @@
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 
 /// Model class for a Gitignore Template.
 class GitignoreTemplate {
@@ -44,13 +44,13 @@ class RateLimit {
 class APIStatus {
   String status;
 
-  @JsonKey(name: "last_updated")
+  @JsonKey(name: 'last_updated')
   DateTime lastUpdatedAt;
 
-  @JsonKey(name: "created_on")
+  @JsonKey(name: 'created_on')
   DateTime createdOn;
 
-  @JsonKey(name: "body")
+  @JsonKey(name: 'body')
   String message;
 
   static APIStatus fromJSON(Map<String, dynamic> input) {

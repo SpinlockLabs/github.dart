@@ -1,7 +1,7 @@
-import "dart:async";
-import "dart:convert";
+import 'dart:async';
+import 'dart:convert';
 import 'package:github/src/common.dart';
-import "package:github/src/common/util/pagination.dart";
+import 'package:github/src/common/util/pagination.dart';
 
 /// The [GitService] handles communication with git related methods of the
 /// GitHub API.
@@ -110,7 +110,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#delete-a-reference
   Future<bool> deleteReference(RepositorySlug slug, String ref) {
     return github
-        .request("DELETE", "/repos/${slug.fullName}/git/refs/$ref")
+        .request('DELETE', '/repos/${slug.fullName}/git/refs/$ref')
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 

@@ -1,6 +1,6 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 /// Model class for a commit in a repository.
@@ -16,11 +16,11 @@ class RepositoryCommit {
   String sha;
 
   /// Url to Commit Page
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Comments url.
-  @JsonKey(name: "comments_url")
+  @JsonKey(name: 'comments_url')
   String commentsUrl;
 
   /// A reference to the raw [GitCommit].
@@ -93,7 +93,7 @@ class CommitStats {
 
 /// Model class of a file that was changed in a commit.
 class CommitFile {
-  @JsonKey(name: "filename")
+  @JsonKey(name: 'filename')
   String name;
 
   int additions;
@@ -101,10 +101,10 @@ class CommitFile {
   int changes;
   String status;
 
-  @JsonKey(name: "raw_url")
+  @JsonKey(name: 'raw_url')
   String rawUrl;
 
-  @JsonKey(name: "blob_url")
+  @JsonKey(name: 'blob_url')
   String blobUrl;
 
   String patch;

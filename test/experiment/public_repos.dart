@@ -4,6 +4,6 @@ void main() {
   final github = GitHub();
 
   github.repositories.listPublicRepositories(limit: 50).listen((repo) {
-    print("-> ${repo.fullName}");
+    print('-> ${repo.fullName}');
   }).onDone(() => github.dispose());
 }

@@ -1,8 +1,8 @@
-import "dart:async";
-import "dart:convert";
+import 'dart:async';
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart' as http_parser;
 import 'package:meta/meta.dart';
 
@@ -14,6 +14,17 @@ import 'package:meta/meta.dart';
 ///       // Use the Client
 ///
 class GitHub {
+  /// Creates a new [GitHub] instance.
+  ///
+  /// [endpoint] is the api endpoint to use
+  /// [auth] is the authentication information
+  GitHub({
+    Authentication auth,
+    this.endpoint = 'https://api.github.com',
+    http.Client client,
+  })  : auth = auth == null ? Authentication.anonymous() : auth,
+        client = client == null ? http.Client() : client;
+
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
@@ -39,17 +50,6 @@ class GitHub {
   SearchService _search;
   UrlShortenerService _urlShortener;
   UsersService _users;
-
-  /// Creates a new [GitHub] instance.
-  ///
-  /// [endpoint] is the api endpoint to use
-  /// [auth] is the authentication information
-  GitHub({
-    Authentication auth,
-    this.endpoint = "https://api.github.com",
-    http.Client client,
-  })  : this.auth = auth == null ? Authentication.anonymous() : auth,
-        this.client = client == null ? http.Client() : client;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -262,10 +262,10 @@ class GitHub {
     headers ??= {};
 
     if (preview != null) {
-      headers["Accept"] = preview;
+      headers['Accept'] = preview;
     }
 
-    headers.putIfAbsent("Accept", () => "application/vnd.github.v3+json");
+    headers.putIfAbsent('Accept', () => 'application/vnd.github.v3+json');
 
     final response = await request(
       method,
@@ -317,22 +317,22 @@ class GitHub {
     if (headers == null) headers = {};
 
     if (preview != null) {
-      headers["Accept"] = preview;
+      headers['Accept'] = preview;
     }
 
     if (auth.isToken) {
-      headers.putIfAbsent("Authorization", () => "token ${auth.token}");
+      headers.putIfAbsent('Authorization', () => 'token ${auth.token}');
     } else if (auth.isBasic) {
       final userAndPass =
           base64Encode(utf8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent("Authorization", () => "basic $userAndPass");
+      headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
     }
 
-    if (method == "PUT" && body == null) {
-      headers.putIfAbsent("Content-Length", () => "0");
+    if (method == 'PUT' && body == null) {
+      headers.putIfAbsent('Content-Length', () => '0');
     }
 
-    var queryString = "";
+    var queryString = '';
 
     if (params != null) {
       queryString = buildQueryString(params);
@@ -340,7 +340,7 @@ class GitHub {
 
     final url = StringBuffer();
 
-    if (path.startsWith("http://") || path.startsWith("https://")) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
       url.write(path);
       url.write(queryString);
     } else {
@@ -389,14 +389,14 @@ class GitHub {
     }
     switch (response.statusCode) {
       case 404:
-        throw NotFound(this, "Requested Resource was Not Found");
+        throw NotFound(this, 'Requested Resource was Not Found');
         break;
       case 401:
         throw AccessForbidden(this);
       case 400:
-        if (message == "Problems parsing JSON") {
+        if (message == 'Problems parsing JSON') {
           throw InvalidJSON(this, message);
-        } else if (message == "Body should be a JSON Hash") {
+        } else if (message == 'Body should be a JSON Hash') {
           throw InvalidJSON(this, message);
         } else {
           throw BadRequest(this);
@@ -405,17 +405,17 @@ class GitHub {
       case 422:
         final buff = StringBuffer();
         buff.writeln();
-        buff.writeln("  Message: $message");
+        buff.writeln('  Message: $message');
         if (errors != null) {
-          buff.writeln("  Errors:");
+          buff.writeln('  Errors:');
           for (final Map<String, String> error in errors) {
             final resource = error['resource'];
             final field = error['field'];
             final code = error['code'];
             buff
-              ..writeln("    Resource: $resource")
-              ..writeln("    Field $field")
-              ..write("    Code: $code");
+              ..writeln('    Resource: $resource')
+              ..writeln('    Field $field')
+              ..write('    Code: $code');
           }
         }
         throw ValidationFailed(this, buff.toString());

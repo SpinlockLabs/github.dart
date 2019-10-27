@@ -1,4 +1,4 @@
-import "dart:async";
+import 'dart:async';
 import 'package:github/src/common.dart';
 
 /// The [UrlShortenerService] provides a handy method to access GitHub's
@@ -20,13 +20,13 @@ class UrlShortenerService extends Service {
     }
 
     return github
-        .request("POST", "http://git.io/", params: params)
+        .request('POST', 'http://git.io/', params: params)
         .then((response) {
       if (response.statusCode != StatusCodes.CREATED) {
-        throw GitHubError(github, "Failed to create shortened url!");
+        throw GitHubError(github, 'Failed to create shortened url!');
       }
 
-      return response.headers["Location"].split("/").last;
+      return response.headers['Location'].split('/').last;
     });
   }
 }

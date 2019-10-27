@@ -1,6 +1,6 @@
-import "dart:async";
+import 'dart:async';
 import 'package:github/src/common.dart';
-import "package:github/src/common/util/pagination.dart";
+import 'package:github/src/common/util/pagination.dart';
 
 /// The [AuthorizationsService] handles communication with authorizations related methods
 /// of the GitHub API.
@@ -17,14 +17,14 @@ class AuthorizationsService extends Service {
   /// API docs: https://developer.github.com/v3/oauth_authorizations/#list-your-authorizations
   Stream<Authorization> listAuthorizations() {
     return PaginationHelper(github)
-        .objects("GET", "/authorizations", Authorization.fromJSON);
+        .objects('GET', '/authorizations', Authorization.fromJSON);
   }
 
   /// Fetches an authorization specified by [id].
   ///
   /// API docs: https://developer.github.com/v3/oauth_authorizations/#get-a-single-authorization
   Future<Authorization> getAuthorization(int id) =>
-      github.getJSON("/authorizations/$id",
+      github.getJSON('/authorizations/$id',
           statusCode: 200, convert: Authorization.fromJSON);
 
   // TODO: Implement remaining API methods of authorizations:

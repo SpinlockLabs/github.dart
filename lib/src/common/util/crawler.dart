@@ -1,4 +1,4 @@
-import "dart:async";
+import 'dart:async';
 import 'package:github/src/common.dart';
 
 // Crawls a Repository to Fetch All Files
@@ -21,6 +21,6 @@ class RepositoryCrawler {
       }
     }
 
-    yield* scan("/");
+    yield* scan('/');
   }
 }

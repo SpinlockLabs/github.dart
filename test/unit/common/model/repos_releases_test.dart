@@ -42,8 +42,8 @@ void main() {
     test('toJson reserializes back to the same type of object', () {
       final createRelease = CreateRelease.from(
           tagName: 'v1.0.0',
-          name: "Initial Release",
-          targetCommitish: "master",
+          name: 'Initial Release',
+          targetCommitish: 'master',
           isDraft: false,
           isPrerelease: true);
       final json = createRelease.toJson();

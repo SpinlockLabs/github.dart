@@ -10,7 +10,7 @@ class GitHubError implements Exception {
   const GitHubError(this.github, this.message, {this.apiUrl, this.source});
 
   @override
-  String toString() => "GitHub Error: $message";
+  String toString() => 'GitHub Error: $message';
 }
 
 class NotReady extends GitHubError {
@@ -38,61 +38,61 @@ class BadRequest extends GitHubError {
 /// GitHub Repository was not found
 class RepositoryNotFound extends NotFound {
   const RepositoryNotFound(GitHub github, String repo)
-      : super(github, "Repository Not Found: $repo");
+      : super(github, 'Repository Not Found: $repo');
 }
 
 /// GitHub User was not found
 class UserNotFound extends NotFound {
   const UserNotFound(GitHub github, String user)
-      : super(github, "User Not Found: $user");
+      : super(github, 'User Not Found: $user');
 }
 
 /// GitHub Organization was not found
 class OrganizationNotFound extends NotFound {
   const OrganizationNotFound(GitHub github, String organization)
-      : super(github, "Organization Not Found: $organization");
+      : super(github, 'Organization Not Found: $organization');
 }
 
 /// GitHub Team was not found
 class TeamNotFound extends NotFound {
   const TeamNotFound(GitHub github, int id)
-      : super(github, "Team Not Found: $id");
+      : super(github, 'Team Not Found: $id');
 }
 
 /// Access was forbidden to a resource
 class AccessForbidden extends GitHubError {
-  const AccessForbidden(GitHub github) : super(github, "Access Forbidden");
+  const AccessForbidden(GitHub github) : super(github, 'Access Forbidden');
 }
 
 /// Client hit the rate limit.
 class RateLimitHit extends GitHubError {
-  const RateLimitHit(GitHub github) : super(github, "Rate Limit Hit");
+  const RateLimitHit(GitHub github) : super(github, 'Rate Limit Hit');
 }
 
 /// A GitHub Server Error
 class ServerError extends GitHubError {
   ServerError(GitHub github, int statusCode, String message)
-      : super(github, "${message ?? 'Server Error'} ($statusCode)");
+      : super(github, '${message ?? 'Server Error'} ($statusCode)');
 }
 
 /// An Unknown Error
 class UnknownError extends GitHubError {
   const UnknownError(GitHub github, [String message])
-      : super(github, message != null ? message : "Unknown Error");
+      : super(github, message != null ? message : 'Unknown Error');
 }
 
 /// GitHub Client was not authenticated
 class NotAuthenticated extends GitHubError {
   const NotAuthenticated(GitHub github)
-      : super(github, "Client not Authenticated");
+      : super(github, 'Client not Authenticated');
 }
 
 class InvalidJSON extends BadRequest {
-  const InvalidJSON(GitHub github, [String message = "Invalid JSON"])
+  const InvalidJSON(GitHub github, [String message = 'Invalid JSON'])
       : super(github, message);
 }
 
 class ValidationFailed extends GitHubError {
-  const ValidationFailed(GitHub github, [String message = "Validation Failed"])
+  const ValidationFailed(GitHub github, [String message = 'Validation Failed'])
       : super(github, message);
 }

@@ -1,4 +1,4 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/util.dart';
 
 /// Model class for a new fork to be created.
@@ -9,7 +9,7 @@ class CreateFork {
 
   String toJSON() {
     final map = <String, dynamic>{};
-    putValue("organization", organization, map);
+    putValue('organization', organization, map);
     return jsonEncode(map);
   }
 }

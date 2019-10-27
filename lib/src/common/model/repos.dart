@@ -1,7 +1,7 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 part 'repos.g.dart';
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -21,15 +21,15 @@ class GitHubComparison {
   String toString() {
     switch (status) {
       case 'identical':
-        return "GitHubComparison: identical";
+        return 'GitHubComparison: identical';
       case 'behind':
-        return "GitHubComparison: behind ($behindBy)";
+        return 'GitHubComparison: behind ($behindBy)';
       case 'diverged':
-        return "GitHubComparison: diverged";
+        return 'GitHubComparison: diverged';
       case 'ahead':
-        return "GitHubComparison: ahead ($aheadBy)";
+        return 'GitHubComparison: ahead ($aheadBy)';
       default:
-        return "Huh??? - $status";
+        return 'Huh??? - $status';
     }
   }
 }
@@ -44,29 +44,29 @@ class Repository {
   int id;
 
   /// Full Repository Name
-  @JsonKey(name: "full_name")
+  @JsonKey(name: 'full_name')
   String fullName;
 
   /// Repository Owner
   UserInformation owner;
 
   /// If the Repository is Private
-  @JsonKey(name: "private")
+  @JsonKey(name: 'private')
   bool isPrivate;
 
   /// If the Repository is a fork
-  @JsonKey(name: "fork")
+  @JsonKey(name: 'fork')
   bool isFork;
 
   /// Url to the GitHub Repository Page
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Repository Description
   String description;
 
   /// Repository Clone Urls
-  @JsonKey(name: "clone_urls")
+  @JsonKey(name: 'clone_urls')
   CloneUrls cloneUrls;
 
   /// Url to the Repository Homepage
@@ -76,34 +76,34 @@ class Repository {
   int size;
 
   /// Repository Stars
-  @JsonKey(name: "stargazers_count")
+  @JsonKey(name: 'stargazers_count')
   int stargazersCount;
 
   /// Repository Watchers
-  @JsonKey(name: "watchers_count")
+  @JsonKey(name: 'watchers_count')
   int watchersCount;
 
   /// Repository Language
   String language;
 
   /// If the Repository has Issues Enabled
-  @JsonKey(name: "has_issues")
+  @JsonKey(name: 'has_issues')
   bool hasIssues;
 
   /// If the Repository has the Wiki Enabled
-  @JsonKey(name: "has_wiki")
+  @JsonKey(name: 'has_wiki')
   bool hasWiki;
 
   /// If the Repository has any Downloads
-  @JsonKey(name: "has_downloads")
+  @JsonKey(name: 'has_downloads')
   bool hasDownloads;
 
   /// Number of Forks
-  @JsonKey(name: "forks_count")
+  @JsonKey(name: 'forks_count')
   int forksCount;
 
   /// Number of Open Issues
-  @JsonKey(name: "open_issues_count")
+  @JsonKey(name: 'open_issues_count')
   int openIssuesCount;
 
   /// Repository Default Branch
@@ -111,19 +111,19 @@ class Repository {
   String defaultBranch;
 
   /// Number of Subscribers
-  @JsonKey(name: "subscribers_count")
+  @JsonKey(name: 'subscribers_count')
   int subscribersCount;
 
   /// Number of users in the network
-  @JsonKey(name: "network_count")
+  @JsonKey(name: 'network_count')
   int networkCount;
 
   /// The time the repository was created at
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The last time the repository was pushed at
-  @JsonKey(name: "pushed_at")
+  @JsonKey(name: 'pushed_at')
   DateTime pushedAt;
 
   @JsonKey(name: 'updated_at')
@@ -264,16 +264,16 @@ class RepositorySlug {
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {
-    final split = f.split("/");
+    final split = f.split('/');
     final o = split[0];
-    final n = (split..removeAt(0)).join("/");
+    final n = (split..removeAt(0)).join('/');
     return RepositorySlug(o, n);
   }
 
   /// The Full Name of the Repository
   ///
   /// Example: owner/name
-  String get fullName => "$owner/$name";
+  String get fullName => '$owner/$name';
 
   @override
   bool operator ==(Object obj) =>
@@ -283,7 +283,7 @@ class RepositorySlug {
   int get hashCode => fullName.hashCode;
 
   @override
-  String toString() => "$owner/$name";
+  String toString() => '$owner/$name';
 }
 
 /// Model class for a new repository to be created.
@@ -301,49 +301,49 @@ class CreateRepository {
   bool private = false;
 
   /// If the repository should have issues enabled.
-  @JsonKey(name: "has_issues")
+  @JsonKey(name: 'has_issues')
   bool hasIssues = true;
 
   /// If the repository should have the wiki enabled.
-  @JsonKey(name: "has_wiki")
+  @JsonKey(name: 'has_wiki')
   bool hasWiki = true;
 
   /// If the repository should have downloads enabled.
-  @JsonKey(name: "has_downloads")
+  @JsonKey(name: 'has_downloads')
   bool hasDownloads = true;
 
   /// The Team ID (Only for Creating a Repository for an Organization)
-  @OnlyWhen("Creating a repository for an organization")
-  @JsonKey(name: "team_id")
+  @OnlyWhen('Creating a repository for an organization')
+  @JsonKey(name: 'team_id')
   int teamID;
 
   /// If GitHub should auto initialize the repository.
-  @JsonKey(name: "auto_init")
+  @JsonKey(name: 'auto_init')
   bool autoInit = false;
 
   /// .gitignore template (only when [autoInit] is true)
-  @OnlyWhen("autoInit is true")
+  @OnlyWhen('autoInit is true')
   String gitignoreTemplate;
 
   /// License template (only when [autoInit] is true)
-  @OnlyWhen("autoInit is true")
+  @OnlyWhen('autoInit is true')
   String licenseTemplate;
 
   CreateRepository(this.name);
 
   String toJSON() {
     return jsonEncode({
-      "name": name,
-      "description": description,
-      "homepage": homepage,
-      "private": private,
-      "has_issues": hasIssues,
-      "has_wiki": hasWiki,
-      "has_downloads": hasDownloads,
-      "team_id": teamID,
-      "auto_init": autoInit,
-      "gitignore_template": gitignoreTemplate,
-      "license_template": licenseTemplate
+      'name': name,
+      'description': description,
+      'homepage': homepage,
+      'private': private,
+      'has_issues': hasIssues,
+      'has_wiki': hasWiki,
+      'has_downloads': hasDownloads,
+      'team_id': teamID,
+      'auto_init': autoInit,
+      'gitignore_template': gitignoreTemplate,
+      'license_template': licenseTemplate
     });
   }
 }
@@ -404,7 +404,7 @@ class LanguageBreakdown {
   String toString() {
     final buffer = StringBuffer();
     _data.forEach((key, value) {
-      buffer.writeln("$key: $value");
+      buffer.writeln('$key: $value');
     });
     return buffer.toString();
   }

@@ -1,4 +1,4 @@
-import "package:json_annotation/json_annotation.dart";
+import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
 /// GitHub Pages Information
@@ -10,7 +10,7 @@ class RepositoryPages {
   String status;
 
   /// If the repo has a custom 404
-  @JsonKey(name: "custom_404")
+  @JsonKey(name: 'custom_404')
   bool hasCustom404;
 
   static RepositoryPages fromJSON(Map<String, dynamic> input) {
@@ -48,15 +48,15 @@ class PageBuild {
   factory PageBuild.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return PageBuild._(
-      url: input["url"],
-      status: input["status"],
-      error: PageBuildError._fromJSON(input["error"] as Map<String, dynamic>),
+      url: input['url'],
+      status: input['status'],
+      error: PageBuildError._fromJSON(input['error'] as Map<String, dynamic>),
       pusher:
-          PageBuildPusher._fromJSON(input["pusher"] as Map<String, dynamic>),
-      commit: input["commit"],
-      duration: input["duration"],
-      createdAt: DateTime.tryParse(input["created_at"]),
-      updatedAt: DateTime.tryParse(input["updated_at"]),
+          PageBuildPusher._fromJSON(input['pusher'] as Map<String, dynamic>),
+      commit: input['commit'],
+      duration: input['duration'],
+      createdAt: DateTime.tryParse(input['created_at']),
+      updatedAt: DateTime.tryParse(input['updated_at']),
     );
   }
 }
@@ -81,12 +81,12 @@ class PageBuildPusher {
   factory PageBuildPusher._fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return PageBuildPusher._(
-      login: input["login"],
-      id: input["id"],
-      apiUrl: input["url"],
-      htmlUrl: input["html_url"],
-      type: input["type"],
-      siteAdmin: input["site_admin"],
+      login: input['login'],
+      id: input['id'],
+      apiUrl: input['url'],
+      htmlUrl: input['html_url'],
+      type: input['type'],
+      siteAdmin: input['site_admin'],
     );
   }
 }
@@ -98,7 +98,7 @@ class PageBuildError {
   factory PageBuildError._fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return PageBuildError._(
-      message: input["message"],
+      message: input['message'],
     );
   }
 }

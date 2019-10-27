@@ -1,7 +1,7 @@
-import "dart:async";
-import "dart:convert";
+import 'dart:async';
+import 'dart:convert';
 import 'package:github/src/common.dart';
-import "package:github/src/common/util/pagination.dart";
+import 'package:github/src/common/util/pagination.dart';
 
 /// The [GistsService] handles communication with gist
 /// methods of the GitHub API.
@@ -15,7 +15,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
     return PaginationHelper(github)
-        .objects("GET", "/users/$username/gists", Gist.fromJSON);
+        .objects('GET', '/users/$username/gists', Gist.fromJSON);
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -23,7 +23,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return PaginationHelper(github).objects("GET", "/gists", Gist.fromJSON);
+    return PaginationHelper(github).objects('GET', '/gists', Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's public gists.
@@ -31,7 +31,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
     return PaginationHelper(github)
-        .objects("GET", "/gists/public", Gist.fromJSON);
+        .objects('GET', '/gists/public', Gist.fromJSON);
   }
 
   /// Fetches the currently authenticated user's starred gists.
@@ -39,13 +39,13 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
     return PaginationHelper(github)
-        .objects("GET", "/gists/starred", Gist.fromJSON);
+        .objects('GET', '/gists/starred', Gist.fromJSON);
   }
 
   /// Fetches a Gist by the specified [id].
   ///
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
-  Future<Gist> getGist(String id) => github.getJSON("/gists/$id",
+  Future<Gist> getGist(String id) => github.getJSON('/gists/$id',
       statusCode: StatusCodes.OK, convert: Gist.fromJSON);
 
   /// Creates a Gist
@@ -56,24 +56,24 @@ class GistsService extends Service {
     String description,
     bool public = false,
   }) {
-    final map = <String, dynamic>{"files": {}};
+    final map = <String, dynamic>{'files': {}};
 
     if (description != null) {
-      map["description"] = description;
+      map['description'] = description;
     }
 
-    map["public"] = public;
+    map['public'] = public;
 
     final f = {};
 
     for (final key in files.keys) {
-      f[key] = {"content": files[key]};
+      f[key] = {'content': files[key]};
     }
 
-    map["files"] = f;
+    map['files'] = f;
 
     return github.postJSON(
-      "/gists",
+      '/gists',
       statusCode: 201,
       body: jsonEncode(map),
       convert: Gist.fromJSON,
@@ -84,7 +84,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#delete-a-gist
   Future<bool> deleteGist(String id) {
-    return github.request("DELETE", "/gists/$id").then((response) {
+    return github.request('DELETE', '/gists/$id').then((response) {
       return response.statusCode == 204;
     });
   }
@@ -100,19 +100,19 @@ class GistsService extends Service {
     final map = <String, dynamic>{};
 
     if (description != null) {
-      map["description"] = description;
+      map['description'] = description;
     }
 
     if (files != null) {
       final f = <String, dynamic>{};
       for (final key in files.keys) {
-        f[key] = files[key] == null ? null : {"content": files[key]};
+        f[key] = files[key] == null ? null : {'content': files[key]};
       }
-      map["files"] = f;
+      map['files'] = f;
     }
 
     return github.postJSON(
-      "/gists/$id",
+      '/gists/$id',
       statusCode: 200,
       body: jsonEncode(map),
       convert: Gist.fromJSON,
@@ -125,7 +125,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
   Future<bool> starGist(String id) {
-    return github.request("POST", "/gists/$id/star").then((response) {
+    return github.request('POST', '/gists/$id/star').then((response) {
       return response.statusCode == 204;
     });
   }
@@ -134,7 +134,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
   Future<bool> unstarGist(String id) {
-    return github.request("DELETE", "/gists/$id/star").then((response) {
+    return github.request('DELETE', '/gists/$id/star').then((response) {
       return response.statusCode == 204;
     });
   }
@@ -143,7 +143,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
   Future<bool> isGistStarred(String id) {
-    return github.request("GET", "/gists/$id/star").then((response) {
+    return github.request('GET', '/gists/$id/star').then((response) {
       return response.statusCode == 204;
     });
   }
@@ -153,7 +153,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
   Future<Gist> forkGist(String id) {
     return github
-        .request("POST", "/gists/$id/forks", statusCode: 201)
+        .request('POST', '/gists/$id/forks', statusCode: 201)
         .then((response) {
       return Gist.fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
     });
@@ -166,7 +166,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
     return PaginationHelper(github)
-        .objects("GET", "/gists/$gistId/comments", GistComment.fromJSON);
+        .objects('GET', '/gists/$gistId/comments', GistComment.fromJSON);
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
@@ -175,7 +175,7 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
-    return github.postJSON("/gists/$gistId/comments",
+    return github.postJSON('/gists/$gistId/comments',
         body: request.toJSON(), convert: GistComment.fromJSON);
   }
 
