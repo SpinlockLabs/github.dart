@@ -1,15 +1,15 @@
-import "dart:async";
-import "dart:html";
+import 'dart:async';
+import 'dart:html';
 
-import "package:github/browser.dart";
+import 'package:github/github.dart';
 
-import "common.dart";
+import 'common.dart';
 
 DivElement usersDiv;
 
 Future<void> main() async {
-  await initViewSourceButton("users.dart");
-  usersDiv = querySelector("#users");
+  await initViewSourceButton('users.dart');
+  usersDiv = querySelector('#users');
   loadUsers();
 }
 
@@ -22,24 +22,23 @@ void loadUsers() {
         userDiv.append(BRElement());
       }
 
-      userDiv.append(
-          GitHubBrowserHelper.createAvatarImage(user, width: 64, height: 64)
-            ..classes.add("avatar"));
+      userDiv.append(createAvatarImage(user, width: 64, height: 64)
+        ..classes.add('avatar'));
       final buff = StringBuffer();
 
       buff
-        ..writeln("Username: <a href=\"${baseUser.htmlUrl}\">${user.login}</a>")
-        ..writeln("Created: ${user.createdAt}")
-        ..writeln("Updated: ${user.updatedAt}");
+        ..writeln('Username: <a href="${baseUser.htmlUrl}">${user.login}</a>')
+        ..writeln('Created: ${user.createdAt}')
+        ..writeln('Updated: ${user.updatedAt}');
 
       if (user.company != null && user.company.isNotEmpty) {
-        buff.writeln("Company: ${user.company}");
+        buff.writeln('Company: ${user.company}');
       }
 
-      buff.writeln("Followers: ${user.followersCount}");
+      buff.writeln('Followers: ${user.followersCount}');
 
       userDiv.append(ParagraphElement()
-        ..appendHtml(buff.toString().replaceAll("\n", "<br/>"),
+        ..appendHtml(buff.toString().replaceAll('\n', '<br/>'),
             treeSanitizer: NodeTreeSanitizer.trusted));
 
       usersDiv.append(userDiv);

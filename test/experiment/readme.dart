@@ -1,10 +1,10 @@
-import "package:github/server.dart";
+import "package:github/github.dart";
 
 void main() {
-  final github = createGitHubClient();
+  final github = GitHub();
 
   github.repositories
-      .getReadme(const RepositorySlug("DirectMyFile", "github.dart"))
+      .getReadme(const RepositorySlug("SpinlockLabs", "github.dart"))
       .then((file) => github.misc.renderMarkdown(file.text))
       .then((html) => print(html))
       .then((_) => github.dispose());

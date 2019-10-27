@@ -1,5 +1,3 @@
-part of github.common;
-
 /// Authentication information.
 class Authentication {
   /// OAuth2 Token

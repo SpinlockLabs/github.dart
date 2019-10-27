@@ -1,4 +1,9 @@
-part of github.common;
+import "dart:convert";
+import 'package:github/src/common.dart';
+import 'package:github/src/util.dart';
+import "package:json_annotation/json_annotation.dart";
+
+part 'repos_contents.g.dart';
 
 /// Model class for a file on GitHub.
 class GitHubFile {

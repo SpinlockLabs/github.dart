@@ -1,4 +1,5 @@
-part of github.common;
+import "package:json_annotation/json_annotation.dart";
+import 'package:meta/meta.dart';
 
 /// GitHub Pages Information
 class RepositoryPages {
@@ -44,7 +45,7 @@ class PageBuild {
     @required this.updatedAt,
   });
 
-  factory PageBuild._fromJSON(Map<String, dynamic> input) {
+  factory PageBuild.fromJSON(Map<String, dynamic> input) {
     if (input == null) return null;
     return PageBuild._(
       url: input["url"],

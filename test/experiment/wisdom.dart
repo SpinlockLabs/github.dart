@@ -1,7 +1,7 @@
-import "package:github/server.dart";
+import 'package:github/github.dart';
 
 void main() {
-  final github = createGitHubClient();
+  final github = GitHub();
 
   github.misc.getWisdom().then((value) {
     print(value);

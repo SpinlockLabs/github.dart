@@ -22,10 +22,10 @@
 
     In your Dart Code:
     ```dart
-    import "package:github/browser.dart";
+    import 'package:github/github.dart';
 
     void main() {
-    var github = createGitHubClient();
+    var github = GitHub();
 
     // Renders Elements with the markdown attribute
     GitHubBrowserHelper.renderMarkdown(github, "*[markdown]");

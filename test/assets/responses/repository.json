@@ -1,10 +1,10 @@
 {
   "headers": {},
   "body": {
-    "full_name": "DirectMyFile/github.dart",
+    "full_name": "SpinlockLabs/github.dart",
     "name": "github.dart",
     "owner": {
-      "login": "DirectMyFile"
+      "login": "SpinlockLabs"
     },
     "default_branch": "master",
     "id": 0

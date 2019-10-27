@@ -1,4 +1,5 @@
-part of github.common;
+import "dart:convert";
+import 'package:github/src/util.dart';
 
 /// Model class for a new fork to be created.
 class CreateFork {

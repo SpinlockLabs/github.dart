@@ -1,4 +1,5 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/util.dart';
 
 /// Marks something as not being ready or complete.
 class NotReadyYet {

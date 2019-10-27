@@ -21,7 +21,7 @@ Please submit issues and pull requests, help out, or just give encouragement.
 
 - [Library Demos](http://github.directcode.org/demos/)
 - [Pub Package](https://pub.dartlang.org/packages/github)
-- [Wiki](https://github.com/DirectMyFile/github.dart/wiki)
+- [Wiki](https://github.com/SpinlockLabs/github.dart/wiki)
 - [Latest API reference](https://pub.dev/documentation/github/latest/)
 
 ## Getting Started
@@ -42,7 +42,7 @@ import 'package:github/browser.dart';
 
 and for the server or Flutter use:
 ```dart
-import 'package:github/server.dart';
+import 'package:github/github.dart';
 ```
 
 and then use it:
@@ -53,7 +53,7 @@ import 'package:github/browser.dart';
 
 void main() async {
   /* Create a GitHub Client */
-  var github = createGitHubClient();
+  var github = GitHub();
 
   /* or Create a GitHub Client using an auth token */
   var github = createGitHubClient(auth: new Authentication.withToken("YourTokenHere"));  

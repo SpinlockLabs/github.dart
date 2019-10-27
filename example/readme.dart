@@ -1,16 +1,16 @@
 import 'dart:convert';
-import "dart:html";
+import 'dart:html';
 
-import "package:github/browser.dart";
+import 'package:github/github.dart';
 
-import "common.dart";
+import 'common.dart';
 
 DivElement readmeDiv;
 
 Future<void> main() async {
-  await initViewSourceButton("readme.dart");
-  readmeDiv = querySelector("#readme");
-  const repo = RepositorySlug("DirectMyFile", "github.dart");
+  await initViewSourceButton('readme.dart');
+  readmeDiv = querySelector('#readme');
+  const repo = RepositorySlug('SpinlockLabs', 'github.dart');
   final readme = await github.repositories.getReadme(repo);
   String markdown = readme.content;
   if (readme.encoding == 'base64') {

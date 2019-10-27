@@ -1,4 +1,6 @@
-part of github.test.helper;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'assets.dart';
 
 final MockHTTPClient httpClient = MockHTTPClient();
 

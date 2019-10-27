@@ -1,4 +1,7 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:github/src/util.dart';
+import "package:json_annotation/json_annotation.dart";
 
 /// Model class for an event.
 class Event {

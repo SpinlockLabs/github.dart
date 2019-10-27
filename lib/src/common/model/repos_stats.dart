@@ -1,4 +1,8 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import "package:json_annotation/json_annotation.dart";
+
+part 'repos_stats.g.dart';
 
 /// Model class for a contributor's statistics for a repository.
 @JsonSerializable(createToJson: false)

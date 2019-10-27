@@ -1,6 +1,10 @@
-part of github.common;
-
-typedef ClientCreator = http.Client Function();
+import "dart:async";
+import "dart:convert";
+import 'package:github/src/common.dart';
+import 'package:github/src/util.dart';
+import "package:http/http.dart" as http;
+import 'package:http_parser/http_parser.dart' as http_parser;
+import 'package:meta/meta.dart';
 
 ///  The Main GitHub Client
 ///
@@ -305,8 +309,8 @@ class GitHub {
   }) async {
     if (rateLimitRemaining != null && rateLimitRemaining <= 0) {
       assert(rateLimitReset != null);
-      var now = DateTime.now();
-      var waitTime = rateLimitReset.difference(now);
+      final now = DateTime.now();
+      final waitTime = rateLimitReset.difference(now);
       await Future.delayed(waitTime);
     }
 
@@ -442,3 +446,16 @@ class GitHub {
     }
   }
 }
+
+void _applyExpandos(Object target, http.Response response) {
+  _etagExpando[target] = response.headers['etag'];
+  if (response.headers['date'] != null) {
+    _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']);
+  }
+}
+
+final _etagExpando = Expando<String>('etag');
+final _dateExpando = Expando<DateTime>('date');
+
+String getResponseEtag(Object obj) => _etagExpando[obj];
+DateTime getResponseDate(Object obj) => _dateExpando[obj];

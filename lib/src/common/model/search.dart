@@ -1,4 +1,7 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import "package:json_annotation/json_annotation.dart";
+
+part 'search.g.dart';
 
 abstract class SearchResults<T> {
   int totalCount;

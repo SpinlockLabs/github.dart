@@ -1,5 +1,3 @@
-library github.test.git_test;
-
 import 'dart:async';
 import 'dart:convert' show jsonEncode, jsonDecode;
 

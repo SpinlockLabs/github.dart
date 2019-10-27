@@ -1,33 +1,33 @@
-import "dart:html";
+import 'dart:html';
 
-import "package:github/browser.dart";
-import "common.dart";
+import 'package:github/github.dart';
+import 'common.dart';
 
 DivElement tableDiv;
 
 LanguageBreakdown breakdown;
 
 Future<void> main() async {
-  await initViewSourceButton("languages.dart");
-  tableDiv = querySelector("#table");
+  await initViewSourceButton('languages.dart');
+  tableDiv = querySelector('#table');
   await loadRepository();
 }
 
 Future<void> loadRepository() async {
-  var user = "dart-lang";
-  var reponame = "sdk";
+  var user = 'dart-lang';
+  var reponame = 'sdk';
 
   final params = queryString;
 
-  if (params.containsKey("user")) {
-    user = params["user"];
+  if (params.containsKey('user')) {
+    user = params['user'];
   }
 
-  if (params.containsKey("repo")) {
-    reponame = params["repo"];
+  if (params.containsKey('repo')) {
+    reponame = params['repo'];
   }
 
-  document.getElementById("name").setInnerHtml("$user/$reponame");
+  document.getElementById('name').setInnerHtml('$user/$reponame');
 
   final repo = RepositorySlug(user, reponame);
   breakdown = await github.repositories.listLanguages(repo);

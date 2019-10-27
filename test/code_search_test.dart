@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:github/server.dart';
+import 'package:github/github.dart';
 
 Future<void> main() async {
   print('Searching ...');
@@ -7,7 +7,7 @@ Future<void> main() async {
 
   final Stream<CodeSearchResults> resultsStream = github.search.code(
     'github',
-    repo: 'DirectMyFile/github.dart',
+    repo: 'SpinlockLabs/github.dart',
     perPage: 5,
     pages: 1,
   );

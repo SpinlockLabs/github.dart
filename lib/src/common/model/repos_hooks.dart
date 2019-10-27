@@ -1,4 +1,6 @@
-part of github.common;
+import "dart:convert";
+import 'package:github/src/util.dart';
+import "package:json_annotation/json_annotation.dart";
 
 /// Model class for a repository hook.
 class Hook {

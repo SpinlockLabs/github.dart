@@ -1,4 +1,8 @@
-part of github.common;
+import "dart:async";
+import "dart:convert";
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import "package:github/src/common/util/pagination.dart";
 
 /// The [SearchService] handles communication with search related methods of
 /// the GitHub API.
@@ -21,14 +25,14 @@ class SearchService extends Service {
 
     bool isFirst = true;
 
-    PaginationHelper(_github)
+    PaginationHelper(github)
         .fetchStreamed("GET", "/search/repositories",
             params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
           response.body.contains("rate limit") &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;
@@ -112,7 +116,7 @@ class SearchService extends Service {
       params['per_page'] = perPage.toString();
     }
 
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .fetchStreamed("GET", "/search/code", params: params, pages: pages)
         .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
   }
@@ -137,13 +141,13 @@ class SearchService extends Service {
 
     var isFirst = true;
 
-    PaginationHelper(_github)
+    PaginationHelper(github)
         .fetchStreamed("GET", "/search/issues", params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
           response.body.contains("rate limit") &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;
@@ -184,13 +188,13 @@ class SearchService extends Service {
 
     var isFirst = true;
 
-    PaginationHelper(_github)
+    PaginationHelper(github)
         .fetchStreamed("GET", "/search/users", params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
           response.body.contains("rate limit") &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;

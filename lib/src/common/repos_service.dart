@@ -1,4 +1,12 @@
-part of github.common;
+import "dart:async";
+import "dart:convert";
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/repos_releases.dart';
+import 'package:github/src/common/model/users.dart';
+import "package:github/src/common/util/pagination.dart";
+import 'package:github/src/util.dart';
+import "package:http/http.dart" as http;
+import 'package:meta/meta.dart';
 
 /// The [RepositoriesService] handles communication with repository related
 /// methods of the GitHub API.
@@ -20,7 +28,7 @@ class RepositoriesService extends Service {
       "direction": direction,
     };
 
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/user/repos",
       (i) => Repository.fromJSON(i),
@@ -42,7 +50,7 @@ class RepositoriesService extends Service {
       "direction": direction
     };
 
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/users/$user/repos",
       (i) => Repository.fromJSON(i),
@@ -58,7 +66,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(org);
     final params = <String, dynamic>{"type": type};
 
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/orgs/$org/repos",
       (i) => Repository.fromJSON(i),
@@ -82,7 +90,7 @@ class RepositoriesService extends Service {
 
     final pages = limit != null ? (limit / 30).ceil() : null;
 
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .fetchStreamed("GET", "/repositories", pages: pages, params: params)
         .expand<Repository>((http.Response response) {
       final list = jsonDecode(response.body) as List<Map<String, dynamic>>;
@@ -100,13 +108,13 @@ class RepositoriesService extends Service {
       {String org}) async {
     ArgumentError.checkNotNull(repository);
     if (org != null) {
-      return _github.postJSON<Map<String, dynamic>, TeamRepository>(
+      return github.postJSON<Map<String, dynamic>, TeamRepository>(
         '/orgs/$org/repos',
         body: repository.toJSON(),
         convert: (i) => TeamRepository.fromJSON(i),
       );
     } else {
-      return _github.postJSON<Map<String, dynamic>, Repository>(
+      return github.postJSON<Map<String, dynamic>, Repository>(
         '/user/repos',
         body: repository.toJSON(),
         convert: (i) => Repository.fromJSON(i),
@@ -116,7 +124,7 @@ class RepositoriesService extends Service {
 
   Future<LicenseDetails> getLicense(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON<Map<String, dynamic>, LicenseDetails>(
+    return github.getJSON<Map<String, dynamic>, LicenseDetails>(
       "/repos/${slug.owner}/${slug.name}/license",
       convert: (json) => LicenseDetails.fromJson(json),
     );
@@ -127,13 +135,13 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#get
   Future<Repository> getRepository(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON<Map<String, dynamic>, Repository>(
+    return github.getJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.owner}/${slug.name}",
       convert: (i) => Repository.fromJSON(i),
       statusCode: StatusCodes.OK,
       fail: (http.Response response) {
         if (response.statusCode == 404) {
-          throw RepositoryNotFound(_github, slug.fullName);
+          throw RepositoryNotFound(github, slug.fullName);
         }
       },
     );
@@ -169,7 +177,7 @@ class RepositoriesService extends Service {
       "has_downloads": hasDownloads,
       "default_branch": "defaultBranch"
     });
-    return _github.postJSON(
+    return github.postJSON(
       "/repos/${slug.fullName}",
       body: jsonEncode(data),
       statusCode: 200,
@@ -183,7 +191,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#delete-a-repository
   Future<bool> deleteRepository(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github
+    return github
         .request(
           'DELETE',
           '/repos/${slug.fullName}',
@@ -198,7 +206,7 @@ class RepositoriesService extends Service {
   Stream<User> listContributors(RepositorySlug slug, {bool anon = false}) {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(anon);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, User>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, User>(
       'GET',
       '/repos/${slug.fullName}/contributors',
       (i) => User.fromJson(i),
@@ -211,7 +219,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-teams
   Stream<Team> listTeams(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Team>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Team>(
       'GET',
       '/repos/${slug.fullName}/teams',
       (i) => Team.fromJSON(i),
@@ -223,7 +231,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-languages
   Future<LanguageBreakdown> listLanguages(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON<Map<String, dynamic>, LanguageBreakdown>(
+    return github.getJSON<Map<String, dynamic>, LanguageBreakdown>(
       "/repos/${slug.fullName}/languages",
       statusCode: StatusCodes.OK,
       convert: (input) => LanguageBreakdown(input.cast<String, int>()),
@@ -235,7 +243,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-tags
   Stream<Tag> listTags(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Tag>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Tag>(
       'GET',
       '/repos/${slug.fullName}/tags',
       (i) => Tag.fromJson(i),
@@ -247,7 +255,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/#list-branches
   Stream<Branch> listBranches(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Branch>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Branch>(
       'GET',
       '/repos/${slug.fullName}/branches',
       (i) => Branch.fromJSON(i),
@@ -260,7 +268,7 @@ class RepositoriesService extends Service {
   Future<Branch> getBranch(RepositorySlug slug, String branch) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(branch);
-    return _github.getJSON<Map<String, dynamic>, Branch>(
+    return github.getJSON<Map<String, dynamic>, Branch>(
       "/repos/${slug.fullName}/branches/$branch",
       convert: (i) => Branch.fromJSON(i),
     );
@@ -271,7 +279,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/collaborators/#list
   Stream<Collaborator> listCollaborators(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects(
+    return PaginationHelper(github).objects(
       "GET",
       "/repos/${slug.fullName}/collaborators",
       (json) => Collaborator.fromJson(json),
@@ -284,7 +292,7 @@ class RepositoriesService extends Service {
     bool catchError = false;
     http.Response response;
     try {
-      response = await _github.request(
+      response = await github.request(
         "GET",
         "/repos/${slug.fullName}/collaborators/$user",
         statusCode: StatusCodes.NO_CONTENT,
@@ -302,7 +310,7 @@ class RepositoriesService extends Service {
   Future<bool> addCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
-    return _github
+    return github
         .request(
           "PUT",
           "/repos/${slug.fullName}/collaborators/$user",
@@ -314,7 +322,7 @@ class RepositoriesService extends Service {
   Future<bool> removeCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/collaborators/$user",
@@ -332,7 +340,7 @@ class RepositoriesService extends Service {
   ) {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(commit);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, CommitComment>(
       "GET",
       "/repos/${slug.fullName}/commits/${commit.sha}/comments",
@@ -346,7 +354,7 @@ class RepositoriesService extends Service {
   /// https://developer.github.com/v3/repos/comments/#list-commit-comments-for-a-repository
   Stream<CommitComment> listCommitComments(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, CommitComment>(
       "GET",
       "repos/${slug.fullName}/comments",
@@ -378,7 +386,7 @@ class RepositoriesService extends Service {
       'position': position,
       'line': line,
     });
-    return _github.postJSON<Map<String, dynamic>, CommitComment>(
+    return github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/commits/${commit.sha}/comments",
       body: jsonEncode(data),
       statusCode: StatusCodes.CREATED,
@@ -393,7 +401,7 @@ class RepositoriesService extends Service {
       {@required int id}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github.getJSON<Map<String, dynamic>, CommitComment>(
+    return github.getJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/comments/$id",
       statusCode: StatusCodes.OK,
       convert: (i) => CommitComment.fromJSON(i),
@@ -412,7 +420,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
     ArgumentError.checkNotNull(body);
-    return _github.postJSON<Map<String, dynamic>, CommitComment>(
+    return github.postJSON<Map<String, dynamic>, CommitComment>(
       "/repos/${slug.fullName}/comments/$id",
       body: jsonEncode(createNonNullMap({'body': body})),
       statusCode: StatusCodes.OK,
@@ -427,7 +435,7 @@ class RepositoriesService extends Service {
   Future<bool> deleteCommitComment(RepositorySlug slug,
       {@required int id}) async {
     ArgumentError.checkNotNull(slug);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/comments/$id",
@@ -441,7 +449,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
   Stream<RepositoryCommit> listCommits(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, RepositoryCommit>(
       "GET",
       "/repos/${slug.fullName}/commits",
@@ -455,7 +463,7 @@ class RepositoriesService extends Service {
   Future<RepositoryCommit> getCommit(RepositorySlug slug, String sha) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(sha);
-    return _github.getJSON<Map<String, dynamic>, RepositoryCommit>(
+    return github.getJSON<Map<String, dynamic>, RepositoryCommit>(
       "/repos/${slug.fullName}/commits/$sha",
       convert: (i) => RepositoryCommit.fromJSON(i),
       statusCode: StatusCodes.OK,
@@ -465,7 +473,7 @@ class RepositoriesService extends Service {
   Future<String> getCommitDiff(RepositorySlug slug, String sha) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(sha);
-    return _github
+    return github
         .request(
           "GET",
           "/repos/${slug.fullName}/commits/$sha",
@@ -489,7 +497,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(refBase);
     ArgumentError.checkNotNull(refHead);
-    return _github.getJSON<Map<String, dynamic>, GitHubComparison>(
+    return github.getJSON<Map<String, dynamic>, GitHubComparison>(
       "/repos/${slug.fullName}/compare/$refBase...$refHead",
       convert: (j) => GitHubComparison.fromJson(j),
     );
@@ -511,13 +519,13 @@ class RepositoriesService extends Service {
       url += '?ref=$ref';
     }
 
-    return _github.getJSON(
+    return github.getJSON(
       url,
       headers: headers,
       statusCode: StatusCodes.OK,
       fail: (http.Response response) {
         if (response.statusCode == StatusCodes.NOT_FOUND) {
-          throw NotFound(_github, response.body);
+          throw NotFound(github, response.body);
         }
       },
       convert: (Map<String, dynamic> input) => GitHubFile.fromJSON(input, slug),
@@ -549,7 +557,7 @@ class RepositoriesService extends Service {
       url += '?ref=$ref';
     }
 
-    return _github.getJSON(
+    return github.getJSON(
       url,
       convert: (input) {
         final contents = RepositoryContents();
@@ -558,7 +566,7 @@ class RepositoriesService extends Service {
           // it was likely a 404 – but we don't have the status code here
           // But we can guess an the JSON content
           if (input.containsKey('message')) {
-            throw GitHubError(_github, input['message'],
+            throw GitHubError(github, input['message'],
                 apiUrl: input['documentation_url']);
           }
           contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
@@ -578,7 +586,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, CreateFile file) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(file);
-    final http.Response response = await _github.request(
+    final http.Response response = await github.request(
       "PUT",
       "/repos/${slug.fullName}/contents/${file.path}",
       body: file.toJSON(),
@@ -601,7 +609,7 @@ class RepositoriesService extends Service {
       "sha": sha,
       "branch": branch,
     });
-    final http.Response response = await _github.request(
+    final http.Response response = await github.request(
       "PUT",
       "/repos/${slug.fullName}/contents/$path",
       body: jsonEncode(map),
@@ -619,7 +627,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(path);
     final Map<String, dynamic> map =
         createNonNullMap({"message": message, "sha": sha, "branch": branch});
-    final http.Response response = await _github.request(
+    final http.Response response = await github.request(
       "DELETE",
       "/repos/${slug.fullName}/contents/$path",
       body: jsonEncode(map),
@@ -637,7 +645,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
     ArgumentError.checkNotNull(format);
-    final http.Response response = await _github.request(
+    final http.Response response = await github.request(
       "GET",
       "/repos/${slug.fullName}/$format/$ref",
       statusCode: StatusCodes.FOUND,
@@ -650,7 +658,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/forks/#list-forks
   Stream<Repository> listForks(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Repository>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Repository>(
       "GET",
       "/repos/${slug.fullName}/forks",
       (i) => Repository.fromJSON(i),
@@ -663,7 +671,7 @@ class RepositoriesService extends Service {
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) async {
     ArgumentError.checkNotNull(slug);
     if (fork == null) fork = CreateFork();
-    return _github.postJSON<Map<String, dynamic>, Repository>(
+    return github.postJSON<Map<String, dynamic>, Repository>(
       "/repos/${slug.fullName}/forks",
       body: fork.toJSON(),
       convert: (i) => Repository.fromJSON(i),
@@ -675,7 +683,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/hooks/#list-hooks
   Stream<Hook> listHooks(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Hook>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Hook>(
       "GET",
       "/repos/${slug.fullName}/hooks",
       (input) => Hook.fromJSON(slug.fullName, input),
@@ -688,7 +696,7 @@ class RepositoriesService extends Service {
   Future<Hook> getHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github.getJSON<Map<String, dynamic>, Hook>(
+    return github.getJSON<Map<String, dynamic>, Hook>(
       "/repos/${slug.fullName}/hooks/$id",
       convert: (i) => Hook.fromJSON(slug.fullName, i),
     );
@@ -700,7 +708,7 @@ class RepositoriesService extends Service {
   Future<Hook> createHook(RepositorySlug slug, CreateHook hook) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(hook);
-    return _github.postJSON<Map<String, dynamic>, Hook>(
+    return github.postJSON<Map<String, dynamic>, Hook>(
       "/repos/${slug.fullName}/hooks",
       convert: (i) => Hook.fromJSON(slug.fullName, i),
       body: hook.toJSON(),
@@ -739,7 +747,7 @@ class RepositoriesService extends Service {
     if (configContentType != 'json' && configContentType != 'form') {
       throw ArgumentError.value(configContentType, 'configContentType');
     }
-    return _github.postJSON<Map<String, dynamic>, Hook>(
+    return github.postJSON<Map<String, dynamic>, Hook>(
       "/repos/${slug.fullName}/hooks/${hookToEdit.id.toString()}",
       statusCode: StatusCodes.OK,
       convert: (i) => Hook.fromJSON(slug.fullName, i),
@@ -766,7 +774,7 @@ class RepositoriesService extends Service {
   Future<bool> testPushHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github
+    return github
         .request(
           "POST",
           "/repos/${slug.fullName}/hooks/$id/tests",
@@ -781,7 +789,7 @@ class RepositoriesService extends Service {
   Future<bool> pingHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github
+    return github
         .request(
           "POST",
           "/repos/${slug.fullName}/hooks/$id/pings",
@@ -793,7 +801,7 @@ class RepositoriesService extends Service {
   Future<bool> deleteHook(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/hooks/$id",
@@ -809,7 +817,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/keys/#list
   Stream<PublicKey> listDeployKeys(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, PublicKey>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, PublicKey>(
       "GET",
       "/repos/${slug.fullName}/keys",
       (i) => PublicKey.fromJSON(i),
@@ -824,7 +832,7 @@ class RepositoriesService extends Service {
       {@required int id}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github.getJSON<Map<String, dynamic>, PublicKey>(
+    return github.getJSON<Map<String, dynamic>, PublicKey>(
       "/repos/${slug.fullName}/keys/$id",
       statusCode: StatusCodes.OK,
       convert: (i) => PublicKey.fromJSON(i),
@@ -838,7 +846,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, CreatePublicKey key) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(key);
-    return _github.postJSON<Map<String, dynamic>, PublicKey>(
+    return github.postJSON<Map<String, dynamic>, PublicKey>(
       "/repos/${slug.fullName}/keys",
       body: key.toJSON(),
       statusCode: StatusCodes.CREATED,
@@ -853,7 +861,7 @@ class RepositoriesService extends Service {
       {@required RepositorySlug slug, @required PublicKey key}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(key);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/keys/${key.id}",
@@ -868,7 +876,7 @@ class RepositoriesService extends Service {
   Future<RepositoryCommit> merge(RepositorySlug slug, CreateMerge merge) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(merge);
-    return _github.postJSON<Map<String, dynamic>, RepositoryCommit>(
+    return github.postJSON<Map<String, dynamic>, RepositoryCommit>(
       "/repos/${slug.fullName}/merges",
       body: merge.toJSON(),
       convert: (i) => RepositoryCommit.fromJSON(i),
@@ -881,7 +889,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/pages/#get-information-about-a-pages-site
   Future<RepositoryPages> getPagesInfo(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON<Map<String, dynamic>, RepositoryPages>(
+    return github.getJSON<Map<String, dynamic>, RepositoryPages>(
       "/repos/${slug.fullName}/pages",
       statusCode: StatusCodes.OK,
       convert: (i) => RepositoryPages.fromJSON(i),
@@ -893,10 +901,10 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/pages/#list-pages-builds
   Stream<PageBuild> listPagesBuilds(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, PageBuild>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, PageBuild>(
       "GET",
       "/repos/${slug.fullName}/pages/builds",
-      (i) => PageBuild._fromJSON(i),
+      (i) => PageBuild.fromJSON(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -906,9 +914,9 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/pages/#list-latest-pages-build
   Future<PageBuild> getLatestPagesBuild(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON(
+    return github.getJSON(
       "/repos/${slug.fullName}/pages/builds/latest",
-      convert: (i) => PageBuild._fromJSON(i),
+      convert: (i) => PageBuild.fromJSON(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -920,7 +928,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#list-releases-for-a-repository
   Stream<Release> listReleases(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github).objects<Map<String, dynamic>, Release>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Release>(
       "GET",
       "/repos/${slug.fullName}/releases",
       (i) => Release.fromJson(i),
@@ -941,7 +949,7 @@ class RepositoriesService extends Service {
   Future<Release> getReleaseById(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
-    return _github.getJSON<Map<String, dynamic>, Release>(
+    return github.getJSON<Map<String, dynamic>, Release>(
       "/repos/${slug.fullName}/releases/$id",
       convert: (i) => Release.fromJson(i),
     );
@@ -951,7 +959,7 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
   Future<Release> getReleaseByTagName(RepositorySlug slug, String tagName) =>
-      _github.getJSON("/repos/${slug.fullName}/releases/tags/$tagName",
+      github.getJSON("/repos/${slug.fullName}/releases/tags/$tagName",
           convert: Release.fromJson);
 
   /// Creates a Release based on the specified [createRelease].
@@ -967,7 +975,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(createRelease);
     final Release release =
-        await _github.postJSON<Map<String, dynamic>, Release>(
+        await github.postJSON<Map<String, dynamic>, Release>(
       "/repos/${slug.fullName}/releases",
       convert: (i) => Release.fromJson(i),
       body: jsonEncode(createRelease.toJson()),
@@ -1013,7 +1021,7 @@ class RepositoriesService extends Service {
   }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(releaseToEdit);
-    return _github.postJSON<Map<String, dynamic>, Release>(
+    return github.postJSON<Map<String, dynamic>, Release>(
       "/repos/${slug.fullName}/releases/${releaseToEdit.id.toString()}",
       body: jsonEncode(createNonNullMap(<String, dynamic>{
         "tag_name": tagName ?? releaseToEdit.tagName,
@@ -1034,7 +1042,7 @@ class RepositoriesService extends Service {
   Future<bool> deleteRelease(RepositorySlug slug, Release release) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(release);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/releases/${release.id}",
@@ -1049,8 +1057,7 @@ class RepositoriesService extends Service {
   Stream<ReleaseAsset> listReleaseAssets(RepositorySlug slug, Release release) {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(release);
-    return PaginationHelper(_github)
-        .objects<Map<String, dynamic>, ReleaseAsset>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, ReleaseAsset>(
       "GET",
       "/repos/${slug.fullName}/releases/${release.id}/assets",
       (i) => ReleaseAsset.fromJson(i),
@@ -1066,7 +1073,7 @@ class RepositoriesService extends Service {
       {@required int assetId}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(release);
-    return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
+    return github.postJSON<Map<String, dynamic>, ReleaseAsset>(
       "/repos/${slug.fullName}/releases/assets/$assetId",
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
@@ -1084,7 +1091,7 @@ class RepositoriesService extends Service {
   }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(assetToEdit);
-    return _github.postJSON<Map<String, dynamic>, ReleaseAsset>(
+    return github.postJSON<Map<String, dynamic>, ReleaseAsset>(
       "/repos/${slug.fullName}/releases/assets/${assetToEdit.id}",
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
@@ -1102,7 +1109,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, ReleaseAsset asset) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(asset);
-    return _github
+    return github
         .request(
           "DELETE",
           "/repos/${slug.fullName}/releases/assets/${asset.id}",
@@ -1118,7 +1125,7 @@ class RepositoriesService extends Service {
     final List<ReleaseAsset> releaseAssets = [];
     for (final createReleaseAsset in createReleaseAssets) {
       final headers = {'Content-Type': createReleaseAsset.contentType};
-      final releaseAsset = await _github.postJSON(
+      final releaseAsset = await github.postJSON(
           release.getUploadUrlFor(
             createReleaseAsset.name,
             createReleaseAsset.label,
@@ -1142,7 +1149,7 @@ class RepositoriesService extends Service {
   ) async {
     ArgumentError.checkNotNull(slug);
     final String path = "/repos/${slug.fullName}/stats/contributors";
-    final http.Response response = await _github.request('GET', path,
+    final http.Response response = await github.request('GET', path,
         headers: {"Accept": "application/vnd.github.v3+json"});
 
     if (response.statusCode == StatusCodes.OK) {
@@ -1150,9 +1157,9 @@ class RepositoriesService extends Service {
           .map((e) => ContributorStatistics.fromJson(e))
           .toList();
     } else if (response.statusCode == StatusCodes.ACCEPTED) {
-      throw NotReady(_github, path);
+      throw NotReady(github, path);
     }
-    _github.handleStatusCode(response);
+    github.handleStatusCode(response);
   }
 
   /// Fetches commit counts for the past year.
@@ -1160,7 +1167,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#commit-activity
   Stream<YearCommitCountWeek> listCommitActivity(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, YearCommitCountWeek>(
       "GET",
       "/repos/${slug.fullName}/stats/commit_activity",
@@ -1173,7 +1180,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#code-frequency
   Stream<WeeklyChangesCount> listCodeFrequency(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, WeeklyChangesCount>(
       "GET",
       "/repos/${slug.fullName}/stats/code_frequency",
@@ -1186,7 +1193,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#participation
   Future<ContributorParticipation> getParticipation(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
-    return _github.getJSON(
+    return github.getJSON(
       "/repos/${slug.fullName}/stats/participation",
       statusCode: StatusCodes.OK,
       convert: (i) => ContributorParticipation.fromJSON(i),
@@ -1198,7 +1205,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/statistics/#punch-card
   Stream<PunchcardEntry> listPunchcard(RepositorySlug slug) {
     ArgumentError.checkNotNull(slug);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, PunchcardEntry>(
       "GET",
       "/repos/${slug.fullName}/stats/punchcard",
@@ -1213,7 +1220,7 @@ class RepositoriesService extends Service {
   Stream<RepositoryStatus> listStatuses(RepositorySlug slug, String ref) {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
-    return PaginationHelper(_github)
+    return PaginationHelper(github)
         .objects<Map<String, dynamic>, RepositoryStatus>(
       "GET",
       "/repos/${slug.fullName}/commits/$ref/statuses",
@@ -1230,7 +1237,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
     ArgumentError.checkNotNull(request);
-    return _github.postJSON<Map<String, dynamic>, RepositoryStatus>(
+    return github.postJSON<Map<String, dynamic>, RepositoryStatus>(
       "/repos/${slug.fullName}/statuses/$ref",
       body: request.toJSON(),
       convert: (i) => RepositoryStatus.fromJSON(i),
@@ -1244,7 +1251,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, String ref) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
-    return _github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
+    return github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
       "/repos/${slug.fullName}/commits/$ref/status",
       convert: CombinedRepositoryStatus.fromJSON,
       statusCode: StatusCodes.OK,
