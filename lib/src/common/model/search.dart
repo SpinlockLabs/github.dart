@@ -47,7 +47,6 @@ class CodeSearchItem {
   @JsonKey(name: 'html_url', fromJson: Uri.parse)
   Uri htmlUrl;
 
-  @JsonKey(fromJson: Repository.fromJSON)
   Repository repository;
 
   static CodeSearchItem fromJson(Map<String, dynamic> input) {

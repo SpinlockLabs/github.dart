@@ -22,7 +22,7 @@ class Notification {
     return Notification()
       ..id = input['id']
       ..repository =
-          Repository.fromJSON(input['repository'] as Map<String, dynamic>)
+          Repository.fromJson(input['repository'] as Map<String, dynamic>)
       ..subject =
           NotificationSubject.fromJSON(input['subject'] as Map<String, dynamic>)
       ..reason = input['reason']

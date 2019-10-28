@@ -21,6 +21,7 @@ CodeSearchItem _$CodeSearchItemFromJson(Map<String, dynamic> json) {
     ..url = Uri.parse(json['url'] as String)
     ..gitUrl = Uri.parse(json['git_url'] as String)
     ..htmlUrl = Uri.parse(json['html_url'] as String)
-    ..repository =
-        Repository.fromJSON(json['repository'] as Map<String, dynamic>);
+    ..repository = json['repository'] == null
+        ? null
+        : Repository.fromJson(json['repository'] as Map<String, dynamic>);
 }

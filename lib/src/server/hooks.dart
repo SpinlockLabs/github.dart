@@ -96,7 +96,7 @@ class RepositoryEvent extends HookEvent {
     return RepositoryEvent()
       ..action = json['action']
       ..repository =
-          Repository.fromJSON(json['repository'] as Map<String, dynamic>)
+          Repository.fromJson(json['repository'] as Map<String, dynamic>)
       ..sender = User.fromJson(json['sender'] as Map<String, dynamic>);
   }
 }
@@ -121,7 +121,7 @@ class ForkEvent extends HookEvent {
 
   static ForkEvent fromJSON(Map<String, dynamic> json) {
     return ForkEvent()
-      ..forkee = Repository.fromJSON(json['forkee'] as Map<String, dynamic>)
+      ..forkee = Repository.fromJson(json['forkee'] as Map<String, dynamic>)
       ..sender = User.fromJson(json['sender'] as Map<String, dynamic>);
   }
 }
@@ -141,7 +141,7 @@ class IssueEvent extends HookEvent {
       ..label = IssueLabel.fromJSON(json['label'] as Map<String, dynamic>)
       ..issue = Issue.fromJSON(json['issue'] as Map<String, dynamic>)
       ..repository =
-          Repository.fromJSON(json['repository'] as Map<String, dynamic>)
+          Repository.fromJson(json['repository'] as Map<String, dynamic>)
       ..sender = User.fromJson(json['sender'] as Map<String, dynamic>);
   }
 }
@@ -158,7 +158,7 @@ class PullRequestEvent extends HookEvent {
       ..action = json['action']
       ..number = json['number']
       ..repository =
-          Repository.fromJSON(json['repository'] as Map<String, dynamic>)
+          Repository.fromJson(json['repository'] as Map<String, dynamic>)
       ..pullRequest =
           PullRequest.fromJSON(json['pull_request'] as Map<String, dynamic>)
       ..sender = User.fromJson(json['sender'] as Map<String, dynamic>);

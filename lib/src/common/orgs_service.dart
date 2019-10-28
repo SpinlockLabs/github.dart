@@ -23,15 +23,16 @@ class OrganizationsService extends Service {
       requestPath = '/user/orgs';
     }
     return PaginationHelper(github)
-        .objects('GET', requestPath, Organization.fromJSON);
+        .objects('GET', requestPath, (i) => Organization.fromJson(i));
   }
 
   /// Fetches the organization specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/orgs/#get-an-organization
   Future<Organization> get(String name) => github.getJSON('/orgs/$name',
-          convert: Organization.fromJSON,
-          statusCode: StatusCodes.OK, fail: (http.Response response) {
+      convert: (i) => Organization.fromJson(i),
+      statusCode: StatusCodes.OK,
+      fail: (http.Response response) {
         if (response.statusCode == 404) {
           throw OrganizationNotFound(github, name);
         }
@@ -65,7 +66,9 @@ class OrganizationsService extends Service {
     });
 
     return github.postJSON('/orgs/$org',
-        statusCode: 200, convert: Organization.fromJSON, body: jsonEncode(map));
+        statusCode: 200,
+        convert: (i) => Organization.fromJson(i),
+        body: jsonEncode(map));
   }
 
   /// Lists all of the teams for the specified organization.
@@ -81,7 +84,8 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
   Future<Team> getTeam(int teamId) {
     return github.getJSON('/teams/$teamId',
-        convert: Organization.fromJSON, statusCode: 200) as Future<Team>;
+        convert: (i) => Organization.fromJson(i),
+        statusCode: 200) as Future<Team>;
   }
 
   /// Creates a Team.
@@ -188,7 +192,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
   Stream<Repository> listTeamRepositories(int teamId) {
     return PaginationHelper(github)
-        .objects('GET', '/teams/$teamId/repos', Repository.fromJSON);
+        .objects('GET', '/teams/$teamId/repos', (i) => Repository.fromJson(i));
   }
 
   /// Checks if a team manages the specified repository.

@@ -38,6 +38,8 @@ class GitHubComparison {
 /// Model class for a repository.
 @JsonSerializable(createToJson: false)
 class Repository {
+  Repository();
+
   /// Repository Name
   String name;
 
@@ -132,8 +134,7 @@ class Repository {
 
   LicenseKind license;
 
-  static Repository fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  factory Repository.fromJson(Map<String, dynamic> input) {
     return _$RepositoryFromJson(input);
   }
 

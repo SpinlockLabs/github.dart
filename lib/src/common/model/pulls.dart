@@ -191,7 +191,7 @@ class PullRequestHead {
     head.ref = input['ref'];
     head.sha = input['sha'];
     head.user = User.fromJson(input['user'] as Map<String, dynamic>);
-    head.repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>);
+    head.repo = Repository.fromJson(input['repo'] as Map<String, dynamic>);
     return head;
   }
 }
