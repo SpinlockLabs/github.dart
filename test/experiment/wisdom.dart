@@ -1,9 +1,8 @@
 import 'package:github/github.dart';
 
-void main() {
+Future<void> main() async {
   final github = GitHub();
-
-  github.misc.getWisdom().then((value) {
-    print(value);
-  }).then((_) => github.dispose());
+  final wisdom = await github.misc.getWisdom();
+  print(wisdom);
+  github.dispose();
 }

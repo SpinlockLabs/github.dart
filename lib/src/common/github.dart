@@ -22,8 +22,8 @@ class GitHub {
     Authentication auth,
     this.endpoint = 'https://api.github.com',
     http.Client client,
-  })  : auth = auth == null ? Authentication.anonymous() : auth,
-        client = client == null ? http.Client() : client;
+  })  : auth = auth ?? Authentication.anonymous(),
+        client = client ?? http.Client();
 
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
@@ -368,7 +368,9 @@ class GitHub {
 
     _updateRateLimit(response.headers);
     if (statusCode != null && statusCode != response.statusCode) {
-      fail != null ? fail(response) : null;
+      if (fail != null) {
+        fail(response);
+      }
       handleStatusCode(response);
     } else {
       return response;

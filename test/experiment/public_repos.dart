@@ -5,5 +5,5 @@ void main() {
 
   github.repositories.listPublicRepositories(limit: 50).listen((repo) {
     print('-> ${repo.fullName}');
-  }).onDone(() => github.dispose());
+  }).onDone(github.dispose);
 }

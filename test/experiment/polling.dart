@@ -8,5 +8,5 @@ void main() {
   poller.start().listen((event) {
     print('New Event:');
     print('- Payload: ${event.payload}');
-  }).onDone(() => github.dispose());
+  }).onDone(github.dispose);
 }

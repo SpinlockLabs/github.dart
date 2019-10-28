@@ -142,12 +142,6 @@ class UserPlan {
   factory UserPlan.fromJson(Map<String, dynamic> json) =>
       _$UserPlanFromJson(json);
 
-  @deprecated
-  static UserPlan fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-    return _$UserPlanFromJson(input);
-  }
-
   // Plan Name
   String name;
 

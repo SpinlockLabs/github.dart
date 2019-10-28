@@ -44,7 +44,7 @@ class OAuth2Flow {
       this.state,
       this.github,
       this.baseUrl = 'https://github.com/login/oauth'})
-      : this.redirectUri =
+      : redirectUri =
             redirectUri == null ? null : _checkRedirectUri(redirectUri);
 
   static String _checkRedirectUri(String uri) {
@@ -88,7 +88,7 @@ class OAuth2Flow {
         .then((response) {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
-        throw json;
+        throw Exception(json['error']);
       }
       return ExchangeResponse(json['access_token'], json['token_type'],
           (json['scope'] as String).split(','));

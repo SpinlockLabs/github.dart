@@ -12,12 +12,15 @@ abstract class SearchResults<T> {
 @JsonSerializable(createToJson: false)
 class CodeSearchResults implements SearchResults<CodeSearchItem> {
   @JsonKey(name: 'total_count')
+  @override
   int totalCount;
 
   @JsonKey(name: 'incomplete_results')
+  @override
   bool incompleteResults;
 
   @JsonKey(fromJson: CodeSearchItem.fromJsonList)
+  @override
   List<CodeSearchItem> items;
 
   static CodeSearchResults fromJson(Map<String, dynamic> input) =>

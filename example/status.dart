@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
-Future<Null> main() async {
+Future<void> main() async {
   final request = await HttpRequest.request(
     'https://status.github.com/api/status.json',
     requestHeaders: {'Origin': window.location.origin},

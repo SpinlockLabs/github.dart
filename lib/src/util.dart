@@ -27,7 +27,7 @@ dynamic copyOf(dynamic input) {
   } else if (input is Map) {
     return Map.from(input);
   } else {
-    throw 'type could not be copied';
+    throw Exception('type could not be copied');
   }
 }
 

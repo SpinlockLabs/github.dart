@@ -29,7 +29,8 @@ class PaginationHelper {
     }
     assert(!params.containsKey('page'));
 
-    do {
+    // ignore: literal_only_boolean_expressions
+    while (true) {
       http.Response response;
       try {
         response = await github.request(method, path,
@@ -75,7 +76,7 @@ class PaginationHelper {
       final nextPageArg = nextUrl.queryParameters['page'];
       assert(nextPageArg != null);
       params['page'] = nextPageArg;
-    } while (true);
+    }
   }
 
   Stream<T> jsonObjects<T>(

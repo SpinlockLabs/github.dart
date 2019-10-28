@@ -52,7 +52,7 @@ void updateRepos(
           <div class="line"></div>
           <h2><a href="${repo.htmlUrl}">${repo.name}</a></h2>
           ${repo.description != "" && repo.description != null ? "<b>Description</b>: ${repo.description}<br/>" : ""}
-          <b>Language</b>: ${repo.language != null ? repo.language : "Unknown"}
+          <b>Language</b>: ${repo.language ?? "Unknown"}
           <br/>
           <b>Default Branch</b>: ${repo.defaultBranch}
           <br/>

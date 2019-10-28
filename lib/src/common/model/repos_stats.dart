@@ -48,6 +48,7 @@ class ContributorWeekStatistics {
   factory ContributorWeekStatistics.fromJson(Map<String, dynamic> json) =>
       _$ContributorWeekStatisticsFromJson(json);
 
+  @override
   String toString() =>
       'ContributorWeekStatistics(start: $start, commits: $commits, additions: $additions, deletions: $deletions)';
 }

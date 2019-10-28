@@ -142,30 +142,6 @@ class OrganizationsService extends Service {
     });
   }
 
-  /// Adds a user to the team.
-  ///
-  /// API docs: https://developer.github.com/v3/orgs/teams/#add-team-member
-  @deprecated
-  Future<bool> addTeamMember(int teamId, String user) {
-    return github
-        .request('PUT', '/teams/$teamId/members/$user')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
-
-  /// Removes a user from the team.
-  ///
-  /// API docs: https://developer.github.com/v3/orgs/teams/#remove-team-member
-  @deprecated
-  Future<bool> removeMember(int teamId, String user) {
-    return github
-        .request('DELETE', '/teams/$teamId/members/$user')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
-
   /// Returns the membership status for a user in a team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership

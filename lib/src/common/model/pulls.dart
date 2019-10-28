@@ -67,7 +67,7 @@ class PullRequestInformation {
       [PullRequestInformation into]) {
     if (input == null) return null;
 
-    final pr = into != null ? into : PullRequestInformation();
+    final pr = into ?? PullRequestInformation();
     pr.head = PullRequestHead.fromJSON(input['head'] as Map<String, dynamic>);
     pr.base = PullRequestHead.fromJSON(input['base'] as Map<String, dynamic>);
     pr.htmlUrl = input['html_url'];

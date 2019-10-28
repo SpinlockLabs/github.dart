@@ -1,11 +1,9 @@
 import 'package:github/github.dart';
 
-void main() {
+Future<void> main() async {
   final github = GitHub();
-
-  github.repositories
-      .getReadme(const RepositorySlug('SpinlockLabs', 'github.dart'))
-      .then((file) => github.misc.renderMarkdown(file.text))
-      .then((html) => print(html))
-      .then((_) => github.dispose());
+  final file = await github.repositories
+      .getReadme(const RepositorySlug('SpinlockLabs', 'github.dart'));
+  print(await github.misc.renderMarkdown(file.text));
+  github.dispose();
 }

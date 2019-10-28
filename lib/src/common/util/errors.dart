@@ -78,7 +78,7 @@ class ServerError extends GitHubError {
 /// An Unknown Error
 class UnknownError extends GitHubError {
   const UnknownError(GitHub github, [String message])
-      : super(github, message != null ? message : 'Unknown Error');
+      : super(github, message ?? 'Unknown Error');
 }
 
 /// GitHub Client was not authenticated

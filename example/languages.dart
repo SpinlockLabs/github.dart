@@ -64,7 +64,7 @@ String generateMarkdown(int accuracy) {
   data.forEach((info) {
     final String name = info[0];
     final int bytes = info[1];
-    final num percentage = ((bytes / total) * 100);
+    final num percentage = (bytes / total) * 100;
     md += '|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|\n';
   });
   return md;

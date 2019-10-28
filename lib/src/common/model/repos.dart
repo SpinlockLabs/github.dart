@@ -18,6 +18,7 @@ class GitHubComparison {
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);
 
+  @override
   String toString() {
     switch (status) {
       case 'identical':
