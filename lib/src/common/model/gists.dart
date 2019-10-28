@@ -3,112 +3,103 @@ import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
+
+part 'gists.g.dart';
 
 /// Model class for gists.
+@immutable
+@JsonSerializable(createToJson: false)
 class Gist {
-  String id;
-  String description;
-  bool public;
-  User owner;
-  User user;
-  List<GistFile> files;
+  const Gist({
+    @required this.id,
+    @required this.description,
+    @required this.public,
+    @required this.owner,
+    @required this.user,
+    @required this.files,
+    @required this.htmlUrl,
+    @required this.commentsCount,
+    @required this.gitPullUrl,
+    @required this.gitPushUrl,
+    @required this.createdAt,
+    @required this.updatedAt,
+  });
+  final String id;
+  final String description;
+  final bool public;
+  final User owner;
+  final User user;
+  final List<GistFile> files;
 
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  final String htmlUrl;
 
   @JsonKey(name: 'comments')
-  int commentsCount;
+  final int commentsCount;
 
   @JsonKey(name: 'git_pull_url')
-  String gitPullUrl;
+  final String gitPullUrl;
 
   @JsonKey(name: 'git_push_url')
-  String gitPushUrl;
+  final String gitPushUrl;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  static Gist fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final gist = Gist()
-      ..id = input['id']
-      ..description = input['description']
-      ..public = input['public']
-      ..owner = User.fromJson(input['owner'] as Map<String, dynamic>)
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
-
-    if (input['files'] != null) {
-      gist.files = [];
-
-      for (final key in input['files'].keys) {
-        final map = copyOf(input['files'][key]) as Map<String, dynamic>;
-        map['name'] = key;
-        gist.files.add(GistFile.fromJson(map));
-      }
-    }
-
-    gist
-      ..htmlUrl = input['html_url']
-      ..commentsCount = input['comments']
-      ..gitPullUrl = input['git_pull_url']
-      ..gitPushUrl = input['git_push_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
-
-    return gist;
-  }
+  factory Gist.fromJson(Map<String, dynamic> input) => _$GistFromJson(input);
 }
 
 /// Model class for a gist file.
+@immutable
+@JsonSerializable(createToJson: false)
 class GistFile {
-  String name;
-  int size;
+  const GistFile({
+    @required this.name,
+    @required this.size,
+    @required this.rawUrl,
+    @required this.type,
+    @required this.language,
+    @required this.truncated,
+    @required this.content,
+  });
+  final String name;
+  final int size;
 
   @JsonKey(name: 'raw_url')
-  String rawUrl;
-  String type;
-  String language;
-  bool truncated;
-  String content;
+  final String rawUrl;
+  final String type;
+  final String language;
+  final bool truncated;
+  final String content;
 
-  static GistFile fromJson(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistFile()
-      ..name = input['name']
-      ..size = input['size']
-      ..rawUrl = input['raw_url']
-      ..type = input['type']
-      ..language = input['language']
-      ..truncated = input['truncated']
-      ..content = input['content'];
-  }
+  factory GistFile.fromJson(Map<String, dynamic> input) =>
+      _$GistFileFromJson(input);
 }
 
 /// Model class for a gist fork.
+@immutable
+@JsonSerializable(createToJson: false)
 class GistFork {
-  User user;
-  int id;
+  const GistFork(
+      {@required this.user,
+      @required this.id,
+      @required this.createdAt,
+      @required this.updatedAt});
+  final User user;
+  final int id;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  static GistFork fromJson(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistFork()
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..id = input['id']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
-  }
+  factory GistFork.fromJson(Map<String, dynamic> input) =>
+      _$GistForkFromJson(input);
 }
 
 /// Model class for a gits history entry.

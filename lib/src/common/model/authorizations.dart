@@ -1,62 +1,60 @@
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
-import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
+
+part 'authorizations.g.dart';
 
 /// Model class for an authorization.
+@immutable
+@JsonSerializable(createToJson: false)
 class Authorization {
-  int id;
+  const Authorization(
+      {@required this.id,
+      @required this.scopes,
+      @required this.token,
+      @required this.app,
+      @required this.note,
+      @required this.noteUrl,
+      @required this.createdAt,
+      @required this.updatedAt,
+      @required this.user});
 
-  List<String> scopes;
-  String token;
-  AuthorizationApplication app;
-  String note;
-  String noteUrl;
-  DateTime createdAt;
-  DateTime updatedAt;
-  User user;
+  final int id;
+  final List<String> scopes;
+  final String token;
+  final AuthorizationApplication app;
+  final String note;
+  @JsonKey(name: 'note_url')
+  final String noteUrl;
+  @JsonKey(name: 'created_at')
+  final DateTime createdAt;
+  @JsonKey(name: 'updated_at')
+  final DateTime updatedAt;
+  final User user;
 
-  Map<String, dynamic> json;
-
-  static Authorization fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return Authorization()
-      ..id = input['id']
-      ..scopes = input['scopes'] as List<String>
-      ..token = input['token']
-      ..app = AuthorizationApplication.fromJSON(
-          input['app'] as Map<String, dynamic>)
-      ..note = input['note']
-      ..noteUrl = input['note_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..json = input
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
-  }
+  factory Authorization.fromJson(Map<String, dynamic> input) =>
+      _$AuthorizationFromJson(input);
 }
 
 /// Model class for an application of an [Authorization].
+@immutable
+@JsonSerializable(createToJson: false)
 class AuthorizationApplication {
-  String url;
-  String name;
+  const AuthorizationApplication({this.url, this.name, this.clientID});
+
+  final String url;
+  final String name;
 
   @JsonKey(name: 'client_id')
-  String clientID;
+  final String clientID;
 
-  AuthorizationApplication();
-
-  static AuthorizationApplication fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return AuthorizationApplication()
-      ..url = input['url']
-      ..name = input['name']
-      ..clientID = input['client_id'];
-  }
+  factory AuthorizationApplication.fromJson(Map<String, dynamic> input) =>
+      _$AuthorizationApplicationFromJson(input);
 }
 
+@JsonSerializable()
 class CreateAuthorization {
   final String note;
 
@@ -67,12 +65,11 @@ class CreateAuthorization {
 
   CreateAuthorization(this.note);
 
+  factory CreateAuthorization.fromJson(Map<String, dynamic> json) =>
+      _$CreateAuthorizationFromJson(json);
+  Map<String, dynamic> toJson() => _$CreateAuthorizationToJson(this);
+
   String toJSON() {
-    final map = <String, dynamic>{};
-    putValue('note', note, map);
-    putValue('note_url', noteUrl, map);
-    putValue('client_id', clientID, map);
-    putValue('client_secret', clientSecret, map);
-    return jsonEncode(map);
+    return jsonEncode(toJson());
   }
 }

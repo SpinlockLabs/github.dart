@@ -15,7 +15,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
     return PaginationHelper(github)
-        .objects('GET', '/users/$username/gists', Gist.fromJSON);
+        .objects('GET', '/users/$username/gists', (i) => Gist.fromJson(i));
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -23,7 +23,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
-    return PaginationHelper(github).objects('GET', '/gists', Gist.fromJSON);
+    return PaginationHelper(github)
+        .objects('GET', '/gists', (i) => Gist.fromJson(i));
   }
 
   /// Fetches the currently authenticated user's public gists.
@@ -31,7 +32,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
     return PaginationHelper(github)
-        .objects('GET', '/gists/public', Gist.fromJSON);
+        .objects('GET', '/gists/public', (i) => Gist.fromJson(i));
   }
 
   /// Fetches the currently authenticated user's starred gists.
@@ -39,14 +40,14 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
     return PaginationHelper(github)
-        .objects('GET', '/gists/starred', Gist.fromJSON);
+        .objects('GET', '/gists/starred', (i) => Gist.fromJson(i));
   }
 
   /// Fetches a Gist by the specified [id].
   ///
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
   Future<Gist> getGist(String id) => github.getJSON('/gists/$id',
-      statusCode: StatusCodes.OK, convert: Gist.fromJSON);
+      statusCode: StatusCodes.OK, convert: (i) => Gist.fromJson(i));
 
   /// Creates a Gist
   ///
@@ -76,7 +77,7 @@ class GistsService extends Service {
       '/gists',
       statusCode: 201,
       body: jsonEncode(map),
-      convert: Gist.fromJSON,
+      convert: (i) => Gist.fromJson(i),
     );
   }
 
@@ -115,7 +116,7 @@ class GistsService extends Service {
       '/gists/$id',
       statusCode: 200,
       body: jsonEncode(map),
-      convert: Gist.fromJSON,
+      convert: (i) => Gist.fromJson(i),
     );
   }
 
@@ -155,7 +156,7 @@ class GistsService extends Service {
     return github
         .request('POST', '/gists/$id/forks', statusCode: 201)
         .then((response) {
-      return Gist.fromJSON(jsonDecode(response.body) as Map<String, dynamic>);
+      return Gist.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 
