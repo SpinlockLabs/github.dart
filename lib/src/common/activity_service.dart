@@ -131,7 +131,7 @@ class ActivityService extends Service {
   Stream<Notification> listNotifications(
       {bool all = false, bool participating = false}) {
     return PaginationHelper(github).objects(
-        'GET', '/notifications', Notification.fromJSON,
+        'GET', '/notifications', (i) => Notification.fromJson(i),
         params: {'all': all, 'participating': participating});
   }
 
@@ -140,8 +140,10 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/notifications/#list-your-notifications-in-a-repository
   Stream<Notification> listRepositoryNotifications(RepositorySlug repository,
       {bool all = false, bool participating = false}) {
-    return PaginationHelper(github).objects('GET',
-        '/repos/${repository.fullName}/notifications', Notification.fromJSON,
+    return PaginationHelper(github).objects(
+        'GET',
+        '/repos/${repository.fullName}/notifications',
+        (i) => Notification.fromJson(i),
         params: {'all': all, 'participating': participating});
   }
 
@@ -185,7 +187,7 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/notifications/#view-a-single-thread
   Future<Notification> getThread(String threadId) =>
       github.getJSON('/notification/threads/$threadId',
-          statusCode: StatusCodes.OK, convert: Notification.fromJSON);
+          statusCode: StatusCodes.OK, convert: (i) => Notification.fromJson(i));
 
   /// Mark the specified notification thread as read.
   ///
@@ -206,8 +208,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
   Stream<User> listStargazers(RepositorySlug slug) {
-    return PaginationHelper(github)
-        .objects('GET', '/repos/${slug.fullName}/stargazers', User.fromJson);
+    return PaginationHelper(github).objects(
+        'GET', '/repos/${slug.fullName}/stargazers', (i) => User.fromJson(i));
   }
 
   /// Lists all the repos starred by a user.
@@ -261,8 +263,8 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-watchers
   Stream<User> listWatchers(RepositorySlug slug) {
-    return PaginationHelper(github)
-        .objects('GET', '/repos/${slug.fullName}/subscribers', User.fromJson);
+    return PaginationHelper(github).objects(
+        'GET', '/repos/${slug.fullName}/subscribers', (i) => User.fromJson(i));
   }
 
   /// Lists the repositories the specified user is watching.

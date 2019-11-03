@@ -1,61 +1,67 @@
-import 'dart:convert';
-import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+part 'repos_hooks.g.dart';
+
 /// Model class for a repository hook.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Hook {
+  Hook({
+    this.id,
+    this.name,
+  });
+
+  int id;
+  String name;
+
   /// Events to Subscribe to
   List<String> events;
 
   /// Content Type
-  @JsonKey(name: 'config/content_type')
-  String contentType;
+  String get contentType => config.contentType;
 
   /// If the hook is active
   bool active;
 
-  /// Hook ID
-  int id;
-
-  /// Hook Name
-  String name;
-
   /// The time the hook was created
-  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The last time the hook was updated
-  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   /// The Repository Name
   String repoName;
 
-  // TODO create a HookConfig class and implement a getter that returns the Map type
-  Map<String, dynamic> config;
+  HookConfig config;
 
-  static Hook fromJSON(String repoName, Map<String, dynamic> input) {
-    if (input == null) return null;
+  factory Hook.fromJson(Map<String, dynamic> input) => _$HookFromJson(input);
+  Map<String, dynamic> toJson() => _$HookToJson(this);
+}
 
-    return Hook()
-      ..events = input['events']?.cast<String>()
-      ..active = input['active']
-      ..name = input['name']
-      ..id = input['id']
-      ..repoName = repoName
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..createdAt = parseDateTime(input['created_at'])
-      ..config = input['config'] as Map<String, dynamic>;
-  }
+@JsonSerializable(fieldRename: FieldRename.snake)
+class HookConfig {
+  HookConfig({
+    this.url,
+    this.contentType,
+    this.secret,
+    this.insecureSsl,
+  });
+  String url;
+  String contentType;
+  String secret;
+  String insecureSsl;
+  factory HookConfig.fromJson(Map<String, dynamic> input) =>
+      _$HookConfigFromJson(input);
+  Map<String, dynamic> toJson() => _$HookConfigToJson(this);
 }
 
 /// Model class for a new hook to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateHook {
   /// Hook Name
   final String name;
 
   /// Hook Configuration
-  final Map<String, dynamic> config;
+  final HookConfig config;
 
   /// Events to Subscribe to
   final List<String> events;
@@ -66,8 +72,7 @@ class CreateHook {
   CreateHook(this.name, this.config,
       {this.events = const ['push'], this.active = true});
 
-  String toJSON() {
-    return jsonEncode(
-        {'name': name, 'config': config, 'events': events, 'active': active});
-  }
+  factory CreateHook.fromJson(Map<String, dynamic> input) =>
+      _$CreateHookFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateHookToJson(this);
 }

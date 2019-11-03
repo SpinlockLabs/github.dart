@@ -110,13 +110,13 @@ class RepositoriesService extends Service {
     if (org != null) {
       return github.postJSON<Map<String, dynamic>, TeamRepository>(
         '/orgs/$org/repos',
-        body: repository.toJSON(),
-        convert: (i) => TeamRepository.fromJSON(i),
+        body: jsonEncode(repository),
+        convert: (i) => TeamRepository.fromJson(i),
       );
     } else {
       return github.postJSON<Map<String, dynamic>, Repository>(
         '/user/repos',
-        body: repository.toJSON(),
+        body: jsonEncode(repository),
         convert: (i) => Repository.fromJson(i),
       );
     }
@@ -222,7 +222,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, Team>(
       'GET',
       '/repos/${slug.fullName}/teams',
-      (i) => Team.fromJSON(i),
+      (i) => Team.fromJson(i),
     );
   }
 
@@ -258,7 +258,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, Branch>(
       'GET',
       '/repos/${slug.fullName}/branches',
-      (i) => Branch.fromJSON(i),
+      (i) => Branch.fromJson(i),
     );
   }
 
@@ -270,7 +270,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(branch);
     return github.getJSON<Map<String, dynamic>, Branch>(
       '/repos/${slug.fullName}/branches/$branch',
-      convert: (i) => Branch.fromJSON(i),
+      convert: (i) => Branch.fromJson(i),
     );
   }
 
@@ -344,7 +344,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, CommitComment>(
       'GET',
       '/repos/${slug.fullName}/commits/${commit.sha}/comments',
-      (i) => CommitComment.fromJSON(i),
+      (i) => CommitComment.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -358,7 +358,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, CommitComment>(
       'GET',
       'repos/${slug.fullName}/comments',
-      (i) => CommitComment.fromJSON(i),
+      (i) => CommitComment.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -390,7 +390,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/commits/${commit.sha}/comments',
       body: jsonEncode(data),
       statusCode: StatusCodes.CREATED,
-      convert: (i) => CommitComment.fromJSON(i),
+      convert: (i) => CommitComment.fromJson(i),
     );
   }
 
@@ -404,7 +404,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, CommitComment>(
       '/repos/${slug.fullName}/comments/$id',
       statusCode: StatusCodes.OK,
-      convert: (i) => CommitComment.fromJSON(i),
+      convert: (i) => CommitComment.fromJson(i),
     );
   }
 
@@ -424,7 +424,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/comments/$id',
       body: jsonEncode(createNonNullMap({'body': body})),
       statusCode: StatusCodes.OK,
-      convert: (i) => CommitComment.fromJSON(i),
+      convert: (i) => CommitComment.fromJson(i),
     );
   }
 
@@ -453,7 +453,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, RepositoryCommit>(
       'GET',
       '/repos/${slug.fullName}/commits',
-      (i) => RepositoryCommit.fromJSON(i),
+      (i) => RepositoryCommit.fromJson(i),
     );
   }
 
@@ -465,7 +465,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(sha);
     return github.getJSON<Map<String, dynamic>, RepositoryCommit>(
       '/repos/${slug.fullName}/commits/$sha',
-      convert: (i) => RepositoryCommit.fromJSON(i),
+      convert: (i) => RepositoryCommit.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -519,17 +519,18 @@ class RepositoriesService extends Service {
       url += '?ref=$ref';
     }
 
-    return github.getJSON(
-      url,
-      headers: headers,
-      statusCode: StatusCodes.OK,
-      fail: (http.Response response) {
-        if (response.statusCode == StatusCodes.NOT_FOUND) {
-          throw NotFound(github, response.body);
-        }
-      },
-      convert: (Map<String, dynamic> input) => GitHubFile.fromJSON(input, slug),
-    );
+    return github.getJSON(url, headers: headers, statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
+      if (response.statusCode == StatusCodes.NOT_FOUND) {
+        throw NotFound(github, response.body);
+      }
+    }, convert: (Map<String, dynamic> input) {
+      GitHubFile file = GitHubFile.fromJson(input);
+      if (file != null && slug != null) {
+        file.sourceRepository = slug;
+      }
+      return file;
+    });
   }
 
   /// Fetches content in a repository at the specified [path].
@@ -569,10 +570,10 @@ class RepositoriesService extends Service {
             throw GitHubError(github, input['message'],
                 apiUrl: input['documentation_url']);
           }
-          contents.file = GitHubFile.fromJSON(input as Map<String, dynamic>);
+          contents.file = GitHubFile.fromJson(input as Map<String, dynamic>);
         } else {
           contents.tree =
-              (input as List).map((it) => GitHubFile.fromJSON(it)).toList();
+              (input as List).map((it) => GitHubFile.fromJson(it)).toList();
         }
         return contents;
       },
@@ -589,9 +590,9 @@ class RepositoriesService extends Service {
     final http.Response response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/${file.path}',
-      body: file.toJSON(),
+      body: jsonEncode(file),
     );
-    return ContentCreation.fromJSON(
+    return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -614,7 +615,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/contents/$path',
       body: jsonEncode(map),
     );
-    return ContentCreation.fromJSON(
+    return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -633,7 +634,7 @@ class RepositoriesService extends Service {
       body: jsonEncode(map),
       statusCode: StatusCodes.OK,
     );
-    return ContentCreation.fromJSON(
+    return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -673,7 +674,7 @@ class RepositoriesService extends Service {
     if (fork == null) fork = CreateFork();
     return github.postJSON<Map<String, dynamic>, Repository>(
       '/repos/${slug.fullName}/forks',
-      body: fork.toJSON(),
+      body: jsonEncode(fork),
       convert: (i) => Repository.fromJson(i),
     );
   }
@@ -686,7 +687,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, Hook>(
       'GET',
       '/repos/${slug.fullName}/hooks',
-      (input) => Hook.fromJSON(slug.fullName, input),
+      (i) => Hook.fromJson(i)..repoName = slug.fullName,
     );
   }
 
@@ -698,7 +699,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(id);
     return github.getJSON<Map<String, dynamic>, Hook>(
       '/repos/${slug.fullName}/hooks/$id',
-      convert: (i) => Hook.fromJSON(slug.fullName, i),
+      convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
     );
   }
 
@@ -710,8 +711,8 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(hook);
     return github.postJSON<Map<String, dynamic>, Hook>(
       '/repos/${slug.fullName}/hooks',
-      convert: (i) => Hook.fromJSON(slug.fullName, i),
-      body: hook.toJSON(),
+      convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
+      body: jsonEncode(hook),
     );
   }
 
@@ -743,24 +744,23 @@ class RepositoriesService extends Service {
   }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(hookToEdit);
-    ArgumentError.checkNotNull(configUrl ?? hookToEdit.config['url']);
+    ArgumentError.checkNotNull(configUrl ?? hookToEdit.config.url);
     if (configContentType != 'json' && configContentType != 'form') {
       throw ArgumentError.value(configContentType, 'configContentType');
     }
     return github.postJSON<Map<String, dynamic>, Hook>(
       '/repos/${slug.fullName}/hooks/${hookToEdit.id.toString()}',
       statusCode: StatusCodes.OK,
-      convert: (i) => Hook.fromJSON(slug.fullName, i),
+      convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
       body: jsonEncode(createNonNullMap(<String, dynamic>{
         'active': active ?? hookToEdit.active,
         'events': events ?? hookToEdit.events,
         'add_events': addEvents,
         'remove_events': removeEvents,
         'config': <String, dynamic>{
-          'url': configUrl ?? hookToEdit.config['url'],
-          'content_type':
-              configContentType ?? hookToEdit.config['content_type'],
-          'secret': configSecret ?? hookToEdit.config['secret'],
+          'url': configUrl ?? hookToEdit.config.url,
+          'content_type': configContentType ?? hookToEdit.config.contentType,
+          'secret': configSecret ?? hookToEdit.config.secret,
           'insecure_ssl':
               configInsecureSsl == null || !configInsecureSsl ? '0' : '1',
         },
@@ -820,7 +820,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, PublicKey>(
       'GET',
       '/repos/${slug.fullName}/keys',
-      (i) => PublicKey.fromJSON(i),
+      (i) => PublicKey.fromJson(i),
     );
   }
 
@@ -835,7 +835,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, PublicKey>(
       '/repos/${slug.fullName}/keys/$id',
       statusCode: StatusCodes.OK,
-      convert: (i) => PublicKey.fromJSON(i),
+      convert: (i) => PublicKey.fromJson(i),
     );
   }
 
@@ -848,9 +848,9 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(key);
     return github.postJSON<Map<String, dynamic>, PublicKey>(
       '/repos/${slug.fullName}/keys',
-      body: key.toJSON(),
+      body: jsonEncode(key),
       statusCode: StatusCodes.CREATED,
-      convert: (i) => PublicKey.fromJSON(i),
+      convert: (i) => PublicKey.fromJson(i),
     );
   }
 
@@ -878,8 +878,8 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(merge);
     return github.postJSON<Map<String, dynamic>, RepositoryCommit>(
       '/repos/${slug.fullName}/merges',
-      body: merge.toJSON(),
-      convert: (i) => RepositoryCommit.fromJSON(i),
+      body: jsonEncode(merge),
+      convert: (i) => RepositoryCommit.fromJson(i),
       statusCode: StatusCodes.CREATED,
     );
   }
@@ -892,7 +892,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, RepositoryPages>(
       '/repos/${slug.fullName}/pages',
       statusCode: StatusCodes.OK,
-      convert: (i) => RepositoryPages.fromJSON(i),
+      convert: (i) => RepositoryPages.fromJson(i),
     );
   }
 
@@ -904,7 +904,7 @@ class RepositoriesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, PageBuild>(
       'GET',
       '/repos/${slug.fullName}/pages/builds',
-      (i) => PageBuild.fromJSON(i),
+      (i) => PageBuild.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -916,7 +916,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     return github.getJSON(
       '/repos/${slug.fullName}/pages/builds/latest',
-      convert: (i) => PageBuild.fromJSON(i),
+      convert: (i) => PageBuild.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }
@@ -960,7 +960,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
   Future<Release> getReleaseByTagName(RepositorySlug slug, String tagName) =>
       github.getJSON('/repos/${slug.fullName}/releases/tags/$tagName',
-          convert: Release.fromJson);
+          convert: (i) => Release.fromJson(i));
 
   /// Creates a Release based on the specified [createRelease].
   ///
@@ -1132,7 +1132,7 @@ class RepositoriesService extends Service {
           ),
           headers: headers,
           body: createReleaseAsset.assetData,
-          convert: ReleaseAsset.fromJson);
+          convert: (i) => ReleaseAsset.fromJson(i));
       releaseAssets.add(releaseAsset);
     }
     return releaseAssets;
@@ -1171,7 +1171,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, YearCommitCountWeek>(
       'GET',
       '/repos/${slug.fullName}/stats/commit_activity',
-      (i) => YearCommitCountWeek.fromJSON(i),
+      (i) => YearCommitCountWeek.fromJson(i),
     );
   }
 
@@ -1184,7 +1184,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, WeeklyChangesCount>(
       'GET',
       '/repos/${slug.fullName}/stats/code_frequency',
-      (i) => WeeklyChangesCount.fromJSON(i),
+      (i) => WeeklyChangesCount.fromJson(i),
     );
   }
 
@@ -1196,7 +1196,7 @@ class RepositoriesService extends Service {
     return github.getJSON(
       '/repos/${slug.fullName}/stats/participation',
       statusCode: StatusCodes.OK,
-      convert: (i) => ContributorParticipation.fromJSON(i),
+      convert: (i) => ContributorParticipation.fromJson(i),
     );
   }
 
@@ -1209,7 +1209,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, PunchcardEntry>(
       'GET',
       '/repos/${slug.fullName}/stats/punchcard',
-      (i) => PunchcardEntry.fromJSON(i),
+      (i) => PunchcardEntry.fromJson(i),
     );
   }
 
@@ -1224,7 +1224,7 @@ class RepositoriesService extends Service {
         .objects<Map<String, dynamic>, RepositoryStatus>(
       'GET',
       '/repos/${slug.fullName}/commits/$ref/statuses',
-      (i) => RepositoryStatus.fromJSON(i),
+      (i) => RepositoryStatus.fromJson(i),
     );
   }
 
@@ -1239,8 +1239,8 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(request);
     return github.postJSON<Map<String, dynamic>, RepositoryStatus>(
       '/repos/${slug.fullName}/statuses/$ref',
-      body: request.toJSON(),
-      convert: (i) => RepositoryStatus.fromJSON(i),
+      body: jsonEncode(request),
+      convert: (i) => RepositoryStatus.fromJson(i),
     );
   }
 
@@ -1253,7 +1253,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(ref);
     return github.getJSON<Map<String, dynamic>, CombinedRepositoryStatus>(
       '/repos/${slug.fullName}/commits/$ref/status',
-      convert: CombinedRepositoryStatus.fromJSON,
+      convert: (i) => CombinedRepositoryStatus.fromJson(i),
       statusCode: StatusCodes.OK,
     );
   }

@@ -1,24 +1,51 @@
-import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
-import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+part 'pulls.g.dart';
+
 /// Model class for a Pull Request.
-class PullRequestInformation {
-  /// If this is a complete pull request
-  final bool isCompletePullRequest;
+@JsonSerializable(fieldRename: FieldRename.snake)
+class PullRequest {
+  PullRequest({
+    this.id,
+    this.htmlUrl,
+    this.diffUrl,
+    this.patchUrl,
+    this.number,
+    this.state,
+    this.title,
+    this.body,
+    this.createdAt,
+    this.updatedAt,
+    this.closedAt,
+    this.mergedAt,
+    this.head,
+    this.base,
+    this.user,
+    this.draft,
+    this.mergeCommitSha,
+    this.merged,
+    this.mergeable,
+    this.mergedBy,
+    this.commentsCount,
+    this.commitsCount,
+    this.additionsCount,
+    this.deletionsCount,
+    this.changedFilesCount,
+    this.labels,
+  });
+
+  /// Pull Request ID
+  int id;
 
   /// Url to the Pull Request Page
-  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Url to the diff for this Pull Request
-  @JsonKey(name: 'diff_url')
   String diffUrl;
 
   /// Url to the patch for this Pull Request
-  @JsonKey(name: 'patch_url')
   String patchUrl;
 
   /// Pull Request Number
@@ -34,19 +61,15 @@ class PullRequestInformation {
   String body;
 
   /// Time the pull request was created
-  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// Time the pull request was updated
-  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   /// Time the pull request was closed
-  @JsonKey(name: 'closed_at')
   DateTime closedAt;
 
   /// Time the pull request was merged
-  @JsonKey(name: 'merged_at')
   DateTime mergedAt;
 
   /// The Pull Request Head
@@ -60,36 +83,6 @@ class PullRequestInformation {
 
   /// Whether or not the pull request is a draft
   bool draft;
-
-  PullRequestInformation([this.isCompletePullRequest = false]);
-
-  static PullRequestInformation fromJSON(Map<String, dynamic> input,
-      [PullRequestInformation into]) {
-    if (input == null) return null;
-
-    final pr = into ?? PullRequestInformation();
-    pr.head = PullRequestHead.fromJSON(input['head'] as Map<String, dynamic>);
-    pr.base = PullRequestHead.fromJSON(input['base'] as Map<String, dynamic>);
-    pr.htmlUrl = input['html_url'];
-    pr.diffUrl = input['diff_url'];
-    pr.patchUrl = input['patch_url'];
-    pr.number = input['number'];
-    pr.state = input['state'];
-    pr.title = input['title'];
-    pr.body = input['body'];
-    pr.createdAt = parseDateTime(input['created_at']);
-    pr.updatedAt = parseDateTime(input['updated_at']);
-    pr.closedAt = parseDateTime(input['closed_at']);
-    pr.mergedAt = parseDateTime(input['merged_at']);
-    pr.user = User.fromJson(input['user'] as Map<String, dynamic>);
-    pr.draft = input['draft'] ?? false;
-    return pr;
-  }
-}
-
-/// Model class for a Complete Pull Request.
-class PullRequest extends PullRequestInformation {
-  @JsonKey(name: 'merge_commit_sha')
   String mergeCommitSha;
 
   /// If the pull request was merged
@@ -99,7 +92,6 @@ class PullRequest extends PullRequestInformation {
   bool mergeable;
 
   /// The user who merged the pull request
-  @JsonKey(name: 'merged_by')
   User mergedBy;
 
   /// Number of comments
@@ -117,191 +109,136 @@ class PullRequest extends PullRequestInformation {
   /// Number of changed files
   int changedFilesCount;
 
-  /// Pull Request ID
-  int id;
-
   /// Pull Request Labels
   List<IssueLabel> labels;
 
-  PullRequest() : super(true);
-
-  static PullRequest fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final PullRequest pr =
-        PullRequestInformation.fromJSON(input, PullRequest());
-    pr.mergeable = input['mergeable'];
-    pr.merged = input['merged'];
-    pr.id = input['id'];
-    pr.mergedBy = User.fromJson(input['merged_by'] as Map<String, dynamic>);
-    pr.mergeCommitSha = input['merge_commit_sha'];
-    pr.commentsCount = input['comments'];
-    pr.commitsCount = input['commits'];
-    pr.additionsCount = input['additions'];
-    pr.deletionsCount = input['deletions'];
-    pr.changedFilesCount = input['changed_files'];
-    pr.labels = input['labels']
-        ?.cast<Map<String, dynamic>>()
-        ?.map<IssueLabel>(IssueLabel.fromJSON)
-        ?.toList();
-    return pr;
-  }
+  factory PullRequest.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestToJson(this);
 }
 
 /// Model class for a pull request merge.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PullRequestMerge {
+  PullRequestMerge({
+    this.merged,
+    this.sha,
+    this.message,
+  });
   bool merged;
   String sha;
   String message;
 
-  PullRequestMerge();
-
-  static PullRequestMerge fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return PullRequestMerge()
-      ..merged = input['merged']
-      ..sha = input['sha']
-      ..message = input['message'];
-  }
+  factory PullRequestMerge.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestMergeFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestMergeToJson(this);
 }
 
 /// Model class for a Pull Request Head.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PullRequestHead {
-  /// Label
+  PullRequestHead({
+    this.label,
+    this.ref,
+    this.sha,
+    this.user,
+    this.repo,
+  });
+
   String label;
-
-  /// Ref
   String ref;
-
-  /// Commit SHA
   String sha;
-
-  /// User
   User user;
-
-  /// Repository
   Repository repo;
 
-  static PullRequestHead fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final head = PullRequestHead();
-    head.label = input['label'];
-    head.ref = input['ref'];
-    head.sha = input['sha'];
-    head.user = User.fromJson(input['user'] as Map<String, dynamic>);
-    head.repo = Repository.fromJson(input['repo'] as Map<String, dynamic>);
-    return head;
-  }
+  factory PullRequestHead.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestHeadFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestHeadToJson(this);
 }
 
 /// Model class for a pull request to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreatePullRequest {
-  /// Pull Request Title
-  final String title;
-
-  /// Pull Request Head
-  final String head;
-
-  /// Pull Request Base
-  final String base;
-
-  /// Pull Request Body
-  String body;
-
   CreatePullRequest(this.title, this.head, this.base, {this.body});
 
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue('title', title, map);
-    putValue('head', head, map);
-    putValue('base', base, map);
-    putValue('body', body, map);
-    return jsonEncode(map);
-  }
+  final String title;
+  final String head;
+  final String base;
+  String body;
+
+  factory CreatePullRequest.fromJson(Map<String, dynamic> input) =>
+      _$CreatePullRequestFromJson(input);
+  Map<String, dynamic> toJson() => _$CreatePullRequestToJson(this);
 }
 
 /// Model class for a pull request comment.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PullRequestComment {
+  PullRequestComment({
+    this.id,
+    this.diffHunk,
+    this.path,
+    this.position,
+    this.originalPosition,
+    this.commitId,
+    this.originalCommitId,
+    this.user,
+    this.body,
+    this.createdAt,
+    this.updatedAt,
+    this.url,
+    this.pullRequestUrl,
+    this.links,
+  });
   int id;
-  @JsonKey(name: 'diff_hunk')
   String diffHunk;
   String path;
   int position;
-
-  @JsonKey(name: 'original_position')
   int originalPosition;
-
-  @JsonKey(name: 'commit_id')
-  String commitID;
-
-  @JsonKey(name: 'original_commit_id')
-  String originalCommitID;
-
+  String commitId;
+  String originalCommitId;
   User user;
   String body;
-
-  @JsonKey(name: 'created_at')
   DateTime createdAt;
-
-  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
-
-  @JsonKey(name: 'html_url')
   String url;
-
-  @JsonKey(name: 'pull_request_url')
   String pullRequestUrl;
-
   @JsonKey(name: '_links')
   Links links;
 
-  static PullRequestComment fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return PullRequestComment()
-      ..id = input['id']
-      ..diffHunk = input['diff_hunk']
-      ..path = input['path']
-      ..position = input['position']
-      ..originalPosition = input['original_position']
-      ..commitID = input['commit_id']
-      ..originalCommitID = input['original_commit_id']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..body = input['body']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..url = input['html_url']
-      ..pullRequestUrl = input['pull_request_url']
-      ..links = Links.fromJson(input['_links'] as Map<String, dynamic>);
-  }
+  factory PullRequestComment.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestCommentToJson(this);
 }
 
 /// Model class for a pull request comment to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreatePullRequestComment {
+  CreatePullRequestComment(this.body, this.commitId, this.path, this.position);
   String body;
-
-  @JsonKey(name: 'commit_id')
   String commitId;
-
   String path;
-
   int position;
 
-  CreatePullRequestComment(this.body, this.commitId, this.path, this.position);
-
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue('body', body, map);
-    putValue('commit_id', commitId, map);
-    putValue('path', path, map);
-    putValue('position', position, map);
-    return jsonEncode(map);
-  }
+  factory CreatePullRequestComment.fromJson(Map<String, dynamic> input) =>
+      _$CreatePullRequestCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$CreatePullRequestCommentToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PullRequestFile {
+  PullRequestFile({
+    this.sha,
+    this.filename,
+    this.status,
+    this.additionsCount,
+    this.deletionsCount,
+    this.changesCount,
+    this.blobUrl,
+    this.rawUrl,
+    this.contentsUrl,
+    this.patch,
+  });
   String sha;
   String filename;
   String status;
@@ -316,18 +253,7 @@ class PullRequestFile {
   String contentsUrl;
   String patch;
 
-  static PullRequestFile fromJSON(Map<String, dynamic> input) {
-    final file = PullRequestFile();
-    file.sha = input['sha'];
-    file.filename = input['filename'];
-    file.status = input['status'];
-    file.additionsCount = input['additions'];
-    file.deletionsCount = input['deletions'];
-    file.changesCount = input['changes'];
-    file.blobUrl = input['blob_url'];
-    file.rawUrl = input['raw_url'];
-    file.contentsUrl = input['contents_url'];
-    file.patch = input['patch'];
-    return file;
-  }
+  factory PullRequestFile.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestFileFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestFileToJson(this);
 }

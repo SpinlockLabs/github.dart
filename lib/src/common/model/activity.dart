@@ -1,53 +1,52 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 
 part 'activity.g.dart';
 
 /// Model class for an event.
-@immutable
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Event {
-  const Event({
-    @required this.id,
-    @required this.type,
-    @required this.repo,
-    @required this.actor,
-    @required this.org,
-    @required this.payload,
-    @required this.createdAt,
+  Event({
+    this.id,
+    this.type,
+    this.repo,
+    this.actor,
+    this.org,
+    this.payload,
+    this.createdAt,
   });
-  final String id;
-  final String type;
-  final Repository repo;
-  final User actor;
-  final Organization org;
-  final Map<String, dynamic> payload;
+  String id;
+  String type;
+  Repository repo;
+  User actor;
+  Organization org;
+  Map<String, dynamic> payload;
 
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  DateTime createdAt;
 
   factory Event.fromJson(Map<String, dynamic> input) => _$EventFromJson(input);
+  Map<String, dynamic> toJson() => _$EventToJson(this);
 }
 
 /// Model class for a repository subscription.
-@immutable
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class RepositorySubscription {
-  const RepositorySubscription({
-    @required this.subscribed,
-    @required this.ignored,
-    @required this.reason,
-    @required this.createdAt,
+  RepositorySubscription({
+    this.subscribed,
+    this.ignored,
+    this.reason,
+    this.createdAt,
   });
-  final bool subscribed;
-  final bool ignored;
-  final String reason;
+  bool subscribed;
+  bool ignored;
+  String reason;
 
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  DateTime createdAt;
 
   factory RepositorySubscription.fromJson(Map<String, dynamic> input) =>
       _$RepositorySubscriptionFromJson(input);
+  Map<String, dynamic> toJson() => _$RepositorySubscriptionToJson(this);
 }

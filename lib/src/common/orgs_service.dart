@@ -76,7 +76,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
   Stream<Team> listTeams(String orgName) {
     return PaginationHelper(github)
-        .objects('GET', '/orgs/$orgName/teams', Team.fromJSON);
+        .objects('GET', '/orgs/$orgName/teams', (i) => Team.fromJson(i));
   }
 
   /// Gets the team specified by the [teamId].
@@ -101,7 +101,9 @@ class OrganizationsService extends Service {
     });
 
     return github.postJSON('/orgs/$org/teams',
-        statusCode: 201, convert: Team.fromJSON, body: jsonEncode(map));
+        statusCode: 201,
+        convert: (i) => Team.fromJson(i),
+        body: jsonEncode(map));
   }
 
   /// Edits a Team.
@@ -118,7 +120,7 @@ class OrganizationsService extends Service {
     return github.postJSON(
       '/teams/$teamId',
       statusCode: 200,
-      convert: Team.fromJSON,
+      convert: (i) => Team.fromJson(i),
       body: jsonEncode(map),
     );
   }
@@ -136,8 +138,8 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-members
   Stream<TeamMember> listTeamMembers(int teamId) {
-    return PaginationHelper(github)
-        .objects('GET', '/teams/$teamId/members', TeamMember.fromJSON);
+    return PaginationHelper(github).objects(
+        'GET', '/teams/$teamId/members', (i) => TeamMember.fromJson(i));
   }
 
   Future<bool> getTeamMemberStatus(int teamId, String user) {
@@ -233,15 +235,15 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-user-teams
   Stream<Team> listUserTeams() {
     return PaginationHelper(github)
-        .objects('GET', '/user/teams', Team.fromJSON);
+        .objects('GET', '/user/teams', (i) => Team.fromJson(i));
   }
 
   /// Lists the hooks for the specified organization.
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
   Stream<Hook> listHooks(String org) {
-    return PaginationHelper(github).objects('GET', '/orgs/$org/hooks',
-        (Map<String, dynamic> input) => Hook.fromJSON(org, input));
+    return PaginationHelper(github).objects(
+        'GET', '/orgs/$org/hooks', (i) => Hook.fromJson(i)..repoName = org);
   }
 
   /// Fetches a single hook by [id].
@@ -249,15 +251,15 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
   Future<Hook> getHook(String org, int id) =>
       github.getJSON('/orgs/$org/hooks/$id',
-          convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i));
+          convert: (i) => Hook.fromJson(i)..repoName = org);
 
   /// Creates an organization hook based on the specified [hook].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
   Future<Hook> createHook(String org, CreateHook hook) {
     return github.postJSON('/orgs/$org/hooks',
-        convert: (Map<String, dynamic> i) => Hook.fromJSON(org, i),
-        body: hook.toJSON());
+        convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
+        body: jsonEncode(hook));
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook

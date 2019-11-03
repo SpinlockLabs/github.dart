@@ -4,115 +4,133 @@ import 'package:json_annotation/json_annotation.dart';
 part 'orgs.g.dart';
 
 /// Model class for a GitHub organization.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Organization {
-  Organization();
+  Organization({
+    this.login,
+    this.id,
+    this.htmlUrl,
+    this.avatarUrl,
+    this.name,
+    this.company,
+    this.blog,
+    this.location,
+    this.email,
+    this.publicReposCount,
+    this.publicGistsCount,
+    this.followersCount,
+    this.followingCount,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   /// Organization Login
-  String login;
+  final String login;
 
   /// Organization ID
-  int id;
+  final int id;
 
   /// Url to Organization Profile
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  final String htmlUrl;
 
   /// Url to the Organization Avatar
   @JsonKey(name: 'avatar_url')
-  String avatarUrl;
+  final String avatarUrl;
 
   /// Organization Name
-  String name;
+  final String name;
 
   /// Organization Company
-  String company;
+  final String company;
 
   /// Organization Blog
-  String blog;
+  final String blog;
 
   /// Organization Location
-  String location;
+  final String location;
 
   /// Organization Email
-  String email;
+  final String email;
 
   /// Number of Public Repositories
   @JsonKey(name: 'public_repos')
-  int publicReposCount;
+  final int publicReposCount;
 
   /// Number of Public Gists
   @JsonKey(name: 'public_gists')
-  int publicGistsCount;
+  final int publicGistsCount;
 
   /// Number of Followers
   @JsonKey(name: 'followers')
-  int followersCount;
+  final int followersCount;
 
   /// Number of People this Organization is Following
   @JsonKey(name: 'following')
-  int followingCount;
+  final int followingCount;
 
   /// Time this organization was created
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  final DateTime createdAt;
 
   /// Time this organization was updated
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
-  factory Organization.fromJson(Map<String, dynamic> input) {
-    return _$OrganizationFromJson(input);
-  }
+  factory Organization.fromJson(Map<String, dynamic> input) =>
+      _$OrganizationFromJson(input);
+  Map<String, dynamic> toJson() => _$OrganizationToJson(this);
 }
 
 /// Model class for organization membership.
+@JsonSerializable(createToJson: false)
 class OrganizationMembership {
-  String state;
-  Organization organization;
+  OrganizationMembership({
+    this.state,
+    this.organization,
+  });
+  final String state;
+  final Organization organization;
 
-  static OrganizationMembership fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return OrganizationMembership()
-      ..organization =
-          Organization.fromJson(input['organization'] as Map<String, dynamic>)
-      ..state = input['state'];
+  factory OrganizationMembership.fromJson(Map<String, dynamic> input) {
+    return _$OrganizationMembershipFromJson(input);
   }
 }
 
 /// Model class for a GitHub team.
+@JsonSerializable(createToJson: false)
 class Team {
+  Team({
+    this.name,
+    this.id,
+    this.permission,
+    this.membersCount,
+    this.reposCount,
+    this.organization,
+  });
+
   /// Team Name
-  String name;
+  final String name;
 
   /// Team ID
-  int id;
+  final int id;
 
   /// Team Permission
-  String permission;
+  final String permission;
 
   /// Number of Members
   @JsonKey(name: 'members_count')
-  int membersCount;
+  final int membersCount;
 
   /// Number of Repositories
   @JsonKey(name: 'repos_count')
-  int reposCount;
+  final int reposCount;
 
   /// Organization
-  Organization organization;
+  final Organization organization;
 
-  static Team fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return Team()
-      ..name = input['name']
-      ..id = input['id']
-      ..membersCount = input['members_count']
-      ..reposCount = input['repos_count']
-      ..organization =
-          Organization.fromJson(input['organization'] as Map<String, dynamic>);
+  factory Team.fromJson(Map<String, dynamic> input) {
+    return _$TeamFromJson(input);
   }
 }
 
@@ -128,50 +146,51 @@ class TeamMembershipState {
 }
 
 /// Model class for a team member.
+@JsonSerializable(createToJson: false)
 class TeamMember {
+  TeamMember(
+      {this.login,
+      this.id,
+      this.avatarUrl,
+      this.type,
+      this.siteAdmin,
+      this.htmlUrl});
+
   /// Member Username
-  String login;
+  final String login;
 
   /// Member ID
-  int id;
+  final int id;
 
   /// Url to Member Avatar
   @JsonKey(name: 'avatar_url')
-  String avatarUrl;
+  final String avatarUrl;
 
   /// Member Type
-  String type;
+  final String type;
 
   /// If the member is a site administrator
   @JsonKey(name: 'site_admin')
-  bool siteAdmin;
+  final bool siteAdmin;
 
   /// Profile of the Member
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  final String htmlUrl;
 
-  static TeamMember fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final member = TeamMember();
-    member.login = input['login'];
-    member.id = input['id'];
-    member.avatarUrl = input['avatar_url'];
-    member.type = input['type'];
-    member.siteAdmin = input['site_admin'];
-    member.htmlUrl = input['html_url'];
-    return member;
+  factory TeamMember.fromJson(Map<String, dynamic> input) {
+    return _$TeamMemberFromJson(input);
   }
 }
 
 /// Model class for a team repository.
 @JsonSerializable(createToJson: false)
 class TeamRepository extends Repository {
+  TeamRepository({this.permissions});
+
   /// Repository Permissions.
   TeamRepositoryPermissions permissions;
 
-  static TeamRepository fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  factory TeamRepository.fromJson(Map<String, dynamic> input) {
     return _$TeamRepositoryFromJson(input);
   }
 }
@@ -179,6 +198,8 @@ class TeamRepository extends Repository {
 /// Model class for team repository permissions.
 @JsonSerializable(createToJson: false)
 class TeamRepositoryPermissions {
+  TeamRepositoryPermissions(this.admin, this.push, this.pull);
+
   /// Administrative Access
   final bool admin;
 
@@ -187,8 +208,6 @@ class TeamRepositoryPermissions {
 
   /// Pull Access
   final bool pull;
-
-  TeamRepositoryPermissions(this.admin, this.push, this.pull);
 
   factory TeamRepositoryPermissions.fromJson(Map<String, dynamic> json) =>
       _$TeamRepositoryPermissionsFromJson(json);

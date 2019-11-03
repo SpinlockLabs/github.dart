@@ -10,7 +10,7 @@ DivElement readmeDiv;
 Future<void> main() async {
   await initViewSourceButton('readme.dart');
   readmeDiv = querySelector('#readme');
-  const repo = RepositorySlug('SpinlockLabs', 'github.dart');
+  var repo = RepositorySlug('SpinlockLabs', 'github.dart');
   final readme = await github.repositories.getReadme(repo);
   String markdown = readme.content;
   if (readme.encoding == 'base64') {

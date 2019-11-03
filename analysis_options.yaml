@@ -582,7 +582,7 @@ linter:
     # http://dart-lang.github.io/linter/lints/prefer_final_fields.html
     # recommendation: optional
     # 0 issues
-    - prefer_final_fields
+    # - prefer_final_fields
 
     # Prefer final in for-each loop variable if reference is not reassigned.
     # http://dart-lang.github.io/linter/lints/prefer_final_in_for_each.html
@@ -595,7 +595,7 @@ linter:
     # recommendation: optional
     # reason: Generates a lot of lint since people use var a lot for local variables.
     # 0 issues
-    - prefer_final_locals
+    # - prefer_final_locals
 
     # Prefer for elements when building maps from iterables.
     # http://dart-lang.github.io/linter/lints/prefer_for_elements_to_map_fromIterable.html

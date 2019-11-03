@@ -166,8 +166,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
-    return PaginationHelper(github)
-        .objects('GET', '/gists/$gistId/comments', GistComment.fromJSON);
+    return PaginationHelper(github).objects(
+        'GET', '/gists/$gistId/comments', (i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
@@ -177,7 +177,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return github.postJSON('/gists/$gistId/comments',
-        body: request.toJSON(), convert: GistComment.fromJSON);
+        body: jsonEncode(request), convert: (i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment

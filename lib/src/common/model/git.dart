@@ -1,41 +1,42 @@
-import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
-import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'git.g.dart';
 
 /// Model class for a blob.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitBlob {
+  GitBlob({
+    this.content,
+    this.encoding,
+    this.url,
+    this.sha,
+    this.size,
+  });
   String content;
   String encoding;
   String url;
   String sha;
   int size;
 
-  static GitBlob fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GitBlob()
-      ..content = (input['content'] as String)?.trim() // includes newline?
-      ..encoding = input['encoding']
-      ..url = input['url']
-      ..sha = input['sha']
-      ..size = input['size'];
-  }
+  factory GitBlob.fromJson(Map<String, dynamic> input) =>
+      _$GitBlobFromJson(input);
+  Map<String, dynamic> toJson() => _$GitBlobToJson(this);
 }
 
 /// Model class for a new blob to be created.
 ///
 /// The [encoding] can be either 'utf-8' or 'base64'.
-@JsonSerializable(createFactory: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitBlob {
-  final String content;
-  final String encoding;
+  CreateGitBlob(this.content, this.encoding);
 
-  const CreateGitBlob(this.content, this.encoding);
+  String content;
+  String encoding;
 
+  factory CreateGitBlob.fromJson(Map<String, dynamic> input) =>
+      _$CreateGitBlobFromJson(input);
   Map<String, dynamic> toJson() => _$CreateGitBlobToJson(this);
 }
 
@@ -43,8 +44,18 @@ class CreateGitBlob {
 ///
 /// Note: This is the raw [GitCommit]. The [RepositoryCommit] is a repository
 /// commit containing GitHub-specific information.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitCommit {
+  GitCommit({
+    this.sha,
+    this.url,
+    this.author,
+    this.committer,
+    this.message,
+    this.tree,
+    this.parents,
+    this.commentCount,
+  });
   String sha;
   String url;
   GitCommitUser author;
@@ -56,26 +67,19 @@ class GitCommit {
   @JsonKey(name: 'comment_count')
   int commentCount;
 
-  GitCommit();
-
-  factory GitCommit.fromJson(Map<String, dynamic> json) =>
-      _$GitCommitFromJson(json);
-
-  static GitCommit fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GitCommit.fromJson(input);
-  }
+  factory GitCommit.fromJson(Map<String, dynamic> input) =>
+      _$GitCommitFromJson(input);
+  Map<String, dynamic> toJson() => _$GitCommitToJson(this);
 }
 
 /// Model class for a new commit to be created.
-@JsonSerializable(includeIfNull: false, createFactory: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitCommit {
   /// The commit message.
-  final String message;
+  String message;
 
   /// The SHA of the tree object this commit points to.
-  final String tree;
+  String tree;
 
   /// The SHAs of the commits that were the parents of this commit. If omitted
   /// or empty, the commit will be written as a root commit.
@@ -89,6 +93,8 @@ class CreateGitCommit {
 
   CreateGitCommit(this.message, this.tree);
 
+  factory CreateGitCommit.fromJson(Map<String, dynamic> input) =>
+      _$CreateGitCommitFromJson(input);
   Map<String, dynamic> toJson() => _$CreateGitCommitToJson(this);
 }
 
@@ -96,13 +102,12 @@ class CreateGitCommit {
 /// not correspond to a GitHub [User].
 @JsonSerializable(includeIfNull: false)
 class GitCommitUser {
-  final String name;
-  final String email;
+  GitCommitUser(this.name, this.email, this.date);
 
+  String name;
+  String email;
   @JsonKey(toJson: dateToGitHubIso8601)
-  final DateTime date;
-
-  const GitCommitUser(this.name, this.email, this.date);
+  DateTime date;
 
   factory GitCommitUser.fromJson(Map<String, dynamic> json) =>
       _$GitCommitUserFromJson(json);
@@ -111,118 +116,115 @@ class GitCommitUser {
 }
 
 /// Model class for a GitHub tree.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitTree {
-  final String sha;
-  final String url;
+  String sha;
+  String url;
 
   /// If truncated is true, the number of items in the tree array exceeded
   /// GitHub's maximum limit.
-  final bool truncated;
+  bool truncated;
 
   @JsonKey(name: 'tree')
-  final List<GitTreeEntry> entries;
+  List<GitTreeEntry> entries;
 
   GitTree(this.sha, this.url, this.truncated, this.entries);
 
-  factory GitTree.fromJson(Map<String, dynamic> json) =>
-      json == null ? null : _$GitTreeFromJson(json);
+  factory GitTree.fromJson(Map<String, dynamic> input) =>
+      _$GitTreeFromJson(input);
+  Map<String, dynamic> toJson() => _$GitTreeToJson(this);
 }
 
 /// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitTreeEntry {
-  final String path;
-  final String mode;
-  final String type;
-  final int size;
-  final String sha;
-  final String url;
+  String path;
+  String mode;
+  String type;
+  int size;
+  String sha;
+  String url;
 
   GitTreeEntry(this.path, this.mode, this.type, this.size, this.sha, this.url);
 
-  factory GitTreeEntry.fromJson(Map<String, dynamic> json) =>
-      _$GitTreeEntryFromJson(json);
+  factory GitTreeEntry.fromJson(Map<String, dynamic> input) =>
+      _$GitTreeEntryFromJson(input);
+  Map<String, dynamic> toJson() => _$GitTreeEntryToJson(this);
 }
 
 /// Model class for a new tree to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitTree {
+  CreateGitTree(this.entries, {this.baseTree});
+
   /// The SHA1 of the tree you want to update with new data.
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
-  @JsonKey(name: 'base_tree')
   String baseTree;
 
   /// The Objects specifying a tree structure.
   @JsonKey(name: 'tree')
-  final List<CreateGitTreeEntry> entries;
+  List<CreateGitTreeEntry> entries;
 
-  CreateGitTree(this.entries);
-
-  String toJSON() {
-    final map = <String, dynamic>{};
-
-    putValue('base_tree', baseTree, map);
-
-    if (entries.isNotEmpty) {
-      putValue(
-          'tree', entries.map((e) => e.toMap()).toList(growable: false), map);
-    }
-
-    return jsonEncode(map);
-  }
+  factory CreateGitTree.fromJson(Map<String, dynamic> input) =>
+      _$CreateGitTreeFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateGitTreeToJson(this);
 }
 
 /// Model class for a new tree entry to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitTreeEntry {
-  final String path;
-  final String mode;
-  final String type;
-  final String sha;
-  final String content;
-
   /// Constructor.
   /// Either [sha] or [content] must be defined.
-  const CreateGitTreeEntry(
+  CreateGitTreeEntry(
     this.path,
     this.mode,
     this.type, {
     this.sha,
     this.content,
   });
+  String path;
+  String mode;
+  String type;
+  String sha;
+  String content;
 
-  Map<String, dynamic> toMap() {
-    final map = <String, dynamic>{};
-
-    putValue('path', path, map);
-    putValue('mode', mode, map);
-    putValue('type', type, map);
-    putValue('sha', sha, map);
-    putValue('content', content, map);
-
-    return map;
-  }
+  factory CreateGitTreeEntry.fromJson(Map<String, dynamic> input) =>
+      _$CreateGitTreeEntryFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateGitTreeEntryToJson(this);
 }
 
 /// Model class for a reference.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitReference {
+  GitReference({
+    this.ref,
+    this.url,
+    this.object,
+  });
   String ref;
   String url;
   GitObject object;
 
-  static GitReference fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-    return _$GitReferenceFromJson(input);
-  }
+  factory GitReference.fromJson(Map<String, dynamic> input) =>
+      _$GitReferenceFromJson(input);
+  Map<String, dynamic> toJson() => _$GitReferenceToJson(this);
 }
 
 /// Model class for a tag.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitTag {
+  GitTag({
+    this.tag,
+    this.sha,
+    this.url,
+    this.message,
+    this.tagger,
+    this.object,
+  });
   String tag;
   String sha;
   String url;
@@ -230,44 +232,36 @@ class GitTag {
   GitCommitUser tagger;
   GitObject object;
 
-  static GitTag fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-    return _$GitTagFromJson(input);
-  }
+  factory GitTag.fromJson(Map<String, dynamic> input) =>
+      _$GitTagFromJson(input);
+  Map<String, dynamic> toJson() => _$GitTagToJson(this);
 }
 
 /// Model class for a new tag to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitTag {
-  final String tag;
-  final String message;
-  String object;
-  String type;
-  final GitCommitUser tagger;
-
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
-  String toJSON() {
-    final map = <String, dynamic>{};
+  String tag;
+  String message;
+  String object;
+  String type;
+  GitCommitUser tagger;
 
-    putValue('tag', tag, map);
-    putValue('message', message, map);
-    putValue('object', object, map);
-    putValue('type', type, map);
-    putValue('tagger', tagger.toJson(), map);
-
-    return jsonEncode(map);
-  }
+  factory CreateGitTag.fromJson(Map<String, dynamic> input) =>
+      _$CreateGitTagFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateGitTagToJson(this);
 }
 
 /// Model class for an object referenced by [GitReference] and [GitTag].
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GitObject {
-  final String type;
-  final String sha;
-  final String url;
-
   GitObject(this.type, this.sha, this.url);
+  String type;
+  String sha;
+  String url;
 
-  factory GitObject.fromJson(Map<String, dynamic> json) =>
-      _$GitObjectFromJson(json);
+  factory GitObject.fromJson(Map<String, dynamic> input) =>
+      _$GitObjectFromJson(input);
+  Map<String, dynamic> toJson() => _$GitObjectToJson(this);
 }

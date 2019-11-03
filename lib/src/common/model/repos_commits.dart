@@ -1,14 +1,29 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
+
+part 'repos_commits.g.dart';
 
 /// Model class for a commit in a repository.
 ///
 /// Note: The [RepositoryCommit] wraps a [GitCommit], so author/committer
 /// information is in two places, but contain different details about them:
 /// in [RepositoryCommit] "github details", in [GitCommit] "git details".
+@JsonSerializable()
 class RepositoryCommit {
+  RepositoryCommit({
+    this.url,
+    this.sha,
+    this.htmlUrl,
+    this.commentsUrl,
+    this.commit,
+    this.author,
+    this.committer,
+    this.parents,
+    this.stats,
+    this.files,
+  });
+
   /// API url.
   String url;
 
@@ -41,37 +56,20 @@ class RepositoryCommit {
   /// The files changed in this commit.
   List<CommitFile> files;
 
-  static RepositoryCommit fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final commit = RepositoryCommit()
-      ..url = input['url']
-      ..sha = input['sha']
-      ..htmlUrl = input['html_url']
-      ..commentsUrl = input['comments_url']
-      ..commit = GitCommit.fromJSON(input['commit'] as Map<String, dynamic>)
-      ..author = User.fromJson(input['author'] as Map<String, dynamic>)
-      ..committer = User.fromJson(input['committer'] as Map<String, dynamic>)
-      ..stats = CommitStats.fromJSON(input['stats'] as Map<String, dynamic>);
-
-    if (input['parents'] != null) {
-      commit.parents = (input['parents'] as List<dynamic>)
-          .map((parent) => GitCommit.fromJson(parent))
-          .toList();
-    }
-
-    if (input['files'] != null) {
-      commit.files = (input['files'] as List<dynamic>)
-          .map((file) => CommitFile.fromJSON(file))
-          .toList();
-    }
-
-    return commit;
-  }
+  factory RepositoryCommit.fromJson(Map<String, dynamic> input) =>
+      _$RepositoryCommitFromJson(input);
+  Map<String, dynamic> toJson() => _$RepositoryCommitToJson(this);
 }
 
 /// Model class for commit statistics.
+@JsonSerializable()
 class CommitStats {
+  CommitStats({
+    this.additions,
+    this.deletions,
+    this.total,
+  });
+
   /// Number of Additions.
   int additions;
 
@@ -81,18 +79,24 @@ class CommitStats {
   /// Total changes.
   int total;
 
-  static CommitStats fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return CommitStats()
-      ..additions = input['additions']
-      ..deletions = input['deletions']
-      ..total = input['total'];
-  }
+  factory CommitStats.fromJson(Map<String, dynamic> input) =>
+      _$CommitStatsFromJson(input);
+  Map<String, dynamic> toJson() => _$CommitStatsToJson(this);
 }
 
 /// Model class of a file that was changed in a commit.
+@JsonSerializable()
 class CommitFile {
+  CommitFile({
+    this.name,
+    this.additions,
+    this.deletions,
+    this.changes,
+    this.status,
+    this.rawUrl,
+    this.blobUrl,
+    this.patch,
+  });
   @JsonKey(name: 'filename')
   String name;
 
@@ -109,28 +113,29 @@ class CommitFile {
 
   String patch;
 
-  Map<String, dynamic> json;
-
-  static CommitFile fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return CommitFile()
-      ..name = input['filename']
-      ..additions = input['additions']
-      ..deletions = input['deletions']
-      ..changes = input['changes']
-      ..status = input['status']
-      ..rawUrl = input['raw_url']
-      ..blobUrl = input['blob_url']
-      ..patch = input['patch']
-      ..json = input;
-  }
+  factory CommitFile.fromJson(Map<String, dynamic> input) =>
+      _$CommitFileFromJson(input);
+  Map<String, dynamic> toJson() => _$CommitFileToJson(this);
 }
 
 /// Model class for a commit comment.
 ///
 /// See https://developer.github.com/v3/repos/comments
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CommitComment {
+  CommitComment({
+    this.id,
+    this.line,
+    this.position,
+    this.path,
+    this.apiUrl,
+    this.commitId,
+    this.createdAt,
+    this.htmlUrl,
+    this.updatedAt,
+    this.body,
+  });
+
   /// Id of the comment
   final int id;
 
@@ -151,40 +156,17 @@ class CommitComment {
   /// Can be equals to [createdAt]
   final DateTime updatedAt;
 
-  /// https://github.com/...
+  /// Ex: https://github.com/...
   final String htmlUrl;
 
-  /// https://api.github.com/...
+  /// Ex: https://api.github.com/...
+  @JsonKey(name: 'url')
   final String apiUrl;
 
   /// Content of the comment
   final String body;
 
-  const CommitComment._({
-    @required this.id,
-    @required this.line,
-    @required this.position,
-    @required this.path,
-    @required this.apiUrl,
-    @required this.commitId,
-    @required this.createdAt,
-    @required this.htmlUrl,
-    @required this.updatedAt,
-    @required this.body,
-  });
-
-  factory CommitComment.fromJSON(Map<String, dynamic> input) {
-    return CommitComment._(
-      id: input['id'],
-      htmlUrl: input['html_url'],
-      apiUrl: input['url'],
-      body: input['body'],
-      path: input['path'],
-      position: input['position'],
-      line: input['line'],
-      commitId: input['commit_id'],
-      createdAt: DateTime.parse(input['created_at']),
-      updatedAt: DateTime.parse(input['updated_at']),
-    );
-  }
+  factory CommitComment.fromJson(Map<String, dynamic> input) =>
+      _$CommitCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$CommitCommentToJson(this);
 }

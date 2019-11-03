@@ -26,6 +26,16 @@ Event _$EventFromJson(Map<String, dynamic> json) {
   );
 }
 
+Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
+      'id': instance.id,
+      'type': instance.type,
+      'repo': instance.repo,
+      'actor': instance.actor,
+      'org': instance.org,
+      'payload': instance.payload,
+      'created_at': instance.createdAt?.toIso8601String(),
+    };
+
 RepositorySubscription _$RepositorySubscriptionFromJson(
     Map<String, dynamic> json) {
   return RepositorySubscription(
@@ -37,3 +47,12 @@ RepositorySubscription _$RepositorySubscriptionFromJson(
         : DateTime.parse(json['created_at'] as String),
   );
 }
+
+Map<String, dynamic> _$RepositorySubscriptionToJson(
+        RepositorySubscription instance) =>
+    <String, dynamic>{
+      'subscribed': instance.subscribed,
+      'ignored': instance.ignored,
+      'reason': instance.reason,
+      'created_at': instance.createdAt?.toIso8601String(),
+    };

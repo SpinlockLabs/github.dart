@@ -60,3 +60,54 @@ GistFork _$GistForkFromJson(Map<String, dynamic> json) {
         : DateTime.parse(json['updated_at'] as String),
   );
 }
+
+GistHistoryEntry _$GistHistoryEntryFromJson(Map<String, dynamic> json) {
+  return GistHistoryEntry(
+    version: json['version'] as String,
+    user: json['user'] == null
+        ? null
+        : User.fromJson(json['user'] as Map<String, dynamic>),
+    deletions: json['change_status/deletions'] as int,
+    additions: json['change_status/additions'] as int,
+    totalChanges: json['change_status/total'] as int,
+    committedAt: json['committed_at'] == null
+        ? null
+        : DateTime.parse(json['committed_at'] as String),
+  );
+}
+
+GistComment _$GistCommentFromJson(Map<String, dynamic> json) {
+  return GistComment(
+    id: json['id'] as int,
+    user: json['user'] == null
+        ? null
+        : User.fromJson(json['user'] as Map<String, dynamic>),
+    createdAt: json['created_at'] == null
+        ? null
+        : DateTime.parse(json['created_at'] as String),
+    updatedAt: json['updated_at'] == null
+        ? null
+        : DateTime.parse(json['updated_at'] as String),
+    body: json['body'] as String,
+  );
+}
+
+Map<String, dynamic> _$GistCommentToJson(GistComment instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user': instance.user,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'body': instance.body,
+    };
+
+CreateGistComment _$CreateGistCommentFromJson(Map<String, dynamic> json) {
+  return CreateGistComment(
+    json['body'] as String,
+  );
+}
+
+Map<String, dynamic> _$CreateGistCommentToJson(CreateGistComment instance) =>
+    <String, dynamic>{
+      'body': instance.body,
+    };

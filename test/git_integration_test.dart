@@ -35,7 +35,7 @@ void main() {
   });
 
   test('create and get a new blob', () async {
-    const newBlob = CreateGitBlob('bbb', 'utf-8');
+    var newBlob = CreateGitBlob('bbb', 'utf-8');
 
     // createBlob()
     final createdBlob = await github.git.createBlob(slug, newBlob);
@@ -56,9 +56,9 @@ void main() {
   });
 
   test('create and get a new tree', () async {
-    const entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
+    var entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
         content: 'This is a repository for integration tests.');
-    const entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
+    var entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
         content: 'Some file in a folder.');
 
     final newTree = CreateGitTree([entry1, entry2])
@@ -135,8 +135,8 @@ void main() {
 
       final count = issues.length;
 
-      final issueRequest = IssueRequest()
-        ..title = 'new issue - ${_randomGitName()}';
+      final issueRequest =
+          IssueRequest(title: 'new issue - ${_randomGitName()}');
 
       await github.issues.create(slug, issueRequest);
 

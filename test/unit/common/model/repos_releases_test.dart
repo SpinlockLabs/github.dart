@@ -13,7 +13,7 @@ void main() {
 
     test('toJson', () {
       final release = Release.fromJson(releasePayload);
-      expect(() => release.toJson(), returnsNormally);
+      expect(release.toJson, returnsNormally);
     });
   });
 
@@ -24,7 +24,7 @@ void main() {
 
     test('toJson', () {
       final releaseAsset = ReleaseAsset.fromJson(releaseAssetPayload);
-      expect(() => releaseAsset.toJson(), returnsNormally);
+      expect(releaseAsset.toJson, returnsNormally);
     });
   });
 
@@ -36,7 +36,7 @@ void main() {
 
     test('toJson', () {
       final createRelease = CreateRelease.fromJson(createReleasePayload);
-      expect(() => createRelease.toJson(), returnsNormally);
+      expect(createRelease.toJson, returnsNormally);
     });
 
     test('toJson reserializes back to the same type of object', () {

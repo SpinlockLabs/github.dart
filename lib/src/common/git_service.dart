@@ -15,14 +15,14 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/blobs/#get-a-blob
   Future<GitBlob> getBlob(RepositorySlug slug, String sha) =>
       github.getJSON('/repos/${slug.fullName}/git/blobs/$sha',
-          convert: GitBlob.fromJSON, statusCode: StatusCodes.OK);
+          convert: (i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK);
 
   /// Creates a blob with specified [blob] content.
   ///
   /// API docs: https://developer.github.com/v3/git/blobs/#create-a-blob
   Future<GitBlob> createBlob(RepositorySlug slug, CreateGitBlob blob) {
     return github.postJSON('/repos/${slug.fullName}/git/blobs',
-        convert: GitBlob.fromJSON,
+        convert: (i) => GitBlob.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(blob));
   }
@@ -32,14 +32,14 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/commits/#get-a-commit
   Future<GitCommit> getCommit(RepositorySlug slug, String sha) =>
       github.getJSON('/repos/${slug.fullName}/git/commits/$sha',
-          convert: GitCommit.fromJSON, statusCode: StatusCodes.OK);
+          convert: (i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK);
 
   /// Creates a new commit in a repository.
   ///
   /// API docs: https://developer.github.com/v3/git/commits/#create-a-commit
   Future<GitCommit> createCommit(RepositorySlug slug, CreateGitCommit commit) {
     return github.postJSON('/repos/${slug.fullName}/git/commits',
-        convert: GitCommit.fromJSON,
+        convert: (i) => GitCommit.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(commit));
   }
@@ -51,7 +51,7 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#get-a-reference
   Future<GitReference> getReference(RepositorySlug slug, String ref) =>
       github.getJSON('/repos/${slug.fullName}/git/refs/$ref',
-          convert: GitReference.fromJSON, statusCode: StatusCodes.OK);
+          convert: (i) => GitReference.fromJson(i), statusCode: StatusCodes.OK);
 
   /// Lists the references in a repository.
   ///
@@ -66,7 +66,8 @@ class GitService extends Service {
       path += '/$type';
     }
 
-    return PaginationHelper(github).objects('GET', path, GitReference.fromJSON);
+    return PaginationHelper(github)
+        .objects('GET', path, (i) => GitReference.fromJson(i));
   }
 
   /// Creates a new reference in a repository.
@@ -78,7 +79,7 @@ class GitService extends Service {
   Future<GitReference> createReference(
       RepositorySlug slug, String ref, String sha) {
     return github.postJSON('/repos/${slug.fullName}/git/refs',
-        convert: GitReference.fromJSON,
+        convert: (i) => GitReference.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode({'ref': ref, 'sha': sha}));
   }
@@ -100,7 +101,7 @@ class GitService extends Service {
         .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',
             body: body, headers: headers)
         .then((response) {
-      return GitReference.fromJSON(
+      return GitReference.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
@@ -119,16 +120,16 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/tags/#get-a-tag
   Future<GitTag> getTag(RepositorySlug slug, String sha) =>
       github.getJSON('/repos/${slug.fullName}/git/tags/$sha',
-          convert: GitTag.fromJSON, statusCode: StatusCodes.OK);
+          convert: (i) => GitTag.fromJson(i), statusCode: StatusCodes.OK);
 
   /// Creates a new tag in a repository.
   ///
   /// API docs: https://developer.github.com/v3/git/tags/#create-a-tag-object
   Future<GitTag> createTag(RepositorySlug slug, CreateGitTag tag) =>
       github.postJSON('/repos/${slug.fullName}/git/tags',
-          convert: GitTag.fromJSON,
+          convert: (i) => GitTag.fromJson(i),
           statusCode: StatusCodes.CREATED,
-          body: tag.toJSON());
+          body: jsonEncode(tag));
 
   /// Fetches a tree from a repository for the given ref [sha].
   ///
@@ -154,6 +155,6 @@ class GitService extends Service {
     return github.postJSON('/repos/${slug.fullName}/git/trees',
         convert: (j) => GitTree.fromJson(j),
         statusCode: StatusCodes.CREATED,
-        body: tree.toJSON());
+        body: jsonEncode(tree));
   }
 }

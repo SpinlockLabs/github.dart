@@ -5,7 +5,7 @@ void main() {
 
   github.repositories
       .getContents(
-        const RepositorySlug('SpinlockLabs', 'github.dart'),
+        RepositorySlug('SpinlockLabs', 'github.dart'),
         'pubspec.yaml',
       )
       .then((contents) => contents.file)

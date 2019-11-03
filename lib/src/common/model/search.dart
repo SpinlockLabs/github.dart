@@ -29,13 +29,8 @@ class CodeSearchResults implements SearchResults<CodeSearchItem> {
 
 @JsonSerializable(createToJson: false)
 class CodeSearchItem {
-  @JsonKey()
   String name;
-
-  @JsonKey()
   String path;
-
-  @JsonKey()
   String sha;
 
   @JsonKey(fromJson: Uri.parse)

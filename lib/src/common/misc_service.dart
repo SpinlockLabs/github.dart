@@ -35,7 +35,7 @@ class MiscService extends Service {
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
   Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
       github.getJSON('/gitignore/templates/$name',
-          convert: GitignoreTemplate.fromJSON);
+          convert: (i) => GitignoreTemplate.fromJson(i));
 
   /// Renders Markdown from the [input].
   ///
@@ -69,7 +69,7 @@ class MiscService extends Service {
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() =>
       github.getJSON('https://status.github.com/api/status.json',
-          statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
+          statusCode: StatusCodes.OK, convert: (i) => APIStatus.fromJson(i));
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {

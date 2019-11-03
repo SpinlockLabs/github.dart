@@ -5,9 +5,10 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_stats.g.dart';
 
 /// Model class for a contributor's statistics for a repository.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ContributorStatistics {
-  /// The Author
+  ContributorStatistics(this.author, this.total, this.weeks);
+
   final User author;
 
   /// Total Commits
@@ -16,16 +17,18 @@ class ContributorStatistics {
   /// Weekly Statistics
   final List<ContributorWeekStatistics> weeks;
 
-  ContributorStatistics(this.author, this.total, this.weeks);
-
-  factory ContributorStatistics.fromJson(Map<String, dynamic> json) =>
-      _$ContributorStatisticsFromJson(json);
+  factory ContributorStatistics.fromJson(Map<String, dynamic> input) =>
+      _$ContributorStatisticsFromJson(input);
+  Map<String, dynamic> toJson() => _$ContributorStatisticsToJson(this);
 }
 
 /// Model class to represent the number of additions, deletions and commits
 /// a contributor made in a given week.
-@JsonSerializable(createToJson: false)
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ContributorWeekStatistics {
+  ContributorWeekStatistics(
+      this.start, this.additions, this.deletions, this.commits);
+
   /// Beginning of the Week (As a Unix Timestamp)
   @JsonKey(name: 'w')
   final int start;
@@ -42,11 +45,9 @@ class ContributorWeekStatistics {
   @JsonKey(name: 'c')
   final int commits;
 
-  ContributorWeekStatistics(
-      this.start, this.additions, this.deletions, this.commits);
-
-  factory ContributorWeekStatistics.fromJson(Map<String, dynamic> json) =>
-      _$ContributorWeekStatisticsFromJson(json);
+  factory ContributorWeekStatistics.fromJson(Map<String, dynamic> input) =>
+      _$ContributorWeekStatisticsFromJson(input);
+  Map<String, dynamic> toJson() => _$ContributorWeekStatisticsToJson(this);
 
   @override
   String toString() =>
@@ -54,24 +55,33 @@ class ContributorWeekStatistics {
 }
 
 /// Model class for contributor participation.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class ContributorParticipation {
+  ContributorParticipation({
+    this.all,
+    this.owner,
+  });
+
   /// Commit Counts for All Users
   List<int> all;
 
   /// Commit Counts for the Owner
   List<int> owner;
 
-  static ContributorParticipation fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return ContributorParticipation()
-      ..all = input['all'] as List<int>
-      ..owner = input['owner'] as List<int>;
-  }
+  factory ContributorParticipation.fromJson(Map<String, dynamic> input) =>
+      _$ContributorParticipationFromJson(input);
+  Map<String, dynamic> toJson() => _$ContributorParticipationToJson(this);
 }
 
 /// Model class for a week in a full year commit count.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class YearCommitCountWeek {
+  YearCommitCountWeek({
+    this.days,
+    this.total,
+    this.timestamp,
+  });
+
   /// Commit Counts for each day (starting with Sunday)
   List<int> days;
 
@@ -81,19 +91,20 @@ class YearCommitCountWeek {
   /// Timestamp for Beginning of Week
   int timestamp;
 
-  static YearCommitCountWeek fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final c = YearCommitCountWeek();
-    c.days = input['days'] as List<int>;
-    c.total = input['total'];
-    c.timestamp = input['week'];
-    return c;
-  }
+  factory YearCommitCountWeek.fromJson(Map<String, dynamic> input) =>
+      _$YearCommitCountWeekFromJson(input);
+  Map<String, dynamic> toJson() => _$YearCommitCountWeekToJson(this);
 }
 
 /// Model class for a weekly change count.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class WeeklyChangesCount {
+  WeeklyChangesCount({
+    this.timestamp,
+    this.additions,
+    this.deletions,
+  });
+
   /// Timestamp for Beginning of Week
   int timestamp;
 
@@ -103,18 +114,20 @@ class WeeklyChangesCount {
   /// Number of Deletions
   int deletions;
 
-  static WeeklyChangesCount fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-    final c = WeeklyChangesCount();
-    c.timestamp = input[0];
-    c.additions = input[1];
-    c.deletions = input[2];
-    return c;
-  }
+  factory WeeklyChangesCount.fromJson(Map<String, dynamic> input) =>
+      _$WeeklyChangesCountFromJson(input);
+  Map<String, dynamic> toJson() => _$WeeklyChangesCountToJson(this);
 }
 
 /// Model Class for a Punchcard Entry
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PunchcardEntry {
+  PunchcardEntry({
+    this.weekday,
+    this.hour,
+    this.commits,
+  });
+
   /// Weekday (With 0 as Sunday and 6 as Saturday)
   int weekday;
 
@@ -124,12 +137,7 @@ class PunchcardEntry {
   /// Number of Commits
   int commits;
 
-  static PunchcardEntry fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-    final c = PunchcardEntry();
-    c.weekday = input[0];
-    c.hour = input[1];
-    c.commits = input[2];
-    return c;
-  }
+  factory PunchcardEntry.fromJson(Map<String, dynamic> input) =>
+      _$PunchcardEntryFromJson(input);
+  Map<String, dynamic> toJson() => _$PunchcardEntryToJson(this);
 }
