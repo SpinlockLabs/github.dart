@@ -1,3 +1,18 @@
+## v6.0.0
+
+- There's a single entrypoint now: `package:github/github.dart`
+- For web: browser specific helper methods have moved. use import `package:github/browser_helper.dart` (renderMarkdown, and createAvatorImage)
+- `createGithubClient(...)` has been removed. Just create a GitHub object directly now.
+- `findAuthenticationFromEnvironment` now works in both server/flutter and web environments
+  - On the web, it will check the query string first, then localstorage
+- all static methods are now factory constructors
+- fromJSON is now fromJson everywhere
+- toJSON is now toJson everywhere
+- Use JsonSerializable everywhere
+- removed deprecated items
+- renamed some fields with ID at the end to be Id
+- most model constructors now have named parameters for all properties
+
 ## v5.5.0
 
 - Provide a single platform independent import `import 'package:github/githb.dart';`
