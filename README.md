@@ -30,17 +30,11 @@ First, add the following to your pubspec.yaml:
 
 ```yaml
 dependencies:
-  github: ^5.0.0
+  github: ^6.0.0
 ```
 
 Then import the library
 
-For the browser use:
-```dart
-import 'package:github/browser.dart';
-```
-
-and for the server or Flutter use:
 ```dart
 import 'package:github/github.dart';
 ```
@@ -49,14 +43,17 @@ and then use it:
 
 **Example**
 ```dart
-import 'package:github/browser.dart';
+import 'package:github/github.dart';
 
 void main() async {
-  /* Create a GitHub Client */
+  /* Create a GitHub Client, with anonymous authentication by default */
   var github = GitHub();
 
+  /* or Create a GitHub Client and have it try to find your token or credentials automatically */
+  var github = GitHub(auth: findAuthenticationFromEnvironment());  
+
   /* or Create a GitHub Client using an auth token */
-  var github = createGitHubClient(auth: new Authentication.withToken("YourTokenHere"));  
+  var github = GitHub(auth: new Authentication.withToken("YourTokenHere"));  
 
   Repository repo = await github.repositories.getRepository(new RepositorySlug("user_or_org", "repo_name"));
   /* Do Something with repo */

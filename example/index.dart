@@ -1,10 +1,11 @@
 import 'dart:html';
+import 'common.dart';
 
 void main() {
   final InputElement tokenInput = querySelector('#token');
-  final String token = window.sessionStorage['token'];
-  tokenInput.value = token;
+  tokenInput.value = github.auth.token ?? '';
+  window.sessionStorage['GITHUB_TOKEN'] = tokenInput.value;
   tokenInput.onKeyUp.listen((_) {
-    window.sessionStorage['token'] = tokenInput.value;
+    window.sessionStorage['GITHUB_TOKEN'] = tokenInput.value;
   });
 }
