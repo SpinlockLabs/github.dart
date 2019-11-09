@@ -14,7 +14,8 @@ Future<void> main() async {
 
 void loadReleases() {
   github.repositories
-      .listReleases(RepositorySlug('twbs', 'bootstrap'))
+      .listReleases(RepositorySlug('Workiva', 'wdesk'))
+      .take(10)
       .toList()
       .then((releases) {
     for (final release in releases) {

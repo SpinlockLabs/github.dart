@@ -9,6 +9,7 @@ part of 'repos_releases.dart';
 Release _$ReleaseFromJson(Map<String, dynamic> json) {
   return Release(
     id: json['id'] as int,
+    url: json['url'] as String,
     htmlUrl: json['html_url'] as String,
     tarballUrl: json['tarball_url'] as String,
     uploadUrl: json['upload_url'] as String,
@@ -39,6 +40,7 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
+      'url': instance.url,
       'html_url': instance.htmlUrl,
       'tarball_url': instance.tarballUrl,
       'zipball_url': instance.zipballUrl,

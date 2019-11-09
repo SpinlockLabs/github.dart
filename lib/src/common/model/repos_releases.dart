@@ -11,6 +11,7 @@ part 'repos_releases.g.dart';
 class Release {
   Release({
     this.id,
+    this.url,
     this.htmlUrl,
     this.tarballUrl,
     this.uploadUrl,
@@ -27,6 +28,9 @@ class Release {
     this.author,
     this.assets,
   });
+
+  /// Url to this Release
+  String url;
 
   /// Url to this Release
   String htmlUrl;

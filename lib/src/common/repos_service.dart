@@ -938,14 +938,6 @@ class RepositoriesService extends Service {
   /// Fetches a single release by the release ID.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
-  @Deprecated(
-      'Use getReleaseById or for getting a release using a tag name, use getReleaseByTagName')
-  Future<Release> getRelease(RepositorySlug slug, int id) =>
-      getReleaseById(slug, id);
-
-  /// Fetches a single release by the release ID.
-  ///
-  /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
   Future<Release> getReleaseById(RepositorySlug slug, int id) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
