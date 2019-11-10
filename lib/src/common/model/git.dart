@@ -75,6 +75,9 @@ class GitCommit {
 /// Model class for a new commit to be created.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGitCommit {
+  CreateGitCommit(this.message, this.tree,
+      {this.parents, this.committer, this.author});
+
   /// The commit message.
   String message;
 
@@ -90,8 +93,6 @@ class CreateGitCommit {
 
   /// Info about the author.
   GitCommitUser author;
-
-  CreateGitCommit(this.message, this.tree);
 
   factory CreateGitCommit.fromJson(Map<String, dynamic> input) =>
       _$CreateGitCommitFromJson(input);

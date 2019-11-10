@@ -210,17 +210,17 @@ Map<String, dynamic> _$RepositorySlugToJson(RepositorySlug instance) =>
 CreateRepository _$CreateRepositoryFromJson(Map<String, dynamic> json) {
   return CreateRepository(
     json['name'] as String,
-  )
-    ..description = json['description'] as String
-    ..homepage = json['homepage'] as String
-    ..private = json['private'] as bool
-    ..hasIssues = json['has_issues'] as bool
-    ..hasWiki = json['has_wiki'] as bool
-    ..hasDownloads = json['has_downloads'] as bool
-    ..teamId = json['team_id'] as int
-    ..autoInit = json['auto_init'] as bool
-    ..gitignoreTemplate = json['gitignore_template'] as String
-    ..licenseTemplate = json['license_template'] as String;
+    description: json['description'] as String,
+    homepage: json['homepage'] as String,
+    private: json['private'] as bool,
+    hasIssues: json['has_issues'] as bool,
+    hasDownloads: json['has_downloads'] as bool,
+    teamId: json['team_id'] as int,
+    autoInit: json['auto_init'] as bool,
+    gitignoreTemplate: json['gitignore_template'] as String,
+    licenseTemplate: json['license_template'] as String,
+    hasWiki: json['has_wiki'] as bool,
+  );
 }
 
 Map<String, dynamic> _$CreateRepositoryToJson(CreateRepository instance) =>

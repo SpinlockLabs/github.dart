@@ -36,6 +36,7 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
         ?.toList(),
   )
     ..zipballUrl = json['zipball_url'] as String
+    ..assetsUrl = json['assets_url'] as String
     ..errors = json['errors'] as List;
 }
 
@@ -45,6 +46,7 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'tarball_url': instance.tarballUrl,
       'zipball_url': instance.zipballUrl,
       'upload_url': instance.uploadUrl,
+      'assets_url': instance.assetsUrl,
       'id': instance.id,
       'node_id': instance.nodeId,
       'tag_name': instance.tagName,

@@ -212,6 +212,13 @@ class CreateRelease {
 }
 
 class CreateReleaseAsset {
+  CreateReleaseAsset({
+    @required this.name,
+    @required this.contentType,
+    @required this.assetData,
+    this.label,
+  });
+
   /// The file name of the asset.
   String name;
 
@@ -229,11 +236,4 @@ class CreateReleaseAsset {
   ///
   /// GitHub expects the asset data in its raw binary form, rather than JSON.
   Uint8List assetData;
-
-  CreateReleaseAsset({
-    @required this.name,
-    @required this.contentType,
-    @required this.assetData,
-    this.label,
-  });
 }

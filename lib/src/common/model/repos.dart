@@ -327,6 +327,18 @@ class RepositorySlug {
 /// Model class for a new repository to be created.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CreateRepository {
+  CreateRepository(this.name,
+      {this.description,
+      this.homepage,
+      this.private,
+      this.hasIssues,
+      this.hasDownloads,
+      this.teamId,
+      this.autoInit,
+      this.gitignoreTemplate,
+      this.licenseTemplate,
+      this.hasWiki});
+
   /// Repository Name
   final String name;
 
@@ -362,8 +374,6 @@ class CreateRepository {
   /// License template (only when [autoInit] is true)
   @OnlyWhen('autoInit is true')
   String licenseTemplate;
-
-  CreateRepository(this.name);
 
   factory CreateRepository.fromJson(Map<String, dynamic> input) =>
       _$CreateRepositoryFromJson(input);

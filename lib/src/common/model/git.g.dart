@@ -74,14 +74,14 @@ CreateGitCommit _$CreateGitCommitFromJson(Map<String, dynamic> json) {
   return CreateGitCommit(
     json['message'] as String,
     json['tree'] as String,
-  )
-    ..parents = (json['parents'] as List)?.map((e) => e as String)?.toList()
-    ..committer = json['committer'] == null
+    parents: (json['parents'] as List)?.map((e) => e as String)?.toList(),
+    committer: json['committer'] == null
         ? null
-        : GitCommitUser.fromJson(json['committer'] as Map<String, dynamic>)
-    ..author = json['author'] == null
+        : GitCommitUser.fromJson(json['committer'] as Map<String, dynamic>),
+    author: json['author'] == null
         ? null
-        : GitCommitUser.fromJson(json['author'] as Map<String, dynamic>);
+        : GitCommitUser.fromJson(json['author'] as Map<String, dynamic>),
+  );
 }
 
 Map<String, dynamic> _$CreateGitCommitToJson(CreateGitCommit instance) =>
