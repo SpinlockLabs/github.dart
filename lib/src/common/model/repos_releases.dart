@@ -45,6 +45,8 @@ class Release {
   /// This key is a hypermedia resource. https://developer.github.com/v3/#hypermedia
   String uploadUrl;
 
+  String assetsUrl;
+
   /// Release ID
   int id;
 
