@@ -1,20 +1,20 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:github/server.dart';
+import 'package:github/github.dart';
 
-import '../helper.dart';
+import '../helper/http.dart';
 
 void main() {
-  final github = createGitHubClient();
+  final github = GitHub();
   final response = MockResponse(
     jsonEncode(<String, dynamic>{
-      "message": "Invalid Entity",
-      "errors": [
+      'message': 'Invalid Entity',
+      'errors': [
         {
-          "resource": "Issue",
-          "field": "body",
-          "code": "not_found",
+          'resource': 'Issue',
+          'field': 'body',
+          'code': 'not_found',
         }
       ]
     }),
@@ -29,7 +29,7 @@ void main() {
     exit(0);
   }
 
-  print("Invalid Entity Error Handling Failed");
+  print('Invalid Entity Error Handling Failed');
 
   exit(1);
 }

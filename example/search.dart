@@ -1,5 +1,4 @@
 import 'dart:html';
-import 'package:github/browser.dart';
 import 'common.dart';
 
 Future<void> main() async {
@@ -46,6 +45,6 @@ Future<void> search(_) async {
   }
 }
 
-String val(String id) => (querySelector("#$id") as InputElement).value;
+String val(String id) => (querySelector('#$id') as InputElement).value;
 bool isChecked(String id) =>
     (querySelector('#$id') as CheckboxInputElement).checked;

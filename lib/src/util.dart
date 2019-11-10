@@ -4,7 +4,7 @@ String buildQueryString(Map<String, dynamic> params) {
   final queryString = StringBuffer();
 
   if (params.isNotEmpty && !params.values.every((value) => value == null)) {
-    queryString.write("?");
+    queryString.write('?');
   }
 
   int i = 0;
@@ -13,9 +13,9 @@ String buildQueryString(Map<String, dynamic> params) {
     if (params[key] == null) {
       continue;
     }
-    queryString.write("$key=${Uri.encodeComponent(params[key].toString())}");
+    queryString.write('$key=${Uri.encodeComponent(params[key].toString())}');
     if (i != params.keys.length) {
-      queryString.write("&");
+      queryString.write('&');
     }
   }
   return queryString.toString();
@@ -27,7 +27,7 @@ dynamic copyOf(dynamic input) {
   } else if (input is Map) {
     return Map.from(input);
   } else {
-    throw "type could not be copied";
+    throw Exception('type could not be copied');
   }
 }
 
@@ -76,9 +76,9 @@ Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
 // TODO: only used in test – delete?
 int parseFancyNumber(String input) {
   input = input.trim();
-  if (input.contains(",")) input = input.replaceAll(",", "");
+  if (input.contains(',')) input = input.replaceAll(',', '');
 
-  const multipliers = {"h": 100, "k": 1000, "ht": 100000, "m": 1000000};
+  const multipliers = {'h': 100, 'k': 1000, 'ht': 100000, 'm': 1000000};
   int value;
 
   if (!multipliers.keys.any((m) => input.endsWith(m))) {

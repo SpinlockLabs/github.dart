@@ -1,14 +1,14 @@
-part of github.common;
+import 'package:json_annotation/json_annotation.dart';
+part 'repos_forks.g.dart';
 
 /// Model class for a new fork to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateFork {
-  final String organization;
-
   CreateFork([this.organization]);
 
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("organization", organization, map);
-    return jsonEncode(map);
-  }
+  String organization;
+
+  factory CreateFork.fromJson(Map<String, dynamic> input) =>
+      _$CreateForkFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateForkToJson(this);
 }

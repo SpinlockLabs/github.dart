@@ -1,35 +1,37 @@
-part of github.common;
+import 'package:json_annotation/json_annotation.dart';
+
+part 'keys.g.dart';
 
 /// Model class for a public key.
 ///
 /// Note: [PublicKey] is used both by the repositories' deploy keys and by the
 /// users' public keys.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PublicKey {
-  int id;
-  String key;
-  String title;
+  PublicKey({
+    this.id,
+    this.key,
+    this.title,
+  });
+  final int id;
+  final String key;
+  final String title;
 
-  static PublicKey fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return PublicKey()
-      ..id = input['id']
-      ..key = input['key']
-      ..title = input['title'];
-  }
+  factory PublicKey.fromJson(Map<String, dynamic> input) =>
+      _$PublicKeyFromJson(input);
+  Map<String, dynamic> toJson() => _$PublicKeyToJson(this);
 }
 
 /// Model class for a new public key to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreatePublicKey {
+  CreatePublicKey(this.title, this.key);
+
   final String title;
   final String key;
 
-  CreatePublicKey(this.title, this.key);
+  Map<String, dynamic> toJson() => _$CreatePublicKeyToJson(this);
 
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("key", key, map);
-    return jsonEncode(map);
-  }
+  factory CreatePublicKey.fromJson(Map<String, dynamic> input) =>
+      _$CreatePublicKeyFromJson(input);
 }

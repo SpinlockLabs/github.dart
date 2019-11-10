@@ -1,9 +1,8 @@
-import "package:github/server.dart";
+import 'package:github/github.dart';
 
-void main() {
-  final github = createGitHubClient();
-
-  github.misc.getWisdom().then((value) {
-    print(value);
-  }).then((_) => github.dispose());
+Future<void> main() async {
+  final github = GitHub();
+  final wisdom = await github.misc.getWisdom();
+  print(wisdom);
+  github.dispose();
 }

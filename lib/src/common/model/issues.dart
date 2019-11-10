@@ -1,14 +1,39 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'issues.g.dart';
 
 /// Model class for an issue on the tracker.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Issue {
+  Issue({
+    this.id,
+    this.url,
+    this.htmlUrl,
+    this.number,
+    this.state,
+    this.title,
+    this.user,
+    this.labels,
+    this.assignee,
+    this.milestone,
+    this.commentsCount,
+    this.pullRequest,
+    this.createdAt,
+    this.closedAt,
+    this.updatedAt,
+    this.body,
+    this.closedBy,
+  });
+
   int id;
 
   /// The api url.
   String url;
 
   /// Url to the Issue Page
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
   /// Issue Number
@@ -33,66 +58,48 @@ class Issue {
   Milestone milestone;
 
   /// Number of Comments
-  @JsonKey(name: "comments")
+  @JsonKey(name: 'comments')
   int commentsCount;
 
   /// A Pull Request
-  @JsonKey(name: "pull_request")
+  @JsonKey(name: 'pull_request')
   IssuePullRequest pullRequest;
 
   /// Time that the issue was created at
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
   /// The time that the issue was closed at
-  @JsonKey(name: "closed_at")
+  @JsonKey(name: 'closed_at')
   DateTime closedAt;
 
   /// The time that the issue was updated at
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
   String body;
 
   /// The user who closed the issue
-  @JsonKey(name: "closed_by")
+  @JsonKey(name: 'closed_by')
   User closedBy;
 
-  static Issue fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  bool get isOpen => state == 'open';
+  bool get isClosed => state == 'closed';
 
-    List<Map<String, Object>> labels =
-        input['labels'].cast<Map<String, dynamic>>();
-    if (labels == null) labels = <Map<String, dynamic>>[];
-
-    return Issue()
-      ..id = input['id']
-      ..url = input['url']
-      ..htmlUrl = input['html_url']
-      ..number = input['number']
-      ..state = input['state']
-      ..title = input['title']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..labels = labels.map(IssueLabel.fromJSON).toList(growable: false)
-      ..assignee = User.fromJson(input['assignee'] as Map<String, dynamic>)
-      ..milestone =
-          Milestone.fromJSON(input['milestone'] as Map<String, dynamic>)
-      ..commentsCount = input['comments']
-      ..pullRequest = IssuePullRequest.fromJSON(
-          input['pull_request'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..closedAt = parseDateTime(input['closed_at'])
-      ..closedBy = User.fromJson(input['closed_by'] as Map<String, dynamic>)
-      ..body = input['body'];
-  }
-
-  bool get isOpen => state == "open";
-  bool get isClosed => state == "closed";
+  factory Issue.fromJson(Map<String, dynamic> input) => _$IssueFromJson(input);
+  Map<String, dynamic> toJson() => _$IssueToJson(this);
 }
 
 /// Model class for a request to create/edit an issue.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class IssueRequest {
+  IssueRequest(
+      {this.title,
+      this.body,
+      this.labels,
+      this.assignee,
+      this.state,
+      this.milestone});
   String title;
   String body;
   List<String> labels;
@@ -100,104 +107,94 @@ class IssueRequest {
   String state;
   int milestone;
 
-  IssueRequest();
+  Map<String, dynamic> toJson() => _$IssueRequestToJson(this);
 
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("body", body, map);
-    putValue("labels", labels, map);
-    putValue("assignee", assignee, map);
-    putValue("state", state, map);
-    putValue("milestone", milestone, map);
-    return jsonEncode(map);
-  }
+  factory IssueRequest.fromJson(Map<String, dynamic> input) =>
+      _$IssueRequestFromJson(input);
 }
 
 /// Model class for a pull request for an issue.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class IssuePullRequest {
+  IssuePullRequest({
+    this.htmlUrl,
+    this.diffUrl,
+    this.patchUrl,
+  });
+
   /// Url to the Page for this Issue Pull Request
-  @JsonKey(name: "html_url")
   String htmlUrl;
-
-  /// Diff Url
-  @JsonKey(name: "diff_url")
   String diffUrl;
-
-  /// Patch Url
-  @JsonKey(name: "patch_url")
   String patchUrl;
 
-  static IssuePullRequest fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return IssuePullRequest()
-      ..htmlUrl = input['html_url']
-      ..diffUrl = input['diff_url']
-      ..patchUrl = input['patch_url'];
-  }
+  factory IssuePullRequest.fromJson(Map<String, dynamic> input) =>
+      _$IssuePullRequestFromJson(input);
+  Map<String, dynamic> toJson() => _$IssuePullRequestToJson(this);
 }
 
 /// Model class for an issue comment.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class IssueComment {
+  IssueComment({
+    this.id,
+    this.body,
+    this.user,
+    this.createdAt,
+    this.updatedAt,
+    this.url,
+    this.htmlUrl,
+    this.issueUrl,
+  });
   int id;
-
   String body;
-
   User user;
-
   DateTime createdAt;
-
   DateTime updatedAt;
-
   String url;
-
-  @JsonKey(name: "html_url")
   String htmlUrl;
-
-  @JsonKey(name: "issue_url")
   String issueUrl;
 
-  static IssueComment fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return IssueComment()
-      ..id = input['id']
-      ..body = input['body']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..url = input['url']
-      ..htmlUrl = input['html_url']
-      ..issueUrl = input['issue_url'];
-  }
+  factory IssueComment.fromJson(Map<String, dynamic> input) =>
+      _$IssueCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$IssueCommentToJson(this);
 }
 
 /// Model class for an issue label.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class IssueLabel {
-  /// Label Name
-  String name;
+  IssueLabel({
+    this.name,
+    this.color,
+  });
 
-  /// Label Color
+  String name;
   String color;
 
-  static IssueLabel fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    assert(input['name'] != null);
-    assert(input['color'] != null);
-
-    return IssueLabel()
-      ..name = input['name']
-      ..color = input['color'];
-  }
+  factory IssueLabel.fromJson(Map<String, dynamic> input) =>
+      _$IssueLabelFromJson(input);
+  Map<String, dynamic> toJson() => _$IssueLabelToJson(this);
 
   @override
   String toString() => 'IssueLabel: $name';
 }
 
 /// Model class for a milestone.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Milestone {
+  Milestone({
+    this.id,
+    this.number,
+    this.state,
+    this.title,
+    this.description,
+    this.creator,
+    this.openIssuesCount,
+    this.closedIssuesCount,
+    this.createdAt,
+    this.updatedAt,
+    this.dueOn,
+  });
+
   /// Unique Identifier for Milestone
   int id;
 
@@ -217,59 +214,44 @@ class Milestone {
   User creator;
 
   /// Number of Open Issues
-  @JsonKey(name: "open_issues")
+  @JsonKey(name: 'open_issues')
   int openIssuesCount;
 
   /// Number of Closed Issues
-  @JsonKey(name: "closed_issues")
+  @JsonKey(name: 'closed_issues')
   int closedIssuesCount;
 
   /// Time the milestone was created at
-  @JsonKey(name: "created_at")
   DateTime createdAt;
 
   /// The last time the milestone was updated at
-  @JsonKey(name: "updated_at")
   DateTime updatedAt;
 
   /// The due date for this milestone
-  @JsonKey(name: "due_on")
   DateTime dueOn;
 
-  static Milestone fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return Milestone()
-      ..id = input['id']
-      ..number = input['number']
-      ..state = input['state']
-      ..title = input['title']
-      ..description = input['description']
-      ..creator = User.fromJson(input['creator'] as Map<String, dynamic>)
-      ..openIssuesCount = input['open_issues']
-      ..closedIssuesCount = input['closed_issues']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..dueOn = parseDateTime(input['due_on']);
-  }
+  factory Milestone.fromJson(Map<String, dynamic> input) =>
+      _$MilestoneFromJson(input);
+  Map<String, dynamic> toJson() => _$MilestoneToJson(this);
 }
 
 /// Model class for a new milestone to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateMilestone {
-  final String title;
+  CreateMilestone(
+    this.title, {
+    this.state,
+    this.description,
+    this.dueOn,
+  });
 
+  String title;
   String state;
   String description;
   DateTime dueOn;
 
-  CreateMilestone(this.title);
+  Map<String, dynamic> toJson() => _$CreateMilestoneToJson(this);
 
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("title", title, map);
-    putValue("state", state, map);
-    putValue(description, description, map);
-    putValue("due_on", dateToGitHubIso8601(dueOn), map);
-    return jsonEncode(map);
-  }
+  factory CreateMilestone.fromJson(Map<String, dynamic> input) =>
+      _$CreateMilestoneFromJson(input);
 }

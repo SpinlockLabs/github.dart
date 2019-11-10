@@ -1,63 +1,52 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'activity.g.dart';
 
 /// Model class for an event.
+@JsonSerializable()
 class Event {
-  Repository repo;
-
-  User actor;
-
-  Organization org;
-
-  @JsonKey(name: "created_at")
-  DateTime createdAt;
-
+  Event({
+    this.id,
+    this.type,
+    this.repo,
+    this.actor,
+    this.org,
+    this.payload,
+    this.createdAt,
+  });
   String id;
-
   String type;
-
-  Map<String, dynamic> json;
-
+  Repository repo;
+  User actor;
+  Organization org;
   Map<String, dynamic> payload;
 
-  static Event fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
+  @JsonKey(name: 'created_at')
+  DateTime createdAt;
 
-    final event = Event();
-
-    event.json = input;
-
-    event.type = input['type'];
-
-    event
-      ..repo = Repository.fromJSON(input['repo'] as Map<String, dynamic>)
-      ..org = Organization.fromJSON(input['org'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..id = input['id']
-      ..actor = User.fromJson(input['actor'] as Map<String, dynamic>)
-      ..payload = input['payload'] as Map<String, dynamic>;
-
-    return event;
-  }
+  factory Event.fromJson(Map<String, dynamic> input) => _$EventFromJson(input);
+  Map<String, dynamic> toJson() => _$EventToJson(this);
 }
 
 /// Model class for a repository subscription.
+@JsonSerializable()
 class RepositorySubscription {
+  RepositorySubscription({
+    this.subscribed,
+    this.ignored,
+    this.reason,
+    this.createdAt,
+  });
   bool subscribed;
   bool ignored;
   String reason;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  RepositorySubscription();
-
-  static RepositorySubscription fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return RepositorySubscription()
-      ..subscribed = input['subscribed']
-      ..ignored = input['ignored']
-      ..reason = input['reason']
-      ..createdAt = parseDateTime(input['created_at']);
-  }
+  factory RepositorySubscription.fromJson(Map<String, dynamic> input) =>
+      _$RepositorySubscriptionFromJson(input);
+  Map<String, dynamic> toJson() => _$RepositorySubscriptionToJson(this);
 }

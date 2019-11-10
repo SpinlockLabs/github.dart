@@ -1,27 +1,16 @@
-library github.test.helper;
-
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-
-import "package:http/http.dart" as http;
-import 'package:github/server.dart';
-import 'package:test/test.dart';
-
-part 'helper/assets.dart';
-part 'helper/expect.dart';
-part 'helper/http.dart';
+import 'package:github/github.dart';
 
 GitHub github = _makeGitHubClient();
 
 GitHub _makeGitHubClient() {
   GitHub g;
 
-  if (Platform.environment.containsKey("GITHUB_TOKEN")) {
-    g = createGitHubClient(
-        auth: Authentication.withToken(Platform.environment["GITHUB_TOKEN"]));
+  if (Platform.environment.containsKey('GITHUB_TOKEN')) {
+    g = GitHub(
+        auth: Authentication.withToken(Platform.environment['GITHUB_TOKEN']));
   } else {
-    g = createGitHubClient();
+    g = GitHub();
   }
 
   return g;

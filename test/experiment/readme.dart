@@ -1,11 +1,9 @@
-import "package:github/server.dart";
+import 'package:github/github.dart';
 
-void main() {
-  final github = createGitHubClient();
-
-  github.repositories
-      .getReadme(const RepositorySlug("DirectMyFile", "github.dart"))
-      .then((file) => github.misc.renderMarkdown(file.text))
-      .then((html) => print(html))
-      .then((_) => github.dispose());
+Future<void> main() async {
+  final github = GitHub();
+  final file = await github.repositories
+      .getReadme(RepositorySlug('SpinlockLabs', 'github.dart'));
+  print(await github.misc.renderMarkdown(file.text));
+  github.dispose();
 }

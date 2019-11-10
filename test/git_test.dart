@@ -1,11 +1,9 @@
-library github.test.git_test;
-
 import 'dart:async';
 import 'dart:convert' show jsonEncode, jsonDecode;
 
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
-import "package:http/http.dart" as http;
+import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -20,7 +18,7 @@ void main() {
   setUp(() {
     github = MockGitHub();
     git = GitService(github);
-    repo = const RepositorySlug('o', 'n');
+    repo = RepositorySlug('o', 'n');
   });
 
   group('getBlob()', () {
@@ -28,25 +26,25 @@ void main() {
       git.getBlob(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: GitBlob.fromJSON, statusCode: StatusCodes.OK));
+          convert: (i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
   group('createBlob()', () {
     test('constructs correct path', () {
-      const CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
       verify(github.postJSON(
         '/repos/o/n/git/blobs',
-        convert: GitBlob.fromJSON,
+        convert: (i) => GitBlob.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(blob),
       ));
     });
 
     test('creates valid JSON body', () {
-      const CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
 
       git.createBlob(repo, blob);
       final body = captureSentBody(github);
@@ -60,7 +58,7 @@ void main() {
       git.getCommit(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/commits/sh',
-          convert: GitCommit.fromJSON, statusCode: StatusCodes.OK));
+          convert: (i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
@@ -71,7 +69,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/commits',
-        convert: GitCommit.fromJSON,
+        convert: (i) => GitCommit.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: jsonEncode(commit),
       ));
@@ -108,7 +106,8 @@ void main() {
       git.getReference(repo, 'heads/b');
 
       verify(github.getJSON('/repos/o/n/git/refs/heads/b',
-          convert: GitReference.fromJSON, statusCode: StatusCodes.OK));
+          convert: (i) => GitReference.fromJson(i),
+          statusCode: StatusCodes.OK));
     });
   });
 
@@ -118,7 +117,7 @@ void main() {
       git.createReference(repo, someRef, someSha);
 
       verify(github.postJSON('/repos/o/n/git/refs',
-          convert: GitReference.fromJSON,
+          convert: (i) => GitReference.fromJson(i),
           statusCode: StatusCodes.CREATED,
           body: jsonEncode({'ref': someRef, 'sha': someSha})));
     });
@@ -193,7 +192,7 @@ void main() {
       git.getTag(repo, someSha);
 
       verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-          convert: GitTag.fromJSON, statusCode: StatusCodes.OK));
+          convert: (i) => GitTag.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
@@ -205,9 +204,9 @@ void main() {
       git.createTag(repo, createGitTag);
 
       verify(github.postJSON('/repos/o/n/git/tags',
-          convert: GitTag.fromJSON,
+          convert: (i) => GitTag.fromJson(i),
           statusCode: StatusCodes.CREATED,
-          body: createGitTag.toJSON()));
+          body: jsonEncode(createGitTag)));
     });
 
     test('creates valid JSON body', () {
@@ -248,12 +247,12 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/trees',
           convert: (j) => GitTree.fromJson(j),
           statusCode: StatusCodes.CREATED,
-          body: createGitTree.toJSON()));
+          body: jsonEncode(createGitTree)));
     });
 
     test('with sha creates valid JSON body', () {
       // given
-      const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
+      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           sha: '44b4fc6d56897b048c772eb4087f854f46256132');
 
       final tree = CreateGitTree([treeEntry]);
@@ -274,7 +273,7 @@ void main() {
 
     test('with content creates valid JSON body', () {
       // given
-      const treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
+      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
           content: 'some file content');
 
       final tree = CreateGitTree([treeEntry]);

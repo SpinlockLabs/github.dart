@@ -1,4 +1,6 @@
-part of github.common;
+import 'dart:async';
+import 'dart:convert';
+import 'package:github/src/common.dart';
 
 /// The [MiscService] handles communication with misc related methods of the
 /// GitHub API.
@@ -12,8 +14,8 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    final r = _github.getJSON<Map, Map<String, String>>(
-      "/emojis",
+    final r = github.getJSON<Map, Map<String, String>>(
+      '/emojis',
       statusCode: StatusCodes.OK,
       convert: (Map json) => json.cast<String, String>(),
     );
@@ -24,7 +26,7 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
   Future<List<String>> listGitignoreTemplates() {
-    return _github.getJSON("/gitignore/templates") as Future<List<String>>;
+    return github.getJSON('/gitignore/templates') as Future<List<String>>;
   }
 
   /// Gets a .gitignore template by [name].
@@ -32,8 +34,8 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
   Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
-      _github.getJSON("/gitignore/templates/$name",
-          convert: GitignoreTemplate.fromJSON);
+      github.getJSON('/gitignore/templates/$name',
+          convert: (i) => GitignoreTemplate.fromJson(i));
 
   /// Renders Markdown from the [input].
   ///
@@ -42,10 +44,10 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
   Future<String> renderMarkdown(String input,
-      {String mode = "markdown", String context}) {
-    return _github
-        .request("POST", "/markdown",
-            body: jsonEncode({"text": input, "mode": mode, "context": context}))
+      {String mode = 'markdown', String context}) {
+    return github
+        .request('POST', '/markdown',
+            body: jsonEncode({'text': input, 'mode': mode, 'context': context}))
         .then((response) {
       return response.body;
     });
@@ -59,25 +61,25 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/rate_limit/
   Future<RateLimit> getRateLimit() {
-    return _github.request("GET", "/").then((response) {
+    return github.request('GET', '/').then((response) {
       return RateLimit.fromHeaders(response.headers);
     });
   }
 
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() =>
-      _github.getJSON("https://status.github.com/api/status.json",
-          statusCode: StatusCodes.OK, convert: APIStatus.fromJSON);
+      github.getJSON('https://status.github.com/api/status.json',
+          statusCode: StatusCodes.OK, convert: (i) => APIStatus.fromJson(i));
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String text]) {
     final params = <String, dynamic>{};
 
     if (text != null) {
-      params["s"] = text;
+      params['s'] = text;
     }
 
-    return _github.request("GET", "/octocat", params: params).then((response) {
+    return github.request('GET', '/octocat', params: params).then((response) {
       return response.body;
     });
   }
@@ -86,7 +88,7 @@ class MiscService extends Service {
   Future<String> getWisdom() => getOctocat();
 
   Future<String> getZen() =>
-      _github.request("GET", "/zen").then((response) => response.body);
+      github.request('GET', '/zen').then((response) => response.body);
 }
 
 class Octocat {

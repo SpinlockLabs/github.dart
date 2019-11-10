@@ -1,32 +1,40 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'repos_statuses.g.dart';
 
 /// Model class for the combined status of a repository.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CombinedRepositoryStatus {
+  CombinedRepositoryStatus({
+    this.state,
+    this.sha,
+    this.totalCount,
+    this.statuses,
+    this.repository,
+  });
   String state;
   String sha;
   int totalCount;
   List<RepositoryStatus> statuses;
   Repository repository;
 
-  CombinedRepositoryStatus();
-
-  static CombinedRepositoryStatus fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return CombinedRepositoryStatus()
-      ..state = input["state"]
-      ..sha = input["sha"]
-      ..totalCount = input["total_count"]
-      ..statuses = (input["statuses"] as List<Map<String, dynamic>>)
-          .map((it) => RepositoryStatus.fromJSON(it))
-          .toList()
-      ..repository =
-          Repository.fromJSON(input["repository"] as Map<String, dynamic>);
-  }
+  factory CombinedRepositoryStatus.fromJson(Map<String, dynamic> input) =>
+      _$CombinedRepositoryStatusFromJson(input);
+  Map<String, dynamic> toJson() => _$CombinedRepositoryStatusToJson(this);
 }
 
 /// Model class for the status of a repository at a particular reference.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class RepositoryStatus {
+  RepositoryStatus({
+    this.createdAt,
+    this.updatedAt,
+    this.state,
+    this.targetUrl,
+    this.description,
+    this.context,
+  });
   DateTime createdAt;
   DateTime updatedAt;
   String state;
@@ -34,37 +42,23 @@ class RepositoryStatus {
   String description;
   String context;
 
-  static RepositoryStatus fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return RepositoryStatus()
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..state = input['state']
-      ..targetUrl = input['target_url']
-      ..description = input['description']
-      ..context = input['context'];
-  }
+  factory RepositoryStatus.fromJson(Map<String, dynamic> input) =>
+      _$RepositoryStatusFromJson(input);
+  Map<String, dynamic> toJson() => _$RepositoryStatusToJson(this);
 }
 
 /// Model class for a new repository status to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateStatus {
+  CreateStatus(this.state, {this.targetUrl, this.description, this.context});
+
   final String state;
-
-  @JsonKey(name: "target_url")
-  String targetUrl;
-
   String description;
   String context;
+  @JsonKey(name: 'target_url')
+  String targetUrl;
 
-  CreateStatus(this.state);
-
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("state", state, map);
-    putValue("target_url", targetUrl, map);
-    putValue("description", description, map);
-    putValue("context", context, map);
-    return jsonEncode(map);
-  }
+  factory CreateStatus.fromJson(Map<String, dynamic> input) =>
+      _$CreateStatusFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateStatusToJson(this);
 }

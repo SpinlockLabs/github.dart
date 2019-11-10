@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:test/test.dart';
-import 'package:github/server.dart';
+import 'package:github/github.dart';
 
 const _licenseJson = r'''  {
   "name": "LICENSE",

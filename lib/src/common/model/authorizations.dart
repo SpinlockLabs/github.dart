@@ -1,9 +1,24 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'authorizations.g.dart';
 
 /// Model class for an authorization.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Authorization {
-  int id;
+  Authorization(
+      {this.id,
+      this.scopes,
+      this.token,
+      this.app,
+      this.note,
+      this.noteUrl,
+      this.createdAt,
+      this.updatedAt,
+      this.user});
 
+  int id;
   List<String> scopes;
   String token;
   AuthorizationApplication app;
@@ -13,62 +28,37 @@ class Authorization {
   DateTime updatedAt;
   User user;
 
-  Map<String, dynamic> json;
-
-  static Authorization fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return Authorization()
-      ..id = input['id']
-      ..scopes = input['scopes'] as List<String>
-      ..token = input['token']
-      ..app = AuthorizationApplication.fromJSON(
-          input['app'] as Map<String, dynamic>)
-      ..note = input['note']
-      ..noteUrl = input['note_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..json = input
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
-  }
+  factory Authorization.fromJson(Map<String, dynamic> input) =>
+      _$AuthorizationFromJson(input);
+  Map<String, dynamic> toJson() => _$AuthorizationToJson(this);
 }
 
 /// Model class for an application of an [Authorization].
+@JsonSerializable(fieldRename: FieldRename.snake)
 class AuthorizationApplication {
+  AuthorizationApplication({this.url, this.name, this.clientId});
+
   String url;
   String name;
+  String clientId;
 
-  @JsonKey(name: "client_id")
-  String clientID;
-
-  AuthorizationApplication();
-
-  static AuthorizationApplication fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return AuthorizationApplication()
-      ..url = input['url']
-      ..name = input['name']
-      ..clientID = input['client_id'];
-  }
+  factory AuthorizationApplication.fromJson(Map<String, dynamic> input) =>
+      _$AuthorizationApplicationFromJson(input);
+  Map<String, dynamic> toJson() => _$AuthorizationApplicationToJson(this);
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateAuthorization {
-  final String note;
+  CreateAuthorization(this.note,
+      {this.scopes, this.noteUrl, this.clientId, this.clientSecret});
 
+  String note;
   List<String> scopes;
   String noteUrl;
-  String clientID;
+  String clientId;
   String clientSecret;
 
-  CreateAuthorization(this.note);
-
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("note", note, map);
-    putValue("note_url", noteUrl, map);
-    putValue("client_id", clientID, map);
-    putValue("client_secret", clientSecret, map);
-    return jsonEncode(map);
-  }
+  factory CreateAuthorization.fromJson(Map<String, dynamic> input) =>
+      _$CreateAuthorizationFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateAuthorizationToJson(this);
 }

@@ -7,7 +7,7 @@ GitHub.dart is of course Open Source! We love it when people contribute!
 - Make sure you have a [GitHub Account](https://github.com/signup/free).
 - Make sure the [Dart SDK](https://www.dartlang.org/tools/sdk/) is installed on your system.
 - Make sure you have [Git](http://git-scm.com/) installed on your system.
-- [Fork](https://help.github.com/articles/fork-a-repo) the [repository](https://github.com/DirectMyFile/github.dart) on GitHub.
+- [Fork](https://help.github.com/articles/fork-a-repo) the [repository](https://github.com/SpinlockLabs/github.dart) on GitHub.
 
 ## Making Changes
 

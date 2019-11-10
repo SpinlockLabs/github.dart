@@ -1,12 +1,12 @@
-import "package:github/server.dart";
+import 'package:github/github.dart';
 
 void main() {
   final github = GitHub();
 
   github.repositories
       .getContents(
-        const RepositorySlug("DirectMyFile", "github.dart"),
-        "pubspec.yaml",
+        RepositorySlug('SpinlockLabs', 'github.dart'),
+        'pubspec.yaml',
       )
       .then((contents) => contents.file)
       .then((file) => print(file.text))

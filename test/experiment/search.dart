@@ -1,10 +1,10 @@
-import "package:github/server.dart";
+import 'package:github/github.dart';
 
 void main() {
-  final github = createGitHubClient();
+  final github = GitHub();
 
-  github.search.repositories("github").listen((repo) {
+  github.search.repositories('github').listen((repo) {
     print(
         "${repo.fullName}: ${repo.description.isNotEmpty ? repo.description : "No Description"}");
-  }).onDone(() => github.dispose());
+  }).onDone(github.dispose);
 }

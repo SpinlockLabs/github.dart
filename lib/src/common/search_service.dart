@@ -1,4 +1,8 @@
-part of github.common;
+import 'dart:async';
+import 'dart:convert';
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:github/src/common/util/pagination.dart';
 
 /// The [SearchService] handles communication with search related methods of
 /// the GitHub API.
@@ -12,23 +16,23 @@ class SearchService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/search/#search-repositories
   Stream<Repository> repositories(String query, {String sort, int pages = 2}) {
-    final params = <String, dynamic>{"q": query};
+    final params = <String, dynamic>{'q': query};
     if (sort != null) {
-      params["sort"] = sort;
+      params['sort'] = sort;
     }
 
     final controller = StreamController<Repository>();
 
     bool isFirst = true;
 
-    PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/repositories",
+    PaginationHelper(github)
+        .fetchStreamed('GET', '/search/repositories',
             params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
-          response.body.contains("rate limit") &&
+          response.body.contains('rate limit') &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;
@@ -41,7 +45,7 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => Repository.fromJSON(item)).forEach(controller.add);
+      items.map((item) => Repository.fromJson(item)).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -79,7 +83,7 @@ class SearchService extends Service {
     // Known Issue: If a query already has a qualifier and the same
     // qualifier parameter is passed in, it will be duplicated.
     // Example: code('example repo:ex', repo: 'ex') will result in
-    // a query of "example repo:ex repo:ex"
+    // a query of 'example repo:ex repo:ex'
     query += _searchQualifier('language', language);
     query += _searchQualifier('filename', filename);
     query += _searchQualifier('extension', extension);
@@ -112,8 +116,8 @@ class SearchService extends Service {
       params['per_page'] = perPage.toString();
     }
 
-    return PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/code", params: params, pages: pages)
+    return PaginationHelper(github)
+        .fetchStreamed('GET', '/search/code', params: params, pages: pages)
         .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
   }
 
@@ -128,22 +132,22 @@ class SearchService extends Service {
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   /// API docs: https://developer.github.com/v3/search/#search-issues
   Stream<Issue> issues(String query, {String sort, int pages = 2}) {
-    final params = <String, dynamic>{"q": query};
+    final params = <String, dynamic>{'q': query};
     if (sort != null) {
-      params["sort"] = sort;
+      params['sort'] = sort;
     }
 
     final controller = StreamController<Issue>();
 
     var isFirst = true;
 
-    PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/issues", params: params, pages: pages)
+    PaginationHelper(github)
+        .fetchStreamed('GET', '/search/issues', params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
-          response.body.contains("rate limit") &&
+          response.body.contains('rate limit') &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;
@@ -156,7 +160,7 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => Issue.fromJSON(item)).forEach(controller.add);
+      items.map((item) => Issue.fromJson(item)).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -172,25 +176,25 @@ class SearchService extends Service {
     int pages = 2,
     int perPage = 30,
   }) {
-    final params = <String, dynamic>{"q": query};
+    final params = <String, dynamic>{'q': query};
 
     if (sort != null) {
-      params["sort"] = sort;
+      params['sort'] = sort;
     }
 
-    params["per_page"] = perPage.toString();
+    params['per_page'] = perPage.toString();
 
     final controller = StreamController<User>();
 
     var isFirst = true;
 
-    PaginationHelper(_github)
-        .fetchStreamed("GET", "/search/users", params: params, pages: pages)
+    PaginationHelper(github)
+        .fetchStreamed('GET', '/search/users', params: params, pages: pages)
         .listen((response) {
       if (response.statusCode == 403 &&
-          response.body.contains("rate limit") &&
+          response.body.contains('rate limit') &&
           isFirst) {
-        throw RateLimitHit(_github);
+        throw RateLimitHit(github);
       }
 
       isFirst = false;

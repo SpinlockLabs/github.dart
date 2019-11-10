@@ -1,8 +1,8 @@
-part of github.common;
+import 'package:github/src/common.dart';
 
 /// Superclass for all services.
 abstract class Service {
-  final GitHub _github;
+  final GitHub github;
 
-  const Service(this._github);
+  const Service(this.github);
 }

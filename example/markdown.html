@@ -16,19 +16,21 @@
   <div hidden markdown>
     # Hello World
 
-    This is an example of the Markdown Rendering in GitHub.dart!
+    This is an example of the Markdown rendering in GitHub.dart! 
+    You'll need to import browser_helper.dart to get access to the renderMarkdown method.
 
     ## Usage
 
     In your Dart Code:
     ```dart
-    import "package:github/browser.dart";
+    import 'package:github/github.dart';
+    import 'package:github/browser_helper.dart';
 
     void main() {
-    var github = createGitHubClient();
+      var github = GitHub();
 
-    // Renders Elements with the markdown attribute
-    GitHubBrowserHelper.renderMarkdown(github, "*[markdown]");
+      // Renders Elements with the markdown attribute
+      renderMarkdown(github, "*[markdown]");
     }
     ```
 

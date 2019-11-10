@@ -1,8 +1,8 @@
-import "dart:async";
-import "dart:html";
+import 'dart:async';
+import 'dart:html';
 
-import "package:github/browser.dart";
-import "common.dart";
+import 'package:github/github.dart';
+import 'common.dart';
 
 DivElement $output;
 InputElement $input;
@@ -10,7 +10,7 @@ ButtonElement $btn;
 
 Future<void> main() async {
   await initViewSourceButton('organization.dart');
-  $output = querySelector("#output");
+  $output = querySelector('#output');
   $input = querySelector('#input');
   $btn = querySelector('#submit');
   $input.onChange.listen((_) {

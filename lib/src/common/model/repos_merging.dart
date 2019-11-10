@@ -1,20 +1,16 @@
-part of github.common;
+import 'package:json_annotation/json_annotation.dart';
+part 'repos_merging.g.dart';
 
 /// Model class for a new merge to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateMerge {
+  CreateMerge(this.base, this.head, {this.commitMessage});
+
   final String base;
   final String head;
-
-  @JsonKey(name: "commit_message")
   String commitMessage;
 
-  CreateMerge(this.base, this.head);
-
-  String toJSON() {
-    final map = <String, dynamic>{};
-    putValue("base", base, map);
-    putValue("head", head, map);
-    putValue("commit_message", commitMessage, map);
-    return jsonEncode(map);
-  }
+  factory CreateMerge.fromJson(Map<String, dynamic> input) =>
+      _$CreateMergeFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateMergeToJson(this);
 }

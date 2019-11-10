@@ -1,7 +1,26 @@
-part of github.common;
+import 'package:github/src/common.dart';
+import 'package:github/src/common/model/users.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'gists.g.dart';
 
 /// Model class for gists.
+@JsonSerializable(createToJson: false)
 class Gist {
+  Gist({
+    this.id,
+    this.description,
+    this.public,
+    this.owner,
+    this.user,
+    this.files,
+    this.htmlUrl,
+    this.commentsCount,
+    this.gitPullUrl,
+    this.gitPushUrl,
+    this.createdAt,
+    this.updatedAt,
+  });
   String id;
   String description;
   bool public;
@@ -9,168 +28,130 @@ class Gist {
   User user;
   List<GistFile> files;
 
-  @JsonKey(name: "html_url")
+  @JsonKey(name: 'html_url')
   String htmlUrl;
 
-  @JsonKey(name: "comments")
+  @JsonKey(name: 'comments')
   int commentsCount;
 
-  @JsonKey(name: "git_pull_url")
+  @JsonKey(name: 'git_pull_url')
   String gitPullUrl;
 
-  @JsonKey(name: "git_push_url")
+  @JsonKey(name: 'git_push_url')
   String gitPushUrl;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
-  static Gist fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    final gist = Gist()
-      ..id = input['id']
-      ..description = input['description']
-      ..public = input['public']
-      ..owner = User.fromJson(input['owner'] as Map<String, dynamic>)
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>);
-
-    if (input['files'] != null) {
-      gist.files = [];
-
-      for (final key in input['files'].keys) {
-        final map = copyOf(input['files'][key]) as Map<String, dynamic>;
-        map['name'] = key;
-        gist.files.add(GistFile.fromJson(map));
-      }
-    }
-
-    gist
-      ..htmlUrl = input['html_url']
-      ..commentsCount = input['comments']
-      ..gitPullUrl = input['git_pull_url']
-      ..gitPushUrl = input['git_push_url']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
-
-    return gist;
-  }
+  factory Gist.fromJson(Map<String, dynamic> input) => _$GistFromJson(input);
 }
 
 /// Model class for a gist file.
+@JsonSerializable(createToJson: false)
 class GistFile {
+  GistFile({
+    this.name,
+    this.size,
+    this.rawUrl,
+    this.type,
+    this.language,
+    this.truncated,
+    this.content,
+  });
   String name;
   int size;
 
-  @JsonKey(name: "raw_url")
+  @JsonKey(name: 'raw_url')
   String rawUrl;
   String type;
   String language;
   bool truncated;
   String content;
 
-  static GistFile fromJson(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistFile()
-      ..name = input['name']
-      ..size = input['size']
-      ..rawUrl = input['raw_url']
-      ..type = input['type']
-      ..language = input['language']
-      ..truncated = input['truncated']
-      ..content = input['content'];
-  }
+  factory GistFile.fromJson(Map<String, dynamic> input) =>
+      _$GistFileFromJson(input);
 }
 
 /// Model class for a gist fork.
+@JsonSerializable(createToJson: false)
 class GistFork {
+  GistFork({this.user, this.id, this.createdAt, this.updatedAt});
   User user;
   int id;
 
-  @JsonKey(name: "created_at")
+  @JsonKey(name: 'created_at')
   DateTime createdAt;
 
-  @JsonKey(name: "updated_at")
+  @JsonKey(name: 'updated_at')
   DateTime updatedAt;
 
-  static GistFork fromJson(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistFork()
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..id = input['id']
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at']);
-  }
+  factory GistFork.fromJson(Map<String, dynamic> input) =>
+      _$GistForkFromJson(input);
 }
 
 /// Model class for a gits history entry.
+@JsonSerializable(createToJson: false)
 class GistHistoryEntry {
+  GistHistoryEntry({
+    this.version,
+    this.user,
+    this.deletions,
+    this.additions,
+    this.totalChanges,
+    this.committedAt,
+  });
   String version;
 
   User user;
 
-  @JsonKey(name: "change_status/deletions")
+  @JsonKey(name: 'change_status/deletions')
   int deletions;
 
-  @JsonKey(name: "change_status/additions")
+  @JsonKey(name: 'change_status/additions')
   int additions;
 
-  @JsonKey(name: "change_status/total")
+  @JsonKey(name: 'change_status/total')
   int totalChanges;
 
-  @JsonKey(name: "committed_at")
+  @JsonKey(name: 'committed_at')
   DateTime committedAt;
 
-  static GistHistoryEntry fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistHistoryEntry()
-      ..version = input['version']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..deletions = input['change_status']['deletions']
-      ..additions = input['change_status']['additions']
-      ..totalChanges = input['change_status']['total']
-      ..committedAt = parseDateTime(input['committed_at']);
-  }
+  factory GistHistoryEntry.fromJson(Map<String, dynamic> input) =>
+      _$GistHistoryEntryFromJson(input);
 }
 
 /// Model class for gist comments.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class GistComment {
+  GistComment({
+    this.id,
+    this.user,
+    this.createdAt,
+    this.updatedAt,
+    this.body,
+  });
+
   int id;
   User user;
-
-  @JsonKey(name: "created_at")
   DateTime createdAt;
-
-  @JsonKey(name: "updated_at")
   DateTime updatedAt;
-
   String body;
 
-  static GistComment fromJSON(Map<String, dynamic> input) {
-    if (input == null) return null;
-
-    return GistComment()
-      ..id = input['id']
-      ..user = User.fromJson(input['user'] as Map<String, dynamic>)
-      ..createdAt = parseDateTime(input['created_at'])
-      ..updatedAt = parseDateTime(input['updated_at'])
-      ..body = input['body'];
-  }
+  factory GistComment.fromJson(Map<String, dynamic> input) =>
+      _$GistCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$GistCommentToJson(this);
 }
 
 /// Model class for a new gist comment to be created.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGistComment {
-  final String body;
-
   CreateGistComment(this.body);
+  String body;
 
-  String toJSON() {
-    final map = <String, dynamic>{'body': body};
-    return jsonEncode(map);
-  }
+  factory CreateGistComment.fromJson(Map<String, dynamic> input) =>
+      _$CreateGistCommentFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateGistCommentToJson(this);
 }
