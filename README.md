@@ -41,7 +41,8 @@ import 'package:github/github.dart';
 
 and then use it:
 
-**Example**
+### Example
+
 ```dart
 import 'package:github/github.dart';
 
@@ -49,7 +50,8 @@ Future<void> main() async {
   /* Create a GitHub Client, with anonymous authentication by default */
   var github = GitHub();
 
-  /* or Create a GitHub Client and have it try to find your token or credentials automatically
+  /*
+  or Create a GitHub Client and have it try to find your token or credentials automatically
   In Flutter and in server environments this will search environment variables in this order
   GITHUB_ADMIN_TOKEN
   GITHUB_DART_TOKEN
@@ -65,14 +67,13 @@ Future<void> main() async {
   var github = GitHub(auth: findAuthenticationFromEnvironment());
 
   /* or Create a GitHub Client using an auth token */
-  var github = GitHub(auth: new Authentication.withToken("YourTokenHere"));
+  var github = GitHub(auth: Authentication.withToken('YourTokenHere'));
 
   /* or Create a GitHub Client using a username and password */
-  var github = GitHub(auth: new Authentication.basic('username', 'password'));
+  var github = GitHub(auth: Authentication.basic('username', 'password'));
 
-  Repository repo = await github.repositories.getRepository(new RepositorySlug("user_or_org", "repo_name"));
+  Repository repo = await github.repositories.getRepository(RepositorySlug('user_or_org', 'repo_name'));
   /* Do Something with repo */
-
 }
 ```
 
