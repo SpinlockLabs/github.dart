@@ -1,3 +1,6 @@
+## v6.0.1
+ - Fix https://github.com/SpinlockLabs/github.dart/issues/190
+
 ## v6.0.0
 
 - There's a single entrypoint now: `package:github/github.dart`
