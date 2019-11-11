@@ -1,3 +1,6 @@
+## v6.0.2
+ - Fixed `GitHubFile.text` to properly decode `content`.
+
 ## v6.0.1
  - Fix https://github.com/SpinlockLabs/github.dart/issues/190
 
@@ -15,6 +18,8 @@
 - removed deprecated items
 - renamed some fields with ID at the end to be Id
 - most model constructors now have named parameters for all properties
+- `GitHubFile.content` is now exactly the content returned from the JSON API
+  without newlines removed.
 
 ## v5.5.0
 

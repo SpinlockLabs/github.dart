@@ -37,7 +37,7 @@ class GitHubFile {
   /// File Path
   String path;
 
-  /// File Content
+  /// Base-64 encoded file content with newlines.
   String content;
 
   /// SHA
@@ -55,10 +55,10 @@ class GitHubFile {
   @JsonKey(name: '_links')
   Links links;
 
-  /// Text Content
+  /// The value in [content] Base-64 decoded.
   String get text {
     if (_text == null) {
-      _text = utf8.decode(base64Decode(content));
+      _text = utf8.decode(base64Decode(LineSplitter.split(content).join()));
     }
     return _text;
   }
