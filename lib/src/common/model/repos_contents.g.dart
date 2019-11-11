@@ -56,6 +56,24 @@ Map<String, dynamic> _$LinksToJson(Links instance) => <String, dynamic>{
       'html': instance.html?.toString(),
     };
 
+RepositoryContents _$RepositoryContentsFromJson(Map<String, dynamic> json) {
+  return RepositoryContents(
+    file: json['file'] == null
+        ? null
+        : GitHubFile.fromJson(json['file'] as Map<String, dynamic>),
+    tree: (json['tree'] as List)
+        ?.map((e) =>
+            e == null ? null : GitHubFile.fromJson(e as Map<String, dynamic>))
+        ?.toList(),
+  );
+}
+
+Map<String, dynamic> _$RepositoryContentsToJson(RepositoryContents instance) =>
+    <String, dynamic>{
+      'file': instance.file,
+      'tree': instance.tree,
+    };
+
 CreateFile _$CreateFileFromJson(Map<String, dynamic> json) {
   return CreateFile(
     path: json['path'] as String,

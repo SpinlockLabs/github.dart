@@ -87,12 +87,22 @@ class Links {
 }
 
 /// Model class for a file or directory.
+@JsonSerializable(fieldRename: FieldRename.snake)
 class RepositoryContents {
+  RepositoryContents({
+    this.file,
+    this.tree,
+  });
   GitHubFile file;
   List<GitHubFile> tree;
 
   bool get isFile => file != null;
   bool get isDirectory => tree != null;
+
+  factory RepositoryContents.fromJson(Map<String, dynamic> json) =>
+      _$RepositoryContentsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RepositoryContentsToJson(this);
 }
 
 /// Model class for a new file to be created.
