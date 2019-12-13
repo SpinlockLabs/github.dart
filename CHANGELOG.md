@@ -1,3 +1,6 @@
+## v6.0.3
+ - Add archived and disabled fields to the Repository class
+
 ## v6.0.2
  - Fixed `GitHubFile.text` to properly decode `content`.
 

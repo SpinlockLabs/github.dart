@@ -64,6 +64,8 @@ class Repository {
     this.updatedAt,
     this.pushedAt,
     this.license,
+    this.archived,
+    this.disabled,
   });
 
   /// Repository Name
@@ -159,6 +161,9 @@ class Repository {
   final DateTime updatedAt;
 
   final LicenseKind license;
+
+  final bool archived;
+  final bool disabled;
 
   factory Repository.fromJson(Map<String, dynamic> input) =>
       _$RepositoryFromJson(input);

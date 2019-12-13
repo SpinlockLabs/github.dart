@@ -56,6 +56,8 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
     license: json['license'] == null
         ? null
         : LicenseKind.fromJson(json['license'] as Map<String, dynamic>),
+    archived: json['archived'] as bool,
+    disabled: json['disabled'] as bool,
   );
 }
 
@@ -87,6 +89,8 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
       'pushed_at': instance.pushedAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'license': instance.license,
+      'archived': instance.archived,
+      'disabled': instance.disabled,
     };
 
 CloneUrls _$CloneUrlsFromJson(Map<String, dynamic> json) {
