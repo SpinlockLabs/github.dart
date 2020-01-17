@@ -1,13 +1,16 @@
-## v6.0.3
+## 6.0.4
+ - This fixes #196 (https://github.com/SpinlockLabs/github.dart/issues/196)
+
+## 6.0.3
  - Add archived and disabled fields to the Repository class
 
-## v6.0.2
+## 6.0.2
  - Fixed `GitHubFile.text` to properly decode `content`.
 
-## v6.0.1
+## 6.0.1
  - Fix https://github.com/SpinlockLabs/github.dart/issues/190
 
-## v6.0.0
+## 6.0.0
 
 - There's a single entrypoint now: `package:github/github.dart`
 - For web: browser specific helper methods have moved. use import `package:github/browser_helper.dart` (renderMarkdown, and createAvatorImage)
