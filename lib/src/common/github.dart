@@ -387,7 +387,9 @@ class GitHub {
     if (response.headers['content-type'].contains('application/json')) {
       final json = jsonDecode(response.body);
       message = json['message'];
-      errors = List<Map<String, String>>.from(json['errors']);
+      if (json['errors'] != null) {
+        errors = List<Map<String, String>>.from(json['errors']);
+      }
     }
     switch (response.statusCode) {
       case 404:
