@@ -1,3 +1,6 @@
+## 6.0.5
+ - Fix null errors issue https://github.com/SpinlockLabs/github.dart/issues/199 
+
 ## 6.0.4
  - This fixes #196 (https://github.com/SpinlockLabs/github.dart/issues/196)
 
