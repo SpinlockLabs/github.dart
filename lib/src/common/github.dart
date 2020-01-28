@@ -229,7 +229,7 @@ class GitHub {
       headers['Accept'] = preview;
     }
 
-    headers.putIfAbsent('Accept', () => 'application/vnd.github.v3+json');
+    headers.putIfAbsent('Accept', () => v3ApiMimeType);
 
     final response = await request(
       method,

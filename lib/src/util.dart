@@ -1,5 +1,7 @@
 final RegExp githubDateRemoveRegExp = RegExp(r'\.\d*');
 
+const v3ApiMimeType = 'application/vnd.github.v3+json';
+
 String buildQueryString(Map<String, dynamic> params) {
   final queryString = StringBuffer();
 
