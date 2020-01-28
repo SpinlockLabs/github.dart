@@ -9,11 +9,11 @@ import 'package:github/src/common.dart';
 ///  [selector] is the selector to use to find markdown elements.
 ///  [indent] is the indent that needs to be stripped out.
 void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
-  final ElementList elements = document.querySelectorAll(selector);
+  final elements = document.querySelectorAll(selector);
 
   elements.removeWhere((Element it) => it.attributes.containsKey('rendered'));
 
-  for (final Element e in elements) {
+  for (final e in elements) {
     final txt = e.text;
 
     final md = txt.split('\n').map((it) {

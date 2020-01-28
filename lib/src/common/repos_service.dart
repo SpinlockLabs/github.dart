@@ -149,7 +149,7 @@ class RepositoriesService extends Service {
 
   /// Fetches a list of repositories specified by [slugs].
   Stream<Repository> getRepositories(List<RepositorySlug> slugs) async* {
-    for (final RepositorySlug slug in slugs) {
+    for (final slug in slugs) {
       final repo = await getRepository(slug);
       yield repo;
     }
@@ -167,7 +167,7 @@ class RepositoriesService extends Service {
       bool hasWiki,
       bool hasDownloads}) async {
     ArgumentError.checkNotNull(slug);
-    final Map<String, dynamic> data = createNonNullMap({
+    final data = createNonNullMap({
       'name': name,
       'description': description,
       'homepage': homepage,
@@ -289,7 +289,7 @@ class RepositoriesService extends Service {
   Future<bool> isCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
-    bool catchError = false;
+    var catchError = false;
     http.Response response;
     try {
       response = await github.request(
@@ -380,7 +380,7 @@ class RepositoriesService extends Service {
   }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(commit);
-    final Map<String, dynamic> data = createNonNullMap({
+    final data = createNonNullMap({
       'body': body,
       'path': path,
       'position': position,
@@ -513,7 +513,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     final headers = <String, String>{};
 
-    String url = '/repos/${slug.fullName}/readme';
+    var url = '/repos/${slug.fullName}/readme';
 
     if (ref != null) {
       url += '?ref=$ref';
@@ -525,7 +525,7 @@ class RepositoriesService extends Service {
         throw NotFound(github, response.body);
       }
     }, convert: (Map<String, dynamic> input) {
-      GitHubFile file = GitHubFile.fromJson(input);
+      var file = GitHubFile.fromJson(input);
       if (file != null && slug != null) {
         file.sourceRepository = slug;
       }
@@ -552,7 +552,7 @@ class RepositoriesService extends Service {
       {String ref}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(path);
-    String url = '/repos/${slug.fullName}/contents/$path';
+    var url = '/repos/${slug.fullName}/contents/$path';
 
     if (ref != null) {
       url += '?ref=$ref';
@@ -587,7 +587,7 @@ class RepositoriesService extends Service {
       RepositorySlug slug, CreateFile file) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(file);
-    final http.Response response = await github.request(
+    final response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/${file.path}',
       body: jsonEncode(file),
@@ -604,13 +604,13 @@ class RepositoriesService extends Service {
       {String branch}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(path);
-    final Map<String, dynamic> map = createNonNullMap({
+    final map = createNonNullMap({
       'message': message,
       'content': content,
       'sha': sha,
       'branch': branch,
     });
-    final http.Response response = await github.request(
+    final response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/$path',
       body: jsonEncode(map),
@@ -626,9 +626,9 @@ class RepositoriesService extends Service {
       String message, String sha, String branch) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(path);
-    final Map<String, dynamic> map =
+    final map =
         createNonNullMap({'message': message, 'sha': sha, 'branch': branch});
-    final http.Response response = await github.request(
+    final response = await github.request(
       'DELETE',
       '/repos/${slug.fullName}/contents/$path',
       body: jsonEncode(map),
@@ -646,7 +646,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(ref);
     ArgumentError.checkNotNull(format);
-    final http.Response response = await github.request(
+    final response = await github.request(
       'GET',
       '/repos/${slug.fullName}/$format/$ref',
       statusCode: StatusCodes.FOUND,
@@ -671,7 +671,7 @@ class RepositoriesService extends Service {
   /// API docs: https://developer.github.com/v3/repos/forks/#create-a-fork
   Future<Repository> createFork(RepositorySlug slug, [CreateFork fork]) async {
     ArgumentError.checkNotNull(slug);
-    if (fork == null) fork = CreateFork();
+    fork ??= CreateFork();
     return github.postJSON<Map<String, dynamic>, Repository>(
       '/repos/${slug.fullName}/forks',
       body: jsonEncode(fork),
@@ -966,8 +966,7 @@ class RepositoriesService extends Service {
   }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(createRelease);
-    final Release release =
-        await github.postJSON<Map<String, dynamic>, Release>(
+    final release = await github.postJSON<Map<String, dynamic>, Release>(
       '/repos/${slug.fullName}/releases',
       convert: (i) => Release.fromJson(i),
       body: jsonEncode(createRelease.toJson()),
@@ -1114,7 +1113,7 @@ class RepositoriesService extends Service {
     Release release,
     Iterable<CreateReleaseAsset> createReleaseAssets,
   ) async {
-    final List<ReleaseAsset> releaseAssets = [];
+    final releaseAssets = <ReleaseAsset>[];
     for (final createReleaseAsset in createReleaseAssets) {
       final headers = {'Content-Type': createReleaseAsset.contentType};
       final releaseAsset = await github.postJSON(
@@ -1140,8 +1139,8 @@ class RepositoriesService extends Service {
     RepositorySlug slug,
   ) async {
     ArgumentError.checkNotNull(slug);
-    final String path = '/repos/${slug.fullName}/stats/contributors';
-    final http.Response response = await github.request('GET', path,
+    final path = '/repos/${slug.fullName}/stats/contributors';
+    final response = await github.request('GET', path,
         headers: {'Accept': 'application/vnd.github.v3+json'});
 
     if (response.statusCode == StatusCodes.OK) {

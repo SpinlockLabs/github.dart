@@ -32,7 +32,7 @@ void main() {
 
   group('createBlob()', () {
     test('constructs correct path', () {
-      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      var blob = CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
       verify(github.postJSON(
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('creates valid JSON body', () {
-      CreateGitBlob blob = CreateGitBlob('bbb', 'utf-8');
+      var blob = CreateGitBlob('bbb', 'utf-8');
 
       git.createBlob(repo, blob);
       final body = captureSentBody(github);
@@ -64,7 +64,7 @@ void main() {
 
   group('createCommit()', () {
     test('constructs correct path', () {
-      final CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha');
+      final commit = CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
       verify(github.postJSON(
@@ -77,9 +77,9 @@ void main() {
 
     test('creates valid JSON body', () {
       // given
-      const String date = '2014-10-02T15:21:29Z';
+      const date = '2014-10-02T15:21:29Z';
 
-      final CreateGitCommit commit = CreateGitCommit('aMessage', 'aTreeSha')
+      final commit = CreateGitCommit('aMessage', 'aTreeSha')
         ..parents = ['parentSha1', 'parentSha2']
         ..committer = GitCommitUser('cName', 'cEmail', parseDateTime(date))
         ..author = GitCommitUser('aName', 'aEmail', parseDateTime(date));
@@ -134,7 +134,7 @@ void main() {
   group('editReference()', () {
     test('constructs correct path', () {
       // given
-      final http.Response expectedResponse = http.Response('{}', 200);
+      final expectedResponse = http.Response('{}', 200);
 
       when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
@@ -149,7 +149,7 @@ void main() {
 
     test('creates valid JSON body', () {
       // given
-      final http.Response expectedResponse = http.Response('{}', 200);
+      final expectedResponse = http.Response('{}', 200);
       when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
@@ -157,7 +157,7 @@ void main() {
       git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
-      final List<dynamic> captured = verify(github.request(
+      final captured = verify(github.request(
         any,
         any,
         body: captureAny,
@@ -176,7 +176,7 @@ void main() {
   group('deleteReference()', () {
     test('constructs correct path', () {
       // given
-      final http.Response expectedResponse = http.Response('{}', 200);
+      final expectedResponse = http.Response('{}', 200);
       when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
 
       // when

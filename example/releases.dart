@@ -24,7 +24,7 @@ void loadReleases() {
         <h1>${release.name}</h1>
       </div>
       ''', treeSanitizer: NodeTreeSanitizer.trusted);
-      final Element rel = releasesDiv.querySelector('#release-${release.id}');
+      final rel = releasesDiv.querySelector('#release-${release.id}');
       void append(String key, String value) {
         if (value == null) {
           return;

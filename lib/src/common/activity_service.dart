@@ -344,9 +344,7 @@ class EventPoller {
     _controller = StreamController<Event>();
 
     void handleEvent(http.Response response) {
-      if (interval == null) {
-        interval = int.parse(response.headers['x-poll-interval']);
-      }
+      interval ??= int.parse(response.headers['x-poll-interval']);
 
       if (response.statusCode == 304) {
         return;
@@ -374,17 +372,15 @@ class EventPoller {
         }
       }
 
-      if (_timer == null) {
-        _timer = Timer.periodic(Duration(seconds: interval), (timer) {
-          final headers = <String, String>{};
+      _timer ??= Timer.periodic(Duration(seconds: interval), (timer) {
+        final headers = <String, String>{};
 
-          if (_lastFetched != null) {
-            headers['If-None-Match'] = _lastFetched;
-          }
+        if (_lastFetched != null) {
+          headers['If-None-Match'] = _lastFetched;
+        }
 
-          github.request('GET', path, headers: headers).then(handleEvent);
-        });
-      }
+        github.request('GET', path, headers: headers).then(handleEvent);
+      });
     }
 
     final headers = <String, String>{};

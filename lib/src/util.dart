@@ -7,7 +7,7 @@ String buildQueryString(Map<String, dynamic> params) {
     queryString.write('?');
   }
 
-  int i = 0;
+  var i = 0;
   for (final key in params.keys) {
     i++;
     if (params[key] == null) {

@@ -15,12 +15,12 @@ Authentication findAuthenticationFromEnvironment() {
         'security', const ['find-internet-password', '-g', '-s', 'github.com']);
 
     if (result.exitCode == 0) {
-      final String out = result.stdout.toString();
+      final out = result.stdout.toString();
 
-      String username = out.split('"acct"<blob>="')[1];
+      var username = out.split('"acct"<blob>="')[1];
       username = username.substring(0, username.indexOf('\n'));
       username = username.substring(0, username.length - 1);
-      String password = result.stderr.toString().split('password:')[1].trim();
+      var password = result.stderr.toString().split('password:')[1].trim();
       password = password.substring(1, password.length - 1);
       return Authentication.basic(username.trim(), password.trim());
     }

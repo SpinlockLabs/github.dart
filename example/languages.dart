@@ -42,7 +42,7 @@ void reloadTable({int accuracy = 4}) {
   }
 
   isReloadingTable = true;
-  final String md = generateMarkdown(accuracy);
+  final md = generateMarkdown(accuracy);
   github.misc.renderMarkdown(md).then((html) {
     tableDiv.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
@@ -54,10 +54,10 @@ int totalBytes(LanguageBreakdown breakdown) {
 }
 
 String generateMarkdown(int accuracy) {
-  final int total = totalBytes(breakdown);
+  final total = totalBytes(breakdown);
   final data = breakdown.toList();
 
-  String md = '|Name|Bytes|Percentage|\n';
+  var md = '|Name|Bytes|Percentage|\n';
   md += '|-----|-----|-----|\n';
   data.sort((a, b) => b[1].compareTo(a[1]));
 

@@ -57,10 +57,8 @@ class GitHubFile {
 
   /// The value in [content] Base-64 decoded.
   String get text {
-    if (_text == null) {
-      _text = utf8.decode(base64Decode(LineSplitter.split(content).join()));
-    }
-    return _text;
+    return _text ??=
+        utf8.decode(base64Decode(LineSplitter.split(content).join()));
   }
 
   String _text;

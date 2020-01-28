@@ -29,11 +29,10 @@ class MockResponse extends http.Response {
       : super(body, statusCode, headers: headers);
 
   factory MockResponse.fromAsset(String name) {
-    final Map<String, dynamic> responseData =
+    final responseData =
         jsonDecode(asset('responses/$name.json').readAsStringSync())
             as Map<String, dynamic>;
-    final Map<String, String> headers =
-        responseData['headers'] as Map<String, String>;
+    final headers = responseData['headers'] as Map<String, String>;
     final dynamic body = responseData['body'];
     final int statusCode = responseData['statusCode'];
     String actualBody;

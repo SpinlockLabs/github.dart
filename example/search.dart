@@ -9,7 +9,7 @@ Future<void> main() async {
 }
 
 Future<void> search(_) async {
-  final Stream<CodeSearchResults> resultsStream = github.search.code(
+  final resultsStream = github.search.code(
     val('query'),
     language: val('language'),
     filename: val('filename'),
@@ -28,13 +28,13 @@ Future<void> search(_) async {
   final DivElement resultsDiv = querySelector('#results');
   resultsDiv.innerHtml = '';
 
-  int count = 0;
+  var count = 0;
   await for (final results in resultsStream) {
     count += results.items.length;
     querySelector('#nresults').text =
         '${results.totalCount} result${results.totalCount == 1 ? "" : "s"} (showing $count)';
 
-    for (final CodeSearchItem item in results.items) {
+    for (final item in results.items) {
       final url = item.htmlUrl;
       final path = item.path;
       resultsDiv.append(DivElement()

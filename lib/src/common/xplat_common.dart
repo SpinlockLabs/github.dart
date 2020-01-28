@@ -4,7 +4,7 @@ Authentication findAuthenticationFromEnvironment() =>
     Authentication.anonymous();
 
 Authentication findAuthenticationInMap(Map map) {
-  for (final String key in COMMON_GITHUB_TOKEN_ENV_KEYS) {
+  for (final key in COMMON_GITHUB_TOKEN_ENV_KEYS) {
     if (map.containsKey(key)) {
       return Authentication.withToken(map[key]);
     }
