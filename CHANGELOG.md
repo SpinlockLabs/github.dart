@@ -1,3 +1,6 @@
+## 6.1.0
+ - Add (experimental) `listReactions` method to `IssueService`.
+
 ## 6.0.6
  - Clean up lints https://github.com/SpinlockLabs/github.dart/pull/202
 

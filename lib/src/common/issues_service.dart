@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/common/util/pagination.dart';
@@ -128,6 +129,19 @@ class IssuesService extends Service {
       params: params,
     );
   }
+
+  /// This API is currently in preview. It may break.
+  ///
+  /// See https://developer.github.com/v3/reactions/
+  Stream<Reaction> listReactions(RepositorySlug slug, int issueNumber) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions',
+        (i) => Reaction.fromJson(i),
+        headers: {
+          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+        },
+      );
 
   /// Edit an issue.
   ///
