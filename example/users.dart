@@ -18,7 +18,7 @@ void loadUsers() {
     github.users.getUser(baseUser.login).then((user) {
       final userDiv = DivElement();
 
-      for (int i = 1; i <= 2; i++) {
+      for (var i = 1; i <= 2; i++) {
         userDiv.append(BRElement());
       }
 

@@ -80,10 +80,7 @@ class GitHub {
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity {
-    if (_activity == null) {
-      _activity = ActivityService(this);
-    }
-    return _activity;
+    return _activity ??= ActivityService(this);
   }
 
   /// Service for autorizations related methods of the GitHub API.
@@ -91,90 +88,57 @@ class GitHub {
   /// Note: You can only access this API via Basic Authentication using your
   /// username and password, not tokens.
   AuthorizationsService get authorizations {
-    if (_authorizations == null) {
-      _authorizations = AuthorizationsService(this);
-    }
-    return _authorizations;
+    return _authorizations ??= AuthorizationsService(this);
   }
 
   /// Service for gist related methods of the GitHub API.
   GistsService get gists {
-    if (_gists == null) {
-      _gists = GistsService(this);
-    }
-    return _gists;
+    return _gists ??= GistsService(this);
   }
 
   /// Service for git data related methods of the GitHub API.
   GitService get git {
-    if (_git == null) {
-      _git = GitService(this);
-    }
-    return _git;
+    return _git ??= GitService(this);
   }
 
   /// Service for issues related methods of the GitHub API.
   IssuesService get issues {
-    if (_issues == null) {
-      _issues = IssuesService(this);
-    }
-    return _issues;
+    return _issues ??= IssuesService(this);
   }
 
   /// Service for misc related methods of the GitHub API.
   MiscService get misc {
-    if (_misc == null) {
-      _misc = MiscService(this);
-    }
-    return _misc;
+    return _misc ??= MiscService(this);
   }
 
   /// Service for organization related methods of the GitHub API.
   OrganizationsService get organizations {
-    if (_organizations == null) {
-      _organizations = OrganizationsService(this);
-    }
-    return _organizations;
+    return _organizations ??= OrganizationsService(this);
   }
 
   /// Service for pull requests related methods of the GitHub API.
   PullRequestsService get pullRequests {
-    if (_pullRequests == null) {
-      _pullRequests = PullRequestsService(this);
-    }
-    return _pullRequests;
+    return _pullRequests ??= PullRequestsService(this);
   }
 
   /// Service for repository related methods of the GitHub API.
   RepositoriesService get repositories {
-    if (_repositories == null) {
-      _repositories = RepositoriesService(this);
-    }
-    return _repositories;
+    return _repositories ??= RepositoriesService(this);
   }
 
   /// Service for search related methods of the GitHub API.
   SearchService get search {
-    if (_search == null) {
-      _search = SearchService(this);
-    }
-    return _search;
+    return _search ??= SearchService(this);
   }
 
   /// Service to provide a handy method to access GitHub's url shortener.
   UrlShortenerService get urlShortener {
-    if (_urlShortener == null) {
-      _urlShortener = UrlShortenerService(this);
-    }
-    return _urlShortener;
+    return _urlShortener ??= UrlShortenerService(this);
   }
 
   /// Service for user related methods of the GitHub API.
   UsersService get users {
-    if (_users == null) {
-      _users = UsersService(this);
-    }
-    return _users;
+    return _users ??= UsersService(this);
   }
 
   /// Handles Get Requests that respond with JSON
@@ -192,7 +156,7 @@ class GitHub {
   /// The default [convert] function returns the input object.
   Future<T> getJSON<S, T>(String path,
           {int statusCode,
-          void fail(http.Response response),
+          void Function(http.Response response) fail,
           Map<String, String> headers,
           Map<String, String> params,
           JSONConverter<S, T> convert,
@@ -228,7 +192,7 @@ class GitHub {
   Future<T> postJSON<S, T>(
     String path, {
     int statusCode,
-    void fail(http.Response response),
+    void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, String> params,
     JSONConverter<S, T> convert,
@@ -251,7 +215,7 @@ class GitHub {
     String method,
     String path, {
     int statusCode,
-    void fail(http.Response response),
+    void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, String> params,
     JSONConverter<S, T> convert,
@@ -304,7 +268,7 @@ class GitHub {
     Map<String, dynamic> params,
     dynamic body,
     int statusCode,
-    void fail(http.Response response),
+    void Function(http.Response response) fail,
     String preview,
   }) async {
     if (rateLimitRemaining != null && rateLimitRemaining <= 0) {
@@ -314,7 +278,7 @@ class GitHub {
       await Future.delayed(waitTime);
     }
 
-    if (headers == null) headers = {};
+    headers ??= {};
 
     if (preview != null) {
       headers['Accept'] = preview;
@@ -412,7 +376,7 @@ class GitHub {
         buff.writeln('  Message: $message');
         if (errors != null) {
           buff.writeln('  Errors:');
-          for (final Map<String, String> error in errors) {
+          for (final error in errors) {
             final resource = error['resource'];
             final field = error['field'];
             final code = error['code'];

@@ -17,10 +17,10 @@ class PaginationHelper {
       Map<String, dynamic> params,
       String body,
       int statusCode = 200}) async* {
-    int count = 0;
-    const Duration serverErrorBackOff = Duration(seconds: 10);
-    const int maxServerErrors = 10;
-    int serverErrors = 0;
+    var count = 0;
+    const serverErrorBackOff = Duration(seconds: 10);
+    const maxServerErrors = 10;
+    var serverErrors = 0;
 
     if (params == null) {
       params = {};
@@ -89,7 +89,7 @@ class PaginationHelper {
     int statusCode = 200,
     String preview,
   }) async* {
-    if (headers == null) headers = {};
+    headers ??= {};
     if (preview != null) {
       headers['Accept'] = preview;
     }
@@ -137,9 +137,9 @@ Map<String, String> parseLinkHeader(String input) {
       throw const FormatException('Invalid Link Header');
     }
     final kv = part.split('; ');
-    String url = kv[0].substring(1);
+    var url = kv[0].substring(1);
     url = url.substring(0, url.length - 1);
-    String key = kv[1];
+    var key = kv[1];
     key = key.replaceAll('"', '').substring(4);
     out[key] = url;
   }

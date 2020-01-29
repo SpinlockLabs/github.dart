@@ -42,7 +42,7 @@ List<Repository> _reposCache;
 
 void updateRepos(
   List<Repository> repos, [
-  int compare(Repository a, Repository b),
+  int Function(Repository a, Repository b) compare,
 ]) {
   document.querySelector('#repos').children.clear();
   repos.sort(compare);
@@ -69,7 +69,7 @@ void updateRepos(
   }
 }
 
-void loadRepos([int compare(Repository a, Repository b)]) {
+void loadRepos([int Function(Repository a, Repository b) compare]) {
   final title = querySelector('#title');
   if (title.text.contains('(')) {
     title.replaceWith(HeadingElement.h2()
@@ -90,9 +90,7 @@ void loadRepos([int compare(Repository a, Repository b)]) {
     }
   }
 
-  if (compare == null) {
-    compare = (a, b) => a.name.compareTo(b.name);
-  }
+  compare ??= (a, b) => a.name.compareTo(b.name);
 
   github.repositories.listUserRepositories(user).toList().then((repos) {
     _reposCache = repos;

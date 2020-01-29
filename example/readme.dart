@@ -12,7 +12,7 @@ Future<void> main() async {
   readmeDiv = querySelector('#readme');
   var repo = RepositorySlug('SpinlockLabs', 'github.dart');
   final readme = await github.repositories.getReadme(repo);
-  String markdown = readme.content;
+  var markdown = readme.content;
   if (readme.encoding == 'base64') {
     markdown = String.fromCharCodes(base64.decode(markdown));
   }

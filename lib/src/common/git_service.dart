@@ -61,7 +61,7 @@ class GitService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#get-all-references
   Stream<GitReference> listReferences(RepositorySlug slug, {String type}) {
-    String path = '/repos/${slug.fullName}/git/refs';
+    var path = '/repos/${slug.fullName}/git/refs';
     if (type != null) {
       path += '/$type';
     }
@@ -93,7 +93,7 @@ class GitService extends Service {
     String sha, {
     bool force = false,
   }) {
-    final String body = jsonEncode({'sha': sha, 'force': force});
+    final body = jsonEncode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
     final headers = {'content-length': body.length.toString()};
 

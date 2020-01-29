@@ -23,7 +23,7 @@ class SearchService extends Service {
 
     final controller = StreamController<Repository>();
 
-    bool isFirst = true;
+    var isFirst = true;
 
     PaginationHelper(github)
         .fetchStreamed('GET', '/search/repositories',
@@ -95,7 +95,7 @@ class SearchService extends Service {
     query += _searchQualifier('size', size);
 
     // build up the in: qualifier based on the 2 booleans
-    String _in = '';
+    var _in = '';
     if (inFile) {
       _in = 'file';
     }
