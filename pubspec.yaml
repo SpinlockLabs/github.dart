@@ -1,5 +1,5 @@
 name: github
-version: 6.0.5
+version: 6.0.6
 description: A high-level GitHub API Client Library that uses Github's v3 API
 homepage: https://github.com/SpinlockLabs/github.dart
 

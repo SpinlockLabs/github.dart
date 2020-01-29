@@ -1,3 +1,6 @@
+## 6.0.6
+ - Clean up lints https://github.com/SpinlockLabs/github.dart/pull/202
+
 ## 6.0.5
  - Fix null errors issue https://github.com/SpinlockLabs/github.dart/issues/199 
 
