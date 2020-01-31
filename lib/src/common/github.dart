@@ -352,7 +352,13 @@ class GitHub {
       final json = jsonDecode(response.body);
       message = json['message'];
       if (json['errors'] != null) {
-        errors = List<Map<String, String>>.from(json['errors']);
+        try {
+          errors = List<Map<String, String>>.from(json['errors']);
+        } catch (_) {
+          errors = [
+            {'code': json['errors'].toString()}
+          ];
+        }
       }
     }
     switch (response.statusCode) {

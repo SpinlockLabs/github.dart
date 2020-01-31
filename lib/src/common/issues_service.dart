@@ -130,18 +130,28 @@ class IssuesService extends Service {
     );
   }
 
+  /// Gets a stream of [Reaction]s for an issue.
+  /// The optional content param let's you filter the request for only reactions
+  /// of that type.
+  /// WARNING: ReactionType.plusOne and ReactionType.minusOne currently do not
+  /// work and will throw an exception is used. All others without + or - signs
+  /// work fine to filter.
+  ///
   /// This API is currently in preview. It may break.
   ///
   /// See https://developer.github.com/v3/reactions/
-  Stream<Reaction> listReactions(RepositorySlug slug, int issueNumber) =>
-      PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions',
-        (i) => Reaction.fromJson(i),
-        headers: {
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
-      );
+  Stream<Reaction> listReactions(RepositorySlug slug, int issueNumber,
+      {ReactionType content}) {
+    var query = content != null ? '?content=${content.content}' : '';
+    return PaginationHelper(github).objects(
+      'GET',
+      '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions$query',
+      (i) => Reaction.fromJson(i),
+      headers: {
+        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      },
+    );
+  }
 
   /// Edit an issue.
   ///
