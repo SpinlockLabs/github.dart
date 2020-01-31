@@ -1140,8 +1140,8 @@ class RepositoriesService extends Service {
   ) async {
     ArgumentError.checkNotNull(slug);
     final path = '/repos/${slug.fullName}/stats/contributors';
-    final response = await github.request('GET', path,
-        headers: {'Accept': 'application/vnd.github.v3+json'});
+    final response =
+        await github.request('GET', path, headers: {'Accept': v3ApiMimeType});
 
     if (response.statusCode == StatusCodes.OK) {
       return (jsonDecode(response.body) as List)

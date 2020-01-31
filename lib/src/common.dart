@@ -17,6 +17,7 @@ export 'package:github/src/common/model/misc.dart';
 export 'package:github/src/common/model/notifications.dart';
 export 'package:github/src/common/model/orgs.dart';
 export 'package:github/src/common/model/pulls.dart';
+export 'package:github/src/common/model/reaction.dart';
 export 'package:github/src/common/model/repos.dart';
 export 'package:github/src/common/model/repos_commits.dart';
 export 'package:github/src/common/model/repos_contents.dart';

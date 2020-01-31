@@ -4,6 +4,7 @@ import 'dart:convert' show jsonDecode;
 import 'package:http/http.dart' as http;
 
 import '../../common.dart';
+import '../../util.dart';
 
 /// Internal Helper for dealing with GitHub Pagination.
 class PaginationHelper {
@@ -93,7 +94,7 @@ class PaginationHelper {
     if (preview != null) {
       headers['Accept'] = preview;
     }
-    headers.putIfAbsent('Accept', () => 'application/vnd.github.v3+json');
+    headers.putIfAbsent('Accept', () => v3ApiMimeType);
 
     await for (final response in fetchStreamed(method, path,
         pages: pages,
