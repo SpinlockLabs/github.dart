@@ -133,15 +133,18 @@ class IssuesService extends Service {
   /// This API is currently in preview. It may break.
   ///
   /// See https://developer.github.com/v3/reactions/
-  Stream<Reaction> listReactions(RepositorySlug slug, int issueNumber) =>
-      PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions',
-        (i) => Reaction.fromJson(i),
-        headers: {
-          'Accept': 'application/vnd.github.squirrel-girl-preview+json',
-        },
-      );
+  Stream<Reaction> listReactions(RepositorySlug slug, int issueNumber,
+      {ReactionType content}) {
+    var query = content != null ? '?content=${content.content}' : '';
+    return PaginationHelper(github).objects(
+      'GET',
+      '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions$query',
+      (i) => Reaction.fromJson(i),
+      headers: {
+        'Accept': 'application/vnd.github.squirrel-girl-preview+json',
+      },
+    );
+  }
 
   /// Edit an issue.
   ///
