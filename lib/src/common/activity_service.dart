@@ -153,7 +153,9 @@ class ActivityService extends Service {
   Future<bool> markNotificationsRead({DateTime lastRead}) {
     final data = {};
 
-    if (lastRead != null) data['last_read_at'] = lastRead.toIso8601String();
+    if (lastRead != null) {
+      data['last_read_at'] = lastRead.toIso8601String();
+    }
 
     return github
         .request('PUT', '/notifications', body: jsonEncode(data))
@@ -172,7 +174,9 @@ class ActivityService extends Service {
   }) {
     final data = {};
 
-    if (lastRead != null) data['last_read_at'] = lastRead.toIso8601String();
+    if (lastRead != null) {
+      data['last_read_at'] = lastRead.toIso8601String();
+    }
 
     return github
         .request('PUT', '/repos/${slug.fullName}/notifications',
@@ -339,7 +343,9 @@ class EventPoller {
       throw Exception('Polling already started.');
     }
 
-    if (after != null) after = after.toUtc();
+    if (after != null) {
+      after = after.toUtc();
+    }
 
     _controller = StreamController<Event>();
 

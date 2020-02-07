@@ -78,7 +78,9 @@ Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
 // TODO: only used in test – delete?
 int parseFancyNumber(String input) {
   input = input.trim();
-  if (input.contains(',')) input = input.replaceAll(',', '');
+  if (input.contains(',')) {
+    input = input.replaceAll(',', '');
+  }
 
   const multipliers = {'h': 100, 'k': 1000, 'ht': 100000, 'm': 1000000};
   int value;
