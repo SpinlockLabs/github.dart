@@ -17,6 +17,7 @@ GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) {
     sha: json['sha'] as String,
     htmlUrl: json['html_url'] as String,
     gitUrl: json['git_url'] as String,
+    downloadUrl: json['download_url'] as String,
     links: json['_links'] == null
         ? null
         : Links.fromJson(json['_links'] as Map<String, dynamic>),
@@ -38,6 +39,7 @@ Map<String, dynamic> _$GitHubFileToJson(GitHubFile instance) =>
       'sha': instance.sha,
       'html_url': instance.htmlUrl,
       'git_url': instance.gitUrl,
+      'download_url': instance.downloadUrl,
       '_links': instance.links,
       'sourceRepository': instance.sourceRepository,
     };

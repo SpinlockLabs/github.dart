@@ -18,6 +18,7 @@ class GitHubFile {
     this.sha,
     this.htmlUrl,
     this.gitUrl,
+    this.downloadUrl,
     this.links,
     this.sourceRepository,
   });
@@ -50,6 +51,10 @@ class GitHubFile {
   /// Git Url
   @JsonKey(name: 'git_url')
   String gitUrl;
+
+  /// Download Url
+  @JsonKey(name: 'download_url')
+  String downloadUrl;
 
   /// Links
   @JsonKey(name: '_links')
