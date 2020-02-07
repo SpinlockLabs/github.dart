@@ -297,12 +297,18 @@ class RepositoriesService extends Service {
         '/repos/${slug.fullName}/collaborators/$user',
         statusCode: StatusCodes.NO_CONTENT,
         fail: (response) {
-          if (response.statusCode == StatusCodes.NOT_FOUND) catchError = true;
+          if (response.statusCode == StatusCodes.NOT_FOUND) {
+            catchError = true;
+          }
         },
       );
-      if (response.statusCode == StatusCodes.NO_CONTENT) return true;
+      if (response.statusCode == StatusCodes.NO_CONTENT) {
+        return true;
+      }
     } catch (e) {
-      if (!catchError) rethrow;
+      if (!catchError) {
+        rethrow;
+      }
     }
     return false;
   }

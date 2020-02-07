@@ -17,7 +17,9 @@ Authentication findAuthenticationFromEnvironment() {
 /// Parse the query string to a parameter `Map`
 Map<String, String> _parseQuery(String path) {
   final params = <String, String>{};
-  if (!path.contains('?')) return params;
+  if (!path.contains('?')) {
+    return params;
+  }
   final queryStr = path.substring(path.indexOf('?') + 1);
   queryStr.split('&').forEach((String keyValPair) {
     final keyVal = _parseKeyVal(keyValPair);
