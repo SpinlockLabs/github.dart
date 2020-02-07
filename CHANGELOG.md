@@ -1,3 +1,7 @@
+## 6.1.1
+ - Use pedantic and address some lint https://github.com/SpinlockLabs/github.dart/pull/205
+ - Add missing download url for repos contents https://github.com/SpinlockLabs/github.dart/pull/206
+
 ## 6.1.0
  - Add (experimental) `listReactions` method to `IssueService`.
 
