@@ -23,7 +23,7 @@ Future main() async {
 
   for (var language in languages) {
     final color =
-        map[language]['color']?.toString()?.toUpperCase() ?? '#000000';
+        map[language]['color']?.toString()?.toUpperCase() ?? '#ededed';
 
     language = language.replaceAll("'", "\\'");
 
