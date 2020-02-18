@@ -14,6 +14,8 @@ class Notification {
     this.unread,
     this.updatedAt,
     this.lastReadAt,
+    this.url,
+    this.subscriptionUrl,
   });
   final String id;
   final Repository repository;
@@ -27,6 +29,11 @@ class Notification {
   @JsonKey(name: 'last_read_at')
   final DateTime lastReadAt;
 
+  final String url;
+
+  @JsonKey(name: 'subscription_url')
+  final String subscriptionUrl;
+
   factory Notification.fromJson(Map<String, dynamic> input) =>
       _$NotificationFromJson(input);
 }
@@ -34,9 +41,13 @@ class Notification {
 /// Model class for a notification subject.
 @JsonSerializable(createToJson: false)
 class NotificationSubject {
-  NotificationSubject({this.title, this.type});
+  NotificationSubject({this.title, this.type, this.url, this.latestCommentUrl});
   final String title;
   final String type;
+  final String url;
+
+  @JsonKey(name: 'latest_comment_url')
+  final String latestCommentUrl;
 
   factory NotificationSubject.fromJson(Map<String, dynamic> input) =>
       _$NotificationSubjectFromJson(input);
