@@ -23,6 +23,8 @@ Notification _$NotificationFromJson(Map<String, dynamic> json) {
     lastReadAt: json['last_read_at'] == null
         ? null
         : DateTime.parse(json['last_read_at'] as String),
+    url: json['url'] as String,
+    subscriptionUrl: json['subscription_url'] as String,
   );
 }
 
@@ -30,5 +32,7 @@ NotificationSubject _$NotificationSubjectFromJson(Map<String, dynamic> json) {
   return NotificationSubject(
     title: json['title'] as String,
     type: json['type'] as String,
+    url: json['url'] as String,
+    latestCommentUrl: json['latest_comment_url'] as String,
   );
 }
