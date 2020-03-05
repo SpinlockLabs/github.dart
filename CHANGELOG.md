@@ -1,3 +1,7 @@
+## 6.1.3
+ - Add missing fields for Notification https://github.com/SpinlockLabs/github.dart/pull/210
+ - Can now create draft PRs https://github.com/SpinlockLabs/github.dart/pull/212
+
 ## 6.1.2
  - Update default language color to match github https://github.com/SpinlockLabs/github.dart/pull/208
 
