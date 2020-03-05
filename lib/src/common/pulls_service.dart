@@ -49,8 +49,14 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/#create-a-pull-request
   Future<PullRequest> create(RepositorySlug slug, CreatePullRequest request) {
-    return github.postJSON('/repos/${slug.fullName}/pulls',
-        convert: (i) => PullRequest.fromJson(i), body: jsonEncode(request));
+    return github.postJSON(
+      '/repos/${slug.fullName}/pulls',
+      convert: (i) => PullRequest.fromJson(i),
+      body: jsonEncode(request),
+      preview: request.draft
+          ? 'application/vnd.github.shadow-cat-preview+json'
+          : null,
+    );
   }
 
   /// Edit a pull request.

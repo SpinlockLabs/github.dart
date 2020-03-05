@@ -129,6 +129,7 @@ CreatePullRequest _$CreatePullRequestFromJson(Map<String, dynamic> json) {
     json['title'] as String,
     json['head'] as String,
     json['base'] as String,
+    draft: json['draft'] as bool,
     body: json['body'] as String,
   );
 }
@@ -138,6 +139,7 @@ Map<String, dynamic> _$CreatePullRequestToJson(CreatePullRequest instance) =>
       'title': instance.title,
       'head': instance.head,
       'base': instance.base,
+      'draft': instance.draft,
       'body': instance.body,
     };
 
