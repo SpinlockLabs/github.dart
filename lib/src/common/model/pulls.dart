@@ -1,6 +1,7 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:meta/meta.dart';
 
 part 'pulls.g.dart';
 
@@ -159,11 +160,20 @@ class PullRequestHead {
 /// Model class for a pull request to be created.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CreatePullRequest {
-  CreatePullRequest(this.title, this.head, this.base, {this.body});
+  CreatePullRequest(this.title, this.head, this.base,
+      {this.draft = false, this.body});
 
   final String title;
   final String head;
   final String base;
+
+  /// Whether a draft PR should be created.
+  ///
+  /// This is currently experimental functionality since the way draft PRs are
+  /// created through Github's REST API is in developer preview only - and could change at any time.
+  @experimental
+  final bool draft;
+
   String body;
 
   factory CreatePullRequest.fromJson(Map<String, dynamic> input) =>
