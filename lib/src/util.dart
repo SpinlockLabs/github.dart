@@ -65,11 +65,16 @@ DateTime parseDateTime(String input) {
   return DateTime.parse(input);
 }
 
-Map<K, V> createNonNullMap<K, V>(Map<K, V> input) {
+/// Returns a new map containing only the entries of [input] whose value is not null.
+///
+/// If [recursive] is true, nested maps are also filtered.
+Map<K, V> createNonNullMap<K, V>(Map<K, V> input, {bool recursive = true}) {
   final map = <K, V>{};
-  for (final key in input.keys) {
-    if (input[key] != null) {
-      map[key] = input[key];
+  for (final entry in input.entries) {
+    if (entry.value != null) {
+      map[entry.key] = recursive && entry.value is Map
+          ? createNonNullMap(entry.value as Map, recursive: recursive)
+          : entry.value;
     }
   }
   return map;
