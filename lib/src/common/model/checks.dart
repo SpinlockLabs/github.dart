@@ -63,7 +63,25 @@ class CheckRunConclusion extends _EnumWithValue {
   static const cancelled = CheckRunConclusion._('cancelled');
   static const timedOut = CheckRunConclusion._('timed_out');
   static const actionRequired = CheckRunConclusion._('action_required');
+
   const CheckRunConclusion._(String value) : super._(value);
+
+  factory CheckRunConclusion._fromValue(String value) {
+    for (final level in const [
+      success,
+      failure,
+      neutral,
+      cancelled,
+      timedOut,
+      actionRequired
+    ]) {
+      if (level._jsonValue == value) {
+        return level;
+      }
+    }
+    throw Exception(
+        'This level of check run conclusion is unimplemented: $value.');
+  }
 }
 
 class CheckRunStatus extends _EnumWithValue {
@@ -336,4 +354,54 @@ class CheckRunAction {
       'identifier': identifier,
     });
   }
+}
+
+@immutable
+class CheckSuite {
+  final int id;
+  final String headSha;
+  final CheckRunConclusion conclusion;
+
+  const CheckSuite({
+    @required this.conclusion,
+    @required this.headSha,
+    @required this.id,
+  });
+
+  factory CheckSuite.fromJson(Map<String, dynamic> input) {
+    if (input == null) {
+      return null;
+    }
+    return CheckSuite(
+      conclusion: CheckRunConclusion._fromValue(input['conclusion']),
+      headSha: input['head_sha'],
+      id: input['id'],
+    );
+  }
+}
+
+@immutable
+class AutoTriggerChecks {
+  /// The id of the GitHub App.
+  final int appId;
+
+  /// Set to true to enable automatic creation of CheckSuite events upon pushes to the repository, or false to disable them.
+  final bool setting;
+
+  const AutoTriggerChecks({
+    @required this.appId,
+    this.setting = true,
+  }) : assert(appId != null);
+
+  factory AutoTriggerChecks.fromJson(Map<String, dynamic> input) {
+    if (input == null) {
+      return null;
+    }
+    return AutoTriggerChecks(
+      appId: input['app_id'],
+      setting: input['setting'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'app_id': appId, 'setting': setting};
 }

@@ -13,16 +13,21 @@ class ChecksService extends Service {
   /// Methods to interact with Check Runs.
   ///
   /// API docs: https://developer.github.com/v3/checks/runs/
-  final CheckRunsService checkRuns;
-  ChecksService(GitHub github)
-      : checkRuns = CheckRunsService._(github),
-        super(github);
+  final _CheckRunsService checkRuns;
 
-  // TODO: implement Check Suites methods https://developer.github.com/v3/checks/suites/
+  /// Methods to interact with Check Suites.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/
+  final _CheckSuitesService checkSuites;
+
+  ChecksService(GitHub github)
+      : checkRuns = _CheckRunsService._(github),
+        checkSuites = _CheckSuitesService._(github),
+        super(github);
 }
 
-class CheckRunsService extends Service {
-  CheckRunsService._(GitHub github) : super(github);
+class _CheckRunsService extends Service {
+  _CheckRunsService._(GitHub github) : super(github);
 
   /// Creates a new check run for a specific commit in a repository.
   /// Your GitHub App must have the `checks:write` permission to create check runs.
@@ -226,6 +231,122 @@ class CheckRunsService extends Service {
       '/repos/${slug.fullName}/check-runs/${checkRun.id}/annotations',
       (i) => CheckRunAnnotation.fromJSON(i),
       statusCode: StatusCodes.OK,
+      preview: _previewHeader,
+    );
+  }
+}
+
+class _CheckSuitesService extends Service {
+  _CheckSuitesService._(GitHub github) : super(github);
+
+  /// Gets a single check suite using its `id`.
+  /// GitHub Apps must have the `checks:read` permission on a private repository or pull access to a public repository to get check suites.
+  /// OAuth Apps and authenticated users must have the `repo` scope to get check suites in a private repository.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/#get-a-single-check-suite
+  Future<CheckSuite> getCheckSuite(
+    RepositorySlug slug, {
+    @required int checkSuiteId,
+  }) async {
+    ArgumentError.checkNotNull(checkSuiteId);
+    return github.requestJson(
+      'GET',
+      'repos/$slug/check-suites/$checkSuiteId',
+      convert: (input) => CheckSuite.fromJson(input),
+      preview: _previewHeader,
+      statusCode: StatusCodes.OK,
+    );
+  }
+
+  /// Lists check suites for a commit `[ref]`.
+  /// The `[ref]` can be a SHA, branch name, or a tag name.
+  /// GitHub Apps must have the `checks:read` permission on a private repository or pull access to a public repository to list check suites.
+  /// OAuth Apps and authenticated users must have the `repo` scope to get check suites in a private repository.
+  /// * [appId]: Filters check suites by GitHub App id.
+  /// * [checkName]: Filters checks suites by the name of the check run.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/#list-check-suites-for-a-specific-ref
+  Stream<CheckSuite> listCheckSuitesForRef(
+    RepositorySlug slug, {
+    @required String ref,
+    int appId,
+    String checkName,
+  }) {
+    ArgumentError.checkNotNull(ref);
+    return PaginationHelper(github).objects<Map<String, dynamic>, CheckSuite>(
+      'GET',
+      'repos/$slug/commits/$ref/check-suites',
+      (input) => CheckSuite.fromJson(input),
+      preview: _previewHeader,
+      params: createNonNullMap({
+        'app_id': appId,
+        'check_name': checkName,
+      }),
+      statusCode: StatusCodes.OK,
+      arrayKey: 'check_suites',
+    );
+  }
+
+  /// Changes the default automatic flow when creating check suites.
+  /// By default, the CheckSuiteEvent is automatically created each time code is pushed to a repository.
+  /// When you disable the automatic creation of check suites, you can manually [Create a check suite](https://developer.github.com/v3/checks/suites/#create-a-check-suite).
+  /// You must have admin permissions in the repository to set preferences for check suites.
+  /// * [autoTriggerChecks]: Enables or disables automatic creation of CheckSuite events upon pushes to the repository. Enabled by default.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/#update-repository-preferences-for-check-suites
+  Future<List<AutoTriggerChecks>> updatePreferencesForCheckSuites(
+    RepositorySlug slug, {
+    @required List<AutoTriggerChecks> autoTriggerChecks,
+  }) {
+    ArgumentError.checkNotNull(autoTriggerChecks);
+    return github.requestJson<Map<String, dynamic>, List<AutoTriggerChecks>>(
+      'PATCH',
+      'repos/$slug/check-suites/preferences',
+      statusCode: StatusCodes.OK,
+      preview: _previewHeader,
+      body: {'auto_trigger_checks': autoTriggerChecks},
+      convert: (input) => (input['preferences']['auto_trigger_checks'] as List)
+          .map((e) => AutoTriggerChecks.fromJson(e))
+          .toList(),
+    );
+  }
+
+  /// By default, check suites are automatically created when you create a [check run](https://developer.github.com/v3/checks/runs/).
+  /// You only need to use this endpoint for manually creating check suites when you've disabled automatic creation using "[Set preferences for check suites on a repository](https://developer.github.com/v3/checks/suites/#set-preferences-for-check-suites-on-a-repository)".
+  /// Your GitHub App must have the `checks:write` permission to create check suites.
+  /// * [headSha]: The sha of the head commit.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/#create-a-check-suite
+  Future<CheckSuite> createCheckSuite(
+    RepositorySlug slug, {
+    @required String headSha,
+  }) {
+    ArgumentError.checkNotNull(headSha);
+    return github.requestJson<Map<String, dynamic>, CheckSuite>(
+      'POST',
+      'repos/$slug/check-suites',
+      statusCode: StatusCodes.CREATED,
+      preview: _previewHeader,
+      params: {'head_sha': headSha},
+      convert: (input) => CheckSuite.fromJson(input),
+    );
+  }
+
+  /// Triggers GitHub to rerequest an existing check suite, without pushing new code to a repository.
+  /// This endpoint will trigger the [`check_suite` webhook](https://developer.github.com/v3/activity/events/types/#checksuiteevent) event with the action rerequested.
+  /// When a check suite is `rerequested`, its `status` is reset to `queued` and the `conclusion` is cleared.
+  /// To rerequest a check suite, your GitHub App must have the `checks:read` permission on a private repository or pull access to a public repository.
+  ///
+  /// API docs: https://developer.github.com/v3/checks/suites/#rerequest-check-suite
+  Future<void> reRequestCheckSuite(
+    RepositorySlug slug, {
+    @required int checkSuiteId,
+  }) {
+    ArgumentError.checkNotNull(checkSuiteId);
+    return github.request(
+      'POST',
+      'repos/$slug/check-suites/$checkSuiteId/rerequest',
+      statusCode: StatusCodes.CREATED,
       preview: _previewHeader,
     );
   }
