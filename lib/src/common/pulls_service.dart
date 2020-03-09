@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 
 /// The [PullRequestsService] handles communication with pull request
@@ -52,7 +53,7 @@ class PullRequestsService extends Service {
     return github.postJSON(
       '/repos/${slug.fullName}/pulls',
       convert: (i) => PullRequest.fromJson(i),
-      body: jsonEncode(request),
+      body: GitHubJson.encode(request),
       preview: request.draft
           ? 'application/vnd.github.shadow-cat-preview+json'
           : null,
@@ -72,7 +73,7 @@ class PullRequestsService extends Service {
 
     return github
         .request('POST', '/repos/${slug.fullName}/pulls/$number',
-            body: jsonEncode(map))
+            body: GitHubJson.encode(map))
         .then((response) {
       return PullRequest.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);
@@ -123,7 +124,7 @@ class PullRequestsService extends Service {
 
     return github
         .request('PUT', '/repos/${slug.fullName}/pulls/$number/merge',
-            body: jsonEncode(json))
+            body: GitHubJson.encode(json))
         .then((response) {
       return PullRequestMerge.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);
@@ -157,7 +158,7 @@ class PullRequestsService extends Service {
   Future<IssueComment> createComment(
       RepositorySlug slug, int number, CreatePullRequestComment comment) {
     return github.postJSON('/repos/${slug.fullName}/pulls/$number/comments',
-        body: jsonEncode(comment.toJson()),
+        body: GitHubJson.encode(comment.toJson()),
         convert: (i) => PullRequestComment.fromJson(i),
         statusCode: 201) as Future<IssueComment>;
   }

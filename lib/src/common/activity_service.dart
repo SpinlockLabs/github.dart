@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 
@@ -158,7 +159,7 @@ class ActivityService extends Service {
     }
 
     return github
-        .request('PUT', '/notifications', body: jsonEncode(data))
+        .request('PUT', '/notifications', body: GitHubJson.encode(data))
         .then((response) {
       return response.statusCode == 205;
     });
@@ -180,7 +181,7 @@ class ActivityService extends Service {
 
     return github
         .request('PUT', '/repos/${slug.fullName}/notifications',
-            body: jsonEncode(data))
+            body: GitHubJson.encode(data))
         .then((response) {
       return response.statusCode == 205;
     });
@@ -311,7 +312,7 @@ class ActivityService extends Service {
       '/repos/${slug.fullName}/subscription',
       statusCode: StatusCodes.OK,
       convert: (i) => RepositorySubscription.fromJson(i),
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
     );
   }
 

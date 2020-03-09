@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 
@@ -68,7 +69,7 @@ class OrganizationsService extends Service {
     return github.postJSON('/orgs/$org',
         statusCode: 200,
         convert: (i) => Organization.fromJson(i),
-        body: jsonEncode(map));
+        body: GitHubJson.encode(map));
   }
 
   /// Lists all of the teams for the specified organization.
@@ -103,7 +104,7 @@ class OrganizationsService extends Service {
     return github.postJSON('/orgs/$org/teams',
         statusCode: 201,
         convert: (i) => Team.fromJson(i),
-        body: jsonEncode(map));
+        body: GitHubJson.encode(map));
   }
 
   /// Edits a Team.
@@ -121,7 +122,7 @@ class OrganizationsService extends Service {
       '/teams/$teamId',
       statusCode: 200,
       convert: (i) => Team.fromJson(i),
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
     );
   }
 
@@ -259,7 +260,7 @@ class OrganizationsService extends Service {
   Future<Hook> createHook(String org, CreateHook hook) {
     return github.postJSON('/orgs/$org/hooks',
         convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
-        body: jsonEncode(hook));
+        body: GitHubJson.encode(hook));
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook

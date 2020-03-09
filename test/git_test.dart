@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:convert' show jsonEncode, jsonDecode;
+import 'dart:convert';
 
 import 'package:github/src/common.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
@@ -39,7 +40,7 @@ void main() {
         '/repos/o/n/git/blobs',
         convert: (i) => GitBlob.fromJson(i),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode(blob),
+        body: GitHubJson.encode(blob),
       ));
     });
 
@@ -71,7 +72,7 @@ void main() {
         '/repos/o/n/git/commits',
         convert: (i) => GitCommit.fromJson(i),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode(commit),
+        body: GitHubJson.encode(commit),
       ));
     });
 
@@ -119,7 +120,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/refs',
           convert: (i) => GitReference.fromJson(i),
           statusCode: StatusCodes.CREATED,
-          body: jsonEncode({'ref': someRef, 'sha': someSha})));
+          body: GitHubJson.encode({'ref': someRef, 'sha': someSha})));
     });
 
     test('creates valid JSON body', () {
@@ -206,7 +207,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/tags',
           convert: (i) => GitTag.fromJson(i),
           statusCode: StatusCodes.CREATED,
-          body: jsonEncode(createGitTag)));
+          body: GitHubJson.encode(createGitTag)));
     });
 
     test('creates valid JSON body', () {
@@ -247,7 +248,7 @@ void main() {
       verify(github.postJSON('/repos/o/n/git/trees',
           convert: (j) => GitTree.fromJson(j),
           statusCode: StatusCodes.CREATED,
-          body: jsonEncode(createGitTree)));
+          body: GitHubJson.encode(createGitTree)));
     });
 
     test('with sha creates valid JSON body', () {

@@ -65,8 +65,8 @@ DateTime parseDateTime(String input) {
   return DateTime.parse(input);
 }
 
-Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
-  final map = <String, dynamic>{};
+Map<K, V> createNonNullMap<K, V>(Map<K, V> input) {
+  final map = <K, V>{};
   for (final key in input.keys) {
     if (input[key] != null) {
       map[key] = input[key];

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:github/src/json.dart';
 import 'package:test/test.dart';
 import 'package:github/github.dart';
 
@@ -41,4 +42,4 @@ void main() {
   });
 }
 
-String _prettyEncode(obj) => const JsonEncoder.withIndent(' ').convert(obj);
+String _prettyEncode(obj) => GitHubJson.encode(obj, indent: ' ');
