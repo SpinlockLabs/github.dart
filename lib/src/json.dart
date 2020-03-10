@@ -19,10 +19,22 @@ class GitHubJson {
       object = createNonNullMap(object as Map, recursive: true);
     }
     if (object is List) {
-      object = (object as List)
-          .map((e) => e is Map ? createNonNullMap(e, recursive: true) : e)
-          .toList();
+      object = _parseList(object as List);
     }
     return encoder.convert(object);
+  }
+
+  /// Maps maps in input to non-null maps.
+  /// Also checks nested lists.
+  static List _parseList(List input) {
+    return input.map((e) {
+      if (e is Map) {
+        return createNonNullMap(e, recursive: true);
+      }
+      if (e is List) {
+        return _parseList(e);
+      }
+      return e;
+    }).toList();
   }
 }
