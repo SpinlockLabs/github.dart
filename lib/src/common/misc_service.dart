@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/json.dart';
 

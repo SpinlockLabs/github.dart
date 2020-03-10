@@ -16,7 +16,12 @@ class GitHubJson {
   static String encode(Object object, {String indent}) {
     final encoder = JsonEncoder.withIndent(indent, _toEncodable);
     if (object is Map) {
-      object = createNonNullMap(object);
+      object = createNonNullMap(object as Map, recursive: true);
+    }
+    if (object is List) {
+      object = (object as List)
+          .map((e) => e is Map ? createNonNullMap(e, recursive: true) : e)
+          .toList();
     }
     return encoder.convert(object);
   }
