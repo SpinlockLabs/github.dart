@@ -10,31 +10,21 @@ class GitHubJson {
     if (object is DateTime) {
       return dateToGitHubIso8601(object);
     }
-    return object.toJson();
+    return _checkObject(object.toJson());
   }
 
   static String encode(Object object, {String indent}) {
     final encoder = JsonEncoder.withIndent(indent, _toEncodable);
-    if (object is Map) {
-      object = createNonNullMap(object as Map, recursive: true);
-    }
-    if (object is List) {
-      object = _parseList(object as List);
-    }
-    return encoder.convert(object);
+    return encoder.convert(_checkObject(object));
   }
 
-  /// Maps maps in input to non-null maps.
-  /// Also checks nested lists.
-  static List _parseList(List input) {
-    return input.map((e) {
-      if (e is Map) {
-        return createNonNullMap(e, recursive: true);
-      }
-      if (e is List) {
-        return _parseList(e);
-      }
-      return e;
-    }).toList();
+  static dynamic _checkObject(dynamic object) {
+    if (object is Map) {
+      return createNonNullMap(object, recursive: true);
+    }
+    if (object is List) {
+      return object.map(_checkObject).toList();
+    }
+    return object;
   }
 }
