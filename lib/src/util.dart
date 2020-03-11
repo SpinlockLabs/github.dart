@@ -49,13 +49,6 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
   return out;
 }
 
-class MapEntry<K, V> {
-  final K key;
-  final V value;
-
-  MapEntry(this.key, this.value);
-}
-
 /// Internal method to handle null for parsing dates.
 DateTime parseDateTime(String input) {
   if (input == null) {
