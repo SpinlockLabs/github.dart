@@ -303,16 +303,17 @@ class ActivityService extends Service {
     RepositorySlug slug, {
     bool subscribed,
     bool ignored,
-  }) {
+  }) async {
     final map =
         createNonNullMap({'subscribed': subscribed, 'ignored': ignored});
-
-    return github.postJSON(
+    final response = await github.request(
+      'PUT',
       '/repos/${slug.fullName}/subscription',
       statusCode: StatusCodes.OK,
-      convert: (i) => RepositorySubscription.fromJson(i),
       body: jsonEncode(map),
     );
+    return RepositorySubscription.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   /// Deletes a Repository Subscription
