@@ -125,9 +125,11 @@ class UsersService extends Service {
       });
 
   /// Follows a user.
+  ///
+  /// https://developer.github.com/v3/users/followers/#follow-a-user
   Future<bool> followUser(String user) {
     return github
-        .request('POST', '/user/following/$user', statusCode: 204)
+        .request('PUT', '/user/following/$user', statusCode: 204)
         .then((response) {
       return response.statusCode == 204;
     });
