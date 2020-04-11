@@ -38,7 +38,7 @@ class RepositoriesService extends Service {
 
   /// Lists the repositories of the user specified by [user] in a streamed fashion.
   ///
-  /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
+  /// API docs: https://developer.github.com/v3/repos/#list-repositories-for-a-user
   Stream<Repository> listUserRepositories(String user,
       {String type = 'owner',
       String sort = 'full_name',
@@ -60,7 +60,7 @@ class RepositoriesService extends Service {
 
   /// List repositories for the specified [org].
   ///
-  /// API docs: https://developer.github.com/v3/repos/#list-user-repositories
+  /// API docs: https://developer.github.com/v3/repos/#list-organization-repositories
   Stream<Repository> listOrganizationRepositories(String org,
       {String type = 'all'}) {
     ArgumentError.checkNotNull(org);
