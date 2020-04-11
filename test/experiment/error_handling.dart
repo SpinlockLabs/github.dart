@@ -1,14 +1,14 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:github/github.dart';
+import 'package:github/src/json.dart';
 
 import '../helper/http.dart';
 
 void main() {
   final github = GitHub();
   final response = MockResponse(
-    jsonEncode(<String, dynamic>{
+    GitHubJson.encode(<String, dynamic>{
       'message': 'Invalid Entity',
       'errors': [
         {

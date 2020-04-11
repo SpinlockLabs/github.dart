@@ -49,13 +49,6 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
   return out;
 }
 
-class MapEntry<K, V> {
-  final K key;
-  final V value;
-
-  MapEntry(this.key, this.value);
-}
-
 /// Internal method to handle null for parsing dates.
 DateTime parseDateTime(String input) {
   if (input == null) {
@@ -65,11 +58,16 @@ DateTime parseDateTime(String input) {
   return DateTime.parse(input);
 }
 
-Map<String, dynamic> createNonNullMap(Map<String, dynamic> input) {
-  final map = <String, dynamic>{};
-  for (final key in input.keys) {
-    if (input[key] != null) {
-      map[key] = input[key];
+/// Returns a new map containing only the entries of [input] whose value is not null.
+///
+/// If [recursive] is true, nested maps are also filtered.
+Map<K, V> createNonNullMap<K, V>(Map<K, V> input, {bool recursive = true}) {
+  final map = <K, V>{};
+  for (final entry in input.entries) {
+    if (entry.value != null) {
+      map[entry.key] = recursive && entry.value is Map
+          ? createNonNullMap(entry.value as Map, recursive: recursive)
+          : entry.value;
     }
   }
   return map;

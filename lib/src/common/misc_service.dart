@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:github/src/common.dart';
+import 'package:github/src/json.dart';
 
 /// The [MiscService] handles communication with misc related methods of the
 /// GitHub API.
@@ -47,7 +47,8 @@ class MiscService extends Service {
       {String mode = 'markdown', String context}) {
     return github
         .request('POST', '/markdown',
-            body: jsonEncode({'text': input, 'mode': mode, 'context': context}))
+            body: GitHubJson.encode(
+                {'text': input, 'mode': mode, 'context': context}))
         .then((response) {
       return response.body;
     });

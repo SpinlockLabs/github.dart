@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:github/src/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../common.dart';
 
@@ -32,7 +33,7 @@ class HookMiddleware {
           request.headers.value('X-GitHub-Event'),
           jsonDecode(content) as Map<String, dynamic>));
       request.response
-        ..write(jsonEncode({'handled': _eventController.hasListener}))
+        ..write(GitHubJson.encode({'handled': _eventController.hasListener}))
         ..close();
     });
   }

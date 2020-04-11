@@ -4,6 +4,7 @@ import 'package:github/src/common.dart';
 import 'package:github/src/common/model/repos_releases.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
@@ -110,13 +111,13 @@ class RepositoriesService extends Service {
     if (org != null) {
       return github.postJSON<Map<String, dynamic>, TeamRepository>(
         '/orgs/$org/repos',
-        body: jsonEncode(repository),
+        body: GitHubJson.encode(repository),
         convert: (i) => TeamRepository.fromJson(i),
       );
     } else {
       return github.postJSON<Map<String, dynamic>, Repository>(
         '/user/repos',
-        body: jsonEncode(repository),
+        body: GitHubJson.encode(repository),
         convert: (i) => Repository.fromJson(i),
       );
     }
@@ -179,7 +180,7 @@ class RepositoriesService extends Service {
     });
     return github.postJSON(
       '/repos/${slug.fullName}',
-      body: jsonEncode(data),
+      body: GitHubJson.encode(data),
       statusCode: 200,
     );
   }
@@ -394,7 +395,7 @@ class RepositoriesService extends Service {
     });
     return github.postJSON<Map<String, dynamic>, CommitComment>(
       '/repos/${slug.fullName}/commits/${commit.sha}/comments',
-      body: jsonEncode(data),
+      body: GitHubJson.encode(data),
       statusCode: StatusCodes.CREATED,
       convert: (i) => CommitComment.fromJson(i),
     );
@@ -428,7 +429,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(body);
     return github.postJSON<Map<String, dynamic>, CommitComment>(
       '/repos/${slug.fullName}/comments/$id',
-      body: jsonEncode(createNonNullMap({'body': body})),
+      body: GitHubJson.encode(createNonNullMap({'body': body})),
       statusCode: StatusCodes.OK,
       convert: (i) => CommitComment.fromJson(i),
     );
@@ -596,7 +597,7 @@ class RepositoriesService extends Service {
     final response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/${file.path}',
-      body: jsonEncode(file),
+      body: GitHubJson.encode(file),
     );
     return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
@@ -619,7 +620,7 @@ class RepositoriesService extends Service {
     final response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/$path',
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
     );
     return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
@@ -637,7 +638,7 @@ class RepositoriesService extends Service {
     final response = await github.request(
       'DELETE',
       '/repos/${slug.fullName}/contents/$path',
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
       statusCode: StatusCodes.OK,
     );
     return ContentCreation.fromJson(
@@ -680,7 +681,7 @@ class RepositoriesService extends Service {
     fork ??= CreateFork();
     return github.postJSON<Map<String, dynamic>, Repository>(
       '/repos/${slug.fullName}/forks',
-      body: jsonEncode(fork),
+      body: GitHubJson.encode(fork),
       convert: (i) => Repository.fromJson(i),
     );
   }
@@ -718,7 +719,7 @@ class RepositoriesService extends Service {
     return github.postJSON<Map<String, dynamic>, Hook>(
       '/repos/${slug.fullName}/hooks',
       convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
-      body: jsonEncode(hook),
+      body: GitHubJson.encode(hook),
     );
   }
 
@@ -758,7 +759,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/hooks/${hookToEdit.id.toString()}',
       statusCode: StatusCodes.OK,
       convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
-      body: jsonEncode(createNonNullMap(<String, dynamic>{
+      body: GitHubJson.encode(createNonNullMap(<String, dynamic>{
         'active': active ?? hookToEdit.active,
         'events': events ?? hookToEdit.events,
         'add_events': addEvents,
@@ -854,7 +855,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(key);
     return github.postJSON<Map<String, dynamic>, PublicKey>(
       '/repos/${slug.fullName}/keys',
-      body: jsonEncode(key),
+      body: GitHubJson.encode(key),
       statusCode: StatusCodes.CREATED,
       convert: (i) => PublicKey.fromJson(i),
     );
@@ -884,7 +885,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(merge);
     return github.postJSON<Map<String, dynamic>, RepositoryCommit>(
       '/repos/${slug.fullName}/merges',
-      body: jsonEncode(merge),
+      body: GitHubJson.encode(merge),
       convert: (i) => RepositoryCommit.fromJson(i),
       statusCode: StatusCodes.CREATED,
     );
@@ -975,7 +976,7 @@ class RepositoriesService extends Service {
     final release = await github.postJSON<Map<String, dynamic>, Release>(
       '/repos/${slug.fullName}/releases',
       convert: (i) => Release.fromJson(i),
-      body: jsonEncode(createRelease.toJson()),
+      body: GitHubJson.encode(createRelease.toJson()),
     );
     if (release.hasErrors) {
       final alreadyExistsErrorCode = release.errors.firstWhere(
@@ -1020,7 +1021,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(releaseToEdit);
     return github.postJSON<Map<String, dynamic>, Release>(
       '/repos/${slug.fullName}/releases/${releaseToEdit.id.toString()}',
-      body: jsonEncode(createNonNullMap(<String, dynamic>{
+      body: GitHubJson.encode(createNonNullMap(<String, dynamic>{
         'tag_name': tagName ?? releaseToEdit.tagName,
         'target_commitish': targetCommitish ?? releaseToEdit.targetCommitish,
         'name': name ?? releaseToEdit.name,
@@ -1092,7 +1093,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/releases/assets/${assetToEdit.id}',
       statusCode: StatusCodes.OK,
       convert: (i) => ReleaseAsset.fromJson(i),
-      body: jsonEncode(createNonNullMap(<String, dynamic>{
+      body: GitHubJson.encode(createNonNullMap(<String, dynamic>{
         'name': name ?? assetToEdit.name,
         'label': label ?? assetToEdit.label,
       })),
@@ -1236,7 +1237,7 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(request);
     return github.postJSON<Map<String, dynamic>, RepositoryStatus>(
       '/repos/${slug.fullName}/statuses/$ref',
-      body: jsonEncode(request),
+      body: GitHubJson.encode(request),
       convert: (i) => RepositoryStatus.fromJson(i),
     );
   }

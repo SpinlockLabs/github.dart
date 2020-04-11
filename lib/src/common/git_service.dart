@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 
 /// The [GitService] handles communication with git related methods of the
 /// GitHub API.
@@ -24,7 +25,7 @@ class GitService extends Service {
     return github.postJSON('/repos/${slug.fullName}/git/blobs',
         convert: (i) => GitBlob.fromJson(i),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode(blob));
+        body: GitHubJson.encode(blob));
   }
 
   /// Fetches a commit from [slug] for a given [sha].
@@ -41,7 +42,7 @@ class GitService extends Service {
     return github.postJSON('/repos/${slug.fullName}/git/commits',
         convert: (i) => GitCommit.fromJson(i),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode(commit));
+        body: GitHubJson.encode(commit));
   }
 
   /// Fetches a reference from a repository for the given [ref].
@@ -81,7 +82,7 @@ class GitService extends Service {
     return github.postJSON('/repos/${slug.fullName}/git/refs',
         convert: (i) => GitReference.fromJson(i),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode({'ref': ref, 'sha': sha}));
+        body: GitHubJson.encode({'ref': ref, 'sha': sha}));
   }
 
   /// Updates a reference in a repository.
@@ -93,7 +94,7 @@ class GitService extends Service {
     String sha, {
     bool force = false,
   }) {
-    final body = jsonEncode({'sha': sha, 'force': force});
+    final body = GitHubJson.encode({'sha': sha, 'force': force});
     // Somehow the reference updates PATCH request needs a valid content-length.
     final headers = {'content-length': body.length.toString()};
 
@@ -129,7 +130,7 @@ class GitService extends Service {
       github.postJSON('/repos/${slug.fullName}/git/tags',
           convert: (i) => GitTag.fromJson(i),
           statusCode: StatusCodes.CREATED,
-          body: jsonEncode(tag));
+          body: GitHubJson.encode(tag));
 
   /// Fetches a tree from a repository for the given ref [sha].
   ///
@@ -155,6 +156,6 @@ class GitService extends Service {
     return github.postJSON('/repos/${slug.fullName}/git/trees',
         convert: (j) => GitTree.fromJson(j),
         statusCode: StatusCodes.CREATED,
-        body: jsonEncode(tree));
+        body: GitHubJson.encode(tree));
   }
 }

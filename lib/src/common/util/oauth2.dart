@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 
@@ -76,7 +77,7 @@ class OAuth2Flow {
       headers['Origin'] = origin;
     }
 
-    final body = jsonEncode(<String, dynamic>{
+    final body = GitHubJson.encode(<String, dynamic>{
       'client_id': clientId,
       'client_secret': clientSecret,
       'code': code,

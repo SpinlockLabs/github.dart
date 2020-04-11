@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,7 +42,7 @@ class UsersService extends Service {
 
     return github.postJSON(
       '/user',
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
       statusCode: 200,
       convert: (i) => CurrentUser.fromJson(i),
     );
@@ -95,14 +95,14 @@ class UsersService extends Service {
   /// API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
   Stream<UserEmail> addEmails(List<String> emails) => PaginationHelper(github)
       .objects('POST', '/user/emails', (i) => UserEmail.fromJson(i),
-          statusCode: 201, body: jsonEncode(emails));
+          statusCode: 201, body: GitHubJson.encode(emails));
 
   /// Delete Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#delete-email-addresses
   Future<bool> deleteEmails(List<String> emails) => github
       .request('DELETE', '/user/emails',
-          body: jsonEncode(emails), statusCode: 204)
+          body: GitHubJson.encode(emails), statusCode: 204)
       .then((x) => x.statusCode == 204);
 
   /// List user followers.
@@ -168,7 +168,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/keys/#create-a-public-key
   Future<PublicKey> createPublicKey(CreatePublicKey key) {
-    return github.postJSON('/user/keys', body: jsonEncode(key))
+    return github.postJSON('/user/keys', body: GitHubJson.encode(key))
         as Future<PublicKey>;
   }
 

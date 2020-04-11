@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
+import 'package:github/src/json.dart';
 
 /// The [GistsService] handles communication with gist
 /// methods of the GitHub API.
@@ -76,7 +77,7 @@ class GistsService extends Service {
     return github.postJSON(
       '/gists',
       statusCode: 201,
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
       convert: (i) => Gist.fromJson(i),
     );
   }
@@ -115,7 +116,7 @@ class GistsService extends Service {
     return github.postJSON(
       '/gists/$id',
       statusCode: 200,
-      body: jsonEncode(map),
+      body: GitHubJson.encode(map),
       convert: (i) => Gist.fromJson(i),
     );
   }
@@ -177,7 +178,8 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return github.postJSON('/gists/$gistId/comments',
-        body: jsonEncode(request), convert: (i) => GistComment.fromJson(i));
+        body: GitHubJson.encode(request),
+        convert: (i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment
