@@ -211,6 +211,48 @@ class GitHub {
         preview: preview,
       );
 
+  /// Handles PUT Requests that respond with JSON
+  ///
+  /// [path] can either be a path like '/repos' or a full url.
+  /// [statusCode] is the expected status code. If it is null, it is ignored.
+  /// If the status code that the response returns is not the status code you provide
+  /// then the [fail] function will be called with the HTTP Response.
+  ///
+  /// If you don't throw an error or break out somehow, it will go into some error checking
+  /// that throws exceptions when it finds a 404 or 401. If it doesn't find a general HTTP Status Code
+  /// for errors, it throws an Unknown Error.
+  ///
+  /// [headers] are HTTP Headers. If it doesn't exist, the 'Accept' and 'Authorization' headers are added.
+  /// [params] are query string parameters.
+  /// [convert] is a simple function that is passed this [GitHub] instance and a JSON object.
+  ///
+  /// The future will pass the object returned from this function to the then method.
+  /// The default [convert] function returns the input object.
+  /// [body] is the data to send to the server. Pass in a List<int> if you want to post binary body data. Everything else will have .toString() called on it and set as text content
+  /// [S] represents the input type.
+  /// [T] represents the type return from this function after conversion
+  Future<T> putJSON<S, T>(
+    String path, {
+    int statusCode,
+    void Function(http.Response response) fail,
+    Map<String, String> headers,
+    Map<String, String> params,
+    JSONConverter<S, T> convert,
+    dynamic body,
+    String preview,
+  }) =>
+      _requestJson(
+        'PUT',
+        path,
+        statusCode: statusCode,
+        fail: fail,
+        headers: headers,
+        params: params,
+        convert: convert,
+        body: body,
+        preview: preview,
+      );
+
   Future<T> _requestJson<S, T>(
     String method,
     String path, {

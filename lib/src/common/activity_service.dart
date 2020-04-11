@@ -307,7 +307,7 @@ class ActivityService extends Service {
     final map =
         createNonNullMap({'subscribed': subscribed, 'ignored': ignored});
 
-    return github.postJSON(
+    return github.putJSON(
       '/repos/${slug.fullName}/subscription',
       statusCode: StatusCodes.OK,
       convert: (i) => RepositorySubscription.fromJson(i),
