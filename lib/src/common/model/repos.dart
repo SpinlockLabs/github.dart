@@ -35,7 +35,7 @@ class GitHubComparison {
 }
 
 /// Model class for a repository.
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class Repository {
   Repository({
     this.name,
@@ -46,7 +46,10 @@ class Repository {
     this.isFork,
     this.htmlUrl,
     this.description,
-    this.cloneUrls,
+    this.cloneUrl,
+    this.gitUrl,
+    this.sshUrl,
+    this.svnUrl,
     this.homepage,
     this.size,
     this.stargazersCount,
@@ -75,7 +78,6 @@ class Repository {
   final int id;
 
   /// Full Repository Name
-  @JsonKey(name: 'full_name')
   final String fullName;
 
   /// Repository Owner
@@ -90,15 +92,26 @@ class Repository {
   final bool isFork;
 
   /// Url to the GitHub Repository Page
-  @JsonKey(name: 'html_url')
   final String htmlUrl;
 
   /// Repository Description
   final String description;
 
+  // https clone URL
+  final String cloneUrl;
+
+  final String sshUrl;
+
+  final String svnUrl;
+
+  final String gitUrl;
+
   /// Repository Clone Urls
-  @JsonKey(name: 'clone_urls')
-  final CloneUrls cloneUrls;
+  CloneUrls _cloneUrls;
+
+  CloneUrls get cloneUrls {
+    return _cloneUrls ??= CloneUrls(gitUrl, sshUrl, cloneUrl, svnUrl);
+  }
 
   /// Url to the Repository Homepage
   final String homepage;
@@ -177,6 +190,7 @@ class Repository {
 }
 
 /// Repository Clone Urls
+@Deprecated("These URLs are available on the Repository class")
 @JsonSerializable()
 class CloneUrls {
   /// Git Protocol
