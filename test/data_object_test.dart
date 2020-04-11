@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:github/src/json.dart';
 import 'package:test/test.dart';
 import 'package:github/github.dart';
 

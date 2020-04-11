@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:github/src/common.dart';
-import 'package:github/src/json.dart';
 
 /// The [MiscService] handles communication with misc related methods of the
 /// GitHub API.

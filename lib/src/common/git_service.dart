@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
-import 'package:github/src/json.dart';
 
 /// The [GitService] handles communication with git related methods of the
 /// GitHub API.

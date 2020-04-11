@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:github/src/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 import '../common.dart';
 

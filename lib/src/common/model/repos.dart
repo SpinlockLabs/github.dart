@@ -190,7 +190,7 @@ class Repository {
 }
 
 /// Repository Clone Urls
-@Deprecated("These URLs are available on the Repository class")
+@Deprecated('These URLs are available on the Repository class')
 @JsonSerializable()
 class CloneUrls {
   /// Git Protocol

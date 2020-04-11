@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:github/github.dart';
-import 'package:github/src/json.dart';
 
 import '../helper/http.dart';
 
