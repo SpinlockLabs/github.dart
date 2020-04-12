@@ -1,30 +1,13 @@
+import 'package:github/src/common/util/utils.dart';
 import 'package:github/src/util.dart';
 import 'package:meta/meta.dart';
 
-@immutable
-abstract class _EnumWithValue {
-  final String _jsonValue;
-  const _EnumWithValue._(this._jsonValue);
-
-  @override
-  String toString() => _jsonValue;
-
-  String toJson() => _jsonValue;
-
-  @override
-  bool operator ==(dynamic other) =>
-      other is _EnumWithValue && _jsonValue == other._jsonValue;
-
-  @override
-  int get hashCode => _jsonValue.hashCode;
-}
-
-class CheckRunAnnotationLevel extends _EnumWithValue {
+class CheckRunAnnotationLevel extends EnumWithValue {
   static const notice = CheckRunAnnotationLevel._('notice');
   static const warning = CheckRunAnnotationLevel._('warning');
   static const failure = CheckRunAnnotationLevel._('failure');
 
-  const CheckRunAnnotationLevel._(String value) : super._(value);
+  const CheckRunAnnotationLevel._(String value) : super(value);
 
   factory CheckRunAnnotationLevel._fromValue(String value) {
     switch (value) {
@@ -56,7 +39,7 @@ class CheckRunAnnotationLevel extends _EnumWithValue {
   bool operator >=(CheckRunAnnotationLevel other) => !(this < other);
 }
 
-class CheckRunConclusion extends _EnumWithValue {
+class CheckRunConclusion extends EnumWithValue {
   static const success = CheckRunConclusion._('success');
   static const failure = CheckRunConclusion._('failure');
   static const neutral = CheckRunConclusion._('neutral');
@@ -64,7 +47,7 @@ class CheckRunConclusion extends _EnumWithValue {
   static const timedOut = CheckRunConclusion._('timed_out');
   static const actionRequired = CheckRunConclusion._('action_required');
 
-  const CheckRunConclusion._(String value) : super._(value);
+  const CheckRunConclusion._(String value) : super(value);
 
   factory CheckRunConclusion._fromValue(String value) {
     for (final level in const [
@@ -75,7 +58,7 @@ class CheckRunConclusion extends _EnumWithValue {
       timedOut,
       actionRequired
     ]) {
-      if (level._jsonValue == value) {
+      if (level.value == value) {
         return level;
       }
     }
@@ -84,17 +67,17 @@ class CheckRunConclusion extends _EnumWithValue {
   }
 }
 
-class CheckRunStatus extends _EnumWithValue {
+class CheckRunStatus extends EnumWithValue {
   static const queued = CheckRunStatus._('queued');
   static const inProgress = CheckRunStatus._('in_progress');
   static const completed = CheckRunStatus._('completed');
-  const CheckRunStatus._(String value) : super._(value);
+  const CheckRunStatus._(String value) : super(value);
 }
 
-class CheckRunFilter extends _EnumWithValue {
+class CheckRunFilter extends EnumWithValue {
   static const all = CheckRunFilter._('all');
   static const latest = CheckRunFilter._('latest');
-  const CheckRunFilter._(String value) : super._(value);
+  const CheckRunFilter._(String value) : super(value);
 }
 
 @immutable

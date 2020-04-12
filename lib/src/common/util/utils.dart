@@ -1,5 +1,31 @@
 import 'package:github/src/common.dart';
 import 'package:github/src/util.dart';
+import 'package:meta/meta.dart';
+
+/// A Json encodable class that mimics an enum,
+/// but with a String value that is used for serialization.
+@immutable
+abstract class EnumWithValue {
+  final String value;
+
+  /// The value will be used when [toJson] or [toString] will be called.
+  /// It will also be used to check if two [EnumWithValue] are equal.
+  const EnumWithValue(this.value);
+
+  @override
+  String toString() => value;
+
+  /// Returns the String value of this.
+  String toJson() => value;
+
+  /// True iff [other] is an [EnumWithValue] with the same value as this object.
+  @override
+  bool operator ==(dynamic other) =>
+      other is EnumWithValue && value == other.value;
+
+  @override
+  int get hashCode => value.hashCode;
+}
 
 /// Marks something as not being ready or complete.
 class NotReadyYet {
@@ -21,7 +47,9 @@ class OnlyWhen {
 ///
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
 String dateToGitHubIso8601(DateTime date) {
-  if (date == null) return null;
+  if (date == null) {
+    return null;
+  }
   // Regex removes the milliseconds.
   return date.toUtc().toIso8601String().replaceAll(githubDateRemoveRegExp, '');
 }
