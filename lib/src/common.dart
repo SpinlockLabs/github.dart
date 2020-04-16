@@ -2,6 +2,7 @@
 /// Contains the Models and other GitHub stuff.
 export 'package:github/src/common/activity_service.dart';
 export 'package:github/src/common/authorizations_service.dart';
+export 'package:github/src/common/checks_service.dart';
 export 'package:github/src/common/gists_service.dart';
 export 'package:github/src/common/git_service.dart';
 export 'package:github/src/common/github.dart';
@@ -9,6 +10,7 @@ export 'package:github/src/common/issues_service.dart';
 export 'package:github/src/common/misc_service.dart';
 export 'package:github/src/common/model/activity.dart';
 export 'package:github/src/common/model/authorizations.dart';
+export 'package:github/src/common/model/checks.dart';
 export 'package:github/src/common/model/gists.dart';
 export 'package:github/src/common/model/git.dart';
 export 'package:github/src/common/model/issues.dart';
