@@ -229,15 +229,15 @@ class CheckRunAnnotation {
   @override
   bool operator ==(dynamic other) {
     if (other is CheckRunAnnotation) {
-      return other.annotationLevel == this.annotationLevel &&
-          other.path == this.path &&
-          other.startColumn == this.startColumn &&
-          other.endColumn == this.endColumn &&
-          other.startLine == this.startLine &&
-          other.endLine == this.endLine &&
-          other.title == this.title &&
-          other.message == this.message &&
-          other.rawDetails == this.rawDetails;
+      return other.annotationLevel == annotationLevel &&
+          other.path == path &&
+          other.startColumn == startColumn &&
+          other.endColumn == endColumn &&
+          other.startLine == startLine &&
+          other.endLine == endLine &&
+          other.title == title &&
+          other.message == message &&
+          other.rawDetails == rawDetails;
     }
     return false;
   }
