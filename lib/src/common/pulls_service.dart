@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
 import 'package:github/src/common/util/pagination.dart';
-import 'package:github/src/util.dart';
+import 'package:github/src/common/util/utils.dart';
 
 /// The [PullRequestsService] handles communication with pull request
 /// methods of the GitHub API.

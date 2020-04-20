@@ -1,3 +1,6 @@
+## 6.2.1
+ - Consolidated utils from src/util.dart into src/common/utils/utils.dart
+
 ## 6.2.0
  - Added Checks API https://github.com/SpinlockLabs/github.dart/pull/182
  - Bug fix: Fix setRepositorySubscription to be a PUT instead of a POST https://github.com/SpinlockLabs/github.dart/commit/5b5d7656ce9ce1cb06e15651da06e7e192bc19e1

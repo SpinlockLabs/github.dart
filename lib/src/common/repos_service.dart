@@ -4,7 +4,7 @@ import 'package:github/src/common.dart';
 import 'package:github/src/common/model/repos_releases.dart';
 import 'package:github/src/common/model/users.dart';
 import 'package:github/src/common/util/pagination.dart';
-import 'package:github/src/util.dart';
+import 'package:github/src/common/util/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 

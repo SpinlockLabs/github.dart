@@ -1,5 +1,4 @@
 import 'package:github/src/common/util/utils.dart';
-import 'package:github/src/util.dart';
 import 'package:meta/meta.dart';
 
 class CheckRunAnnotationLevel extends EnumWithValue {

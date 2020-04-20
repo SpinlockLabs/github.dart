@@ -1,4 +1,4 @@
-import 'package:github/src/util.dart';
+import 'package:github/src/common/util/utils.dart';
 
 void main() {
   test('1k', 1000);

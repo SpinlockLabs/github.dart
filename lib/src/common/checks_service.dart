@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:github/github.dart';
-import 'package:github/src/util.dart';
+import 'package:github/src/common/util/utils.dart';
 import 'package:meta/meta.dart';
 
 const _previewHeader = 'application/vnd.github.antiope-preview+json';

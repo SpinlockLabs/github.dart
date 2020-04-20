@@ -4,7 +4,6 @@ import 'dart:convert' show jsonDecode;
 import 'package:http/http.dart' as http;
 
 import '../../common.dart';
-import '../../util.dart';
 
 /// Internal Helper for dealing with GitHub Pagination.
 class PaginationHelper {

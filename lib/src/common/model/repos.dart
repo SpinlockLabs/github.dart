@@ -1,5 +1,4 @@
 import 'package:github/src/common.dart';
-import 'package:github/src/util.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'repos.g.dart';
 

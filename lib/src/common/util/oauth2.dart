@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:github/src/common.dart';
-import 'package:github/src/util.dart';
 import 'package:http/http.dart' as http;
 
 /// OAuth2 Flow Helper
