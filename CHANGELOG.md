@@ -1,5 +1,6 @@
 ## 6.2.1
  - Consolidated utils from src/util.dart into src/common/utils/utils.dart
+ - Added a new top level entry point `hooks.dart` to improve dartdocs and IDE usability when writing hooks
 
 ## 6.2.0
  - Added Checks API https://github.com/SpinlockLabs/github.dart/pull/182
