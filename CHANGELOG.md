@@ -1,3 +1,6 @@
+## 6.2.2
+ - Fixed typo in documentation
+
 ## 6.2.1
  - Consolidated utils from src/util.dart into src/common/utils/utils.dart
  - Added a new top level entry point `hooks.dart` to improve dartdocs and IDE usability when writing hooks
