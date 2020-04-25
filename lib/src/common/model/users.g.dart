@@ -67,6 +67,29 @@ Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) {
   );
 }
 
+Contributor _$ContributorFromJson(Map<String, dynamic> json) {
+  return Contributor(
+    id: json['id'] as int,
+    login: json['login'] as String,
+    avatarUrl: json['avatar_url'] as String,
+    htmlUrl: json['html_url'] as String,
+    type: json['type'] as String,
+    siteAdmin: json['site_admin'] as bool,
+    contributions: json['contributions'] as int,
+  );
+}
+
+Map<String, dynamic> _$ContributorToJson(Contributor instance) =>
+    <String, dynamic>{
+      'login': instance.login,
+      'id': instance.id,
+      'avatar_url': instance.avatarUrl,
+      'html_url': instance.htmlUrl,
+      'type': instance.type,
+      'site_admin': instance.siteAdmin,
+      'contributions': instance.contributions,
+    };
+
 CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
   return CurrentUser()
     ..login = json['login'] as String
