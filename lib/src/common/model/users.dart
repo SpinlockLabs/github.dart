@@ -116,7 +116,8 @@ class Collaborator {
 }
 
 /// The response from listing contributors on a repo.
-// https://developer.github.com/v3/repos/collaborators/#response
+///
+/// https://developer.github.com/v3/repos/#response-if-repository-contains-content
 @JsonSerializable(fieldRename: FieldRename.snake)
 class Contributor {
   Contributor({
