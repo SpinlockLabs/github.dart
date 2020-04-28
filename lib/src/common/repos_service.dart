@@ -203,13 +203,14 @@ class RepositoriesService extends Service {
   /// Lists the contributors of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-contributors
-  Stream<User> listContributors(RepositorySlug slug, {bool anon = false}) {
+  Stream<Contributor> listContributors(RepositorySlug slug,
+      {bool anon = false}) {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(anon);
-    return PaginationHelper(github).objects<Map<String, dynamic>, User>(
+    return PaginationHelper(github).objects<Map<String, dynamic>, Contributor>(
       'GET',
       '/repos/${slug.fullName}/contributors',
-      (i) => User.fromJson(i),
+      (i) => Contributor.fromJson(i),
       params: <String, dynamic>{'anon': anon.toString()},
     );
   }

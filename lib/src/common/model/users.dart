@@ -115,6 +115,46 @@ class Collaborator {
       _$CollaboratorFromJson(json);
 }
 
+/// The response from listing contributors on a repo.
+///
+/// https://developer.github.com/v3/repos/#response-if-repository-contains-content
+@JsonSerializable(fieldRename: FieldRename.snake)
+class Contributor {
+  Contributor({
+    this.id,
+    this.login,
+    this.avatarUrl,
+    this.htmlUrl,
+    this.type,
+    this.siteAdmin,
+    this.contributions,
+  });
+
+  /// User's Username
+  String login;
+
+  /// User ID
+  int id;
+
+  /// Avatar URL
+  String avatarUrl;
+
+  /// Url to this user's profile.
+  String htmlUrl;
+
+  String type;
+
+  /// If the user is a site administrator
+  bool siteAdmin;
+
+  /// Contributions count
+  int contributions;
+
+  factory Contributor.fromJson(Map<String, dynamic> input) =>
+      _$ContributorFromJson(input);
+  Map<String, dynamic> toJson() => _$ContributorToJson(this);
+}
+
 /// The Currently Authenticated User
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CurrentUser extends User {
