@@ -1,3 +1,6 @@
+## 6.3.0
+- Add `listCurrentUserFollowing()` function to `UsersService`
+
 ## 6.2.2
  - Fixed typo in documentation
 

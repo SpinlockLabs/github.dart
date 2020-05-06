@@ -150,6 +150,13 @@ class UsersService extends Service {
       'GET', '/user/followers', (i) => User.fromJson(i),
       statusCode: 200);
 
+  /// List current user following
+  ///
+  /// API docs: https://developer.github.com/v3/users/followers/#list-users-followed-by-the-authenticated-user
+  Stream<User> listCurrentUserFollowing() => PaginationHelper(github).objects(
+      'GET', '/user/following', (i) => User.fromJson(i),
+      statusCode: 200);
+
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
   /// the public keys for the authenticated user are fetched.
   ///
