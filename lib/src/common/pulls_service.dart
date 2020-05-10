@@ -53,9 +53,8 @@ class PullRequestsService extends Service {
       '/repos/${slug.fullName}/pulls',
       convert: (i) => PullRequest.fromJson(i),
       body: GitHubJson.encode(request),
-      preview: request.draft
-          ? 'application/vnd.github.shadow-cat-preview+json'
-          : null,
+      preview: 'application/vnd.github.sailor-v-preview+json',
+      statusCode: StatusCodes.CREATED,
     );
   }
 
