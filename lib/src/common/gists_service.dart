@@ -84,10 +84,13 @@ class GistsService extends Service {
   /// Deletes the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#delete-a-gist
-  Future<bool> deleteGist(String id) {
-    return github.request('DELETE', '/gists/$id').then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> deleteGist(String id) async {
+    await github.request(
+      'DELETE',
+      '/gists/$id',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Edits a Gist.
@@ -125,28 +128,41 @@ class GistsService extends Service {
   /// Star the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
-  Future<bool> starGist(String id) {
-    return github.request('POST', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> starGist(String id) async {
+    await github.request(
+      'POST',
+      '/gists/$id/star',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Unstar the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
-  Future<bool> unstarGist(String id) {
-    return github.request('DELETE', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> unstarGist(String id) async {
+    await github.request(
+      'DELETE',
+      '/gists/$id/star',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Checks if the specified Gist is starred.
   ///
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
-  Future<bool> isGistStarred(String id) {
-    return github.request('GET', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> isGistStarred(String id) async {
+    try {
+      await github.request(
+        'GET',
+        '/gists/$id/star',
+        statusCode: StatusCodes.NO_CONTENT,
+      );
+      return true;
+    } on NotFound {
+      return false;
+    }
   }
 
   /// Forks the specified Gist.
@@ -176,9 +192,12 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
-    return github.postJSON('/gists/$gistId/comments',
-        body: GitHubJson.encode(request),
-        convert: (i) => GistComment.fromJson(i));
+    return github.postJSON(
+      '/gists/$gistId/comments',
+      body: GitHubJson.encode(request),
+      statusCode: StatusCodes.CREATED,
+      convert: (i) => GistComment.fromJson(i),
+    );
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment

@@ -103,23 +103,22 @@ class RepositoriesService extends Service {
   /// repository will be created under that organization. If no [org] is
   /// specified, it will be created for the authenticated user.
   ///
-  /// API docs: https://developer.github.com/v3/repos/#create
-  Future<Repository> createRepository(CreateRepository repository,
-      {String org}) async {
+  /// * API docs: https://developer.github.com/v3/repos/#create-a-repository-for-the-authenticated-user
+  /// * API docs:
+  Future<Repository> createRepository(
+    CreateRepository repository, {
+    String org,
+  }) async {
     ArgumentError.checkNotNull(repository);
-    if (org != null) {
-      return github.postJSON<Map<String, dynamic>, TeamRepository>(
-        '/orgs/$org/repos',
-        body: GitHubJson.encode(repository),
-        convert: (i) => TeamRepository.fromJson(i),
-      );
-    } else {
-      return github.postJSON<Map<String, dynamic>, Repository>(
-        '/user/repos',
-        body: GitHubJson.encode(repository),
-        convert: (i) => Repository.fromJson(i),
-      );
-    }
+    final isOrg = org != null;
+    final path = isOrg ? '/orgs/$org/repos' : '/user/repos';
+    return github.postJSON<Map<String, dynamic>, Repository>(
+      path,
+      body: GitHubJson.encode(repository),
+      convert: (i) =>
+          isOrg ? TeamRepository.fromJson(i) : Repository.fromJson(i),
+      statusCode: StatusCodes.CREATED,
+    );
   }
 
   Future<LicenseDetails> getLicense(RepositorySlug slug) async {
@@ -127,6 +126,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, LicenseDetails>(
       '/repos/${slug.owner}/${slug.name}/license',
       convert: (json) => LicenseDetails.fromJson(json),
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -272,6 +272,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, Branch>(
       '/repos/${slug.fullName}/branches/$branch',
       convert: (i) => Branch.fromJson(i),
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -507,6 +508,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, GitHubComparison>(
       '/repos/${slug.fullName}/compare/$refBase...$refHead',
       convert: (j) => GitHubComparison.fromJson(j),
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -567,6 +569,7 @@ class RepositoriesService extends Service {
 
     return github.getJSON(
       url,
+      statusCode: StatusCodes.OK,
       convert: (input) {
         final contents = RepositoryContents();
         if (input is Map) {
@@ -589,15 +592,18 @@ class RepositoriesService extends Service {
 
   /// Creates a new file in a repository.
   ///
-  /// API docs: https://developer.github.com/v3/repos/contents/#create-a-file
+  /// API docs: https://developer.github.com/v3/repos/contents/#create-or-update-a-file
   Future<ContentCreation> createFile(
-      RepositorySlug slug, CreateFile file) async {
+    RepositorySlug slug,
+    CreateFile file,
+  ) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(file);
     final response = await github.request(
       'PUT',
       '/repos/${slug.fullName}/contents/${file.path}',
       body: GitHubJson.encode(file),
+      statusCode: StatusCodes.CREATED,
     );
     return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
@@ -605,10 +611,15 @@ class RepositoriesService extends Service {
 
   /// Updates the specified file.
   ///
-  /// API docs: https://developer.github.com/v3/repos/contents/#update-a-file
-  Future<ContentCreation> updateFile(RepositorySlug slug, String path,
-      String message, String content, String sha,
-      {String branch}) async {
+  /// API docs: https://developer.github.com/v3/repos/contents/#create-or-update-a-file
+  Future<ContentCreation> updateFile(
+    RepositorySlug slug,
+    String path,
+    String message,
+    String content,
+    String sha, {
+    String branch,
+  }) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(path);
     final map = createNonNullMap({
@@ -621,6 +632,7 @@ class RepositoriesService extends Service {
       'PUT',
       '/repos/${slug.fullName}/contents/$path',
       body: GitHubJson.encode(map),
+      statusCode: StatusCodes.CREATED,
     );
     return ContentCreation.fromJson(
         jsonDecode(response.body) as Map<String, dynamic>);
@@ -683,6 +695,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/forks',
       body: GitHubJson.encode(fork),
       convert: (i) => Repository.fromJson(i),
+      statusCode: StatusCodes.ACCEPTED,
     );
   }
 
@@ -707,6 +720,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, Hook>(
       '/repos/${slug.fullName}/hooks/$id',
       convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -720,6 +734,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/hooks',
       convert: (i) => Hook.fromJson(i)..repoName = slug.fullName,
       body: GitHubJson.encode(hook),
+      statusCode: StatusCodes.CREATED,
     );
   }
 
@@ -951,6 +966,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, Release>(
       '/repos/${slug.fullName}/releases/$id',
       convert: (i) => Release.fromJson(i),
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -958,8 +974,11 @@ class RepositoriesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
   Future<Release> getReleaseByTagName(RepositorySlug slug, String tagName) =>
-      github.getJSON('/repos/${slug.fullName}/releases/tags/$tagName',
-          convert: (i) => Release.fromJson(i));
+      github.getJSON(
+        '/repos/${slug.fullName}/releases/tags/$tagName',
+        convert: (i) => Release.fromJson(i),
+        statusCode: StatusCodes.OK,
+      );
 
   /// Creates a Release based on the specified [createRelease].
   ///
@@ -977,6 +996,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/releases',
       convert: (i) => Release.fromJson(i),
       body: GitHubJson.encode(createRelease.toJson()),
+      statusCode: StatusCodes.CREATED,
     );
     if (release.hasErrors) {
       final alreadyExistsErrorCode = release.errors.firstWhere(
@@ -1124,13 +1144,15 @@ class RepositoriesService extends Service {
     for (final createReleaseAsset in createReleaseAssets) {
       final headers = {'Content-Type': createReleaseAsset.contentType};
       final releaseAsset = await github.postJSON(
-          release.getUploadUrlFor(
-            createReleaseAsset.name,
-            createReleaseAsset.label,
-          ),
-          headers: headers,
-          body: createReleaseAsset.assetData,
-          convert: (i) => ReleaseAsset.fromJson(i));
+        release.getUploadUrlFor(
+          createReleaseAsset.name,
+          createReleaseAsset.label,
+        ),
+        headers: headers,
+        body: createReleaseAsset.assetData,
+        convert: (i) => ReleaseAsset.fromJson(i),
+        statusCode: StatusCodes.CREATED,
+      );
       releaseAssets.add(releaseAsset);
     }
     return releaseAssets;
@@ -1147,8 +1169,12 @@ class RepositoriesService extends Service {
   ) async {
     ArgumentError.checkNotNull(slug);
     final path = '/repos/${slug.fullName}/stats/contributors';
-    final response =
-        await github.request('GET', path, headers: {'Accept': v3ApiMimeType});
+    final response = await github.request(
+      'GET',
+      path,
+      headers: {'Accept': v3ApiMimeType},
+      statusCode: StatusCodes.OK,
+    );
 
     if (response.statusCode == StatusCodes.OK) {
       return (jsonDecode(response.body) as List)
@@ -1239,6 +1265,7 @@ class RepositoriesService extends Service {
       '/repos/${slug.fullName}/statuses/$ref',
       body: GitHubJson.encode(request),
       convert: (i) => RepositoryStatus.fromJson(i),
+      statusCode: StatusCodes.OK,
     );
   }
 

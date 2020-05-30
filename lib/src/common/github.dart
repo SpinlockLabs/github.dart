@@ -143,7 +143,7 @@ class GitHub {
   /// The default [convert] function returns the input object.
   Future<T> getJSON<S, T>(
     String path, {
-    int statusCode,
+    @required int statusCode,
     void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, String> params,
@@ -183,7 +183,7 @@ class GitHub {
   /// [T] represents the type return from this function after conversion
   Future<T> postJSON<S, T>(
     String path, {
-    int statusCode,
+    @required int statusCode,
     void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, dynamic> params,
@@ -225,7 +225,7 @@ class GitHub {
   /// [T] represents the type return from this function after conversion
   Future<T> putJSON<S, T>(
     String path, {
-    int statusCode,
+    @required int statusCode,
     void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, dynamic> params,
@@ -248,7 +248,7 @@ class GitHub {
   Future<T> requestJson<S, T>(
     String method,
     String path, {
-    int statusCode,
+    @required int statusCode,
     void Function(http.Response response) fail,
     Map<String, String> headers,
     Map<String, dynamic> params,
@@ -298,10 +298,10 @@ class GitHub {
   Future<http.Response> request(
     String method,
     String path, {
+    @required int statusCode,
     Map<String, String> headers,
     Map<String, dynamic> params,
     dynamic body,
-    int statusCode,
     void Function(http.Response response) fail,
     String preview,
   }) async {
