@@ -125,23 +125,28 @@ class OrganizationsService extends Service {
     );
   }
 
-  /// Deletes the team specified by the [teamId]
+  /// Deletes the team specified by the [teamSlug]
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
-  Future<bool> deleteTeam(int teamId) {
-    return github.request('DELETE', '/teams/$teamId').then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> deleteTeam(String org, String teamSlug) async {
+    await github.request(
+      'DELETE',
+      'orgs/$org/teams/$teamSlug',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Lists the team members of the team with [teamId].
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-members
+  @deprecated
   Stream<TeamMember> listTeamMembers(int teamId) {
     return PaginationHelper(github).objects(
         'GET', '/teams/$teamId/members', (i) => TeamMember.fromJson(i));
   }
 
+  @deprecated
   Future<bool> getTeamMemberStatus(int teamId, String user) {
     return github.getJSON('/teams/$teamId/memberships/$user').then((json) {
       return json['state'];
@@ -151,6 +156,7 @@ class OrganizationsService extends Service {
   /// Returns the membership status for a user in a team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
+  @deprecated
   Future<TeamMembershipState> getTeamMembership(int teamId, String user) {
     final completer = Completer<TeamMembershipState>();
 
@@ -175,6 +181,7 @@ class OrganizationsService extends Service {
   /// Invites a user to the specified team.
   ///
   /// API docs: https://developer.github.com/v3/teams/members/#add-or-update-team-membership
+  @deprecated
   Future<TeamMembershipState> addTeamMembership(int teamId, String user) async {
     final response = await github
         .request('PUT', '/teams/$teamId/memberships/$user', statusCode: 200);
@@ -184,6 +191,7 @@ class OrganizationsService extends Service {
   /// Removes a user from the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
+  @deprecated
   Future removeTeamMembership(int teamId, String user) {
     return github.request('DELETE', '/teams/$teamId/memberships/$user',
         statusCode: 204);
@@ -192,6 +200,7 @@ class OrganizationsService extends Service {
   /// Lists the repositories that the specified team has access to.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
+  @deprecated
   Stream<Repository> listTeamRepositories(int teamId) {
     return PaginationHelper(github)
         .objects('GET', '/teams/$teamId/repos', (i) => Repository.fromJson(i));
@@ -200,6 +209,7 @@ class OrganizationsService extends Service {
   /// Checks if a team manages the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-repo
+  @deprecated
   Future<bool> isTeamRepository(int teamId, RepositorySlug slug) {
     return github
         .request('GET', '/teams/$teamId/repos/${slug.fullName}')
@@ -211,6 +221,7 @@ class OrganizationsService extends Service {
   /// Adds a repository to be managed by the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#add-team-repo
+  @deprecated
   Future<bool> addTeamRepository(int teamId, RepositorySlug slug) {
     return github
         .request('PUT', '/teams/$teamId/repos/${slug.fullName}')
@@ -222,6 +233,7 @@ class OrganizationsService extends Service {
   /// Removes a repository from being managed by the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#remove-team-repo
+  @deprecated
   Future<bool> removeTeamRepository(int teamId, RepositorySlug slug) {
     return github
         .request('DELETE', '/teams/$teamId/repos/${slug.fullName}')
