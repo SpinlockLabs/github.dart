@@ -950,6 +950,7 @@ class RepositoriesService extends Service {
     return github.getJSON<Map<String, dynamic>, Release>(
       '/repos/${slug.fullName}/releases/latest',
       convert: (i) => Release.fromJson(i),
+      statusCode: StatusCodes.OK,
     );
   }
 
