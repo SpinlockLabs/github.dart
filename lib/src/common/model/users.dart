@@ -87,6 +87,10 @@ class User {
   /// Last time this [User] was updated.
   DateTime updatedAt;
 
+  /// The username of the twitter account (without leading @)
+  @JsonKey(name: 'twitter_username')
+  String twitterUsername;
+
   factory User.fromJson(Map<String, dynamic> input) => _$UserFromJson(input);
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
