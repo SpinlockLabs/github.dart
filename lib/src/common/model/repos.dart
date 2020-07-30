@@ -105,13 +105,6 @@ class Repository {
 
   final String gitUrl;
 
-  /// Repository Clone Urls
-  CloneUrls _cloneUrls;
-
-  CloneUrls get cloneUrls {
-    return _cloneUrls ??= CloneUrls(gitUrl, sshUrl, cloneUrl, svnUrl);
-  }
-
   /// Url to the Repository Homepage
   final String homepage;
 

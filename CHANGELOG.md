@@ -1,3 +1,6 @@
+## 7.0.0
+ - Removed deprecated CloneUrls property on Repository class
+
 ## 6.2.3
  - Add twitter username to User class https://github.com/SpinlockLabs/github.dart/pull/228
  - Improve pub.dev score
