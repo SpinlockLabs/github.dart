@@ -1,3 +1,7 @@
+## 6.2.3
+ - Add twitter username to User class https://github.com/SpinlockLabs/github.dart/pull/228
+ - Improve pub.dev score
+
 ## 6.2.2
  - Fixed typo in documentation
 
