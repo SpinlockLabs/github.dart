@@ -30,7 +30,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
     updatedAt: json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String),
-  );
+  )..twitterUsername = json['twitter_username'] as String;
 }
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -52,6 +52,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'following': instance.followingCount,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'twitter_username': instance.twitterUsername,
     };
 
 Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) {
@@ -114,6 +115,7 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
     ..updatedAt = json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String)
+    ..twitterUsername = json['twitter_username'] as String
     ..privateReposCount = json['total_private_repos'] as int
     ..ownedPrivateReposCount = json['owned_private_repos'] as int
     ..diskUsage = json['disk_usage'] as int
@@ -142,6 +144,7 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
       'following': instance.followingCount,
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
+      'twitter_username': instance.twitterUsername,
       'total_private_repos': instance.privateReposCount,
       'owned_private_repos': instance.ownedPrivateReposCount,
       'disk_usage': instance.diskUsage,
