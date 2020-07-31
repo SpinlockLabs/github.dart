@@ -942,6 +942,18 @@ class RepositoriesService extends Service {
     );
   }
 
+  /// Lists the latest release for the specified repository.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/releases/#get-the-latest-release
+  Future<Release> getLatestRelease(RepositorySlug slug) {
+    ArgumentError.checkNotNull(slug);
+    return github.getJSON<Map<String, dynamic>, Release>(
+      '/repos/${slug.fullName}/releases/latest',
+      convert: (i) => Release.fromJson(i),
+      statusCode: StatusCodes.OK,
+    );
+  }
+
   /// Fetches a single release by the release ID.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-single-release
