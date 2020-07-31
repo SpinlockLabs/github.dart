@@ -1,3 +1,7 @@
+## 7.0.1
+ - Add `getLatestRelease()` to RepositoriesService
+ - Add `listCurrentUserFollowing()` function to `UsersService`
+
 ## 7.0.0
  - Removed deprecated CloneUrls property on Repository class
 
