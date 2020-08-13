@@ -986,10 +986,10 @@ class RepositoriesService extends Service {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(createRelease);
     final release = await github.postJSON<Map<String, dynamic>, Release>(
-      '/repos/${slug.fullName}/releases',
-      convert: (i) => Release.fromJson(i),
-      body: GitHubJson.encode(createRelease.toJson()),
-    );
+        '/repos/${slug.fullName}/releases',
+        convert: (i) => Release.fromJson(i),
+        body: GitHubJson.encode(createRelease.toJson()),
+        statusCode: StatusCodes.CREATED);
     if (release.hasErrors) {
       final alreadyExistsErrorCode = release.errors.firstWhere(
         (error) => error['code'] == 'already_exists',
