@@ -89,7 +89,8 @@ class Release {
 
   List errors;
 
-  factory Release.fromJson(Map<String, dynamic> input) => _$ReleaseFromJson(input);
+  factory Release.fromJson(Map<String, dynamic> input) =>
+      _$ReleaseFromJson(input);
   Map<String, dynamic> toJson() => _$ReleaseToJson(this);
 
   String getUploadUrlFor(String name, [String label]) =>
@@ -144,7 +145,8 @@ class ReleaseAsset {
   /// Time the asset was last updated
   DateTime updatedAt;
 
-  factory ReleaseAsset.fromJson(Map<String, dynamic> input) => _$ReleaseAssetFromJson(input);
+  factory ReleaseAsset.fromJson(Map<String, dynamic> input) =>
+      _$ReleaseAssetFromJson(input);
   Map<String, dynamic> toJson() => _$ReleaseAssetToJson(this);
 }
 
@@ -204,7 +206,8 @@ class CreateRelease {
       isDraft.hashCode ^
       isPrerelease.hashCode;
 
-  factory CreateRelease.fromJson(Map<String, dynamic> input) => _$CreateReleaseFromJson(input);
+  factory CreateRelease.fromJson(Map<String, dynamic> input) =>
+      _$CreateReleaseFromJson(input);
   Map<String, dynamic> toJson() => _$CreateReleaseToJson(this);
 }
 
