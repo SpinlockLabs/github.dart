@@ -968,30 +968,22 @@ class RepositoriesService extends Service {
 
   /// Fetches a single release by the release tag name.
   ///
-  /// Returns null if the release doesn't exist.
+  /// Throws a [ReleaseNotFound] exception if the release
+  /// doesn't exist.
   ///
   /// API docs: https://developer.github.com/v3/repos/releases/#get-a-release-by-tag-name
   Future<Release> getReleaseByTagName(
       RepositorySlug slug, String tagName) async {
-    // github.getJSON('/repos/${slug.fullName}/releases/tags/$tagName', convert: (i) => Release.fromJson(i));
-
-    Release release;
-    try {
-      release = await github.getJSON(
-        '/repos/${slug.fullName}/releases/tags/$tagName',
-        convert: (i) => Release.fromJson(i),
-        statusCode: StatusCodes.OK,
-        fail: (http.Response response) {
-          if (response.statusCode == 404) {
-            // we just return null if the tag can't be found.
-            throw ReleaseNotFound.fromTagName(github, tagName);
-          }
-        },
-      );
-    } on ReleaseNotFound catch (e) {
-      release = null;
-    }
-    return release;
+    return github.getJSON(
+      '/repos/${slug.fullName}/releases/tags/$tagName',
+      convert: (i) => Release.fromJson(i),
+      statusCode: StatusCodes.OK,
+      fail: (http.Response response) {
+        if (response.statusCode == 404) {
+          throw ReleaseNotFound.fromTagName(github, tagName);
+        }
+      },
+    );
   }
 
   /// Creates a Release based on the specified [createRelease].
