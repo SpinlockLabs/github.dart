@@ -1,3 +1,6 @@
+## 7.0.2
+ - https://github.com/SpinlockLabs/github.dart/pull/231
+
 ## 7.0.1
  - Add `getLatestRelease()` to RepositoriesService
  - Add `listCurrentUserFollowing()` function to `UsersService`
