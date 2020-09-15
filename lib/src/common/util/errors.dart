@@ -41,6 +41,12 @@ class RepositoryNotFound extends NotFound {
       : super(github, 'Repository Not Found: $repo');
 }
 
+/// Release not found
+class ReleaseNotFound extends NotFound {
+  const ReleaseNotFound.fromTagName(GitHub github, String tagName)
+      : super(github, 'Release for tagName $tagName Not Found.');
+}
+
 /// GitHub User was not found
 class UserNotFound extends NotFound {
   const UserNotFound(GitHub github, String user)

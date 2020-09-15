@@ -274,7 +274,10 @@ class RepositorySlug {
   /// Repository Name
   String name;
 
-  RepositorySlug(this.owner, this.name);
+  RepositorySlug(this.owner, this.name) {
+    ArgumentError.checkNotNull(owner, 'owner');
+    ArgumentError.checkNotNull(name, 'name');
+  }
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {

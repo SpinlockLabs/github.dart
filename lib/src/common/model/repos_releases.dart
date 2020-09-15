@@ -96,7 +96,7 @@ class Release {
   String getUploadUrlFor(String name, [String label]) =>
       "${uploadUrl.substring(0, uploadUrl.indexOf('{'))}?name=$name${label != null ? ",$label" : ""}";
 
-  bool get hasErrors => errors?.isNotEmpty;
+  bool get hasErrors => errors == null ? false : errors.isNotEmpty;
 }
 
 /// Model class for a release asset.
