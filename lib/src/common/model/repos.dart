@@ -105,13 +105,6 @@ class Repository {
 
   final String gitUrl;
 
-  /// Repository Clone Urls
-  CloneUrls _cloneUrls;
-
-  CloneUrls get cloneUrls {
-    return _cloneUrls ??= CloneUrls(gitUrl, sshUrl, cloneUrl, svnUrl);
-  }
-
   /// Url to the Repository Homepage
   final String homepage;
 
@@ -186,37 +179,6 @@ class Repository {
 
   @override
   String toString() => 'Repository: ${owner.login}/$name';
-}
-
-/// Repository Clone Urls
-@Deprecated('These URLs are available on the Repository class')
-@JsonSerializable()
-class CloneUrls {
-  /// Git Protocol
-  ///
-  /// git://github.com/user/repo.git
-  final String git;
-
-  /// SSH Protocol
-  ///
-  /// git@github.com:user/repo.git
-  final String ssh;
-
-  /// HTTPS Protocol
-  ///
-  /// https://github.com/user/repo.git
-  final String https;
-
-  /// Subversion Protocol
-  ///
-  /// https://github.com/user/repo
-  final String svn;
-
-  CloneUrls(this.git, this.ssh, this.https, this.svn);
-
-  factory CloneUrls.fromJson(Map<String, dynamic> input) =>
-      _$CloneUrlsFromJson(input);
-  Map<String, dynamic> toJson() => _$CloneUrlsToJson(this);
 }
 
 @JsonSerializable(createToJson: false)
@@ -312,7 +274,10 @@ class RepositorySlug {
   /// Repository Name
   String name;
 
-  RepositorySlug(this.owner, this.name);
+  RepositorySlug(this.owner, this.name) {
+    ArgumentError.checkNotNull(owner, 'owner');
+    ArgumentError.checkNotNull(name, 'name');
+  }
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {

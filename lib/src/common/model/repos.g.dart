@@ -97,22 +97,6 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
       'disabled': instance.disabled,
     };
 
-CloneUrls _$CloneUrlsFromJson(Map<String, dynamic> json) {
-  return CloneUrls(
-    json['git'] as String,
-    json['ssh'] as String,
-    json['https'] as String,
-    json['svn'] as String,
-  );
-}
-
-Map<String, dynamic> _$CloneUrlsToJson(CloneUrls instance) => <String, dynamic>{
-      'git': instance.git,
-      'ssh': instance.ssh,
-      'https': instance.https,
-      'svn': instance.svn,
-    };
-
 Tag _$TagFromJson(Map<String, dynamic> json) {
   return Tag(
     json['name'] as String,

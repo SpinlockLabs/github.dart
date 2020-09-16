@@ -369,7 +369,7 @@ linter:
 
     # Avoid unsafe HTML APIs.
     # http://dart-lang.github.io/linter/lints/unsafe_html.html
-    - unsafe_html
+    # - unsafe_html
 
     # Prefer an 8-digit hexadecimal integer(0xFFFFFFFF) to instantiate Color.
     # http://dart-lang.github.io/linter/lints/use_full_hex_values_for_flutter_colors.html
