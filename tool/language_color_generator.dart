@@ -17,7 +17,7 @@ Future<void> main() async {
     ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
     ..writeln('// VERSION OF ${DateTime.now().toIso8601String()}')
     ..writeln()
-    ..writeln('const kGitHubLanguageColors = <String, String>{');
+    ..writeln('const languageColors = <String, String>{');
 
   final map = yaml.value as YamlMap;
 
