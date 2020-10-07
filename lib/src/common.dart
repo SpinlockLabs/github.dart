@@ -46,4 +46,5 @@ export 'package:github/src/common/util/oauth2.dart';
 export 'package:github/src/common/util/pagination.dart';
 export 'package:github/src/common/util/service.dart';
 export 'package:github/src/common/util/utils.dart';
+export 'package:github/src/const/language_color.dart';
 export 'package:github/src/const/token_env_keys.dart';
