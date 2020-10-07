@@ -1,3 +1,6 @@
+## 7.0.3
+ - Export `languageColors` as part of the library. This is the map of github languages to their colors https://github.com/SpinlockLabs/github.dart/pull/232
+
 ## 7.0.2
  - https://github.com/SpinlockLabs/github.dart/pull/231
 
