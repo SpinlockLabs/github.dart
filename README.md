@@ -6,7 +6,7 @@
 This is a library for interacting with GitHub in Dart. It works on all platforms including web, server, and Flutter.
 Please submit issues and pull requests, help out, or just give encouragement.
 
-**Notice**: We are looking for contributors. If you're interested or have questions, join the chat at https://gitter.im/SpinlockLabs/community
+**Notice**: We are looking for contributors. If you're interested or have questions, head over to discussions https://github.com/SpinlockLabs/github.dart/discussions
 
 ## Features
 
@@ -30,4 +30,4 @@ See the examples in the example directory to learn how to use some of the featur
 
 ## Contacting Us
 
-Join our Gitter chat at https://gitter.im/SpinlockLabs/community
+Post a question, idea, in the discussions group https://github.com/SpinlockLabs/github.dart/discussions
