@@ -25,16 +25,21 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
   Future<List<String>> listGitignoreTemplates() {
-    return github.getJSON('/gitignore/templates') as Future<List<String>>;
+    return github.getJSON(
+      '/gitignore/templates',
+      statusCode: StatusCodes.OK,
+    ) as Future<List<String>>;
   }
 
   /// Gets a .gitignore template by [name].
   /// All template names can be fetched using [listGitignoreTemplates].
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
-  Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
-      github.getJSON('/gitignore/templates/$name',
-          convert: (i) => GitignoreTemplate.fromJson(i));
+  Future<GitignoreTemplate> getGitignoreTemplate(String name) => github.getJSON(
+        '/gitignore/templates/$name',
+        convert: (i) => GitignoreTemplate.fromJson(i),
+        statusCode: StatusCodes.OK,
+      );
 
   /// Renders Markdown from the [input].
   ///
@@ -42,15 +47,22 @@ class MiscService extends Service {
   /// [context] is the repository context. Only take into account when [mode] is 'gfm'.
   ///
   /// API docs: https://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
-  Future<String> renderMarkdown(String input,
-      {String mode = 'markdown', String context}) {
-    return github
-        .request('POST', '/markdown',
-            body: GitHubJson.encode(
-                {'text': input, 'mode': mode, 'context': context}))
-        .then((response) {
-      return response.body;
-    });
+  Future<String> renderMarkdown(
+    String input, {
+    String mode = 'markdown',
+    String context,
+  }) async {
+    final response = await github.request(
+      'POST',
+      '/markdown',
+      body: GitHubJson.encode({
+        'text': input,
+        'mode': mode,
+        'context': context,
+      }),
+      statusCode: StatusCodes.OK,
+    );
+    return response.body;
   }
 
   // TODO: Implement renderMarkdownRaw: https://developer.github.com/v3/markdown/#render-a-markdown-document-in-raw-mode
@@ -61,9 +73,9 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/rate_limit/
   Future<RateLimit> getRateLimit() {
-    return github.request('GET', '/').then((response) {
-      return RateLimit.fromHeaders(response.headers);
-    });
+    return github
+        .request('GET', '/', statusCode: StatusCodes.OK)
+        .then((response) => RateLimit.fromHeaders(response.headers));
   }
 
   /// Gets the GitHub API Status.
@@ -79,16 +91,17 @@ class MiscService extends Service {
       params['s'] = text;
     }
 
-    return github.request('GET', '/octocat', params: params).then((response) {
-      return response.body;
-    });
+    return github
+        .request('GET', '/octocat', params: params, statusCode: StatusCodes.OK)
+        .then((response) => response.body);
   }
 
   /// Returns an ASCII Octocat with some wisdom.
   Future<String> getWisdom() => getOctocat();
 
-  Future<String> getZen() =>
-      github.request('GET', '/zen').then((response) => response.body);
+  Future<String> getZen() => github
+      .request('GET', '/zen', statusCode: StatusCodes.OK)
+      .then((response) => response.body);
 }
 
 class Octocat {

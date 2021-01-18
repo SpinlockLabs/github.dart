@@ -155,23 +155,28 @@ class IssuesService extends Service {
 
   /// Edit an issue.
   ///
-  /// API docs: https://developer.github.com/v3/issues/#edit-an-issue
+  /// API docs: https://developer.github.com/v3/issues/#update-an-issue
   Future<Issue> edit(
       RepositorySlug slug, int issueNumber, IssueRequest issue) async {
     return github
-        .request('PATCH', '/repos/${slug.fullName}/issues/$issueNumber',
-            body: GitHubJson.encode(issue))
-        .then<Issue>((response) {
-      return Issue.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-    });
+        .request(
+          'PATCH',
+          '/repos/${slug.fullName}/issues/$issueNumber',
+          body: GitHubJson.encode(issue),
+          statusCode: StatusCodes.OK,
+        )
+        .then<Issue>((response) =>
+            Issue.fromJson(jsonDecode(response.body) as Map<String, dynamic>));
   }
 
   /// Get an issue.
   ///
-  /// API docs: https://developer.github.com/v3/issues/#get-a-single-issue
-  Future<Issue> get(RepositorySlug slug, int issueNumber) =>
-      github.getJSON('/repos/${slug.fullName}/issues/$issueNumber',
-          convert: (i) => Issue.fromJson(i));
+  /// API docs: https://developer.github.com/v3/issues/#get-an-issue
+  Future<Issue> get(RepositorySlug slug, int issueNumber) => github.getJSON(
+        '/repos/${slug.fullName}/issues/$issueNumber',
+        statusCode: StatusCodes.OK,
+        convert: (i) => Issue.fromJson(i),
+      );
 
   /// Create an issue.
   ///
@@ -180,6 +185,7 @@ class IssuesService extends Service {
     final response = await github.request(
       'POST',
       '/repos/${slug.fullName}/issues',
+      statusCode: StatusCodes.CREATED,
       body: GitHubJson.encode(issue),
     );
 
@@ -203,10 +209,17 @@ class IssuesService extends Service {
   /// Checks if a user is an assignee for the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#check-assignee
-  Future<bool> isAssignee(RepositorySlug slug, String repoName) {
-    return github
-        .request('GET', '/repos/${slug.fullName}/assignees/$repoName')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> isAssignee(RepositorySlug slug, String repoName) async {
+    try {
+      await github.request(
+        'GET',
+        '/repos/${slug.fullName}/assignees/$repoName',
+        statusCode: StatusCodes.NO_CONTENT,
+      );
+      return true;
+    } on NotFound {
+      return false;
+    }
   }
 
   /// Lists comments on the specified issue.
@@ -234,8 +247,11 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#get-a-single-comment
   Future<IssueComment> getComment(RepositorySlug slug, int id) =>
-      github.getJSON('/repos/${slug.fullName}/issues/comments/$id',
-          convert: (i) => IssueComment.fromJson(i));
+      github.getJSON(
+        '/repos/${slug.fullName}/issues/comments/$id',
+        statusCode: StatusCodes.OK,
+        convert: (i) => IssueComment.fromJson(i),
+      );
 
   /// Creates a new comment on the specified issue
   ///
@@ -256,10 +272,13 @@ class IssuesService extends Service {
   /// Deletes an issue comment.
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#delete-a-comment
-  Future<bool> deleteComment(RepositorySlug slug, int id) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/issues/comments/$id')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> deleteComment(RepositorySlug slug, int id) async {
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/issues/comments/$id',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   // TODO: Implement issues events methods: https://developer.github.com/v3/issues/events/
@@ -284,28 +303,36 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#create-a-label
   Future<IssueLabel> createLabel(
       RepositorySlug slug, String name, String color) {
-    return github.postJSON('/repos/${slug.fullName}/labels',
-        body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: (i) => IssueLabel.fromJson(i));
+    return github.postJSON(
+      '/repos/${slug.fullName}/labels',
+      body: GitHubJson.encode({'name': name, 'color': color}),
+      statusCode: StatusCodes.CREATED,
+      convert: (i) => IssueLabel.fromJson(i),
+    );
   }
 
   /// Edits a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
-    return github.postJSON('/repos/${slug.fullName}/labels/$name',
-        body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: (i) => IssueLabel.fromJson(i));
+    return github.postJSON(
+      '/repos/${slug.fullName}/labels/$name',
+      body: GitHubJson.encode({'name': name, 'color': color}),
+      statusCode: StatusCodes.OK,
+      convert: (i) => IssueLabel.fromJson(i),
+    );
   }
 
   /// Deletes a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#delete-a-label
   Future<bool> deleteLabel(RepositorySlug slug, String name) async {
-    final response =
-        await github.request('DELETE', '/repos/${slug.fullName}/labels/$name');
-
-    return response.statusCode == StatusCodes.NO_CONTENT;
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/labels/$name',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Lists all labels for an issue.
@@ -322,10 +349,14 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#add-labels-to-an-issue
   Future<List<IssueLabel>> addLabelsToIssue(
-      RepositorySlug slug, int issueNumber, List<String> labels) {
+    RepositorySlug slug,
+    int issueNumber,
+    List<String> labels,
+  ) {
     return github.postJSON<List<dynamic>, List<IssueLabel>>(
       '/repos/${slug.fullName}/issues/$issueNumber/labels',
       body: GitHubJson.encode(labels),
+      statusCode: StatusCodes.OK,
       convert: (input) => input
           .cast<Map<String, dynamic>>()
           .map((i) => IssueLabel.fromJson(i))
@@ -339,12 +370,14 @@ class IssuesService extends Service {
   Future<List<IssueLabel>> replaceLabelsForIssue(
       RepositorySlug slug, int issueNumber, List<String> labels) {
     return github
-        .request('PUT', '/repos/${slug.fullName}/issues/$issueNumber/labels',
-            body: GitHubJson.encode(labels))
-        .then((response) {
-      return jsonDecode(response.body)
-          .map((Map<String, dynamic> it) => IssueLabel.fromJson(it));
-    });
+        .request(
+          'PUT',
+          '/repos/${slug.fullName}/issues/$issueNumber/labels',
+          body: GitHubJson.encode(labels),
+          statusCode: StatusCodes.OK,
+        )
+        .then((response) => jsonDecode(response.body)
+            .map((Map<String, dynamic> it) => IssueLabel.fromJson(it)));
   }
 
   /// Removes a label for an issue.
@@ -352,19 +385,27 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#remove-a-label-from-an-issue
   Future<bool> removeLabelForIssue(
       RepositorySlug slug, int issueNumber, String label) async {
-    final response = await github.request(
-        'DELETE', '/repos/${slug.fullName}/issues/$issueNumber/labels/$label');
-
-    return response.statusCode == StatusCodes.OK;
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/issues/$issueNumber/labels/$label',
+      statusCode: StatusCodes.OK,
+    );
+    return true;
   }
 
   /// Removes all labels for an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#remove-all-labels-from-an-issue
-  Future<bool> removeAllLabelsForIssue(RepositorySlug slug, int issueNumber) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/issues/$issueNumber/labels')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> removeAllLabelsForIssue(
+    RepositorySlug slug,
+    int issueNumber,
+  ) async {
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/issues/$issueNumber/labels',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   // TODO: Implement listLabelsByMilestone: https://developer.github.com/v3/issues/labels/#get-labels-for-every-issue-in-a-milestone
@@ -383,10 +424,15 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/milestones/#create-a-milestone
   Future<Milestone> createMilestone(
-      RepositorySlug slug, CreateMilestone request) {
-    return github.postJSON('/repos/${slug.fullName}/milestones',
-        body: GitHubJson.encode(request),
-        convert: (i) => Milestone.fromJson(i));
+    RepositorySlug slug,
+    CreateMilestone request,
+  ) {
+    return github.postJSON(
+      '/repos/${slug.fullName}/milestones',
+      statusCode: StatusCodes.CREATED,
+      body: GitHubJson.encode(request),
+      convert: (i) => Milestone.fromJson(i),
+    );
   }
 
   // TODO: Implement editMilestone: https://developer.github.com/v3/issues/milestones/#update-a-milestone
@@ -394,9 +440,12 @@ class IssuesService extends Service {
   /// Deletes a milestone.
   ///
   /// API docs: https://developer.github.com/v3/issues/milestones/#delete-a-milestone
-  Future<bool> deleteMilestone(RepositorySlug slug, int number) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/milestones/$number')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> deleteMilestone(RepositorySlug slug, int number) async {
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/milestones/$number',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 }

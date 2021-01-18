@@ -53,17 +53,22 @@ class PullRequestsService extends Service {
       '/repos/${slug.fullName}/pulls',
       convert: (i) => PullRequest.fromJson(i),
       body: GitHubJson.encode(request),
-      preview: request.draft
-          ? 'application/vnd.github.shadow-cat-preview+json'
-          : null,
+      preview: 'application/vnd.github.sailor-v-preview+json',
+      statusCode: StatusCodes.CREATED,
     );
   }
 
   /// Edit a pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
-  Future<PullRequest> edit(RepositorySlug slug, int number,
-      {String title, String body, String state, String base}) {
+  Future<PullRequest> edit(
+    RepositorySlug slug,
+    int number, {
+    String title,
+    String body,
+    String state,
+    String base,
+  }) {
     final map = <String, dynamic>{};
     putValue('title', title, map);
     putValue('body', body, map);
@@ -71,12 +76,14 @@ class PullRequestsService extends Service {
     putValue('base', base, map);
 
     return github
-        .request('POST', '/repos/${slug.fullName}/pulls/$number',
-            body: GitHubJson.encode(map))
-        .then((response) {
-      return PullRequest.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
-    });
+        .request(
+          'PATCH',
+          '/repos/${slug.fullName}/pulls/$number',
+          body: GitHubJson.encode(map),
+          statusCode: StatusCodes.OK,
+        )
+        .then((response) => PullRequest.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>));
   }
 
   /// Lists the commits in a pull request.
@@ -99,12 +106,13 @@ class PullRequestsService extends Service {
         (i) => PullRequestFile.fromJson(i));
   }
 
-  Future<bool> isMerged(RepositorySlug slug, int number) {
-    return github
-        .request('GET', '/repos/${slug.fullName}/pulls/$number/merge')
-        .then((response) {
-      return response.statusCode == 204;
-    });
+  Future<bool> isMerged(RepositorySlug slug, int number) async {
+    await github.request(
+      'GET',
+      '/repos/${slug.fullName}/pulls/$number/merge',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Merge a pull request (Merge Button).
@@ -122,12 +130,14 @@ class PullRequestsService extends Service {
     }
 
     return github
-        .request('PUT', '/repos/${slug.fullName}/pulls/$number/merge',
-            body: GitHubJson.encode(json))
-        .then((response) {
-      return PullRequestMerge.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
-    });
+        .request(
+          'PUT',
+          '/repos/${slug.fullName}/pulls/$number/merge',
+          body: GitHubJson.encode(json),
+          statusCode: StatusCodes.OK,
+        )
+        .then((response) => PullRequestMerge.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>));
   }
 
   /// Lists all comments on the specified pull request.

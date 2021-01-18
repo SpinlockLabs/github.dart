@@ -15,8 +15,11 @@ class UsersService extends Service {
   /// Fetches the user specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
-  Future<User> getUser(String name) =>
-      github.getJSON('/users/$name', convert: (i) => User.fromJson(i));
+  Future<User> getUser(String name) => github.getJSON(
+        '/users/$name',
+        convert: (i) => User.fromJson(i),
+        statusCode: StatusCodes.OK,
+      );
 
   /// Updates the Current User.
   ///
@@ -70,9 +73,14 @@ class UsersService extends Service {
       convert: (i) => CurrentUser.fromJson(i));
 
   /// Checks if a user exists.
-  Future<bool> isUser(String name) => github
-      .request('GET', '/users/$name')
-      .then((resp) => resp.statusCode == StatusCodes.OK);
+  Future<bool> isUser(String name) async {
+    try {
+      await github.request('GET', '/users/$name', statusCode: StatusCodes.OK);
+      return true;
+    } on NotFound {
+      return false;
+    }
+  }
 
   // TODO: Implement editUser: https://developer.github.com/v3/users/#update-the-authenticated-user
 

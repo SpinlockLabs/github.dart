@@ -149,7 +149,7 @@ class ActivityService extends Service {
 
   /// Marks all notifications up to [lastRead] as read.
   ///
-  /// API docs: https://developer.github.com/v3/activity/notifications/#mark-as-read
+  /// API docs: https://developer.github.com/v3/activity/notifications/#mark-notifications-as-read
   Future<bool> markNotificationsRead({DateTime lastRead}) {
     final data = {};
 
@@ -158,7 +158,9 @@ class ActivityService extends Service {
     }
 
     return github
-        .request('PUT', '/notifications', body: GitHubJson.encode(data))
+        .request('PUT', '/notifications',
+            body: GitHubJson.encode(data),
+            statusCode: StatusCodes.RESET_CONTENT)
         .then((response) {
       return response.statusCode == 205;
     });
@@ -180,7 +182,8 @@ class ActivityService extends Service {
 
     return github
         .request('PUT', '/repos/${slug.fullName}/notifications',
-            body: GitHubJson.encode(data))
+            body: GitHubJson.encode(data),
+            statusCode: StatusCodes.RESET_CONTENT)
         .then((response) {
       return response.statusCode == 205;
     });
@@ -198,7 +201,8 @@ class ActivityService extends Service {
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
   Future<bool> markThreadRead(String threadId) {
     return github
-        .request('PATCH', '/notifications/threads/$threadId')
+        .request('PATCH', '/notifications/threads/$threadId',
+            statusCode: StatusCodes.RESET_CONTENT)
         .then((response) {
       return response.statusCode == StatusCodes.RESET_CONTENT;
     });
@@ -234,33 +238,42 @@ class ActivityService extends Service {
 
   /// Checks if the currently authenticated user has starred the specified repository.
   ///
-  /// API docs: https://developer.github.com/v3/activity/starring/#check-if-you-are-starring-a-repository
-  Future<bool> isStarred(RepositorySlug slug) {
-    return github
-        .request('GET', '/user/starred/${slug.fullName}')
-        .then((response) {
-      return response.statusCode == 204;
-    });
+  /// API docs: https://developer.github.com/v3/activity/starring/#check-if-a-repository-is-starred-by-the-authenticated-user
+  Future<bool> isStarred(RepositorySlug slug) async {
+    try {
+      await github.request(
+        'GET',
+        '/user/starred/${slug.fullName}',
+        statusCode: StatusCodes.NO_CONTENT,
+      );
+      return true;
+    } on NotFound {
+      return false;
+    }
   }
 
   /// Stars the specified repository for the currently authenticated user.
   ///
-  /// API docs: https://developer.github.com/v3/activity/starring/#star-a-repository
-  Future star(RepositorySlug slug) {
-    return github.request('PUT', '/user/starred/${slug.fullName}',
-        headers: {'Content-Length': '0'}).then((response) {
-      return null;
-    });
+  /// API docs: https://developer.github.com/v3/activity/starring/#star-a-repository-for-the-authenticated-user
+  Future<void> star(RepositorySlug slug) async {
+    await github.request(
+      'PUT',
+      '/user/starred/${slug.fullName}',
+      headers: {'Content-Length': '0'},
+      statusCode: StatusCodes.NO_CONTENT,
+    );
   }
 
   /// Unstars the specified repository for the currently authenticated user.
   ///
-  /// API docs: https://developer.github.com/v3/activity/starring/#unstar-a-repository
-  Future unstar(RepositorySlug slug) {
-    return github.request('DELETE', '/user/starred/${slug.fullName}',
-        headers: {'Content-Length': '0'}).then((response) {
-      return null;
-    });
+  /// API docs: https://developer.github.com/v3/activity/starring/#unstar-a-repository-for-the-authenticated-user
+  Future<void> unstar(RepositorySlug slug) async {
+    await github.request(
+      'DELETE',
+      '/user/starred/${slug.fullName}',
+      headers: {'Content-Length': '0'},
+      statusCode: StatusCodes.NO_CONTENT,
+    );
   }
 
   /// Lists the watchers of the specified repository.
@@ -318,11 +331,13 @@ class ActivityService extends Service {
   /// Deletes a Repository Subscription
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
-  Future deleteRepositorySubscription(RepositorySlug slug) {
-    return github.request('DELETE', '/repos/${slug.fullName}/subscription',
-        headers: {'Content-Length': '0'}).then((response) {
-      return null;
-    });
+  Future<void> deleteRepositorySubscription(RepositorySlug slug) async {
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/subscription',
+      headers: {'Content-Length': '0'},
+      statusCode: StatusCodes.NO_CONTENT,
+    );
   }
 }
 
@@ -385,7 +400,9 @@ class EventPoller {
           headers['If-None-Match'] = _lastFetched;
         }
 
-        github.request('GET', path, headers: headers).then(handleEvent);
+        github
+            .request('GET', path, headers: headers, statusCode: null)
+            .then(handleEvent);
       });
     }
 
@@ -395,7 +412,9 @@ class EventPoller {
       headers['If-None-Match'] = _lastFetched;
     }
 
-    github.request('GET', path, headers: headers).then(handleEvent);
+    github
+        .request('GET', path, headers: headers, statusCode: null)
+        .then(handleEvent);
 
     return _controller.stream;
   }

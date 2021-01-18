@@ -98,21 +98,27 @@ class GitService extends Service {
     final headers = {'content-length': body.length.toString()};
 
     return github
-        .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',
-            body: body, headers: headers)
-        .then((response) {
-      return GitReference.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
-    });
+        .request(
+          'PATCH',
+          '/repos/${slug.fullName}/git/refs/$ref',
+          body: body,
+          headers: headers,
+          statusCode: StatusCodes.OK,
+        )
+        .then((response) => GitReference.fromJson(
+            jsonDecode(response.body) as Map<String, dynamic>));
   }
 
   /// Deletes a reference.
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#delete-a-reference
-  Future<bool> deleteReference(RepositorySlug slug, String ref) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/git/refs/$ref')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+  Future<bool> deleteReference(RepositorySlug slug, String ref) async {
+    await github.request(
+      'DELETE',
+      '/repos/${slug.fullName}/git/refs/$ref',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
+    return true;
   }
 
   /// Fetches a tag from the repo given a SHA.
