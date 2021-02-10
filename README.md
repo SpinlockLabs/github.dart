@@ -19,7 +19,7 @@ Please submit issues and pull requests, help out, or just give encouragement.
 
 ## Links
 
-- [Library Demos](https://github.directcode.org/demos/)
+- [Library Demos](https://github.directcode.org/demos/) (based on the [sample code](https://github.com/SpinlockLabs/github.dart/tree/master/example))
 - [Pub Package](https://pub.dartlang.org/packages/github)
 - [Wiki](https://github.com/SpinlockLabs/github.dart/wiki)
 - [Latest API reference](https://pub.dev/documentation/github/latest/)
