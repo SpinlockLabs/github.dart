@@ -15,7 +15,8 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/blobs/#get-a-blob
   Future<GitBlob> getBlob(RepositorySlug slug, String? sha) =>
       github.getJSON('/repos/${slug.fullName}/git/blobs/$sha',
-          convert: (dynamic i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => GitBlob.fromJson(i),
+          statusCode: StatusCodes.OK);
 
   /// Creates a blob with specified [blob] content.
   ///
@@ -32,7 +33,8 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/commits/#get-a-commit
   Future<GitCommit> getCommit(RepositorySlug slug, String? sha) =>
       github.getJSON('/repos/${slug.fullName}/git/commits/$sha',
-          convert: (dynamic i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => GitCommit.fromJson(i),
+          statusCode: StatusCodes.OK);
 
   /// Creates a new commit in a repository.
   ///
@@ -51,7 +53,8 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#get-a-reference
   Future<GitReference> getReference(RepositorySlug slug, String ref) =>
       github.getJSON('/repos/${slug.fullName}/git/refs/$ref',
-          convert: (dynamic i) => GitReference.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => GitReference.fromJson(i),
+          statusCode: StatusCodes.OK);
 
   /// Lists the references in a repository.
   ///
@@ -120,7 +123,8 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/tags/#get-a-tag
   Future<GitTag> getTag(RepositorySlug slug, String? sha) =>
       github.getJSON('/repos/${slug.fullName}/git/tags/$sha',
-          convert: (dynamic i) => GitTag.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => GitTag.fromJson(i),
+          statusCode: StatusCodes.OK);
 
   /// Creates a new tag in a repository.
   ///
@@ -145,7 +149,8 @@ class GitService extends Service {
     }
 
     return github.getJSON(path,
-        convert: (dynamic j) => GitTree.fromJson(j), statusCode: StatusCodes.OK);
+        convert: (dynamic j) => GitTree.fromJson(j),
+        statusCode: StatusCodes.OK);
   }
 
   /// Creates a new tree in a repository.

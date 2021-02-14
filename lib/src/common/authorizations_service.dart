@@ -16,8 +16,8 @@ class AuthorizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/oauth_authorizations/#list-your-authorizations
   Stream<Authorization> listAuthorizations() {
-    return PaginationHelper(github)
-        .objects('GET', '/authorizations', (dynamic i) => Authorization.fromJson(i));
+    return PaginationHelper(github).objects(
+        'GET', '/authorizations', (dynamic i) => Authorization.fromJson(i));
   }
 
   /// Fetches an authorization specified by [id].

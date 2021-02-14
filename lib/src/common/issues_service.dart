@@ -196,8 +196,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
   Stream<User> listAssignees(RepositorySlug slug) {
-    return PaginationHelper(github).objects(
-        'GET', '/repos/${slug.fullName}/assignees', (dynamic i) => User.fromJson(i));
+    return PaginationHelper(github).objects('GET',
+        '/repos/${slug.fullName}/assignees', (dynamic i) => User.fromJson(i));
   }
 
   /// Checks if a user is an assignee for the specified repository.
@@ -269,7 +269,9 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabels(RepositorySlug slug) {
     return PaginationHelper(github).objects(
-        'GET', '/repos/${slug.fullName}/labels', (dynamic i) => IssueLabel.fromJson(i));
+        'GET',
+        '/repos/${slug.fullName}/labels',
+        (dynamic i) => IssueLabel.fromJson(i));
   }
 
   /// Fetches a single label.
@@ -277,7 +279,8 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#get-a-single-label
   Future<IssueLabel> getLabel(RepositorySlug slug, String name) =>
       github.getJSON('/repos/${slug.fullName}/labels/$name',
-          convert: (dynamic i) => IssueLabel.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => IssueLabel.fromJson(i),
+          statusCode: StatusCodes.OK);
 
   /// Creates a new label on the specified repository.
   ///
@@ -373,8 +376,10 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/milestones/#list-milestones-for-a-repository
   Stream<Milestone> listMilestones(RepositorySlug slug) {
-    return PaginationHelper(github).objects('GET',
-        '/repos/${slug.fullName}/milestones', (dynamic i) => Milestone.fromJson(i));
+    return PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/milestones',
+        (dynamic i) => Milestone.fromJson(i));
   }
 
   // TODO: Implement getMilestone: https://developer.github.com/v3/issues/milestones/#get-a-single-milestone

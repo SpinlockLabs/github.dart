@@ -192,8 +192,7 @@ class Tag {
 
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 
-  factory Tag.fromJson(Map<String, dynamic> input) =>
-      _$TagFromJson(input);
+  factory Tag.fromJson(Map<String, dynamic> input) => _$TagFromJson(input);
 
   @override
   String toString() => 'Tag: $name';

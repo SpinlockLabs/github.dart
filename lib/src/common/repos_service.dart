@@ -832,8 +832,7 @@ class RepositoriesService extends Service {
   /// * [id]: id of the key to retrieve.
   ///
   /// https://developer.github.com/v3/repos/keys/#get
-  Future<PublicKey> getDeployKey(RepositorySlug slug,
-      {required int id}) async {
+  Future<PublicKey> getDeployKey(RepositorySlug slug, {required int id}) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(id);
     return github.getJSON<Map<String, dynamic>, PublicKey>(

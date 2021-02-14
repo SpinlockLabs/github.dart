@@ -69,7 +69,8 @@ class MiscService extends Service {
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() =>
       github.getJSON('https://status.github.com/api/status.json',
-          statusCode: StatusCodes.OK, convert: (dynamic i) => APIStatus.fromJson(i));
+          statusCode: StatusCodes.OK,
+          convert: (dynamic i) => APIStatus.fromJson(i));
 
   /// Returns an ASCII Octocat with the specified [text].
   Future<String> getOctocat([String? text]) {

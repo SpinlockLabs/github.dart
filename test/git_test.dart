@@ -25,7 +25,8 @@ void main() {
       git.getBlob(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: (dynamic i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitBlob.fromJson(i),
+          statusCode: StatusCodes.OK));
     });
   });
 
@@ -57,7 +58,8 @@ void main() {
       git.getCommit(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/commits/sh',
-          convert: (dynamic i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitCommit.fromJson(i),
+          statusCode: StatusCodes.OK));
     });
   });
 
@@ -176,7 +178,8 @@ void main() {
     test('constructs correct path', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any!, any!)).thenReturn(Future.value(expectedResponse));
+      when(github.request(any!, any!))
+          .thenReturn(Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
@@ -191,7 +194,8 @@ void main() {
       git.getTag(repo, someSha);
 
       verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-          convert: (dynamic i) => GitTag.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitTag.fromJson(i),
+          statusCode: StatusCodes.OK));
     });
   });
 
@@ -225,7 +229,8 @@ void main() {
       git.getTree(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: (dynamic j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (dynamic j) => GitTree.fromJson(j),
+          statusCode: StatusCodes.OK));
     });
   });
 
@@ -234,7 +239,8 @@ void main() {
       git.getTree(repo, 'sh', recursive: true);
 
       verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: (dynamic j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (dynamic j) => GitTree.fromJson(j),
+          statusCode: StatusCodes.OK));
     });
   });
 

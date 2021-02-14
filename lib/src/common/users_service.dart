@@ -79,8 +79,8 @@ class UsersService extends Service {
   /// Lists all users.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-all-users
-  Stream<User> listUsers({int? pages, int? since}) =>
-      PaginationHelper(github).objects('GET', '/users', (dynamic i) => User.fromJson(i),
+  Stream<User> listUsers({int? pages, int? since}) => PaginationHelper(github)
+      .objects('GET', '/users', (dynamic i) => User.fromJson(i),
           pages: pages, params: {'since': since});
 
   /// Lists all email addresses for the currently authenticated user.

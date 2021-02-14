@@ -14,8 +14,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return PaginationHelper(github)
-        .objects('GET', '/users/$username/gists', (dynamic i) => Gist.fromJson(i));
+    return PaginationHelper(github).objects(
+        'GET', '/users/$username/gists', (dynamic i) => Gist.fromJson(i));
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -166,8 +166,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
-    return PaginationHelper(github).objects(
-        'GET', '/gists/$gistId/comments', (dynamic i) => GistComment.fromJson(i));
+    return PaginationHelper(github).objects('GET', '/gists/$gistId/comments',
+        (dynamic i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment

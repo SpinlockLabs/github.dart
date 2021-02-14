@@ -368,7 +368,7 @@ class GitHub {
     } else {
       return response;
     }
-    
+
     throw UnknownError(this);
   }
 
