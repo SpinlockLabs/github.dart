@@ -336,7 +336,7 @@ class EventPoller {
   final List<String?> handledEvents = [];
 
   Timer? _timer;
-  StreamController<Event>? _controller;
+  StreamController<Event>? _controller; // ignore: close_sinks
 
   String? _lastFetched;
 
@@ -385,20 +385,20 @@ class EventPoller {
       }
 
       _timer ??= Timer.periodic(Duration(seconds: interval!), (timer) {
-        final headers = <String, String?>{};
+        final headers = <String, String>{};
 
         if (_lastFetched != null) {
-          headers['If-None-Match'] = _lastFetched;
+          headers['If-None-Match'] = _lastFetched ?? '';
         }
 
         github.request('GET', path, headers: headers).then(handleEvent);
       });
     }
 
-    final headers = <String, String?>{};
+    final headers = <String, String>{};
 
     if (_lastFetched != null) {
-      headers['If-None-Match'] = _lastFetched;
+      headers['If-None-Match'] = _lastFetched ?? '';
     }
 
     github.request('GET', path, headers: headers).then(handleEvent);

@@ -293,7 +293,7 @@ class GitHub {
   Future<http.Response> request(
     String method,
     String path, {
-    Map<String, String?>? headers,
+    Map<String, String>? headers,
     Map<String, dynamic>? params,
     dynamic body,
     int? statusCode,
@@ -307,7 +307,7 @@ class GitHub {
       await Future.delayed(waitTime);
     }
 
-    headers ??= {};
+    headers ??= <String, String>{};
 
     if (preview != null) {
       headers['Accept'] = preview;
@@ -346,7 +346,7 @@ class GitHub {
     }
 
     final request = http.Request(method, Uri.parse(url.toString()));
-    request.headers.addAll(headers as Map<String, String>);
+    request.headers.addAll(headers);
     if (body != null) {
       if (body is List<int>) {
         request.bodyBytes = body;
