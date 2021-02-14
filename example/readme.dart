@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:html';
 
 import 'package:github/github.dart';
@@ -12,11 +11,6 @@ Future<void> main() async {
   readmeDiv = querySelector('#readme');
   var repo = RepositorySlug('SpinlockLabs', 'github.dart');
   final readme = await github.repositories.getReadme(repo);
-  var markdown = readme.content;
-  if (readme.encoding == 'base64') {
-    markdown = String.fromCharCodes(base64.decode(markdown));
-  }
-  print(markdown);
-  final html = await github.misc.renderMarkdown(markdown);
+  final html = await github.misc.renderMarkdown(readme.text);
   readmeDiv.appendHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
 }
