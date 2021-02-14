@@ -25,57 +25,57 @@ class Organization {
   });
 
   /// Organization Login
-  final String login;
+  final String? login;
 
   /// Organization ID
-  final int id;
+  final int? id;
 
   /// Url to Organization Profile
   @JsonKey(name: 'html_url')
-  final String htmlUrl;
+  final String? htmlUrl;
 
   /// Url to the Organization Avatar
   @JsonKey(name: 'avatar_url')
-  final String avatarUrl;
+  final String? avatarUrl;
 
   /// Organization Name
-  final String name;
+  final String? name;
 
   /// Organization Company
-  final String company;
+  final String? company;
 
   /// Organization Blog
-  final String blog;
+  final String? blog;
 
   /// Organization Location
-  final String location;
+  final String? location;
 
   /// Organization Email
-  final String email;
+  final String? email;
 
   /// Number of Public Repositories
   @JsonKey(name: 'public_repos')
-  final int publicReposCount;
+  final int? publicReposCount;
 
   /// Number of Public Gists
   @JsonKey(name: 'public_gists')
-  final int publicGistsCount;
+  final int? publicGistsCount;
 
   /// Number of Followers
   @JsonKey(name: 'followers')
-  final int followersCount;
+  final int? followersCount;
 
   /// Number of People this Organization is Following
   @JsonKey(name: 'following')
-  final int followingCount;
+  final int? followingCount;
 
   /// Time this organization was created
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// Time this organization was updated
   @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   factory Organization.fromJson(Map<String, dynamic> input) =>
       _$OrganizationFromJson(input);
@@ -89,8 +89,8 @@ class OrganizationMembership {
     this.state,
     this.organization,
   });
-  final String state;
-  final Organization organization;
+  final String? state;
+  final Organization? organization;
 
   factory OrganizationMembership.fromJson(Map<String, dynamic> input) {
     return _$OrganizationMembershipFromJson(input);
@@ -110,24 +110,24 @@ class Team {
   });
 
   /// Team Name
-  final String name;
+  final String? name;
 
   /// Team ID
-  final int id;
+  final int? id;
 
   /// Team Permission
-  final String permission;
+  final String? permission;
 
   /// Number of Members
   @JsonKey(name: 'members_count')
-  final int membersCount;
+  final int? membersCount;
 
   /// Number of Repositories
   @JsonKey(name: 'repos_count')
-  final int reposCount;
+  final int? reposCount;
 
   /// Organization
-  final Organization organization;
+  final Organization? organization;
 
   factory Team.fromJson(Map<String, dynamic> input) {
     return _$TeamFromJson(input);
@@ -136,7 +136,7 @@ class Team {
 
 /// Model class for the team membership state.
 class TeamMembershipState {
-  final String name;
+  final String? name;
 
   TeamMembershipState(this.name);
 
@@ -157,25 +157,25 @@ class TeamMember {
       this.htmlUrl});
 
   /// Member Username
-  final String login;
+  final String? login;
 
   /// Member ID
-  final int id;
+  final int? id;
 
   /// Url to Member Avatar
   @JsonKey(name: 'avatar_url')
-  final String avatarUrl;
+  final String? avatarUrl;
 
   /// Member Type
-  final String type;
+  final String? type;
 
   /// If the member is a site administrator
   @JsonKey(name: 'site_admin')
-  final bool siteAdmin;
+  final bool? siteAdmin;
 
   /// Profile of the Member
   @JsonKey(name: 'html_url')
-  final String htmlUrl;
+  final String? htmlUrl;
 
   factory TeamMember.fromJson(Map<String, dynamic> input) {
     return _$TeamMemberFromJson(input);
@@ -188,7 +188,7 @@ class TeamRepository extends Repository {
   TeamRepository({this.permissions});
 
   /// Repository Permissions.
-  TeamRepositoryPermissions permissions;
+  TeamRepositoryPermissions? permissions;
 
   factory TeamRepository.fromJson(Map<String, dynamic> input) {
     return _$TeamRepositoryFromJson(input);
@@ -201,13 +201,13 @@ class TeamRepositoryPermissions {
   TeamRepositoryPermissions(this.admin, this.push, this.pull);
 
   /// Administrative Access
-  final bool admin;
+  final bool? admin;
 
   /// Push Access
-  final bool push;
+  final bool? push;
 
   /// Pull Access
-  final bool pull;
+  final bool? pull;
 
   factory TeamRepositoryPermissions.fromJson(Map<String, dynamic> json) =>
       _$TeamRepositoryPermissionsFromJson(json);

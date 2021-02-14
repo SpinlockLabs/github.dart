@@ -11,10 +11,10 @@ class RepositoryPages {
     this.hasCustom404,
   });
 
-  String cname;
-  String status;
+  String? cname;
+  String? status;
   @JsonKey(name: 'custom_404')
-  bool hasCustom404;
+  bool? hasCustom404;
 
   factory RepositoryPages.fromJson(Map<String, dynamic> input) =>
       _$RepositoryPagesFromJson(input);
@@ -33,14 +33,14 @@ class PageBuild {
     this.createdAt,
     this.updatedAt,
   });
-  String url;
-  String status;
-  PageBuildError error;
-  PageBuildPusher pusher;
-  String commit;
-  int duration;
-  DateTime createdAt;
-  DateTime updatedAt;
+  String? url;
+  String? status;
+  PageBuildError? error;
+  PageBuildPusher? pusher;
+  String? commit;
+  int? duration;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   factory PageBuild.fromJson(Map<String, dynamic> input) =>
       _$PageBuildFromJson(input);
@@ -57,13 +57,13 @@ class PageBuildPusher {
     this.type,
     this.siteAdmin,
   });
-  int id;
-  String login;
+  int? id;
+  String? login;
   @JsonKey(name: 'url')
-  String apiUrl;
-  String htmlUrl;
-  String type;
-  bool siteAdmin;
+  String? apiUrl;
+  String? htmlUrl;
+  String? type;
+  bool? siteAdmin;
 
   factory PageBuildPusher.fromJson(Map<String, dynamic> input) =>
       _$PageBuildPusherFromJson(input);
@@ -73,7 +73,7 @@ class PageBuildPusher {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class PageBuildError {
   PageBuildError({this.message});
-  String message;
+  String? message;
 
   factory PageBuildError.fromJson(Map<String, dynamic> input) =>
       _$PageBuildErrorFromJson(input);

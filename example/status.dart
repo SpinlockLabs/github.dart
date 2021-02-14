@@ -8,10 +8,10 @@ Future<void> main() async {
     requestHeaders: {'Origin': window.location.origin},
   );
 
-  final text = request.responseText;
+  final text = request.responseText!;
   final map = json.decode(text);
 
-  querySelector('#status')
+  querySelector('#status')!
     ..appendText(map['status'])
     ..classes.add('status-${map["status"]}');
 }

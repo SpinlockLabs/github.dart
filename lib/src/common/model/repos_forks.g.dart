@@ -8,7 +8,7 @@ part of 'repos_forks.dart';
 
 CreateFork _$CreateForkFromJson(Map<String, dynamic> json) {
   return CreateFork(
-    json['organization'] as String,
+    json['organization'] as String?,
   );
 }
 

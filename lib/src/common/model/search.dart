@@ -4,24 +4,24 @@ import 'package:json_annotation/json_annotation.dart';
 part 'search.g.dart';
 
 abstract class SearchResults<T> {
-  int totalCount;
-  bool incompleteResults;
-  List<T> items;
+  int? totalCount;
+  bool? incompleteResults;
+  List<T>? items;
 }
 
 @JsonSerializable(createToJson: false)
 class CodeSearchResults implements SearchResults<CodeSearchItem> {
   @JsonKey(name: 'total_count')
   @override
-  int totalCount;
+  int? totalCount;
 
   @JsonKey(name: 'incomplete_results')
   @override
-  bool incompleteResults;
+  bool? incompleteResults;
 
   @JsonKey(fromJson: CodeSearchItem.fromJsonList)
   @override
-  List<CodeSearchItem> items;
+  List<CodeSearchItem>? items;
 
   static CodeSearchResults fromJson(Map<String, dynamic> input) =>
       _$CodeSearchResultsFromJson(input);
@@ -29,20 +29,20 @@ class CodeSearchResults implements SearchResults<CodeSearchItem> {
 
 @JsonSerializable(createToJson: false)
 class CodeSearchItem {
-  String name;
-  String path;
-  String sha;
+  String? name;
+  String? path;
+  String? sha;
 
   @JsonKey(fromJson: Uri.parse)
-  Uri url;
+  Uri? url;
 
   @JsonKey(name: 'git_url', fromJson: Uri.parse)
-  Uri gitUrl;
+  Uri? gitUrl;
 
   @JsonKey(name: 'html_url', fromJson: Uri.parse)
-  Uri htmlUrl;
+  Uri? htmlUrl;
 
-  Repository repository;
+  Repository? repository;
 
   static CodeSearchItem fromJson(Map<String, dynamic> input) {
     return _$CodeSearchItemFromJson(input);

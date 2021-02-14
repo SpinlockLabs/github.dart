@@ -16,15 +16,15 @@ class Event {
     this.payload,
     this.createdAt,
   });
-  String id;
-  String type;
-  Repository repo;
-  User actor;
-  Organization org;
-  Map<String, dynamic> payload;
+  String? id;
+  String? type;
+  Repository? repo;
+  User? actor;
+  Organization? org;
+  Map<String, dynamic>? payload;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   factory Event.fromJson(Map<String, dynamic> input) => _$EventFromJson(input);
   Map<String, dynamic> toJson() => _$EventToJson(this);
@@ -39,12 +39,12 @@ class RepositorySubscription {
     this.reason,
     this.createdAt,
   });
-  bool subscribed;
-  bool ignored;
-  String reason;
+  bool? subscribed;
+  bool? ignored;
+  String? reason;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   factory RepositorySubscription.fromJson(Map<String, dynamic> input) =>
       _$RepositorySubscriptionFromJson(input);

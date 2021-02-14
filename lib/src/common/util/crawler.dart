@@ -12,9 +12,9 @@ class RepositoryCrawler {
     Stream<GitHubFile> scan(String path) async* {
       final contents = await github.repositories.getContents(slug, path);
 
-      for (final content in contents.tree) {
+      for (final content in contents.tree!) {
         if (content.type == 'dir') {
-          yield* scan(content.path);
+          yield* scan(content.path!);
         } else {
           yield content;
         }

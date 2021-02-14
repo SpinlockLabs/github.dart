@@ -6,7 +6,7 @@ part 'repos_forks.g.dart';
 class CreateFork {
   CreateFork([this.organization]);
 
-  String organization;
+  String? organization;
 
   factory CreateFork.fromJson(Map<String, dynamic> input) =>
       _$CreateForkFromJson(input);

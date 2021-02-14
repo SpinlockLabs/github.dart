@@ -9,9 +9,9 @@ import 'package:test/test.dart';
 class MockGitHub extends Mock implements GitHub {}
 
 void main() {
-  MockGitHub github;
-  GitService git;
-  RepositorySlug repo;
+  late MockGitHub github;
+  late GitService git;
+  late RepositorySlug repo;
   const someSha = 'someSHA';
 
   setUp(() {
@@ -25,7 +25,7 @@ void main() {
       git.getBlob(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: (i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitBlob.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
@@ -36,7 +36,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/blobs',
-        convert: (i) => GitBlob.fromJson(i),
+        convert: (dynamic i) => GitBlob.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: GitHubJson.encode(blob),
       ));
@@ -46,7 +46,7 @@ void main() {
       var blob = CreateGitBlob('bbb', 'utf-8');
 
       git.createBlob(repo, blob);
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['content'], equals('bbb'));
       expect(body['encoding'], equals('utf-8'));
     });
@@ -57,7 +57,7 @@ void main() {
       git.getCommit(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/commits/sh',
-          convert: (i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitCommit.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
@@ -68,7 +68,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/commits',
-        convert: (i) => GitCommit.fromJson(i),
+        convert: (dynamic i) => GitCommit.fromJson(i),
         statusCode: StatusCodes.CREATED,
         body: GitHubJson.encode(commit),
       ));
@@ -80,14 +80,14 @@ void main() {
 
       final commit = CreateGitCommit('aMessage', 'aTreeSha')
         ..parents = ['parentSha1', 'parentSha2']
-        ..committer = GitCommitUser('cName', 'cEmail', parseDateTime(date))
-        ..author = GitCommitUser('aName', 'aEmail', parseDateTime(date));
+        ..committer = GitCommitUser('cName', 'cEmail', DateTime.parse(date))
+        ..author = GitCommitUser('aName', 'aEmail', DateTime.parse(date));
 
       // when
       git.createCommit(repo, commit);
 
       // then
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['message'], equals('aMessage'));
       expect(body['tree'], equals('aTreeSha'));
       expect(body['parents'], equals(['parentSha1', 'parentSha2']));
@@ -105,7 +105,7 @@ void main() {
       git.getReference(repo, 'heads/b');
 
       verify(github.getJSON('/repos/o/n/git/refs/heads/b',
-          convert: (i) => GitReference.fromJson(i),
+          convert: (dynamic i) => GitReference.fromJson(i),
           statusCode: StatusCodes.OK));
     });
   });
@@ -116,7 +116,7 @@ void main() {
       git.createReference(repo, someRef, someSha);
 
       verify(github.postJSON('/repos/o/n/git/refs',
-          convert: (i) => GitReference.fromJson(i),
+          convert: (dynamic i) => GitReference.fromJson(i),
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode({'ref': someRef, 'sha': someSha})));
     });
@@ -124,7 +124,7 @@ void main() {
     test('creates valid JSON body', () {
       git.createReference(repo, someRef, someSha);
 
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['ref'], equals(someRef));
       expect(body['sha'], equals(someSha));
     });
@@ -135,7 +135,7 @@ void main() {
       // given
       final expectedResponse = http.Response('{}', 200);
 
-      when(github.request(any, any, body: any, headers: any))
+      when(github.request(any!, any!, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
       // when
@@ -149,7 +149,7 @@ void main() {
     test('creates valid JSON body', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any, any, body: any, headers: any))
+      when(github.request(any!, any!, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
       // when
@@ -157,8 +157,8 @@ void main() {
 
       // then
       final captured = verify(github.request(
-        any,
-        any,
+        any!,
+        any!,
         body: captureAny,
         headers: captureAny,
       )).captured;
@@ -176,7 +176,7 @@ void main() {
     test('constructs correct path', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
+      when(github.request(any!, any!)).thenReturn(Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
@@ -191,7 +191,7 @@ void main() {
       git.getTag(repo, someSha);
 
       verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-          convert: (i) => GitTag.fromJson(i), statusCode: StatusCodes.OK));
+          convert: (dynamic i) => GitTag.fromJson(i), statusCode: StatusCodes.OK));
     });
   });
 
@@ -203,7 +203,7 @@ void main() {
       git.createTag(repo, createGitTag);
 
       verify(github.postJSON('/repos/o/n/git/tags',
-          convert: (i) => GitTag.fromJson(i),
+          convert: (dynamic i) => GitTag.fromJson(i),
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode(createGitTag)));
     });
@@ -211,7 +211,7 @@ void main() {
     test('creates valid JSON body', () {
       git.createTag(repo, createGitTag);
 
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['tag'], equals('v0.0.1'));
       expect(body['message'], equals('a message'));
       expect(body['object'], equals(someSha));
@@ -225,7 +225,7 @@ void main() {
       git.getTree(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: (j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (dynamic j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
@@ -234,7 +234,7 @@ void main() {
       git.getTree(repo, 'sh', recursive: true);
 
       verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: (j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
+          convert: (dynamic j) => GitTree.fromJson(j), statusCode: StatusCodes.OK));
     });
   });
 
@@ -244,7 +244,7 @@ void main() {
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
-          convert: (j) => GitTree.fromJson(j),
+          convert: (dynamic j) => GitTree.fromJson(j),
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode(createGitTree)));
     });
@@ -260,7 +260,7 @@ void main() {
       git.createTree(repo, tree);
 
       // then
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -281,7 +281,7 @@ void main() {
       git.createTree(repo, tree);
 
       // then
-      final body = captureSentBody(github);
+      final body = captureSentBody(github)!;
       expect(body['tree'], isNotNull);
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
@@ -292,14 +292,14 @@ void main() {
   });
 }
 
-Map<String, dynamic> captureSentBody(MockGitHub github) {
+Map<String, dynamic>? captureSentBody(MockGitHub github) {
   final bodyString = verify(github.postJSON(
-    any,
+    any!,
     convert: any,
     statusCode: any,
     body: captureAny,
   )).captured.single;
 
-  final body = jsonDecode(bodyString) as Map<String, dynamic>;
+  final body = jsonDecode(bodyString) as Map<String, dynamic>?;
   return body;
 }

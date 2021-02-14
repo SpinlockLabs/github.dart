@@ -8,7 +8,7 @@ part of 'hooks.dart';
 
 RepositoryEvent _$RepositoryEventFromJson(Map<String, dynamic> json) {
   return RepositoryEvent(
-    action: json['action'] as String,
+    action: json['action'] as String?,
     repository: json['repository'] == null
         ? null
         : Repository.fromJson(json['repository'] as Map<String, dynamic>),
@@ -27,7 +27,7 @@ Map<String, dynamic> _$RepositoryEventToJson(RepositoryEvent instance) =>
 
 IssueCommentEvent _$IssueCommentEventFromJson(Map<String, dynamic> json) {
   return IssueCommentEvent(
-    action: json['action'] as String,
+    action: json['action'] as String?,
     issue: json['issue'] == null
         ? null
         : Issue.fromJson(json['issue'] as Map<String, dynamic>),
@@ -62,7 +62,7 @@ Map<String, dynamic> _$ForkEventToJson(ForkEvent instance) => <String, dynamic>{
 
 IssueEvent _$IssueEventFromJson(Map<String, dynamic> json) {
   return IssueEvent(
-    action: json['action'] as String,
+    action: json['action'] as String?,
     assignee: json['assignee'] == null
         ? null
         : User.fromJson(json['assignee'] as Map<String, dynamic>),
@@ -93,8 +93,8 @@ Map<String, dynamic> _$IssueEventToJson(IssueEvent instance) =>
 
 PullRequestEvent _$PullRequestEventFromJson(Map<String, dynamic> json) {
   return PullRequestEvent(
-    action: json['action'] as String,
-    number: json['number'] as int,
+    action: json['action'] as String?,
+    number: json['number'] as int?,
     pullRequest: json['pull_request'] == null
         ? null
         : PullRequest.fromJson(json['pull_request'] as Map<String, dynamic>),

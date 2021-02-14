@@ -21,30 +21,30 @@ class Gist {
     this.createdAt,
     this.updatedAt,
   });
-  String id;
-  String description;
-  bool public;
-  User owner;
-  User user;
-  List<GistFile> files;
+  String? id;
+  String? description;
+  bool? public;
+  User? owner;
+  User? user;
+  List<GistFile>? files;
 
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  String? htmlUrl;
 
   @JsonKey(name: 'comments')
-  int commentsCount;
+  int? commentsCount;
 
   @JsonKey(name: 'git_pull_url')
-  String gitPullUrl;
+  String? gitPullUrl;
 
   @JsonKey(name: 'git_push_url')
-  String gitPushUrl;
+  String? gitPushUrl;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   factory Gist.fromJson(Map<String, dynamic> input) => _$GistFromJson(input);
 }
@@ -61,15 +61,15 @@ class GistFile {
     this.truncated,
     this.content,
   });
-  String name;
-  int size;
+  String? name;
+  int? size;
 
   @JsonKey(name: 'raw_url')
-  String rawUrl;
-  String type;
-  String language;
-  bool truncated;
-  String content;
+  String? rawUrl;
+  String? type;
+  String? language;
+  bool? truncated;
+  String? content;
 
   factory GistFile.fromJson(Map<String, dynamic> input) =>
       _$GistFileFromJson(input);
@@ -79,14 +79,14 @@ class GistFile {
 @JsonSerializable(createToJson: false)
 class GistFork {
   GistFork({this.user, this.id, this.createdAt, this.updatedAt});
-  User user;
-  int id;
+  User? user;
+  int? id;
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   factory GistFork.fromJson(Map<String, dynamic> input) =>
       _$GistForkFromJson(input);
@@ -103,21 +103,21 @@ class GistHistoryEntry {
     this.totalChanges,
     this.committedAt,
   });
-  String version;
+  String? version;
 
-  User user;
+  User? user;
 
   @JsonKey(name: 'change_status/deletions')
-  int deletions;
+  int? deletions;
 
   @JsonKey(name: 'change_status/additions')
-  int additions;
+  int? additions;
 
   @JsonKey(name: 'change_status/total')
-  int totalChanges;
+  int? totalChanges;
 
   @JsonKey(name: 'committed_at')
-  DateTime committedAt;
+  DateTime? committedAt;
 
   factory GistHistoryEntry.fromJson(Map<String, dynamic> input) =>
       _$GistHistoryEntryFromJson(input);
@@ -134,11 +134,11 @@ class GistComment {
     this.body,
   });
 
-  int id;
-  User user;
-  DateTime createdAt;
-  DateTime updatedAt;
-  String body;
+  int? id;
+  User? user;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? body;
 
   factory GistComment.fromJson(Map<String, dynamic> input) =>
       _$GistCommentFromJson(input);
@@ -149,7 +149,7 @@ class GistComment {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class CreateGistComment {
   CreateGistComment(this.body);
-  String body;
+  String? body;
 
   factory CreateGistComment.fromJson(Map<String, dynamic> input) =>
       _$CreateGistCommentFromJson(input);

@@ -10,7 +10,7 @@ class UrlShortenerService extends Service {
 
   /// Shortens the provided [url]. An optional [code] can be provided to create
   /// your own vanity URL.
-  Future<String> shortenUrl(String url, {String code}) {
+  Future<String> shortenUrl(String url, {String? code}) {
     final params = <String, dynamic>{};
 
     params['url'] = url;
@@ -26,7 +26,7 @@ class UrlShortenerService extends Service {
         throw GitHubError(github, 'Failed to create shortened url!');
       }
 
-      return response.headers['Location'].split('/').last;
+      return response.headers['Location']!.split('/').last;
     });
   }
 }

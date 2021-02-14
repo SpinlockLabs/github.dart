@@ -6,9 +6,9 @@ part 'repos_merging.g.dart';
 class CreateMerge {
   CreateMerge(this.base, this.head, {this.commitMessage});
 
-  final String base;
-  final String head;
-  String commitMessage;
+  final String? base;
+  final String? head;
+  String? commitMessage;
 
   factory CreateMerge.fromJson(Map<String, dynamic> input) =>
       _$CreateMergeFromJson(input);

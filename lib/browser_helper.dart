@@ -14,7 +14,7 @@ void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
   elements.removeWhere((Element it) => it.attributes.containsKey('rendered'));
 
   for (final e in elements) {
-    final txt = e.text;
+    final txt = e.text!;
 
     final md = txt.split('\n').map((it) {
       return it.length >= indent ? it.substring(indent) : it;

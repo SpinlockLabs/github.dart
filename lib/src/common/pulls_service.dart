@@ -16,10 +16,10 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#list-pull-requests
   Stream<PullRequest> list(
     RepositorySlug slug, {
-    int pages,
-    String base,
+    int? pages,
+    String? base,
     String direction = 'desc',
-    String head,
+    String? head,
     String sort = 'created',
     String state = 'open',
   }) {
@@ -33,7 +33,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/pulls?state=$state',
-        (i) => PullRequest.fromJson(i),
+        (dynamic i) => PullRequest.fromJson(i),
         pages: pages,
         params: params);
   }
@@ -43,7 +43,7 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#get-a-single-pull-request
   Future<PullRequest> get(RepositorySlug slug, int number) =>
       github.getJSON('/repos/${slug.fullName}/pulls/$number',
-          convert: (i) => PullRequest.fromJson(i), statusCode: StatusCodes.OK);
+          convert: (dynamic i) => PullRequest.fromJson(i), statusCode: StatusCodes.OK);
 
   /// Creates a Pull Request based on the given [request].
   ///
@@ -51,9 +51,9 @@ class PullRequestsService extends Service {
   Future<PullRequest> create(RepositorySlug slug, CreatePullRequest request) {
     return github.postJSON(
       '/repos/${slug.fullName}/pulls',
-      convert: (i) => PullRequest.fromJson(i),
+      convert: (dynamic i) => PullRequest.fromJson(i),
       body: GitHubJson.encode(request),
-      preview: request.draft
+      preview: request.draft!
           ? 'application/vnd.github.shadow-cat-preview+json'
           : null,
     );
@@ -63,7 +63,7 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
   Future<PullRequest> edit(RepositorySlug slug, int number,
-      {String title, String body, String state, String base}) {
+      {String? title, String? body, String? state, String? base}) {
     final map = <String, dynamic>{};
     putValue('title', title, map);
     putValue('body', body, map);
@@ -86,7 +86,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/pulls/$number/commits',
-        (i) => RepositoryCommit.fromJson(i));
+        (dynamic i) => RepositoryCommit.fromJson(i));
   }
 
   /// Lists the files in a pull request.
@@ -96,7 +96,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/pulls/$number/files',
-        (i) => PullRequestFile.fromJson(i));
+        (dynamic i) => PullRequestFile.fromJson(i));
   }
 
   Future<bool> isMerged(RepositorySlug slug, int number) {
@@ -113,7 +113,7 @@ class PullRequestsService extends Service {
   Future<PullRequestMerge> merge(
     RepositorySlug slug,
     int number, {
-    String message,
+    String? message,
   }) {
     final json = <String, dynamic>{};
 
@@ -138,7 +138,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/pulls/$number/comments',
-        (i) => PullRequestComment.fromJson(i));
+        (dynamic i) => PullRequestComment.fromJson(i));
   }
 
   /// Lists all comments on all pull requests for the repository.
@@ -148,7 +148,7 @@ class PullRequestsService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/pulls/comments',
-        (i) => PullRequestComment.fromJson(i));
+        (dynamic i) => PullRequestComment.fromJson(i));
   }
 
   /// Creates a new pull request comment.
@@ -158,7 +158,7 @@ class PullRequestsService extends Service {
       RepositorySlug slug, int number, CreatePullRequestComment comment) {
     return github.postJSON('/repos/${slug.fullName}/pulls/$number/comments',
         body: GitHubJson.encode(comment.toJson()),
-        convert: (i) => PullRequestComment.fromJson(i),
+        convert: (dynamic i) => PullRequestComment.fromJson(i),
         statusCode: 201) as Future<IssueComment>;
   }
 

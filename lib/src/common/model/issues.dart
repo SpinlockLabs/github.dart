@@ -27,61 +27,61 @@ class Issue {
     this.closedBy,
   });
 
-  int id;
+  int? id;
 
   /// The api url.
-  String url;
+  String? url;
 
   /// Url to the Issue Page
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  String? htmlUrl;
 
   /// Issue Number
-  int number;
+  int? number;
 
   /// Issue State
-  String state;
+  String? state;
 
   /// Issue Title
-  String title;
+  String? title;
 
   /// User who created the issue.
-  User user;
+  User? user;
 
   /// Issue Labels
-  List<IssueLabel> labels;
+  List<IssueLabel>? labels;
 
   /// The User that the issue is assigned to
-  User assignee;
+  User? assignee;
 
   /// The Milestone
-  Milestone milestone;
+  Milestone? milestone;
 
   /// Number of Comments
   @JsonKey(name: 'comments')
-  int commentsCount;
+  int? commentsCount;
 
   /// A Pull Request
   @JsonKey(name: 'pull_request')
-  IssuePullRequest pullRequest;
+  IssuePullRequest? pullRequest;
 
   /// Time that the issue was created at
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// The time that the issue was closed at
   @JsonKey(name: 'closed_at')
-  DateTime closedAt;
+  DateTime? closedAt;
 
   /// The time that the issue was updated at
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
-  String body;
+  String? body;
 
   /// The user who closed the issue
   @JsonKey(name: 'closed_by')
-  User closedBy;
+  User? closedBy;
 
   bool get isOpen => state == 'open';
   bool get isClosed => state == 'closed';
@@ -100,12 +100,12 @@ class IssueRequest {
       this.assignee,
       this.state,
       this.milestone});
-  String title;
-  String body;
-  List<String> labels;
-  String assignee;
-  String state;
-  int milestone;
+  String? title;
+  String? body;
+  List<String>? labels;
+  String? assignee;
+  String? state;
+  int? milestone;
 
   Map<String, dynamic> toJson() => _$IssueRequestToJson(this);
 
@@ -123,9 +123,9 @@ class IssuePullRequest {
   });
 
   /// Url to the Page for this Issue Pull Request
-  String htmlUrl;
-  String diffUrl;
-  String patchUrl;
+  String? htmlUrl;
+  String? diffUrl;
+  String? patchUrl;
 
   factory IssuePullRequest.fromJson(Map<String, dynamic> input) =>
       _$IssuePullRequestFromJson(input);
@@ -145,14 +145,14 @@ class IssueComment {
     this.htmlUrl,
     this.issueUrl,
   });
-  int id;
-  String body;
-  User user;
-  DateTime createdAt;
-  DateTime updatedAt;
-  String url;
-  String htmlUrl;
-  String issueUrl;
+  int? id;
+  String? body;
+  User? user;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? url;
+  String? htmlUrl;
+  String? issueUrl;
 
   factory IssueComment.fromJson(Map<String, dynamic> input) =>
       _$IssueCommentFromJson(input);
@@ -167,8 +167,8 @@ class IssueLabel {
     this.color,
   });
 
-  String name;
-  String color;
+  String? name;
+  String? color;
 
   factory IssueLabel.fromJson(Map<String, dynamic> input) =>
       _$IssueLabelFromJson(input);
@@ -196,39 +196,39 @@ class Milestone {
   });
 
   /// Unique Identifier for Milestone
-  int id;
+  int? id;
 
   /// Milestone Number
-  int number;
+  int? number;
 
   /// Milestone State
-  String state;
+  String? state;
 
   /// Milestone Title
-  String title;
+  String? title;
 
   /// Milestone Description
-  String description;
+  String? description;
 
   /// Milestone Creator
-  User creator;
+  User? creator;
 
   /// Number of Open Issues
   @JsonKey(name: 'open_issues')
-  int openIssuesCount;
+  int? openIssuesCount;
 
   /// Number of Closed Issues
   @JsonKey(name: 'closed_issues')
-  int closedIssuesCount;
+  int? closedIssuesCount;
 
   /// Time the milestone was created at
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// The last time the milestone was updated at
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   /// The due date for this milestone
-  DateTime dueOn;
+  DateTime? dueOn;
 
   factory Milestone.fromJson(Map<String, dynamic> input) =>
       _$MilestoneFromJson(input);
@@ -245,10 +245,10 @@ class CreateMilestone {
     this.dueOn,
   });
 
-  String title;
-  String state;
-  String description;
-  DateTime dueOn;
+  String? title;
+  String? state;
+  String? description;
+  DateTime? dueOn;
 
   Map<String, dynamic> toJson() => _$CreateMilestoneToJson(this);
 

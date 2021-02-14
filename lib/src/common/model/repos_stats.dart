@@ -9,13 +9,13 @@ part 'repos_stats.g.dart';
 class ContributorStatistics {
   ContributorStatistics(this.author, this.total, this.weeks);
 
-  final User author;
+  final User? author;
 
   /// Total Commits
-  final int total;
+  final int? total;
 
   /// Weekly Statistics
-  final List<ContributorWeekStatistics> weeks;
+  final List<ContributorWeekStatistics>? weeks;
 
   factory ContributorStatistics.fromJson(Map<String, dynamic> input) =>
       _$ContributorStatisticsFromJson(input);
@@ -31,19 +31,19 @@ class ContributorWeekStatistics {
 
   /// Beginning of the Week (As a Unix Timestamp)
   @JsonKey(name: 'w')
-  final int start;
+  final int? start;
 
   /// Number of Additions
   @JsonKey(name: 'a')
-  final int additions;
+  final int? additions;
 
   /// Number of Deletions
   @JsonKey(name: 'd')
-  final int deletions;
+  final int? deletions;
 
   /// Number of Commits
   @JsonKey(name: 'c')
-  final int commits;
+  final int? commits;
 
   factory ContributorWeekStatistics.fromJson(Map<String, dynamic> input) =>
       _$ContributorWeekStatisticsFromJson(input);
@@ -63,10 +63,10 @@ class ContributorParticipation {
   });
 
   /// Commit Counts for All Users
-  List<int> all;
+  List<int>? all;
 
   /// Commit Counts for the Owner
-  List<int> owner;
+  List<int>? owner;
 
   factory ContributorParticipation.fromJson(Map<String, dynamic> input) =>
       _$ContributorParticipationFromJson(input);
@@ -83,13 +83,13 @@ class YearCommitCountWeek {
   });
 
   /// Commit Counts for each day (starting with Sunday)
-  List<int> days;
+  List<int>? days;
 
   /// Total Commit Count
-  int total;
+  int? total;
 
   /// Timestamp for Beginning of Week
-  int timestamp;
+  int? timestamp;
 
   factory YearCommitCountWeek.fromJson(Map<String, dynamic> input) =>
       _$YearCommitCountWeekFromJson(input);
@@ -106,13 +106,13 @@ class WeeklyChangesCount {
   });
 
   /// Timestamp for Beginning of Week
-  int timestamp;
+  int? timestamp;
 
   /// Number of Additions
-  int additions;
+  int? additions;
 
   /// Number of Deletions
-  int deletions;
+  int? deletions;
 
   factory WeeklyChangesCount.fromJson(Map<String, dynamic> input) =>
       _$WeeklyChangesCountFromJson(input);
@@ -129,13 +129,13 @@ class PunchcardEntry {
   });
 
   /// Weekday (With 0 as Sunday and 6 as Saturday)
-  int weekday;
+  int? weekday;
 
   /// Hour of Day
-  int hour;
+  int? hour;
 
   /// Number of Commits
-  int commits;
+  int? commits;
 
   factory PunchcardEntry.fromJson(Map<String, dynamic> input) =>
       _$PunchcardEntryFromJson(input);

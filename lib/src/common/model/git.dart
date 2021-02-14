@@ -14,11 +14,11 @@ class GitBlob {
     this.sha,
     this.size,
   });
-  String content;
-  String encoding;
-  String url;
-  String sha;
-  int size;
+  String? content;
+  String? encoding;
+  String? url;
+  String? sha;
+  int? size;
 
   factory GitBlob.fromJson(Map<String, dynamic> input) =>
       _$GitBlobFromJson(input);
@@ -32,8 +32,8 @@ class GitBlob {
 class CreateGitBlob {
   CreateGitBlob(this.content, this.encoding);
 
-  String content;
-  String encoding;
+  String? content;
+  String? encoding;
 
   factory CreateGitBlob.fromJson(Map<String, dynamic> input) =>
       _$CreateGitBlobFromJson(input);
@@ -56,16 +56,16 @@ class GitCommit {
     this.parents,
     this.commentCount,
   });
-  String sha;
-  String url;
-  GitCommitUser author;
-  GitCommitUser committer;
-  String message;
-  GitTree tree;
-  List<GitCommit> parents;
+  String? sha;
+  String? url;
+  GitCommitUser? author;
+  GitCommitUser? committer;
+  String? message;
+  GitTree? tree;
+  List<GitCommit>? parents;
 
   @JsonKey(name: 'comment_count')
-  int commentCount;
+  int? commentCount;
 
   factory GitCommit.fromJson(Map<String, dynamic> input) =>
       _$GitCommitFromJson(input);
@@ -79,20 +79,20 @@ class CreateGitCommit {
       {this.parents, this.committer, this.author});
 
   /// The commit message.
-  String message;
+  String? message;
 
   /// The SHA of the tree object this commit points to.
-  String tree;
+  String? tree;
 
   /// The SHAs of the commits that were the parents of this commit. If omitted
   /// or empty, the commit will be written as a root commit.
-  List<String> parents;
+  List<String?>? parents;
 
   /// Info about the committer.
-  GitCommitUser committer;
+  GitCommitUser? committer;
 
   /// Info about the author.
-  GitCommitUser author;
+  GitCommitUser? author;
 
   factory CreateGitCommit.fromJson(Map<String, dynamic> input) =>
       _$CreateGitCommitFromJson(input);
@@ -105,10 +105,10 @@ class CreateGitCommit {
 class GitCommitUser {
   GitCommitUser(this.name, this.email, this.date);
 
-  String name;
-  String email;
+  String? name;
+  String? email;
   @JsonKey(toJson: dateToGitHubIso8601)
-  DateTime date;
+  DateTime? date;
 
   factory GitCommitUser.fromJson(Map<String, dynamic> json) =>
       _$GitCommitUserFromJson(json);
@@ -119,15 +119,15 @@ class GitCommitUser {
 /// Model class for a GitHub tree.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class GitTree {
-  String sha;
-  String url;
+  String? sha;
+  String? url;
 
   /// If truncated is true, the number of items in the tree array exceeded
   /// GitHub's maximum limit.
-  bool truncated;
+  bool? truncated;
 
   @JsonKey(name: 'tree')
-  List<GitTreeEntry> entries;
+  List<GitTreeEntry>? entries;
 
   GitTree(this.sha, this.url, this.truncated, this.entries);
 
@@ -141,12 +141,12 @@ class GitTree {
 /// tree.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class GitTreeEntry {
-  String path;
-  String mode;
-  String type;
-  int size;
-  String sha;
-  String url;
+  String? path;
+  String? mode;
+  String? type;
+  int? size;
+  String? sha;
+  String? url;
 
   GitTreeEntry(this.path, this.mode, this.type, this.size, this.sha, this.url);
 
@@ -164,11 +164,11 @@ class CreateGitTree {
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
-  String baseTree;
+  String? baseTree;
 
   /// The Objects specifying a tree structure.
   @JsonKey(name: 'tree')
-  List<CreateGitTreeEntry> entries;
+  List<CreateGitTreeEntry>? entries;
 
   factory CreateGitTree.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTreeFromJson(input);
@@ -187,11 +187,11 @@ class CreateGitTreeEntry {
     this.sha,
     this.content,
   });
-  String path;
-  String mode;
-  String type;
-  String sha;
-  String content;
+  String? path;
+  String? mode;
+  String? type;
+  String? sha;
+  String? content;
 
   factory CreateGitTreeEntry.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTreeEntryFromJson(input);
@@ -206,9 +206,9 @@ class GitReference {
     this.url,
     this.object,
   });
-  String ref;
-  String url;
-  GitObject object;
+  String? ref;
+  String? url;
+  GitObject? object;
 
   factory GitReference.fromJson(Map<String, dynamic> input) =>
       _$GitReferenceFromJson(input);
@@ -226,12 +226,12 @@ class GitTag {
     this.tagger,
     this.object,
   });
-  String tag;
-  String sha;
-  String url;
-  String message;
-  GitCommitUser tagger;
-  GitObject object;
+  String? tag;
+  String? sha;
+  String? url;
+  String? message;
+  GitCommitUser? tagger;
+  GitObject? object;
 
   factory GitTag.fromJson(Map<String, dynamic> input) =>
       _$GitTagFromJson(input);
@@ -243,11 +243,11 @@ class GitTag {
 class CreateGitTag {
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
-  String tag;
-  String message;
-  String object;
-  String type;
-  GitCommitUser tagger;
+  String? tag;
+  String? message;
+  String? object;
+  String? type;
+  GitCommitUser? tagger;
 
   factory CreateGitTag.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTagFromJson(input);
@@ -258,9 +258,9 @@ class CreateGitTag {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class GitObject {
   GitObject(this.type, this.sha, this.url);
-  String type;
-  String sha;
-  String url;
+  String? type;
+  String? sha;
+  String? url;
 
   factory GitObject.fromJson(Map<String, dynamic> input) =>
       _$GitObjectFromJson(input);

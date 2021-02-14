@@ -6,6 +6,6 @@ void main() {
       .listReactions(RepositorySlug('SpinlockLabs', 'github.dart'), 177,
           content: ReactionType.plusOne)
       .listen((Reaction r) {
-    print(ReactionType.fromString(r.content).emoji);
+    print(ReactionType.fromString(r.content)!.emoji);
   });
 }

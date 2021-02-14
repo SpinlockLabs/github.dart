@@ -13,11 +13,11 @@ class CombinedRepositoryStatus {
     this.statuses,
     this.repository,
   });
-  String state;
-  String sha;
-  int totalCount;
-  List<RepositoryStatus> statuses;
-  Repository repository;
+  String? state;
+  String? sha;
+  int? totalCount;
+  List<RepositoryStatus>? statuses;
+  Repository? repository;
 
   factory CombinedRepositoryStatus.fromJson(Map<String, dynamic> input) =>
       _$CombinedRepositoryStatusFromJson(input);
@@ -35,12 +35,12 @@ class RepositoryStatus {
     this.description,
     this.context,
   });
-  DateTime createdAt;
-  DateTime updatedAt;
-  String state;
-  String targetUrl;
-  String description;
-  String context;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? state;
+  String? targetUrl;
+  String? description;
+  String? context;
 
   factory RepositoryStatus.fromJson(Map<String, dynamic> input) =>
       _$RepositoryStatusFromJson(input);
@@ -52,11 +52,11 @@ class RepositoryStatus {
 class CreateStatus {
   CreateStatus(this.state, {this.targetUrl, this.description, this.context});
 
-  final String state;
-  String description;
-  String context;
+  final String? state;
+  String? description;
+  String? context;
   @JsonKey(name: 'target_url')
-  String targetUrl;
+  String? targetUrl;
 
   factory CreateStatus.fromJson(Map<String, dynamic> input) =>
       _$CreateStatusFromJson(input);

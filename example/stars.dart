@@ -3,17 +3,17 @@ import 'dart:html';
 import 'package:github/github.dart';
 import 'common.dart';
 
-DivElement $stars;
+DivElement? $stars;
 
 Future<void> main() async {
   await initViewSourceButton('stars.dart');
-  $stars = querySelector('#stars');
+  $stars = querySelector('#stars') as DivElement?;
   loadStars();
 }
 
 void loadStars() {
-  var user = 'SpinlockLabs';
-  var repo = 'github.dart';
+  String? user = 'SpinlockLabs';
+  String? repo = 'github.dart';
 
   if (queryString.containsKey('user')) {
     user = queryString['user'];
@@ -23,7 +23,7 @@ void loadStars() {
     repo = queryString['repo'];
   }
 
-  querySelector('#title').appendText(' for $user/$repo');
+  querySelector('#title')!.appendText(' for $user/$repo');
 
   github.activity
       .listStargazers(RepositorySlug(user, repo))
@@ -36,9 +36,9 @@ void loadStars() {
       ..classes.add('avatar'));
     h.append(AnchorElement(href: stargazer.htmlUrl)
       ..append(ParagraphElement()..text = stargazer.login));
-    $stars.append(h);
+    $stars!.append(h);
   }).onDone(() {
-    querySelector('#total')
+    querySelector('#total')!
         .appendText(querySelectorAll('.user').length.toString() + ' stars');
   });
 }

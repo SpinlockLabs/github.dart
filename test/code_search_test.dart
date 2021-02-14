@@ -14,7 +14,7 @@ Future<void> main() async {
   final results = await resultsStream.first;
   print('${results.totalCount} results');
   var k = 1;
-  for (final i in results.items) {
+  for (final i in results.items!) {
     print('${k++} ${i.path}');
   }
   exit(0);

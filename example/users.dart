@@ -5,11 +5,11 @@ import 'package:github/github.dart';
 
 import 'common.dart';
 
-DivElement usersDiv;
+DivElement? usersDiv;
 
 Future<void> main() async {
   await initViewSourceButton('users.dart');
-  usersDiv = querySelector('#users');
+  usersDiv = querySelector('#users') as DivElement?;
   loadUsers();
 }
 
@@ -31,7 +31,7 @@ void loadUsers() {
         ..writeln('Created: ${user.createdAt}')
         ..writeln('Updated: ${user.updatedAt}');
 
-      if (user.company != null && user.company.isNotEmpty) {
+      if (user.company != null && user.company!.isNotEmpty) {
         buff.writeln('Company: ${user.company}');
       }
 
@@ -41,7 +41,7 @@ void loadUsers() {
         ..appendHtml(buff.toString().replaceAll('\n', '<br/>'),
             treeSanitizer: NodeTreeSanitizer.trusted));
 
-      usersDiv.append(userDiv);
+      usersDiv!.append(userDiv);
     });
   });
 }

@@ -45,7 +45,7 @@ class OnlyWhen {
 /// Converts the [date] to GitHub's ISO-8601 format:
 ///
 /// The format is "YYYY-MM-DDTHH:mm:ssZ"
-String dateToGitHubIso8601(DateTime date) {
+String? dateToGitHubIso8601(DateTime? date) {
   if (date == null) {
     return null;
   }
@@ -143,24 +143,15 @@ List<MapEntry<dynamic, dynamic>> mapToList(Map<dynamic, dynamic> input) {
   return out;
 }
 
-/// Internal method to handle null for parsing dates.
-DateTime parseDateTime(String input) {
-  if (input == null) {
-    return null;
-  }
-
-  return DateTime.parse(input);
-}
-
 /// Returns a new map containing only the entries of [input] whose value is not null.
 ///
 /// If [recursive] is true, nested maps are also filtered.
-Map<K, V> createNonNullMap<K, V>(Map<K, V> input, {bool recursive = true}) {
-  final map = <K, V>{};
+Map<K, V?> createNonNullMap<K, V>(Map<K, V> input, {bool recursive = true}) {
+  final map = <K, V?>{};
   for (final entry in input.entries) {
     if (entry.value != null) {
       map[entry.key] = recursive && entry.value is Map
-          ? createNonNullMap(entry.value as Map, recursive: recursive)
+          ? createNonNullMap(entry.value as Map, recursive: recursive) as V?
           : entry.value;
     }
   }
@@ -182,7 +173,7 @@ int parseFancyNumber(String input) {
   } else {
     final m = multipliers.keys.firstWhere((m) => input.endsWith(m));
     input = input.substring(0, input.length - m.length);
-    value = num.parse(input) * multipliers[m];
+    value = num.parse(input) * multipliers[m]! as int;
   }
 
   return value;

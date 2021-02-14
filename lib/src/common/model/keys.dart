@@ -13,9 +13,9 @@ class PublicKey {
     this.key,
     this.title,
   });
-  final int id;
-  final String key;
-  final String title;
+  final int? id;
+  final String? key;
+  final String? title;
 
   factory PublicKey.fromJson(Map<String, dynamic> input) =>
       _$PublicKeyFromJson(input);
@@ -27,8 +27,8 @@ class PublicKey {
 class CreatePublicKey {
   CreatePublicKey(this.title, this.key);
 
-  final String title;
-  final String key;
+  final String? title;
+  final String? key;
 
   Map<String, dynamic> toJson() => _$CreatePublicKeyToJson(this);
 

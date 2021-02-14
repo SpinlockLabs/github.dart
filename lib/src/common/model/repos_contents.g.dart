@@ -8,16 +8,16 @@ part of 'repos_contents.dart';
 
 GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) {
   return GitHubFile(
-    type: json['type'] as String,
-    encoding: json['encoding'] as String,
-    size: json['size'] as int,
-    name: json['name'] as String,
-    path: json['path'] as String,
-    content: json['content'] as String,
-    sha: json['sha'] as String,
-    htmlUrl: json['html_url'] as String,
-    gitUrl: json['git_url'] as String,
-    downloadUrl: json['download_url'] as String,
+    type: json['type'] as String?,
+    encoding: json['encoding'] as String?,
+    size: json['size'] as int?,
+    name: json['name'] as String?,
+    path: json['path'] as String?,
+    content: json['content'] as String?,
+    sha: json['sha'] as String?,
+    htmlUrl: json['html_url'] as String?,
+    gitUrl: json['git_url'] as String?,
+    downloadUrl: json['download_url'] as String?,
     links: json['_links'] == null
         ? null
         : Links.fromJson(json['_links'] as Map<String, dynamic>),
@@ -63,10 +63,9 @@ RepositoryContents _$RepositoryContentsFromJson(Map<String, dynamic> json) {
     file: json['file'] == null
         ? null
         : GitHubFile.fromJson(json['file'] as Map<String, dynamic>),
-    tree: (json['tree'] as List)
-        ?.map((e) =>
-            e == null ? null : GitHubFile.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    tree: (json['tree'] as List<dynamic>?)
+        ?.map((e) => GitHubFile.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -78,10 +77,10 @@ Map<String, dynamic> _$RepositoryContentsToJson(RepositoryContents instance) =>
 
 CreateFile _$CreateFileFromJson(Map<String, dynamic> json) {
   return CreateFile(
-    path: json['path'] as String,
-    content: json['content'] as String,
-    message: json['message'] as String,
-    branch: json['branch'] as String,
+    path: json['path'] as String?,
+    content: json['content'] as String?,
+    message: json['message'] as String?,
+    branch: json['branch'] as String?,
     committer: json['committer'] == null
         ? null
         : CommitUser.fromJson(json['committer'] as Map<String, dynamic>),
@@ -99,8 +98,8 @@ Map<String, dynamic> _$CreateFileToJson(CreateFile instance) =>
 
 CommitUser _$CommitUserFromJson(Map<String, dynamic> json) {
   return CommitUser(
-    json['name'] as String,
-    json['email'] as String,
+    json['name'] as String?,
+    json['email'] as String?,
   );
 }
 

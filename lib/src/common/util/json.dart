@@ -38,7 +38,7 @@ class GitHubJson {
   /// and it also deletes keys associated with null values in maps before converting them.
   ///
   /// The obtained String can be decoded using `jsonDecode`.
-  static String encode(Object object, {String indent}) {
+  static String encode(Object object, {String? indent}) {
     final encoder = JsonEncoder.withIndent(indent, _toEncodable);
     return encoder.convert(_checkObject(object));
   }

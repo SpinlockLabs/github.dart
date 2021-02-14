@@ -16,7 +16,7 @@ Authentication findAuthenticationFromEnvironment() =>
 /// The first one that exists is used as the github token to call [Authentication.withToken] with.
 /// If the above fails, the GITHUB_USERNAME and GITHUB_PASSWORD keys will be checked.
 /// If those keys both exist, then [Authentication.basic] will be used.
-Authentication findAuthenticationInMap(Map map) {
+Authentication? findAuthenticationInMap(Map map) {
   for (final key in COMMON_GITHUB_TOKEN_ENV_KEYS) {
     if (map.containsKey(key)) {
       return Authentication.withToken(map[key]);

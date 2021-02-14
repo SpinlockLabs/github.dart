@@ -8,15 +8,15 @@ part of 'misc.dart';
 
 GitignoreTemplate _$GitignoreTemplateFromJson(Map<String, dynamic> json) {
   return GitignoreTemplate(
-    name: json['name'] as String,
-    source: json['source'] as String,
+    name: json['name'] as String?,
+    source: json['source'] as String?,
   );
 }
 
 RateLimit _$RateLimitFromJson(Map<String, dynamic> json) {
   return RateLimit(
-    json['limit'] as int,
-    json['remaining'] as int,
+    json['limit'] as int?,
+    json['remaining'] as int?,
     json['resets'] == null ? null : DateTime.parse(json['resets'] as String),
   );
 }
@@ -29,14 +29,14 @@ Map<String, dynamic> _$RateLimitToJson(RateLimit instance) => <String, dynamic>{
 
 APIStatus _$APIStatusFromJson(Map<String, dynamic> json) {
   return APIStatus(
-    status: json['status'] as String,
+    status: json['status'] as String?,
     lastUpdatedAt: json['last_updated'] == null
         ? null
         : DateTime.parse(json['last_updated'] as String),
     createdOn: json['created_on'] == null
         ? null
         : DateTime.parse(json['created_on'] as String),
-    message: json['body'] as String,
+    message: json['body'] as String?,
   );
 }
 

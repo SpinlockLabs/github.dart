@@ -18,15 +18,15 @@ class Authorization {
       this.updatedAt,
       this.user});
 
-  int id;
-  List<String> scopes;
-  String token;
-  AuthorizationApplication app;
-  String note;
-  String noteUrl;
-  DateTime createdAt;
-  DateTime updatedAt;
-  User user;
+  int? id;
+  List<String>? scopes;
+  String? token;
+  AuthorizationApplication? app;
+  String? note;
+  String? noteUrl;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  User? user;
 
   factory Authorization.fromJson(Map<String, dynamic> input) =>
       _$AuthorizationFromJson(input);
@@ -38,9 +38,9 @@ class Authorization {
 class AuthorizationApplication {
   AuthorizationApplication({this.url, this.name, this.clientId});
 
-  String url;
-  String name;
-  String clientId;
+  String? url;
+  String? name;
+  String? clientId;
 
   factory AuthorizationApplication.fromJson(Map<String, dynamic> input) =>
       _$AuthorizationApplicationFromJson(input);
@@ -52,11 +52,11 @@ class CreateAuthorization {
   CreateAuthorization(this.note,
       {this.scopes, this.noteUrl, this.clientId, this.clientSecret});
 
-  String note;
-  List<String> scopes;
-  String noteUrl;
-  String clientId;
-  String clientSecret;
+  String? note;
+  List<String>? scopes;
+  String? noteUrl;
+  String? clientId;
+  String? clientSecret;
 
   factory CreateAuthorization.fromJson(Map<String, dynamic> input) =>
       _$CreateAuthorizationFromJson(input);

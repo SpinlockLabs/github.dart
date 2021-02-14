@@ -24,10 +24,10 @@ class OAuth2Flow {
   final List<String> scopes;
 
   /// Redirect URI
-  final String redirectUri;
+  final String? redirectUri;
 
   /// State
-  final String state;
+  final String? state;
 
   /// Client Secret
   final String clientSecret;
@@ -35,10 +35,10 @@ class OAuth2Flow {
   /// OAuth2 Base URL
   final String baseUrl;
 
-  GitHub github;
+  GitHub? github;
 
   OAuth2Flow(this.clientId, this.clientSecret,
-      {String redirectUri,
+      {String? redirectUri,
       this.scopes = const [],
       this.state,
       this.github,
@@ -65,7 +65,7 @@ class OAuth2Flow {
   }
 
   /// Exchanges the given [code] for a token.
-  Future<ExchangeResponse> exchange(String code, [String origin]) {
+  Future<ExchangeResponse> exchange(String code, [String? origin]) {
     final headers = <String, String>{
       'Accept': 'application/json',
       'content-type': 'application/json'
@@ -82,8 +82,8 @@ class OAuth2Flow {
       'redirect_uri': redirectUri
     });
 
-    return (github == null ? http.Client() : github.client)
-        .post('$baseUrl/access_token', body: body, headers: headers)
+    return (github == null ? http.Client() : github!.client)
+        .post(Uri.parse('$baseUrl/access_token'), body: body, headers: headers)
         .then((response) {
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       if (json['error'] != null) {
@@ -97,9 +97,9 @@ class OAuth2Flow {
 
 /// Represents a response for exchanging a code for a token.
 class ExchangeResponse {
-  final String token;
+  final String? token;
   final List<String> scopes;
-  final String tokenType;
+  final String? tokenType;
 
   ExchangeResponse(this.token, this.tokenType, this.scopes);
 }
