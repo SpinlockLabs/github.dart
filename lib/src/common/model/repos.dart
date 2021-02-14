@@ -57,6 +57,7 @@ class Repository {
     this.hasIssues,
     this.hasWiki,
     this.hasDownloads,
+    this.hasPages = false,
     this.forksCount,
     this.openIssuesCount,
     this.defaultBranch,
@@ -133,6 +134,10 @@ class Repository {
   /// If the Repository has any Downloads
   @JsonKey(name: 'has_downloads')
   final bool? hasDownloads;
+
+  /// If the Repository has any Github Pages
+  @JsonKey(name: 'has_pages')
+  final bool hasPages;
 
   /// Number of Forks
   @JsonKey(name: 'forks_count')
