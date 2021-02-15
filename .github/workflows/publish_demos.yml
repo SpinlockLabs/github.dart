@@ -15,6 +15,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           pub global activate webdev
+          pub get
           pub global run webdev build -o build
           rm build/example/packages
 
