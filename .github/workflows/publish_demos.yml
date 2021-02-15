@@ -12,9 +12,12 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
 
+      - name: Install rsync 📚
+        run: |
+          apt-get update && apt-get install -y rsync
+    
       - name: Install and Build 🔧
         run: |
-          apt-get install rsync
           pub global activate webdev
           pub get
           pub global run webdev build -o build -- --delete-conflicting-outputs
