@@ -16,7 +16,7 @@ jobs:
         run: |
           pub global activate webdev
           pub get
-          pub global run webdev build -o build
+          pub global run webdev build -o build --delete-conflicting-outputs
           rm build/example/packages
 
       - name: Publish 🚀
