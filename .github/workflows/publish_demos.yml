@@ -14,6 +14,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
+          apt-get install rsync
           pub global activate webdev
           pub get
           pub global run webdev build -o build -- --delete-conflicting-outputs
