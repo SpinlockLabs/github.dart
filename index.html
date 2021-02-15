@@ -1,10 +1,46 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>GitHub for Dart</title>
-  </head>
 
-  <body>
-	<a href="demos/"><h3>Demos</h3></a>
-  </body>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub for Dart - Demos</title>
+  <style>
+    a {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>GitHub for Dart - Demos</h1>
+  <div>
+    These demos will work without a github token, but it is easy to exhaust the rate limit
+    without specifying a token. The demos will stop working when that happens. To use a
+    personal github token, enter it in the input below. It will be saved in session storage,
+    which goes away when you close your browser. Alternatively, you can add a
+    querystring parameter to specify your token on any of the examples like
+    <b><code>?GITHUB_TOKEN=[yourtoken]</code></b>
+
+    <p>Github Token: <input type="text" id="token" size="50"></p>
+
+    <a href="readme.html">Readme</a>
+    <a href="repos.html">Repositories</a>
+    <a href="organization.html">Organization</a>
+    <a href="users.html">Users</a>
+    <a href="user_info.html">User Information</a>
+    <a href="languages.html">Language Breakdown</a>
+    <a href="releases.html">Releases</a>
+    <a href="stars.html">Stars</a>
+    <a href="search.html">Code Search</a>
+    <a href="emoji.html">Emoji</a>
+    <a href="markdown.html">Markdown</a>
+    <a href="zen.html">Zen</a>
+
+    <script defer src="index.dart.js"></script>
+</body>
+
 </html>
