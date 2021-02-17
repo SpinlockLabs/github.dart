@@ -1,3 +1,6 @@
+## 7.1.0-nullsafe.0
+  - Update to null safety
+
 ## 7.0.4
  - Add hasPages attribute to Repository https://github.com/SpinlockLabs/github.dart/pull/238
 
