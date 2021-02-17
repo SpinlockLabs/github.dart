@@ -1,4 +1,4 @@
-name: Build and Deploy
+name: Publish Demos
 on:
   push:
     branches:
@@ -12,13 +12,18 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
 
+      - name: Install rsync 📚
+        run: |
+          apt-get update && apt-get install -y rsync
+    
       - name: Install and Build 🔧
         run: |
           pub global activate webdev
-          webdev build -o build
+          pub get
+          pub global run webdev build -o build -- --delete-conflicting-outputs
           rm build/example/packages
 
-      - name: Deploy 🚀
+      - name: Publish 🚀
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           branch: gh-pages # The branch the action should deploy to.
