@@ -188,12 +188,12 @@ class Repository {
 
 @JsonSerializable(createToJson: false)
 class Tag {
-  final String? name;
-  final CommitInfo? commit;
+  final String name;
+  final CommitInfo commit;
   @JsonKey(name: 'zipball_url')
-  final String? zipUrl;
+  final String zipUrl;
   @JsonKey(name: 'tarball_url')
-  final String? tarUrl;
+  final String tarUrl;
 
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 

@@ -1,4 +1,4 @@
-## 7.1.0-nullsafe.0
+## 8.0.0-nullsafe.1
   - Update to null safety
 
 ## 7.0.4

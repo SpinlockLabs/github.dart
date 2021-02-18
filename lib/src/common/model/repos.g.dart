@@ -101,12 +101,10 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
 
 Tag _$TagFromJson(Map<String, dynamic> json) {
   return Tag(
-    json['name'] as String?,
-    json['commit'] == null
-        ? null
-        : CommitInfo.fromJson(json['commit'] as Map<String, dynamic>),
-    json['zipball_url'] as String?,
-    json['tarball_url'] as String?,
+    json['name'] as String,
+    CommitInfo.fromJson(json['commit'] as Map<String, dynamic>),
+    json['zipball_url'] as String,
+    json['tarball_url'] as String,
   );
 }
 
