@@ -137,7 +137,7 @@ class Repository {
 
   /// If the Repository has any Github Pages
   @JsonKey(name: 'has_pages')
-  final bool hasPages;
+  final bool? hasPages;
 
   /// Number of Forks
   @JsonKey(name: 'forks_count')
