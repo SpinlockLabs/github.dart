@@ -10,9 +10,9 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
   return GitHubComparison(
     json['url'] as String?,
     json['status'] as String?,
-    json['aheadBy'] as int?,
-    json['behindBy'] as int?,
-    json['totalCommits'] as int?,
+    json['ahead_by'] as int?,
+    json['behind_by'] as int?,
+    json['total_commits'] as int?,
   );
 }
 
@@ -20,46 +20,50 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
   return Repository(
     name: json['name'] as String? ?? '',
     id: json['id'] as int? ?? 0,
-    fullName: json['fullName'] as String? ?? '',
+    fullName: json['full_name'] as String? ?? '',
     owner: json['owner'] == null
         ? null
         : UserInformation.fromJson(json['owner'] as Map<String, dynamic>),
-    htmlUrl: json['htmlUrl'] as String? ?? '',
+    htmlUrl: json['html_url'] as String? ?? '',
     description: json['description'] as String? ?? '',
-    cloneUrl: json['cloneUrl'] as String? ?? '',
-    gitUrl: json['gitUrl'] as String? ?? '',
-    sshUrl: json['sshUrl'] as String? ?? '',
-    svnUrl: json['svnUrl'] as String? ?? '',
-    defaultBranch: json['defaultBranch'] as String? ?? '',
-    createdAt: json['createdAt'] == null
+    cloneUrl: json['clone_url'] as String? ?? '',
+    gitUrl: json['git_url'] as String? ?? '',
+    sshUrl: json['ssh_url'] as String? ?? '',
+    svnUrl: json['svn_url'] as String? ?? '',
+    defaultBranch: json['default_branch'] as String? ?? '',
+    createdAt: json['created_at'] == null
         ? null
-        : DateTime.parse(json['createdAt'] as String),
+        : DateTime.parse(json['created_at'] as String),
     isPrivate: json['private'] as bool? ?? false,
     isFork: json['fork'] as bool? ?? false,
-    stargazersCount: json['stargazersCount'] as int? ?? 0,
-    watchersCount: json['watchersCount'] as int? ?? 0,
+    stargazersCount: json['stargazers_count'] as int? ?? 0,
+    watchersCount: json['watchers_count'] as int? ?? 0,
     language: json['language'] as String? ?? '',
-    hasWiki: json['hasWiki'] as bool? ?? false,
-    hasDownloads: json['hasDownloads'] as bool? ?? false,
-    forksCount: json['forksCount'] as int? ?? 0,
-    openIssuesCount: json['openIssuesCount'] as int? ?? 0,
-    subscribersCount: json['subscribersCount'] as int? ?? 0,
-    networkCount: json['networkCount'] as int? ?? 0,
-    hasIssues: json['hasIssues'] as bool? ?? false,
+    hasWiki: json['has_wiki'] as bool? ?? false,
+    hasDownloads: json['has_downloads'] as bool? ?? false,
+    forksCount: json['forks_count'] as int? ?? 0,
+    openIssuesCount: json['open_issues_count'] as int? ?? 0,
+    subscribersCount: json['subscribers_count'] as int? ?? 0,
+    networkCount: json['network_count'] as int? ?? 0,
+    hasIssues: json['has_issues'] as bool? ?? false,
     size: json['size'] as int? ?? 0,
     archived: json['archived'] as bool? ?? false,
     disabled: json['disabled'] as bool? ?? false,
     homepage: json['homepage'] as String? ?? '',
-    updatedAt: json['updatedAt'] == null
+    updatedAt: json['updated_at'] == null
         ? null
-        : DateTime.parse(json['updatedAt'] as String),
-    pushedAt: json['pushedAt'] == null
+        : DateTime.parse(json['updated_at'] as String),
+    pushedAt: json['pushed_at'] == null
         ? null
-        : DateTime.parse(json['pushedAt'] as String),
+        : DateTime.parse(json['pushed_at'] as String),
     license: json['license'] == null
         ? null
         : LicenseKind.fromJson(json['license'] as Map<String, dynamic>),
-    hasPages: json['hasPages'] as bool? ?? false,
+    hasPages: json['has_pages'] as bool? ?? false,
+    permissions: json['permissions'] == null
+        ? null
+        : RepositoryPermissions.fromJson(
+            json['permissions'] as Map<String, dynamic>),
   );
 }
 
@@ -67,36 +71,54 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
     <String, dynamic>{
       'name': instance.name,
       'id': instance.id,
-      'fullName': instance.fullName,
+      'full_name': instance.fullName,
       'owner': instance.owner,
       'private': instance.isPrivate,
       'fork': instance.isFork,
-      'htmlUrl': instance.htmlUrl,
+      'html_url': instance.htmlUrl,
       'description': instance.description,
-      'cloneUrl': instance.cloneUrl,
-      'sshUrl': instance.sshUrl,
-      'svnUrl': instance.svnUrl,
-      'gitUrl': instance.gitUrl,
+      'clone_url': instance.cloneUrl,
+      'ssh_url': instance.sshUrl,
+      'svn_url': instance.svnUrl,
+      'git_url': instance.gitUrl,
       'homepage': instance.homepage,
       'size': instance.size,
-      'stargazersCount': instance.stargazersCount,
-      'watchersCount': instance.watchersCount,
+      'stargazers_count': instance.stargazersCount,
+      'watchers_count': instance.watchersCount,
       'language': instance.language,
-      'hasIssues': instance.hasIssues,
-      'hasWiki': instance.hasWiki,
-      'hasDownloads': instance.hasDownloads,
-      'hasPages': instance.hasPages,
-      'forksCount': instance.forksCount,
-      'openIssuesCount': instance.openIssuesCount,
-      'defaultBranch': instance.defaultBranch,
-      'subscribersCount': instance.subscribersCount,
-      'networkCount': instance.networkCount,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'pushedAt': instance.pushedAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'has_issues': instance.hasIssues,
+      'has_wiki': instance.hasWiki,
+      'has_downloads': instance.hasDownloads,
+      'has_pages': instance.hasPages,
+      'forks_count': instance.forksCount,
+      'open_issues_count': instance.openIssuesCount,
+      'default_branch': instance.defaultBranch,
+      'subscribers_count': instance.subscribersCount,
+      'network_count': instance.networkCount,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'pushed_at': instance.pushedAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
       'license': instance.license,
       'archived': instance.archived,
       'disabled': instance.disabled,
+      'permissions': instance.permissions,
+    };
+
+RepositoryPermissions _$RepositoryPermissionsFromJson(
+    Map<String, dynamic> json) {
+  return RepositoryPermissions(
+    admin: json['admin'] as bool? ?? false,
+    push: json['push'] as bool? ?? false,
+    pull: json['pull'] as bool? ?? false,
+  );
+}
+
+Map<String, dynamic> _$RepositoryPermissionsToJson(
+        RepositoryPermissions instance) =>
+    <String, dynamic>{
+      'admin': instance.admin,
+      'push': instance.push,
+      'pull': instance.pull,
     };
 
 Tag _$TagFromJson(Map<String, dynamic> json) {
@@ -115,8 +137,8 @@ CommitData _$CommitDataFromJson(Map<String, dynamic> json) {
         ? null
         : GitCommit.fromJson(json['commit'] as Map<String, dynamic>),
     json['url'] as String?,
-    json['htmlUrl'] as String?,
-    json['commentsUrl'] as String?,
+    json['html_url'] as String?,
+    json['comments_url'] as String?,
     json['author'] == null
         ? null
         : CommitDataUser.fromJson(json['author'] as Map<String, dynamic>),
@@ -134,8 +156,8 @@ Map<String, dynamic> _$CommitDataToJson(CommitData instance) =>
       'sha': instance.sha,
       'commit': instance.commit,
       'url': instance.url,
-      'htmlUrl': instance.htmlUrl,
-      'commentsUrl': instance.commentsUrl,
+      'html_url': instance.htmlUrl,
+      'comments_url': instance.commentsUrl,
       'author': instance.author,
       'committer': instance.committer,
       'parents': instance.parents,
@@ -175,8 +197,8 @@ UserInformation _$UserInformationFromJson(Map<String, dynamic> json) {
   return UserInformation(
     json['login'] as String,
     json['id'] as int,
-    json['avatarUrl'] as String,
-    json['htmlUrl'] as String,
+    json['avatar_url'] as String,
+    json['html_url'] as String,
   );
 }
 
@@ -184,8 +206,8 @@ Map<String, dynamic> _$UserInformationToJson(UserInformation instance) =>
     <String, dynamic>{
       'login': instance.login,
       'id': instance.id,
-      'avatarUrl': instance.avatarUrl,
-      'htmlUrl': instance.htmlUrl,
+      'avatar_url': instance.avatarUrl,
+      'html_url': instance.htmlUrl,
     };
 
 RepositorySlug _$RepositorySlugFromJson(Map<String, dynamic> json) {
@@ -207,13 +229,13 @@ CreateRepository _$CreateRepositoryFromJson(Map<String, dynamic> json) {
     description: json['description'] as String?,
     homepage: json['homepage'] as String?,
     private: json['private'] as bool?,
-    hasIssues: json['hasIssues'] as bool?,
-    hasDownloads: json['hasDownloads'] as bool?,
-    teamId: json['teamId'] as int?,
-    autoInit: json['autoInit'] as bool?,
-    gitignoreTemplate: json['gitignoreTemplate'] as String?,
-    licenseTemplate: json['licenseTemplate'] as String?,
-    hasWiki: json['hasWiki'] as bool?,
+    hasIssues: json['has_issues'] as bool?,
+    hasDownloads: json['has_downloads'] as bool?,
+    teamId: json['team_id'] as int?,
+    autoInit: json['auto_init'] as bool?,
+    gitignoreTemplate: json['gitignore_template'] as String?,
+    licenseTemplate: json['license_template'] as String?,
+    hasWiki: json['has_wiki'] as bool?,
   );
 }
 
@@ -223,13 +245,13 @@ Map<String, dynamic> _$CreateRepositoryToJson(CreateRepository instance) =>
       'description': instance.description,
       'homepage': instance.homepage,
       'private': instance.private,
-      'hasIssues': instance.hasIssues,
-      'hasWiki': instance.hasWiki,
-      'hasDownloads': instance.hasDownloads,
-      'teamId': instance.teamId,
-      'autoInit': instance.autoInit,
-      'gitignoreTemplate': instance.gitignoreTemplate,
-      'licenseTemplate': instance.licenseTemplate,
+      'has_issues': instance.hasIssues,
+      'has_wiki': instance.hasWiki,
+      'has_downloads': instance.hasDownloads,
+      'team_id': instance.teamId,
+      'auto_init': instance.autoInit,
+      'gitignore_template': instance.gitignoreTemplate,
+      'license_template': instance.licenseTemplate,
     };
 
 Branch _$BranchFromJson(Map<String, dynamic> json) {
@@ -254,11 +276,12 @@ LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) {
     size: json['size'] as int?,
     url: json['url'] == null ? null : Uri.parse(json['url'] as String),
     htmlUrl:
-        json['htmlUrl'] == null ? null : Uri.parse(json['htmlUrl'] as String),
-    gitUrl: json['gitUrl'] == null ? null : Uri.parse(json['gitUrl'] as String),
-    downloadUrl: json['downloadUrl'] == null
+        json['html_url'] == null ? null : Uri.parse(json['html_url'] as String),
+    gitUrl:
+        json['git_url'] == null ? null : Uri.parse(json['git_url'] as String),
+    downloadUrl: json['download_url'] == null
         ? null
-        : Uri.parse(json['downloadUrl'] as String),
+        : Uri.parse(json['download_url'] as String),
     type: json['type'] as String?,
     content: json['content'] as String?,
     encoding: json['encoding'] as String?,
@@ -278,9 +301,9 @@ Map<String, dynamic> _$LicenseDetailsToJson(LicenseDetails instance) =>
       'sha': instance.sha,
       'size': instance.size,
       'url': instance.url?.toString(),
-      'htmlUrl': instance.htmlUrl?.toString(),
-      'gitUrl': instance.gitUrl?.toString(),
-      'downloadUrl': instance.downloadUrl?.toString(),
+      'html_url': instance.htmlUrl?.toString(),
+      'git_url': instance.gitUrl?.toString(),
+      'download_url': instance.downloadUrl?.toString(),
       'type': instance.type,
       'content': instance.content,
       'encoding': instance.encoding,
@@ -292,9 +315,9 @@ LicenseKind _$LicenseKindFromJson(Map<String, dynamic> json) {
   return LicenseKind(
     key: json['key'] as String?,
     name: json['name'] as String?,
-    spdxId: json['spdxId'] as String?,
+    spdxId: json['spdx_id'] as String?,
     url: json['url'] == null ? null : Uri.parse(json['url'] as String),
-    nodeId: json['nodeId'] as String?,
+    nodeId: json['node_id'] as String?,
   );
 }
 
@@ -302,7 +325,7 @@ Map<String, dynamic> _$LicenseKindToJson(LicenseKind instance) =>
     <String, dynamic>{
       'key': instance.key,
       'name': instance.name,
-      'spdxId': instance.spdxId,
+      'spdx_id': instance.spdxId,
       'url': instance.url?.toString(),
-      'nodeId': instance.nodeId,
+      'node_id': instance.nodeId,
     };

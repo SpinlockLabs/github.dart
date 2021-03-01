@@ -95,9 +95,9 @@ PullRequestEvent _$PullRequestEventFromJson(Map<String, dynamic> json) {
   return PullRequestEvent(
     action: json['action'] as String?,
     number: json['number'] as int?,
-    pullRequest: json['pullRequest'] == null
+    pullRequest: json['pull_request'] == null
         ? null
-        : PullRequest.fromJson(json['pullRequest'] as Map<String, dynamic>),
+        : PullRequest.fromJson(json['pull_request'] as Map<String, dynamic>),
     sender: json['sender'] == null
         ? null
         : User.fromJson(json['sender'] as Map<String, dynamic>),
@@ -111,7 +111,7 @@ Map<String, dynamic> _$PullRequestEventToJson(PullRequestEvent instance) =>
     <String, dynamic>{
       'action': instance.action,
       'number': instance.number,
-      'pullRequest': instance.pullRequest,
+      'pull_request': instance.pullRequest,
       'sender': instance.sender,
       'repository': instance.repository,
     };

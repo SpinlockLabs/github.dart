@@ -11,7 +11,7 @@ CombinedRepositoryStatus _$CombinedRepositoryStatusFromJson(
   return CombinedRepositoryStatus(
     state: json['state'] as String?,
     sha: json['sha'] as String?,
-    totalCount: json['totalCount'] as int?,
+    totalCount: json['total_count'] as int?,
     statuses: (json['statuses'] as List<dynamic>?)
         ?.map((e) => RepositoryStatus.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -26,21 +26,21 @@ Map<String, dynamic> _$CombinedRepositoryStatusToJson(
     <String, dynamic>{
       'state': instance.state,
       'sha': instance.sha,
-      'totalCount': instance.totalCount,
+      'total_count': instance.totalCount,
       'statuses': instance.statuses,
       'repository': instance.repository,
     };
 
 RepositoryStatus _$RepositoryStatusFromJson(Map<String, dynamic> json) {
   return RepositoryStatus(
-    createdAt: json['createdAt'] == null
+    createdAt: json['created_at'] == null
         ? null
-        : DateTime.parse(json['createdAt'] as String),
-    updatedAt: json['updatedAt'] == null
+        : DateTime.parse(json['created_at'] as String),
+    updatedAt: json['updated_at'] == null
         ? null
-        : DateTime.parse(json['updatedAt'] as String),
+        : DateTime.parse(json['updated_at'] as String),
     state: json['state'] as String?,
-    targetUrl: json['targetUrl'] as String?,
+    targetUrl: json['target_url'] as String?,
     description: json['description'] as String?,
     context: json['context'] as String?,
   );
@@ -48,10 +48,10 @@ RepositoryStatus _$RepositoryStatusFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$RepositoryStatusToJson(RepositoryStatus instance) =>
     <String, dynamic>{
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
       'state': instance.state,
-      'targetUrl': instance.targetUrl,
+      'target_url': instance.targetUrl,
       'description': instance.description,
       'context': instance.context,
     };

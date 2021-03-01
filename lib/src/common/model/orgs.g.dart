@@ -82,12 +82,3 @@ TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) {
     htmlUrl: json['html_url'] as String?,
   );
 }
-
-TeamRepositoryPermissions _$TeamRepositoryPermissionsFromJson(
-    Map<String, dynamic> json) {
-  return TeamRepositoryPermissions(
-    json['admin'] as bool?,
-    json['push'] as bool?,
-    json['pull'] as bool?,
-  );
-}

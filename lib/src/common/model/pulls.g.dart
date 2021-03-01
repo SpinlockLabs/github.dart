@@ -9,25 +9,25 @@ part of 'pulls.dart';
 PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
   return PullRequest(
     id: json['id'] as int?,
-    htmlUrl: json['htmlUrl'] as String?,
-    diffUrl: json['diffUrl'] as String?,
-    patchUrl: json['patchUrl'] as String?,
+    htmlUrl: json['html_url'] as String?,
+    diffUrl: json['diff_url'] as String?,
+    patchUrl: json['patch_url'] as String?,
     number: json['number'] as int?,
     state: json['state'] as String?,
     title: json['title'] as String?,
     body: json['body'] as String?,
-    createdAt: json['createdAt'] == null
+    createdAt: json['created_at'] == null
         ? null
-        : DateTime.parse(json['createdAt'] as String),
-    updatedAt: json['updatedAt'] == null
+        : DateTime.parse(json['created_at'] as String),
+    updatedAt: json['updated_at'] == null
         ? null
-        : DateTime.parse(json['updatedAt'] as String),
-    closedAt: json['closedAt'] == null
+        : DateTime.parse(json['updated_at'] as String),
+    closedAt: json['closed_at'] == null
         ? null
-        : DateTime.parse(json['closedAt'] as String),
-    mergedAt: json['mergedAt'] == null
+        : DateTime.parse(json['closed_at'] as String),
+    mergedAt: json['merged_at'] == null
         ? null
-        : DateTime.parse(json['mergedAt'] as String),
+        : DateTime.parse(json['merged_at'] as String),
     head: json['head'] == null
         ? null
         : PullRequestHead.fromJson(json['head'] as Map<String, dynamic>),
@@ -38,17 +38,17 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
     draft: json['draft'] as bool?,
-    mergeCommitSha: json['mergeCommitSha'] as String?,
+    mergeCommitSha: json['merge_commit_sha'] as String?,
     merged: json['merged'] as bool?,
     mergeable: json['mergeable'] as bool?,
-    mergedBy: json['mergedBy'] == null
+    mergedBy: json['merged_by'] == null
         ? null
-        : User.fromJson(json['mergedBy'] as Map<String, dynamic>),
-    commentsCount: json['commentsCount'] as int?,
-    commitsCount: json['commitsCount'] as int?,
-    additionsCount: json['additionsCount'] as int?,
-    deletionsCount: json['deletionsCount'] as int?,
-    changedFilesCount: json['changedFilesCount'] as int?,
+        : User.fromJson(json['merged_by'] as Map<String, dynamic>),
+    commentsCount: json['comments_count'] as int?,
+    commitsCount: json['commits_count'] as int?,
+    additionsCount: json['additions_count'] as int?,
+    deletionsCount: json['deletions_count'] as int?,
+    changedFilesCount: json['changed_files_count'] as int?,
     labels: (json['labels'] as List<dynamic>?)
         ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -58,30 +58,30 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'htmlUrl': instance.htmlUrl,
-      'diffUrl': instance.diffUrl,
-      'patchUrl': instance.patchUrl,
+      'html_url': instance.htmlUrl,
+      'diff_url': instance.diffUrl,
+      'patch_url': instance.patchUrl,
       'number': instance.number,
       'state': instance.state,
       'title': instance.title,
       'body': instance.body,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
-      'closedAt': instance.closedAt?.toIso8601String(),
-      'mergedAt': instance.mergedAt?.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'closed_at': instance.closedAt?.toIso8601String(),
+      'merged_at': instance.mergedAt?.toIso8601String(),
       'head': instance.head,
       'base': instance.base,
       'user': instance.user,
       'draft': instance.draft,
-      'mergeCommitSha': instance.mergeCommitSha,
+      'merge_commit_sha': instance.mergeCommitSha,
       'merged': instance.merged,
       'mergeable': instance.mergeable,
-      'mergedBy': instance.mergedBy,
-      'commentsCount': instance.commentsCount,
-      'commitsCount': instance.commitsCount,
-      'additionsCount': instance.additionsCount,
-      'deletionsCount': instance.deletionsCount,
-      'changedFilesCount': instance.changedFilesCount,
+      'merged_by': instance.mergedBy,
+      'comments_count': instance.commentsCount,
+      'commits_count': instance.commitsCount,
+      'additions_count': instance.additionsCount,
+      'deletions_count': instance.deletionsCount,
+      'changed_files_count': instance.changedFilesCount,
       'labels': instance.labels,
     };
 
@@ -145,24 +145,24 @@ Map<String, dynamic> _$CreatePullRequestToJson(CreatePullRequest instance) =>
 PullRequestComment _$PullRequestCommentFromJson(Map<String, dynamic> json) {
   return PullRequestComment(
     id: json['id'] as int?,
-    diffHunk: json['diffHunk'] as String?,
+    diffHunk: json['diff_hunk'] as String?,
     path: json['path'] as String?,
     position: json['position'] as int?,
-    originalPosition: json['originalPosition'] as int?,
-    commitId: json['commitId'] as String?,
-    originalCommitId: json['originalCommitId'] as String?,
+    originalPosition: json['original_position'] as int?,
+    commitId: json['commit_id'] as String?,
+    originalCommitId: json['original_commit_id'] as String?,
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
     body: json['body'] as String?,
-    createdAt: json['createdAt'] == null
+    createdAt: json['created_at'] == null
         ? null
-        : DateTime.parse(json['createdAt'] as String),
-    updatedAt: json['updatedAt'] == null
+        : DateTime.parse(json['created_at'] as String),
+    updatedAt: json['updated_at'] == null
         ? null
-        : DateTime.parse(json['updatedAt'] as String),
+        : DateTime.parse(json['updated_at'] as String),
     url: json['url'] as String?,
-    pullRequestUrl: json['pullRequestUrl'] as String?,
+    pullRequestUrl: json['pull_request_url'] as String?,
     links: json['_links'] == null
         ? null
         : Links.fromJson(json['_links'] as Map<String, dynamic>),
@@ -172,18 +172,18 @@ PullRequestComment _$PullRequestCommentFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$PullRequestCommentToJson(PullRequestComment instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'diffHunk': instance.diffHunk,
+      'diff_hunk': instance.diffHunk,
       'path': instance.path,
       'position': instance.position,
-      'originalPosition': instance.originalPosition,
-      'commitId': instance.commitId,
-      'originalCommitId': instance.originalCommitId,
+      'original_position': instance.originalPosition,
+      'commit_id': instance.commitId,
+      'original_commit_id': instance.originalCommitId,
       'user': instance.user,
       'body': instance.body,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
       'url': instance.url,
-      'pullRequestUrl': instance.pullRequestUrl,
+      'pull_request_url': instance.pullRequestUrl,
       '_links': instance.links,
     };
 
@@ -191,7 +191,7 @@ CreatePullRequestComment _$CreatePullRequestCommentFromJson(
     Map<String, dynamic> json) {
   return CreatePullRequestComment(
     json['body'] as String?,
-    json['commitId'] as String?,
+    json['commit_id'] as String?,
     json['path'] as String?,
     json['position'] as int?,
   );
@@ -201,7 +201,7 @@ Map<String, dynamic> _$CreatePullRequestCommentToJson(
         CreatePullRequestComment instance) =>
     <String, dynamic>{
       'body': instance.body,
-      'commitId': instance.commitId,
+      'commit_id': instance.commitId,
       'path': instance.path,
       'position': instance.position,
     };
@@ -214,9 +214,9 @@ PullRequestFile _$PullRequestFileFromJson(Map<String, dynamic> json) {
     additionsCount: json['additions'] as int?,
     deletionsCount: json['deletions'] as int?,
     changesCount: json['changes'] as int?,
-    blobUrl: json['blobUrl'] as String?,
-    rawUrl: json['rawUrl'] as String?,
-    contentsUrl: json['contentsUrl'] as String?,
+    blobUrl: json['blob_url'] as String?,
+    rawUrl: json['raw_url'] as String?,
+    contentsUrl: json['contents_url'] as String?,
     patch: json['patch'] as String?,
   );
 }
@@ -229,8 +229,8 @@ Map<String, dynamic> _$PullRequestFileToJson(PullRequestFile instance) =>
       'additions': instance.additionsCount,
       'deletions': instance.deletionsCount,
       'changes': instance.changesCount,
-      'blobUrl': instance.blobUrl,
-      'rawUrl': instance.rawUrl,
-      'contentsUrl': instance.contentsUrl,
+      'blob_url': instance.blobUrl,
+      'raw_url': instance.rawUrl,
+      'contents_url': instance.contentsUrl,
       'patch': instance.patch,
     };

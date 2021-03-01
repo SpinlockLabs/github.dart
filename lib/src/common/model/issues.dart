@@ -31,10 +31,6 @@ class Issue {
     }
   }
 
-  /// Issue Labels
-  @JsonKey(defaultValue: <IssueLabel>[])
-  List<IssueLabel> labels = <IssueLabel>[];
-
   @JsonKey(defaultValue: 0)
   int id;
 
@@ -60,6 +56,10 @@ class Issue {
 
   /// User who created the issue.
   User? user;
+
+  /// Issue Labels
+  @JsonKey(defaultValue: <IssueLabel>[])
+  List<IssueLabel> labels = <IssueLabel>[];
 
   /// The User that the issue is assigned to
   User? assignee;

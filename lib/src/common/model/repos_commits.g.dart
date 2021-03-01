@@ -94,14 +94,14 @@ CommitComment _$CommitCommentFromJson(Map<String, dynamic> json) {
     position: json['position'] as int?,
     path: json['path'] as String?,
     apiUrl: json['url'] as String?,
-    commitId: json['commitId'] as String?,
-    createdAt: json['createdAt'] == null
+    commitId: json['commit_id'] as String?,
+    createdAt: json['created_at'] == null
         ? null
-        : DateTime.parse(json['createdAt'] as String),
-    htmlUrl: json['htmlUrl'] as String?,
-    updatedAt: json['updatedAt'] == null
+        : DateTime.parse(json['created_at'] as String),
+    htmlUrl: json['html_url'] as String?,
+    updatedAt: json['updated_at'] == null
         ? null
-        : DateTime.parse(json['updatedAt'] as String),
+        : DateTime.parse(json['updated_at'] as String),
     body: json['body'] as String?,
   );
 }
@@ -112,10 +112,10 @@ Map<String, dynamic> _$CommitCommentToJson(CommitComment instance) =>
       'path': instance.path,
       'line': instance.line,
       'position': instance.position,
-      'commitId': instance.commitId,
-      'createdAt': instance.createdAt?.toIso8601String(),
-      'updatedAt': instance.updatedAt?.toIso8601String(),
-      'htmlUrl': instance.htmlUrl,
+      'commit_id': instance.commitId,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'html_url': instance.htmlUrl,
       'url': instance.apiUrl,
       'body': instance.body,
     };

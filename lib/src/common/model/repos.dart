@@ -69,6 +69,7 @@ class Repository {
     this.pushedAt,
     this.license,
     this.hasPages = false,
+    this.permissions
   });
 
   /// Repository Name
@@ -84,6 +85,7 @@ class Repository {
   final String fullName;
 
   /// Repository Owner
+  @JsonKey(defaultValue: null)
   final UserInformation? owner;
 
   /// If the Repository is Private
@@ -187,6 +189,8 @@ class Repository {
   @JsonKey(defaultValue: false)
   final bool disabled;
 
+  RepositoryPermissions? permissions;
+
   factory Repository.fromJson(Map<String, dynamic> input) =>
       _$RepositoryFromJson(input);
   Map<String, dynamic> toJson() => _$RepositoryToJson(this);
@@ -196,6 +200,27 @@ class Repository {
 
   @override
   String toString() => 'Repository: $owner/$name';
+}
+
+/// Model class for repository permissions.
+@JsonSerializable()
+class RepositoryPermissions {
+  RepositoryPermissions({this.admin = false, this.push = false, this.pull = false});
+
+  /// Administrative Access
+  @JsonKey(defaultValue: false)
+  final bool admin;
+
+  /// Push Access
+  @JsonKey(defaultValue: false)
+  final bool push;
+
+  /// Pull Access
+  @JsonKey(defaultValue: false)
+  final bool pull;
+
+  factory RepositoryPermissions.fromJson(Map<String, dynamic> json) =>
+      _$RepositoryPermissionsFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
