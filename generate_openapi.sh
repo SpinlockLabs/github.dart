@@ -1,0 +1,1 @@
+openapi-generator generate -i https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json -g dart-dio -o ./ --additional-properties="pubDescription=An unoffical Dart Octokit - (Github Client API),pubAuthor=Rob Becker,pubName=github,pubVersion=8.0.0-dev" --skip-validate-spec
