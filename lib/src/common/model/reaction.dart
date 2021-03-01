@@ -8,7 +8,7 @@ part 'reaction.g.dart';
 /// This API is currently in preview. It may break.
 ///
 /// See https://developer.github.com/v3/reactions/
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Reaction {
   final int? id;
   final String? nodeId;

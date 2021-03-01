@@ -12,16 +12,8 @@ Future<void> main() async {
 }
 
 void loadStars() {
-  String? user = 'SpinlockLabs';
-  String? repo = 'github.dart';
-
-  if (queryString.containsKey('user')) {
-    user = queryString['user'];
-  }
-
-  if (queryString.containsKey('repo')) {
-    repo = queryString['repo'];
-  }
+  var user = queryString['user'] ?? 'SpinlockLabs';
+  var repo = queryString['repo'] ?? 'github.dart';
 
   querySelector('#title')!.appendText(' for $user/$repo');
 

@@ -121,7 +121,7 @@ class CommitFile {
 /// Model class for a commit comment.
 ///
 /// See https://developer.github.com/v3/repos/comments
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitComment {
   CommitComment({
     this.id,

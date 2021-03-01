@@ -5,51 +5,56 @@ import 'package:json_annotation/json_annotation.dart';
 part 'issues.g.dart';
 
 /// Model class for an issue on the tracker.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Issue {
   Issue({
-    this.id,
-    this.url,
-    this.htmlUrl,
-    this.number,
-    this.state,
-    this.title,
+    this.id = 0,
+    this.url = '',
+    this.htmlUrl = '',
+    this.number = 0,
+    this.state = '',
+    this.title = '',
     this.user,
-    this.labels,
+    this.labels = const <IssueLabel>[],
     this.assignee,
     this.milestone,
-    this.commentsCount,
+    this.commentsCount = 0,
     this.pullRequest,
     this.createdAt,
     this.closedAt,
     this.updatedAt,
-    this.body,
+    this.body = '',
     this.closedBy,
   });
 
-  int? id;
+  /// Issue Labels
+  List<IssueLabel> labels = <IssueLabel>[];
+
+  @JsonKey(defaultValue: 0)
+  int id;
 
   /// The api url.
-  String? url;
+  @JsonKey(defaultValue: '')
+  String url;
 
   /// Url to the Issue Page
-  @JsonKey(name: 'html_url')
-  String? htmlUrl;
+  @JsonKey(defaultValue: '')
+  String htmlUrl;
 
   /// Issue Number
-  int? number;
+  @JsonKey(defaultValue: 0)
+  int number;
 
   /// Issue State
-  String? state;
+  @JsonKey(defaultValue: '')
+  String state;
 
   /// Issue Title
-  String? title;
+  @JsonKey(defaultValue: '')
+  String title;
 
   /// User who created the issue.
   User? user;
-
-  /// Issue Labels
-  List<IssueLabel>? labels;
 
   /// The User that the issue is assigned to
   User? assignee;
@@ -58,8 +63,8 @@ class Issue {
   Milestone? milestone;
 
   /// Number of Comments
-  @JsonKey(name: 'comments')
-  int? commentsCount;
+  @JsonKey(name: 'comments', defaultValue: 0)
+  int commentsCount;
 
   /// A Pull Request
   @JsonKey(name: 'pull_request')
@@ -77,7 +82,8 @@ class Issue {
   @JsonKey(name: 'updated_at')
   DateTime? updatedAt;
 
-  String? body;
+  @JsonKey(defaultValue: '')
+  String body;
 
   /// The user who closed the issue
   @JsonKey(name: 'closed_by')
@@ -91,7 +97,7 @@ class Issue {
 }
 
 /// Model class for a request to create/edit an issue.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueRequest {
   IssueRequest(
       {this.title,
@@ -114,7 +120,7 @@ class IssueRequest {
 }
 
 /// Model class for a pull request for an issue.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssuePullRequest {
   IssuePullRequest({
     this.htmlUrl,
@@ -133,7 +139,7 @@ class IssuePullRequest {
 }
 
 /// Model class for an issue comment.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueComment {
   IssueComment({
     this.id,
@@ -160,15 +166,18 @@ class IssueComment {
 }
 
 /// Model class for an issue label.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueLabel {
   IssueLabel({
-    this.name,
-    this.color,
+    this.name = '',
+    this.color = '',
   });
 
-  String? name;
-  String? color;
+  @JsonKey(defaultValue: '')
+  String name;
+
+  @JsonKey(defaultValue: '')
+  String color;
 
   factory IssueLabel.fromJson(Map<String, dynamic> input) =>
       _$IssueLabelFromJson(input);
@@ -179,7 +188,7 @@ class IssueLabel {
 }
 
 /// Model class for a milestone.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Milestone {
   Milestone({
     this.id,
@@ -236,7 +245,7 @@ class Milestone {
 }
 
 /// Model class for a new milestone to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateMilestone {
   CreateMilestone(
     this.title, {

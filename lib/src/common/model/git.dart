@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'git.g.dart';
 
 /// Model class for a blob.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitBlob {
   GitBlob({
     this.content,
@@ -28,7 +28,7 @@ class GitBlob {
 /// Model class for a new blob to be created.
 ///
 /// The [encoding] can be either 'utf-8' or 'base64'.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitBlob {
   CreateGitBlob(this.content, this.encoding);
 
@@ -44,7 +44,7 @@ class CreateGitBlob {
 ///
 /// Note: This is the raw [GitCommit]. The [RepositoryCommit] is a repository
 /// commit containing GitHub-specific information.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitCommit {
   GitCommit({
     this.sha,
@@ -73,7 +73,7 @@ class GitCommit {
 }
 
 /// Model class for a new commit to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitCommit {
   CreateGitCommit(this.message, this.tree,
       {this.parents, this.committer, this.author});
@@ -117,7 +117,7 @@ class GitCommitUser {
 }
 
 /// Model class for a GitHub tree.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTree {
   String? sha;
   String? url;
@@ -139,7 +139,7 @@ class GitTree {
 /// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTreeEntry {
   String? path;
   String? mode;
@@ -156,7 +156,7 @@ class GitTreeEntry {
 }
 
 /// Model class for a new tree to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTree {
   CreateGitTree(this.entries, {this.baseTree});
 
@@ -176,7 +176,7 @@ class CreateGitTree {
 }
 
 /// Model class for a new tree entry to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTreeEntry {
   /// Constructor.
   /// Either [sha] or [content] must be defined.
@@ -199,7 +199,7 @@ class CreateGitTreeEntry {
 }
 
 /// Model class for a reference.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitReference {
   GitReference({
     this.ref,
@@ -216,7 +216,7 @@ class GitReference {
 }
 
 /// Model class for a tag.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTag {
   GitTag({
     this.tag,
@@ -239,7 +239,7 @@ class GitTag {
 }
 
 /// Model class for a new tag to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTag {
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
@@ -255,7 +255,7 @@ class CreateGitTag {
 }
 
 /// Model class for an object referenced by [GitReference] and [GitTag].
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitObject {
   GitObject(this.type, this.sha, this.url);
   String? type;

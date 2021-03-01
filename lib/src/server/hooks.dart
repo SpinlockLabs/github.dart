@@ -89,7 +89,7 @@ class UnknownHookEvent extends HookEvent {
   UnknownHookEvent(this.event, this.data);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryEvent extends HookEvent {
   RepositoryEvent({
     this.action,
@@ -105,7 +105,7 @@ class RepositoryEvent extends HookEvent {
   Map<String, dynamic> toJson() => _$RepositoryEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueCommentEvent extends HookEvent {
   IssueCommentEvent({
     this.action,
@@ -121,7 +121,7 @@ class IssueCommentEvent extends HookEvent {
   Map<String, dynamic> toJson() => _$IssueCommentEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ForkEvent extends HookEvent {
   ForkEvent({
     this.forkee,
@@ -135,7 +135,7 @@ class ForkEvent extends HookEvent {
   Map<String, dynamic> toJson() => _$ForkEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueEvent extends HookEvent {
   IssueEvent({
     this.action,
@@ -157,7 +157,7 @@ class IssueEvent extends HookEvent {
   Map<String, dynamic> toJson() => _$IssueEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestEvent extends HookEvent {
   PullRequestEvent({
     this.action,

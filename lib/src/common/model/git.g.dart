@@ -160,13 +160,13 @@ CreateGitTree _$CreateGitTreeFromJson(Map<String, dynamic> json) {
     (json['tree'] as List<dynamic>?)
         ?.map((e) => CreateGitTreeEntry.fromJson(e as Map<String, dynamic>))
         .toList(),
-    baseTree: json['base_tree'] as String?,
+    baseTree: json['baseTree'] as String?,
   );
 }
 
 Map<String, dynamic> _$CreateGitTreeToJson(CreateGitTree instance) =>
     <String, dynamic>{
-      'base_tree': instance.baseTree,
+      'baseTree': instance.baseTree,
       'tree': instance.entries,
     };
 

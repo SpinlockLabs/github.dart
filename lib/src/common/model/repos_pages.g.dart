@@ -33,12 +33,12 @@ PageBuild _$PageBuildFromJson(Map<String, dynamic> json) {
         : PageBuildPusher.fromJson(json['pusher'] as Map<String, dynamic>),
     commit: json['commit'] as String?,
     duration: json['duration'] as int?,
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
+        : DateTime.parse(json['updatedAt'] as String),
   );
 }
 
@@ -49,8 +49,8 @@ Map<String, dynamic> _$PageBuildToJson(PageBuild instance) => <String, dynamic>{
       'pusher': instance.pusher,
       'commit': instance.commit,
       'duration': instance.duration,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 PageBuildPusher _$PageBuildPusherFromJson(Map<String, dynamic> json) {
@@ -58,9 +58,9 @@ PageBuildPusher _$PageBuildPusherFromJson(Map<String, dynamic> json) {
     login: json['login'] as String?,
     id: json['id'] as int?,
     apiUrl: json['url'] as String?,
-    htmlUrl: json['html_url'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
     type: json['type'] as String?,
-    siteAdmin: json['site_admin'] as bool?,
+    siteAdmin: json['siteAdmin'] as bool?,
   );
 }
 
@@ -69,9 +69,9 @@ Map<String, dynamic> _$PageBuildPusherToJson(PageBuildPusher instance) =>
       'id': instance.id,
       'login': instance.login,
       'url': instance.apiUrl,
-      'html_url': instance.htmlUrl,
+      'htmlUrl': instance.htmlUrl,
       'type': instance.type,
-      'site_admin': instance.siteAdmin,
+      'siteAdmin': instance.siteAdmin,
     };
 
 PageBuildError _$PageBuildErrorFromJson(Map<String, dynamic> json) {

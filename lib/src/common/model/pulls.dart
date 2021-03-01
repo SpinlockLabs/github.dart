@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 part 'pulls.g.dart';
 
 /// Model class for a Pull Request.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequest {
   PullRequest({
     this.id,
@@ -119,7 +119,7 @@ class PullRequest {
 }
 
 /// Model class for a pull request merge.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestMerge {
   PullRequestMerge({
     this.merged,
@@ -136,7 +136,7 @@ class PullRequestMerge {
 }
 
 /// Model class for a Pull Request Head.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestHead {
   PullRequestHead({
     this.label,
@@ -158,7 +158,7 @@ class PullRequestHead {
 }
 
 /// Model class for a pull request to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreatePullRequest {
   CreatePullRequest(this.title, this.head, this.base,
       {this.draft = false, this.body});
@@ -182,7 +182,7 @@ class CreatePullRequest {
 }
 
 /// Model class for a pull request comment.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestComment {
   PullRequestComment({
     this.id,
@@ -222,7 +222,7 @@ class PullRequestComment {
 }
 
 /// Model class for a pull request comment to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreatePullRequestComment {
   CreatePullRequestComment(this.body, this.commitId, this.path, this.position);
   String? body;
@@ -235,7 +235,7 @@ class CreatePullRequestComment {
   Map<String, dynamic> toJson() => _$CreatePullRequestCommentToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestFile {
   PullRequestFile({
     this.sha,

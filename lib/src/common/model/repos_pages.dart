@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_pages.g.dart';
 
 /// GitHub Pages Information
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryPages {
   RepositoryPages({
     this.cname,
@@ -21,7 +21,7 @@ class RepositoryPages {
   Map<String, dynamic> toJson() => _$RepositoryPagesToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PageBuild {
   PageBuild({
     this.url,
@@ -47,7 +47,7 @@ class PageBuild {
   Map<String, dynamic> toJson() => _$PageBuildToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PageBuildPusher {
   PageBuildPusher({
     this.login,
@@ -70,7 +70,7 @@ class PageBuildPusher {
   Map<String, dynamic> toJson() => _$PageBuildPusherToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PageBuildError {
   PageBuildError({this.message});
   String? message;

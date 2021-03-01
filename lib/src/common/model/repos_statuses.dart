@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_statuses.g.dart';
 
 /// Model class for the combined status of a repository.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CombinedRepositoryStatus {
   CombinedRepositoryStatus({
     this.state,
@@ -25,7 +25,7 @@ class CombinedRepositoryStatus {
 }
 
 /// Model class for the status of a repository at a particular reference.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryStatus {
   RepositoryStatus({
     this.createdAt,
@@ -48,7 +48,7 @@ class RepositoryStatus {
 }
 
 /// Model class for a new repository status to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateStatus {
   CreateStatus(this.state, {this.targetUrl, this.description, this.context});
 

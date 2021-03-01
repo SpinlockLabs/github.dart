@@ -9,21 +9,21 @@ part of 'reaction.dart';
 Reaction _$ReactionFromJson(Map<String, dynamic> json) {
   return Reaction(
     id: json['id'] as int?,
-    nodeId: json['node_id'] as String?,
+    nodeId: json['nodeId'] as String?,
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
     content: json['content'] as String?,
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
+        : DateTime.parse(json['createdAt'] as String),
   );
 }
 
 Map<String, dynamic> _$ReactionToJson(Reaction instance) => <String, dynamic>{
       'id': instance.id,
-      'node_id': instance.nodeId,
+      'nodeId': instance.nodeId,
       'user': instance.user,
       'content': instance.content,
-      'created_at': instance.createdAt?.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
     };

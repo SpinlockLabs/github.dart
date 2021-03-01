@@ -10,23 +10,23 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
   return Release(
     id: json['id'] as int?,
     url: json['url'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    tarballUrl: json['tarball_url'] as String?,
-    uploadUrl: json['upload_url'] as String?,
-    nodeId: json['node_id'] as String?,
-    tagName: json['tag_name'] as String?,
-    targetCommitish: json['target_commitish'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
+    tarballUrl: json['tarballUrl'] as String?,
+    uploadUrl: json['uploadUrl'] as String?,
+    nodeId: json['nodeId'] as String?,
+    tagName: json['tagName'] as String?,
+    targetCommitish: json['targetCommitish'] as String?,
     name: json['name'] as String?,
     body: json['body'] as String?,
     description: json['description'] as String?,
     isDraft: json['draft'] as bool?,
     isPrerelease: json['prerelease'] as bool?,
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    publishedAt: json['published_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    publishedAt: json['publishedAt'] == null
         ? null
-        : DateTime.parse(json['published_at'] as String),
+        : DateTime.parse(json['publishedAt'] as String),
     author: json['author'] == null
         ? null
         : User.fromJson(json['author'] as Map<String, dynamic>),
@@ -34,29 +34,29 @@ Release _$ReleaseFromJson(Map<String, dynamic> json) {
         ?.map((e) => ReleaseAsset.fromJson(e as Map<String, dynamic>))
         .toList(),
   )
-    ..zipballUrl = json['zipball_url'] as String?
-    ..assetsUrl = json['assets_url'] as String?
+    ..zipballUrl = json['zipballUrl'] as String?
+    ..assetsUrl = json['assetsUrl'] as String?
     ..errors = json['errors'] as List<dynamic>?;
 }
 
 Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
       'url': instance.url,
-      'html_url': instance.htmlUrl,
-      'tarball_url': instance.tarballUrl,
-      'zipball_url': instance.zipballUrl,
-      'upload_url': instance.uploadUrl,
-      'assets_url': instance.assetsUrl,
+      'htmlUrl': instance.htmlUrl,
+      'tarballUrl': instance.tarballUrl,
+      'zipballUrl': instance.zipballUrl,
+      'uploadUrl': instance.uploadUrl,
+      'assetsUrl': instance.assetsUrl,
       'id': instance.id,
-      'node_id': instance.nodeId,
-      'tag_name': instance.tagName,
-      'target_commitish': instance.targetCommitish,
+      'nodeId': instance.nodeId,
+      'tagName': instance.tagName,
+      'targetCommitish': instance.targetCommitish,
       'name': instance.name,
       'body': instance.body,
       'description': instance.description,
       'draft': instance.isDraft,
       'prerelease': instance.isPrerelease,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'published_at': instance.publishedAt?.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'publishedAt': instance.publishedAt?.toIso8601String(),
       'author': instance.author,
       'assets': instance.assets,
       'errors': instance.errors,
@@ -68,38 +68,38 @@ ReleaseAsset _$ReleaseAssetFromJson(Map<String, dynamic> json) {
     name: json['name'] as String?,
     label: json['label'] as String?,
     state: json['state'] as String?,
-    contentType: json['content_type'] as String?,
+    contentType: json['contentType'] as String?,
     size: json['size'] as int?,
-    downloadCount: json['download_count'] as int?,
-    browserDownloadUrl: json['browser_download_url'] as String?,
-    createdAt: json['created_at'] == null
+    downloadCount: json['downloadCount'] as int?,
+    browserDownloadUrl: json['browserDownloadUrl'] as String?,
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
+        : DateTime.parse(json['updatedAt'] as String),
   );
 }
 
 Map<String, dynamic> _$ReleaseAssetToJson(ReleaseAsset instance) =>
     <String, dynamic>{
-      'browser_download_url': instance.browserDownloadUrl,
+      'browserDownloadUrl': instance.browserDownloadUrl,
       'id': instance.id,
       'name': instance.name,
       'label': instance.label,
       'state': instance.state,
-      'content_type': instance.contentType,
+      'contentType': instance.contentType,
       'size': instance.size,
-      'download_count': instance.downloadCount,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'downloadCount': instance.downloadCount,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) {
   return CreateRelease(
-    json['tag_name'] as String?,
+    json['tagName'] as String?,
   )
-    ..targetCommitish = json['target_commitish'] as String?
+    ..targetCommitish = json['targetCommitish'] as String?
     ..name = json['name'] as String?
     ..body = json['body'] as String?
     ..isDraft = json['draft'] as bool?
@@ -108,8 +108,8 @@ CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
     <String, dynamic>{
-      'tag_name': instance.tagName,
-      'target_commitish': instance.targetCommitish,
+      'tagName': instance.tagName,
+      'targetCommitish': instance.targetCommitish,
       'name': instance.name,
       'body': instance.body,
       'draft': instance.isDraft,

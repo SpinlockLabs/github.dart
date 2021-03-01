@@ -10,9 +10,9 @@ User _$UserFromJson(Map<String, dynamic> json) {
   return User(
     id: json['id'] as int?,
     login: json['login'] as String?,
-    avatarUrl: json['avatar_url'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    siteAdmin: json['site_admin'] as bool?,
+    avatarUrl: json['avatarUrl'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
+    siteAdmin: json['siteAdmin'] as bool?,
     name: json['name'] as String?,
     company: json['company'] as String?,
     blog: json['blog'] as String?,
@@ -24,21 +24,21 @@ User _$UserFromJson(Map<String, dynamic> json) {
     publicGistsCount: json['public_gists'] as int?,
     followersCount: json['followers'] as int?,
     followingCount: json['following'] as int?,
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
-  )..twitterUsername = json['twitter_username'] as String?;
+        : DateTime.parse(json['updatedAt'] as String),
+  )..twitterUsername = json['twitterUsername'] as String?;
 }
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'login': instance.login,
       'id': instance.id,
-      'avatar_url': instance.avatarUrl,
-      'html_url': instance.htmlUrl,
-      'site_admin': instance.siteAdmin,
+      'avatarUrl': instance.avatarUrl,
+      'htmlUrl': instance.htmlUrl,
+      'siteAdmin': instance.siteAdmin,
       'name': instance.name,
       'company': instance.company,
       'blog': instance.blog,
@@ -50,18 +50,18 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'public_gists': instance.publicGistsCount,
       'followers': instance.followersCount,
       'following': instance.followingCount,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'twitter_username': instance.twitterUsername,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'twitterUsername': instance.twitterUsername,
     };
 
 Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) {
   return Collaborator(
     json['login'] as String?,
     json['id'] as int?,
-    json['html_url'] as String?,
+    json['htmlUrl'] as String?,
     json['type'] as String?,
-    json['site_admin'] as bool?,
+    json['siteAdmin'] as bool?,
     (json['permissions'] as Map<String, dynamic>?)?.map(
       (k, e) => MapEntry(k, e as bool),
     ),
@@ -72,10 +72,10 @@ Contributor _$ContributorFromJson(Map<String, dynamic> json) {
   return Contributor(
     id: json['id'] as int?,
     login: json['login'] as String?,
-    avatarUrl: json['avatar_url'] as String?,
-    htmlUrl: json['html_url'] as String?,
+    avatarUrl: json['avatarUrl'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
     type: json['type'] as String?,
-    siteAdmin: json['site_admin'] as bool?,
+    siteAdmin: json['siteAdmin'] as bool?,
     contributions: json['contributions'] as int?,
   );
 }
@@ -84,10 +84,10 @@ Map<String, dynamic> _$ContributorToJson(Contributor instance) =>
     <String, dynamic>{
       'login': instance.login,
       'id': instance.id,
-      'avatar_url': instance.avatarUrl,
-      'html_url': instance.htmlUrl,
+      'avatarUrl': instance.avatarUrl,
+      'htmlUrl': instance.htmlUrl,
       'type': instance.type,
-      'site_admin': instance.siteAdmin,
+      'siteAdmin': instance.siteAdmin,
       'contributions': instance.contributions,
     };
 
@@ -95,9 +95,9 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
   return CurrentUser()
     ..login = json['login'] as String?
     ..id = json['id'] as int?
-    ..avatarUrl = json['avatar_url'] as String?
-    ..htmlUrl = json['html_url'] as String?
-    ..siteAdmin = json['site_admin'] as bool?
+    ..avatarUrl = json['avatarUrl'] as String?
+    ..htmlUrl = json['htmlUrl'] as String?
+    ..siteAdmin = json['siteAdmin'] as bool?
     ..name = json['name'] as String?
     ..company = json['company'] as String?
     ..blog = json['blog'] as String?
@@ -109,13 +109,13 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) {
     ..publicGistsCount = json['public_gists'] as int?
     ..followersCount = json['followers'] as int?
     ..followingCount = json['following'] as int?
-    ..createdAt = json['created_at'] == null
+    ..createdAt = json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String)
-    ..updatedAt = json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String)
+    ..updatedAt = json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String)
-    ..twitterUsername = json['twitter_username'] as String?
+        : DateTime.parse(json['updatedAt'] as String)
+    ..twitterUsername = json['twitterUsername'] as String?
     ..privateReposCount = json['total_private_repos'] as int?
     ..ownedPrivateReposCount = json['owned_private_repos'] as int?
     ..diskUsage = json['disk_usage'] as int?
@@ -128,9 +128,9 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
     <String, dynamic>{
       'login': instance.login,
       'id': instance.id,
-      'avatar_url': instance.avatarUrl,
-      'html_url': instance.htmlUrl,
-      'site_admin': instance.siteAdmin,
+      'avatarUrl': instance.avatarUrl,
+      'htmlUrl': instance.htmlUrl,
+      'siteAdmin': instance.siteAdmin,
       'name': instance.name,
       'company': instance.company,
       'blog': instance.blog,
@@ -142,9 +142,9 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
       'public_gists': instance.publicGistsCount,
       'followers': instance.followersCount,
       'following': instance.followingCount,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'twitter_username': instance.twitterUsername,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'twitterUsername': instance.twitterUsername,
       'total_private_repos': instance.privateReposCount,
       'owned_private_repos': instance.ownedPrivateReposCount,
       'disk_usage': instance.diskUsage,

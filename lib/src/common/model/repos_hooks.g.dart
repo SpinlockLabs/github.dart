@@ -14,13 +14,13 @@ Hook _$HookFromJson(Map<String, dynamic> json) {
     ..events =
         (json['events'] as List<dynamic>?)?.map((e) => e as String).toList()
     ..active = json['active'] as bool?
-    ..createdAt = json['created_at'] == null
+    ..createdAt = json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String)
-    ..updatedAt = json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String)
+    ..updatedAt = json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String)
-    ..repoName = json['repo_name'] as String?
+        : DateTime.parse(json['updatedAt'] as String)
+    ..repoName = json['repoName'] as String?
     ..config = json['config'] == null
         ? null
         : HookConfig.fromJson(json['config'] as Map<String, dynamic>);
@@ -31,27 +31,27 @@ Map<String, dynamic> _$HookToJson(Hook instance) => <String, dynamic>{
       'name': instance.name,
       'events': instance.events,
       'active': instance.active,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'repo_name': instance.repoName,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'repoName': instance.repoName,
       'config': instance.config,
     };
 
 HookConfig _$HookConfigFromJson(Map<String, dynamic> json) {
   return HookConfig(
     url: json['url'] as String?,
-    contentType: json['content_type'] as String?,
+    contentType: json['contentType'] as String?,
     secret: json['secret'] as String?,
-    insecureSsl: json['insecure_ssl'] as String?,
+    insecureSsl: json['insecureSsl'] as String?,
   );
 }
 
 Map<String, dynamic> _$HookConfigToJson(HookConfig instance) =>
     <String, dynamic>{
       'url': instance.url,
-      'content_type': instance.contentType,
+      'contentType': instance.contentType,
       'secret': instance.secret,
-      'insecure_ssl': instance.insecureSsl,
+      'insecureSsl': instance.insecureSsl,
     };
 
 CreateHook _$CreateHookFromJson(Map<String, dynamic> json) {

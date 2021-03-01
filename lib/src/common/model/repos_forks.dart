@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_forks.g.dart';
 
 /// Model class for a new fork to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateFork {
   CreateFork([this.organization]);
 

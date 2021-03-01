@@ -10,7 +10,7 @@ import 'package:github/src/common/xplat_common.dart'
 Authentication findAuthenticationFromEnvironment() {
   // search the query string parameters first
   var auth = findAuthenticationInMap(_parseQuery(window.location.href));
-  auth ??= findAuthenticationInMap(window.sessionStorage);
+  auth ??= findAuthenticationInMap(window.localStorage);
   return auth ?? Authentication.anonymous();
 }
 

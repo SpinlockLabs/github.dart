@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'users.g.dart';
 
 /// Model class for a user.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class User {
   User({
     this.id,
@@ -96,7 +96,7 @@ class User {
 
 /// The response from listing collaborators on a repo.
 // https://developer.github.com/v3/repos/collaborators/#response
-@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+@JsonSerializable(createToJson: false, )
 class Collaborator {
   final String? login;
   final int? id;
@@ -121,7 +121,7 @@ class Collaborator {
 /// The response from listing contributors on a repo.
 ///
 /// https://developer.github.com/v3/repos/#response-if-repository-contains-content
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Contributor {
   Contributor({
     this.id,
@@ -159,7 +159,7 @@ class Contributor {
 }
 
 /// The Currently Authenticated User
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CurrentUser extends User {
   CurrentUser();
 
@@ -185,7 +185,7 @@ class CurrentUser extends User {
 }
 
 /// A Users GitHub Plan
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserPlan {
   UserPlan();
 
@@ -209,7 +209,7 @@ class UserPlan {
 }
 
 /// Model class for a user's email address.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserEmail {
   UserEmail({
     this.email,

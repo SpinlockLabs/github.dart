@@ -18,7 +18,9 @@ void main() {
     final authToken = Platform.environment['GITHUB_API_TOKEN'];
     final repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
     final repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
-
+    if (repoName == null || repoOwner == null) {
+      throw AssertionError('config incorrect');
+    }
     github = GitHub(auth: Authentication.withToken(authToken));
     slug = RepositorySlug(repoOwner, repoName);
   });

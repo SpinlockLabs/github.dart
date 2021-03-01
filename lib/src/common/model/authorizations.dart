@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'authorizations.g.dart';
 
 /// Model class for an authorization.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Authorization {
   Authorization(
       {this.id,
@@ -34,7 +34,7 @@ class Authorization {
 }
 
 /// Model class for an application of an [Authorization].
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class AuthorizationApplication {
   AuthorizationApplication({this.url, this.name, this.clientId});
 
@@ -47,7 +47,7 @@ class AuthorizationApplication {
   Map<String, dynamic> toJson() => _$AuthorizationApplicationToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateAuthorization {
   CreateAuthorization(this.note,
       {this.scopes, this.noteUrl, this.clientId, this.clientSecret});

@@ -5,6 +5,6 @@ void main() {
 
   github.search.repositories('github').listen((repo) {
     print(
-        "${repo.fullName}: ${repo.description!.isNotEmpty ? repo.description : "No Description"}");
+        '${repo.fullName}: ${repo.description}');
   }).onDone(github.dispose);
 }

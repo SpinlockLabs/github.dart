@@ -8,17 +8,17 @@ part of 'issues.dart';
 
 Issue _$IssueFromJson(Map<String, dynamic> json) {
   return Issue(
-    id: json['id'] as int?,
-    url: json['url'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    number: json['number'] as int?,
-    state: json['state'] as String?,
-    title: json['title'] as String?,
+    id: json['id'] as int? ?? 0,
+    url: json['url'] as String? ?? '',
+    htmlUrl: json['htmlUrl'] as String? ?? '',
+    number: json['number'] as int? ?? 0,
+    state: json['state'] as String? ?? '',
+    title: json['title'] as String? ?? '',
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
-    labels: (json['labels'] as List<dynamic>?)
-        ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
+    labels: (json['labels'] as List<dynamic>)
+        .map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
         .toList(),
     assignee: json['assignee'] == null
         ? null
@@ -26,7 +26,7 @@ Issue _$IssueFromJson(Map<String, dynamic> json) {
     milestone: json['milestone'] == null
         ? null
         : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
-    commentsCount: json['comments'] as int?,
+    commentsCount: json['comments'] as int? ?? 0,
     pullRequest: json['pull_request'] == null
         ? null
         : IssuePullRequest.fromJson(
@@ -40,7 +40,7 @@ Issue _$IssueFromJson(Map<String, dynamic> json) {
     updatedAt: json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String),
-    body: json['body'] as String?,
+    body: json['body'] as String? ?? '',
     closedBy: json['closed_by'] == null
         ? null
         : User.fromJson(json['closed_by'] as Map<String, dynamic>),
@@ -48,14 +48,14 @@ Issue _$IssueFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$IssueToJson(Issue instance) => <String, dynamic>{
+      'labels': instance.labels,
       'id': instance.id,
       'url': instance.url,
-      'html_url': instance.htmlUrl,
+      'htmlUrl': instance.htmlUrl,
       'number': instance.number,
       'state': instance.state,
       'title': instance.title,
       'user': instance.user,
-      'labels': instance.labels,
       'assignee': instance.assignee,
       'milestone': instance.milestone,
       'comments': instance.commentsCount,
@@ -91,17 +91,17 @@ Map<String, dynamic> _$IssueRequestToJson(IssueRequest instance) =>
 
 IssuePullRequest _$IssuePullRequestFromJson(Map<String, dynamic> json) {
   return IssuePullRequest(
-    htmlUrl: json['html_url'] as String?,
-    diffUrl: json['diff_url'] as String?,
-    patchUrl: json['patch_url'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
+    diffUrl: json['diffUrl'] as String?,
+    patchUrl: json['patchUrl'] as String?,
   );
 }
 
 Map<String, dynamic> _$IssuePullRequestToJson(IssuePullRequest instance) =>
     <String, dynamic>{
-      'html_url': instance.htmlUrl,
-      'diff_url': instance.diffUrl,
-      'patch_url': instance.patchUrl,
+      'htmlUrl': instance.htmlUrl,
+      'diffUrl': instance.diffUrl,
+      'patchUrl': instance.patchUrl,
     };
 
 IssueComment _$IssueCommentFromJson(Map<String, dynamic> json) {
@@ -111,15 +111,15 @@ IssueComment _$IssueCommentFromJson(Map<String, dynamic> json) {
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
+        : DateTime.parse(json['updatedAt'] as String),
     url: json['url'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    issueUrl: json['issue_url'] as String?,
+    htmlUrl: json['htmlUrl'] as String?,
+    issueUrl: json['issueUrl'] as String?,
   );
 }
 
@@ -128,17 +128,17 @@ Map<String, dynamic> _$IssueCommentToJson(IssueComment instance) =>
       'id': instance.id,
       'body': instance.body,
       'user': instance.user,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
       'url': instance.url,
-      'html_url': instance.htmlUrl,
-      'issue_url': instance.issueUrl,
+      'htmlUrl': instance.htmlUrl,
+      'issueUrl': instance.issueUrl,
     };
 
 IssueLabel _$IssueLabelFromJson(Map<String, dynamic> json) {
   return IssueLabel(
-    name: json['name'] as String?,
-    color: json['color'] as String?,
+    name: json['name'] as String? ?? '',
+    color: json['color'] as String? ?? '',
   );
 }
 
@@ -160,15 +160,14 @@ Milestone _$MilestoneFromJson(Map<String, dynamic> json) {
         : User.fromJson(json['creator'] as Map<String, dynamic>),
     openIssuesCount: json['open_issues'] as int?,
     closedIssuesCount: json['closed_issues'] as int?,
-    createdAt: json['created_at'] == null
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
-    dueOn: json['due_on'] == null
-        ? null
-        : DateTime.parse(json['due_on'] as String),
+        : DateTime.parse(json['updatedAt'] as String),
+    dueOn:
+        json['dueOn'] == null ? null : DateTime.parse(json['dueOn'] as String),
   );
 }
 
@@ -181,9 +180,9 @@ Map<String, dynamic> _$MilestoneToJson(Milestone instance) => <String, dynamic>{
       'creator': instance.creator,
       'open_issues': instance.openIssuesCount,
       'closed_issues': instance.closedIssuesCount,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-      'due_on': instance.dueOn?.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
+      'dueOn': instance.dueOn?.toIso8601String(),
     };
 
 CreateMilestone _$CreateMilestoneFromJson(Map<String, dynamic> json) {
@@ -191,9 +190,8 @@ CreateMilestone _$CreateMilestoneFromJson(Map<String, dynamic> json) {
     json['title'] as String?,
     state: json['state'] as String?,
     description: json['description'] as String?,
-    dueOn: json['due_on'] == null
-        ? null
-        : DateTime.parse(json['due_on'] as String),
+    dueOn:
+        json['dueOn'] == null ? null : DateTime.parse(json['dueOn'] as String),
   );
 }
 
@@ -202,5 +200,5 @@ Map<String, dynamic> _$CreateMilestoneToJson(CreateMilestone instance) =>
       'title': instance.title,
       'state': instance.state,
       'description': instance.description,
-      'due_on': instance.dueOn?.toIso8601String(),
+      'dueOn': instance.dueOn?.toIso8601String(),
     };

@@ -17,13 +17,13 @@ Authorization _$AuthorizationFromJson(Map<String, dynamic> json) {
         : AuthorizationApplication.fromJson(
             json['app'] as Map<String, dynamic>),
     note: json['note'] as String?,
-    noteUrl: json['note_url'] as String?,
-    createdAt: json['created_at'] == null
+    noteUrl: json['noteUrl'] as String?,
+    createdAt: json['createdAt'] == null
         ? null
-        : DateTime.parse(json['created_at'] as String),
-    updatedAt: json['updated_at'] == null
+        : DateTime.parse(json['createdAt'] as String),
+    updatedAt: json['updatedAt'] == null
         ? null
-        : DateTime.parse(json['updated_at'] as String),
+        : DateTime.parse(json['updatedAt'] as String),
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
@@ -37,9 +37,9 @@ Map<String, dynamic> _$AuthorizationToJson(Authorization instance) =>
       'token': instance.token,
       'app': instance.app,
       'note': instance.note,
-      'note_url': instance.noteUrl,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'noteUrl': instance.noteUrl,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
       'user': instance.user,
     };
 
@@ -48,7 +48,7 @@ AuthorizationApplication _$AuthorizationApplicationFromJson(
   return AuthorizationApplication(
     url: json['url'] as String?,
     name: json['name'] as String?,
-    clientId: json['client_id'] as String?,
+    clientId: json['clientId'] as String?,
   );
 }
 
@@ -57,7 +57,7 @@ Map<String, dynamic> _$AuthorizationApplicationToJson(
     <String, dynamic>{
       'url': instance.url,
       'name': instance.name,
-      'client_id': instance.clientId,
+      'clientId': instance.clientId,
     };
 
 CreateAuthorization _$CreateAuthorizationFromJson(Map<String, dynamic> json) {
@@ -65,9 +65,9 @@ CreateAuthorization _$CreateAuthorizationFromJson(Map<String, dynamic> json) {
     json['note'] as String?,
     scopes:
         (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
-    noteUrl: json['note_url'] as String?,
-    clientId: json['client_id'] as String?,
-    clientSecret: json['client_secret'] as String?,
+    noteUrl: json['noteUrl'] as String?,
+    clientId: json['clientId'] as String?,
+    clientSecret: json['clientSecret'] as String?,
   );
 }
 
@@ -76,7 +76,7 @@ Map<String, dynamic> _$CreateAuthorizationToJson(
     <String, dynamic>{
       'note': instance.note,
       'scopes': instance.scopes,
-      'note_url': instance.noteUrl,
-      'client_id': instance.clientId,
-      'client_secret': instance.clientSecret,
+      'noteUrl': instance.noteUrl,
+      'clientId': instance.clientId,
+      'clientSecret': instance.clientSecret,
     };
