@@ -40,7 +40,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
     hasIssues: json['has_issues'] as bool?,
     hasWiki: json['has_wiki'] as bool?,
     hasDownloads: json['has_downloads'] as bool?,
-    hasPages: json['has_pages'] as bool,
+    hasPages: json['has_pages'] as bool?,
     forksCount: json['forks_count'] as int?,
     openIssuesCount: json['open_issues_count'] as int?,
     defaultBranch: json['default_branch'] as String?,
