@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_stats.g.dart';
 
 /// Model class for a contributor's statistics for a repository.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ContributorStatistics {
   ContributorStatistics(this.author, this.total, this.weeks);
 
@@ -24,7 +24,7 @@ class ContributorStatistics {
 
 /// Model class to represent the number of additions, deletions and commits
 /// a contributor made in a given week.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ContributorWeekStatistics {
   ContributorWeekStatistics(
       this.start, this.additions, this.deletions, this.commits);
@@ -55,7 +55,7 @@ class ContributorWeekStatistics {
 }
 
 /// Model class for contributor participation.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ContributorParticipation {
   ContributorParticipation({
     this.all,
@@ -74,7 +74,7 @@ class ContributorParticipation {
 }
 
 /// Model class for a week in a full year commit count.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class YearCommitCountWeek {
   YearCommitCountWeek({
     this.days,
@@ -97,7 +97,7 @@ class YearCommitCountWeek {
 }
 
 /// Model class for a weekly change count.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class WeeklyChangesCount {
   WeeklyChangesCount({
     this.timestamp,
@@ -120,7 +120,7 @@ class WeeklyChangesCount {
 }
 
 /// Model Class for a Punchcard Entry
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PunchcardEntry {
   PunchcardEntry({
     this.weekday,

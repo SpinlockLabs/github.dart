@@ -18,37 +18,38 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) {
 
 Repository _$RepositoryFromJson(Map<String, dynamic> json) {
   return Repository(
-    name: json['name'] as String?,
-    id: json['id'] as int?,
-    fullName: json['full_name'] as String?,
+    name: json['name'] as String? ?? '',
+    id: json['id'] as int? ?? 0,
+    fullName: json['full_name'] as String? ?? '',
     owner: json['owner'] == null
         ? null
         : UserInformation.fromJson(json['owner'] as Map<String, dynamic>),
-    isPrivate: json['private'] as bool?,
-    isFork: json['fork'] as bool?,
-    htmlUrl: json['html_url'] as String?,
-    description: json['description'] as String?,
-    cloneUrl: json['clone_url'] as String?,
-    gitUrl: json['git_url'] as String?,
-    sshUrl: json['ssh_url'] as String?,
-    svnUrl: json['svn_url'] as String?,
-    homepage: json['homepage'] as String?,
-    size: json['size'] as int?,
-    stargazersCount: json['stargazers_count'] as int?,
-    watchersCount: json['watchers_count'] as int?,
-    language: json['language'] as String?,
-    hasIssues: json['has_issues'] as bool?,
-    hasWiki: json['has_wiki'] as bool?,
-    hasDownloads: json['has_downloads'] as bool?,
-    hasPages: json['has_pages'] as bool?,
-    forksCount: json['forks_count'] as int?,
-    openIssuesCount: json['open_issues_count'] as int?,
-    defaultBranch: json['default_branch'] as String?,
-    subscribersCount: json['subscribers_count'] as int?,
-    networkCount: json['network_count'] as int?,
+    htmlUrl: json['html_url'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    cloneUrl: json['clone_url'] as String? ?? '',
+    gitUrl: json['git_url'] as String? ?? '',
+    sshUrl: json['ssh_url'] as String? ?? '',
+    svnUrl: json['svn_url'] as String? ?? '',
+    defaultBranch: json['default_branch'] as String? ?? '',
     createdAt: json['created_at'] == null
         ? null
         : DateTime.parse(json['created_at'] as String),
+    isPrivate: json['private'] as bool? ?? false,
+    isFork: json['fork'] as bool? ?? false,
+    stargazersCount: json['stargazers_count'] as int? ?? 0,
+    watchersCount: json['watchers_count'] as int? ?? 0,
+    language: json['language'] as String? ?? '',
+    hasWiki: json['has_wiki'] as bool? ?? false,
+    hasDownloads: json['has_downloads'] as bool? ?? false,
+    forksCount: json['forks_count'] as int? ?? 0,
+    openIssuesCount: json['open_issues_count'] as int? ?? 0,
+    subscribersCount: json['subscribers_count'] as int? ?? 0,
+    networkCount: json['network_count'] as int? ?? 0,
+    hasIssues: json['has_issues'] as bool? ?? false,
+    size: json['size'] as int? ?? 0,
+    archived: json['archived'] as bool? ?? false,
+    disabled: json['disabled'] as bool? ?? false,
+    homepage: json['homepage'] as String? ?? '',
     updatedAt: json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String),
@@ -58,8 +59,11 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) {
     license: json['license'] == null
         ? null
         : LicenseKind.fromJson(json['license'] as Map<String, dynamic>),
-    archived: json['archived'] as bool?,
-    disabled: json['disabled'] as bool?,
+    hasPages: json['has_pages'] as bool? ?? false,
+    permissions: json['permissions'] == null
+        ? null
+        : RepositoryPermissions.fromJson(
+            json['permissions'] as Map<String, dynamic>),
   );
 }
 
@@ -97,6 +101,24 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
       'license': instance.license,
       'archived': instance.archived,
       'disabled': instance.disabled,
+      'permissions': instance.permissions,
+    };
+
+RepositoryPermissions _$RepositoryPermissionsFromJson(
+    Map<String, dynamic> json) {
+  return RepositoryPermissions(
+    admin: json['admin'] as bool? ?? false,
+    push: json['push'] as bool? ?? false,
+    pull: json['pull'] as bool? ?? false,
+  );
+}
+
+Map<String, dynamic> _$RepositoryPermissionsToJson(
+        RepositoryPermissions instance) =>
+    <String, dynamic>{
+      'admin': instance.admin,
+      'push': instance.push,
+      'pull': instance.pull,
     };
 
 Tag _$TagFromJson(Map<String, dynamic> json) {
@@ -173,10 +195,10 @@ Map<String, dynamic> _$CommitInfoToJson(CommitInfo instance) =>
 
 UserInformation _$UserInformationFromJson(Map<String, dynamic> json) {
   return UserInformation(
-    json['login'] as String?,
-    json['id'] as int?,
-    json['avatar_url'] as String?,
-    json['html_url'] as String?,
+    json['login'] as String,
+    json['id'] as int,
+    json['avatar_url'] as String,
+    json['html_url'] as String,
   );
 }
 
@@ -190,8 +212,8 @@ Map<String, dynamic> _$UserInformationToJson(UserInformation instance) =>
 
 RepositorySlug _$RepositorySlugFromJson(Map<String, dynamic> json) {
   return RepositorySlug(
-    json['owner'] as String?,
-    json['name'] as String?,
+    json['owner'] as String,
+    json['name'] as String,
   );
 }
 

@@ -6,7 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_releases.g.dart';
 
 /// Model class for a release.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Release {
   Release({
     this.id,
@@ -99,7 +99,7 @@ class Release {
 }
 
 /// Model class for a release asset.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ReleaseAsset {
   ReleaseAsset({
     this.id,
@@ -150,7 +150,7 @@ class ReleaseAsset {
 }
 
 /// Model class for a new release to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateRelease {
   /// Tag Name to Base off of
   final String? tagName;

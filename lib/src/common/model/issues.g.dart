@@ -8,25 +8,26 @@ part of 'issues.dart';
 
 Issue _$IssueFromJson(Map<String, dynamic> json) {
   return Issue(
-    id: json['id'] as int?,
-    url: json['url'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    number: json['number'] as int?,
-    state: json['state'] as String?,
-    title: json['title'] as String?,
+    id: json['id'] as int? ?? 0,
+    url: json['url'] as String? ?? '',
+    htmlUrl: json['html_url'] as String? ?? '',
+    number: json['number'] as int? ?? 0,
+    state: json['state'] as String? ?? '',
+    title: json['title'] as String? ?? '',
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
     labels: (json['labels'] as List<dynamic>?)
-        ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
-        .toList(),
+            ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
     assignee: json['assignee'] == null
         ? null
         : User.fromJson(json['assignee'] as Map<String, dynamic>),
     milestone: json['milestone'] == null
         ? null
         : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
-    commentsCount: json['comments'] as int?,
+    commentsCount: json['comments'] as int? ?? 0,
     pullRequest: json['pull_request'] == null
         ? null
         : IssuePullRequest.fromJson(
@@ -40,7 +41,7 @@ Issue _$IssueFromJson(Map<String, dynamic> json) {
     updatedAt: json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String),
-    body: json['body'] as String?,
+    body: json['body'] as String? ?? '',
     closedBy: json['closed_by'] == null
         ? null
         : User.fromJson(json['closed_by'] as Map<String, dynamic>),
@@ -137,8 +138,8 @@ Map<String, dynamic> _$IssueCommentToJson(IssueComment instance) =>
 
 IssueLabel _$IssueLabelFromJson(Map<String, dynamic> json) {
   return IssueLabel(
-    name: json['name'] as String?,
-    color: json['color'] as String?,
+    name: json['name'] as String? ?? '',
+    color: json['color'] as String? ?? '',
   );
 }
 

@@ -90,7 +90,7 @@ class Links {
 }
 
 /// Model class for a file or directory.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryContents {
   RepositoryContents({
     this.file,
@@ -110,7 +110,7 @@ class RepositoryContents {
 
 /// Model class for a new file to be created.
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateFile {
   CreateFile(
       {this.path, this.content, this.message, this.branch, this.committer});
@@ -128,7 +128,7 @@ class CreateFile {
 }
 
 /// Model class for a committer of a commit.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitUser {
   CommitUser(this.name, this.email);
 

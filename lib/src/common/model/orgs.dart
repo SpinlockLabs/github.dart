@@ -1,4 +1,3 @@
-import 'package:github/src/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'orgs.g.dart';
@@ -180,35 +179,4 @@ class TeamMember {
   factory TeamMember.fromJson(Map<String, dynamic> input) {
     return _$TeamMemberFromJson(input);
   }
-}
-
-/// Model class for a team repository.
-@JsonSerializable(createToJson: false)
-class TeamRepository extends Repository {
-  TeamRepository({this.permissions});
-
-  /// Repository Permissions.
-  TeamRepositoryPermissions? permissions;
-
-  factory TeamRepository.fromJson(Map<String, dynamic> input) {
-    return _$TeamRepositoryFromJson(input);
-  }
-}
-
-/// Model class for team repository permissions.
-@JsonSerializable(createToJson: false)
-class TeamRepositoryPermissions {
-  TeamRepositoryPermissions(this.admin, this.push, this.pull);
-
-  /// Administrative Access
-  final bool? admin;
-
-  /// Push Access
-  final bool? push;
-
-  /// Pull Access
-  final bool? pull;
-
-  factory TeamRepositoryPermissions.fromJson(Map<String, dynamic> json) =>
-      _$TeamRepositoryPermissionsFromJson(json);
 }

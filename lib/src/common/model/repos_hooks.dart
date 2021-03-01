@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_hooks.g.dart';
 
 /// Model class for a repository hook.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Hook {
   Hook({
     this.id,
@@ -37,7 +37,7 @@ class Hook {
   Map<String, dynamic> toJson() => _$HookToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class HookConfig {
   HookConfig({
     this.url,
@@ -55,7 +55,7 @@ class HookConfig {
 }
 
 /// Model class for a new hook to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateHook {
   /// Hook Name
   final String? name;

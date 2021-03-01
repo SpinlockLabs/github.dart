@@ -2,7 +2,7 @@ import 'package:github/src/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'repos.g.dart';
 
-@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+@JsonSerializable(createToJson: false, )
 class GitHubComparison {
   final String? url;
   final String? status;
@@ -34,156 +34,193 @@ class GitHubComparison {
 }
 
 /// Model class for a repository.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Repository {
   Repository({
-    this.name,
-    this.id,
-    this.fullName,
+    this.name = '',
+    this.id = 0,
+    this.fullName = '',
     this.owner,
-    this.isPrivate,
-    this.isFork,
-    this.htmlUrl,
-    this.description,
-    this.cloneUrl,
-    this.gitUrl,
-    this.sshUrl,
-    this.svnUrl,
-    this.homepage,
-    this.size,
-    this.stargazersCount,
-    this.watchersCount,
-    this.language,
-    this.hasIssues,
-    this.hasWiki,
-    this.hasDownloads,
-    this.hasPages = false,
-    this.forksCount,
-    this.openIssuesCount,
-    this.defaultBranch,
-    this.subscribersCount,
-    this.networkCount,
+    this.htmlUrl = '',
+    this.description = '',
+    this.cloneUrl = '',
+    this.gitUrl = '',
+    this.sshUrl = '',
+    this.svnUrl = '',
+    this.defaultBranch = '',
     this.createdAt,
+    this.isPrivate = false,
+    this.isFork = false,
+    this.stargazersCount = 0,
+    this.watchersCount = 0,
+    this.language = '',
+    this.hasWiki = false,
+    this.hasDownloads = false,
+    this.forksCount = 0,
+    this.openIssuesCount = 0,
+    this.subscribersCount = 0,
+    this.networkCount = 0,
+    this.hasIssues = false,
+    this.size = 0,
+    this.archived = false,
+    this.disabled = false,
+    this.homepage = '',
     this.updatedAt,
     this.pushedAt,
     this.license,
-    this.archived,
-    this.disabled,
+    this.hasPages = false,
+    this.permissions
   });
 
   /// Repository Name
-  final String? name;
+  @JsonKey(defaultValue: '')
+  final String name;
 
   /// Repository ID
-  final int? id;
+  @JsonKey(defaultValue: 0)
+  final int id;
 
   /// Full Repository Name
-  final String? fullName;
+  @JsonKey(defaultValue: '')
+  final String fullName;
 
   /// Repository Owner
+  @JsonKey(defaultValue: null)
   final UserInformation? owner;
 
   /// If the Repository is Private
-  @JsonKey(name: 'private')
-  final bool? isPrivate;
+  @JsonKey(name: 'private', defaultValue: false)
+  final bool isPrivate;
 
   /// If the Repository is a fork
-  @JsonKey(name: 'fork')
-  final bool? isFork;
+  @JsonKey(name: 'fork', defaultValue: false)
+  final bool isFork;
 
   /// Url to the GitHub Repository Page
-  final String? htmlUrl;
+  @JsonKey(defaultValue: '')
+  final String htmlUrl;
 
   /// Repository Description
-  final String? description;
+  @JsonKey(defaultValue: '')
+  final String description;
 
   // https clone URL
-  final String? cloneUrl;
+  @JsonKey(defaultValue: '')
+  final String cloneUrl;
 
-  final String? sshUrl;
+  @JsonKey(defaultValue: '')
+  final String sshUrl;
 
-  final String? svnUrl;
+  @JsonKey(defaultValue: '')
+  final String svnUrl;
 
-  final String? gitUrl;
+  @JsonKey(defaultValue: '')
+  final String gitUrl;
 
   /// Url to the Repository Homepage
-  final String? homepage;
+  @JsonKey(defaultValue: '')
+  final String homepage;
 
   /// Repository Size
-  final int? size;
+  @JsonKey(defaultValue: 0)
+  final int size;
 
   /// Repository Stars
-  @JsonKey(name: 'stargazers_count')
-  final int? stargazersCount;
+  @JsonKey(defaultValue: 0)
+  final int stargazersCount;
 
   /// Repository Watchers
-  @JsonKey(name: 'watchers_count')
-  final int? watchersCount;
+  @JsonKey(defaultValue: 0)
+  final int watchersCount;
 
   /// Repository Language
-  final String? language;
+  @JsonKey(defaultValue: '')
+  final String language;
 
   /// If the Repository has Issues Enabled
-  @JsonKey(name: 'has_issues')
-  final bool? hasIssues;
+  @JsonKey(defaultValue: false)
+  final bool hasIssues;
 
   /// If the Repository has the Wiki Enabled
-  @JsonKey(name: 'has_wiki')
-  final bool? hasWiki;
+  @JsonKey(defaultValue: false)
+  final bool hasWiki;
 
   /// If the Repository has any Downloads
-  @JsonKey(name: 'has_downloads')
-  final bool? hasDownloads;
+  @JsonKey(defaultValue: false)
+  final bool hasDownloads;
 
   /// If the Repository has any Github Pages
-  @JsonKey(name: 'has_pages')
-  final bool? hasPages;
+  @JsonKey(defaultValue: false)
+  final bool hasPages;
 
   /// Number of Forks
-  @JsonKey(name: 'forks_count')
-  final int? forksCount;
+  @JsonKey(defaultValue: 0)
+  final int forksCount;
 
   /// Number of Open Issues
-  @JsonKey(name: 'open_issues_count')
-  final int? openIssuesCount;
+  @JsonKey(defaultValue: 0)
+  final int openIssuesCount;
 
   /// Repository Default Branch
-  @JsonKey(name: 'default_branch')
-  final String? defaultBranch;
+  @JsonKey(defaultValue: '')
+  final String defaultBranch;
 
   /// Number of Subscribers
-  @JsonKey(name: 'subscribers_count')
-  final int? subscribersCount;
+  @JsonKey(defaultValue: 0)
+  final int subscribersCount;
 
   /// Number of users in the network
-  @JsonKey(name: 'network_count')
-  final int? networkCount;
+  @JsonKey(defaultValue: 0)
+  final int networkCount;
 
   /// The time the repository was created at
-  @JsonKey(name: 'created_at')
   final DateTime? createdAt;
 
   /// The last time the repository was pushed at
-  @JsonKey(name: 'pushed_at')
   final DateTime? pushedAt;
 
-  @JsonKey(name: 'updated_at')
   final DateTime? updatedAt;
 
   final LicenseKind? license;
 
-  final bool? archived;
-  final bool? disabled;
+  @JsonKey(defaultValue: false)
+  final bool archived;
+
+  @JsonKey(defaultValue: false)
+  final bool disabled;
+
+  RepositoryPermissions? permissions;
 
   factory Repository.fromJson(Map<String, dynamic> input) =>
       _$RepositoryFromJson(input);
   Map<String, dynamic> toJson() => _$RepositoryToJson(this);
 
   /// Gets the Repository Slug (Full Name).
-  RepositorySlug slug() => RepositorySlug(owner!.login, name);
+  RepositorySlug slug() => RepositorySlug(owner?.login ?? '', name);
 
   @override
-  String toString() => 'Repository: ${owner!.login}/$name';
+  String toString() => 'Repository: $owner/$name';
+}
+
+/// Model class for repository permissions.
+@JsonSerializable()
+class RepositoryPermissions {
+  RepositoryPermissions({this.admin = false, this.push = false, this.pull = false});
+
+  /// Administrative Access
+  @JsonKey(defaultValue: false)
+  final bool admin;
+
+  /// Push Access
+  @JsonKey(defaultValue: false)
+  final bool push;
+
+  /// Pull Access
+  @JsonKey(defaultValue: false)
+  final bool pull;
+
+  factory RepositoryPermissions.fromJson(Map<String, dynamic> json) =>
+      _$RepositoryPermissionsFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -203,7 +240,7 @@ class Tag {
   String toString() => 'Tag: $name';
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitData {
   final String? sha;
   final GitCommit? commit;
@@ -248,19 +285,19 @@ class CommitInfo {
 }
 
 /// User Information
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserInformation {
   /// Owner Username
-  final String? login;
+  final String login;
 
   /// Owner ID
-  final int? id;
+  final int id;
 
   /// Avatar Url
-  final String? avatarUrl;
+  final String avatarUrl;
 
   /// Url to the user's GitHub Profile
-  final String? htmlUrl;
+  final String htmlUrl;
 
   UserInformation(this.login, this.id, this.avatarUrl, this.htmlUrl);
 
@@ -273,15 +310,12 @@ class UserInformation {
 @JsonSerializable()
 class RepositorySlug {
   /// Repository Owner
-  String? owner;
+  String owner;
 
   /// Repository Name
-  String? name;
+  String name;
 
-  RepositorySlug(this.owner, this.name) {
-    ArgumentError.checkNotNull(owner, 'owner');
-    ArgumentError.checkNotNull(name, 'name');
-  }
+  RepositorySlug(this.owner, this.name);
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {
@@ -312,7 +346,7 @@ class RepositorySlug {
 }
 
 /// Model class for a new repository to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateRepository {
   CreateRepository(this.name,
       {this.description,
@@ -424,7 +458,7 @@ class LanguageBreakdown {
   }
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class LicenseDetails {
   final String? name;
   final String? path;
@@ -466,7 +500,7 @@ class LicenseDetails {
   Map<String, dynamic> toJson() => _$LicenseDetailsToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class LicenseKind {
   final String? key;
   final String? name;

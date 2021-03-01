@@ -14,18 +14,9 @@ Future<void> main() async {
 }
 
 Future<void> loadRepository() async {
-  String? user = 'dart-lang';
-  String? reponame = 'sdk';
-
   final params = queryString;
-
-  if (params.containsKey('user')) {
-    user = params['user'];
-  }
-
-  if (params.containsKey('repo')) {
-    reponame = params['repo'];
-  }
+  var user = params['user'] ?? 'dart-lang';
+  var reponame = params['repo'] ?? 'sdk';
 
   document.getElementById('name')!.setInnerHtml('$user/$reponame');
 

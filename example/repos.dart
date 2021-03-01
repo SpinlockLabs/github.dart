@@ -10,13 +10,13 @@ List<Repository>? repos;
 
 Map<String, Comparator<Repository>> sorts = {
   'stars': (Repository a, Repository b) =>
-      b.stargazersCount!.compareTo(a.stargazersCount!),
+      b.stargazersCount.compareTo(a.stargazersCount),
   'forks': (Repository a, Repository b) =>
-      b.forksCount!.compareTo(a.forksCount!),
+      b.forksCount.compareTo(a.forksCount),
   'created': (Repository a, Repository b) =>
       b.createdAt!.compareTo(a.createdAt!),
   'pushed': (Repository a, Repository b) => b.pushedAt!.compareTo(a.pushedAt!),
-  'size': (Repository a, Repository b) => b.size!.compareTo(a.size!)
+  'size': (Repository a, Repository b) => b.size.compareTo(a.size)
 };
 
 Future<void> main() async {
@@ -53,8 +53,8 @@ void updateRepos(
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.htmlUrl}">${repo.name}</a></h2>
-          ${repo.description != "" && repo.description != null ? "<b>Description</b>: ${repo.description}<br/>" : ""}
-          <b>Language</b>: ${repo.language ?? "Unknown"}
+          ${repo.description != "" ? "<b>Description</b>: ${repo.description}<br/>" : ""}
+          <b>Language</b>: ${repo.language}
           <br/>
           <b>Default Branch</b>: ${repo.defaultBranch}
           <br/>
@@ -92,7 +92,7 @@ void loadRepos([int Function(Repository a, Repository b)? compare]) {
     }
   }
 
-  compare ??= (a, b) => a.name!.compareTo(b.name!);
+  compare ??= (a, b) => a.name.compareTo(b.name);
 
   github.repositories.listUserRepositories(user!).toList().then((repos) {
     _reposCache = repos;

@@ -107,10 +107,10 @@ class RepositoriesService extends Service {
       {String? org}) async {
     ArgumentError.checkNotNull(repository);
     if (org != null) {
-      return github.postJSON<Map<String, dynamic>, TeamRepository>(
+      return github.postJSON<Map<String, dynamic>, Repository>(
         '/orgs/$org/repos',
         body: GitHubJson.encode(repository),
-        convert: (i) => TeamRepository.fromJson(i),
+        convert: (i) => Repository.fromJson(i),
       );
     } else {
       return github.postJSON<Map<String, dynamic>, Repository>(

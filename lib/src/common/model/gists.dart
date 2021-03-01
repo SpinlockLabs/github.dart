@@ -124,7 +124,7 @@ class GistHistoryEntry {
 }
 
 /// Model class for gist comments.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GistComment {
   GistComment({
     this.id,
@@ -146,7 +146,7 @@ class GistComment {
 }
 
 /// Model class for a new gist comment to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGistComment {
   CreateGistComment(this.body);
   String? body;
