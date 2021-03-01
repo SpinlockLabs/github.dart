@@ -17,9 +17,10 @@ Issue _$IssueFromJson(Map<String, dynamic> json) {
     user: json['user'] == null
         ? null
         : User.fromJson(json['user'] as Map<String, dynamic>),
-    labels: (json['labels'] as List<dynamic>)
-        .map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
-        .toList(),
+    labels: (json['labels'] as List<dynamic>?)
+            ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
     assignee: json['assignee'] == null
         ? null
         : User.fromJson(json['assignee'] as Map<String, dynamic>),

@@ -15,7 +15,7 @@ class Issue {
     this.state = '',
     this.title = '',
     this.user,
-    this.labels = const <IssueLabel>[],
+    List<IssueLabel>? labels,
     this.assignee,
     this.milestone,
     this.commentsCount = 0,
@@ -25,9 +25,14 @@ class Issue {
     this.updatedAt,
     this.body = '',
     this.closedBy,
-  });
+  }) {
+    if (labels != null) {
+      this.labels = labels;
+    }
+  }
 
   /// Issue Labels
+  @JsonKey(defaultValue: <IssueLabel>[])
   List<IssueLabel> labels = <IssueLabel>[];
 
   @JsonKey(defaultValue: 0)

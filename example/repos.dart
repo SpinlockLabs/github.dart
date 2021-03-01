@@ -79,7 +79,7 @@ void loadRepos([int Function(Repository a, Repository b)? compare]) {
       ..id = 'title');
   }
 
-  String? user = 'Workiva';
+  String? user = 'SpinlockLabs';
 
   if (queryString.containsKey('user')) {
     user = queryString['user'];
@@ -98,7 +98,4 @@ void loadRepos([int Function(Repository a, Repository b)? compare]) {
     _reposCache = repos;
     updateRepos(repos, compare);
   });
-
-  github.repositories.listTags(RepositorySlug('Workiva','font_face_observer')).toList();
-  github.issues.listByRepo(RepositorySlug('Workiva','over_react')).toList().then((value) => print);
 }

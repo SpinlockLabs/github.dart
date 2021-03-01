@@ -72,7 +72,7 @@
 - For web: browser specific helper methods have moved. use import `package:github/browser_helper.dart` (renderMarkdown, and createAvatorImage)
 - `createGithubClient(...)` has been removed. Just create a GitHub object directly now.
 - `findAuthenticationFromEnvironment` now works in both server/flutter and web environments
-  - On the web, it will check the query string first, then localstorage
+  - On the web, it will check the query string first, then session storage
 - all static methods are now factory constructors
 - fromJSON is now fromJson everywhere
 - toJSON is now toJson everywhere
