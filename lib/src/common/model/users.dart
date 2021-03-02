@@ -96,7 +96,9 @@ class User {
 
 /// The response from listing collaborators on a repo.
 // https://developer.github.com/v3/repos/collaborators/#response
-@JsonSerializable(createToJson: false, )
+@JsonSerializable(
+  createToJson: false,
+)
 class Collaborator {
   final String? login;
   final int? id;

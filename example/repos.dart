@@ -11,8 +11,7 @@ List<Repository>? repos;
 Map<String, Comparator<Repository>> sorts = {
   'stars': (Repository a, Repository b) =>
       b.stargazersCount.compareTo(a.stargazersCount),
-  'forks': (Repository a, Repository b) =>
-      b.forksCount.compareTo(a.forksCount),
+  'forks': (Repository a, Repository b) => b.forksCount.compareTo(a.forksCount),
   'created': (Repository a, Repository b) =>
       b.createdAt!.compareTo(a.createdAt!),
   'pushed': (Repository a, Repository b) => b.pushedAt!.compareTo(a.pushedAt!),

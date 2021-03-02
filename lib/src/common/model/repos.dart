@@ -2,7 +2,9 @@ import 'package:github/src/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'repos.g.dart';
 
-@JsonSerializable(createToJson: false, )
+@JsonSerializable(
+  createToJson: false,
+)
 class GitHubComparison {
   final String? url;
   final String? status;
@@ -36,41 +38,40 @@ class GitHubComparison {
 /// Model class for a repository.
 @JsonSerializable()
 class Repository {
-  Repository({
-    this.name = '',
-    this.id = 0,
-    this.fullName = '',
-    this.owner,
-    this.htmlUrl = '',
-    this.description = '',
-    this.cloneUrl = '',
-    this.gitUrl = '',
-    this.sshUrl = '',
-    this.svnUrl = '',
-    this.defaultBranch = '',
-    this.createdAt,
-    this.isPrivate = false,
-    this.isFork = false,
-    this.stargazersCount = 0,
-    this.watchersCount = 0,
-    this.language = '',
-    this.hasWiki = false,
-    this.hasDownloads = false,
-    this.forksCount = 0,
-    this.openIssuesCount = 0,
-    this.subscribersCount = 0,
-    this.networkCount = 0,
-    this.hasIssues = false,
-    this.size = 0,
-    this.archived = false,
-    this.disabled = false,
-    this.homepage = '',
-    this.updatedAt,
-    this.pushedAt,
-    this.license,
-    this.hasPages = false,
-    this.permissions
-  });
+  Repository(
+      {this.name = '',
+      this.id = 0,
+      this.fullName = '',
+      this.owner,
+      this.htmlUrl = '',
+      this.description = '',
+      this.cloneUrl = '',
+      this.gitUrl = '',
+      this.sshUrl = '',
+      this.svnUrl = '',
+      this.defaultBranch = '',
+      this.createdAt,
+      this.isPrivate = false,
+      this.isFork = false,
+      this.stargazersCount = 0,
+      this.watchersCount = 0,
+      this.language = '',
+      this.hasWiki = false,
+      this.hasDownloads = false,
+      this.forksCount = 0,
+      this.openIssuesCount = 0,
+      this.subscribersCount = 0,
+      this.networkCount = 0,
+      this.hasIssues = false,
+      this.size = 0,
+      this.archived = false,
+      this.disabled = false,
+      this.homepage = '',
+      this.updatedAt,
+      this.pushedAt,
+      this.license,
+      this.hasPages = false,
+      this.permissions});
 
   /// Repository Name
   @JsonKey(defaultValue: '')
@@ -205,7 +206,8 @@ class Repository {
 /// Model class for repository permissions.
 @JsonSerializable()
 class RepositoryPermissions {
-  RepositoryPermissions({this.admin = false, this.push = false, this.pull = false});
+  RepositoryPermissions(
+      {this.admin = false, this.push = false, this.pull = false});
 
   /// Administrative Access
   @JsonKey(defaultValue: false)
