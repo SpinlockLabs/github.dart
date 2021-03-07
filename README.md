@@ -20,7 +20,7 @@ We are looking for contributors. If you're interested or have questions, head ov
 
 ## Links
 
-- [Library Demos](http://spinlocklabs.github.io/github.dart/) (based on the [sample code](https://github.com/SpinlockLabs/github.dart/tree/master/example))
+- [Library Demos](https://spinlocklabs.github.io/github.dart/) (based on the [sample code](https://github.com/SpinlockLabs/github.dart/tree/master/example))
 - [Pub Package](https://pub.dartlang.org/packages/github)
 - [Wiki](https://github.com/SpinlockLabs/github.dart/wiki)
 - [Latest API reference](https://pub.dev/documentation/github/latest/)

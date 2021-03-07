@@ -223,6 +223,8 @@ class RepositoryPermissions {
 
   factory RepositoryPermissions.fromJson(Map<String, dynamic> json) =>
       _$RepositoryPermissionsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RepositoryPermissionsToJson(this);
 }
 
 @JsonSerializable(createToJson: false)
