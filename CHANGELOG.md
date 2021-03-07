@@ -1,4 +1,4 @@
-## 8.0.0-nullsafe.2
+## 8.0.0
   - Allow start page, per_page, number of pages options to pagination helper
   - Allow page options for listTags
 
