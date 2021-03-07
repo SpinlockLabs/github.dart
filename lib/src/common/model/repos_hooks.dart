@@ -3,41 +3,41 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_hooks.g.dart';
 
 /// Model class for a repository hook.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Hook {
   Hook({
     this.id,
     this.name,
   });
 
-  int id;
-  String name;
+  int? id;
+  String? name;
 
   /// Events to Subscribe to
-  List<String> events;
+  List<String>? events;
 
   /// Content Type
-  String get contentType => config.contentType;
+  String? get contentType => config!.contentType;
 
   /// If the hook is active
-  bool active;
+  bool? active;
 
   /// The time the hook was created
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// The last time the hook was updated
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   /// The Repository Name
-  String repoName;
+  String? repoName;
 
-  HookConfig config;
+  HookConfig? config;
 
   factory Hook.fromJson(Map<String, dynamic> input) => _$HookFromJson(input);
   Map<String, dynamic> toJson() => _$HookToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class HookConfig {
   HookConfig({
     this.url,
@@ -45,29 +45,29 @@ class HookConfig {
     this.secret,
     this.insecureSsl,
   });
-  String url;
-  String contentType;
-  String secret;
-  String insecureSsl;
+  String? url;
+  String? contentType;
+  String? secret;
+  String? insecureSsl;
   factory HookConfig.fromJson(Map<String, dynamic> input) =>
       _$HookConfigFromJson(input);
   Map<String, dynamic> toJson() => _$HookConfigToJson(this);
 }
 
 /// Model class for a new hook to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateHook {
   /// Hook Name
-  final String name;
+  final String? name;
 
   /// Hook Configuration
-  final HookConfig config;
+  final HookConfig? config;
 
   /// Events to Subscribe to
-  final List<String> events;
+  final List<String>? events;
 
   /// If the Hook should be active.
-  final bool active;
+  final bool? active;
 
   CreateHook(this.name, this.config,
       {this.events = const ['push'], this.active = true});

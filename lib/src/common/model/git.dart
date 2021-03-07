@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'git.g.dart';
 
 /// Model class for a blob.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitBlob {
   GitBlob({
     this.content,
@@ -14,11 +14,11 @@ class GitBlob {
     this.sha,
     this.size,
   });
-  String content;
-  String encoding;
-  String url;
-  String sha;
-  int size;
+  String? content;
+  String? encoding;
+  String? url;
+  String? sha;
+  int? size;
 
   factory GitBlob.fromJson(Map<String, dynamic> input) =>
       _$GitBlobFromJson(input);
@@ -28,12 +28,12 @@ class GitBlob {
 /// Model class for a new blob to be created.
 ///
 /// The [encoding] can be either 'utf-8' or 'base64'.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitBlob {
   CreateGitBlob(this.content, this.encoding);
 
-  String content;
-  String encoding;
+  String? content;
+  String? encoding;
 
   factory CreateGitBlob.fromJson(Map<String, dynamic> input) =>
       _$CreateGitBlobFromJson(input);
@@ -44,7 +44,7 @@ class CreateGitBlob {
 ///
 /// Note: This is the raw [GitCommit]. The [RepositoryCommit] is a repository
 /// commit containing GitHub-specific information.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitCommit {
   GitCommit({
     this.sha,
@@ -56,16 +56,16 @@ class GitCommit {
     this.parents,
     this.commentCount,
   });
-  String sha;
-  String url;
-  GitCommitUser author;
-  GitCommitUser committer;
-  String message;
-  GitTree tree;
-  List<GitCommit> parents;
+  String? sha;
+  String? url;
+  GitCommitUser? author;
+  GitCommitUser? committer;
+  String? message;
+  GitTree? tree;
+  List<GitCommit>? parents;
 
   @JsonKey(name: 'comment_count')
-  int commentCount;
+  int? commentCount;
 
   factory GitCommit.fromJson(Map<String, dynamic> input) =>
       _$GitCommitFromJson(input);
@@ -73,26 +73,26 @@ class GitCommit {
 }
 
 /// Model class for a new commit to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitCommit {
   CreateGitCommit(this.message, this.tree,
       {this.parents, this.committer, this.author});
 
   /// The commit message.
-  String message;
+  String? message;
 
   /// The SHA of the tree object this commit points to.
-  String tree;
+  String? tree;
 
   /// The SHAs of the commits that were the parents of this commit. If omitted
   /// or empty, the commit will be written as a root commit.
-  List<String> parents;
+  List<String?>? parents;
 
   /// Info about the committer.
-  GitCommitUser committer;
+  GitCommitUser? committer;
 
   /// Info about the author.
-  GitCommitUser author;
+  GitCommitUser? author;
 
   factory CreateGitCommit.fromJson(Map<String, dynamic> input) =>
       _$CreateGitCommitFromJson(input);
@@ -105,10 +105,10 @@ class CreateGitCommit {
 class GitCommitUser {
   GitCommitUser(this.name, this.email, this.date);
 
-  String name;
-  String email;
+  String? name;
+  String? email;
   @JsonKey(toJson: dateToGitHubIso8601)
-  DateTime date;
+  DateTime? date;
 
   factory GitCommitUser.fromJson(Map<String, dynamic> json) =>
       _$GitCommitUserFromJson(json);
@@ -117,17 +117,17 @@ class GitCommitUser {
 }
 
 /// Model class for a GitHub tree.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTree {
-  String sha;
-  String url;
+  String? sha;
+  String? url;
 
   /// If truncated is true, the number of items in the tree array exceeded
   /// GitHub's maximum limit.
-  bool truncated;
+  bool? truncated;
 
   @JsonKey(name: 'tree')
-  List<GitTreeEntry> entries;
+  List<GitTreeEntry>? entries;
 
   GitTree(this.sha, this.url, this.truncated, this.entries);
 
@@ -139,14 +139,14 @@ class GitTree {
 /// Model class for the contents of a tree structure. [GitTreeEntry] can
 /// represent either a blog, a commit (in the case of a submodule), or another
 /// tree.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTreeEntry {
-  String path;
-  String mode;
-  String type;
-  int size;
-  String sha;
-  String url;
+  String? path;
+  String? mode;
+  String? type;
+  int? size;
+  String? sha;
+  String? url;
 
   GitTreeEntry(this.path, this.mode, this.type, this.size, this.sha, this.url);
 
@@ -156,7 +156,7 @@ class GitTreeEntry {
 }
 
 /// Model class for a new tree to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTree {
   CreateGitTree(this.entries, {this.baseTree});
 
@@ -164,11 +164,11 @@ class CreateGitTree {
   /// If you don’t set this, the commit will be created on top of everything;
   /// however, it will only contain your change, the rest of your files will
   /// show up as deleted.
-  String baseTree;
+  String? baseTree;
 
   /// The Objects specifying a tree structure.
   @JsonKey(name: 'tree')
-  List<CreateGitTreeEntry> entries;
+  List<CreateGitTreeEntry>? entries;
 
   factory CreateGitTree.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTreeFromJson(input);
@@ -176,7 +176,7 @@ class CreateGitTree {
 }
 
 /// Model class for a new tree entry to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTreeEntry {
   /// Constructor.
   /// Either [sha] or [content] must be defined.
@@ -187,11 +187,11 @@ class CreateGitTreeEntry {
     this.sha,
     this.content,
   });
-  String path;
-  String mode;
-  String type;
-  String sha;
-  String content;
+  String? path;
+  String? mode;
+  String? type;
+  String? sha;
+  String? content;
 
   factory CreateGitTreeEntry.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTreeEntryFromJson(input);
@@ -199,16 +199,16 @@ class CreateGitTreeEntry {
 }
 
 /// Model class for a reference.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitReference {
   GitReference({
     this.ref,
     this.url,
     this.object,
   });
-  String ref;
-  String url;
-  GitObject object;
+  String? ref;
+  String? url;
+  GitObject? object;
 
   factory GitReference.fromJson(Map<String, dynamic> input) =>
       _$GitReferenceFromJson(input);
@@ -216,7 +216,7 @@ class GitReference {
 }
 
 /// Model class for a tag.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitTag {
   GitTag({
     this.tag,
@@ -226,12 +226,12 @@ class GitTag {
     this.tagger,
     this.object,
   });
-  String tag;
-  String sha;
-  String url;
-  String message;
-  GitCommitUser tagger;
-  GitObject object;
+  String? tag;
+  String? sha;
+  String? url;
+  String? message;
+  GitCommitUser? tagger;
+  GitObject? object;
 
   factory GitTag.fromJson(Map<String, dynamic> input) =>
       _$GitTagFromJson(input);
@@ -239,15 +239,15 @@ class GitTag {
 }
 
 /// Model class for a new tag to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateGitTag {
   CreateGitTag(this.tag, this.message, this.object, this.type, this.tagger);
 
-  String tag;
-  String message;
-  String object;
-  String type;
-  GitCommitUser tagger;
+  String? tag;
+  String? message;
+  String? object;
+  String? type;
+  GitCommitUser? tagger;
 
   factory CreateGitTag.fromJson(Map<String, dynamic> input) =>
       _$CreateGitTagFromJson(input);
@@ -255,12 +255,12 @@ class CreateGitTag {
 }
 
 /// Model class for an object referenced by [GitReference] and [GitTag].
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class GitObject {
   GitObject(this.type, this.sha, this.url);
-  String type;
-  String sha;
-  String url;
+  String? type;
+  String? sha;
+  String? url;
 
   factory GitObject.fromJson(Map<String, dynamic> input) =>
       _$GitObjectFromJson(input);

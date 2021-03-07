@@ -1,13 +1,13 @@
 /// Authentication information.
 class Authentication {
   /// OAuth2 Token
-  final String token;
+  final String? token;
 
   /// GitHub Username
-  final String username;
+  final String? username;
 
   /// GitHub Password
-  final String password;
+  final String? password;
 
   /// Creates an [Authentication] instance that uses the specified OAuth2 [token].
   Authentication.withToken(this.token)

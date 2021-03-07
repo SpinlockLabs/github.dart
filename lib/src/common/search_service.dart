@@ -15,7 +15,7 @@ class SearchService extends Service {
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   ///
   /// API docs: https://developer.github.com/v3/search/#search-repositories
-  Stream<Repository> repositories(String query, {String sort, int pages = 2}) {
+  Stream<Repository> repositories(String query, {String? sort, int pages = 2}) {
     final params = <String, dynamic>{'q': query};
     if (sort != null) {
       params['sort'] = sort;
@@ -65,17 +65,17 @@ class SearchService extends Service {
   /// https://developer.github.com/v3/search/#search-code
   Stream<CodeSearchResults> code(
     String query, {
-    int pages,
-    int perPage,
-    String language,
-    String filename,
-    String extension,
-    String user,
-    String org,
-    String repo,
-    String fork,
-    String path,
-    String size,
+    int? pages,
+    int? perPage,
+    String? language,
+    String? filename,
+    String? extension,
+    String? user,
+    String? org,
+    String? repo,
+    String? fork,
+    String? path,
+    String? size,
     bool inFile = true,
     bool inPath = false,
   }) {
@@ -111,7 +111,7 @@ class SearchService extends Service {
     }
 
     final params = <String, dynamic>{};
-    params['q'] = query ?? '';
+    params['q'] = query;
     if (perPage != null) {
       params['per_page'] = perPage.toString();
     }
@@ -121,7 +121,7 @@ class SearchService extends Service {
         .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
   }
 
-  String _searchQualifier(String key, String value) {
+  String _searchQualifier(String key, String? value) {
     if (value != null && value.isNotEmpty) {
       return ' $key:$value';
     }
@@ -131,7 +131,7 @@ class SearchService extends Service {
   /// Search for issues and pull-requests using [query].
   /// Since the Search Rate Limit is small, this is a best effort implementation.
   /// API docs: https://developer.github.com/v3/search/#search-issues
-  Stream<Issue> issues(String query, {String sort, int pages = 2}) {
+  Stream<Issue> issues(String query, {String? sort, int pages = 2}) {
     final params = <String, dynamic>{'q': query};
     if (sort != null) {
       params['sort'] = sort;
@@ -172,7 +172,7 @@ class SearchService extends Service {
   /// API docs: https://developer.github.com/v3/search/#search-users
   Stream<User> users(
     String query, {
-    String sort,
+    String? sort,
     int pages = 2,
     int perPage = 30,
   }) {

@@ -6,16 +6,16 @@ part 'keys.g.dart';
 ///
 /// Note: [PublicKey] is used both by the repositories' deploy keys and by the
 /// users' public keys.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PublicKey {
   PublicKey({
     this.id,
     this.key,
     this.title,
   });
-  final int id;
-  final String key;
-  final String title;
+  final int? id;
+  final String? key;
+  final String? title;
 
   factory PublicKey.fromJson(Map<String, dynamic> input) =>
       _$PublicKeyFromJson(input);
@@ -23,12 +23,12 @@ class PublicKey {
 }
 
 /// Model class for a new public key to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreatePublicKey {
   CreatePublicKey(this.title, this.key);
 
-  final String title;
-  final String key;
+  final String? title;
+  final String? key;
 
   Map<String, dynamic> toJson() => _$CreatePublicKeyToJson(this);
 

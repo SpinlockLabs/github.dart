@@ -15,20 +15,20 @@ class UsersService extends Service {
   /// Fetches the user specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/users/#get-a-single-user
-  Future<User> getUser(String name) =>
-      github.getJSON('/users/$name', convert: (i) => User.fromJson(i));
+  Future<User> getUser(String? name) =>
+      github.getJSON('/users/$name', convert: (dynamic i) => User.fromJson(i));
 
   /// Updates the Current User.
   ///
   /// API docs: https://developer.github.com/v3/users/#update-the-authenticated-user
   Future<CurrentUser> editCurrentUser(
-      {String name,
-      String email,
-      String blog,
-      String company,
-      String location,
-      bool hireable,
-      String bio}) {
+      {String? name,
+      String? email,
+      String? blog,
+      String? company,
+      String? location,
+      bool? hireable,
+      String? bio}) {
     final map = createNonNullMap(<String, dynamic>{
       'name': name,
       'email': email,
@@ -43,12 +43,12 @@ class UsersService extends Service {
       '/user',
       body: GitHubJson.encode(map),
       statusCode: 200,
-      convert: (i) => CurrentUser.fromJson(i),
+      convert: (dynamic i) => CurrentUser.fromJson(i),
     );
   }
 
   /// Fetches a list of users specified by [names].
-  Stream<User> getUsers(List<String> names, {int pages}) async* {
+  Stream<User> getUsers(List<String> names, {int? pages}) async* {
     for (final name in names) {
       final user = await getUser(name);
       yield user;
@@ -67,7 +67,7 @@ class UsersService extends Service {
           throw AccessForbidden(github);
         }
       },
-      convert: (i) => CurrentUser.fromJson(i));
+      convert: (dynamic i) => CurrentUser.fromJson(i));
 
   /// Checks if a user exists.
   Future<bool> isUser(String name) => github
@@ -79,21 +79,21 @@ class UsersService extends Service {
   /// Lists all users.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-all-users
-  Stream<User> listUsers({int pages, int since}) =>
-      PaginationHelper(github).objects('GET', '/users', (i) => User.fromJson(i),
+  Stream<User> listUsers({int? pages, int? since}) => PaginationHelper(github)
+      .objects('GET', '/users', (dynamic i) => User.fromJson(i),
           pages: pages, params: {'since': since});
 
   /// Lists all email addresses for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#list-email-addresses-for-a-user
   Stream<UserEmail> listEmails() => PaginationHelper(github)
-      .objects('GET', '/user/emails', (i) => UserEmail.fromJson(i));
+      .objects('GET', '/user/emails', (dynamic i) => UserEmail.fromJson(i));
 
   /// Add Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
   Stream<UserEmail> addEmails(List<String> emails) => PaginationHelper(github)
-      .objects('POST', '/user/emails', (i) => UserEmail.fromJson(i),
+      .objects('POST', '/user/emails', (dynamic i) => UserEmail.fromJson(i),
           statusCode: 201, body: GitHubJson.encode(emails));
 
   /// Delete Emails
@@ -108,7 +108,7 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listUserFollowers(String user) => PaginationHelper(github)
-      .objects('GET', '/users/$user/followers', (i) => User.fromJson(i),
+      .objects('GET', '/users/$user/followers', (dynamic i) => User.fromJson(i),
           statusCode: 200);
 
   /// Check if the current user is following the specified user.
@@ -147,14 +147,14 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-followers-of-a-user
   Stream<User> listCurrentUserFollowers() => PaginationHelper(github).objects(
-      'GET', '/user/followers', (i) => User.fromJson(i),
+      'GET', '/user/followers', (dynamic i) => User.fromJson(i),
       statusCode: 200);
 
   /// List current user following
   ///
   /// API docs: https://developer.github.com/v3/users/followers/#list-users-followed-by-the-authenticated-user
   Stream<User> listCurrentUserFollowing() => PaginationHelper(github).objects(
-      'GET', '/user/following', (i) => User.fromJson(i),
+      'GET', '/user/following', (dynamic i) => User.fromJson(i),
       statusCode: 200);
 
   /// Lists the verified public keys for a [userLogin]. If no [userLogin] is specified,
@@ -162,10 +162,10 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/keys/#list-public-keys-for-a-user
   /// and https://developer.github.com/v3/users/keys/#list-your-public-keys
-  Stream<PublicKey> listPublicKeys([String userLogin]) {
+  Stream<PublicKey> listPublicKeys([String? userLogin]) {
     final path = userLogin == null ? '/user/keys' : '/users/$userLogin/keys';
     return PaginationHelper(github)
-        .objects('GET', path, (i) => PublicKey.fromJson(i));
+        .objects('GET', path, (dynamic i) => PublicKey.fromJson(i));
   }
 
   // TODO: Implement getPublicKey: https://developer.github.com/v3/users/keys/#get-a-single-public-key

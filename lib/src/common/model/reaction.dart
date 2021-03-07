@@ -8,13 +8,13 @@ part 'reaction.g.dart';
 /// This API is currently in preview. It may break.
 ///
 /// See https://developer.github.com/v3/reactions/
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Reaction {
-  final int id;
-  final String nodeId;
-  final User user;
-  final String content;
-  final DateTime createdAt;
+  final int? id;
+  final String? nodeId;
+  final User? user;
+  final String? content;
+  final DateTime? createdAt;
 
   Reaction({
     this.id,
@@ -24,7 +24,7 @@ class Reaction {
     this.createdAt,
   });
 
-  ReactionType get type => ReactionType.fromString(content);
+  ReactionType? get type => ReactionType.fromString(content);
 
   factory Reaction.fromJson(Map<String, dynamic> json) =>
       _$ReactionFromJson(json);
@@ -69,5 +69,5 @@ class ReactionType {
     ':eyes:': eyes,
   };
 
-  static ReactionType fromString(String content) => _types[content];
+  static ReactionType? fromString(String? content) => _types[content!];
 }

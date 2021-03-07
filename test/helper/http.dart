@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:http/http.dart' as http;
 import 'assets.dart';
 
@@ -12,10 +13,9 @@ class MockHTTPClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    final matchingUrlCreatorKey = responses.keys.firstWhere(
-        (it) => it.allMatches(request.url.toString()).isNotEmpty,
-        orElse: () => null);
-    final creator = responses[matchingUrlCreatorKey];
+    final matchingUrlCreatorKey = responses.keys.firstWhereOrNull(
+        (it) => it.allMatches(request.url.toString()).isNotEmpty);
+    final creator = responses[matchingUrlCreatorKey!];
     if (creator == null) {
       throw Exception('No Response Configured');
     }
@@ -35,13 +35,13 @@ class MockResponse extends http.Response {
     final headers = responseData['headers'] as Map<String, String>;
     final dynamic body = responseData['body'];
     final int statusCode = responseData['statusCode'];
-    String actualBody;
+    String? actualBody;
     if (body is Map || body is List) {
       actualBody = jsonDecode(body);
     } else {
       actualBody = body.toString();
     }
 
-    return MockResponse(actualBody, headers, statusCode);
+    return MockResponse(actualBody!, headers, statusCode);
   }
 }

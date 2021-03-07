@@ -4,11 +4,9 @@ import 'package:github/github.dart';
 
 import 'common.dart';
 
-DivElement readmeDiv;
-
 Future<void> main() async {
   await initViewSourceButton('readme.dart');
-  readmeDiv = querySelector('#readme');
+  var readmeDiv = querySelector('#readme')!;
   var repo = RepositorySlug('SpinlockLabs', 'github.dart');
   final readme = await github.repositories.getReadme(repo);
   final html = await github.misc.renderMarkdown(readme.text);

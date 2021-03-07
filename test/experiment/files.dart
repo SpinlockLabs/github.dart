@@ -9,6 +9,6 @@ void main() {
         'pubspec.yaml',
       )
       .then((contents) => contents.file)
-      .then((file) => print(file.text))
+      .then((file) => print(file?.text))
       .then((_) => github.dispose());
 }

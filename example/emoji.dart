@@ -3,7 +3,7 @@ import 'dart:html';
 
 import 'common.dart';
 
-Element emojiDiv;
+Element? emojiDiv;
 
 Future<void> main() async {
   await initViewSourceButton('emoji.dart');
@@ -25,23 +25,23 @@ Future<void> loadEmojis() async {
     h.append(
         ImageElement(src: url, width: 64, height: 64)..classes.add('emoji'));
     h.append(ParagraphElement()..text = ':$name:');
-    emojiDiv.append(h);
+    emojiDiv!.append(h);
   });
 }
 
-String lastQuery;
+String? lastQuery;
 
-void filter(String query) {
+void filter(String? query) {
   if (lastQuery != null && lastQuery == query) {
     return;
   }
   lastQuery = query;
-  final boxes = emojiDiv.children;
+  final boxes = emojiDiv!.children;
   for (final box in boxes) {
-    final boxName = box.querySelector('p');
-    final t = boxName.text;
+    final boxName = box.querySelector('p')!;
+    final t = boxName.text!;
     final name = t.substring(1, t.length - 1);
-    if (name.contains(query)) {
+    if (name.contains(query!)) {
       box.style.display = 'inline';
     } else {
       box.style.display = 'none';

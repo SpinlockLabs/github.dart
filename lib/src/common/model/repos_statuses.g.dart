@@ -9,14 +9,12 @@ part of 'repos_statuses.dart';
 CombinedRepositoryStatus _$CombinedRepositoryStatusFromJson(
     Map<String, dynamic> json) {
   return CombinedRepositoryStatus(
-    state: json['state'] as String,
-    sha: json['sha'] as String,
-    totalCount: json['total_count'] as int,
-    statuses: (json['statuses'] as List)
-        ?.map((e) => e == null
-            ? null
-            : RepositoryStatus.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    state: json['state'] as String?,
+    sha: json['sha'] as String?,
+    totalCount: json['total_count'] as int?,
+    statuses: (json['statuses'] as List<dynamic>?)
+        ?.map((e) => RepositoryStatus.fromJson(e as Map<String, dynamic>))
+        .toList(),
     repository: json['repository'] == null
         ? null
         : Repository.fromJson(json['repository'] as Map<String, dynamic>),
@@ -41,10 +39,10 @@ RepositoryStatus _$RepositoryStatusFromJson(Map<String, dynamic> json) {
     updatedAt: json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String),
-    state: json['state'] as String,
-    targetUrl: json['target_url'] as String,
-    description: json['description'] as String,
-    context: json['context'] as String,
+    state: json['state'] as String?,
+    targetUrl: json['target_url'] as String?,
+    description: json['description'] as String?,
+    context: json['context'] as String?,
   );
 }
 
@@ -60,10 +58,10 @@ Map<String, dynamic> _$RepositoryStatusToJson(RepositoryStatus instance) =>
 
 CreateStatus _$CreateStatusFromJson(Map<String, dynamic> json) {
   return CreateStatus(
-    json['state'] as String,
-    targetUrl: json['target_url'] as String,
-    description: json['description'] as String,
-    context: json['context'] as String,
+    json['state'] as String?,
+    targetUrl: json['target_url'] as String?,
+    description: json['description'] as String?,
+    context: json['context'] as String?,
   );
 }
 

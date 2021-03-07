@@ -2,12 +2,11 @@ import 'dart:typed_data';
 
 import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:meta/meta.dart';
 
 part 'repos_releases.g.dart';
 
 /// Model class for a release.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Release {
   Release({
     this.id,
@@ -30,77 +29,77 @@ class Release {
   });
 
   /// Url to this Release
-  String url;
+  String? url;
 
   /// Url to this Release
-  String htmlUrl;
+  String? htmlUrl;
 
   /// Tarball of the Repository Tree at the commit of this release.
-  String tarballUrl;
+  String? tarballUrl;
 
   /// ZIP of the Repository Tree at the commit of this release.
-  String zipballUrl;
+  String? zipballUrl;
 
   /// The endpoint for uploading release assets.
   /// This key is a hypermedia resource. https://developer.github.com/v3/#hypermedia
-  String uploadUrl;
+  String? uploadUrl;
 
-  String assetsUrl;
+  String? assetsUrl;
 
   /// Release ID
-  int id;
+  int? id;
 
-  String nodeId;
+  String? nodeId;
 
   /// Release Tag Name
-  String tagName;
+  String? tagName;
 
   /// Target Commit
-  String targetCommitish;
+  String? targetCommitish;
 
   /// Release Name
-  String name;
+  String? name;
 
   /// Release Notes
-  String body;
+  String? body;
 
   /// Release Description
-  String description;
+  String? description;
 
   /// If the release is a draft.
   @JsonKey(name: 'draft')
-  bool isDraft;
+  bool? isDraft;
 
   /// If the release is a pre-release.
   @JsonKey(name: 'prerelease')
-  bool isPrerelease;
+  bool? isPrerelease;
 
   /// The time this release was created at.
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// The time this release was published at.
-  DateTime publishedAt;
+  DateTime? publishedAt;
 
   /// The author of this release.
-  User author;
+  User? author;
 
   /// Release Assets
-  List<ReleaseAsset> assets;
+  List<ReleaseAsset>? assets;
 
-  List errors;
+  List? errors;
 
   factory Release.fromJson(Map<String, dynamic> input) =>
       _$ReleaseFromJson(input);
   Map<String, dynamic> toJson() => _$ReleaseToJson(this);
 
-  String getUploadUrlFor(String name, [String label]) =>
-      "${uploadUrl.substring(0, uploadUrl.indexOf('{'))}?name=$name${label != null ? ",$label" : ""}";
+  String getUploadUrlFor(String name, [String? label]) =>
+      "${uploadUrl!.substring(0, uploadUrl!.indexOf('{'))}?name=$name${label != null ? ",$label" : ""}";
 
-  bool get hasErrors => errors == null ? false : errors.isNotEmpty;
+  bool get hasErrors => errors == null ? false : errors!.isNotEmpty;
 }
 
 /// Model class for a release asset.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ReleaseAsset {
   ReleaseAsset({
     this.id,
@@ -116,34 +115,34 @@ class ReleaseAsset {
   });
 
   /// Url to download the asset.
-  String browserDownloadUrl;
+  String? browserDownloadUrl;
 
   /// Asset ID
-  int id;
+  int? id;
 
   /// Asset Name
-  String name;
+  String? name;
 
   /// Asset Label
-  String label;
+  String? label;
 
   /// Asset State
-  String state;
+  String? state;
 
   /// Asset Content Type
-  String contentType;
+  String? contentType;
 
   /// Size of Asset
-  int size;
+  int? size;
 
   /// Number of Downloads
-  int downloadCount;
+  int? downloadCount;
 
   /// Time the asset was created at
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// Time the asset was last updated
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   factory ReleaseAsset.fromJson(Map<String, dynamic> input) =>
       _$ReleaseAssetFromJson(input);
@@ -151,37 +150,37 @@ class ReleaseAsset {
 }
 
 /// Model class for a new release to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateRelease {
   /// Tag Name to Base off of
-  final String tagName;
+  final String? tagName;
 
   /// Commit to Target
-  String targetCommitish;
+  String? targetCommitish;
 
   /// Release Name
-  String name;
+  String? name;
 
   /// Release Body
-  String body;
+  String? body;
 
   /// If the release is a draft
   @JsonKey(name: 'draft')
-  bool isDraft;
+  bool? isDraft;
 
   /// true to identify the release as a prerelease.
   /// false to identify the release as a full release. Default: false
   @JsonKey(name: 'prerelease')
-  bool isPrerelease;
+  bool? isPrerelease;
 
   CreateRelease(this.tagName);
 
   CreateRelease.from({
-    @required this.tagName,
-    @required this.name,
-    @required this.targetCommitish,
-    @required this.isDraft,
-    @required this.isPrerelease,
+    required this.tagName,
+    required this.name,
+    required this.targetCommitish,
+    required this.isDraft,
+    required this.isPrerelease,
     this.body,
   });
 
@@ -213,9 +212,9 @@ class CreateRelease {
 
 class CreateReleaseAsset {
   CreateReleaseAsset({
-    @required this.name,
-    @required this.contentType,
-    @required this.assetData,
+    required this.name,
+    required this.contentType,
+    required this.assetData,
     this.label,
   });
 
@@ -223,7 +222,7 @@ class CreateReleaseAsset {
   String name;
 
   /// An alternate short description of the asset. Used in place of the filename.
-  String label;
+  String? label;
 
   /// The media type of the asset.
   ///

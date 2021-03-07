@@ -8,11 +8,11 @@ part of 'git.dart';
 
 GitBlob _$GitBlobFromJson(Map<String, dynamic> json) {
   return GitBlob(
-    content: json['content'] as String,
-    encoding: json['encoding'] as String,
-    url: json['url'] as String,
-    sha: json['sha'] as String,
-    size: json['size'] as int,
+    content: json['content'] as String?,
+    encoding: json['encoding'] as String?,
+    url: json['url'] as String?,
+    sha: json['sha'] as String?,
+    size: json['size'] as int?,
   );
 }
 
@@ -26,8 +26,8 @@ Map<String, dynamic> _$GitBlobToJson(GitBlob instance) => <String, dynamic>{
 
 CreateGitBlob _$CreateGitBlobFromJson(Map<String, dynamic> json) {
   return CreateGitBlob(
-    json['content'] as String,
-    json['encoding'] as String,
+    json['content'] as String?,
+    json['encoding'] as String?,
   );
 }
 
@@ -39,23 +39,22 @@ Map<String, dynamic> _$CreateGitBlobToJson(CreateGitBlob instance) =>
 
 GitCommit _$GitCommitFromJson(Map<String, dynamic> json) {
   return GitCommit(
-    sha: json['sha'] as String,
-    url: json['url'] as String,
+    sha: json['sha'] as String?,
+    url: json['url'] as String?,
     author: json['author'] == null
         ? null
         : GitCommitUser.fromJson(json['author'] as Map<String, dynamic>),
     committer: json['committer'] == null
         ? null
         : GitCommitUser.fromJson(json['committer'] as Map<String, dynamic>),
-    message: json['message'] as String,
+    message: json['message'] as String?,
     tree: json['tree'] == null
         ? null
         : GitTree.fromJson(json['tree'] as Map<String, dynamic>),
-    parents: (json['parents'] as List)
-        ?.map((e) =>
-            e == null ? null : GitCommit.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-    commentCount: json['comment_count'] as int,
+    parents: (json['parents'] as List<dynamic>?)
+        ?.map((e) => GitCommit.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    commentCount: json['comment_count'] as int?,
   );
 }
 
@@ -72,9 +71,10 @@ Map<String, dynamic> _$GitCommitToJson(GitCommit instance) => <String, dynamic>{
 
 CreateGitCommit _$CreateGitCommitFromJson(Map<String, dynamic> json) {
   return CreateGitCommit(
-    json['message'] as String,
-    json['tree'] as String,
-    parents: (json['parents'] as List)?.map((e) => e as String)?.toList(),
+    json['message'] as String?,
+    json['tree'] as String?,
+    parents:
+        (json['parents'] as List<dynamic>?)?.map((e) => e as String?).toList(),
     committer: json['committer'] == null
         ? null
         : GitCommitUser.fromJson(json['committer'] as Map<String, dynamic>),
@@ -95,8 +95,8 @@ Map<String, dynamic> _$CreateGitCommitToJson(CreateGitCommit instance) =>
 
 GitCommitUser _$GitCommitUserFromJson(Map<String, dynamic> json) {
   return GitCommitUser(
-    json['name'] as String,
-    json['email'] as String,
+    json['name'] as String?,
+    json['email'] as String?,
     json['date'] == null ? null : DateTime.parse(json['date'] as String),
   );
 }
@@ -118,13 +118,12 @@ Map<String, dynamic> _$GitCommitUserToJson(GitCommitUser instance) {
 
 GitTree _$GitTreeFromJson(Map<String, dynamic> json) {
   return GitTree(
-    json['sha'] as String,
-    json['url'] as String,
-    json['truncated'] as bool,
-    (json['tree'] as List)
-        ?.map((e) =>
-            e == null ? null : GitTreeEntry.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+    json['sha'] as String?,
+    json['url'] as String?,
+    json['truncated'] as bool?,
+    (json['tree'] as List<dynamic>?)
+        ?.map((e) => GitTreeEntry.fromJson(e as Map<String, dynamic>))
+        .toList(),
   );
 }
 
@@ -137,12 +136,12 @@ Map<String, dynamic> _$GitTreeToJson(GitTree instance) => <String, dynamic>{
 
 GitTreeEntry _$GitTreeEntryFromJson(Map<String, dynamic> json) {
   return GitTreeEntry(
-    json['path'] as String,
-    json['mode'] as String,
-    json['type'] as String,
-    json['size'] as int,
-    json['sha'] as String,
-    json['url'] as String,
+    json['path'] as String?,
+    json['mode'] as String?,
+    json['type'] as String?,
+    json['size'] as int?,
+    json['sha'] as String?,
+    json['url'] as String?,
   );
 }
 
@@ -158,12 +157,10 @@ Map<String, dynamic> _$GitTreeEntryToJson(GitTreeEntry instance) =>
 
 CreateGitTree _$CreateGitTreeFromJson(Map<String, dynamic> json) {
   return CreateGitTree(
-    (json['tree'] as List)
-        ?.map((e) => e == null
-            ? null
-            : CreateGitTreeEntry.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
-    baseTree: json['base_tree'] as String,
+    (json['tree'] as List<dynamic>?)
+        ?.map((e) => CreateGitTreeEntry.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    baseTree: json['base_tree'] as String?,
   );
 }
 
@@ -175,11 +172,11 @@ Map<String, dynamic> _$CreateGitTreeToJson(CreateGitTree instance) =>
 
 CreateGitTreeEntry _$CreateGitTreeEntryFromJson(Map<String, dynamic> json) {
   return CreateGitTreeEntry(
-    json['path'] as String,
-    json['mode'] as String,
-    json['type'] as String,
-    sha: json['sha'] as String,
-    content: json['content'] as String,
+    json['path'] as String?,
+    json['mode'] as String?,
+    json['type'] as String?,
+    sha: json['sha'] as String?,
+    content: json['content'] as String?,
   );
 }
 
@@ -194,8 +191,8 @@ Map<String, dynamic> _$CreateGitTreeEntryToJson(CreateGitTreeEntry instance) =>
 
 GitReference _$GitReferenceFromJson(Map<String, dynamic> json) {
   return GitReference(
-    ref: json['ref'] as String,
-    url: json['url'] as String,
+    ref: json['ref'] as String?,
+    url: json['url'] as String?,
     object: json['object'] == null
         ? null
         : GitObject.fromJson(json['object'] as Map<String, dynamic>),
@@ -211,10 +208,10 @@ Map<String, dynamic> _$GitReferenceToJson(GitReference instance) =>
 
 GitTag _$GitTagFromJson(Map<String, dynamic> json) {
   return GitTag(
-    tag: json['tag'] as String,
-    sha: json['sha'] as String,
-    url: json['url'] as String,
-    message: json['message'] as String,
+    tag: json['tag'] as String?,
+    sha: json['sha'] as String?,
+    url: json['url'] as String?,
+    message: json['message'] as String?,
     tagger: json['tagger'] == null
         ? null
         : GitCommitUser.fromJson(json['tagger'] as Map<String, dynamic>),
@@ -235,10 +232,10 @@ Map<String, dynamic> _$GitTagToJson(GitTag instance) => <String, dynamic>{
 
 CreateGitTag _$CreateGitTagFromJson(Map<String, dynamic> json) {
   return CreateGitTag(
-    json['tag'] as String,
-    json['message'] as String,
-    json['object'] as String,
-    json['type'] as String,
+    json['tag'] as String?,
+    json['message'] as String?,
+    json['object'] as String?,
+    json['type'] as String?,
     json['tagger'] == null
         ? null
         : GitCommitUser.fromJson(json['tagger'] as Map<String, dynamic>),
@@ -256,9 +253,9 @@ Map<String, dynamic> _$CreateGitTagToJson(CreateGitTag instance) =>
 
 GitObject _$GitObjectFromJson(Map<String, dynamic> json) {
   return GitObject(
-    json['type'] as String,
-    json['sha'] as String,
-    json['url'] as String,
+    json['type'] as String?,
+    json['sha'] as String?,
+    json['url'] as String?,
   );
 }
 

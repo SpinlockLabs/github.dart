@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'repos_statuses.g.dart';
 
 /// Model class for the combined status of a repository.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CombinedRepositoryStatus {
   CombinedRepositoryStatus({
     this.state,
@@ -13,11 +13,11 @@ class CombinedRepositoryStatus {
     this.statuses,
     this.repository,
   });
-  String state;
-  String sha;
-  int totalCount;
-  List<RepositoryStatus> statuses;
-  Repository repository;
+  String? state;
+  String? sha;
+  int? totalCount;
+  List<RepositoryStatus>? statuses;
+  Repository? repository;
 
   factory CombinedRepositoryStatus.fromJson(Map<String, dynamic> input) =>
       _$CombinedRepositoryStatusFromJson(input);
@@ -25,7 +25,7 @@ class CombinedRepositoryStatus {
 }
 
 /// Model class for the status of a repository at a particular reference.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryStatus {
   RepositoryStatus({
     this.createdAt,
@@ -35,12 +35,12 @@ class RepositoryStatus {
     this.description,
     this.context,
   });
-  DateTime createdAt;
-  DateTime updatedAt;
-  String state;
-  String targetUrl;
-  String description;
-  String context;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+  String? state;
+  String? targetUrl;
+  String? description;
+  String? context;
 
   factory RepositoryStatus.fromJson(Map<String, dynamic> input) =>
       _$RepositoryStatusFromJson(input);
@@ -48,15 +48,15 @@ class RepositoryStatus {
 }
 
 /// Model class for a new repository status to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateStatus {
   CreateStatus(this.state, {this.targetUrl, this.description, this.context});
 
-  final String state;
-  String description;
-  String context;
+  final String? state;
+  String? description;
+  String? context;
   @JsonKey(name: 'target_url')
-  String targetUrl;
+  String? targetUrl;
 
   factory CreateStatus.fromJson(Map<String, dynamic> input) =>
       _$CreateStatusFromJson(input);

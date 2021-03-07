@@ -8,10 +8,10 @@ class GitignoreTemplate {
   GitignoreTemplate({this.name, this.source});
 
   /// Template Name
-  final String name;
+  final String? name;
 
   /// Template Source
-  final String source;
+  final String? source;
 
   factory GitignoreTemplate.fromJson(Map<String, dynamic> input) =>
       _$GitignoreTemplateFromJson(input);
@@ -21,21 +21,21 @@ class GitignoreTemplate {
 @JsonSerializable()
 class RateLimit {
   /// Maximum number of requests
-  final int limit;
+  final int? limit;
 
   /// Remaining number of requests
-  final int remaining;
+  final int? remaining;
 
   /// Time when the limit expires
-  final DateTime resets;
+  final DateTime? resets;
 
   RateLimit(this.limit, this.remaining, this.resets);
 
   factory RateLimit.fromHeaders(Map<String, String> headers) {
-    final limit = int.parse(headers['x-ratelimit-limit']);
-    final remaining = int.parse(headers['x-ratelimit-remaining']);
+    final limit = int.parse(headers['x-ratelimit-limit']!);
+    final remaining = int.parse(headers['x-ratelimit-remaining']!);
     final resets = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(headers['x-ratelimit-reset']) * 1000);
+        int.parse(headers['x-ratelimit-reset']!) * 1000);
     return RateLimit(limit, remaining, resets);
   }
 
@@ -53,16 +53,16 @@ class APIStatus {
     this.createdOn,
     this.message,
   });
-  final String status;
+  final String? status;
 
   @JsonKey(name: 'last_updated')
-  final DateTime lastUpdatedAt;
+  final DateTime? lastUpdatedAt;
 
   @JsonKey(name: 'created_on')
-  final DateTime createdOn;
+  final DateTime? createdOn;
 
   @JsonKey(name: 'body')
-  final String message;
+  final String? message;
 
   factory APIStatus.fromJson(Map<String, dynamic> input) =>
       _$APIStatusFromJson(input);

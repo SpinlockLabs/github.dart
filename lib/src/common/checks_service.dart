@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:github/github.dart';
 import 'package:github/src/common/util/utils.dart';
-import 'package:meta/meta.dart';
 
 const _previewHeader = 'application/vnd.github.antiope-preview+json';
 
@@ -50,16 +49,16 @@ class _CheckRunsService extends Service {
   /// API docs: https://developer.github.com/v3/checks/runs/#create-a-check-run
   Future<CheckRun> createCheckRun(
     RepositorySlug slug, {
-    @required String name,
-    @required String headSha,
-    String detailsUrl,
-    String externalId,
+    required String name,
+    required String headSha,
+    String? detailsUrl,
+    String? externalId,
     CheckRunStatus status = CheckRunStatus.queued,
-    DateTime startedAt,
-    CheckRunConclusion conclusion,
-    DateTime completedAt,
-    CheckRunOutput output,
-    List<CheckRunAction> actions,
+    DateTime? startedAt,
+    CheckRunConclusion? conclusion,
+    DateTime? completedAt,
+    CheckRunOutput? output,
+    List<CheckRunAction>? actions,
   }) async {
     assert(conclusion != null ||
         (completedAt == null && status != CheckRunStatus.completed));
@@ -102,15 +101,15 @@ class _CheckRunsService extends Service {
   Future<CheckRun> updateCheckRun(
     RepositorySlug slug,
     CheckRun checkRunToUpdate, {
-    String name,
-    String detailsUrl,
-    String externalId,
-    DateTime startedAt,
+    String? name,
+    String? detailsUrl,
+    String? externalId,
+    DateTime? startedAt,
     CheckRunStatus status = CheckRunStatus.queued,
-    CheckRunConclusion conclusion,
-    DateTime completedAt,
-    CheckRunOutput output,
-    List<CheckRunAction> actions,
+    CheckRunConclusion? conclusion,
+    DateTime? completedAt,
+    CheckRunOutput? output,
+    List<CheckRunAction>? actions,
   }) async {
     assert(conclusion != null ||
         (completedAt == null && status != CheckRunStatus.completed));
@@ -146,10 +145,10 @@ class _CheckRunsService extends Service {
   /// API docs: https://developer.github.com/v3/checks/runs/#list-check-runs-for-a-specific-ref
   Stream<CheckRun> listCheckRunsForRef(
     RepositorySlug slug, {
-    @required String ref,
-    String checkName,
-    CheckRunStatus status,
-    CheckRunFilter filter,
+    required String ref,
+    String? checkName,
+    CheckRunStatus? status,
+    CheckRunFilter? filter,
   }) {
     ArgumentError.checkNotNull(ref);
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckRun>(
@@ -177,10 +176,10 @@ class _CheckRunsService extends Service {
   /// API docs: https://developer.github.com/v3/checks/runs/#list-check-runs-in-a-check-suite
   Stream<CheckRun> listCheckRunsInSuite(
     RepositorySlug slug, {
-    @required int checkSuiteId,
-    String checkName,
-    CheckRunStatus status,
-    CheckRunFilter filter,
+    required int checkSuiteId,
+    String? checkName,
+    CheckRunStatus? status,
+    CheckRunFilter? filter,
   }) {
     ArgumentError.checkNotNull(checkSuiteId);
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckRun>(
@@ -205,7 +204,7 @@ class _CheckRunsService extends Service {
   /// API docs: https://developer.github.com/v3/checks/runs/#get-a-single-check-run
   Future<CheckRun> getCheckRun(
     RepositorySlug slug, {
-    @required int checkRunId,
+    required int checkRunId,
   }) {
     ArgumentError.checkNotNull(checkRunId);
     return github.getJSON<Map<String, dynamic>, CheckRun>(
@@ -223,7 +222,7 @@ class _CheckRunsService extends Service {
   /// API docs: https://developer.github.com/v3/checks/runs/#list-annotations-for-a-check-run
   Stream<CheckRunAnnotation> listAnnotationsInCheckRun(
     RepositorySlug slug, {
-    @required CheckRun checkRun,
+    required CheckRun checkRun,
   }) {
     return PaginationHelper(github)
         .objects<Map<String, dynamic>, CheckRunAnnotation>(
@@ -246,13 +245,13 @@ class _CheckSuitesService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/#get-a-single-check-suite
   Future<CheckSuite> getCheckSuite(
     RepositorySlug slug, {
-    @required int checkSuiteId,
+    required int checkSuiteId,
   }) async {
     ArgumentError.checkNotNull(checkSuiteId);
     return github.requestJson(
       'GET',
       'repos/$slug/check-suites/$checkSuiteId',
-      convert: (input) => CheckSuite.fromJson(input),
+      convert: (dynamic input) => CheckSuite.fromJson(input),
       preview: _previewHeader,
       statusCode: StatusCodes.OK,
     );
@@ -268,9 +267,9 @@ class _CheckSuitesService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/#list-check-suites-for-a-specific-ref
   Stream<CheckSuite> listCheckSuitesForRef(
     RepositorySlug slug, {
-    @required String ref,
-    int appId,
-    String checkName,
+    required String ref,
+    int? appId,
+    String? checkName,
   }) {
     ArgumentError.checkNotNull(ref);
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckSuite>(
@@ -296,7 +295,7 @@ class _CheckSuitesService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/#update-repository-preferences-for-check-suites
   Future<List<AutoTriggerChecks>> updatePreferencesForCheckSuites(
     RepositorySlug slug, {
-    @required List<AutoTriggerChecks> autoTriggerChecks,
+    required List<AutoTriggerChecks> autoTriggerChecks,
   }) {
     ArgumentError.checkNotNull(autoTriggerChecks);
     return github.requestJson<Map<String, dynamic>, List<AutoTriggerChecks>>(
@@ -319,7 +318,7 @@ class _CheckSuitesService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/#create-a-check-suite
   Future<CheckSuite> createCheckSuite(
     RepositorySlug slug, {
-    @required String headSha,
+    required String headSha,
   }) {
     ArgumentError.checkNotNull(headSha);
     return github.requestJson<Map<String, dynamic>, CheckSuite>(
@@ -340,7 +339,7 @@ class _CheckSuitesService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/#rerequest-check-suite
   Future<void> reRequestCheckSuite(
     RepositorySlug slug, {
-    @required int checkSuiteId,
+    required int checkSuiteId,
   }) {
     ArgumentError.checkNotNull(checkSuiteId);
     return github.request(

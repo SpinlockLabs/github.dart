@@ -8,18 +8,19 @@ part of 'repos_hooks.dart';
 
 Hook _$HookFromJson(Map<String, dynamic> json) {
   return Hook(
-    id: json['id'] as int,
-    name: json['name'] as String,
+    id: json['id'] as int?,
+    name: json['name'] as String?,
   )
-    ..events = (json['events'] as List)?.map((e) => e as String)?.toList()
-    ..active = json['active'] as bool
+    ..events =
+        (json['events'] as List<dynamic>?)?.map((e) => e as String).toList()
+    ..active = json['active'] as bool?
     ..createdAt = json['created_at'] == null
         ? null
         : DateTime.parse(json['created_at'] as String)
     ..updatedAt = json['updated_at'] == null
         ? null
         : DateTime.parse(json['updated_at'] as String)
-    ..repoName = json['repo_name'] as String
+    ..repoName = json['repo_name'] as String?
     ..config = json['config'] == null
         ? null
         : HookConfig.fromJson(json['config'] as Map<String, dynamic>);
@@ -38,10 +39,10 @@ Map<String, dynamic> _$HookToJson(Hook instance) => <String, dynamic>{
 
 HookConfig _$HookConfigFromJson(Map<String, dynamic> json) {
   return HookConfig(
-    url: json['url'] as String,
-    contentType: json['content_type'] as String,
-    secret: json['secret'] as String,
-    insecureSsl: json['insecure_ssl'] as String,
+    url: json['url'] as String?,
+    contentType: json['content_type'] as String?,
+    secret: json['secret'] as String?,
+    insecureSsl: json['insecure_ssl'] as String?,
   );
 }
 
@@ -55,12 +56,13 @@ Map<String, dynamic> _$HookConfigToJson(HookConfig instance) =>
 
 CreateHook _$CreateHookFromJson(Map<String, dynamic> json) {
   return CreateHook(
-    json['name'] as String,
+    json['name'] as String?,
     json['config'] == null
         ? null
         : HookConfig.fromJson(json['config'] as Map<String, dynamic>),
-    events: (json['events'] as List)?.map((e) => e as String)?.toList(),
-    active: json['active'] as bool,
+    events:
+        (json['events'] as List<dynamic>?)?.map((e) => e as String).toList(),
+    active: json['active'] as bool?,
   );
 }
 

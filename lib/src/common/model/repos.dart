@@ -2,13 +2,15 @@ import 'package:github/src/common.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'repos.g.dart';
 
-@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+@JsonSerializable(
+  createToJson: false,
+)
 class GitHubComparison {
-  final String url;
-  final String status;
-  final int aheadBy;
-  final int behindBy;
-  final int totalCommits;
+  final String? url;
+  final String? status;
+  final int? aheadBy;
+  final int? behindBy;
+  final int? totalCommits;
 
   GitHubComparison(
       this.url, this.status, this.aheadBy, this.behindBy, this.totalCommits);
@@ -34,156 +36,193 @@ class GitHubComparison {
 }
 
 /// Model class for a repository.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Repository {
-  Repository({
-    this.name,
-    this.id,
-    this.fullName,
-    this.owner,
-    this.isPrivate,
-    this.isFork,
-    this.htmlUrl,
-    this.description,
-    this.cloneUrl,
-    this.gitUrl,
-    this.sshUrl,
-    this.svnUrl,
-    this.homepage,
-    this.size,
-    this.stargazersCount,
-    this.watchersCount,
-    this.language,
-    this.hasIssues,
-    this.hasWiki,
-    this.hasDownloads,
-    this.hasPages,
-    this.forksCount,
-    this.openIssuesCount,
-    this.defaultBranch,
-    this.subscribersCount,
-    this.networkCount,
-    this.createdAt,
-    this.updatedAt,
-    this.pushedAt,
-    this.license,
-    this.archived,
-    this.disabled,
-  });
+  Repository(
+      {this.name = '',
+      this.id = 0,
+      this.fullName = '',
+      this.owner,
+      this.htmlUrl = '',
+      this.description = '',
+      this.cloneUrl = '',
+      this.gitUrl = '',
+      this.sshUrl = '',
+      this.svnUrl = '',
+      this.defaultBranch = '',
+      this.createdAt,
+      this.isPrivate = false,
+      this.isFork = false,
+      this.stargazersCount = 0,
+      this.watchersCount = 0,
+      this.language = '',
+      this.hasWiki = false,
+      this.hasDownloads = false,
+      this.forksCount = 0,
+      this.openIssuesCount = 0,
+      this.subscribersCount = 0,
+      this.networkCount = 0,
+      this.hasIssues = false,
+      this.size = 0,
+      this.archived = false,
+      this.disabled = false,
+      this.homepage = '',
+      this.updatedAt,
+      this.pushedAt,
+      this.license,
+      this.hasPages = false,
+      this.permissions});
 
   /// Repository Name
+  @JsonKey(defaultValue: '')
   final String name;
 
   /// Repository ID
+  @JsonKey(defaultValue: 0)
   final int id;
 
   /// Full Repository Name
+  @JsonKey(defaultValue: '')
   final String fullName;
 
   /// Repository Owner
-  final UserInformation owner;
+  @JsonKey(defaultValue: null)
+  final UserInformation? owner;
 
   /// If the Repository is Private
-  @JsonKey(name: 'private')
+  @JsonKey(name: 'private', defaultValue: false)
   final bool isPrivate;
 
   /// If the Repository is a fork
-  @JsonKey(name: 'fork')
+  @JsonKey(name: 'fork', defaultValue: false)
   final bool isFork;
 
   /// Url to the GitHub Repository Page
+  @JsonKey(defaultValue: '')
   final String htmlUrl;
 
   /// Repository Description
+  @JsonKey(defaultValue: '')
   final String description;
 
   // https clone URL
+  @JsonKey(defaultValue: '')
   final String cloneUrl;
 
+  @JsonKey(defaultValue: '')
   final String sshUrl;
 
+  @JsonKey(defaultValue: '')
   final String svnUrl;
 
+  @JsonKey(defaultValue: '')
   final String gitUrl;
 
   /// Url to the Repository Homepage
+  @JsonKey(defaultValue: '')
   final String homepage;
 
   /// Repository Size
+  @JsonKey(defaultValue: 0)
   final int size;
 
   /// Repository Stars
-  @JsonKey(name: 'stargazers_count')
+  @JsonKey(defaultValue: 0)
   final int stargazersCount;
 
   /// Repository Watchers
-  @JsonKey(name: 'watchers_count')
+  @JsonKey(defaultValue: 0)
   final int watchersCount;
 
   /// Repository Language
+  @JsonKey(defaultValue: '')
   final String language;
 
   /// If the Repository has Issues Enabled
-  @JsonKey(name: 'has_issues')
+  @JsonKey(defaultValue: false)
   final bool hasIssues;
 
   /// If the Repository has the Wiki Enabled
-  @JsonKey(name: 'has_wiki')
+  @JsonKey(defaultValue: false)
   final bool hasWiki;
 
   /// If the Repository has any Downloads
-  @JsonKey(name: 'has_downloads')
+  @JsonKey(defaultValue: false)
   final bool hasDownloads;
 
   /// If the Repository has any Github Pages
-  @JsonKey(name: 'has_pages')
+  @JsonKey(defaultValue: false)
   final bool hasPages;
 
   /// Number of Forks
-  @JsonKey(name: 'forks_count')
+  @JsonKey(defaultValue: 0)
   final int forksCount;
 
   /// Number of Open Issues
-  @JsonKey(name: 'open_issues_count')
+  @JsonKey(defaultValue: 0)
   final int openIssuesCount;
 
   /// Repository Default Branch
-  @JsonKey(name: 'default_branch')
+  @JsonKey(defaultValue: '')
   final String defaultBranch;
 
   /// Number of Subscribers
-  @JsonKey(name: 'subscribers_count')
+  @JsonKey(defaultValue: 0)
   final int subscribersCount;
 
   /// Number of users in the network
-  @JsonKey(name: 'network_count')
+  @JsonKey(defaultValue: 0)
   final int networkCount;
 
   /// The time the repository was created at
-  @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// The last time the repository was pushed at
-  @JsonKey(name: 'pushed_at')
-  final DateTime pushedAt;
+  final DateTime? pushedAt;
 
-  @JsonKey(name: 'updated_at')
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
-  final LicenseKind license;
+  final LicenseKind? license;
 
+  @JsonKey(defaultValue: false)
   final bool archived;
+
+  @JsonKey(defaultValue: false)
   final bool disabled;
+
+  RepositoryPermissions? permissions;
 
   factory Repository.fromJson(Map<String, dynamic> input) =>
       _$RepositoryFromJson(input);
   Map<String, dynamic> toJson() => _$RepositoryToJson(this);
 
   /// Gets the Repository Slug (Full Name).
-  RepositorySlug slug() => RepositorySlug(owner.login, name);
+  RepositorySlug slug() => RepositorySlug(owner?.login ?? '', name);
 
   @override
-  String toString() => 'Repository: ${owner.login}/$name';
+  String toString() => 'Repository: $owner/$name';
+}
+
+/// Model class for repository permissions.
+@JsonSerializable()
+class RepositoryPermissions {
+  RepositoryPermissions(
+      {this.admin = false, this.push = false, this.pull = false});
+
+  /// Administrative Access
+  @JsonKey(defaultValue: false)
+  final bool admin;
+
+  /// Push Access
+  @JsonKey(defaultValue: false)
+  final bool push;
+
+  /// Pull Access
+  @JsonKey(defaultValue: false)
+  final bool pull;
+
+  factory RepositoryPermissions.fromJson(Map<String, dynamic> json) =>
+      _$RepositoryPermissionsFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -197,23 +236,22 @@ class Tag {
 
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 
-  factory Tag.fromJson(Map<String, dynamic> input) =>
-      input == null ? null : _$TagFromJson(input);
+  factory Tag.fromJson(Map<String, dynamic> input) => _$TagFromJson(input);
 
   @override
   String toString() => 'Tag: $name';
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitData {
-  final String sha;
-  final GitCommit commit;
-  final String url;
-  final String htmlUrl;
-  final String commentsUrl;
+  final String? sha;
+  final GitCommit? commit;
+  final String? url;
+  final String? htmlUrl;
+  final String? commentsUrl;
 
-  final CommitDataUser author, committer;
-  final List<Map<String, dynamic>> parents;
+  final CommitDataUser? author, committer;
+  final List<Map<String, dynamic>>? parents;
 
   CommitData(this.sha, this.commit, this.url, this.htmlUrl, this.commentsUrl,
       this.author, this.committer, this.parents);
@@ -225,9 +263,9 @@ class CommitData {
 
 @JsonSerializable()
 class CommitDataUser {
-  final String login, type;
+  final String? login, type;
 
-  final int id;
+  final int? id;
 
   CommitDataUser(this.login, this.id, this.type);
 
@@ -238,8 +276,8 @@ class CommitDataUser {
 
 @JsonSerializable()
 class CommitInfo {
-  final String sha;
-  final GitTree tree;
+  final String? sha;
+  final GitTree? tree;
 
   CommitInfo(this.sha, this.tree);
 
@@ -249,7 +287,7 @@ class CommitInfo {
 }
 
 /// User Information
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserInformation {
   /// Owner Username
   final String login;
@@ -279,10 +317,7 @@ class RepositorySlug {
   /// Repository Name
   String name;
 
-  RepositorySlug(this.owner, this.name) {
-    ArgumentError.checkNotNull(owner, 'owner');
-    ArgumentError.checkNotNull(name, 'name');
-  }
+  RepositorySlug(this.owner, this.name);
 
   /// Creates a Repository Slug from a full name.
   factory RepositorySlug.full(String f) {
@@ -313,7 +348,7 @@ class RepositorySlug {
 }
 
 /// Model class for a new repository to be created.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateRepository {
   CreateRepository(this.name,
       {this.description,
@@ -328,40 +363,40 @@ class CreateRepository {
       this.hasWiki});
 
   /// Repository Name
-  final String name;
+  final String? name;
 
   /// Repository Description
-  String description;
+  String? description;
 
   /// Repository Homepage
-  String homepage;
+  String? homepage;
 
   /// If the repository should be private or not.
-  bool private = false;
+  bool? private = false;
 
   /// If the repository should have issues enabled.
-  bool hasIssues = true;
+  bool? hasIssues = true;
 
   /// If the repository should have the wiki enabled.
-  bool hasWiki = true;
+  bool? hasWiki = true;
 
   /// If the repository should have downloads enabled.
-  bool hasDownloads = true;
+  bool? hasDownloads = true;
 
   /// The Team ID (Only for Creating a Repository for an Organization)
   @OnlyWhen('Creating a repository for an organization')
-  int teamId;
+  int? teamId;
 
   /// If GitHub should auto initialize the repository.
-  bool autoInit = false;
+  bool? autoInit = false;
 
   /// .gitignore template (only when [autoInit] is true)
   @OnlyWhen('autoInit is true')
-  String gitignoreTemplate;
+  String? gitignoreTemplate;
 
   /// License template (only when [autoInit] is true)
   @OnlyWhen('autoInit is true')
-  String licenseTemplate;
+  String? licenseTemplate;
 
   factory CreateRepository.fromJson(Map<String, dynamic> input) =>
       _$CreateRepositoryFromJson(input);
@@ -372,10 +407,10 @@ class CreateRepository {
 @JsonSerializable()
 class Branch {
   /// The name of the branch.
-  final String name;
+  final String? name;
 
   /// Commit Information
-  final CommitData commit;
+  final CommitData? commit;
 
   Branch(this.name, this.commit);
 
@@ -425,26 +460,26 @@ class LanguageBreakdown {
   }
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class LicenseDetails {
-  final String name;
-  final String path;
-  final String sha;
-  final int size;
-  final Uri url;
+  final String? name;
+  final String? path;
+  final String? sha;
+  final int? size;
+  final Uri? url;
 
-  final Uri htmlUrl;
-  final Uri gitUrl;
-  final Uri downloadUrl;
+  final Uri? htmlUrl;
+  final Uri? gitUrl;
+  final Uri? downloadUrl;
 
-  final String type;
-  final String content;
-  final String encoding;
+  final String? type;
+  final String? content;
+  final String? encoding;
 
   @JsonKey(name: '_links')
-  final Links links;
+  final Links? links;
 
-  final LicenseKind license;
+  final LicenseKind? license;
 
   LicenseDetails(
       {this.name,
@@ -467,13 +502,13 @@ class LicenseDetails {
   Map<String, dynamic> toJson() => _$LicenseDetailsToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class LicenseKind {
-  final String key;
-  final String name;
-  final String spdxId;
-  final Uri url;
-  final String nodeId;
+  final String? key;
+  final String? name;
+  final String? spdxId;
+  final Uri? url;
+  final String? nodeId;
 
   LicenseKind({this.key, this.name, this.spdxId, this.url, this.nodeId});
 

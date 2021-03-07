@@ -34,7 +34,7 @@ class MiscService extends Service {
   /// API docs: https://developer.github.com/v3/gitignore/#get-a-single-template
   Future<GitignoreTemplate> getGitignoreTemplate(String name) =>
       github.getJSON('/gitignore/templates/$name',
-          convert: (i) => GitignoreTemplate.fromJson(i));
+          convert: (dynamic i) => GitignoreTemplate.fromJson(i));
 
   /// Renders Markdown from the [input].
   ///
@@ -42,8 +42,8 @@ class MiscService extends Service {
   /// [context] is the repository context. Only take into account when [mode] is 'gfm'.
   ///
   /// API docs: https://developer.github.com/v3/markdown/#render-an-arbitrary-markdown-document
-  Future<String> renderMarkdown(String input,
-      {String mode = 'markdown', String context}) {
+  Future<String> renderMarkdown(String? input,
+      {String mode = 'markdown', String? context}) {
     return github
         .request('POST', '/markdown',
             body: GitHubJson.encode(
@@ -69,10 +69,11 @@ class MiscService extends Service {
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() =>
       github.getJSON('https://status.github.com/api/status.json',
-          statusCode: StatusCodes.OK, convert: (i) => APIStatus.fromJson(i));
+          statusCode: StatusCodes.OK,
+          convert: (dynamic i) => APIStatus.fromJson(i));
 
   /// Returns an ASCII Octocat with the specified [text].
-  Future<String> getOctocat([String text]) {
+  Future<String> getOctocat([String? text]) {
     final params = <String, dynamic>{};
 
     if (text != null) {
@@ -92,7 +93,7 @@ class MiscService extends Service {
 }
 
 class Octocat {
-  String name;
-  String image;
-  String url;
+  String? name;
+  String? image;
+  String? url;
 }

@@ -8,9 +8,9 @@ part of 'repos_merging.dart';
 
 CreateMerge _$CreateMergeFromJson(Map<String, dynamic> json) {
   return CreateMerge(
-    json['base'] as String,
-    json['head'] as String,
-    commitMessage: json['commit_message'] as String,
+    json['base'] as String?,
+    json['head'] as String?,
+    commitMessage: json['commit_message'] as String?,
   );
 }
 

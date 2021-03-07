@@ -8,7 +8,7 @@ class CheckRunAnnotationLevel extends EnumWithValue {
 
   const CheckRunAnnotationLevel._(String value) : super(value);
 
-  factory CheckRunAnnotationLevel._fromValue(String value) {
+  factory CheckRunAnnotationLevel._fromValue(String? value) {
     switch (value) {
       case 'notice':
         return notice;
@@ -48,7 +48,7 @@ class CheckRunConclusion extends EnumWithValue {
 
   const CheckRunConclusion._(String value) : super(value);
 
-  factory CheckRunConclusion._fromValue(String value) {
+  factory CheckRunConclusion._fromValue(String? value) {
     for (final level in const [
       success,
       failure,
@@ -81,28 +81,28 @@ class CheckRunFilter extends EnumWithValue {
 
 @immutable
 class CheckRun {
-  final String name;
-  final int id;
-  final String externalId;
-  final String headSha;
-  final CheckRunStatus status;
-  final int checkSuiteId;
-  final String detailsUrl;
+  final String? name;
+  final int? id;
+  final String? externalId;
+  final String? headSha;
+  final CheckRunStatus? status;
+  final int? checkSuiteId;
+  final String? detailsUrl;
   final DateTime startedAt;
 
   const CheckRun._({
-    @required this.id,
-    @required this.externalId,
-    @required this.headSha,
-    @required this.status,
-    @required this.checkSuiteId,
-    @required this.name,
-    @required this.detailsUrl,
-    @required this.startedAt,
+    required this.id,
+    required this.externalId,
+    required this.headSha,
+    required this.status,
+    required this.checkSuiteId,
+    required this.name,
+    required this.detailsUrl,
+    required this.startedAt,
   });
 
   factory CheckRun.fromJson(Map<String, dynamic> input) {
-    CheckRunStatus status;
+    CheckRunStatus? status;
     for (final s in const [
       CheckRunStatus.completed,
       CheckRunStatus.inProgress,
@@ -135,34 +135,33 @@ class CheckRunOutput {
   final String summary;
 
   /// The details of the check run. This parameter supports Markdown.
-  final String text;
+  final String? text;
 
   /// Adds information from your analysis to specific lines of code.
   /// Annotations are visible on GitHub in the Checks and Files changed tab of the pull request.
   /// The Checks API limits the number of annotations to a maximum of 50 per API request.
   /// To create more than 50 annotations, you have to make multiple requests to the Update a check run endpoint.
   /// Each time you update the check run, annotations are appended to the list of annotations that already exist for the check run.
-  final List<CheckRunAnnotation> annotations;
+  final List<CheckRunAnnotation>? annotations;
 
   /// Adds images to the output displayed in the GitHub pull request UI.
-  final List<CheckRunImage> images;
+  final List<CheckRunImage>? images;
 
   const CheckRunOutput({
-    @required this.title,
-    @required this.summary,
+    required this.title,
+    required this.summary,
     this.text,
     this.annotations,
     this.images,
-  })  : assert(title != null),
-        assert(summary != null);
+  });
 
   Map<String, dynamic> toJson() {
     return createNonNullMap(<String, dynamic>{
       'title': title,
       'summary': summary,
       'text': text,
-      'annotations': annotations?.map((a) => a.toJson())?.toList(),
-      'images': images?.map((i) => i.toJson())?.toList(),
+      'annotations': annotations?.map((a) => a.toJson()).toList(),
+      'images': images?.map((i) => i.toJson()).toList(),
     });
   }
 }
@@ -181,12 +180,12 @@ class CheckRunAnnotation {
   /// The start column of the annotation.
   /// Annotations only support start_column and end_column on the same line.
   /// Omit this parameter if start_line and end_line have different values.
-  final int startColumn;
+  final int? startColumn;
 
   /// The end column of the annotation.
   /// Annotations only support start_column and end_column on the same line.
   /// Omit this parameter if start_line and end_line have different values.
-  final int endColumn;
+  final int? endColumn;
 
   /// The level of the annotation.
   /// Can be one of notice, warning, or failure.
@@ -202,24 +201,19 @@ class CheckRunAnnotation {
 
   /// Details about this annotation.
   /// The maximum size is 64 KB.
-  final String rawDetails;
+  final String? rawDetails;
 
   const CheckRunAnnotation({
-    @required this.annotationLevel,
-    @required this.endLine,
-    @required this.message,
-    @required this.path,
-    @required this.startLine,
+    required this.annotationLevel,
+    required this.endLine,
+    required this.message,
+    required this.path,
+    required this.startLine,
+    required this.title,
     this.startColumn,
     this.endColumn,
-    this.title,
     this.rawDetails,
-  })  : assert(path != null),
-        assert(startLine != null),
-        assert(endLine != null),
-        assert(annotationLevel != null),
-        assert(message != null),
-        assert(startColumn == null || startLine == endLine,
+  })  : assert(startColumn == null || startLine == endLine,
             'Annotations only support start_column and end_column on the same line.'),
         assert(endColumn == null || startLine == endLine,
             'Annotations only support start_column and end_column on the same line.'),
@@ -245,9 +239,6 @@ class CheckRunAnnotation {
   int get hashCode => path.hashCode;
 
   factory CheckRunAnnotation.fromJSON(Map<String, dynamic> input) {
-    if (input == null) {
-      return null;
-    }
     return CheckRunAnnotation(
       path: input['path'],
       startLine: input['start_line'],
@@ -286,14 +277,13 @@ class CheckRunImage {
   final String imageUrl;
 
   /// A short image description.
-  final String caption;
+  final String? caption;
 
   const CheckRunImage({
-    @required this.alternativeText,
-    @required this.imageUrl,
+    required this.alternativeText,
+    required this.imageUrl,
     this.caption,
-  })  : assert(alternativeText != null),
-        assert(imageUrl != null);
+  });
 
   Map<String, dynamic> toJson() {
     return createNonNullMap(<String, dynamic>{
@@ -319,13 +309,10 @@ class CheckRunAction {
   final String identifier;
 
   const CheckRunAction({
-    @required this.label,
-    @required this.description,
-    @required this.identifier,
-  })  : assert(label != null),
-        assert(description != null),
-        assert(identifier != null),
-        assert(label.length <= 20),
+    required this.label,
+    required this.description,
+    required this.identifier,
+  })   : assert(label.length <= 20),
         assert(description.length <= 40),
         assert(identifier.length <= 20);
 
@@ -340,20 +327,17 @@ class CheckRunAction {
 
 @immutable
 class CheckSuite {
-  final int id;
-  final String headSha;
+  final int? id;
+  final String? headSha;
   final CheckRunConclusion conclusion;
 
   const CheckSuite({
-    @required this.conclusion,
-    @required this.headSha,
-    @required this.id,
+    required this.conclusion,
+    required this.headSha,
+    required this.id,
   });
 
   factory CheckSuite.fromJson(Map<String, dynamic> input) {
-    if (input == null) {
-      return null;
-    }
     return CheckSuite(
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),
       headSha: input['head_sha'],
@@ -368,17 +352,14 @@ class AutoTriggerChecks {
   final int appId;
 
   /// Set to true to enable automatic creation of CheckSuite events upon pushes to the repository, or false to disable them.
-  final bool setting;
+  final bool? setting;
 
   const AutoTriggerChecks({
-    @required this.appId,
+    required this.appId,
     this.setting = true,
-  }) : assert(appId != null);
+  });
 
   factory AutoTriggerChecks.fromJson(Map<String, dynamic> input) {
-    if (input == null) {
-      return null;
-    }
     return AutoTriggerChecks(
       appId: input['app_id'],
       setting: input['setting'],

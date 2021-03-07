@@ -5,20 +5,22 @@ import 'package:github/github.dart';
 import 'package:test/test.dart';
 
 void main() {
-  String firstCommitSha;
-  String firstCommitTreeSha;
+  String? firstCommitSha;
+  String? firstCommitTreeSha;
 
-  String createdTreeSha;
-  String createdCommitSha;
+  String? createdTreeSha;
+  String? createdCommitSha;
 
-  GitHub github;
-  RepositorySlug slug;
+  late GitHub github;
+  late RepositorySlug slug;
 
   setUpAll(() {
     final authToken = Platform.environment['GITHUB_API_TOKEN'];
     final repoOwner = Platform.environment['GITHUB_DART_TEST_REPO_OWNER'];
     final repoName = Platform.environment['GITHUB_DART_TEST_REPO_NAME'];
-
+    if (repoName == null || repoOwner == null) {
+      throw AssertionError('config incorrect');
+    }
     github = GitHub(auth: Authentication.withToken(authToken));
     slug = RepositorySlug(repoOwner, repoName);
   });
@@ -30,8 +32,8 @@ void main() {
   // Test definitions.
   test('get last commit of master', () async {
     final branch = await github.repositories.getBranch(slug, 'master');
-    firstCommitSha = branch.commit.sha;
-    firstCommitTreeSha = branch.commit.commit.sha;
+    firstCommitSha = branch.commit!.sha;
+    firstCommitTreeSha = branch.commit!.commit!.sha;
   });
 
   test('create and get a new blob', () async {
@@ -43,7 +45,7 @@ void main() {
 
     final fetchedBlob = await github.git.getBlob(slug, createdBlobSha);
 
-    final base64Decoded = base64Decode(fetchedBlob.content);
+    final base64Decoded = base64Decode(fetchedBlob.content!);
 
     expect(utf8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
@@ -72,7 +74,7 @@ void main() {
     final fetchedTree = await github.git.getTree(slug, createdTreeSha);
 
     expect(fetchedTree.sha, equals(createdTreeSha));
-    expect(fetchedTree.entries.length, equals(2));
+    expect(fetchedTree.entries!.length, equals(2));
   });
 
   test('create and get a new commit', () async {
@@ -87,8 +89,8 @@ void main() {
     final fetchedCommit = await github.git.getCommit(slug, createdCommitSha);
     expect(fetchedCommit.sha, equals(createdCommitSha));
     expect(fetchedCommit.message, equals('My test commit'));
-    expect(fetchedCommit.tree.sha, equals(createdTreeSha));
-    expect(fetchedCommit.parents.first.sha, equals(firstCommitSha));
+    expect(fetchedCommit.tree!.sha, equals(createdTreeSha));
+    expect(fetchedCommit.parents!.first.sha, equals(firstCommitSha));
   });
 
   test('update heads/master reference to new commit', () {
@@ -103,8 +105,8 @@ void main() {
 
     final fetchedRef = await github.git.getReference(slug, 'heads/$branchName');
     expect(fetchedRef.ref, equals('refs/heads/$branchName'));
-    expect(fetchedRef.object.type, equals('commit'));
-    expect(fetchedRef.object.sha, equals(createdCommitSha));
+    expect(fetchedRef.object!.type, equals('commit'));
+    expect(fetchedRef.object!.sha, equals(createdCommitSha));
   });
 
   test('create and get a new tag', () async {
@@ -122,8 +124,8 @@ void main() {
     expect(fetchedTag.tag, equals(tagName));
     expect(fetchedTag.sha, equals(createdTagSha));
     expect(fetchedTag.message, equals('Version 0.0.1'));
-    expect(fetchedTag.tagger.name, equals('aName'));
-    expect(fetchedTag.object.sha, equals(createdCommitSha));
+    expect(fetchedTag.tagger!.name, equals('aName'));
+    expect(fetchedTag.object!.sha, equals(createdCommitSha));
 
     // Create a reference for the tag.
     await github.git.createReference(slug, 'refs/tags/$tagName', createdTagSha);

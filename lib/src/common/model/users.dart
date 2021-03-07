@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'users.g.dart';
 
 /// Model class for a user.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class User {
   User({
     this.id,
@@ -27,68 +27,68 @@ class User {
   });
 
   @JsonKey(ignore: true)
-  Map json; // TODO remove
+  Map? json; // TODO remove
 
   /// User's Username
-  String login;
+  String? login;
 
   /// User ID
-  int id;
+  int? id;
 
   /// Avatar URL
-  String avatarUrl;
+  String? avatarUrl;
 
   /// Url to this user's profile.
-  String htmlUrl;
+  String? htmlUrl;
 
   /// If the user is a site administrator
-  bool siteAdmin;
+  bool? siteAdmin;
 
   /// User's Name
-  String name;
+  String? name;
 
   /// Name of User's Company
-  String company;
+  String? company;
 
   /// Link to User's Blog
-  String blog;
+  String? blog;
 
   /// User's Location
-  String location;
+  String? location;
 
   /// User's Email
-  String email;
+  String? email;
 
   /// If this user is hirable
-  bool hirable;
+  bool? hirable;
 
   /// The User's Biography
-  String bio;
+  String? bio;
 
   /// Number of public repositories that this user has
   @JsonKey(name: 'public_repos')
-  int publicReposCount;
+  int? publicReposCount;
 
   /// Number of public gists that this user has
   @JsonKey(name: 'public_gists')
-  int publicGistsCount;
+  int? publicGistsCount;
 
   /// Number of followers that this user has
   @JsonKey(name: 'followers')
-  int followersCount;
+  int? followersCount;
 
   /// Number of Users that this user follows
   @JsonKey(name: 'following')
-  int followingCount;
+  int? followingCount;
 
   /// The time this [User] was created.
-  DateTime createdAt;
+  DateTime? createdAt;
 
   /// Last time this [User] was updated.
-  DateTime updatedAt;
+  DateTime? updatedAt;
 
   /// The username of the twitter account (without leading @)
-  String twitterUsername;
+  String? twitterUsername;
 
   factory User.fromJson(Map<String, dynamic> input) => _$UserFromJson(input);
   Map<String, dynamic> toJson() => _$UserToJson(this);
@@ -96,14 +96,16 @@ class User {
 
 /// The response from listing collaborators on a repo.
 // https://developer.github.com/v3/repos/collaborators/#response
-@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+@JsonSerializable(
+  createToJson: false,
+)
 class Collaborator {
-  final String login;
-  final int id;
-  final String htmlUrl;
-  final String type;
-  final bool siteAdmin;
-  final Map<String, bool> permissions;
+  final String? login;
+  final int? id;
+  final String? htmlUrl;
+  final String? type;
+  final bool? siteAdmin;
+  final Map<String, bool>? permissions;
 
   Collaborator(
     this.login,
@@ -121,7 +123,7 @@ class Collaborator {
 /// The response from listing contributors on a repo.
 ///
 /// https://developer.github.com/v3/repos/#response-if-repository-contains-content
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Contributor {
   Contributor({
     this.id,
@@ -134,24 +136,24 @@ class Contributor {
   });
 
   /// User's Username
-  String login;
+  String? login;
 
   /// User ID
-  int id;
+  int? id;
 
   /// Avatar URL
-  String avatarUrl;
+  String? avatarUrl;
 
   /// Url to this user's profile.
-  String htmlUrl;
+  String? htmlUrl;
 
-  String type;
+  String? type;
 
   /// If the user is a site administrator
-  bool siteAdmin;
+  bool? siteAdmin;
 
   /// Contributions count
-  int contributions;
+  int? contributions;
 
   factory Contributor.fromJson(Map<String, dynamic> input) =>
       _$ContributorFromJson(input);
@@ -159,24 +161,24 @@ class Contributor {
 }
 
 /// The Currently Authenticated User
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CurrentUser extends User {
   CurrentUser();
 
   /// Number of Private Repositories
   @JsonKey(name: 'total_private_repos')
-  int privateReposCount;
+  int? privateReposCount;
 
   /// Number of Owned Private Repositories that the user owns
   @JsonKey(name: 'owned_private_repos')
-  int ownedPrivateReposCount;
+  int? ownedPrivateReposCount;
 
   /// The User's Disk Usage
   @JsonKey(name: 'disk_usage')
-  int diskUsage;
+  int? diskUsage;
 
   /// The User's GitHub Plan
-  UserPlan plan;
+  UserPlan? plan;
 
   factory CurrentUser.fromJson(Map<String, dynamic> input) =>
       _$CurrentUserFromJson(input);
@@ -185,23 +187,23 @@ class CurrentUser extends User {
 }
 
 /// A Users GitHub Plan
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserPlan {
   UserPlan();
 
   // Plan Name
-  String name;
+  String? name;
 
   // Plan Space
-  int space;
+  int? space;
 
   // Number of Private Repositories
   @JsonKey(name: 'private_repos')
-  int privateReposCount;
+  int? privateReposCount;
 
   // Number of Collaborators
   @JsonKey(name: 'collaborators')
-  int collaboratorsCount;
+  int? collaboratorsCount;
 
   factory UserPlan.fromJson(Map<String, dynamic> input) =>
       _$UserPlanFromJson(input);
@@ -209,16 +211,16 @@ class UserPlan {
 }
 
 /// Model class for a user's email address.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class UserEmail {
   UserEmail({
     this.email,
     this.verified,
     this.primary,
   });
-  String email;
-  bool verified;
-  bool primary;
+  String? email;
+  bool? verified;
+  bool? primary;
 
   factory UserEmail.fromJson(Map<String, dynamic> input) =>
       _$UserEmailFromJson(input);

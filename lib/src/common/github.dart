@@ -19,9 +19,9 @@ class GitHub {
   /// [endpoint] is the api endpoint to use
   /// [auth] is the authentication information
   GitHub({
-    Authentication auth,
+    Authentication? auth,
     this.endpoint = 'https://api.github.com',
-    http.Client client,
+    http.Client? client,
   })  : auth = auth ?? Authentication.anonymous(),
         client = client ?? http.Client();
 
@@ -30,7 +30,7 @@ class GitHub {
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
   /// Authentication Information
-  Authentication auth;
+  Authentication? auth;
 
   /// API Endpoint
   final String endpoint;
@@ -38,19 +38,19 @@ class GitHub {
   /// HTTP Client
   final http.Client client;
 
-  ActivityService _activity;
-  AuthorizationsService _authorizations;
-  GistsService _gists;
-  GitService _git;
-  IssuesService _issues;
-  MiscService _misc;
-  OrganizationsService _organizations;
-  PullRequestsService _pullRequests;
-  RepositoriesService _repositories;
-  SearchService _search;
-  UrlShortenerService _urlShortener;
-  UsersService _users;
-  ChecksService _checks;
+  ActivityService? _activity;
+  AuthorizationsService? _authorizations;
+  GistsService? _gists;
+  GitService? _git;
+  IssuesService? _issues;
+  MiscService? _misc;
+  OrganizationsService? _organizations;
+  PullRequestsService? _pullRequests;
+  RepositoriesService? _repositories;
+  SearchService? _search;
+  UrlShortenerService? _urlShortener;
+  UsersService? _users;
+  ChecksService? _checks;
 
   /// The maximum number of requests that the consumer is permitted to make per
   /// hour.
@@ -58,26 +58,26 @@ class GitHub {
   /// Updated with every request.
   ///
   /// Will be `null` if no requests have been made yet.
-  int get rateLimitLimit => _rateLimitLimit;
+  int? get rateLimitLimit => _rateLimitLimit;
 
   /// The number of requests remaining in the current rate limit window.
   ///
   /// Updated with every request.
   ///
   /// Will be `null` if no requests have been made yet.
-  int get rateLimitRemaining => _rateLimitRemaining;
+  int? get rateLimitRemaining => _rateLimitRemaining;
 
   /// The time at which the current rate limit window resets.
   ///
   /// Updated with every request.
   ///
   /// Will be `null` if no requests have been made yet.
-  DateTime get rateLimitReset => _rateLimitReset == null
+  DateTime? get rateLimitReset => _rateLimitReset == null
       ? null
-      : DateTime.fromMillisecondsSinceEpoch(_rateLimitReset * 1000,
+      : DateTime.fromMillisecondsSinceEpoch(_rateLimitReset! * 1000,
           isUtc: true);
 
-  int _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
+  int? _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
 
   /// Service for activity related methods of the GitHub API.
   ActivityService get activity => _activity ??= ActivityService(this);
@@ -143,12 +143,12 @@ class GitHub {
   /// The default [convert] function returns the input object.
   Future<T> getJSON<S, T>(
     String path, {
-    int statusCode,
-    void Function(http.Response response) fail,
-    Map<String, String> headers,
-    Map<String, String> params,
-    JSONConverter<S, T> convert,
-    String preview,
+    int? statusCode,
+    void Function(http.Response response)? fail,
+    Map<String, String>? headers,
+    Map<String, String>? params,
+    JSONConverter<S, T>? convert,
+    String? preview,
   }) =>
       requestJson(
         'GET',
@@ -183,13 +183,13 @@ class GitHub {
   /// [T] represents the type return from this function after conversion
   Future<T> postJSON<S, T>(
     String path, {
-    int statusCode,
-    void Function(http.Response response) fail,
-    Map<String, String> headers,
-    Map<String, dynamic> params,
-    JSONConverter<S, T> convert,
+    int? statusCode,
+    void Function(http.Response response)? fail,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+    JSONConverter<S, T>? convert,
     dynamic body,
-    String preview,
+    String? preview,
   }) =>
       requestJson(
         'POST',
@@ -225,13 +225,13 @@ class GitHub {
   /// [T] represents the type return from this function after conversion
   Future<T> putJSON<S, T>(
     String path, {
-    int statusCode,
-    void Function(http.Response response) fail,
-    Map<String, String> headers,
-    Map<String, dynamic> params,
-    JSONConverter<S, T> convert,
+    int? statusCode,
+    void Function(http.Response response)? fail,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+    JSONConverter<S, T>? convert,
     dynamic body,
-    String preview,
+    String? preview,
   }) =>
       requestJson(
         'PUT',
@@ -248,15 +248,15 @@ class GitHub {
   Future<T> requestJson<S, T>(
     String method,
     String path, {
-    int statusCode,
-    void Function(http.Response response) fail,
-    Map<String, String> headers,
-    Map<String, dynamic> params,
-    JSONConverter<S, T> convert,
+    int? statusCode,
+    void Function(http.Response response)? fail,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+    JSONConverter<S, T?>? convert,
     dynamic body,
-    String preview,
+    String? preview,
   }) async {
-    convert ??= (input) => input as T;
+    convert ??= (input) => input as T?;
     headers ??= {};
 
     if (preview != null) {
@@ -277,12 +277,7 @@ class GitHub {
 
     final json = jsonDecode(response.body);
 
-    if (convert == null) {
-      _applyExpandos(json, response);
-      return json;
-    }
-
-    final returnValue = convert(json);
+    final T returnValue = convert(json)!;
     _applyExpandos(returnValue, response);
     return returnValue;
   }
@@ -298,31 +293,31 @@ class GitHub {
   Future<http.Response> request(
     String method,
     String path, {
-    Map<String, String> headers,
-    Map<String, dynamic> params,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
     dynamic body,
-    int statusCode,
-    void Function(http.Response response) fail,
-    String preview,
+    int? statusCode,
+    void Function(http.Response response)? fail,
+    String? preview,
   }) async {
-    if (rateLimitRemaining != null && rateLimitRemaining <= 0) {
+    if (rateLimitRemaining != null && rateLimitRemaining! <= 0) {
       assert(rateLimitReset != null);
       final now = DateTime.now();
-      final waitTime = rateLimitReset.difference(now);
+      final waitTime = rateLimitReset!.difference(now);
       await Future.delayed(waitTime);
     }
 
-    headers ??= {};
+    headers ??= <String, String>{};
 
     if (preview != null) {
       headers['Accept'] = preview;
     }
 
-    if (auth.isToken) {
-      headers.putIfAbsent('Authorization', () => 'token ${auth.token}');
-    } else if (auth.isBasic) {
+    if (auth!.isToken) {
+      headers.putIfAbsent('Authorization', () => 'token ${auth!.token}');
+    } else if (auth!.isBasic) {
       final userAndPass =
-          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
+          base64Encode(utf8.encode('${auth!.username}:${auth!.password}'));
       headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
     }
 
@@ -373,6 +368,8 @@ class GitHub {
     } else {
       return response;
     }
+
+    throw UnknownError(this);
   }
 
   ///
@@ -380,9 +377,9 @@ class GitHub {
   ///
   @alwaysThrows
   void handleStatusCode(http.Response response) {
-    String message;
-    List<Map<String, String>> errors;
-    if (response.headers['content-type'].contains('application/json')) {
+    String? message;
+    List<Map<String, String>>? errors;
+    if (response.headers['content-type']!.contains('application/json')) {
       final json = jsonDecode(response.body);
       message = json['message'];
       if (json['errors'] != null) {
@@ -398,7 +395,6 @@ class GitHub {
     switch (response.statusCode) {
       case 404:
         throw NotFound(this, 'Requested Resource was Not Found');
-        break;
       case 401:
         throw AccessForbidden(this);
       case 400:
@@ -409,7 +405,6 @@ class GitHub {
         } else {
           throw BadRequest(this);
         }
-        break;
       case 422:
         final buff = StringBuffer();
         buff.writeln();
@@ -448,22 +443,22 @@ class GitHub {
 
   void _updateRateLimit(Map<String, String> headers) {
     if (headers.containsKey(_ratelimitLimitHeader)) {
-      _rateLimitLimit = int.parse(headers[_ratelimitLimitHeader]);
-      _rateLimitRemaining = int.parse(headers[_ratelimitRemainingHeader]);
-      _rateLimitReset = int.parse(headers[_ratelimitResetHeader]);
+      _rateLimitLimit = int.parse(headers[_ratelimitLimitHeader]!);
+      _rateLimitRemaining = int.parse(headers[_ratelimitRemainingHeader]!);
+      _rateLimitReset = int.parse(headers[_ratelimitResetHeader]!);
     }
   }
 }
 
-void _applyExpandos(Object target, http.Response response) {
+void _applyExpandos(dynamic target, http.Response response) {
   _etagExpando[target] = response.headers['etag'];
   if (response.headers['date'] != null) {
-    _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']);
+    _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']!);
   }
 }
 
 final _etagExpando = Expando<String>('etag');
 final _dateExpando = Expando<DateTime>('date');
 
-String getResponseEtag(Object obj) => _etagExpando[obj];
-DateTime getResponseDate(Object obj) => _dateExpando[obj];
+String? getResponseEtag(Object obj) => _etagExpando[obj];
+DateTime? getResponseDate(Object obj) => _dateExpando[obj];

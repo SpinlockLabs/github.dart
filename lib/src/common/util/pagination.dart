@@ -12,10 +12,10 @@ class PaginationHelper {
   PaginationHelper(this.github);
 
   Stream<http.Response> fetchStreamed(String method, String path,
-      {int pages,
-      Map<String, String> headers,
-      Map<String, dynamic> params,
-      String body,
+      {int? pages,
+      Map<String, String>? headers,
+      Map<String, dynamic>? params,
+      String? body,
       int statusCode = 200}) async* {
     var count = 0;
     const serverErrorBackOff = Duration(seconds: 10);
@@ -27,7 +27,9 @@ class PaginationHelper {
     } else {
       params = Map.from(params);
     }
-    assert(!params.containsKey('page'));
+
+    var page = params['page'] ?? 1;
+    params['page'] = page;
 
     // ignore: literal_only_boolean_expressions
     while (true) {
@@ -62,9 +64,6 @@ class PaginationHelper {
       }
 
       final info = parseLinkHeader(link);
-      if (info == null) {
-        break;
-      }
 
       final next = info['next'];
 
@@ -72,23 +71,20 @@ class PaginationHelper {
         break;
       }
 
-      final nextUrl = Uri.parse(next);
-      final nextPageArg = nextUrl.queryParameters['page'];
-      assert(nextPageArg != null);
-      params['page'] = nextPageArg;
+      params['page'] = ++page;
     }
   }
 
   Stream<T> jsonObjects<T>(
     String method,
     String path, {
-    int pages,
-    Map<String, String> headers,
-    Map<String, dynamic> params,
-    String body,
+    int? pages,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+    String? body,
     int statusCode = 200,
-    String preview,
-    String arrayKey,
+    String? preview,
+    String? arrayKey,
   }) async* {
     headers ??= {};
     if (preview != null) {
@@ -106,11 +102,11 @@ class PaginationHelper {
       statusCode: statusCode,
     )) {
       final json = arrayKey == null
-          ? jsonDecode(response.body) as List
+          ? jsonDecode(response.body) as List?
           : (jsonDecode(response.body) as Map)[arrayKey];
 
       for (final item in json) {
-        yield item as T;
+        yield (item as T?)!;
       }
     }
   }
@@ -121,13 +117,13 @@ class PaginationHelper {
     String method,
     String path,
     JSONConverter<S, T> converter, {
-    int pages,
-    Map<String, String> headers,
-    Map<String, dynamic> params,
-    String body,
+    int? pages,
+    Map<String, String>? headers,
+    Map<String, dynamic>? params,
+    String? body,
     int statusCode = 200,
-    String preview,
-    String arrayKey,
+    String? preview,
+    String? arrayKey,
   }) {
     return jsonObjects<S>(
       method,

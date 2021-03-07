@@ -30,7 +30,7 @@ class HookMiddleware {
     const Utf8Decoder().bind(request).join().then((content) {
       _eventController.add(HookEvent.fromJson(
           request.headers.value('X-GitHub-Event'),
-          jsonDecode(content) as Map<String, dynamic>));
+          jsonDecode(content) as Map<String, dynamic>?));
       request.response
         ..write(GitHubJson.encode({'handled': _eventController.hasListener}))
         ..close();
@@ -42,7 +42,7 @@ class HookServer extends HookMiddleware {
   final String host;
   final int port;
 
-  HttpServer _server;
+  late HttpServer _server;
 
   HookServer(this.port, [this.host = '0.0.0.0']);
 
@@ -68,74 +68,74 @@ class HookServer extends HookMiddleware {
 class HookEvent {
   HookEvent();
 
-  factory HookEvent.fromJson(String event, Map<String, dynamic> json) {
+  factory HookEvent.fromJson(String? event, Map<String, dynamic>? json) {
     if (event == 'pull_request') {
-      return PullRequestEvent.fromJson(json);
+      return PullRequestEvent.fromJson(json!);
     } else if (event == 'issues') {
-      return IssueEvent.fromJson(json);
+      return IssueEvent.fromJson(json!);
     } else if (event == 'issue_comment') {
-      return IssueCommentEvent.fromJson(json);
+      return IssueCommentEvent.fromJson(json!);
     } else if (event == 'repository') {
-      return RepositoryEvent.fromJson(json);
+      return RepositoryEvent.fromJson(json!);
     }
     return UnknownHookEvent(event, json);
   }
 }
 
 class UnknownHookEvent extends HookEvent {
-  final String event;
-  final Map<String, dynamic> data;
+  final String? event;
+  final Map<String, dynamic>? data;
 
   UnknownHookEvent(this.event, this.data);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryEvent extends HookEvent {
   RepositoryEvent({
     this.action,
     this.repository,
     this.sender,
   });
-  String action;
-  Repository repository;
-  User sender;
+  String? action;
+  Repository? repository;
+  User? sender;
 
   factory RepositoryEvent.fromJson(Map<String, dynamic> input) =>
       _$RepositoryEventFromJson(input);
   Map<String, dynamic> toJson() => _$RepositoryEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueCommentEvent extends HookEvent {
   IssueCommentEvent({
     this.action,
     this.issue,
     this.comment,
   });
-  String action;
-  Issue issue;
-  IssueComment comment;
+  String? action;
+  Issue? issue;
+  IssueComment? comment;
 
   factory IssueCommentEvent.fromJson(Map<String, dynamic> input) =>
       _$IssueCommentEventFromJson(input);
   Map<String, dynamic> toJson() => _$IssueCommentEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class ForkEvent extends HookEvent {
   ForkEvent({
     this.forkee,
     this.sender,
   });
-  Repository forkee;
-  User sender;
+  Repository? forkee;
+  User? sender;
 
   factory ForkEvent.fromJson(Map<String, dynamic> input) =>
       _$ForkEventFromJson(input);
   Map<String, dynamic> toJson() => _$ForkEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class IssueEvent extends HookEvent {
   IssueEvent({
     this.action,
@@ -145,19 +145,19 @@ class IssueEvent extends HookEvent {
     this.sender,
     this.repository,
   });
-  String action;
-  User assignee;
-  IssueLabel label;
-  Issue issue;
-  User sender;
-  Repository repository;
+  String? action;
+  User? assignee;
+  IssueLabel? label;
+  Issue? issue;
+  User? sender;
+  Repository? repository;
 
   factory IssueEvent.fromJson(Map<String, dynamic> input) =>
       _$IssueEventFromJson(input);
   Map<String, dynamic> toJson() => _$IssueEventToJson(this);
 }
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class PullRequestEvent extends HookEvent {
   PullRequestEvent({
     this.action,
@@ -166,11 +166,11 @@ class PullRequestEvent extends HookEvent {
     this.sender,
     this.repository,
   });
-  String action;
-  int number;
-  PullRequest pullRequest;
-  User sender;
-  Repository repository;
+  String? action;
+  int? number;
+  PullRequest? pullRequest;
+  User? sender;
+  Repository? repository;
 
   factory PullRequestEvent.fromJson(Map<String, dynamic> input) =>
       _$PullRequestEventFromJson(input);

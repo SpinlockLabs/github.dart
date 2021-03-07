@@ -14,8 +14,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listUserGists(String username) {
-    return PaginationHelper(github)
-        .objects('GET', '/users/$username/gists', (i) => Gist.fromJson(i));
+    return PaginationHelper(github).objects(
+        'GET', '/users/$username/gists', (dynamic i) => Gist.fromJson(i));
   }
 
   /// Fetches the gists for the currently authenticated user.
@@ -24,7 +24,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserGists() {
     return PaginationHelper(github)
-        .objects('GET', '/gists', (i) => Gist.fromJson(i));
+        .objects('GET', '/gists', (dynamic i) => Gist.fromJson(i));
   }
 
   /// Fetches the currently authenticated user's public gists.
@@ -32,7 +32,7 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserPublicGists() {
     return PaginationHelper(github)
-        .objects('GET', '/gists/public', (i) => Gist.fromJson(i));
+        .objects('GET', '/gists/public', (dynamic i) => Gist.fromJson(i));
   }
 
   /// Fetches the currently authenticated user's starred gists.
@@ -40,21 +40,21 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#list-gists
   Stream<Gist> listCurrentUserStarredGists() {
     return PaginationHelper(github)
-        .objects('GET', '/gists/starred', (i) => Gist.fromJson(i));
+        .objects('GET', '/gists/starred', (dynamic i) => Gist.fromJson(i));
   }
 
   /// Fetches a Gist by the specified [id].
   ///
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
   Future<Gist> getGist(String id) => github.getJSON('/gists/$id',
-      statusCode: StatusCodes.OK, convert: (i) => Gist.fromJson(i));
+      statusCode: StatusCodes.OK, convert: (dynamic i) => Gist.fromJson(i));
 
   /// Creates a Gist
   ///
   /// API docs: https://developer.github.com/v3/gists/#create-a-gist
   Future<Gist> createGist(
     Map<String, String> files, {
-    String description,
+    String? description,
     bool public = false,
   }) {
     final map = <String, dynamic>{'files': {}};
@@ -77,7 +77,7 @@ class GistsService extends Service {
       '/gists',
       statusCode: 201,
       body: GitHubJson.encode(map),
-      convert: (i) => Gist.fromJson(i),
+      convert: (dynamic i) => Gist.fromJson(i),
     );
   }
 
@@ -95,8 +95,8 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/#edit-a-gist
   Future<Gist> editGist(
     String id, {
-    String description,
-    Map<String, String> files,
+    String? description,
+    Map<String, String>? files,
   }) {
     final map = <String, dynamic>{};
 
@@ -116,7 +116,7 @@ class GistsService extends Service {
       '/gists/$id',
       statusCode: 200,
       body: GitHubJson.encode(map),
-      convert: (i) => Gist.fromJson(i),
+      convert: (dynamic i) => Gist.fromJson(i),
     );
   }
 
@@ -166,8 +166,8 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
   Stream<GistComment> listComments(String gistId) {
-    return PaginationHelper(github).objects(
-        'GET', '/gists/$gistId/comments', (i) => GistComment.fromJson(i));
+    return PaginationHelper(github).objects('GET', '/gists/$gistId/comments',
+        (dynamic i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
@@ -178,7 +178,7 @@ class GistsService extends Service {
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return github.postJSON('/gists/$gistId/comments',
         body: GitHubJson.encode(request),
-        convert: (i) => GistComment.fromJson(i));
+        convert: (dynamic i) => GistComment.fromJson(i));
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment

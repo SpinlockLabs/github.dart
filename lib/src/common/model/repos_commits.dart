@@ -25,36 +25,36 @@ class RepositoryCommit {
   });
 
   /// API url.
-  String url;
+  String? url;
 
   /// Commit SHA
-  String sha;
+  String? sha;
 
   /// Url to Commit Page
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  String? htmlUrl;
 
   /// Comments url.
   @JsonKey(name: 'comments_url')
-  String commentsUrl;
+  String? commentsUrl;
 
   /// A reference to the raw [GitCommit].
-  GitCommit commit;
+  GitCommit? commit;
 
   /// Commit Author
-  User author;
+  User? author;
 
   /// Commit Committer.
-  User committer;
+  User? committer;
 
   /// Commit parents.
-  List<GitCommit> parents;
+  List<GitCommit>? parents;
 
   /// Commit statistics.
-  CommitStats stats;
+  CommitStats? stats;
 
   /// The files changed in this commit.
-  List<CommitFile> files;
+  List<CommitFile>? files;
 
   factory RepositoryCommit.fromJson(Map<String, dynamic> input) =>
       _$RepositoryCommitFromJson(input);
@@ -71,13 +71,13 @@ class CommitStats {
   });
 
   /// Number of Additions.
-  int additions;
+  int? additions;
 
   /// Number of Deletions.
-  int deletions;
+  int? deletions;
 
   /// Total changes.
-  int total;
+  int? total;
 
   factory CommitStats.fromJson(Map<String, dynamic> input) =>
       _$CommitStatsFromJson(input);
@@ -98,20 +98,20 @@ class CommitFile {
     this.patch,
   });
   @JsonKey(name: 'filename')
-  String name;
+  String? name;
 
-  int additions;
-  int deletions;
-  int changes;
-  String status;
+  int? additions;
+  int? deletions;
+  int? changes;
+  String? status;
 
   @JsonKey(name: 'raw_url')
-  String rawUrl;
+  String? rawUrl;
 
   @JsonKey(name: 'blob_url')
-  String blobUrl;
+  String? blobUrl;
 
-  String patch;
+  String? patch;
 
   factory CommitFile.fromJson(Map<String, dynamic> input) =>
       _$CommitFileFromJson(input);
@@ -121,7 +121,7 @@ class CommitFile {
 /// Model class for a commit comment.
 ///
 /// See https://developer.github.com/v3/repos/comments
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitComment {
   CommitComment({
     this.id,
@@ -137,34 +137,34 @@ class CommitComment {
   });
 
   /// Id of the comment
-  final int id;
+  final int? id;
 
   /// Relative path of the file on which the comment has been posted
-  final String path;
+  final String? path;
 
   /// Line on file
-  final int line;
+  final int? line;
 
   /// Position on the diff
-  final int position;
+  final int? position;
 
   /// SHA of the commit where the comment has been made
-  final String commitId;
+  final String? commitId;
 
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   /// Can be equals to [createdAt]
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
 
   /// Ex: https://github.com/...
-  final String htmlUrl;
+  final String? htmlUrl;
 
   /// Ex: https://api.github.com/...
   @JsonKey(name: 'url')
-  final String apiUrl;
+  final String? apiUrl;
 
   /// Content of the comment
-  final String body;
+  final String? body;
 
   factory CommitComment.fromJson(Map<String, dynamic> input) =>
       _$CommitCommentFromJson(input);

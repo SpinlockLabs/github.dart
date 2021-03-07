@@ -24,52 +24,52 @@ class GitHubFile {
   });
 
   /// Type of File
-  String type;
+  String? type;
 
   /// File Encoding
-  String encoding;
+  String? encoding;
 
   /// File Size
-  int size;
+  int? size;
 
   /// File Name
-  String name;
+  String? name;
 
   /// File Path
-  String path;
+  String? path;
 
   /// Base-64 encoded file content with newlines.
-  String content;
+  String? content;
 
   /// SHA
-  String sha;
+  String? sha;
 
   /// Url to file
   @JsonKey(name: 'html_url')
-  String htmlUrl;
+  String? htmlUrl;
 
   /// Git Url
   @JsonKey(name: 'git_url')
-  String gitUrl;
+  String? gitUrl;
 
   /// Download Url
   @JsonKey(name: 'download_url')
-  String downloadUrl;
+  String? downloadUrl;
 
   /// Links
   @JsonKey(name: '_links')
-  Links links;
+  Links? links;
 
   /// The value in [content] Base-64 decoded.
   String get text {
     return _text ??=
-        utf8.decode(base64Decode(LineSplitter.split(content).join()));
+        utf8.decode(base64Decode(LineSplitter.split(content!).join()));
   }
 
-  String _text;
+  String? _text;
 
   /// Source Repository
-  RepositorySlug sourceRepository;
+  RepositorySlug? sourceRepository;
 
   factory GitHubFile.fromJson(Map<String, dynamic> input) =>
       _$GitHubFileFromJson(input);
@@ -78,9 +78,9 @@ class GitHubFile {
 
 @JsonSerializable()
 class Links {
-  final Uri self;
-  final Uri git;
-  final Uri html;
+  final Uri? self;
+  final Uri? git;
+  final Uri? html;
 
   Links({this.git, this.self, this.html});
 
@@ -90,14 +90,14 @@ class Links {
 }
 
 /// Model class for a file or directory.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class RepositoryContents {
   RepositoryContents({
     this.file,
     this.tree,
   });
-  GitHubFile file;
-  List<GitHubFile> tree;
+  GitHubFile? file;
+  List<GitHubFile>? tree;
 
   bool get isFile => file != null;
   bool get isDirectory => tree != null;
@@ -110,16 +110,16 @@ class RepositoryContents {
 
 /// Model class for a new file to be created.
 
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CreateFile {
   CreateFile(
       {this.path, this.content, this.message, this.branch, this.committer});
 
-  String path;
-  String message;
-  String content;
-  String branch;
-  CommitUser committer;
+  String? path;
+  String? message;
+  String? content;
+  String? branch;
+  CommitUser? committer;
 
   factory CreateFile.fromJson(Map<String, dynamic> json) =>
       _$CreateFileFromJson(json);
@@ -128,12 +128,12 @@ class CreateFile {
 }
 
 /// Model class for a committer of a commit.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class CommitUser {
   CommitUser(this.name, this.email);
 
-  final String name;
-  final String email;
+  final String? name;
+  final String? email;
 
   factory CommitUser.fromJson(Map<String, dynamic> input) =>
       _$CommitUserFromJson(input);
@@ -144,8 +144,8 @@ class CommitUser {
 /// Model class for the response of a content creation.
 @JsonSerializable()
 class ContentCreation {
-  final RepositoryCommit commit;
-  final GitHubFile content;
+  final RepositoryCommit? commit;
+  final GitHubFile? content;
 
   ContentCreation(this.commit, this.content);
 

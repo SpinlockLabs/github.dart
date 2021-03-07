@@ -8,15 +8,16 @@ part of 'authorizations.dart';
 
 Authorization _$AuthorizationFromJson(Map<String, dynamic> json) {
   return Authorization(
-    id: json['id'] as int,
-    scopes: (json['scopes'] as List)?.map((e) => e as String)?.toList(),
-    token: json['token'] as String,
+    id: json['id'] as int?,
+    scopes:
+        (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
+    token: json['token'] as String?,
     app: json['app'] == null
         ? null
         : AuthorizationApplication.fromJson(
             json['app'] as Map<String, dynamic>),
-    note: json['note'] as String,
-    noteUrl: json['note_url'] as String,
+    note: json['note'] as String?,
+    noteUrl: json['note_url'] as String?,
     createdAt: json['created_at'] == null
         ? null
         : DateTime.parse(json['created_at'] as String),
@@ -45,9 +46,9 @@ Map<String, dynamic> _$AuthorizationToJson(Authorization instance) =>
 AuthorizationApplication _$AuthorizationApplicationFromJson(
     Map<String, dynamic> json) {
   return AuthorizationApplication(
-    url: json['url'] as String,
-    name: json['name'] as String,
-    clientId: json['client_id'] as String,
+    url: json['url'] as String?,
+    name: json['name'] as String?,
+    clientId: json['client_id'] as String?,
   );
 }
 
@@ -61,11 +62,12 @@ Map<String, dynamic> _$AuthorizationApplicationToJson(
 
 CreateAuthorization _$CreateAuthorizationFromJson(Map<String, dynamic> json) {
   return CreateAuthorization(
-    json['note'] as String,
-    scopes: (json['scopes'] as List)?.map((e) => e as String)?.toList(),
-    noteUrl: json['note_url'] as String,
-    clientId: json['client_id'] as String,
-    clientSecret: json['client_secret'] as String,
+    json['note'] as String?,
+    scopes:
+        (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
+    noteUrl: json['note_url'] as String?,
+    clientId: json['client_id'] as String?,
+    clientSecret: json['client_secret'] as String?,
   );
 }
 
