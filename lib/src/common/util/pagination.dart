@@ -27,7 +27,9 @@ class PaginationHelper {
     } else {
       params = Map.from(params);
     }
-    assert(!params.containsKey('page'));
+
+    var page = params['page'] ?? 1;
+    params['page'] = page;
 
     // ignore: literal_only_boolean_expressions
     while (true) {
@@ -69,9 +71,7 @@ class PaginationHelper {
         break;
       }
 
-      final nextUrl = Uri.parse(next);
-      final nextPageArg = nextUrl.queryParameters['page']!;
-      params['page'] = nextPageArg;
+      params['page'] = ++page;
     }
   }
 

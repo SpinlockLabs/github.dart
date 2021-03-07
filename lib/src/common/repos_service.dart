@@ -241,13 +241,12 @@ class RepositoriesService extends Service {
   /// Lists the tags of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/repos/#list-tags
-  Stream<Tag> listTags(RepositorySlug slug) {
+  Stream<Tag> listTags(RepositorySlug slug,
+      {int page = 1, int? pages, int perPage = 30}) {
     ArgumentError.checkNotNull(slug);
     return PaginationHelper(github).objects<Map<String, dynamic>, Tag>(
-      'GET',
-      '/repos/${slug.fullName}/tags',
-      (i) => Tag.fromJson(i),
-    );
+        'GET', '/repos/${slug.fullName}/tags', (i) => Tag.fromJson(i),
+        pages: pages, params: {'page': page, 'per_page': perPage});
   }
 
   /// Lists the branches of the specified repository.
