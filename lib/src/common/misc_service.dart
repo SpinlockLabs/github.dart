@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:github/src/common.dart';
 
 /// The [MiscService] handles communication with misc related methods of the
@@ -61,8 +62,8 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/rate_limit/
   Future<RateLimit> getRateLimit() {
-    return github.request('GET', '/').then((response) {
-      return RateLimit.fromHeaders(response.headers);
+    return github.request('GET', '/rate_limit').then((response) {
+      return RateLimit.fromRateLimitResponse(jsonDecode(response.body));
     });
   }
 
