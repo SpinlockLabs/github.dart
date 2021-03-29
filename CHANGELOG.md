@@ -1,3 +1,6 @@
+## 8.1.0
+  - `RateLimit` queries `/rate_limit` and no longer uses quota
+
 ## 8.0.1
   - Minor tweaks to improve pub score
 
