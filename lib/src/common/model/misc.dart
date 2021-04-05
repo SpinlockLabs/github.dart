@@ -39,6 +39,17 @@ class RateLimit {
     return RateLimit(limit, remaining, resets);
   }
 
+  /// Construct [RateLimit] from JSON response of /rate_limit.
+  ///
+  /// API docs: https://developer.github.com/v3/rate_limit/
+  factory RateLimit.fromRateLimitResponse(Map<String, dynamic> response) {
+    final rateJson = response['rate'] as Map<String, dynamic>;
+    final limit = int.parse(rateJson['limit']!);
+    final remaining = int.parse(rateJson['remaining']!);
+    final resets = DateTime.fromMillisecondsSinceEpoch(rateJson['reset']!);
+    return RateLimit(limit, remaining, resets);
+  }
+
   factory RateLimit.fromJson(Map<String, dynamic> input) =>
       _$RateLimitFromJson(input);
   Map<String, dynamic> toJson() => _$RateLimitToJson(this);
