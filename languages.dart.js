@@ -8281,7 +8281,7 @@ t.b3.a(a)
 s=window
 s.toString
 r=this.a
-q=C.o.f6(s,"view_source.html?script="+r,"View Source")
+q=C.o.f6(s,"https://github.com/SpinlockLabs/github.dart/blob/master/example/"+r,"View Source")
 o.a=null
 o.b=o.c=!1
 s=new R.jV(o,q)

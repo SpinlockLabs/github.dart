@@ -7681,7 +7681,7 @@ t.b3.a(a)
 s=window
 s.toString
 r=this.a
-q=C.r.eG(s,"view_source.html?script="+r,"View Source")
+q=C.r.eG(s,"https://github.com/SpinlockLabs/github.dart/blob/master/example/"+r,"View Source")
 o.a=null
 o.b=o.c=!1
 s=new R.j5(o,q)
