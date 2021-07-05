@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 /// **Example**:
 ///
 ///      var flow = new OAuth2Flow('ClientID', 'ClientSecret');
-///      var authUrl = flow.createAuthorizationURL();
+///      var authUrl = flow.createAuthorizeUrl();
 ///      // Display to the User and handle the redirect URI, and also get the code.
 ///      flow.exchange(code).then((response) {
 ///        var github = new GitHub(auth: new Authentication.withToken(response.token));
