@@ -1,3 +1,6 @@
+## 8.1.2
+ - Fixes `RateLimit.fromRateLimitResponse` to not double cast int
+
 ## 8.1.1
   - Fix up examples and license file https://github.com/SpinlockLabs/github.dart/pull/255 https://github.com/SpinlockLabs/github.dart/pull/254 https://github.com/SpinlockLabs/github.dart/pull/253
 
