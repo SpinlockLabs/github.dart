@@ -312,7 +312,7 @@ class CheckRunAction {
     required this.label,
     required this.description,
     required this.identifier,
-  })   : assert(label.length <= 20),
+  })  : assert(label.length <= 20),
         assert(description.length <= 40),
         assert(identifier.length <= 20);
 

@@ -1,3 +1,6 @@
+## 8.1.3
+ - Add per page parameter to stars related activities https://github.com/SpinlockLabs/github.dart/pull/265
+
 ## 8.1.2
  - Fixes `RateLimit.fromRateLimitResponse` to not double cast int
 

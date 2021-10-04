@@ -16,7 +16,8 @@ void main() {
             "used": 1
           }
       }''';
-      final rateLimit = RateLimit.fromRateLimitResponse(jsonDecode(rateLimitJson));
+      final rateLimit =
+          RateLimit.fromRateLimitResponse(jsonDecode(rateLimitJson));
 
       expect(rateLimit.limit, 5000);
       expect(rateLimit.remaining, 4999);
