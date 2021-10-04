@@ -215,25 +215,28 @@ class ActivityService extends Service {
   /// Lists people who have starred the specified repo.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
-  Stream<User> listStargazers(RepositorySlug slug) {
+  Stream<User> listStargazers(RepositorySlug slug, {int perPage = 30}) {
     return PaginationHelper(github).objects('GET',
-        '/repos/${slug.fullName}/stargazers', (dynamic i) => User.fromJson(i));
+        '/repos/${slug.fullName}/stargazers', (dynamic i) => User.fromJson(i),
+        params: {'per_page': perPage});
   }
 
   /// Lists all the repos starred by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
-  Stream<Repository> listStarredByUser(String user) {
+  Stream<Repository> listStarredByUser(String user, {int perPage = 30}) {
     return PaginationHelper(github).objects(
-        'GET', '/users/$user/starred', (dynamic i) => Repository.fromJson(i));
+        'GET', '/users/$user/starred', (dynamic i) => Repository.fromJson(i),
+        params: {'per_page': perPage});
   }
 
   /// Lists all the repos by the current user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
-  Stream<Repository> listStarred() {
-    return PaginationHelper(github)
-        .objects('GET', '/user/starred', (dynamic i) => Repository.fromJson(i));
+  Stream<Repository> listStarred({int perPage = 30}) {
+    return PaginationHelper(github).objects(
+        'GET', '/user/starred', (dynamic i) => Repository.fromJson(i),
+        params: {'per_page': perPage});
   }
 
   /// Checks if the currently authenticated user has starred the specified repository.
