@@ -52,6 +52,10 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
     labels: (json['labels'] as List<dynamic>?)
         ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
         .toList(),
+    requestedReviewers: (json['requested_reviewers'] as List<dynamic>?)
+        ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    reviewCommentCount: json['review_comments'] as int?,
   );
 }
 
@@ -83,6 +87,8 @@ Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
       'deletions_count': instance.deletionsCount,
       'changed_files_count': instance.changedFilesCount,
       'labels': instance.labels,
+      'requested_reviewers': instance.requestedReviewers,
+      'review_comments': instance.reviewCommentCount,
     };
 
 PullRequestMerge _$PullRequestMergeFromJson(Map<String, dynamic> json) {
