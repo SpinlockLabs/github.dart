@@ -116,10 +116,10 @@ class PullRequest {
   List<IssueLabel>? labels;
 
   /// Reviewers requested for this Pull Request.
-  List<User>? requestedReviewers,
+  List<User>? requestedReviewers;
 
   /// The number of review comments on the Pull Request.
-  int? reviewCommentCount,
+  int? reviewCommentCount;
 
   factory PullRequest.fromJson(Map<String, dynamic> input) =>
       _$PullRequestFromJson(input);
