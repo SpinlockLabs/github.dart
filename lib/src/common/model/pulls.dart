@@ -35,6 +35,8 @@ class PullRequest {
     this.deletionsCount,
     this.changedFilesCount,
     this.labels,
+    this.requestedReviewers,
+    this.reviewCommentCount,
   });
 
   /// Pull Request ID
@@ -112,6 +114,12 @@ class PullRequest {
 
   /// Pull Request Labels
   List<IssueLabel>? labels;
+
+  /// Reviewers requested for this Pull Request.
+  List<User>? requestedReviewers;
+
+  /// The number of review comments on the Pull Request.
+  int? reviewCommentCount;
 
   factory PullRequest.fromJson(Map<String, dynamic> input) =>
       _$PullRequestFromJson(input);
