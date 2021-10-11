@@ -29,14 +29,19 @@ class PullRequest {
     this.merged,
     this.mergeable,
     this.mergedBy,
-    this.commentsCount,
-    this.commitsCount,
-    this.additionsCount,
-    this.deletionsCount,
-    this.changedFilesCount,
+    this.commentsCount = 0,
+    this.commitsCount = 0,
+    this.additionsCount = 0,
+    this.deletionsCount = 0,
+    this.changedFilesCount = 0,
     this.labels,
     this.requestedReviewers,
-    this.reviewCommentCount,
+    this.reviewCommentCount = 0,
+    this.milestone,
+    this.rebaseable = false,
+    this.mergeableState = '',
+    this.maintainerCanModify = false,
+    this.authorAssociation = '',
   });
 
   /// Pull Request ID
@@ -98,18 +103,23 @@ class PullRequest {
   User? mergedBy;
 
   /// Number of comments
+  @JsonKey(name: 'comments')
   int? commentsCount;
 
   /// Number of commits
+  @JsonKey(name: 'commits')
   int? commitsCount;
 
   /// Number of additions
+  @JsonKey(name: 'additions')
   int? additionsCount;
 
   /// Number of deletions
+  @JsonKey(name: 'deletions')
   int? deletionsCount;
 
   /// Number of changed files
+  @JsonKey(name: 'changed_files')
   int? changedFilesCount;
 
   /// Pull Request Labels
@@ -119,7 +129,19 @@ class PullRequest {
   List<User>? requestedReviewers;
 
   /// The number of review comments on the Pull Request.
+  @JsonKey(name: 'review_comments')
   int? reviewCommentCount;
+
+  Milestone? milestone;
+
+  bool? rebaseable;
+
+  String? mergeableState;
+
+  bool? maintainerCanModify;
+
+  /// Ex: CONTRIBUTOR, NONE, OWNER
+  String? authorAssociation;
 
   factory PullRequest.fromJson(Map<String, dynamic> input) =>
       _$PullRequestFromJson(input);

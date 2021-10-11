@@ -1,3 +1,20 @@
+## 8.2.0
+ - add more fields to the PullRequest class and fixed JSON naming bugs
+   - Added:
+     - requestedReviewers
+     - reviewCommentCount
+     - milestone
+     - rebaseable
+     - mergeableState
+     - maintainerCanModify
+     - authorAssociation
+   - Fixed (these were previously always null)
+     - commentsCount
+     - commitsCount
+     - additionsCount
+     - deletionsCount
+     - changedFilesCount
+
 ## 8.1.3
  - Add per page parameter to stars related activities https://github.com/SpinlockLabs/github.dart/pull/265
 

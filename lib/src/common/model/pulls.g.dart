@@ -44,11 +44,11 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
     mergedBy: json['merged_by'] == null
         ? null
         : User.fromJson(json['merged_by'] as Map<String, dynamic>),
-    commentsCount: json['comments_count'] as int?,
-    commitsCount: json['commits_count'] as int?,
-    additionsCount: json['additions_count'] as int?,
-    deletionsCount: json['deletions_count'] as int?,
-    changedFilesCount: json['changed_files_count'] as int?,
+    commentsCount: json['comments'] as int?,
+    commitsCount: json['commits'] as int?,
+    additionsCount: json['additions'] as int?,
+    deletionsCount: json['deletions'] as int?,
+    changedFilesCount: json['changed_files'] as int?,
     labels: (json['labels'] as List<dynamic>?)
         ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
         .toList(),
@@ -56,6 +56,13 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) {
         ?.map((e) => User.fromJson(e as Map<String, dynamic>))
         .toList(),
     reviewCommentCount: json['review_comments'] as int?,
+    milestone: json['milestone'] == null
+        ? null
+        : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
+    rebaseable: json['rebaseable'] as bool?,
+    mergeableState: json['mergeable_state'] as String?,
+    maintainerCanModify: json['maintainer_can_modify'] as bool?,
+    authorAssociation: json['author_association'] as String?,
   );
 }
 
@@ -81,14 +88,19 @@ Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
       'merged': instance.merged,
       'mergeable': instance.mergeable,
       'merged_by': instance.mergedBy,
-      'comments_count': instance.commentsCount,
-      'commits_count': instance.commitsCount,
-      'additions_count': instance.additionsCount,
-      'deletions_count': instance.deletionsCount,
-      'changed_files_count': instance.changedFilesCount,
+      'comments': instance.commentsCount,
+      'commits': instance.commitsCount,
+      'additions': instance.additionsCount,
+      'deletions': instance.deletionsCount,
+      'changed_files': instance.changedFilesCount,
       'labels': instance.labels,
       'requested_reviewers': instance.requestedReviewers,
       'review_comments': instance.reviewCommentCount,
+      'milestone': instance.milestone,
+      'rebaseable': instance.rebaseable,
+      'mergeable_state': instance.mergeableState,
+      'maintainer_can_modify': instance.maintainerCanModify,
+      'author_association': instance.authorAssociation,
     };
 
 PullRequestMerge _$PullRequestMergeFromJson(Map<String, dynamic> json) {
