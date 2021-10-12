@@ -124,6 +124,21 @@ class CheckRun {
       startedAt: DateTime.parse(input['started_at']),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'id': id,
+      'external_id': externalId,
+      'status': status,
+      'head_sha': externalId,
+      'check_suite': <String, dynamic>{
+        'id': checkSuiteId,
+      },
+      'details_url': detailsUrl,
+      'started_at': startedAt.toIso8601String(),
+    };
+  }
 }
 
 @immutable
@@ -325,6 +340,7 @@ class CheckRunAction {
   }
 }
 
+/// API docs: https://docs.github.com/en/rest/reference/checks#check-suites
 @immutable
 class CheckSuite {
   final int? id;
@@ -343,6 +359,14 @@ class CheckSuite {
       headSha: input['head_sha'],
       id: input['id'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conclusion': conclusion,
+      'head_sha': headSha,
+      'id': id,
+    };
   }
 }
 
