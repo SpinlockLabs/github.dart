@@ -1,3 +1,6 @@
+## 8.2.1
+- Add `CheckSuiteEvent` and `CheckRunEvent`
+
 ## 8.2.0
  - add more fields to the PullRequest class and fixed JSON naming bugs
    - Added:
