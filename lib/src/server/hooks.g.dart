@@ -6,6 +6,52 @@ part of 'hooks.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+CheckRunEvent _$CheckRunEventFromJson(Map<String, dynamic> json) {
+  return CheckRunEvent(
+    action: json['action'] as String?,
+    checkRun: json['check_run'] == null
+        ? null
+        : CheckRun.fromJson(json['check_run'] as Map<String, dynamic>),
+    sender: json['sender'] == null
+        ? null
+        : User.fromJson(json['sender'] as Map<String, dynamic>),
+    repository: json['repository'] == null
+        ? null
+        : Repository.fromJson(json['repository'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$CheckRunEventToJson(CheckRunEvent instance) =>
+    <String, dynamic>{
+      'check_run': instance.checkRun,
+      'action': instance.action,
+      'sender': instance.sender,
+      'repository': instance.repository,
+    };
+
+CheckSuiteEvent _$CheckSuiteEventFromJson(Map<String, dynamic> json) {
+  return CheckSuiteEvent(
+    action: json['action'] as String?,
+    checkSuite: json['check_suite'] == null
+        ? null
+        : CheckSuite.fromJson(json['check_suite'] as Map<String, dynamic>),
+    repository: json['repository'] == null
+        ? null
+        : Repository.fromJson(json['repository'] as Map<String, dynamic>),
+    sender: json['sender'] == null
+        ? null
+        : User.fromJson(json['sender'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$CheckSuiteEventToJson(CheckSuiteEvent instance) =>
+    <String, dynamic>{
+      'action': instance.action,
+      'check_suite': instance.checkSuite,
+      'repository': instance.repository,
+      'sender': instance.sender,
+    };
+
 RepositoryEvent _$RepositoryEventFromJson(Map<String, dynamic> json) {
   return RepositoryEvent(
     action: json['action'] as String?,

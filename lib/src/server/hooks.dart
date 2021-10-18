@@ -90,6 +90,43 @@ class UnknownHookEvent extends HookEvent {
 }
 
 @JsonSerializable()
+class CheckRunEvent extends HookEvent {
+  CheckRunEvent({
+    this.action,
+    this.checkRun,
+    this.sender,
+    this.repository,
+  });
+
+  factory CheckRunEvent.fromJson(Map<String, dynamic> input) => _$CheckRunEventFromJson(input);
+  CheckRun? checkRun;
+  String? action;
+  User? sender;
+  Repository? repository;
+
+  Map<String, dynamic> toJson() => _$CheckRunEventToJson(this);
+}
+
+@JsonSerializable()
+class CheckSuiteEvent extends HookEvent {
+  CheckSuiteEvent({
+    this.action,
+    this.checkSuite,
+    this.repository,
+    this.sender,
+  });
+
+  String? action;
+  CheckSuite? checkSuite;
+  Repository? repository;
+  User? sender;
+
+  factory CheckSuiteEvent.fromJson(Map<String, dynamic> input) =>
+      _$CheckSuiteEventFromJson(input);
+  Map<String, dynamic> toJson() => _$CheckSuiteEventToJson(this);
+}
+
+@JsonSerializable()
 class RepositoryEvent extends HookEvent {
   RepositoryEvent({
     this.action,
