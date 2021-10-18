@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'issues.g.dart';
 
 /// Model class for an issue on the tracker.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable()
 class Issue {
   Issue({
     this.id = 0,
