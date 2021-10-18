@@ -6,11 +6,9 @@ part of 'repos_forks.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-CreateFork _$CreateForkFromJson(Map<String, dynamic> json) {
-  return CreateFork(
-    json['organization'] as String?,
-  );
-}
+CreateFork _$CreateForkFromJson(Map<String, dynamic> json) => CreateFork(
+      json['organization'] as String?,
+    );
 
 Map<String, dynamic> _$CreateForkToJson(CreateFork instance) =>
     <String, dynamic>{

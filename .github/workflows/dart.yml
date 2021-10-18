@@ -6,10 +6,10 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
     container:
-      image: dart:2.13
-    
+      image: dart:2.14
+
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
