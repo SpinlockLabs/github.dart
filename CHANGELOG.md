@@ -1,4 +1,7 @@
-## 8.2.2-dev
+## 8.2.2
+- Up minimum json_serializable to ^6.0.0, json_annotation to ^4.3.0
+- Cleanup and regenerate generated files
+- Require Dart SDK 2.14
 
 ## 8.2.1
 - Add `CheckSuiteEvent` and `CheckRunEvent`
