@@ -1,3 +1,5 @@
+## 8.2.2-dev
+
 ## 8.2.1
 - Add `CheckSuiteEvent` and `CheckRunEvent`
 
