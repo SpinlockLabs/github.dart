@@ -1,3 +1,7 @@
+## 8.2.3
+- Added `generateReleaseNotes` boolean to CreateRelase class to have github auto-create release notes
+- Added `generateReleaseNotes` method to RepositoriesService to have github create release notes
+  between to tags (without creating a release) and return the name and body. This is helpful when you want to add the release notes to a CHANGELOG.md before making the actual release
 ## 8.2.2
 - Up minimum json_serializable to ^6.0.0, json_annotation to ^4.3.0
 - Cleanup and regenerate generated files
