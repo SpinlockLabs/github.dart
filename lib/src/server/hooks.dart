@@ -98,7 +98,8 @@ class CheckRunEvent extends HookEvent {
     this.repository,
   });
 
-  factory CheckRunEvent.fromJson(Map<String, dynamic> input) => _$CheckRunEventFromJson(input);
+  factory CheckRunEvent.fromJson(Map<String, dynamic> input) =>
+      _$CheckRunEventFromJson(input);
   CheckRun? checkRun;
   String? action;
   User? sender;

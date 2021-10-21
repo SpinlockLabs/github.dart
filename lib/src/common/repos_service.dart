@@ -1276,4 +1276,20 @@ class RepositoriesService extends Service {
       statusCode: StatusCodes.OK,
     );
   }
+
+  /// Generate a name and body describing a release. The body content will be
+  /// markdown formatted and contain information like the changes since last
+  /// release and users who contributed. The generated release notes are not
+  /// saved anywhere. They are intended to be generated and used when
+  /// creating a new release.
+  ///
+  /// API docs: https://docs.github.com/en/rest/reference/repos#generate-release-notes-content-for-a-release
+  Future<ReleaseNotes> generateReleaseNotes(CreateReleaseNotes crn) async {
+    return github.postJSON<Map<String, dynamic>, ReleaseNotes>(
+      '/repos/${crn.owner}/${crn.repo}/releases/generate-notes',
+      body: GitHubJson.encode(crn),
+      statusCode: StatusCodes.OK,
+      convert: (i) => ReleaseNotes.fromJson(i),
+    );
+  }
 }

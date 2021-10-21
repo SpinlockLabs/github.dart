@@ -99,7 +99,9 @@ CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) =>
       ..name = json['name'] as String?
       ..body = json['body'] as String?
       ..isDraft = json['draft'] as bool?
-      ..isPrerelease = json['prerelease'] as bool?;
+      ..isPrerelease = json['prerelease'] as bool?
+      ..discussionCategoryName = json['discussion_category_name'] as String?
+      ..generateReleaseNotes = json['generate_release_notes'] as bool;
 
 Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
     <String, dynamic>{
@@ -109,4 +111,37 @@ Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
       'body': instance.body,
       'draft': instance.isDraft,
       'prerelease': instance.isPrerelease,
+      'discussion_category_name': instance.discussionCategoryName,
+      'generate_release_notes': instance.generateReleaseNotes,
+    };
+
+ReleaseNotes _$ReleaseNotesFromJson(Map<String, dynamic> json) => ReleaseNotes(
+      json['name'] as String,
+      json['body'] as String,
+    );
+
+Map<String, dynamic> _$ReleaseNotesToJson(ReleaseNotes instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'body': instance.body,
+    };
+
+CreateReleaseNotes _$CreateReleaseNotesFromJson(Map<String, dynamic> json) =>
+    CreateReleaseNotes(
+      json['owner'] as String,
+      json['repo'] as String,
+      json['tag_name'] as String,
+      targetCommitish: json['target_commitish'] as String?,
+      previousTagName: json['previous_tag_name'] as String?,
+      configurationFilePath: json['configuration_file_path'] as String?,
+    );
+
+Map<String, dynamic> _$CreateReleaseNotesToJson(CreateReleaseNotes instance) =>
+    <String, dynamic>{
+      'owner': instance.owner,
+      'repo': instance.repo,
+      'tag_name': instance.tagName,
+      'target_commitish': instance.targetCommitish,
+      'previous_tag_name': instance.previousTagName,
+      'configuration_file_path': instance.configurationFilePath,
     };
