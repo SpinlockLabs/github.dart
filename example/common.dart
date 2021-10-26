@@ -3,8 +3,8 @@ import 'dart:html';
 
 import 'package:github/github.dart';
 
-export 'package:github/github.dart';
 export 'package:github/browser_helper.dart';
+export 'package:github/github.dart';
 
 /// Wires up a listener to a button with an id of view-source,
 /// if it exists, to show the script source

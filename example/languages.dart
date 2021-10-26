@@ -18,7 +18,7 @@ Future<void> loadRepository() async {
   var user = params['user'] ?? 'dart-lang';
   var reponame = params['repo'] ?? 'sdk';
 
-  document.getElementById('name')!.setInnerHtml('$user/$reponame');
+  document.getElementById('name')!.text = '$user/$reponame';
 
   final repo = RepositorySlug(user, reponame);
   breakdown = await github.repositories.listLanguages(repo);
