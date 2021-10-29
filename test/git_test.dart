@@ -178,8 +178,7 @@ void main() {
     test('constructs correct path', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any, any))
-          .thenReturn(Future.value(expectedResponse));
+      when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
