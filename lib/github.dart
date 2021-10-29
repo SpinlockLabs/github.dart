@@ -1,4 +1,5 @@
 export 'package:github/src/common.dart';
+
 /// Do a conditional export of the right cross platform pieces depending on
 /// if dart.html or dart.io is available.
 export 'package:github/src/common/xplat_common.dart'
