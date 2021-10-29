@@ -35,6 +35,7 @@ void reloadTable({int accuracy = 4}) {
   isReloadingTable = true;
   final md = generateMarkdown(accuracy);
   github.misc.renderMarkdown(md).then((html) {
+    // ignore: unsafe_html
     tableDiv!.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
   });
