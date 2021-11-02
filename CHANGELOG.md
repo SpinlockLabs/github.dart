@@ -1,3 +1,6 @@
+## 8.2.4
+- Make CheckRunConclusion nullable
+
 ## 8.2.3
 - Added `generateReleaseNotes` boolean to CreateRelase class to have github auto-create release notes
 - Added `generateReleaseNotes` method to RepositoriesService to have github create release notes

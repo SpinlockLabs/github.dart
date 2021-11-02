@@ -5,17 +5,17 @@ import 'package:meta/meta.dart';
 /// but with a String value that is used for serialization.
 @immutable
 abstract class EnumWithValue {
-  final String value;
+  final String? value;
 
   /// The value will be used when [toJson] or [toString] will be called.
   /// It will also be used to check if two [EnumWithValue] are equal.
   const EnumWithValue(this.value);
 
   @override
-  String toString() => value;
+  String toString() => value ?? 'null';
 
   /// Returns the String value of this.
-  String toJson() => value;
+  String toJson() => value ?? 'null';
 
   /// True iff [other] is an [EnumWithValue] with the same value as this object.
   @override
