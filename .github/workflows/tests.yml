@@ -16,5 +16,7 @@ jobs:
       run: dart format --output=none --set-exit-if-changed .
     - name: Analyze
       run: dart analyze
-    - name: Test
-      run: dart test
+    # - name: Unit tests
+    #   run: dart test test
+    # - name: Integration tests
+    #   run: dart test integration_test
