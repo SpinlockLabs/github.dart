@@ -45,10 +45,14 @@ class CheckRunConclusion extends EnumWithValue {
   static const cancelled = CheckRunConclusion._('cancelled');
   static const timedOut = CheckRunConclusion._('timed_out');
   static const actionRequired = CheckRunConclusion._('action_required');
+  static const empty = CheckRunConclusion._(null);
 
-  const CheckRunConclusion._(String value) : super(value);
+  const CheckRunConclusion._(String? value) : super(value);
 
   factory CheckRunConclusion._fromValue(String? value) {
+    if (value == null) {
+      return empty;
+    }
     for (final level in const [
       success,
       failure,
