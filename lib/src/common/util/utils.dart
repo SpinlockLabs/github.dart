@@ -60,6 +60,7 @@ RepositorySlug slugFromAPIUrl(String url) {
   return RepositorySlug(parts[0], parts[1]);
 }
 
+// ignore: avoid_classes_with_only_static_members
 abstract class StatusCodes {
   static const int OK = 200;
   static const int CREATED = 201;

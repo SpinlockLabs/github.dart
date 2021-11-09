@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockGitHub extends Mock implements GitHub {}
+import 'src/mocks.mocks.dart';
 
 void main() {
   late MockGitHub github;
@@ -137,7 +137,7 @@ void main() {
       // given
       final expectedResponse = http.Response('{}', 200);
 
-      when(github.request(any!, any!, body: any, headers: any))
+      when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
       // when
@@ -151,7 +151,7 @@ void main() {
     test('creates valid JSON body', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any!, any!, body: any, headers: any))
+      when(github.request(any, any, body: any, headers: any))
           .thenReturn(Future.value(expectedResponse));
 
       // when
@@ -159,8 +159,8 @@ void main() {
 
       // then
       final captured = verify(github.request(
-        any!,
-        any!,
+        any,
+        any,
         body: captureAny,
         headers: captureAny,
       )).captured;
@@ -178,8 +178,7 @@ void main() {
     test('constructs correct path', () {
       // given
       final expectedResponse = http.Response('{}', 200);
-      when(github.request(any!, any!))
-          .thenReturn(Future.value(expectedResponse));
+      when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
 
       // when
       git.deleteReference(repo, 'heads/b');
@@ -300,7 +299,7 @@ void main() {
 
 Map<String, dynamic>? captureSentBody(MockGitHub github) {
   final bodyString = verify(github.postJSON(
-    any!,
+    any,
     convert: any,
     statusCode: any,
     body: captureAny,

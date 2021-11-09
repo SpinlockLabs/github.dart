@@ -1,3 +1,4 @@
+import 'package:github/src/common/model/pulls.dart';
 import 'package:github/src/common/util/utils.dart';
 import 'package:meta/meta.dart';
 
@@ -350,18 +351,26 @@ class CheckSuite {
   final int? id;
   final String? headSha;
   final CheckRunConclusion conclusion;
+  final List<PullRequest> pullRequests;
 
   const CheckSuite({
     required this.conclusion,
     required this.headSha,
     required this.id,
+    required this.pullRequests,
   });
 
   factory CheckSuite.fromJson(Map<String, dynamic> input) {
+    var pullRequestsJson = input['pull_requests'] as List<dynamic>;
+    var pullRequests = pullRequestsJson
+        .map((dynamic json) =>
+            PullRequest.fromJson(json as Map<String, dynamic>))
+        .toList();
     return CheckSuite(
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),
       headSha: input['head_sha'],
       id: input['id'],
+      pullRequests: pullRequests,
     );
   }
 
