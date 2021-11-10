@@ -1,3 +1,7 @@
+## 8.2.5
+- no library code changes
+- Add auto pub publish on new releases
+
 ## 8.2.4
 - Make CheckRunConclusion nullable
 
