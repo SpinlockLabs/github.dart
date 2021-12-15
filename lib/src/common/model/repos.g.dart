@@ -13,6 +13,9 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) =>
       json['ahead_by'] as int?,
       json['behind_by'] as int?,
       json['total_commits'] as int?,
+      (json['files'] as List<dynamic>?)
+          ?.map((e) => CommitFile.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
