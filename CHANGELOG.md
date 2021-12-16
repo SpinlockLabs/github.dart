@@ -1,4 +1,4 @@
-## 8.2.6
+## 8.3.0
 - Support `files` field in class `GitHubComparison`
 
 ## 8.2.5
