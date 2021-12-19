@@ -1,3 +1,6 @@
+## 8.4.0
+- added `updateComment` to update issue comments https://github.com/SpinlockLabs/github.dart/pull/286
+
 ## 8.3.0
 - Support `files` field in class `GitHubComparison`
 
