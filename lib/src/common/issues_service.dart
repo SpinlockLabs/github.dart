@@ -251,7 +251,18 @@ class IssuesService extends Service {
     );
   }
 
-  // TODO: Implement editComment: https://developer.github.com/v3/issues/comments/#edit-a-comment
+  /// Update an issue comment.
+  ///
+  /// API docs: https://docs.github.com/en/rest/reference/issues#update-an-issue-comment
+  Future<IssueComment> updateComment(RepositorySlug slug, int id, String body) {
+    final it = GitHubJson.encode({'body': body});
+    return github.postJSON(
+      '/repos/${slug.fullName}/issues/comments/$id',
+      body: it,
+      convert: (dynamic i) => IssueComment.fromJson(i),
+      statusCode: StatusCodes.OK,
+    );
+  }
 
   /// Deletes an issue comment.
   ///
