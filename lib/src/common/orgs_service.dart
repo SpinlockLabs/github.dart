@@ -238,6 +238,14 @@ class OrganizationsService extends Service {
         .objects('GET', '/user/teams', (dynamic i) => Team.fromJson(i));
   }
 
+  /// Lists all of the users in an organization
+  ///
+  /// API docs: https://developer.github.com/v3/orgs/teams/#list-user-teams
+  Stream<User> listUsers(String org) {
+    return PaginationHelper(github)
+        .objects('GET', '/orgs/$org/members', (dynamic i) => User.fromJson(i));
+  }
+
   /// Lists the hooks for the specified organization.
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks

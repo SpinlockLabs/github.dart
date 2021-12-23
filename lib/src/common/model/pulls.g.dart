@@ -62,7 +62,9 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) => PullRequest(
       mergeableState: json['mergeable_state'] as String? ?? '',
       maintainerCanModify: json['maintainer_can_modify'] as bool? ?? false,
       authorAssociation: json['author_association'] as String? ?? '',
-    );
+    )..repo = json['repo'] == null
+        ? null
+        : Repository.fromJson(json['repo'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
     <String, dynamic>{
@@ -99,6 +101,7 @@ Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
       'mergeable_state': instance.mergeableState,
       'maintainer_can_modify': instance.maintainerCanModify,
       'author_association': instance.authorAssociation,
+      'repo': instance.repo,
     };
 
 PullRequestMerge _$PullRequestMergeFromJson(Map<String, dynamic> json) =>
@@ -243,4 +246,52 @@ Map<String, dynamic> _$PullRequestFileToJson(PullRequestFile instance) =>
       'raw_url': instance.rawUrl,
       'contents_url': instance.contentsUrl,
       'patch': instance.patch,
+    };
+
+PullRequestReview _$PullRequestReviewFromJson(Map<String, dynamic> json) =>
+    PullRequestReview(
+      id: json['id'] as int,
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      body: json['body'] as String?,
+      state: json['state'] as String?,
+      htmlUrl: json['html_url'] as String?,
+      pullRequestUrl: json['pull_request_url'] as String?,
+    )
+      ..submittedAt = json['submitted_at'] == null
+          ? null
+          : DateTime.parse(json['submitted_at'] as String)
+      ..authorAssociation = json['author_association'] as String?
+      ..commitId = json['commit_id'] as String?;
+
+Map<String, dynamic> _$PullRequestReviewToJson(PullRequestReview instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'user': instance.user,
+      'body': instance.body,
+      'state': instance.state,
+      'html_url': instance.htmlUrl,
+      'pull_request_url': instance.pullRequestUrl,
+      'submitted_at': instance.submittedAt?.toIso8601String(),
+      'author_association': instance.authorAssociation,
+      'commit_id': instance.commitId,
+    };
+
+CreatePullRequestReview _$CreatePullRequestReviewFromJson(
+        Map<String, dynamic> json) =>
+    CreatePullRequestReview(
+      json['owner'] as String,
+      json['repo'] as String,
+      json['pull_number'] as int,
+      json['event'] as String,
+      body: json['body'] as String?,
+    );
+
+Map<String, dynamic> _$CreatePullRequestReviewToJson(
+        CreatePullRequestReview instance) =>
+    <String, dynamic>{
+      'owner': instance.owner,
+      'repo': instance.repo,
+      'event': instance.event,
+      'body': instance.body,
+      'pull_number': instance.pullNumber,
     };

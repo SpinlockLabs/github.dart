@@ -100,6 +100,16 @@ class PullRequestsService extends Service {
         (dynamic i) => PullRequestFile.fromJson(i));
   }
 
+  /// Lists the reviews for a pull request.
+  ///
+  /// API docs: https://docs.github.com/en/rest/reference/pulls#list-reviews-for-a-pull-request
+  Stream<PullRequestReview> listReviews(RepositorySlug slug, int number) {
+    return PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/pulls/$number/reviews',
+        (dynamic i) => PullRequestReview.fromJson(i));
+  }
+
   Future<bool> isMerged(RepositorySlug slug, int number) {
     return github
         .request('GET', '/repos/${slug.fullName}/pulls/$number/merge')
@@ -165,4 +175,16 @@ class PullRequestsService extends Service {
 
   // TODO: Implement editComment: https://developer.github.com/v3/pulls/comments/#edit-a-comment
   // TODO: Implement deleteComment: https://developer.github.com/v3/pulls/comments/#delete-a-comment
+
+  /// Creates a new pull request comment.
+  ///
+  /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment
+  Future<PullRequestReview> createReview(
+      RepositorySlug slug, CreatePullRequestReview review) {
+    return github.postJSON(
+            '/repos/${slug.fullName}/pulls/${review.pullNumber}/reviews',
+            body: GitHubJson.encode(review),
+            convert: (dynamic i) => PullRequestReview.fromJson(i))
+        as Future<PullRequestReview>;
+  }
 }

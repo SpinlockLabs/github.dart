@@ -143,6 +143,8 @@ class PullRequest {
   /// Ex: CONTRIBUTOR, NONE, OWNER
   String? authorAssociation;
 
+  Repository? repo;
+
   factory PullRequest.fromJson(Map<String, dynamic> input) =>
       _$PullRequestFromJson(input);
   Map<String, dynamic> toJson() => _$PullRequestToJson(this);
@@ -297,3 +299,45 @@ class PullRequestFile {
       _$PullRequestFileFromJson(input);
   Map<String, dynamic> toJson() => _$PullRequestFileToJson(this);
 }
+
+@JsonSerializable()
+class PullRequestReview {
+  PullRequestReview(
+      {required this.id,
+      required this.user,
+      this.body,
+      this.state,
+      this.htmlUrl,
+      this.pullRequestUrl});
+  int id;
+  User user;
+  String? body;
+  String? state;
+  String? htmlUrl;
+  String? pullRequestUrl;
+  DateTime? submittedAt;
+  String? authorAssociation;
+  String? commitId;
+
+  factory PullRequestReview.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestReviewFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestReviewToJson(this);
+}
+
+@JsonSerializable()
+class CreatePullRequestReview {
+  CreatePullRequestReview(this.owner, this.repo, this.pullNumber, this.event,
+      {this.body});
+
+  String owner;
+  String repo;
+  String event;
+  String? body;
+  int pullNumber;
+  // TODO List<PullRequestReviewComment> comments;
+
+  factory CreatePullRequestReview.fromJson(Map<String, dynamic> input) =>
+      _$CreatePullRequestReviewFromJson(input);
+  Map<String, dynamic> toJson() => _$CreatePullRequestReviewToJson(this);
+}
+// TODO  PullRequestReviewComment https://docs.github.com/en/rest/reference/pulls#create-a-review-for-a-pull-request
