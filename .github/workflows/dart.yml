@@ -1,4 +1,4 @@
-name: Dart CI
+name: Dart Checks (analyze,format,publishable)
 
 on: [push]
 
