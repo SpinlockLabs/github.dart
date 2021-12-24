@@ -1,3 +1,10 @@
+## 8.5.0
+
+* Adds listing and creating PR Reviews, listing users in an org by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/287
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.4.0...8.5.0
+
 ## 8.4.0
 - added `updateComment` to update issue comments https://github.com/SpinlockLabs/github.dart/pull/286
 
