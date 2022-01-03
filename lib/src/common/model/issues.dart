@@ -17,6 +17,7 @@ class Issue {
     this.user,
     List<IssueLabel>? labels,
     this.assignee,
+    this.assignees,
     this.milestone,
     this.commentsCount = 0,
     this.pullRequest,
@@ -58,6 +59,9 @@ class Issue {
   /// The User that the issue is assigned to
   User? assignee;
 
+  /// The User that the issue is assigned to
+  List<User>? assignees;
+
   /// The Milestone
   Milestone? milestone;
 
@@ -97,12 +101,14 @@ class IssueRequest {
       this.body,
       this.labels,
       this.assignee,
+      this.assignees,
       this.state,
       this.milestone});
   String? title;
   String? body;
   List<String>? labels;
   String? assignee;
+  List<String>? assignees;
   String? state;
   int? milestone;
 

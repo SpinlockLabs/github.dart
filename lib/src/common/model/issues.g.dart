@@ -23,6 +23,9 @@ Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
       assignee: json['assignee'] == null
           ? null
           : User.fromJson(json['assignee'] as Map<String, dynamic>),
+      assignees: (json['assignees'] as List<dynamic>?)
+          ?.map((e) => User.fromJson(e as Map<String, dynamic>))
+          .toList(),
       milestone: json['milestone'] == null
           ? null
           : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
@@ -56,6 +59,7 @@ Map<String, dynamic> _$IssueToJson(Issue instance) => <String, dynamic>{
       'user': instance.user,
       'labels': instance.labels,
       'assignee': instance.assignee,
+      'assignees': instance.assignees,
       'milestone': instance.milestone,
       'comments': instance.commentsCount,
       'pull_request': instance.pullRequest,
@@ -72,6 +76,9 @@ IssueRequest _$IssueRequestFromJson(Map<String, dynamic> json) => IssueRequest(
       labels:
           (json['labels'] as List<dynamic>?)?.map((e) => e as String).toList(),
       assignee: json['assignee'] as String?,
+      assignees: (json['assignees'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       state: json['state'] as String?,
       milestone: json['milestone'] as int?,
     );
@@ -82,6 +89,7 @@ Map<String, dynamic> _$IssueRequestToJson(IssueRequest instance) =>
       'body': instance.body,
       'labels': instance.labels,
       'assignee': instance.assignee,
+      'assignees': instance.assignees,
       'state': instance.state,
       'milestone': instance.milestone,
     };
