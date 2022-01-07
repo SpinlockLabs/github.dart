@@ -56,6 +56,13 @@ OrganizationMembership _$OrganizationMembershipFromJson(
           : Organization.fromJson(json['organization'] as Map<String, dynamic>),
     );
 
+Map<String, dynamic> _$OrganizationMembershipToJson(
+        OrganizationMembership instance) =>
+    <String, dynamic>{
+      'state': instance.state,
+      'organization': instance.organization,
+    };
+
 Team _$TeamFromJson(Map<String, dynamic> json) => Team(
       name: json['name'] as String?,
       id: json['id'] as int?,
@@ -67,6 +74,15 @@ Team _$TeamFromJson(Map<String, dynamic> json) => Team(
           : Organization.fromJson(json['organization'] as Map<String, dynamic>),
     );
 
+Map<String, dynamic> _$TeamToJson(Team instance) => <String, dynamic>{
+      'name': instance.name,
+      'id': instance.id,
+      'permission': instance.permission,
+      'members_count': instance.membersCount,
+      'repos_count': instance.reposCount,
+      'organization': instance.organization,
+    };
+
 TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) => TeamMember(
       login: json['login'] as String?,
       id: json['id'] as int?,
@@ -75,3 +91,13 @@ TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) => TeamMember(
       siteAdmin: json['site_admin'] as bool?,
       htmlUrl: json['html_url'] as String?,
     );
+
+Map<String, dynamic> _$TeamMemberToJson(TeamMember instance) =>
+    <String, dynamic>{
+      'login': instance.login,
+      'id': instance.id,
+      'avatar_url': instance.avatarUrl,
+      'type': instance.type,
+      'site_admin': instance.siteAdmin,
+      'html_url': instance.htmlUrl,
+    };

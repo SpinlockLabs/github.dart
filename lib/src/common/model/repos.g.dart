@@ -18,6 +18,16 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
+Map<String, dynamic> _$GitHubComparisonToJson(GitHubComparison instance) =>
+    <String, dynamic>{
+      'url': instance.url,
+      'status': instance.status,
+      'ahead_by': instance.aheadBy,
+      'behind_by': instance.behindBy,
+      'total_commits': instance.totalCommits,
+      'files': instance.files,
+    };
+
 Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       name: json['name'] as String? ?? '',
       id: json['id'] as int? ?? 0,
@@ -126,6 +136,13 @@ Tag _$TagFromJson(Map<String, dynamic> json) => Tag(
       json['zipball_url'] as String,
       json['tarball_url'] as String,
     );
+
+Map<String, dynamic> _$TagToJson(Tag instance) => <String, dynamic>{
+      'name': instance.name,
+      'commit': instance.commit,
+      'zipball_url': instance.zipUrl,
+      'tarball_url': instance.tarUrl,
+    };
 
 CommitData _$CommitDataFromJson(Map<String, dynamic> json) => CommitData(
       json['sha'] as String?,

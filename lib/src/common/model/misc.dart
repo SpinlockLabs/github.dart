@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'misc.g.dart';
 
 /// Model class for a Gitignore Template.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class GitignoreTemplate {
   GitignoreTemplate({this.name, this.source});
 
@@ -15,6 +15,7 @@ class GitignoreTemplate {
 
   factory GitignoreTemplate.fromJson(Map<String, dynamic> input) =>
       _$GitignoreTemplateFromJson(input);
+  Map<String, dynamic> toJson() => _$GitignoreTemplateToJson(this);
 }
 
 /// Model class for GitHub Rate Limit Information.

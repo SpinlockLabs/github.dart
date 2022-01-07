@@ -16,9 +16,9 @@ Gist _$GistFromJson(Map<String, dynamic> json) => Gist(
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      files: (json['files'] as List<dynamic>?)
-          ?.map((e) => GistFile.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      files: (json['files'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, GistFile.fromJson(e as Map<String, dynamic>)),
+      ),
       htmlUrl: json['html_url'] as String?,
       commentsCount: json['comments'] as int?,
       gitPullUrl: json['git_pull_url'] as String?,
@@ -31,8 +31,23 @@ Gist _$GistFromJson(Map<String, dynamic> json) => Gist(
           : DateTime.parse(json['updated_at'] as String),
     );
 
+Map<String, dynamic> _$GistToJson(Gist instance) => <String, dynamic>{
+      'id': instance.id,
+      'description': instance.description,
+      'public': instance.public,
+      'owner': instance.owner,
+      'user': instance.user,
+      'files': instance.files,
+      'html_url': instance.htmlUrl,
+      'comments': instance.commentsCount,
+      'git_pull_url': instance.gitPullUrl,
+      'git_push_url': instance.gitPushUrl,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+    };
+
 GistFile _$GistFileFromJson(Map<String, dynamic> json) => GistFile(
-      name: json['name'] as String?,
+      filename: json['filename'] as String?,
       size: json['size'] as int?,
       rawUrl: json['raw_url'] as String?,
       type: json['type'] as String?,
@@ -40,6 +55,16 @@ GistFile _$GistFileFromJson(Map<String, dynamic> json) => GistFile(
       truncated: json['truncated'] as bool?,
       content: json['content'] as String?,
     );
+
+Map<String, dynamic> _$GistFileToJson(GistFile instance) => <String, dynamic>{
+      'filename': instance.filename,
+      'size': instance.size,
+      'raw_url': instance.rawUrl,
+      'type': instance.type,
+      'language': instance.language,
+      'truncated': instance.truncated,
+      'content': instance.content,
+    };
 
 GistFork _$GistForkFromJson(Map<String, dynamic> json) => GistFork(
       user: json['user'] == null
@@ -54,6 +79,13 @@ GistFork _$GistForkFromJson(Map<String, dynamic> json) => GistFork(
           : DateTime.parse(json['updated_at'] as String),
     );
 
+Map<String, dynamic> _$GistForkToJson(GistFork instance) => <String, dynamic>{
+      'user': instance.user,
+      'id': instance.id,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
+    };
+
 GistHistoryEntry _$GistHistoryEntryFromJson(Map<String, dynamic> json) =>
     GistHistoryEntry(
       version: json['version'] as String?,
@@ -67,6 +99,16 @@ GistHistoryEntry _$GistHistoryEntryFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['committed_at'] as String),
     );
+
+Map<String, dynamic> _$GistHistoryEntryToJson(GistHistoryEntry instance) =>
+    <String, dynamic>{
+      'version': instance.version,
+      'user': instance.user,
+      'change_status/deletions': instance.deletions,
+      'change_status/additions': instance.additions,
+      'change_status/total': instance.totalChanges,
+      'committed_at': instance.committedAt?.toIso8601String(),
+    };
 
 GistComment _$GistCommentFromJson(Map<String, dynamic> json) => GistComment(
       id: json['id'] as int?,

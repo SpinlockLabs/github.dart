@@ -27,6 +27,19 @@ Notification _$NotificationFromJson(Map<String, dynamic> json) => Notification(
       subscriptionUrl: json['subscription_url'] as String?,
     );
 
+Map<String, dynamic> _$NotificationToJson(Notification instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'repository': instance.repository,
+      'subject': instance.subject,
+      'reason': instance.reason,
+      'unread': instance.unread,
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'last_read_at': instance.lastReadAt?.toIso8601String(),
+      'url': instance.url,
+      'subscription_url': instance.subscriptionUrl,
+    };
+
 NotificationSubject _$NotificationSubjectFromJson(Map<String, dynamic> json) =>
     NotificationSubject(
       title: json['title'] as String?,
@@ -34,3 +47,12 @@ NotificationSubject _$NotificationSubjectFromJson(Map<String, dynamic> json) =>
       url: json['url'] as String?,
       latestCommentUrl: json['latest_comment_url'] as String?,
     );
+
+Map<String, dynamic> _$NotificationSubjectToJson(
+        NotificationSubject instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'type': instance.type,
+      'url': instance.url,
+      'latest_comment_url': instance.latestCommentUrl,
+    };

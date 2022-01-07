@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'gists.g.dart';
 
 /// Model class for gists.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Gist {
   Gist({
     this.id,
@@ -26,7 +26,7 @@ class Gist {
   bool? public;
   User? owner;
   User? user;
-  List<GistFile>? files;
+  Map<String, GistFile>? files;
 
   @JsonKey(name: 'html_url')
   String? htmlUrl;
@@ -50,10 +50,10 @@ class Gist {
 }
 
 /// Model class for a gist file.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class GistFile {
   GistFile({
-    this.name,
+    this.filename,
     this.size,
     this.rawUrl,
     this.type,
@@ -61,10 +61,9 @@ class GistFile {
     this.truncated,
     this.content,
   });
-  String? name;
-  int? size;
 
-  @JsonKey(name: 'raw_url')
+  String? filename;
+  int? size;
   String? rawUrl;
   String? type;
   String? language;
@@ -73,10 +72,11 @@ class GistFile {
 
   factory GistFile.fromJson(Map<String, dynamic> input) =>
       _$GistFileFromJson(input);
+  Map<String, dynamic> toJson() => _$GistFileToJson(this);
 }
 
 /// Model class for a gist fork.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class GistFork {
   GistFork({this.user, this.id, this.createdAt, this.updatedAt});
   User? user;
@@ -93,7 +93,7 @@ class GistFork {
 }
 
 /// Model class for a gits history entry.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class GistHistoryEntry {
   GistHistoryEntry({
     this.version,

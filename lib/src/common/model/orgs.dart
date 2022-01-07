@@ -82,7 +82,7 @@ class Organization {
 }
 
 /// Model class for organization membership.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class OrganizationMembership {
   OrganizationMembership({
     this.state,
@@ -94,10 +94,11 @@ class OrganizationMembership {
   factory OrganizationMembership.fromJson(Map<String, dynamic> input) {
     return _$OrganizationMembershipFromJson(input);
   }
+  Map<String, dynamic> toJson() => _$OrganizationMembershipToJson(this);
 }
 
 /// Model class for a GitHub team.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Team {
   Team({
     this.name,
@@ -131,6 +132,7 @@ class Team {
   factory Team.fromJson(Map<String, dynamic> input) {
     return _$TeamFromJson(input);
   }
+  Map<String, dynamic> toJson() => _$TeamToJson(this);
 }
 
 /// Model class for the team membership state.
@@ -145,7 +147,7 @@ class TeamMembershipState {
 }
 
 /// Model class for a team member.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class TeamMember {
   TeamMember(
       {this.login,
@@ -179,4 +181,5 @@ class TeamMember {
   factory TeamMember.fromJson(Map<String, dynamic> input) {
     return _$TeamMemberFromJson(input);
   }
+  Map<String, dynamic> toJson() => _$TeamMemberToJson(this);
 }
