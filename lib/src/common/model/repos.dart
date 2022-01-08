@@ -213,7 +213,7 @@ class Tag {
 
   factory Tag.fromJson(Map<String, dynamic> input) => _$TagFromJson(input);
   Map<String, dynamic> toJson() => _$TagToJson(this);
-  
+
   @override
   String toString() => 'Tag: $name';
 }

@@ -58,6 +58,7 @@ class CodeSearchItem {
     }
     return result;
   }
+
   Map<String, dynamic> toJson() => _$CodeSearchItemToJson(this);
 }
 
