@@ -1,3 +1,20 @@
+## 9.0.0
+
+**Breaking change:** In the Gist class, the old type of files was
+```dart
+List<GistFile>? files;
+```
+and the new type is
+```dart
+Map<String, GistFile>? files;
+```
+
+**Breaking change:** In the GistFile class, the name property is now filename
+
+* Fix getting gists by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/294
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.5.0...9.0.0
+
 ## 8.5.0
 
 * Adds listing and creating PR Reviews, listing users in an org by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/287
