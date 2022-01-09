@@ -47,6 +47,7 @@ class Gist {
   DateTime? updatedAt;
 
   factory Gist.fromJson(Map<String, dynamic> input) => _$GistFromJson(input);
+  Map<String, dynamic> toJson() => _$GistToJson(this);
 }
 
 /// Model class for a gist file.
@@ -90,6 +91,7 @@ class GistFork {
 
   factory GistFork.fromJson(Map<String, dynamic> input) =>
       _$GistForkFromJson(input);
+  Map<String, dynamic> toJson() => _$GistForkToJson(this);
 }
 
 /// Model class for a gits history entry.
@@ -121,6 +123,7 @@ class GistHistoryEntry {
 
   factory GistHistoryEntry.fromJson(Map<String, dynamic> input) =>
       _$GistHistoryEntryFromJson(input);
+  Map<String, dynamic> toJson() => _$GistHistoryEntryToJson(this);
 }
 
 /// Model class for gist comments.
