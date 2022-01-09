@@ -12,6 +12,12 @@ GitignoreTemplate _$GitignoreTemplateFromJson(Map<String, dynamic> json) =>
       source: json['source'] as String?,
     );
 
+Map<String, dynamic> _$GitignoreTemplateToJson(GitignoreTemplate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'source': instance.source,
+    };
+
 RateLimit _$RateLimitFromJson(Map<String, dynamic> json) => RateLimit(
       json['limit'] as int?,
       json['remaining'] as int?,

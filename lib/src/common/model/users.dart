@@ -96,9 +96,7 @@ class User {
 
 /// The response from listing collaborators on a repo.
 // https://developer.github.com/v3/repos/collaborators/#response
-@JsonSerializable(
-  createToJson: false,
-)
+@JsonSerializable()
 class Collaborator {
   final String? login;
   final int? id;
@@ -118,6 +116,7 @@ class Collaborator {
 
   factory Collaborator.fromJson(Map<String, dynamic> json) =>
       _$CollaboratorFromJson(json);
+  Map<String, dynamic> toJson() => _$CollaboratorToJson(this);
 }
 
 /// The response from listing contributors on a repo.

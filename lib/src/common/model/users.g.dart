@@ -64,6 +64,16 @@ Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) => Collaborator(
       ),
     );
 
+Map<String, dynamic> _$CollaboratorToJson(Collaborator instance) =>
+    <String, dynamic>{
+      'login': instance.login,
+      'id': instance.id,
+      'html_url': instance.htmlUrl,
+      'type': instance.type,
+      'site_admin': instance.siteAdmin,
+      'permissions': instance.permissions,
+    };
+
 Contributor _$ContributorFromJson(Map<String, dynamic> json) => Contributor(
       id: json['id'] as int?,
       login: json['login'] as String?,

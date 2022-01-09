@@ -3,9 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'repos.g.dart';
 
-@JsonSerializable(
-  createToJson: false,
-)
+@JsonSerializable()
 class GitHubComparison {
   final String? url;
   final String? status;
@@ -19,6 +17,7 @@ class GitHubComparison {
 
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);
+  Map<String, dynamic> toJson() => _$GitHubComparisonToJson(this);
 
   @override
   String toString() {
@@ -201,7 +200,7 @@ class RepositoryPermissions {
   Map<String, dynamic> toJson() => _$RepositoryPermissionsToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Tag {
   final String name;
   final CommitInfo commit;
@@ -213,6 +212,7 @@ class Tag {
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 
   factory Tag.fromJson(Map<String, dynamic> input) => _$TagFromJson(input);
+  Map<String, dynamic> toJson() => _$TagToJson(this);
 
   @override
   String toString() => 'Tag: $name';
