@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:github/src/common.dart';
 import 'package:meta/meta.dart';
 

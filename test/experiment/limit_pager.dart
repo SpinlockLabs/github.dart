@@ -5,8 +5,8 @@ void main() {
   print(solve(201));
 }
 
-const int MAX_PER_PAGE = 100;
-const int ACCURACY_RANGE = 5;
+const int maxPerPage = 100;
+const int accuracyRange = 5;
 
 /// Solves the most efficient way to fetch the number of objects [limit] with the least requests.
 PaginationInformation solve(int limit) {
@@ -14,12 +14,12 @@ PaginationInformation solve(int limit) {
     throw RangeError('limit cannot be less than zero (was $limit)');
   }
 
-  if (limit < MAX_PER_PAGE) {
+  if (limit < maxPerPage) {
     return PaginationInformation(limit, 1, limit);
   }
 
-  if ((limit % MAX_PER_PAGE) == 0) {
-    return PaginationInformation(limit, limit ~/ MAX_PER_PAGE, MAX_PER_PAGE);
+  if ((limit % maxPerPage) == 0) {
+    return PaginationInformation(limit, limit ~/ maxPerPage, maxPerPage);
   }
 
   const itemsPerPage = 100;

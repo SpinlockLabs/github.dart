@@ -1,3 +1,8 @@
+## 9.0.2-dev
+
+## 9.0.1
+- Add `conclusion` property in class `CheckRun`
+
 ## 9.0.0
 
 **Breaking change:** In the Gist class, the old type of files was
@@ -14,9 +19,6 @@ Map<String, GistFile>? files;
 * Fix getting gists by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/294
 
 **Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.5.0...9.0.0
-
-## 9.0.1
-- Add `conclusion` property in class `CheckRun`
 
 ## 8.5.0
 

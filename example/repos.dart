@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:github/github.dart';
-
 import 'common.dart';
 
 DivElement? repositoriesDiv;
@@ -29,14 +27,14 @@ Future<void> main() async {
     loadRepos();
   });
 
-  sorts.keys.forEach((name) {
+  for (final name in sorts.keys) {
     querySelector('#sort-$name')!.onClick.listen((event) {
       if (_reposCache == null) {
         loadRepos(sorts[name]);
       }
       updateRepos(_reposCache!, sorts[name]);
     });
-  });
+  }
 }
 
 List<Repository>? _reposCache;
