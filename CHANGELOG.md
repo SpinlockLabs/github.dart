@@ -15,6 +15,9 @@ Map<String, GistFile>? files;
 
 **Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.5.0...9.0.0
 
+## 9.0.1
+- Add `conclusion` property in class `CheckRun`
+
 ## 8.5.0
 
 * Adds listing and creating PR Reviews, listing users in an org by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/287
