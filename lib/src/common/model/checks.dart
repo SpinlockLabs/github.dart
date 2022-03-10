@@ -94,7 +94,7 @@ class CheckRun {
   final int? checkSuiteId;
   final String? detailsUrl;
   final DateTime startedAt;
-  final CheckRunConclusion conclusion;
+  final CheckRunConclusion? conclusion;
   final String? slug;
 
   const CheckRun._({
