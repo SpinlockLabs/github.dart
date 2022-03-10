@@ -95,6 +95,7 @@ class CheckRun {
   final String? detailsUrl;
   final DateTime startedAt;
   final CheckRunConclusion conclusion;
+  final String? slug;
 
   const CheckRun._({
     required this.id,
@@ -106,6 +107,7 @@ class CheckRun {
     required this.detailsUrl,
     required this.startedAt,
     required this.conclusion,
+    required this.slug,
   });
 
   factory CheckRun.fromJson(Map<String, dynamic> input) {
@@ -130,6 +132,7 @@ class CheckRun {
       detailsUrl: input['details_url'],
       startedAt: DateTime.parse(input['started_at']),
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),
+      slug: input['app']['slug'],
     );
   }
 
@@ -146,6 +149,7 @@ class CheckRun {
       'details_url': detailsUrl,
       'started_at': startedAt.toIso8601String(),
       'conclusion': conclusion,
+      'slug': slug,
     };
   }
 }

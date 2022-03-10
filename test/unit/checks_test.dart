@@ -104,6 +104,7 @@ void main() {
       expect(checkRun.id, 4);
       expect(checkRun.name, 'mighty_readme');
       expect(checkRun.conclusion, CheckRunConclusion.neutral);
+      expect(checkRun.slug, 'octoapp');
     });
   });
 }
