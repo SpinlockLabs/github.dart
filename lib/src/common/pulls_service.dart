@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:github/src/common.dart';
-import 'package:github/src/common/util/pagination.dart';
-import 'package:github/src/common/util/utils.dart';
 
 /// The [PullRequestsService] handles communication with pull request
 /// methods of the GitHub API.
@@ -182,9 +181,9 @@ class PullRequestsService extends Service {
   Future<PullRequestReview> createReview(
       RepositorySlug slug, CreatePullRequestReview review) {
     return github.postJSON(
-            '/repos/${slug.fullName}/pulls/${review.pullNumber}/reviews',
-            body: GitHubJson.encode(review),
-            convert: (dynamic i) => PullRequestReview.fromJson(i))
-        as Future<PullRequestReview>;
+      '/repos/${slug.fullName}/pulls/${review.pullNumber}/reviews',
+      body: GitHubJson.encode(review),
+      convert: (dynamic i) => PullRequestReview.fromJson(i),
+    );
   }
 }

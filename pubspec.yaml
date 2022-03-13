@@ -1,5 +1,5 @@
 name: github
-version: 9.0.1
+version: 9.0.2
 description: A high-level GitHub API Client Library that uses Github's v3 API
 homepage: https://github.com/SpinlockLabs/github.dart
 
@@ -18,7 +18,7 @@ dev_dependencies:
   build_test: any
   build_web_compilers: any
   json_serializable: ^6.0.0
+  lints: ^1.0.0
   mockito: ^5.0.0
-  pedantic: ^1.10.0
   test: ^1.16.0
   yaml: ^3.0.0

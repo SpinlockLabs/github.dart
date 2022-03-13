@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:github/src/common.dart';
-import 'package:github/src/common/util/pagination.dart';
 
 /// The [GistsService] handles communication with gist
 /// methods of the GitHub API.

@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:github/src/common.dart';
-import 'package:github/src/common/model/users.dart';
-import 'package:github/src/common/util/pagination.dart';
 
 /// The [IssuesService] handles communication with issues related methods of the
 /// GitHub API.

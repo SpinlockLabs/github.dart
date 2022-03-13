@@ -309,8 +309,8 @@ class RepositorySlug {
   String get fullName => '$owner/$name';
 
   @override
-  bool operator ==(Object obj) =>
-      obj is RepositorySlug && obj.fullName == fullName;
+  bool operator ==(Object other) =>
+      other is RepositorySlug && other.fullName == fullName;
 
   @override
   int get hashCode => fullName.hashCode;

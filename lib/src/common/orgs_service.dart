@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:github/src/common.dart';
-import 'package:github/src/common/util/pagination.dart';
-import 'package:github/src/common/util/utils.dart';
 import 'package:http/http.dart' as http;
 
 /// The [OrganizationsService] handles communication with organization

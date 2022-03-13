@@ -1,3 +1,4 @@
+// ignore: constant_identifier_names
 const List<String> COMMON_GITHUB_TOKEN_ENV_KEYS = [
   'GITHUB_ADMIN_TOKEN',
   'GITHUB_DART_TOKEN',

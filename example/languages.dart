@@ -1,6 +1,5 @@
 import 'dart:html';
 
-import 'package:github/github.dart';
 import 'common.dart';
 
 DivElement? tableDiv;
@@ -49,15 +48,17 @@ String generateMarkdown(int accuracy) {
   final total = totalBytes(breakdown);
   final data = breakdown.toList();
 
-  var md = '|Name|Bytes|Percentage|\n';
-  md += '|-----|-----|-----|\n';
+  var md = StringBuffer('''
+|Name|Bytes|Percentage|
+|-----|-----|-----|
+''');
   data.sort((a, b) => b[1].compareTo(a[1]));
 
-  data.forEach((info) {
+  for (final info in data) {
     final String? name = info[0];
     final int bytes = info[1];
     final num percentage = (bytes / total) * 100;
-    md += '|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|\n';
-  });
-  return md;
+    md.writeln('|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|');
+  }
+  return md.toString();
 }
