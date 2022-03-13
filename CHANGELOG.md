@@ -1,4 +1,5 @@
-## 9.0.2-dev
+## 9.0.2
+- Switched to use the lints package instead of pedantic https://github.com/SpinlockLabs/github.dart/pull/301
 
 ## 9.0.1
 - Add `conclusion` property in class `CheckRun`
