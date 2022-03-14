@@ -38,3 +38,12 @@ Pull Request rejections are not a bad thing. It just means you need to fix somet
 ## Becoming a Committer
 
 If you get on IRC and ask us, we can review your work and add you as a committer if we think you should have it.
+
+## Releasing & Publishing
+
+This repo is now configured to release after every PR merge. This means a couple things for PRs that are put up:
+
+1. A semver label is required. A github check will remind you that you need one. Reviewers should check that it is correct.
+2. There is no need to modify the version in the pubspec.yaml in your PRs. The tooling will update the version according to the semver label applied to your PR.
+3. Same thing for the CHANGELOG.md. Tooling will update it automatically after merge.
+4. A github release will be created and published ot pub.dev for you.
