@@ -45,7 +45,6 @@ void main(List<String> args) async {
   }
   print('Semver label: $semverLabel');
 
-
   run('cider bump $semverLabel');
   var newVersion = getVersion();
   print('Current Version: $currentVersion');
@@ -55,15 +54,15 @@ void main(List<String> args) async {
       slug.owner, slug.name, newVersion,
       previousTagName: currentVersion));
 
-  var releaseNotes = rn.body.replaceFirst('## What\'s Changed','');
+  var releaseNotes = rn.body.replaceFirst('## What\'s Changed', '');
   releaseNotes = '## $newVersion\n$releaseNotes';
-  
+
   print(releaseNotes);
 
   var log = File('CHANGELOG.md');
   var logdata = log.existsSync() ? log.readAsStringSync() : '';
   log.writeAsStringSync('${releaseNotes}\n\n$logdata');
-  
+
   run('git add pubspec.yaml CHANGELOG.md');
   run('git', rest: ['commit', '-m', 'prep $newVersion']);
   run('git push');
