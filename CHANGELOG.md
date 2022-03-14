@@ -1,3 +1,10 @@
+## 9.0.3
+
+* Update Language Colors March 13th 2022 by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/302
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.0.2...9.0.3
+
 ## 9.0.2
 - Switched to use the lints package instead of pedantic https://github.com/SpinlockLabs/github.dart/pull/301
 
