@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'authorizations.dart';
 
 // **************************************************************************
@@ -15,8 +17,7 @@ Authorization _$AuthorizationFromJson(Map<String, dynamic> json) =>
       app: json['app'] == null
           ? null
           : AuthorizationApplication.fromJson(
-              json['app'] as Map<String, dynamic>,
-            ),
+              json['app'] as Map<String, dynamic>),
       note: json['note'] as String?,
       noteUrl: json['note_url'] as String?,
       createdAt: json['created_at'] == null
@@ -44,8 +45,7 @@ Map<String, dynamic> _$AuthorizationToJson(Authorization instance) =>
     };
 
 AuthorizationApplication _$AuthorizationApplicationFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     AuthorizationApplication(
       url: json['url'] as String?,
       name: json['name'] as String?,
@@ -53,8 +53,7 @@ AuthorizationApplication _$AuthorizationApplicationFromJson(
     );
 
 Map<String, dynamic> _$AuthorizationApplicationToJson(
-  AuthorizationApplication instance,
-) =>
+        AuthorizationApplication instance) =>
     <String, dynamic>{
       'url': instance.url,
       'name': instance.name,
@@ -72,8 +71,7 @@ CreateAuthorization _$CreateAuthorizationFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$CreateAuthorizationToJson(
-  CreateAuthorization instance,
-) =>
+        CreateAuthorization instance) =>
     <String, dynamic>{
       'note': instance.note,
       'scopes': instance.scopes,

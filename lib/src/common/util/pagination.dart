@@ -130,19 +130,18 @@ class PaginationHelper {
     int statusCode = 200,
     String? preview,
     String? arrayKey,
-  }) {
-    return jsonObjects<S>(
-      method,
-      path,
-      pages: pages,
-      headers: headers,
-      params: params,
-      body: body,
-      statusCode: statusCode,
-      preview: preview,
-      arrayKey: arrayKey,
-    ).map(converter);
-  }
+  }) =>
+      jsonObjects<S>(
+        method,
+        path,
+        pages: pages,
+        headers: headers,
+        params: params,
+        body: body,
+        statusCode: statusCode,
+        preview: preview,
+        arrayKey: arrayKey,
+      ).map(converter);
 }
 
 //TODO(kevmoo): use regex here.

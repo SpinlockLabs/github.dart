@@ -135,21 +135,19 @@ class CheckRun {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'name': name,
-      'id': id,
-      'external_id': externalId,
-      'status': status,
-      'head_sha': externalId,
-      'check_suite': <String, dynamic>{
-        'id': checkSuiteId,
-      },
-      'details_url': detailsUrl,
-      'started_at': startedAt.toIso8601String(),
-      'conclusion': conclusion,
-    };
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'name': name,
+        'id': id,
+        'external_id': externalId,
+        'status': status,
+        'head_sha': externalId,
+        'check_suite': <String, dynamic>{
+          'id': checkSuiteId,
+        },
+        'details_url': detailsUrl,
+        'started_at': startedAt.toIso8601String(),
+        'conclusion': conclusion,
+      };
 }
 
 @immutable
@@ -181,15 +179,13 @@ class CheckRunOutput {
     this.images,
   });
 
-  Map<String, dynamic> toJson() {
-    return createNonNullMap(<String, dynamic>{
-      'title': title,
-      'summary': summary,
-      'text': text,
-      'annotations': annotations?.map((a) => a.toJson()).toList(),
-      'images': images?.map((i) => i.toJson()).toList(),
-    });
-  }
+  Map<String, dynamic> toJson() => createNonNullMap(<String, dynamic>{
+        'title': title,
+        'summary': summary,
+        'text': text,
+        'annotations': annotations?.map((a) => a.toJson()).toList(),
+        'images': images?.map((i) => i.toJson()).toList(),
+      });
 }
 
 @immutable
@@ -268,34 +264,31 @@ class CheckRunAnnotation {
   @override
   int get hashCode => path.hashCode;
 
-  factory CheckRunAnnotation.fromJSON(Map<String, dynamic> input) {
-    return CheckRunAnnotation(
-      path: input['path'],
-      startLine: input['start_line'],
-      endLine: input['end_line'],
-      startColumn: input['start_column'],
-      endColumn: input['end_column'],
-      annotationLevel:
-          CheckRunAnnotationLevel._fromValue(input['annotation_level']),
-      title: input['title'],
-      message: input['message'],
-      rawDetails: input['raw_details'],
-    );
-  }
+  factory CheckRunAnnotation.fromJSON(Map<String, dynamic> input) =>
+      CheckRunAnnotation(
+        path: input['path'],
+        startLine: input['start_line'],
+        endLine: input['end_line'],
+        startColumn: input['start_column'],
+        endColumn: input['end_column'],
+        annotationLevel:
+            CheckRunAnnotationLevel._fromValue(input['annotation_level']),
+        title: input['title'],
+        message: input['message'],
+        rawDetails: input['raw_details'],
+      );
 
-  Map<String, dynamic> toJson() {
-    return createNonNullMap(<String, dynamic>{
-      'path': path,
-      'start_line': startLine,
-      'end_line': endLine,
-      'start_column': startColumn,
-      'end_column': endColumn,
-      'annotation_level': annotationLevel.toString(),
-      'message': message,
-      'title': title,
-      'rax_details': rawDetails,
-    });
-  }
+  Map<String, dynamic> toJson() => createNonNullMap(<String, dynamic>{
+        'path': path,
+        'start_line': startLine,
+        'end_line': endLine,
+        'start_column': startColumn,
+        'end_column': endColumn,
+        'annotation_level': annotationLevel.toString(),
+        'message': message,
+        'title': title,
+        'rax_details': rawDetails,
+      });
 }
 
 @immutable
@@ -315,13 +308,11 @@ class CheckRunImage {
     this.caption,
   });
 
-  Map<String, dynamic> toJson() {
-    return createNonNullMap(<String, dynamic>{
-      'alt': alternativeText,
-      'image_url': imageUrl,
-      'caption': caption,
-    });
-  }
+  Map<String, dynamic> toJson() => createNonNullMap(<String, dynamic>{
+        'alt': alternativeText,
+        'image_url': imageUrl,
+        'caption': caption,
+      });
 }
 
 @immutable
@@ -346,13 +337,11 @@ class CheckRunAction {
         assert(description.length <= 40),
         assert(identifier.length <= 20);
 
-  Map<String, dynamic> toJson() {
-    return createNonNullMap(<String, dynamic>{
-      'label': label,
-      'description': description,
-      'identifier': identifier,
-    });
-  }
+  Map<String, dynamic> toJson() => createNonNullMap(<String, dynamic>{
+        'label': label,
+        'description': description,
+        'identifier': identifier,
+      });
 }
 
 /// API docs: https://docs.github.com/en/rest/reference/checks#check-suites
@@ -385,13 +374,11 @@ class CheckSuite {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'conclusion': conclusion,
-      'head_sha': headSha,
-      'id': id,
-    };
-  }
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'conclusion': conclusion,
+        'head_sha': headSha,
+        'id': id,
+      };
 }
 
 @immutable
@@ -407,12 +394,11 @@ class AutoTriggerChecks {
     this.setting = true,
   });
 
-  factory AutoTriggerChecks.fromJson(Map<String, dynamic> input) {
-    return AutoTriggerChecks(
-      appId: input['app_id'],
-      setting: input['setting'],
-    );
-  }
+  factory AutoTriggerChecks.fromJson(Map<String, dynamic> input) =>
+      AutoTriggerChecks(
+        appId: input['app_id'],
+        setting: input['setting'],
+      );
 
   Map<String, dynamic> toJson() => {'app_id': appId, 'setting': setting};
 }

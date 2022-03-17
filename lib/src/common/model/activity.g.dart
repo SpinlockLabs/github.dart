@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'activity.dart';
 
 // **************************************************************************
@@ -35,8 +37,7 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
     };
 
 RepositorySubscription _$RepositorySubscriptionFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     RepositorySubscription(
       subscribed: json['subscribed'] as bool?,
       ignored: json['ignored'] as bool?,
@@ -47,8 +48,7 @@ RepositorySubscription _$RepositorySubscriptionFromJson(
     );
 
 Map<String, dynamic> _$RepositorySubscriptionToJson(
-  RepositorySubscription instance,
-) =>
+        RepositorySubscription instance) =>
     <String, dynamic>{
       'subscribed': instance.subscribed,
       'ignored': instance.ignored,

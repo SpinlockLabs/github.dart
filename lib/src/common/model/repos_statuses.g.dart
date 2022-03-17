@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'repos_statuses.dart';
 
 // **************************************************************************
@@ -7,8 +9,7 @@ part of 'repos_statuses.dart';
 // **************************************************************************
 
 CombinedRepositoryStatus _$CombinedRepositoryStatusFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     CombinedRepositoryStatus(
       state: json['state'] as String?,
       sha: json['sha'] as String?,
@@ -22,8 +23,7 @@ CombinedRepositoryStatus _$CombinedRepositoryStatusFromJson(
     );
 
 Map<String, dynamic> _$CombinedRepositoryStatusToJson(
-  CombinedRepositoryStatus instance,
-) =>
+        CombinedRepositoryStatus instance) =>
     <String, dynamic>{
       'state': instance.state,
       'sha': instance.sha,

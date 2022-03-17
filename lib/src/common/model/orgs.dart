@@ -91,9 +91,8 @@ class OrganizationMembership {
   final String? state;
   final Organization? organization;
 
-  factory OrganizationMembership.fromJson(Map<String, dynamic> input) {
-    return _$OrganizationMembershipFromJson(input);
-  }
+  factory OrganizationMembership.fromJson(Map<String, dynamic> input) =>
+      _$OrganizationMembershipFromJson(input);
   Map<String, dynamic> toJson() => _$OrganizationMembershipToJson(this);
 }
 
@@ -129,9 +128,7 @@ class Team {
   /// Organization
   final Organization? organization;
 
-  factory Team.fromJson(Map<String, dynamic> input) {
-    return _$TeamFromJson(input);
-  }
+  factory Team.fromJson(Map<String, dynamic> input) => _$TeamFromJson(input);
   Map<String, dynamic> toJson() => _$TeamToJson(this);
 }
 
@@ -179,8 +176,7 @@ class TeamMember {
   @JsonKey(name: 'html_url')
   final String? htmlUrl;
 
-  factory TeamMember.fromJson(Map<String, dynamic> input) {
-    return _$TeamMemberFromJson(input);
-  }
+  factory TeamMember.fromJson(Map<String, dynamic> input) =>
+      _$TeamMemberFromJson(input);
   Map<String, dynamic> toJson() => _$TeamMemberToJson(this);
 }

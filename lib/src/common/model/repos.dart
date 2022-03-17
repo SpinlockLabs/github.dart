@@ -423,9 +423,7 @@ class LanguageBreakdown {
   /// The Primary Language
   String get primary {
     final list = mapToList(_data);
-    list.sort((a, b) {
-      return a.value.compareTo(b.value);
-    });
+    list.sort((a, b) => a.value.compareTo(b.value));
     return list.first.key;
   }
 

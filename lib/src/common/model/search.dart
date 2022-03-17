@@ -45,9 +45,8 @@ class CodeSearchItem {
 
   Repository? repository;
 
-  static CodeSearchItem fromJson(Map<String, dynamic> input) {
-    return _$CodeSearchItemFromJson(input);
-  }
+  static CodeSearchItem fromJson(Map<String, dynamic> input) =>
+      _$CodeSearchItemFromJson(input);
 
   static List<CodeSearchItem> fromJsonList(List<dynamic> input) {
     final result = <CodeSearchItem>[];

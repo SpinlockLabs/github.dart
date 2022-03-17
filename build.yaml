@@ -6,3 +6,7 @@ targets:
           # Options configure how source code is generated for every
           # `@JsonSerializable`-annotated class in the package.
           field_rename: snake
+      source_gen|combining_builder:
+        options:
+          ignore_for_file:
+          - require_trailing_commas

@@ -40,9 +40,8 @@ void reloadTable({int accuracy = 4}) {
   });
 }
 
-int totalBytes(LanguageBreakdown breakdown) {
-  return breakdown.info.values.reduce((a, b) => a + b);
-}
+int totalBytes(LanguageBreakdown breakdown) =>
+    breakdown.info.values.reduce((a, b) => a + b);
 
 String generateMarkdown(int accuracy) {
   final total = totalBytes(breakdown);

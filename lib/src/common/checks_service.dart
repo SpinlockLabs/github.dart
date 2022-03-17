@@ -230,16 +230,15 @@ class _CheckRunsService extends Service {
   Stream<CheckRunAnnotation> listAnnotationsInCheckRun(
     RepositorySlug slug, {
     required CheckRun checkRun,
-  }) {
-    return PaginationHelper(github)
-        .objects<Map<String, dynamic>, CheckRunAnnotation>(
-      'GET',
-      '/repos/${slug.fullName}/check-runs/${checkRun.id}/annotations',
-      CheckRunAnnotation.fromJSON,
-      statusCode: StatusCodes.OK,
-      preview: _previewHeader,
-    );
-  }
+  }) =>
+      PaginationHelper(github)
+          .objects<Map<String, dynamic>, CheckRunAnnotation>(
+        'GET',
+        '/repos/${slug.fullName}/check-runs/${checkRun.id}/annotations',
+        CheckRunAnnotation.fromJSON,
+        statusCode: StatusCodes.OK,
+        preview: _previewHeader,
+      );
 }
 
 class _CheckSuitesService extends Service {

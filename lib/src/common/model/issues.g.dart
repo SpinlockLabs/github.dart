@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'issues.dart';
 
 // **************************************************************************
@@ -30,8 +32,7 @@ Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
       pullRequest: json['pull_request'] == null
           ? null
           : IssuePullRequest.fromJson(
-              json['pull_request'] as Map<String, dynamic>,
-            ),
+              json['pull_request'] as Map<String, dynamic>),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),

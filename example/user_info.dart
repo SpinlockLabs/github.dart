@@ -10,9 +10,8 @@ Future<void> main() async {
   loadUser();
 }
 
-GitHub createClient(String? token) {
-  return GitHub(auth: Authentication.withToken(token));
-}
+GitHub createClient(String? token) =>
+    GitHub(auth: Authentication.withToken(token));
 
 void loadUser() {
   final localToken = document.getElementById('token') as InputElement?;

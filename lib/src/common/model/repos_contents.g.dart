@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'repos_contents.dart';
 
 // **************************************************************************
@@ -23,8 +25,7 @@ GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) => GitHubFile(
       sourceRepository: json['source_repository'] == null
           ? null
           : RepositorySlug.fromJson(
-              json['source_repository'] as Map<String, dynamic>,
-            ),
+              json['source_repository'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$GitHubFileToJson(GitHubFile instance) =>

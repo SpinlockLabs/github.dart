@@ -25,9 +25,8 @@ class MiscService extends Service {
   /// Lists available .gitignore template names.
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
-  Future<List<String>> listGitignoreTemplates() {
-    return github.getJSON('/gitignore/templates') as Future<List<String>>;
-  }
+  Future<List<String>> listGitignoreTemplates() =>
+      github.getJSON('/gitignore/templates') as Future<List<String>>;
 
   /// Gets a .gitignore template by [name].
   /// All template names can be fetched using [listGitignoreTemplates].
@@ -48,19 +47,16 @@ class MiscService extends Service {
     String? input, {
     String mode = 'markdown',
     String? context,
-  }) {
-    return github
-        .request(
-      'POST',
-      '/markdown',
-      body: GitHubJson.encode(
-        {'text': input, 'mode': mode, 'context': context},
-      ),
-    )
-        .then((response) {
-      return response.body;
-    });
-  }
+  }) =>
+      github
+          .request(
+            'POST',
+            '/markdown',
+            body: GitHubJson.encode(
+              {'text': input, 'mode': mode, 'context': context},
+            ),
+          )
+          .then((response) => response.body);
 
   // TODO: Implement renderMarkdownRaw: https://developer.github.com/v3/markdown/#render-a-markdown-document-in-raw-mode
 
@@ -69,11 +65,10 @@ class MiscService extends Service {
   /// Gets API Rate Limit Information
   ///
   /// API docs: https://developer.github.com/v3/rate_limit/
-  Future<RateLimit> getRateLimit() {
-    return github.request('GET', '/rate_limit').then((response) {
-      return RateLimit.fromRateLimitResponse(jsonDecode(response.body));
-    });
-  }
+  Future<RateLimit> getRateLimit() => github.request('GET', '/rate_limit').then(
+        (response) =>
+            RateLimit.fromRateLimitResponse(jsonDecode(response.body)),
+      );
 
   /// Gets the GitHub API Status.
   Future<APIStatus> getApiStatus() => github.getJSON(
@@ -90,9 +85,9 @@ class MiscService extends Service {
       params['s'] = text;
     }
 
-    return github.request('GET', '/octocat', params: params).then((response) {
-      return response.body;
-    });
+    return github
+        .request('GET', '/octocat', params: params)
+        .then((response) => response.body);
   }
 
   /// Returns an ASCII Octocat with some wisdom.

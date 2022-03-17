@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'repos.dart';
 
 // **************************************************************************
@@ -74,8 +76,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       permissions: json['permissions'] == null
           ? null
           : RepositoryPermissions.fromJson(
-              json['permissions'] as Map<String, dynamic>,
-            ),
+              json['permissions'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
@@ -116,8 +117,7 @@ Map<String, dynamic> _$RepositoryToJson(Repository instance) =>
     };
 
 RepositoryPermissions _$RepositoryPermissionsFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     RepositoryPermissions(
       admin: json['admin'] as bool? ?? false,
       push: json['push'] as bool? ?? false,
@@ -125,8 +125,7 @@ RepositoryPermissions _$RepositoryPermissionsFromJson(
     );
 
 Map<String, dynamic> _$RepositoryPermissionsToJson(
-  RepositoryPermissions instance,
-) =>
+        RepositoryPermissions instance) =>
     <String, dynamic>{
       'admin': instance.admin,
       'push': instance.push,

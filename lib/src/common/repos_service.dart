@@ -1030,18 +1030,17 @@ class RepositoriesService extends Service {
   Future<Release> getReleaseByTagName(
     RepositorySlug slug,
     String? tagName,
-  ) async {
-    return github.getJSON(
-      '/repos/${slug.fullName}/releases/tags/$tagName',
-      convert: Release.fromJson,
-      statusCode: StatusCodes.OK,
-      fail: (http.Response response) {
-        if (response.statusCode == 404) {
-          throw ReleaseNotFound.fromTagName(github, tagName);
-        }
-      },
-    );
-  }
+  ) async =>
+      github.getJSON(
+        '/repos/${slug.fullName}/releases/tags/$tagName',
+        convert: Release.fromJson,
+        statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
+          if (response.statusCode == 404) {
+            throw ReleaseNotFound.fromTagName(github, tagName);
+          }
+        },
+      );
 
   /// Creates a Release based on the specified [createRelease].
   ///
@@ -1364,12 +1363,11 @@ class RepositoriesService extends Service {
   /// creating a new release.
   ///
   /// API docs: https://docs.github.com/en/rest/reference/repos#generate-release-notes-content-for-a-release
-  Future<ReleaseNotes> generateReleaseNotes(CreateReleaseNotes crn) async {
-    return github.postJSON<Map<String, dynamic>, ReleaseNotes>(
-      '/repos/${crn.owner}/${crn.repo}/releases/generate-notes',
-      body: GitHubJson.encode(crn),
-      statusCode: StatusCodes.OK,
-      convert: ReleaseNotes.fromJson,
-    );
-  }
+  Future<ReleaseNotes> generateReleaseNotes(CreateReleaseNotes crn) async =>
+      github.postJSON<Map<String, dynamic>, ReleaseNotes>(
+        '/repos/${crn.owner}/${crn.repo}/releases/generate-notes',
+        body: GitHubJson.encode(crn),
+        statusCode: StatusCodes.OK,
+        convert: ReleaseNotes.fromJson,
+      );
 }

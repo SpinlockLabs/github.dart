@@ -14,10 +14,8 @@ class ActivityService extends Service {
   /// Lists public events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events
-  Stream<Event> listPublicEvents({int pages = 2}) {
-    return PaginationHelper(github)
-        .objects('GET', '/events', Event.fromJson, pages: pages);
-  }
+  Stream<Event> listPublicEvents({int pages = 2}) => PaginationHelper(github)
+      .objects('GET', '/events', Event.fromJson, pages: pages);
 
   /// Lists public events for a network of repositories.
   ///
@@ -25,14 +23,13 @@ class ActivityService extends Service {
   Stream<Event> listRepositoryNetworkEvents(
     RepositorySlug slug, {
     int pages = 2,
-  }) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/networks/${slug.fullName}/events',
-      Event.fromJson,
-      pages: pages,
-    );
-  }
+  }) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/networks/${slug.fullName}/events',
+        Event.fromJson,
+        pages: pages,
+      );
 
   /// Returns an [EventPoller] for repository network events.
   ///
@@ -49,14 +46,13 @@ class ActivityService extends Service {
   /// Lists repository issue events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
-  Stream<Event> listRepositoryIssueEvents(RepositorySlug slug, {int? pages}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/issues/events',
-      Event.fromJson,
-      pages: pages,
-    );
-  }
+  Stream<Event> listRepositoryIssueEvents(RepositorySlug slug, {int? pages}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/issues/events',
+        Event.fromJson,
+        pages: pages,
+      );
 
   /// Returns an [EventPoller] for public events.
   ///
@@ -66,14 +62,13 @@ class ActivityService extends Service {
   /// Lists repository events.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-repository-events
-  Stream<Event> listRepositoryEvents(RepositorySlug slug, {int? pages}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/events',
-      Event.fromJson,
-      pages: pages,
-    );
-  }
+  Stream<Event> listRepositoryEvents(RepositorySlug slug, {int? pages}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/events',
+        Event.fromJson,
+        pages: pages,
+      );
 
   /// Returns an [EventPoller] for repository events.
   ///
@@ -84,10 +79,9 @@ class ActivityService extends Service {
   /// Lists public events for an organization.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-for-an-organization
-  Stream<Event> listEventsForOrganization(String name, {int? pages}) {
-    return PaginationHelper(github)
-        .objects('GET', '/orgs/$name/events', Event.fromJson, pages: pages);
-  }
+  Stream<Event> listEventsForOrganization(String name, {int? pages}) =>
+      PaginationHelper(github)
+          .objects('GET', '/orgs/$name/events', Event.fromJson, pages: pages);
 
   /// Returns an [EventPoller] for public events for an organization.
   ///
@@ -110,26 +104,27 @@ class ActivityService extends Service {
   /// Lists the events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-events-performed-by-a-user
-  Stream<Event> listEventsPerformedByUser(String username, {int? pages}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/users/$username/events',
-      Event.fromJson,
-      pages: pages,
-    );
-  }
+  Stream<Event> listEventsPerformedByUser(String username, {int? pages}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/users/$username/events',
+        Event.fromJson,
+        pages: pages,
+      );
 
   /// Lists the public events performed by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/events/#list-public-events-performed-by-a-user
-  Stream<Event> listPublicEventsPerformedByUser(String username, {int? pages}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/users/$username/events/public',
-      Event.fromJson,
-      pages: pages,
-    );
-  }
+  Stream<Event> listPublicEventsPerformedByUser(
+    String username, {
+    int? pages,
+  }) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/users/$username/events/public',
+        Event.fromJson,
+        pages: pages,
+      );
 
   /// Returns an [EventPoller] for the user's organization dashboard.
   ///
@@ -145,14 +140,13 @@ class ActivityService extends Service {
   Stream<Notification> listNotifications({
     bool all = false,
     bool participating = false,
-  }) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/notifications',
-      Notification.fromJson,
-      params: {'all': all, 'participating': participating},
-    );
-  }
+  }) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/notifications',
+        Notification.fromJson,
+        params: {'all': all, 'participating': participating},
+      );
 
   /// Lists all notifications for a given repository.
   ///
@@ -161,14 +155,13 @@ class ActivityService extends Service {
     RepositorySlug repository, {
     bool all = false,
     bool participating = false,
-  }) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${repository.fullName}/notifications',
-      Notification.fromJson,
-      params: {'all': all, 'participating': participating},
-    );
-  }
+  }) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${repository.fullName}/notifications',
+        Notification.fromJson,
+        params: {'all': all, 'participating': participating},
+      );
 
   /// Marks all notifications up to [lastRead] as read.
   ///
@@ -182,9 +175,7 @@ class ActivityService extends Service {
 
     return github
         .request('PUT', '/notifications', body: GitHubJson.encode(data))
-        .then((response) {
-      return response.statusCode == 205;
-    });
+        .then((response) => response.statusCode == 205);
   }
 
   /// Marks all notifications up to [lastRead] in the specified repository as
@@ -203,13 +194,11 @@ class ActivityService extends Service {
 
     return github
         .request(
-      'PUT',
-      '/repos/${slug.fullName}/notifications',
-      body: GitHubJson.encode(data),
-    )
-        .then((response) {
-      return response.statusCode == 205;
-    });
+          'PUT',
+          '/repos/${slug.fullName}/notifications',
+          body: GitHubJson.encode(data),
+        )
+        .then((response) => response.statusCode == 205);
   }
 
   /// Fetches the specified notification thread.
@@ -224,13 +213,9 @@ class ActivityService extends Service {
   /// Mark the specified notification thread as read.
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-a-thread-as-read
-  Future<bool> markThreadRead(String threadId) {
-    return github
-        .request('PATCH', '/notifications/threads/$threadId')
-        .then((response) {
-      return response.statusCode == StatusCodes.RESET_CONTENT;
-    });
-  }
+  Future<bool> markThreadRead(String threadId) => github
+      .request('PATCH', '/notifications/threads/$threadId')
+      .then((response) => response.statusCode == StatusCodes.RESET_CONTENT);
 
   // TODO: Implement getThreadSubscription: https://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
   // TODO: Implement setThreadSubscription: https://developer.github.com/v3/activity/notifications/#set-a-thread-subscription
@@ -239,99 +224,78 @@ class ActivityService extends Service {
   /// Lists people who have starred the specified repo.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-stargazers
-  Stream<User> listStargazers(RepositorySlug slug, {int perPage = 30}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/stargazers',
-      User.fromJson,
-      params: {'per_page': perPage},
-    );
-  }
+  Stream<User> listStargazers(RepositorySlug slug, {int perPage = 30}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/stargazers',
+        User.fromJson,
+        params: {'per_page': perPage},
+      );
 
   /// Lists all the repos starred by a user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
-  Stream<Repository> listStarredByUser(String user, {int perPage = 30}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/users/$user/starred',
-      Repository.fromJson,
-      params: {'per_page': perPage},
-    );
-  }
+  Stream<Repository> listStarredByUser(String user, {int perPage = 30}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/users/$user/starred',
+        Repository.fromJson,
+        params: {'per_page': perPage},
+      );
 
   /// Lists all the repos by the current user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
-  Stream<Repository> listStarred({int perPage = 30}) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/user/starred',
-      Repository.fromJson,
-      params: {'per_page': perPage},
-    );
-  }
+  Stream<Repository> listStarred({int perPage = 30}) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/user/starred',
+        Repository.fromJson,
+        params: {'per_page': perPage},
+      );
 
   /// Checks if the currently authenticated user has starred the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#check-if-you-are-starring-a-repository
-  Future<bool> isStarred(RepositorySlug slug) {
-    return github
-        .request('GET', '/user/starred/${slug.fullName}')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> isStarred(RepositorySlug slug) => github
+      .request('GET', '/user/starred/${slug.fullName}')
+      .then((response) => response.statusCode == 204);
 
   /// Stars the specified repository for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#star-a-repository
-  Future star(RepositorySlug slug) {
-    return github.request(
-      'PUT',
-      '/user/starred/${slug.fullName}',
-      headers: {'Content-Length': '0'},
-    ).then((response) {
-      return null;
-    });
-  }
+  Future star(RepositorySlug slug) => github.request(
+        'PUT',
+        '/user/starred/${slug.fullName}',
+        headers: {'Content-Length': '0'},
+      ).then((response) => null);
 
   /// Unstars the specified repository for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#unstar-a-repository
-  Future unstar(RepositorySlug slug) {
-    return github.request(
-      'DELETE',
-      '/user/starred/${slug.fullName}',
-      headers: {'Content-Length': '0'},
-    ).then((response) {
-      return null;
-    });
-  }
+  Future unstar(RepositorySlug slug) => github.request(
+        'DELETE',
+        '/user/starred/${slug.fullName}',
+        headers: {'Content-Length': '0'},
+      ).then((response) => null);
 
   /// Lists the watchers of the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-watchers
-  Stream<User> listWatchers(RepositorySlug slug) {
-    return PaginationHelper(github)
-        .objects('GET', '/repos/${slug.fullName}/subscribers', User.fromJson);
-  }
+  Stream<User> listWatchers(RepositorySlug slug) => PaginationHelper(github)
+      .objects('GET', '/repos/${slug.fullName}/subscribers', User.fromJson);
 
   /// Lists the repositories the specified user is watching.
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
-  Stream<Repository> listWatchedByUser(String user) {
-    return PaginationHelper(github)
-        .objects('GET', '/users/$user/subscriptions', Repository.fromJson);
-  }
+  Stream<Repository> listWatchedByUser(String user) => PaginationHelper(github)
+      .objects('GET', '/users/$user/subscriptions', Repository.fromJson);
 
   /// Lists the repositories the current user is watching.
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#list-repositories-being-watched
-  Stream<Repository> listWatched() {
-    return PaginationHelper(github)
-        .objects('GET', '/user/subscriptions', Repository.fromJson);
-  }
+  Stream<Repository> listWatched() => PaginationHelper(github)
+      .objects('GET', '/user/subscriptions', Repository.fromJson);
 
   /// Fetches repository subscription information.
   ///
@@ -367,15 +331,11 @@ class ActivityService extends Service {
   /// Deletes a Repository Subscription
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
-  Future deleteRepositorySubscription(RepositorySlug slug) {
-    return github.request(
-      'DELETE',
-      '/repos/${slug.fullName}/subscription',
-      headers: {'Content-Length': '0'},
-    ).then((response) {
-      return null;
-    });
-  }
+  Future deleteRepositorySubscription(RepositorySlug slug) => github.request(
+        'DELETE',
+        '/repos/${slug.fullName}/subscription',
+        headers: {'Content-Length': '0'},
+      ).then((response) => null);
 }
 
 class EventPoller {

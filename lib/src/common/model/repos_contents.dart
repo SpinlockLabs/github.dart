@@ -61,10 +61,8 @@ class GitHubFile {
   Links? links;
 
   /// The value in [content] Base-64 decoded.
-  String get text {
-    return _text ??=
-        utf8.decode(base64Decode(LineSplitter.split(content!).join()));
-  }
+  String get text =>
+      _text ??= utf8.decode(base64Decode(LineSplitter.split(content!).join()));
 
   String? _text;
 

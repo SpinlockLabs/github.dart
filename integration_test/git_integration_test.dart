@@ -103,9 +103,10 @@ void main() {
     expect(fetchedCommit.parents!.first.sha, equals(firstCommitSha));
   });
 
-  test('update heads/master reference to new commit', () {
-    return github.git.editReference(slug, 'heads/master', createdCommitSha);
-  });
+  test(
+    'update heads/master reference to new commit',
+    () => github.git.editReference(slug, 'heads/master', createdCommitSha),
+  );
 
   test('create and get a new reference (branch)', () async {
     final branchName = _randomGitName();

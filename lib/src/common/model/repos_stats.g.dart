@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'repos_stats.dart';
 
 // **************************************************************************
@@ -7,24 +9,20 @@ part of 'repos_stats.dart';
 // **************************************************************************
 
 ContributorStatistics _$ContributorStatisticsFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     ContributorStatistics(
       json['author'] == null
           ? null
           : User.fromJson(json['author'] as Map<String, dynamic>),
       json['total'] as int?,
       (json['weeks'] as List<dynamic>?)
-          ?.map(
-            (e) =>
-                ContributorWeekStatistics.fromJson(e as Map<String, dynamic>),
-          )
+          ?.map((e) =>
+              ContributorWeekStatistics.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$ContributorStatisticsToJson(
-  ContributorStatistics instance,
-) =>
+        ContributorStatistics instance) =>
     <String, dynamic>{
       'author': instance.author,
       'total': instance.total,
@@ -32,8 +30,7 @@ Map<String, dynamic> _$ContributorStatisticsToJson(
     };
 
 ContributorWeekStatistics _$ContributorWeekStatisticsFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     ContributorWeekStatistics(
       json['w'] as int?,
       json['a'] as int?,
@@ -42,8 +39,7 @@ ContributorWeekStatistics _$ContributorWeekStatisticsFromJson(
     );
 
 Map<String, dynamic> _$ContributorWeekStatisticsToJson(
-  ContributorWeekStatistics instance,
-) =>
+        ContributorWeekStatistics instance) =>
     <String, dynamic>{
       'w': instance.start,
       'a': instance.additions,
@@ -52,16 +48,14 @@ Map<String, dynamic> _$ContributorWeekStatisticsToJson(
     };
 
 ContributorParticipation _$ContributorParticipationFromJson(
-  Map<String, dynamic> json,
-) =>
+        Map<String, dynamic> json) =>
     ContributorParticipation(
       all: (json['all'] as List<dynamic>?)?.map((e) => e as int).toList(),
       owner: (json['owner'] as List<dynamic>?)?.map((e) => e as int).toList(),
     );
 
 Map<String, dynamic> _$ContributorParticipationToJson(
-  ContributorParticipation instance,
-) =>
+        ContributorParticipation instance) =>
     <String, dynamic>{
       'all': instance.all,
       'owner': instance.owner,
@@ -75,8 +69,7 @@ YearCommitCountWeek _$YearCommitCountWeekFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$YearCommitCountWeekToJson(
-  YearCommitCountWeek instance,
-) =>
+        YearCommitCountWeek instance) =>
     <String, dynamic>{
       'days': instance.days,
       'total': instance.total,

@@ -79,21 +79,17 @@ class OrganizationsService extends Service {
   /// Lists all of the teams for the specified organization.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-teams
-  Stream<Team> listTeams(String orgName) {
-    return PaginationHelper(github)
-        .objects('GET', '/orgs/$orgName/teams', Team.fromJson);
-  }
+  Stream<Team> listTeams(String orgName) => PaginationHelper(github)
+      .objects('GET', '/orgs/$orgName/teams', Team.fromJson);
 
   /// Gets the team specified by the [teamId].
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
-  Future<Team> getTeam(int teamId) {
-    return github.getJSON(
-      '/teams/$teamId',
-      convert: Organization.fromJson,
-      statusCode: 200,
-    ) as Future<Team>;
-  }
+  Future<Team> getTeam(int teamId) => github.getJSON(
+        '/teams/$teamId',
+        convert: Organization.fromJson,
+        statusCode: 200,
+      ) as Future<Team>;
 
   /// Creates a Team.
   ///
@@ -146,25 +142,19 @@ class OrganizationsService extends Service {
   /// Deletes the team specified by the [teamId]
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
-  Future<bool> deleteTeam(int teamId) {
-    return github.request('DELETE', '/teams/$teamId').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> deleteTeam(int teamId) => github
+      .request('DELETE', '/teams/$teamId')
+      .then((response) => response.statusCode == 204);
 
   /// Lists the team members of the team with [teamId].
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-members
-  Stream<TeamMember> listTeamMembers(int teamId) {
-    return PaginationHelper(github)
-        .objects('GET', '/teams/$teamId/members', TeamMember.fromJson);
-  }
+  Stream<TeamMember> listTeamMembers(int teamId) => PaginationHelper(github)
+      .objects('GET', '/teams/$teamId/members', TeamMember.fromJson);
 
-  Future<bool> getTeamMemberStatus(int teamId, String user) {
-    return github.getJSON('/teams/$teamId/memberships/$user').then((json) {
-      return json['state'];
-    });
-  }
+  Future<bool> getTeamMemberStatus(int teamId, String user) => github
+      .getJSON('/teams/$teamId/memberships/$user')
+      .then((json) => json['state']);
 
   /// Returns the membership status for a user in a team.
   ///
@@ -202,81 +192,60 @@ class OrganizationsService extends Service {
   /// Removes a user from the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
-  Future removeTeamMembership(int teamId, String user) {
-    return github.request(
-      'DELETE',
-      '/teams/$teamId/memberships/$user',
-      statusCode: 204,
-    );
-  }
+  Future removeTeamMembership(int teamId, String user) => github.request(
+        'DELETE',
+        '/teams/$teamId/memberships/$user',
+        statusCode: 204,
+      );
 
   /// Lists the repositories that the specified team has access to.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-team-repos
-  Stream<Repository> listTeamRepositories(int teamId) {
-    return PaginationHelper(github)
-        .objects('GET', '/teams/$teamId/repos', Repository.fromJson);
-  }
+  Stream<Repository> listTeamRepositories(int teamId) =>
+      PaginationHelper(github)
+          .objects('GET', '/teams/$teamId/repos', Repository.fromJson);
 
   /// Checks if a team manages the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-repo
-  Future<bool> isTeamRepository(int teamId, RepositorySlug slug) {
-    return github
-        .request('GET', '/teams/$teamId/repos/${slug.fullName}')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> isTeamRepository(int teamId, RepositorySlug slug) => github
+      .request('GET', '/teams/$teamId/repos/${slug.fullName}')
+      .then((response) => response.statusCode == 204);
 
   /// Adds a repository to be managed by the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#add-team-repo
-  Future<bool> addTeamRepository(int teamId, RepositorySlug slug) {
-    return github
-        .request('PUT', '/teams/$teamId/repos/${slug.fullName}')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> addTeamRepository(int teamId, RepositorySlug slug) => github
+      .request('PUT', '/teams/$teamId/repos/${slug.fullName}')
+      .then((response) => response.statusCode == 204);
 
   /// Removes a repository from being managed by the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#remove-team-repo
-  Future<bool> removeTeamRepository(int teamId, RepositorySlug slug) {
-    return github
-        .request('DELETE', '/teams/$teamId/repos/${slug.fullName}')
-        .then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> removeTeamRepository(int teamId, RepositorySlug slug) => github
+      .request('DELETE', '/teams/$teamId/repos/${slug.fullName}')
+      .then((response) => response.statusCode == 204);
 
   /// Lists all of the teams across all of the organizations to which the authenticated user belongs.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-user-teams
-  Stream<Team> listUserTeams() {
-    return PaginationHelper(github)
-        .objects('GET', '/user/teams', Team.fromJson);
-  }
+  Stream<Team> listUserTeams() =>
+      PaginationHelper(github).objects('GET', '/user/teams', Team.fromJson);
 
   /// Lists all of the users in an organization
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#list-user-teams
-  Stream<User> listUsers(String org) {
-    return PaginationHelper(github)
-        .objects('GET', '/orgs/$org/members', User.fromJson);
-  }
+  Stream<User> listUsers(String org) => PaginationHelper(github)
+      .objects('GET', '/orgs/$org/members', User.fromJson);
 
   /// Lists the hooks for the specified organization.
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
-  Stream<Hook> listHooks(String org) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/orgs/$org/hooks',
-      (dynamic i) => Hook.fromJson(i)..repoName = org,
-    );
-  }
+  Stream<Hook> listHooks(String org) => PaginationHelper(github).objects(
+        'GET',
+        '/orgs/$org/hooks',
+        (dynamic i) => Hook.fromJson(i)..repoName = org,
+      );
 
   /// Fetches a single hook by [id].
   ///
@@ -289,29 +258,23 @@ class OrganizationsService extends Service {
   /// Creates an organization hook based on the specified [hook].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
-  Future<Hook> createHook(String org, CreateHook hook) {
-    return github.postJSON(
-      '/orgs/$org/hooks',
-      convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
-      body: GitHubJson.encode(hook),
-    );
-  }
+  Future<Hook> createHook(String org, CreateHook hook) => github.postJSON(
+        '/orgs/$org/hooks',
+        convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
+        body: GitHubJson.encode(hook),
+      );
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook
 
   /// Pings the organization hook.
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#ping-a-hook
-  Future<bool> pingHook(String org, int id) {
-    return github
-        .request('POST', '/orgs/$org/hooks/$id/pings')
-        .then((response) => response.statusCode == 204);
-  }
+  Future<bool> pingHook(String org, int id) => github
+      .request('POST', '/orgs/$org/hooks/$id/pings')
+      .then((response) => response.statusCode == 204);
 
   /// Deletes the specified hook.
-  Future<bool> deleteHook(String org, int id) {
-    return github.request('DELETE', '/orgs/$org/hooks/$id').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> deleteHook(String org, int id) => github
+      .request('DELETE', '/orgs/$org/hooks/$id')
+      .then((response) => response.statusCode == 204);
 }

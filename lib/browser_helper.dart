@@ -16,9 +16,10 @@ void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
   for (final e in elements) {
     final txt = e.text!;
 
-    final md = txt.split('\n').map((it) {
-      return it.length >= indent ? it.substring(indent) : it;
-    }).join('\n');
+    final md = txt
+        .split('\n')
+        .map((it) => it.length >= indent ? it.substring(indent) : it)
+        .join('\n');
 
     github.misc.renderMarkdown(md).then((html) {
       e.hidden = false;
@@ -35,6 +36,5 @@ ImageElement createAvatarImage(
   User user, {
   int width = 128,
   int height = 128,
-}) {
-  return ImageElement(src: user.avatarUrl, width: width, height: height);
-}
+}) =>
+    ImageElement(src: user.avatarUrl, width: width, height: height);

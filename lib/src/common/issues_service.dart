@@ -22,18 +22,17 @@ class IssuesService extends Service {
     DateTime? since,
     int? perPage,
     List<String>? labels,
-  }) {
-    return _listIssues(
-      '/issues',
-      milestoneNumber,
-      state,
-      direction,
-      sort,
-      since,
-      perPage,
-      labels,
-    );
-  }
+  }) =>
+      _listIssues(
+        '/issues',
+        milestoneNumber,
+        state,
+        direction,
+        sort,
+        since,
+        perPage,
+        labels,
+      );
 
   /// List all issues across owned and member repositories for the authenticated
   /// user.
@@ -47,18 +46,17 @@ class IssuesService extends Service {
     DateTime? since,
     int? perPage,
     List<String>? labels,
-  }) {
-    return _listIssues(
-      '/user/issues',
-      milestoneNumber,
-      state,
-      direction,
-      sort,
-      since,
-      perPage,
-      labels,
-    );
-  }
+  }) =>
+      _listIssues(
+        '/user/issues',
+        milestoneNumber,
+        state,
+        direction,
+        sort,
+        since,
+        perPage,
+        labels,
+      );
 
   /// List all issues for a given organization for the authenticated user.
   ///
@@ -72,18 +70,17 @@ class IssuesService extends Service {
     DateTime? since,
     int? perPage,
     List<String>? labels,
-  }) {
-    return _listIssues(
-      '/orgs/$org/issues',
-      milestoneNumber,
-      state,
-      direction,
-      sort,
-      since,
-      perPage,
-      labels,
-    );
-  }
+  }) =>
+      _listIssues(
+        '/orgs/$org/issues',
+        milestoneNumber,
+        state,
+        direction,
+        sort,
+        since,
+        perPage,
+        labels,
+      );
 
   /// Lists the issues for the specified repository.
   ///
@@ -99,18 +96,17 @@ class IssuesService extends Service {
     DateTime? since,
     int? perPage,
     List<String>? labels,
-  }) {
-    return _listIssues(
-      '/repos/${slug.fullName}/issues',
-      milestoneNumber,
-      state,
-      direction,
-      sort,
-      since,
-      perPage,
-      labels,
-    );
-  }
+  }) =>
+      _listIssues(
+        '/repos/${slug.fullName}/issues',
+        milestoneNumber,
+        state,
+        direction,
+        sort,
+        since,
+        perPage,
+        labels,
+      );
 
   Stream<Issue> _listIssues(
     String pathSegment,
@@ -200,17 +196,18 @@ class IssuesService extends Service {
     RepositorySlug slug,
     int issueNumber,
     IssueRequest issue,
-  ) async {
-    return github
-        .request(
-      'PATCH',
-      '/repos/${slug.fullName}/issues/$issueNumber',
-      body: GitHubJson.encode(issue),
-    )
-        .then<Issue>((response) {
-      return Issue.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-    });
-  }
+  ) async =>
+      github
+          .request(
+            'PATCH',
+            '/repos/${slug.fullName}/issues/$issueNumber',
+            body: GitHubJson.encode(issue),
+          )
+          .then<Issue>(
+            (response) => Issue.fromJson(
+              jsonDecode(response.body) as Map<String, dynamic>,
+            ),
+          );
 
   /// Get an issue.
   ///
@@ -242,19 +239,15 @@ class IssuesService extends Service {
   /// may be assigned.
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
-  Stream<User> listAssignees(RepositorySlug slug) {
-    return PaginationHelper(github)
-        .objects('GET', '/repos/${slug.fullName}/assignees', User.fromJson);
-  }
+  Stream<User> listAssignees(RepositorySlug slug) => PaginationHelper(github)
+      .objects('GET', '/repos/${slug.fullName}/assignees', User.fromJson);
 
   /// Checks if a user is an assignee for the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#check-assignee
-  Future<bool> isAssignee(RepositorySlug slug, String repoName) {
-    return github
-        .request('GET', '/repos/${slug.fullName}/assignees/$repoName')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
-  }
+  Future<bool> isAssignee(RepositorySlug slug, String repoName) => github
+      .request('GET', '/repos/${slug.fullName}/assignees/$repoName')
+      .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
 
   /// Lists comments on the specified issue.
   ///
@@ -262,24 +255,22 @@ class IssuesService extends Service {
   Stream<IssueComment> listCommentsByIssue(
     RepositorySlug slug,
     int issueNumber,
-  ) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/issues/$issueNumber/comments',
-      IssueComment.fromJson,
-    );
-  }
+  ) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/issues/$issueNumber/comments',
+        IssueComment.fromJson,
+      );
 
   /// Lists all comments in a repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
-  Stream<IssueComment> listCommentsByRepo(RepositorySlug slug) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/issues/comments',
-      IssueComment.fromJson,
-    );
-  }
+  Stream<IssueComment> listCommentsByRepo(RepositorySlug slug) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/issues/comments',
+        IssueComment.fromJson,
+      );
 
   /// Fetches the specified issue comment.
   ///
@@ -323,21 +314,17 @@ class IssuesService extends Service {
   /// Deletes an issue comment.
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#delete-a-comment
-  Future<bool> deleteComment(RepositorySlug slug, int id) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/issues/comments/$id')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
-  }
+  Future<bool> deleteComment(RepositorySlug slug, int id) => github
+      .request('DELETE', '/repos/${slug.fullName}/issues/comments/$id')
+      .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
 
   // TODO: Implement issues events methods: https://developer.github.com/v3/issues/events/
 
   /// Lists all labels for a repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
-  Stream<IssueLabel> listLabels(RepositorySlug slug) {
-    return PaginationHelper(github)
-        .objects('GET', '/repos/${slug.fullName}/labels', IssueLabel.fromJson);
-  }
+  Stream<IssueLabel> listLabels(RepositorySlug slug) => PaginationHelper(github)
+      .objects('GET', '/repos/${slug.fullName}/labels', IssueLabel.fromJson);
 
   /// Fetches a single label.
   ///
@@ -356,24 +343,26 @@ class IssuesService extends Service {
     RepositorySlug slug,
     String name,
     String color,
-  ) {
-    return github.postJSON(
-      '/repos/${slug.fullName}/labels',
-      body: GitHubJson.encode({'name': name, 'color': color}),
-      convert: IssueLabel.fromJson,
-    );
-  }
+  ) =>
+      github.postJSON(
+        '/repos/${slug.fullName}/labels',
+        body: GitHubJson.encode({'name': name, 'color': color}),
+        convert: IssueLabel.fromJson,
+      );
 
   /// Edits a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
-  Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
-    return github.postJSON(
-      '/repos/${slug.fullName}/labels/$name',
-      body: GitHubJson.encode({'name': name, 'color': color}),
-      convert: IssueLabel.fromJson,
-    );
-  }
+  Future<IssueLabel> editLabel(
+    RepositorySlug slug,
+    String name,
+    String color,
+  ) =>
+      github.postJSON(
+        '/repos/${slug.fullName}/labels/$name',
+        body: GitHubJson.encode({'name': name, 'color': color}),
+        convert: IssueLabel.fromJson,
+      );
 
   /// Deletes a label.
   ///
@@ -388,13 +377,12 @@ class IssuesService extends Service {
   /// Lists all labels for an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
-  Stream<IssueLabel> listLabelsByIssue(RepositorySlug slug, int issueNumber) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/issues/$issueNumber/labels',
-      IssueLabel.fromJson,
-    );
-  }
+  Stream<IssueLabel> listLabelsByIssue(RepositorySlug slug, int issueNumber) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/issues/$issueNumber/labels',
+        IssueLabel.fromJson,
+      );
 
   /// Adds labels to an issue.
   ///
@@ -403,14 +391,15 @@ class IssuesService extends Service {
     RepositorySlug slug,
     int issueNumber,
     List<String> labels,
-  ) {
-    return github.postJSON<List<dynamic>, List<IssueLabel>>(
-      '/repos/${slug.fullName}/issues/$issueNumber/labels',
-      body: GitHubJson.encode(labels),
-      convert: (input) =>
-          input.cast<Map<String, dynamic>>().map(IssueLabel.fromJson).toList(),
-    );
-  }
+  ) =>
+      github.postJSON<List<dynamic>, List<IssueLabel>>(
+        '/repos/${slug.fullName}/issues/$issueNumber/labels',
+        body: GitHubJson.encode(labels),
+        convert: (input) => input
+            .cast<Map<String, dynamic>>()
+            .map(IssueLabel.fromJson)
+            .toList(),
+      );
 
   /// Replaces all labels for an issue.
   ///
@@ -419,17 +408,16 @@ class IssuesService extends Service {
     RepositorySlug slug,
     int issueNumber,
     List<String> labels,
-  ) {
-    return github
-        .request(
-      'PUT',
-      '/repos/${slug.fullName}/issues/$issueNumber/labels',
-      body: GitHubJson.encode(labels),
-    )
-        .then((response) {
-      return jsonDecode(response.body).map(IssueLabel.fromJson);
-    });
-  }
+  ) =>
+      github
+          .request(
+            'PUT',
+            '/repos/${slug.fullName}/issues/$issueNumber/labels',
+            body: GitHubJson.encode(labels),
+          )
+          .then(
+            (response) => jsonDecode(response.body).map(IssueLabel.fromJson),
+          );
 
   /// Removes a label for an issue.
   ///
@@ -450,24 +438,25 @@ class IssuesService extends Service {
   /// Removes all labels for an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#remove-all-labels-from-an-issue
-  Future<bool> removeAllLabelsForIssue(RepositorySlug slug, int issueNumber) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/issues/$issueNumber/labels')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
-  }
+  Future<bool> removeAllLabelsForIssue(RepositorySlug slug, int issueNumber) =>
+      github
+          .request(
+            'DELETE',
+            '/repos/${slug.fullName}/issues/$issueNumber/labels',
+          )
+          .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
 
   // TODO: Implement listLabelsByMilestone: https://developer.github.com/v3/issues/labels/#get-labels-for-every-issue-in-a-milestone
 
   /// Lists all milestones for a repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/milestones/#list-milestones-for-a-repository
-  Stream<Milestone> listMilestones(RepositorySlug slug) {
-    return PaginationHelper(github).objects(
-      'GET',
-      '/repos/${slug.fullName}/milestones',
-      Milestone.fromJson,
-    );
-  }
+  Stream<Milestone> listMilestones(RepositorySlug slug) =>
+      PaginationHelper(github).objects(
+        'GET',
+        '/repos/${slug.fullName}/milestones',
+        Milestone.fromJson,
+      );
 
   // TODO: Implement getMilestone: https://developer.github.com/v3/issues/milestones/#get-a-single-milestone
 
@@ -477,22 +466,19 @@ class IssuesService extends Service {
   Future<Milestone> createMilestone(
     RepositorySlug slug,
     CreateMilestone request,
-  ) {
-    return github.postJSON(
-      '/repos/${slug.fullName}/milestones',
-      body: GitHubJson.encode(request),
-      convert: Milestone.fromJson,
-    );
-  }
+  ) =>
+      github.postJSON(
+        '/repos/${slug.fullName}/milestones',
+        body: GitHubJson.encode(request),
+        convert: Milestone.fromJson,
+      );
 
   // TODO: Implement editMilestone: https://developer.github.com/v3/issues/milestones/#update-a-milestone
 
   /// Deletes a milestone.
   ///
   /// API docs: https://developer.github.com/v3/issues/milestones/#delete-a-milestone
-  Future<bool> deleteMilestone(RepositorySlug slug, int number) {
-    return github
-        .request('DELETE', '/repos/${slug.fullName}/milestones/$number')
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
-  }
+  Future<bool> deleteMilestone(RepositorySlug slug, int number) => github
+      .request('DELETE', '/repos/${slug.fullName}/milestones/$number')
+      .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
 }

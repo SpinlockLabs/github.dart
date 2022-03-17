@@ -48,23 +48,21 @@ class OAuth2Flow {
   }) : redirectUri =
             redirectUri == null ? null : _checkRedirectUri(redirectUri);
 
-  static String _checkRedirectUri(String uri) {
-    return uri.contains('?') ? uri.substring(0, uri.indexOf('?')) : uri;
-  }
+  static String _checkRedirectUri(String uri) =>
+      uri.contains('?') ? uri.substring(0, uri.indexOf('?')) : uri;
 
   /// Generates an Authorization URL
   ///
   /// This should be displayed to the user.
-  String createAuthorizeUrl() {
-    return baseUrl +
-        '/authorize' +
-        buildQueryString({
-          'client_id': clientId,
-          'scope': scopes.join(','),
-          'redirect_uri': redirectUri,
-          'state': state
-        });
-  }
+  String createAuthorizeUrl() =>
+      baseUrl +
+      '/authorize' +
+      buildQueryString({
+        'client_id': clientId,
+        'scope': scopes.join(','),
+        'redirect_uri': redirectUri,
+        'state': state
+      });
 
   /// Exchanges the given [code] for a token.
   Future<ExchangeResponse> exchange(String code, [String? origin]) {

@@ -1,5 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
+// ignore_for_file: require_trailing_commas
+
 part of 'notifications.dart';
 
 // **************************************************************************
@@ -14,8 +16,7 @@ Notification _$NotificationFromJson(Map<String, dynamic> json) => Notification(
       subject: json['subject'] == null
           ? null
           : NotificationSubject.fromJson(
-              json['subject'] as Map<String, dynamic>,
-            ),
+              json['subject'] as Map<String, dynamic>),
       reason: json['reason'] as String?,
       unread: json['unread'] as bool?,
       updatedAt: json['updated_at'] == null
@@ -50,8 +51,7 @@ NotificationSubject _$NotificationSubjectFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$NotificationSubjectToJson(
-  NotificationSubject instance,
-) =>
+        NotificationSubject instance) =>
     <String, dynamic>{
       'title': instance.title,
       'type': instance.type,

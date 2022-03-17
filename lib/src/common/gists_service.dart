@@ -13,34 +13,27 @@ class GistsService extends Service {
   /// lists gists for a user.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
-  Stream<Gist> listUserGists(String username) {
-    return PaginationHelper(github)
-        .objects('GET', '/users/$username/gists', Gist.fromJson);
-  }
+  Stream<Gist> listUserGists(String username) => PaginationHelper(github)
+      .objects('GET', '/users/$username/gists', Gist.fromJson);
 
   /// Fetches the gists for the currently authenticated user.
   /// If the user is not authenticated, this returns all public gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
-  Stream<Gist> listCurrentUserGists() {
-    return PaginationHelper(github).objects('GET', '/gists', Gist.fromJson);
-  }
+  Stream<Gist> listCurrentUserGists() =>
+      PaginationHelper(github).objects('GET', '/gists', Gist.fromJson);
 
   /// Fetches the currently authenticated user's public gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
-  Stream<Gist> listCurrentUserPublicGists() {
-    return PaginationHelper(github)
-        .objects('GET', '/gists/public', Gist.fromJson);
-  }
+  Stream<Gist> listCurrentUserPublicGists() =>
+      PaginationHelper(github).objects('GET', '/gists/public', Gist.fromJson);
 
   /// Fetches the currently authenticated user's starred gists.
   ///
   /// API docs: https://developer.github.com/v3/gists/#list-gists
-  Stream<Gist> listCurrentUserStarredGists() {
-    return PaginationHelper(github)
-        .objects('GET', '/gists/starred', Gist.fromJson);
-  }
+  Stream<Gist> listCurrentUserStarredGists() =>
+      PaginationHelper(github).objects('GET', '/gists/starred', Gist.fromJson);
 
   /// Fetches a Gist by the specified [id].
   ///
@@ -86,11 +79,9 @@ class GistsService extends Service {
   /// Deletes the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#delete-a-gist
-  Future<bool> deleteGist(String id) {
-    return github.request('DELETE', '/gists/$id').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> deleteGist(String id) => github
+      .request('DELETE', '/gists/$id')
+      .then((response) => response.statusCode == 204);
 
   /// Edits a Gist.
   ///
@@ -127,63 +118,53 @@ class GistsService extends Service {
   /// Star the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
-  Future<bool> starGist(String id) {
-    return github.request('POST', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> starGist(String id) => github
+      .request('POST', '/gists/$id/star')
+      .then((response) => response.statusCode == 204);
 
   /// Unstar the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
-  Future<bool> unstarGist(String id) {
-    return github.request('DELETE', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> unstarGist(String id) => github
+      .request('DELETE', '/gists/$id/star')
+      .then((response) => response.statusCode == 204);
 
   /// Checks if the specified Gist is starred.
   ///
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
-  Future<bool> isGistStarred(String id) {
-    return github.request('GET', '/gists/$id/star').then((response) {
-      return response.statusCode == 204;
-    });
-  }
+  Future<bool> isGistStarred(String id) => github
+      .request('GET', '/gists/$id/star')
+      .then((response) => response.statusCode == 204);
 
   /// Forks the specified Gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/#check-if-a-gist-is-starred
-  Future<Gist> forkGist(String id) {
-    return github
-        .request('POST', '/gists/$id/forks', statusCode: 201)
-        .then((response) {
-      return Gist.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
-    });
-  }
+  Future<Gist> forkGist(String id) => github
+      .request('POST', '/gists/$id/forks', statusCode: 201)
+      .then(
+        (response) =>
+            Gist.fromJson(jsonDecode(response.body) as Map<String, dynamic>),
+      );
 
   // TODO: Implement listGistForks: https://developer.github.com/v3/gists/#list-gist-forks
 
   /// Lists all comments for a gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#list-comments-on-a-gist
-  Stream<GistComment> listComments(String gistId) {
-    return PaginationHelper(github)
-        .objects('GET', '/gists/$gistId/comments', GistComment.fromJson);
-  }
+  Stream<GistComment> listComments(String gistId) => PaginationHelper(github)
+      .objects('GET', '/gists/$gistId/comments', GistComment.fromJson);
 
   // TODO: Implement getComment: https://developer.github.com/v3/gists/comments/#get-a-single-comment
 
   /// Creates a comment for a gist.
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
-  Future<GistComment> createComment(String gistId, CreateGistComment request) {
-    return github.postJSON(
-      '/gists/$gistId/comments',
-      body: GitHubJson.encode(request),
-      convert: GistComment.fromJson,
-    );
-  }
+  Future<GistComment> createComment(String gistId, CreateGistComment request) =>
+      github.postJSON(
+        '/gists/$gistId/comments',
+        body: GitHubJson.encode(request),
+        convert: GistComment.fromJson,
+      );
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment
   // TODO: Implement deleteComment: https://developer.github.com/v3/gists/comments/#delete-a-comment

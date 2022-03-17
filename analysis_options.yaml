@@ -396,3 +396,4 @@ linter:
     - prefer_final_fields
     - use_function_type_syntax_for_parameters
     - require_trailing_commas
+    - prefer_expression_function_bodies
