@@ -78,7 +78,7 @@ class _CheckRunsService extends Service {
         'output': output,
         'actions': actions,
       })),
-      convert: (i) => CheckRun.fromJson(i),
+      convert: CheckRun.fromJson,
     );
   }
 
@@ -129,7 +129,7 @@ class _CheckRunsService extends Service {
         'output': output,
         'actions': actions,
       })),
-      convert: (i) => CheckRun.fromJson(i),
+      convert: CheckRun.fromJson,
     );
   }
 
@@ -153,7 +153,7 @@ class _CheckRunsService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckRun>(
       'GET',
       'repos/$slug/commits/$ref/check-runs',
-      (input) => CheckRun.fromJson(input),
+      CheckRun.fromJson,
       statusCode: StatusCodes.OK,
       preview: _previewHeader,
       params: createNonNullMap({
@@ -184,7 +184,7 @@ class _CheckRunsService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckRun>(
       'GET',
       'repos/$slug/check-suites/$checkSuiteId/check-runs',
-      (input) => CheckRun.fromJson(input),
+      CheckRun.fromJson,
       statusCode: StatusCodes.OK,
       preview: _previewHeader,
       params: createNonNullMap({
@@ -210,7 +210,7 @@ class _CheckRunsService extends Service {
       'repos/${slug.fullName}/check-runs/$checkRunId',
       preview: _previewHeader,
       statusCode: StatusCodes.OK,
-      convert: (i) => CheckRun.fromJson(i),
+      convert: CheckRun.fromJson,
     );
   }
 
@@ -227,7 +227,7 @@ class _CheckRunsService extends Service {
         .objects<Map<String, dynamic>, CheckRunAnnotation>(
       'GET',
       '/repos/${slug.fullName}/check-runs/${checkRun.id}/annotations',
-      (i) => CheckRunAnnotation.fromJSON(i),
+      CheckRunAnnotation.fromJSON,
       statusCode: StatusCodes.OK,
       preview: _previewHeader,
     );
@@ -250,7 +250,7 @@ class _CheckSuitesService extends Service {
     return github.requestJson(
       'GET',
       'repos/$slug/check-suites/$checkSuiteId',
-      convert: (dynamic input) => CheckSuite.fromJson(input),
+      convert: CheckSuite.fromJson,
       preview: _previewHeader,
       statusCode: StatusCodes.OK,
     );
@@ -274,7 +274,7 @@ class _CheckSuitesService extends Service {
     return PaginationHelper(github).objects<Map<String, dynamic>, CheckSuite>(
       'GET',
       'repos/$slug/commits/$ref/check-suites',
-      (input) => CheckSuite.fromJson(input),
+      CheckSuite.fromJson,
       preview: _previewHeader,
       params: createNonNullMap({
         'app_id': appId,
@@ -304,7 +304,8 @@ class _CheckSuitesService extends Service {
       preview: _previewHeader,
       body: {'auto_trigger_checks': autoTriggerChecks},
       convert: (input) => (input['preferences']['auto_trigger_checks'] as List)
-          .map((e) => AutoTriggerChecks.fromJson(e))
+          .cast<Map<String, dynamic>>()
+          .map(AutoTriggerChecks.fromJson)
           .toList(),
     );
   }
@@ -326,7 +327,7 @@ class _CheckSuitesService extends Service {
       statusCode: StatusCodes.CREATED,
       preview: _previewHeader,
       params: {'head_sha': headSha},
-      convert: (input) => CheckSuite.fromJson(input),
+      convert: CheckSuite.fromJson,
     );
   }
 

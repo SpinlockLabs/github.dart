@@ -25,8 +25,7 @@ void main() {
       git.getBlob(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: (dynamic i) => GitBlob.fromJson(i),
-          statusCode: StatusCodes.OK));
+          convert: GitBlob.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -37,7 +36,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/blobs',
-        convert: (dynamic i) => GitBlob.fromJson(i),
+        convert: GitBlob.fromJson,
         statusCode: StatusCodes.CREATED,
         body: GitHubJson.encode(blob),
       ));
@@ -58,8 +57,7 @@ void main() {
       git.getCommit(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/commits/sh',
-          convert: (dynamic i) => GitCommit.fromJson(i),
-          statusCode: StatusCodes.OK));
+          convert: GitCommit.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -70,7 +68,7 @@ void main() {
 
       verify(github.postJSON(
         '/repos/o/n/git/commits',
-        convert: (dynamic i) => GitCommit.fromJson(i),
+        convert: GitCommit.fromJson,
         statusCode: StatusCodes.CREATED,
         body: GitHubJson.encode(commit),
       ));
@@ -107,8 +105,7 @@ void main() {
       git.getReference(repo, 'heads/b');
 
       verify(github.getJSON('/repos/o/n/git/refs/heads/b',
-          convert: (dynamic i) => GitReference.fromJson(i),
-          statusCode: StatusCodes.OK));
+          convert: GitReference.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -118,7 +115,7 @@ void main() {
       git.createReference(repo, someRef, someSha);
 
       verify(github.postJSON('/repos/o/n/git/refs',
-          convert: (dynamic i) => GitReference.fromJson(i),
+          convert: GitReference.fromJson,
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode({'ref': someRef, 'sha': someSha})));
     });
@@ -193,8 +190,7 @@ void main() {
       git.getTag(repo, someSha);
 
       verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-          convert: (dynamic i) => GitTag.fromJson(i),
-          statusCode: StatusCodes.OK));
+          convert: GitTag.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -206,7 +202,7 @@ void main() {
       git.createTag(repo, createGitTag);
 
       verify(github.postJSON('/repos/o/n/git/tags',
-          convert: (dynamic i) => GitTag.fromJson(i),
+          convert: GitTag.fromJson,
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode(createGitTag)));
     });
@@ -228,8 +224,7 @@ void main() {
       git.getTree(repo, 'sh');
 
       verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: (dynamic j) => GitTree.fromJson(j),
-          statusCode: StatusCodes.OK));
+          convert: GitTree.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -238,8 +233,7 @@ void main() {
       git.getTree(repo, 'sh', recursive: true);
 
       verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: (dynamic j) => GitTree.fromJson(j),
-          statusCode: StatusCodes.OK));
+          convert: GitTree.fromJson, statusCode: StatusCodes.OK));
     });
   });
 
@@ -249,7 +243,7 @@ void main() {
       git.createTree(repo, createGitTree);
 
       verify(github.postJSON('/repos/o/n/git/trees',
-          convert: (dynamic j) => GitTree.fromJson(j),
+          convert: GitTree.fromJson,
           statusCode: StatusCodes.CREATED,
           body: GitHubJson.encode(createGitTree)));
     });

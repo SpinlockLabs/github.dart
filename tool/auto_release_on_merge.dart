@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:github/github.dart';
 import 'package:yaml/yaml.dart';
 
@@ -6,10 +7,10 @@ const semvers = ['major', 'minor', 'patch'];
 
 /// Meant to be run from the github workflow.
 /// Expected arguments of:
-/// [repo] the full repo owner/name format
-/// [pr number] PR number of which to release
+/// `repo`: the full repo owner/name format
+/// `pr number`: PR number of which to release
 /// the semver label is expected to be on the PR
-void main(List<String> args) async {
+Future<void> main(List<String> args) async {
   if (args.length < 2) {
     print('Usage: dart tool/auto_release_on_merge owner_and_repo pull_number');
     exit(1);
@@ -61,7 +62,7 @@ void main(List<String> args) async {
 
   var log = File('CHANGELOG.md');
   var logdata = log.existsSync() ? log.readAsStringSync() : '';
-  log.writeAsStringSync('${releaseNotes}\n\n$logdata');
+  log.writeAsStringSync('$releaseNotes\n\n$logdata');
 
   run('git add pubspec.yaml CHANGELOG.md');
   run('git', rest: ['commit', '-m', 'prep $newVersion']);
@@ -95,15 +96,21 @@ String run(String cmd, {List<String>? rest}) {
     args = rest;
   } else {
     args = cmd.split(' ');
-    if (args.isEmpty) return '';
+    if (args.isEmpty) {
+      return '';
+    }
     cmd = args.removeAt(0);
   }
   var result = Process.runSync(cmd, args);
   if (result.exitCode != 0) {
     print('Command failed');
   }
-  if (result.stdout != null) print(result.stdout);
-  if (result.stderr != null) print(result.stderr);
+  if (result.stdout != null) {
+    print(result.stdout);
+  }
+  if (result.stderr != null) {
+    print(result.stderr);
+  }
   if (result.exitCode != 0) {
     exit(6);
   }
