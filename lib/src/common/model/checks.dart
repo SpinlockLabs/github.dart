@@ -19,7 +19,8 @@ class CheckRunAnnotationLevel extends EnumWithValue {
         return failure;
       default:
         throw Exception(
-            'This level of check run annotation is unimplemented: $value.');
+          'This level of check run annotation is unimplemented: $value.',
+        );
     }
   }
 
@@ -67,7 +68,8 @@ class CheckRunConclusion extends EnumWithValue {
       }
     }
     throw Exception(
-        'This level of check run conclusion is unimplemented: $value.');
+      'This level of check run conclusion is unimplemented: $value.',
+    );
   }
 }
 
@@ -237,10 +239,14 @@ class CheckRunAnnotation {
     this.startColumn,
     this.endColumn,
     this.rawDetails,
-  })  : assert(startColumn == null || startLine == endLine,
-            'Annotations only support start_column and end_column on the same line.'),
-        assert(endColumn == null || startLine == endLine,
-            'Annotations only support start_column and end_column on the same line.'),
+  })  : assert(
+          startColumn == null || startLine == endLine,
+          'Annotations only support start_column and end_column on the same line.',
+        ),
+        assert(
+          endColumn == null || startLine == endLine,
+          'Annotations only support start_column and end_column on the same line.',
+        ),
         assert(title.length <= 255);
 
   @override
@@ -367,8 +373,9 @@ class CheckSuite {
   factory CheckSuite.fromJson(Map<String, dynamic> input) {
     var pullRequestsJson = input['pull_requests'] as List<dynamic>;
     var pullRequests = pullRequestsJson
-        .map((dynamic json) =>
-            PullRequest.fromJson(json as Map<String, dynamic>))
+        .map(
+          (dynamic json) => PullRequest.fromJson(json as Map<String, dynamic>),
+        )
         .toList();
     return CheckSuite(
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),

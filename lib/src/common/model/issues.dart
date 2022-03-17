@@ -92,13 +92,14 @@ class Issue {
 /// Model class for a request to create/edit an issue.
 @JsonSerializable()
 class IssueRequest {
-  IssueRequest(
-      {this.title,
-      this.body,
-      this.labels,
-      this.assignee,
-      this.state,
-      this.milestone});
+  IssueRequest({
+    this.title,
+    this.body,
+    this.labels,
+    this.assignee,
+    this.state,
+    this.milestone,
+  });
   String? title;
   String? body;
   List<String>? labels;

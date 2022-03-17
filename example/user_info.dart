@@ -29,16 +29,20 @@ void loadUser() {
     github.users.getCurrentUser().then((final CurrentUser user) {
       info!.children.clear();
       info!.hidden = false;
-      info!.appendHtml('''
+      info!.appendHtml(
+        '''
       <b>Name</b>: ${user.name}
-      ''');
+      ''',
+      );
 
       void append(String name, dynamic value) {
         if (value != null) {
-          info!.appendHtml('''
+          info!.appendHtml(
+            '''
             <br/>
             <b>$name</b>: ${value.toString()}
-          ''');
+          ''',
+          );
         }
       }
 

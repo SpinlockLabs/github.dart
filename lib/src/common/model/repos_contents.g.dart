@@ -23,7 +23,8 @@ GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) => GitHubFile(
       sourceRepository: json['source_repository'] == null
           ? null
           : RepositorySlug.fromJson(
-              json['source_repository'] as Map<String, dynamic>),
+              json['source_repository'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$GitHubFileToJson(GitHubFile instance) =>

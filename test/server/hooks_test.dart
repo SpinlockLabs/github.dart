@@ -9,7 +9,8 @@ void main() {
   group('CheckSuiteEvent', () {
     test('deserialize', () async {
       final checkSuiteEvent = CheckSuiteEvent.fromJson(
-          json.decode(checkSuiteString) as Map<String, dynamic>);
+        json.decode(checkSuiteString) as Map<String, dynamic>,
+      );
       // Top level properties.
       expect(checkSuiteEvent.action, 'requested');
       expect(checkSuiteEvent.checkSuite, isA<CheckSuite>());
@@ -23,7 +24,8 @@ void main() {
   group('CheckRunEvent', () {
     test('deserialize', () async {
       final checkRunEvent = CheckRunEvent.fromJson(
-          json.decode(checkRunString) as Map<String, dynamic>);
+        json.decode(checkRunString) as Map<String, dynamic>,
+      );
       // Top level properties.
       expect(checkRunEvent.action, 'created');
       expect(checkRunEvent.checkRun, isA<CheckRun>());

@@ -17,20 +17,27 @@ void loadReleases() {
       .toList()
       .then((releases) {
     for (final release in releases) {
-      releasesDiv!.appendHtml('''
+      releasesDiv!.appendHtml(
+        '''
       <div class="repo box" id="release-${release.id}">
         <h1>${release.name}</h1>
       </div>
-      ''', treeSanitizer: NodeTreeSanitizer.trusted);
+      ''',
+        treeSanitizer: NodeTreeSanitizer.trusted,
+      );
       final rel = releasesDiv!.querySelector('#release-${release.id}');
       void append(String key, String value) {
-        rel!.appendHtml('<br/><b>$key</b>: $value',
-            treeSanitizer: NodeTreeSanitizer.trusted);
+        rel!.appendHtml(
+          '<br/><b>$key</b>: $value',
+          treeSanitizer: NodeTreeSanitizer.trusted,
+        );
       }
 
       append('Tag', '<a href=${release.htmlUrl}>${release.tagName}</a>');
-      append('Download',
-          '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>');
+      append(
+        'Download',
+        '<a href="${release.tarballUrl}">TAR</a> | <a href="${release.zipballUrl}">ZIP</a>',
+      );
     }
   });
 }

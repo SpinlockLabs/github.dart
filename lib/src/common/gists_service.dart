@@ -45,8 +45,11 @@ class GistsService extends Service {
   /// Fetches a Gist by the specified [id].
   ///
   /// API docs: https://developer.github.com/v3/gists/#get-a-single-gist
-  Future<Gist> getGist(String id) => github.getJSON('/gists/$id',
-      statusCode: StatusCodes.OK, convert: Gist.fromJson);
+  Future<Gist> getGist(String id) => github.getJSON(
+        '/gists/$id',
+        statusCode: StatusCodes.OK,
+        convert: Gist.fromJson,
+      );
 
   /// Creates a Gist
   ///
@@ -175,8 +178,11 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
-    return github.postJSON('/gists/$gistId/comments',
-        body: GitHubJson.encode(request), convert: GistComment.fromJson);
+    return github.postJSON(
+      '/gists/$gistId/comments',
+      body: GitHubJson.encode(request),
+      convert: GistComment.fromJson,
+    );
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment

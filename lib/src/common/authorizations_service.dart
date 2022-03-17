@@ -23,9 +23,11 @@ class AuthorizationsService extends Service {
   /// Fetches an authorization specified by [id].
   ///
   /// API docs: https://developer.github.com/v3/oauth_authorizations/#get-a-single-authorization
-  Future<Authorization> getAuthorization(int id) =>
-      github.getJSON('/authorizations/$id',
-          statusCode: 200, convert: Authorization.fromJson);
+  Future<Authorization> getAuthorization(int id) => github.getJSON(
+        '/authorizations/$id',
+        statusCode: 200,
+        convert: Authorization.fromJson,
+      );
 
   // TODO: Implement remaining API methods of authorizations:
   // See https://developer.github.com/v3/oauth_authorizations/

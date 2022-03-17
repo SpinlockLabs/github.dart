@@ -30,7 +30,8 @@ Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
       pullRequest: json['pull_request'] == null
           ? null
           : IssuePullRequest.fromJson(
-              json['pull_request'] as Map<String, dynamic>),
+              json['pull_request'] as Map<String, dynamic>,
+            ),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),

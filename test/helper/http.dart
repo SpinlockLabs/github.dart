@@ -6,7 +6,8 @@ import 'assets.dart';
 final MockHTTPClient httpClient = MockHTTPClient();
 
 typedef ResponseCreator = http.StreamedResponse Function(
-    http.BaseRequest request);
+  http.BaseRequest request,
+);
 
 class MockHTTPClient extends http.BaseClient {
   final Map<Pattern, ResponseCreator> responses = <Pattern, ResponseCreator>{};
@@ -14,7 +15,8 @@ class MockHTTPClient extends http.BaseClient {
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     final matchingUrlCreatorKey = responses.keys.firstWhereOrNull(
-        (it) => it.allMatches(request.url.toString()).isNotEmpty);
+      (it) => it.allMatches(request.url.toString()).isNotEmpty,
+    );
     final creator = responses[matchingUrlCreatorKey!];
     if (creator == null) {
       throw Exception('No Response Configured');

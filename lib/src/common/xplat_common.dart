@@ -23,7 +23,9 @@ Authentication? findAuthenticationInMap(Map map) {
     }
     if (map['GITHUB_USERNAME'] is String && map['GITHUB_PASSWORD'] is String) {
       return Authentication.basic(
-          map['GITHUB_USERNAME'], map['GITHUB_PASSWORD']);
+        map['GITHUB_USERNAME'],
+        map['GITHUB_PASSWORD'],
+      );
     }
   }
   return null;

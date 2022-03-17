@@ -395,3 +395,4 @@ linter:
     - omit_local_variable_types
     - prefer_final_fields
     - use_function_type_syntax_for_parameters
+    - require_trailing_commas

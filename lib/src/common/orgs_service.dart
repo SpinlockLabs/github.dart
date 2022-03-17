@@ -28,13 +28,16 @@ class OrganizationsService extends Service {
   /// Fetches the organization specified by [name].
   ///
   /// API docs: https://developer.github.com/v3/orgs/#get-an-organization
-  Future<Organization> get(String? name) => github.getJSON('/orgs/$name',
-          convert: Organization.fromJson,
-          statusCode: StatusCodes.OK, fail: (http.Response response) {
-        if (response.statusCode == 404) {
-          throw OrganizationNotFound(github, name);
-        }
-      });
+  Future<Organization> get(String? name) => github.getJSON(
+        '/orgs/$name',
+        convert: Organization.fromJson,
+        statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
+          if (response.statusCode == 404) {
+            throw OrganizationNotFound(github, name);
+          }
+        },
+      );
 
   /// Fetches the organizations specified by [names].
   Stream<Organization> getMulti(List<String> names) async* {
@@ -47,13 +50,15 @@ class OrganizationsService extends Service {
   /// Edits an Organization
   ///
   /// API docs: https://developer.github.com/v3/orgs/#edit-an-organization
-  Future<Organization> edit(String org,
-      {String? billingEmail,
-      String? company,
-      String? email,
-      String? location,
-      String? name,
-      String? description}) {
+  Future<Organization> edit(
+    String org, {
+    String? billingEmail,
+    String? company,
+    String? email,
+    String? location,
+    String? name,
+    String? description,
+  }) {
     final map = createNonNullMap(<String, dynamic>{
       'billing_email': billingEmail,
       'company': company,
@@ -63,10 +68,12 @@ class OrganizationsService extends Service {
       'description': description
     });
 
-    return github.postJSON('/orgs/$org',
-        statusCode: 200,
-        convert: Organization.fromJson,
-        body: GitHubJson.encode(map));
+    return github.postJSON(
+      '/orgs/$org',
+      statusCode: 200,
+      convert: Organization.fromJson,
+      body: GitHubJson.encode(map),
+    );
   }
 
   /// Lists all of the teams for the specified organization.
@@ -81,15 +88,23 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
   Future<Team> getTeam(int teamId) {
-    return github.getJSON('/teams/$teamId',
-        convert: Organization.fromJson, statusCode: 200) as Future<Team>;
+    return github.getJSON(
+      '/teams/$teamId',
+      convert: Organization.fromJson,
+      statusCode: 200,
+    ) as Future<Team>;
   }
 
   /// Creates a Team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#create-team
-  Future<Team> createTeam(String org, String name,
-      {String? description, List<String>? repos, String? permission}) {
+  Future<Team> createTeam(
+    String org,
+    String name, {
+    String? description,
+    List<String>? repos,
+    String? permission,
+  }) {
     final map = createNonNullMap(<String, dynamic>{
       'name': name,
       'description': description,
@@ -97,15 +112,23 @@ class OrganizationsService extends Service {
       'permission': permission
     });
 
-    return github.postJSON('/orgs/$org/teams',
-        statusCode: 201, convert: Team.fromJson, body: GitHubJson.encode(map));
+    return github.postJSON(
+      '/orgs/$org/teams',
+      statusCode: 201,
+      convert: Team.fromJson,
+      body: GitHubJson.encode(map),
+    );
   }
 
   /// Edits a Team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#edit-team
-  Future<Team> editTeam(int teamId, String name,
-      {String? description, String? permission}) {
+  Future<Team> editTeam(
+    int teamId,
+    String name, {
+    String? description,
+    String? permission,
+  }) {
     final map = createNonNullMap(<String, dynamic>{
       'name': name,
       'description': description,
@@ -180,8 +203,11 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future removeTeamMembership(int teamId, String user) {
-    return github.request('DELETE', '/teams/$teamId/memberships/$user',
-        statusCode: 204);
+    return github.request(
+      'DELETE',
+      '/teams/$teamId/memberships/$user',
+      statusCode: 204,
+    );
   }
 
   /// Lists the repositories that the specified team has access to.
@@ -245,24 +271,30 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
   Stream<Hook> listHooks(String org) {
-    return PaginationHelper(github).objects('GET', '/orgs/$org/hooks',
-        (dynamic i) => Hook.fromJson(i)..repoName = org);
+    return PaginationHelper(github).objects(
+      'GET',
+      '/orgs/$org/hooks',
+      (dynamic i) => Hook.fromJson(i)..repoName = org,
+    );
   }
 
   /// Fetches a single hook by [id].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#get-single-hook
-  Future<Hook> getHook(String org, int id) =>
-      github.getJSON('/orgs/$org/hooks/$id',
-          convert: (dynamic i) => Hook.fromJson(i)..repoName = org);
+  Future<Hook> getHook(String org, int id) => github.getJSON(
+        '/orgs/$org/hooks/$id',
+        convert: (dynamic i) => Hook.fromJson(i)..repoName = org,
+      );
 
   /// Creates an organization hook based on the specified [hook].
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#create-a-hook
   Future<Hook> createHook(String org, CreateHook hook) {
-    return github.postJSON('/orgs/$org/hooks',
-        convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
-        body: GitHubJson.encode(hook));
+    return github.postJSON(
+      '/orgs/$org/hooks',
+      convert: (Map<String, dynamic> i) => Hook.fromJson(i)..repoName = org,
+      body: GitHubJson.encode(hook),
+    );
   }
 
   // TODO: Implement editHook: https://developer.github.com/v3/orgs/hooks/#edit-a-hook

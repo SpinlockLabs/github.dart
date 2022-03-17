@@ -69,8 +69,12 @@ class CreateHook {
   /// If the Hook should be active.
   final bool? active;
 
-  CreateHook(this.name, this.config,
-      {this.events = const ['push'], this.active = true});
+  CreateHook(
+    this.name,
+    this.config, {
+    this.events = const ['push'],
+    this.active = true,
+  });
 
   factory CreateHook.fromJson(Map<String, dynamic> input) =>
       _$CreateHookFromJson(input);

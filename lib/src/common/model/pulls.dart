@@ -191,8 +191,13 @@ class PullRequestHead {
 /// Model class for a pull request to be created.
 @JsonSerializable()
 class CreatePullRequest {
-  CreatePullRequest(this.title, this.head, this.base,
-      {this.draft = false, this.body});
+  CreatePullRequest(
+    this.title,
+    this.head,
+    this.base, {
+    this.draft = false,
+    this.body,
+  });
 
   final String? title;
   final String? head;
@@ -301,13 +306,14 @@ class PullRequestFile {
 
 @JsonSerializable()
 class PullRequestReview {
-  PullRequestReview(
-      {required this.id,
-      required this.user,
-      this.body,
-      this.state,
-      this.htmlUrl,
-      this.pullRequestUrl});
+  PullRequestReview({
+    required this.id,
+    required this.user,
+    this.body,
+    this.state,
+    this.htmlUrl,
+    this.pullRequestUrl,
+  });
   int id;
   User user;
   String? body;
@@ -325,8 +331,13 @@ class PullRequestReview {
 
 @JsonSerializable()
 class CreatePullRequestReview {
-  CreatePullRequestReview(this.owner, this.repo, this.pullNumber, this.event,
-      {this.body});
+  CreatePullRequestReview(
+    this.owner,
+    this.repo,
+    this.pullNumber,
+    this.event, {
+    this.body,
+  });
 
   String owner;
   String repo;

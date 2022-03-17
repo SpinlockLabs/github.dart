@@ -74,8 +74,13 @@ class GitCommit {
 /// Model class for a new commit to be created.
 @JsonSerializable()
 class CreateGitCommit {
-  CreateGitCommit(this.message, this.tree,
-      {this.parents, this.committer, this.author});
+  CreateGitCommit(
+    this.message,
+    this.tree, {
+    this.parents,
+    this.committer,
+    this.author,
+  });
 
   /// The commit message.
   String? message;

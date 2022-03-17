@@ -15,8 +15,9 @@ Future<void> initViewSourceButton(String script) async {
   document.querySelector('#view-source')?.onClick.listen((_) {
     // ignore: unsafe_html
     final popup = window.open(
-        'https://github.com/SpinlockLabs/github.dart/blob/master/example/$script',
-        'View Source');
+      'https://github.com/SpinlockLabs/github.dart/blob/master/example/$script',
+      'View Source',
+    );
     String? code;
 
     var fetched = false;

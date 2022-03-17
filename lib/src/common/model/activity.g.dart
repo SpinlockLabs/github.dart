@@ -35,7 +35,8 @@ Map<String, dynamic> _$EventToJson(Event instance) => <String, dynamic>{
     };
 
 RepositorySubscription _$RepositorySubscriptionFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     RepositorySubscription(
       subscribed: json['subscribed'] as bool?,
       ignored: json['ignored'] as bool?,
@@ -46,7 +47,8 @@ RepositorySubscription _$RepositorySubscriptionFromJson(
     );
 
 Map<String, dynamic> _$RepositorySubscriptionToJson(
-        RepositorySubscription instance) =>
+  RepositorySubscription instance,
+) =>
     <String, dynamic>{
       'subscribed': instance.subscribed,
       'ignored': instance.ignored,

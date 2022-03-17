@@ -37,13 +37,15 @@ class OAuth2Flow {
 
   GitHub? github;
 
-  OAuth2Flow(this.clientId, this.clientSecret,
-      {String? redirectUri,
-      this.scopes = const [],
-      this.state,
-      this.github,
-      this.baseUrl = 'https://github.com/login/oauth'})
-      : redirectUri =
+  OAuth2Flow(
+    this.clientId,
+    this.clientSecret, {
+    String? redirectUri,
+    this.scopes = const [],
+    this.state,
+    this.github,
+    this.baseUrl = 'https://github.com/login/oauth',
+  }) : redirectUri =
             redirectUri == null ? null : _checkRedirectUri(redirectUri);
 
   static String _checkRedirectUri(String uri) {
@@ -89,8 +91,11 @@ class OAuth2Flow {
       if (json['error'] != null) {
         throw Exception(json['error']);
       }
-      return ExchangeResponse(json['access_token'], json['token_type'],
-          (json['scope'] as String).split(','));
+      return ExchangeResponse(
+        json['access_token'],
+        json['token_type'],
+        (json['scope'] as String).split(','),
+      );
     });
   }
 }

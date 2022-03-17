@@ -27,7 +27,11 @@ class ContributorStatistics {
 @JsonSerializable()
 class ContributorWeekStatistics {
   ContributorWeekStatistics(
-      this.start, this.additions, this.deletions, this.commits);
+    this.start,
+    this.additions,
+    this.deletions,
+    this.commits,
+  );
 
   /// Beginning of the Week (As a Unix Timestamp)
   @JsonKey(name: 'w')

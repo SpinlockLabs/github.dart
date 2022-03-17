@@ -7,16 +7,17 @@ part 'authorizations.g.dart';
 /// Model class for an authorization.
 @JsonSerializable()
 class Authorization {
-  Authorization(
-      {this.id,
-      this.scopes,
-      this.token,
-      this.app,
-      this.note,
-      this.noteUrl,
-      this.createdAt,
-      this.updatedAt,
-      this.user});
+  Authorization({
+    this.id,
+    this.scopes,
+    this.token,
+    this.app,
+    this.note,
+    this.noteUrl,
+    this.createdAt,
+    this.updatedAt,
+    this.user,
+  });
 
   int? id;
   List<String>? scopes;
@@ -49,8 +50,13 @@ class AuthorizationApplication {
 
 @JsonSerializable()
 class CreateAuthorization {
-  CreateAuthorization(this.note,
-      {this.scopes, this.noteUrl, this.clientId, this.clientSecret});
+  CreateAuthorization(
+    this.note, {
+    this.scopes,
+    this.noteUrl,
+    this.clientId,
+    this.clientSecret,
+  });
 
   String? note;
   List<String>? scopes;

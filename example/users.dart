@@ -20,8 +20,9 @@ void loadUsers() {
         userDiv.append(BRElement());
       }
 
-      userDiv.append(createAvatarImage(user, width: 64, height: 64)
-        ..classes.add('avatar'));
+      userDiv.append(
+        createAvatarImage(user, width: 64, height: 64)..classes.add('avatar'),
+      );
       final buff = StringBuffer();
 
       buff
@@ -35,9 +36,13 @@ void loadUsers() {
 
       buff.writeln('Followers: ${user.followersCount}');
 
-      userDiv.append(ParagraphElement()
-        ..appendHtml(buff.toString().replaceAll('\n', '<br/>'),
-            treeSanitizer: NodeTreeSanitizer.trusted));
+      userDiv.append(
+        ParagraphElement()
+          ..appendHtml(
+            buff.toString().replaceAll('\n', '<br/>'),
+            treeSanitizer: NodeTreeSanitizer.trusted,
+          ),
+      );
 
       usersDiv!.append(userDiv);
     });

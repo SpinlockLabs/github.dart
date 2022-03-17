@@ -179,15 +179,16 @@ class CreateRelease {
 
   CreateRelease(this.tagName);
 
-  CreateRelease.from(
-      {required this.tagName,
-      required this.name,
-      required this.targetCommitish,
-      required this.isDraft,
-      required this.isPrerelease,
-      this.body,
-      this.discussionCategoryName,
-      this.generateReleaseNotes = false});
+  CreateRelease.from({
+    required this.tagName,
+    required this.name,
+    required this.targetCommitish,
+    required this.isDraft,
+    required this.isPrerelease,
+    this.body,
+    this.discussionCategoryName,
+    this.generateReleaseNotes = false,
+  });
 
   @override
   bool operator ==(Object other) =>
@@ -260,8 +261,14 @@ class ReleaseNotes {
 
 @JsonSerializable()
 class CreateReleaseNotes {
-  CreateReleaseNotes(this.owner, this.repo, this.tagName,
-      {this.targetCommitish, this.previousTagName, this.configurationFilePath});
+  CreateReleaseNotes(
+    this.owner,
+    this.repo,
+    this.tagName, {
+    this.targetCommitish,
+    this.previousTagName,
+    this.configurationFilePath,
+  });
 
   String owner;
   String repo;

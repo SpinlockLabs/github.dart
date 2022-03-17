@@ -48,10 +48,12 @@ String generateMarkdown(int accuracy) {
   final total = totalBytes(breakdown);
   final data = breakdown.toList();
 
-  var md = StringBuffer('''
+  var md = StringBuffer(
+    '''
 |Name|Bytes|Percentage|
 |-----|-----|-----|
-''');
+''',
+  );
   data.sort((a, b) => b[1].compareTo(a[1]));
 
   for (final info in data) {

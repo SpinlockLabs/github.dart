@@ -74,8 +74,10 @@ class GitHub {
   /// Will be `null` if no requests have been made yet.
   DateTime? get rateLimitReset => _rateLimitReset == null
       ? null
-      : DateTime.fromMillisecondsSinceEpoch(_rateLimitReset! * 1000,
-          isUtc: true);
+      : DateTime.fromMillisecondsSinceEpoch(
+          _rateLimitReset! * 1000,
+          isUtc: true,
+        );
 
   int? _rateLimitReset, _rateLimitLimit, _rateLimitRemaining;
 

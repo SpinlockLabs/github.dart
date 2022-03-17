@@ -29,17 +29,23 @@ class PullRequestsService extends Service {
     putValue('sort', sort, params);
     putValue('state', state, params);
 
-    return PaginationHelper(github).objects('GET',
-        '/repos/${slug.fullName}/pulls?state=$state', PullRequest.fromJson,
-        pages: pages, params: params);
+    return PaginationHelper(github).objects(
+      'GET',
+      '/repos/${slug.fullName}/pulls?state=$state',
+      PullRequest.fromJson,
+      pages: pages,
+      params: params,
+    );
   }
 
   /// Fetches a single pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#get-a-single-pull-request
-  Future<PullRequest> get(RepositorySlug slug, int number) =>
-      github.getJSON('/repos/${slug.fullName}/pulls/$number',
-          convert: PullRequest.fromJson, statusCode: StatusCodes.OK);
+  Future<PullRequest> get(RepositorySlug slug, int number) => github.getJSON(
+        '/repos/${slug.fullName}/pulls/$number',
+        convert: PullRequest.fromJson,
+        statusCode: StatusCodes.OK,
+      );
 
   /// Creates a Pull Request based on the given [request].
   ///
@@ -58,8 +64,14 @@ class PullRequestsService extends Service {
   /// Edit a pull request.
   ///
   /// API docs: https://developer.github.com/v3/pulls/#update-a-pull-request
-  Future<PullRequest> edit(RepositorySlug slug, int number,
-      {String? title, String? body, String? state, String? base}) {
+  Future<PullRequest> edit(
+    RepositorySlug slug,
+    int number, {
+    String? title,
+    String? body,
+    String? state,
+    String? base,
+  }) {
     final map = <String, dynamic>{};
     putValue('title', title, map);
     putValue('body', body, map);
@@ -67,11 +79,15 @@ class PullRequestsService extends Service {
     putValue('base', base, map);
 
     return github
-        .request('POST', '/repos/${slug.fullName}/pulls/$number',
-            body: GitHubJson.encode(map))
+        .request(
+      'POST',
+      '/repos/${slug.fullName}/pulls/$number',
+      body: GitHubJson.encode(map),
+    )
         .then((response) {
       return PullRequest.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     });
   }
 
@@ -80,9 +96,10 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
   Stream<RepositoryCommit> listCommits(RepositorySlug slug, int number) {
     return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/pulls/$number/commits',
-        RepositoryCommit.fromJson);
+      'GET',
+      '/repos/${slug.fullName}/pulls/$number/commits',
+      RepositoryCommit.fromJson,
+    );
   }
 
   /// Lists the files in a pull request.
@@ -90,9 +107,10 @@ class PullRequestsService extends Service {
   /// API docs: https://developer.github.com/v3/pulls/#list-pull-requests-files
   Stream<PullRequestFile> listFiles(RepositorySlug slug, int number) {
     return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/pulls/$number/files',
-        PullRequestFile.fromJson);
+      'GET',
+      '/repos/${slug.fullName}/pulls/$number/files',
+      PullRequestFile.fromJson,
+    );
   }
 
   /// Lists the reviews for a pull request.
@@ -100,9 +118,10 @@ class PullRequestsService extends Service {
   /// API docs: https://docs.github.com/en/rest/reference/pulls#list-reviews-for-a-pull-request
   Stream<PullRequestReview> listReviews(RepositorySlug slug, int number) {
     return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/pulls/$number/reviews',
-        PullRequestReview.fromJson);
+      'GET',
+      '/repos/${slug.fullName}/pulls/$number/reviews',
+      PullRequestReview.fromJson,
+    );
   }
 
   Future<bool> isMerged(RepositorySlug slug, int number) {
@@ -128,11 +147,15 @@ class PullRequestsService extends Service {
     }
 
     return github
-        .request('PUT', '/repos/${slug.fullName}/pulls/$number/merge',
-            body: GitHubJson.encode(json))
+        .request(
+      'PUT',
+      '/repos/${slug.fullName}/pulls/$number/merge',
+      body: GitHubJson.encode(json),
+    )
         .then((response) {
       return PullRequestMerge.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     });
   }
 
@@ -140,30 +163,41 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
   Stream<PullRequestComment> listCommentsByPullRequest(
-      RepositorySlug slug, int number) {
+    RepositorySlug slug,
+    int number,
+  ) {
     return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/pulls/$number/comments',
-        PullRequestComment.fromJson);
+      'GET',
+      '/repos/${slug.fullName}/pulls/$number/comments',
+      PullRequestComment.fromJson,
+    );
   }
 
   /// Lists all comments on all pull requests for the repository.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
   Stream<PullRequestComment> listComments(RepositorySlug slug) {
-    return PaginationHelper(github).objects('GET',
-        '/repos/${slug.fullName}/pulls/comments', PullRequestComment.fromJson);
+    return PaginationHelper(github).objects(
+      'GET',
+      '/repos/${slug.fullName}/pulls/comments',
+      PullRequestComment.fromJson,
+    );
   }
 
   /// Creates a new pull request comment.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment
   Future<IssueComment> createComment(
-      RepositorySlug slug, int number, CreatePullRequestComment comment) {
-    return github.postJSON('/repos/${slug.fullName}/pulls/$number/comments',
-        body: GitHubJson.encode(comment.toJson()),
-        convert: PullRequestComment.fromJson,
-        statusCode: 201) as Future<IssueComment>;
+    RepositorySlug slug,
+    int number,
+    CreatePullRequestComment comment,
+  ) {
+    return github.postJSON(
+      '/repos/${slug.fullName}/pulls/$number/comments',
+      body: GitHubJson.encode(comment.toJson()),
+      convert: PullRequestComment.fromJson,
+      statusCode: 201,
+    ) as Future<IssueComment>;
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/pulls/comments/#edit-a-comment
@@ -173,7 +207,9 @@ class PullRequestsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment
   Future<PullRequestReview> createReview(
-      RepositorySlug slug, CreatePullRequestReview review) {
+    RepositorySlug slug,
+    CreatePullRequestReview review,
+  ) {
     return github.postJSON(
       '/repos/${slug.fullName}/pulls/${review.pullNumber}/reviews',
       body: GitHubJson.encode(review),

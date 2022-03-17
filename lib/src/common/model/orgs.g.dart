@@ -48,7 +48,8 @@ Map<String, dynamic> _$OrganizationToJson(Organization instance) =>
     };
 
 OrganizationMembership _$OrganizationMembershipFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     OrganizationMembership(
       state: json['state'] as String?,
       organization: json['organization'] == null
@@ -57,7 +58,8 @@ OrganizationMembership _$OrganizationMembershipFromJson(
     );
 
 Map<String, dynamic> _$OrganizationMembershipToJson(
-        OrganizationMembership instance) =>
+  OrganizationMembership instance,
+) =>
     <String, dynamic>{
       'state': instance.state,
       'organization': instance.organization,

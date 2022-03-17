@@ -23,7 +23,8 @@ Future<void> loadEmojis() async {
     h.className = 'emojibox';
     h.style.textAlign = 'center';
     h.append(
-        ImageElement(src: url, width: 64, height: 64)..classes.add('emoji'));
+      ImageElement(src: url, width: 64, height: 64)..classes.add('emoji'),
+    );
     h.append(ParagraphElement()..text = ':$name:');
     emojiDiv!.append(h);
   });

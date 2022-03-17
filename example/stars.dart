@@ -23,10 +23,14 @@ void loadStars() {
     h.classes.add('box');
     h.classes.add('user');
     h.style.textAlign = 'center';
-    h.append(ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)
-      ..classes.add('avatar'));
-    h.append(AnchorElement(href: stargazer.htmlUrl)
-      ..append(ParagraphElement()..text = stargazer.login));
+    h.append(
+      ImageElement(src: stargazer.avatarUrl, width: 64, height: 64)
+        ..classes.add('avatar'),
+    );
+    h.append(
+      AnchorElement(href: stargazer.htmlUrl)
+        ..append(ParagraphElement()..text = stargazer.login),
+    );
     $stars!.append(h);
   }).onDone(() {
     querySelector('#total')!

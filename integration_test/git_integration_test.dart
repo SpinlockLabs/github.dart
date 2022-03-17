@@ -50,18 +50,28 @@ void main() {
     expect(utf8.decode(base64Decoded), equals('bbb'));
     expect(fetchedBlob.encoding, equals('base64'));
     expect(
-        fetchedBlob.url,
-        equals(
-            'https://api.github.com/repos/${slug.fullName}/git/blobs/$createdBlobSha'));
+      fetchedBlob.url,
+      equals(
+        'https://api.github.com/repos/${slug.fullName}/git/blobs/$createdBlobSha',
+      ),
+    );
     expect(fetchedBlob.sha, equals(createdBlobSha));
     expect(fetchedBlob.size, equals(3));
   });
 
   test('create and get a new tree', () async {
-    var entry1 = CreateGitTreeEntry('README.md', '100644', 'blob',
-        content: 'This is a repository for integration tests.');
-    var entry2 = CreateGitTreeEntry('subdir/asdf.txt', '100644', 'blob',
-        content: 'Some file in a folder.');
+    var entry1 = CreateGitTreeEntry(
+      'README.md',
+      '100644',
+      'blob',
+      content: 'This is a repository for integration tests.',
+    );
+    var entry2 = CreateGitTreeEntry(
+      'subdir/asdf.txt',
+      '100644',
+      'blob',
+      content: 'Some file in a folder.',
+    );
 
     final newTree = CreateGitTree([entry1, entry2])
       ..baseTree = firstCommitTreeSha;
@@ -112,8 +122,13 @@ void main() {
   test('create and get a new tag', () async {
     final tagName = 'v${_randomGitName()}';
 
-    final newTag = CreateGitTag(tagName, 'Version 0.0.1', createdCommitSha,
-        'commit', GitCommitUser('aName', 'aEmail', DateTime.now()));
+    final newTag = CreateGitTag(
+      tagName,
+      'Version 0.0.1',
+      createdCommitSha,
+      'commit',
+      GitCommitUser('aName', 'aEmail', DateTime.now()),
+    );
 
     // createTag()
     final createdTag = await github.git.createTag(slug, newTag);

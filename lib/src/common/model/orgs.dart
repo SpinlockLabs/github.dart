@@ -149,13 +149,14 @@ class TeamMembershipState {
 /// Model class for a team member.
 @JsonSerializable()
 class TeamMember {
-  TeamMember(
-      {this.login,
-      this.id,
-      this.avatarUrl,
-      this.type,
-      this.siteAdmin,
-      this.htmlUrl});
+  TeamMember({
+    this.login,
+    this.id,
+    this.avatarUrl,
+    this.type,
+    this.siteAdmin,
+    this.htmlUrl,
+  });
 
   /// Member Username
   final String? login;

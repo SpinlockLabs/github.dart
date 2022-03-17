@@ -203,7 +203,8 @@ Map<String, dynamic> _$PullRequestCommentToJson(PullRequestComment instance) =>
     };
 
 CreatePullRequestComment _$CreatePullRequestCommentFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     CreatePullRequestComment(
       json['body'] as String?,
       json['commit_id'] as String?,
@@ -212,7 +213,8 @@ CreatePullRequestComment _$CreatePullRequestCommentFromJson(
     );
 
 Map<String, dynamic> _$CreatePullRequestCommentToJson(
-        CreatePullRequestComment instance) =>
+  CreatePullRequestComment instance,
+) =>
     <String, dynamic>{
       'body': instance.body,
       'commit_id': instance.commitId,
@@ -277,7 +279,8 @@ Map<String, dynamic> _$PullRequestReviewToJson(PullRequestReview instance) =>
     };
 
 CreatePullRequestReview _$CreatePullRequestReviewFromJson(
-        Map<String, dynamic> json) =>
+  Map<String, dynamic> json,
+) =>
     CreatePullRequestReview(
       json['owner'] as String,
       json['repo'] as String,
@@ -287,7 +290,8 @@ CreatePullRequestReview _$CreatePullRequestReviewFromJson(
     );
 
 Map<String, dynamic> _$CreatePullRequestReviewToJson(
-        CreatePullRequestReview instance) =>
+  CreatePullRequestReview instance,
+) =>
     <String, dynamic>{
       'owner': instance.owner,
       'repo': instance.repo,

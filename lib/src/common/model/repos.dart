@@ -12,8 +12,14 @@ class GitHubComparison {
   final int? totalCommits;
   final List<CommitFile>? files;
 
-  GitHubComparison(this.url, this.status, this.aheadBy, this.behindBy,
-      this.totalCommits, this.files);
+  GitHubComparison(
+    this.url,
+    this.status,
+    this.aheadBy,
+    this.behindBy,
+    this.totalCommits,
+    this.files,
+  );
 
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);
@@ -39,40 +45,41 @@ class GitHubComparison {
 /// Model class for a repository.
 @JsonSerializable()
 class Repository {
-  Repository(
-      {this.name = '',
-      this.id = 0,
-      this.fullName = '',
-      this.owner,
-      this.htmlUrl = '',
-      this.description = '',
-      this.cloneUrl = '',
-      this.gitUrl = '',
-      this.sshUrl = '',
-      this.svnUrl = '',
-      this.defaultBranch = '',
-      this.createdAt,
-      this.isPrivate = false,
-      this.isFork = false,
-      this.stargazersCount = 0,
-      this.watchersCount = 0,
-      this.language = '',
-      this.hasWiki = false,
-      this.hasDownloads = false,
-      this.forksCount = 0,
-      this.openIssuesCount = 0,
-      this.subscribersCount = 0,
-      this.networkCount = 0,
-      this.hasIssues = false,
-      this.size = 0,
-      this.archived = false,
-      this.disabled = false,
-      this.homepage = '',
-      this.updatedAt,
-      this.pushedAt,
-      this.license,
-      this.hasPages = false,
-      this.permissions});
+  Repository({
+    this.name = '',
+    this.id = 0,
+    this.fullName = '',
+    this.owner,
+    this.htmlUrl = '',
+    this.description = '',
+    this.cloneUrl = '',
+    this.gitUrl = '',
+    this.sshUrl = '',
+    this.svnUrl = '',
+    this.defaultBranch = '',
+    this.createdAt,
+    this.isPrivate = false,
+    this.isFork = false,
+    this.stargazersCount = 0,
+    this.watchersCount = 0,
+    this.language = '',
+    this.hasWiki = false,
+    this.hasDownloads = false,
+    this.forksCount = 0,
+    this.openIssuesCount = 0,
+    this.subscribersCount = 0,
+    this.networkCount = 0,
+    this.hasIssues = false,
+    this.size = 0,
+    this.archived = false,
+    this.disabled = false,
+    this.homepage = '',
+    this.updatedAt,
+    this.pushedAt,
+    this.license,
+    this.hasPages = false,
+    this.permissions,
+  });
 
   /// Repository Name
   final String name;
@@ -182,8 +189,11 @@ class Repository {
 /// Model class for repository permissions.
 @JsonSerializable()
 class RepositoryPermissions {
-  RepositoryPermissions(
-      {this.admin = false, this.push = false, this.pull = false});
+  RepositoryPermissions({
+    this.admin = false,
+    this.push = false,
+    this.pull = false,
+  });
 
   /// Administrative Access
   final bool admin;
@@ -229,8 +239,16 @@ class CommitData {
   final CommitDataUser? author, committer;
   final List<Map<String, dynamic>>? parents;
 
-  CommitData(this.sha, this.commit, this.url, this.htmlUrl, this.commentsUrl,
-      this.author, this.committer, this.parents);
+  CommitData(
+    this.sha,
+    this.commit,
+    this.url,
+    this.htmlUrl,
+    this.commentsUrl,
+    this.author,
+    this.committer,
+    this.parents,
+  );
 
   factory CommitData.fromJson(Map<String, dynamic> input) =>
       _$CommitDataFromJson(input);
@@ -326,17 +344,19 @@ class RepositorySlug {
 /// Model class for a new repository to be created.
 @JsonSerializable()
 class CreateRepository {
-  CreateRepository(this.name,
-      {this.description,
-      this.homepage,
-      this.private,
-      this.hasIssues,
-      this.hasDownloads,
-      this.teamId,
-      this.autoInit,
-      this.gitignoreTemplate,
-      this.licenseTemplate,
-      this.hasWiki});
+  CreateRepository(
+    this.name, {
+    this.description,
+    this.homepage,
+    this.private,
+    this.hasIssues,
+    this.hasDownloads,
+    this.teamId,
+    this.autoInit,
+    this.gitignoreTemplate,
+    this.licenseTemplate,
+    this.hasWiki,
+  });
 
   /// Repository Name
   final String? name;
@@ -457,20 +477,21 @@ class LicenseDetails {
 
   final LicenseKind? license;
 
-  LicenseDetails(
-      {this.name,
-      this.path,
-      this.sha,
-      this.size,
-      this.url,
-      this.htmlUrl,
-      this.gitUrl,
-      this.downloadUrl,
-      this.type,
-      this.content,
-      this.encoding,
-      this.links,
-      this.license});
+  LicenseDetails({
+    this.name,
+    this.path,
+    this.sha,
+    this.size,
+    this.url,
+    this.htmlUrl,
+    this.gitUrl,
+    this.downloadUrl,
+    this.type,
+    this.content,
+    this.encoding,
+    this.links,
+    this.license,
+  });
 
   factory LicenseDetails.fromJson(Map<String, dynamic> json) =>
       _$LicenseDetailsFromJson(json);

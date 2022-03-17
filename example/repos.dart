@@ -46,7 +46,8 @@ void updateRepos(
   document.querySelector('#repos')!.children.clear();
   repos.sort(compare);
   for (final repo in repos) {
-    repositoriesDiv!.appendHtml('''
+    repositoriesDiv!.appendHtml(
+      '''
         <div class="repo" id="repo_${repo.name}">
           <div class="line"></div>
           <h2><a href="${repo.htmlUrl}">${repo.name}</a></h2>
@@ -64,16 +65,20 @@ void updateRepos(
           <b>Size</b>: ${repo.size} bytes
           <p></p>
         </div>
-      ''', treeSanitizer: NodeTreeSanitizer.trusted);
+      ''',
+      treeSanitizer: NodeTreeSanitizer.trusted,
+    );
   }
 }
 
 void loadRepos([int Function(Repository a, Repository b)? compare]) {
   final title = querySelector('#title')!;
   if (title.text!.contains('(')) {
-    title.replaceWith(HeadingElement.h2()
-      ..text = 'GitHub for Dart - Repositories'
-      ..id = 'title');
+    title.replaceWith(
+      HeadingElement.h2()
+        ..text = 'GitHub for Dart - Repositories'
+        ..id = 'title',
+    );
   }
 
   String? user = 'SpinlockLabs';

@@ -19,14 +19,15 @@ class UsersService extends Service {
   /// Updates the Current User.
   ///
   /// API docs: https://developer.github.com/v3/users/#update-the-authenticated-user
-  Future<CurrentUser> editCurrentUser(
-      {String? name,
-      String? email,
-      String? blog,
-      String? company,
-      String? location,
-      bool? hireable,
-      String? bio}) {
+  Future<CurrentUser> editCurrentUser({
+    String? name,
+    String? email,
+    String? blog,
+    String? company,
+    String? location,
+    bool? hireable,
+    String? bio,
+  }) {
     final map = createNonNullMap(<String, dynamic>{
       'name': name,
       'email': email,
@@ -58,13 +59,16 @@ class UsersService extends Service {
   /// Throws [AccessForbidden] if we are not authenticated.
   ///
   /// API docs: https://developer.github.com/v3/users/#get-the-authenticated-user
-  Future<CurrentUser> getCurrentUser() =>
-      github.getJSON('/user', statusCode: StatusCodes.OK,
-          fail: (http.Response response) {
-        if (response.statusCode == StatusCodes.FORBIDDEN) {
-          throw AccessForbidden(github);
-        }
-      }, convert: CurrentUser.fromJson);
+  Future<CurrentUser> getCurrentUser() => github.getJSON(
+        '/user',
+        statusCode: StatusCodes.OK,
+        fail: (http.Response response) {
+          if (response.statusCode == StatusCodes.FORBIDDEN) {
+            throw AccessForbidden(github);
+          }
+        },
+        convert: CurrentUser.fromJson,
+      );
 
   /// Checks if a user exists.
   Future<bool> isUser(String name) => github
@@ -77,8 +81,13 @@ class UsersService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/users/#get-all-users
   Stream<User> listUsers({int? pages, int? since}) =>
-      PaginationHelper(github).objects('GET', '/users', User.fromJson,
-          pages: pages, params: {'since': since});
+      PaginationHelper(github).objects(
+        'GET',
+        '/users',
+        User.fromJson,
+        pages: pages,
+        params: {'since': since},
+      );
 
   /// Lists all email addresses for the currently authenticated user.
   ///
@@ -89,16 +98,25 @@ class UsersService extends Service {
   /// Add Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#add-email-addresses
-  Stream<UserEmail> addEmails(List<String> emails) => PaginationHelper(github)
-      .objects('POST', '/user/emails', UserEmail.fromJson,
-          statusCode: 201, body: GitHubJson.encode(emails));
+  Stream<UserEmail> addEmails(List<String> emails) =>
+      PaginationHelper(github).objects(
+        'POST',
+        '/user/emails',
+        UserEmail.fromJson,
+        statusCode: 201,
+        body: GitHubJson.encode(emails),
+      );
 
   /// Delete Emails
   ///
   /// API docs: https://developer.github.com/v3/users/emails/#delete-email-addresses
   Future<bool> deleteEmails(List<String> emails) => github
-      .request('DELETE', '/user/emails',
-          body: GitHubJson.encode(emails), statusCode: 204)
+      .request(
+        'DELETE',
+        '/user/emails',
+        body: GitHubJson.encode(emails),
+        statusCode: 204,
+      )
       .then((x) => x.statusCode == 204);
 
   /// List user followers.

@@ -51,9 +51,14 @@ Future<void> main(List<String> args) async {
   print('Current Version: $currentVersion');
   print('New Version    : $newVersion');
 
-  var rn = await gh.repositories.generateReleaseNotes(CreateReleaseNotes(
-      slug.owner, slug.name, newVersion,
-      previousTagName: currentVersion));
+  var rn = await gh.repositories.generateReleaseNotes(
+    CreateReleaseNotes(
+      slug.owner,
+      slug.name,
+      newVersion,
+      previousTagName: currentVersion,
+    ),
+  );
 
   var releaseNotes = rn.body.replaceFirst('## What\'s Changed', '');
   releaseNotes = '## $newVersion\n$releaseNotes';
@@ -71,14 +76,16 @@ Future<void> main(List<String> args) async {
   // print('autoprep commit: $commit');
 
   var release = await gh.repositories.createRelease(
-      slug,
-      CreateRelease.from(
-          tagName: newVersion,
-          name: newVersion,
-          generateReleaseNotes: true,
-          targetCommitish: 'master',
-          isDraft: false,
-          isPrerelease: false));
+    slug,
+    CreateRelease.from(
+      tagName: newVersion,
+      name: newVersion,
+      generateReleaseNotes: true,
+      targetCommitish: 'master',
+      isDraft: false,
+      isPrerelease: false,
+    ),
+  );
 
   print('$newVersion release created at ${release.createdAt}');
   exit(0);

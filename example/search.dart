@@ -37,10 +37,14 @@ Future<void> search(_) async {
     for (final item in results.items!) {
       final url = item.htmlUrl;
       final path = item.path;
-      resultsDiv.append(DivElement()
-        ..append(AnchorElement(href: url.toString())
-          ..text = path
-          ..target = '_blank'));
+      resultsDiv.append(
+        DivElement()
+          ..append(
+            AnchorElement(href: url.toString())
+              ..text = path
+              ..target = '_blank',
+          ),
+      );
     }
   }
 }

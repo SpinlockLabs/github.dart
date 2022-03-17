@@ -25,8 +25,12 @@ class SearchService extends Service {
     var isFirst = true;
 
     PaginationHelper(github)
-        .fetchStreamed('GET', '/search/repositories',
-            params: params, pages: pages)
+        .fetchStreamed(
+      'GET',
+      '/search/repositories',
+      params: params,
+      pages: pages,
+    )
         .listen((response) {
       if (response.statusCode == 403 &&
           response.body.contains('rate limit') &&

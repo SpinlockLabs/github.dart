@@ -24,8 +24,13 @@ void main() {
     test('constructs correct path', () {
       git.getBlob(repo, 'sh');
 
-      verify(github.getJSON('/repos/o/n/git/blobs/sh',
-          convert: GitBlob.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/blobs/sh',
+          convert: GitBlob.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
@@ -34,12 +39,14 @@ void main() {
       var blob = CreateGitBlob('bbb', 'utf-8');
       git.createBlob(repo, blob);
 
-      verify(github.postJSON(
-        '/repos/o/n/git/blobs',
-        convert: GitBlob.fromJson,
-        statusCode: StatusCodes.CREATED,
-        body: GitHubJson.encode(blob),
-      ));
+      verify(
+        github.postJSON(
+          '/repos/o/n/git/blobs',
+          convert: GitBlob.fromJson,
+          statusCode: StatusCodes.CREATED,
+          body: GitHubJson.encode(blob),
+        ),
+      );
     });
 
     test('creates valid JSON body', () {
@@ -56,8 +63,13 @@ void main() {
     test('constructs correct path', () {
       git.getCommit(repo, 'sh');
 
-      verify(github.getJSON('/repos/o/n/git/commits/sh',
-          convert: GitCommit.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/commits/sh',
+          convert: GitCommit.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
@@ -66,12 +78,14 @@ void main() {
       final commit = CreateGitCommit('aMessage', 'aTreeSha');
       git.createCommit(repo, commit);
 
-      verify(github.postJSON(
-        '/repos/o/n/git/commits',
-        convert: GitCommit.fromJson,
-        statusCode: StatusCodes.CREATED,
-        body: GitHubJson.encode(commit),
-      ));
+      verify(
+        github.postJSON(
+          '/repos/o/n/git/commits',
+          convert: GitCommit.fromJson,
+          statusCode: StatusCodes.CREATED,
+          body: GitHubJson.encode(commit),
+        ),
+      );
     });
 
     test('creates valid JSON body', () {
@@ -104,8 +118,13 @@ void main() {
     test('constructs correct path', () {
       git.getReference(repo, 'heads/b');
 
-      verify(github.getJSON('/repos/o/n/git/refs/heads/b',
-          convert: GitReference.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/refs/heads/b',
+          convert: GitReference.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
@@ -114,10 +133,14 @@ void main() {
     test('constructs correct path', () {
       git.createReference(repo, someRef, someSha);
 
-      verify(github.postJSON('/repos/o/n/git/refs',
+      verify(
+        github.postJSON(
+          '/repos/o/n/git/refs',
           convert: GitReference.fromJson,
           statusCode: StatusCodes.CREATED,
-          body: GitHubJson.encode({'ref': someRef, 'sha': someSha})));
+          body: GitHubJson.encode({'ref': someRef, 'sha': someSha}),
+        ),
+      );
     });
 
     test('creates valid JSON body', () {
@@ -141,8 +164,14 @@ void main() {
       git.editReference(repo, 'heads/b', someSha);
 
       // then
-      verify(github.request('PATCH', '/repos/o/n/git/refs/heads/b',
-          headers: any, body: any));
+      verify(
+        github.request(
+          'PATCH',
+          '/repos/o/n/git/refs/heads/b',
+          headers: any,
+          body: any,
+        ),
+      );
     });
 
     test('creates valid JSON body', () {
@@ -155,12 +184,14 @@ void main() {
       git.editReference(repo, 'heads/b', someSha, force: true);
 
       // then
-      final captured = verify(github.request(
-        any,
-        any,
-        body: captureAny,
-        headers: captureAny,
-      )).captured;
+      final captured = verify(
+        github.request(
+          any,
+          any,
+          body: captureAny,
+          headers: captureAny,
+        ),
+      ).captured;
 
       final body = jsonDecode(captured[0]);
       final headers = captured[1];
@@ -189,22 +220,36 @@ void main() {
     test('constructs correct path', () {
       git.getTag(repo, someSha);
 
-      verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-          convert: GitTag.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/tags/someSHA',
+          convert: GitTag.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
   group('createTag()', () {
-    final createGitTag = CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
-        GitCommitUser('aName', 'aEmail', DateTime.now()));
+    final createGitTag = CreateGitTag(
+      'v0.0.1',
+      'a message',
+      someSha,
+      'commit',
+      GitCommitUser('aName', 'aEmail', DateTime.now()),
+    );
 
     test('constructs correct path', () {
       git.createTag(repo, createGitTag);
 
-      verify(github.postJSON('/repos/o/n/git/tags',
+      verify(
+        github.postJSON(
+          '/repos/o/n/git/tags',
           convert: GitTag.fromJson,
           statusCode: StatusCodes.CREATED,
-          body: GitHubJson.encode(createGitTag)));
+          body: GitHubJson.encode(createGitTag),
+        ),
+      );
     });
 
     test('creates valid JSON body', () {
@@ -223,8 +268,13 @@ void main() {
     test('constructs correct path', () {
       git.getTree(repo, 'sh');
 
-      verify(github.getJSON('/repos/o/n/git/trees/sh',
-          convert: GitTree.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/trees/sh',
+          convert: GitTree.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
@@ -232,8 +282,13 @@ void main() {
     test('constructs correct path', () {
       git.getTree(repo, 'sh', recursive: true);
 
-      verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-          convert: GitTree.fromJson, statusCode: StatusCodes.OK));
+      verify(
+        github.getJSON(
+          '/repos/o/n/git/trees/sh?recursive=1',
+          convert: GitTree.fromJson,
+          statusCode: StatusCodes.OK,
+        ),
+      );
     });
   });
 
@@ -242,16 +297,24 @@ void main() {
       final createGitTree = CreateGitTree([]);
       git.createTree(repo, createGitTree);
 
-      verify(github.postJSON('/repos/o/n/git/trees',
+      verify(
+        github.postJSON(
+          '/repos/o/n/git/trees',
           convert: GitTree.fromJson,
           statusCode: StatusCodes.CREATED,
-          body: GitHubJson.encode(createGitTree)));
+          body: GitHubJson.encode(createGitTree),
+        ),
+      );
     });
 
     test('with sha creates valid JSON body', () {
       // given
-      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
-          sha: '44b4fc6d56897b048c772eb4087f854f46256132');
+      var treeEntry = CreateGitTreeEntry(
+        'file.rb',
+        '100644',
+        'blob',
+        sha: '44b4fc6d56897b048c772eb4087f854f46256132',
+      );
 
       final tree = CreateGitTree([treeEntry]);
 
@@ -264,15 +327,21 @@ void main() {
       expect(body['tree'][0]['path'], equals('file.rb'));
       expect(body['tree'][0]['mode'], equals('100644'));
       expect(body['tree'][0]['type'], equals('blob'));
-      expect(body['tree'][0]['sha'],
-          equals('44b4fc6d56897b048c772eb4087f854f46256132'));
+      expect(
+        body['tree'][0]['sha'],
+        equals('44b4fc6d56897b048c772eb4087f854f46256132'),
+      );
       expect(body['tree'][0]['content'], isNull);
     });
 
     test('with content creates valid JSON body', () {
       // given
-      var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
-          content: 'some file content');
+      var treeEntry = CreateGitTreeEntry(
+        'file.rb',
+        '100644',
+        'blob',
+        content: 'some file content',
+      );
 
       final tree = CreateGitTree([treeEntry]);
 
@@ -292,12 +361,14 @@ void main() {
 }
 
 Map<String, dynamic>? captureSentBody(MockGitHub github) {
-  final bodyString = verify(github.postJSON(
-    any,
-    convert: any,
-    statusCode: any,
-    body: captureAny,
-  )).captured.single;
+  final bodyString = verify(
+    github.postJSON(
+      any,
+      convert: any,
+      statusCode: any,
+      body: captureAny,
+    ),
+  ).captured.single;
 
   final body = jsonDecode(bodyString) as Map<String, dynamic>?;
   return body;

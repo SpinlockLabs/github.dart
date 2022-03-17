@@ -36,7 +36,8 @@ class RateLimit {
     final limit = int.parse(headers['x-ratelimit-limit']!);
     final remaining = int.parse(headers['x-ratelimit-remaining']!);
     final resets = DateTime.fromMillisecondsSinceEpoch(
-        int.parse(headers['x-ratelimit-reset']!) * 1000);
+      int.parse(headers['x-ratelimit-reset']!) * 1000,
+    );
     return RateLimit(limit, remaining, resets);
   }
 

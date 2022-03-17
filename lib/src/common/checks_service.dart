@@ -59,25 +59,29 @@ class _CheckRunsService extends Service {
     CheckRunOutput? output,
     List<CheckRunAction>? actions,
   }) async {
-    assert(conclusion != null ||
-        (completedAt == null && status != CheckRunStatus.completed));
+    assert(
+      conclusion != null ||
+          (completedAt == null && status != CheckRunStatus.completed),
+    );
     assert(actions == null || actions.length <= 3);
     return github.postJSON<Map<String, dynamic>, CheckRun>(
       '/repos/${slug.fullName}/check-runs',
       statusCode: StatusCodes.CREATED,
       preview: _previewHeader,
-      body: jsonEncode(createNonNullMap(<String, dynamic>{
-        'name': name,
-        'head_sha': headSha,
-        'details_url': detailsUrl,
-        'external_id': externalId,
-        'status': status,
-        'started_at': dateToGitHubIso8601(startedAt),
-        'conclusion': conclusion,
-        'completed_at': dateToGitHubIso8601(completedAt),
-        'output': output,
-        'actions': actions,
-      })),
+      body: jsonEncode(
+        createNonNullMap(<String, dynamic>{
+          'name': name,
+          'head_sha': headSha,
+          'details_url': detailsUrl,
+          'external_id': externalId,
+          'status': status,
+          'started_at': dateToGitHubIso8601(startedAt),
+          'conclusion': conclusion,
+          'completed_at': dateToGitHubIso8601(completedAt),
+          'output': output,
+          'actions': actions,
+        }),
+      ),
       convert: CheckRun.fromJson,
     );
   }
@@ -110,25 +114,29 @@ class _CheckRunsService extends Service {
     CheckRunOutput? output,
     List<CheckRunAction>? actions,
   }) async {
-    assert(conclusion != null ||
-        (completedAt == null && status != CheckRunStatus.completed));
+    assert(
+      conclusion != null ||
+          (completedAt == null && status != CheckRunStatus.completed),
+    );
     assert(actions == null || actions.length <= 3);
     return github.requestJson<Map<String, dynamic>, CheckRun>(
       'PATCH',
       '/repos/${slug.fullName}/check-runs/${checkRunToUpdate.id}',
       statusCode: StatusCodes.OK,
       preview: _previewHeader,
-      body: jsonEncode(createNonNullMap(<String, dynamic>{
-        'name': name,
-        'details_url': detailsUrl,
-        'external_id': externalId,
-        'started_at': dateToGitHubIso8601(startedAt),
-        'status': status,
-        'conclusion': conclusion,
-        'completed_at': dateToGitHubIso8601(completedAt),
-        'output': output,
-        'actions': actions,
-      })),
+      body: jsonEncode(
+        createNonNullMap(<String, dynamic>{
+          'name': name,
+          'details_url': detailsUrl,
+          'external_id': externalId,
+          'started_at': dateToGitHubIso8601(startedAt),
+          'status': status,
+          'conclusion': conclusion,
+          'completed_at': dateToGitHubIso8601(completedAt),
+          'output': output,
+          'actions': actions,
+        }),
+      ),
       convert: CheckRun.fromJson,
     );
   }

@@ -12,7 +12,9 @@ export 'hooks.dart';
 Authentication findAuthenticationFromEnvironment() {
   if (Platform.isMacOS) {
     final result = Process.runSync(
-        'security', const ['find-internet-password', '-g', '-s', 'github.com']);
+      'security',
+      const ['find-internet-password', '-g', '-s', 'github.com'],
+    );
 
     if (result.exitCode == 0) {
       final out = result.stdout.toString();
