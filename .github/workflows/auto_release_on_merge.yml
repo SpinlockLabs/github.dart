@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    container: dart:2.14.4
+    container: dart:2.15.1
 
     steps:
       - name: Checkout
@@ -30,4 +30,3 @@ jobs:
           pub get
           pub global activate cider
           dart tool/auto_release_on_merge.dart ${{github.repository}} ${{github.event.pull_request.number}}
-          
