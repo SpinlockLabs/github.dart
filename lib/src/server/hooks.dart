@@ -214,24 +214,3 @@ class PullRequestEvent extends HookEvent {
       _$PullRequestEventFromJson(input);
   Map<String, dynamic> toJson() => _$PullRequestEventToJson(this);
 }
-
-@JsonSerializable(fieldRename: FieldRename.snake)
-class CreateEvent extends HookEvent {
-  CreateEvent({
-    this.ref,
-    this.refType,
-    this.pusherType,
-    this.repository,
-    this.sender,
-  });
-
-  factory CreateEvent.fromJson(Map<String, dynamic> input) => _$CreateEventFromJson(input);
-  String? ref;
-  String? refType;
-  String? pusherType;
-  Repository? repository;
-  User? sender;
-
-  Map<String, dynamic> toJson() => _$CreateEventToJson(this);
-}
-
