@@ -225,7 +225,8 @@ class CreateEvent extends HookEvent {
     this.sender,
   });
 
-  factory CreateEvent.fromJson(Map<String, dynamic> input) => _$CreateEventFromJson(input);
+  factory CreateEvent.fromJson(Map<String, dynamic> input) =>
+      _$CreateEventFromJson(input);
   String? ref;
   String? refType;
   String? pusherType;
