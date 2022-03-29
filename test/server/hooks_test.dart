@@ -39,4 +39,22 @@ void main() {
       expect(checkRun.status, CheckRunStatus.queued);
     });
   });
+
+  group('CreateEvent', () {
+    test('deserialize', () async {
+      final createEvent = CreateEvent.fromJson(
+          json.decode(createString) as Map<String, dynamic>);
+      expect(createEvent.ref, 'simple-branch');
+      expect(createEvent.refType, 'branch');
+      expect(createEvent.pusherType, 'user');
+
+      final repo = createEvent.repository!;
+      expect(repo.slug().fullName, 'Codertocat/Hello-World');
+      expect(repo.id, 186853002);
+
+      final sender = createEvent.sender!;
+      expect(sender.login, "Codertocat");
+      expect(sender.htmlUrl, "https://github.com/Codertocat");
+    });
+  });
 }
