@@ -1,3 +1,12 @@
+## 9.1.0
+
+* add 'create' github webhook event to hooks.dart by @XilaiZhang in https://github.com/SpinlockLabs/github.dart/pull/304
+
+## New Contributors
+* @XilaiZhang made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/304
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.0.3...9.1.0
+
 ## 9.0.3
 
 * Update Language Colors March 13th 2022 by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/302
