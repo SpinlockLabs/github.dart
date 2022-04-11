@@ -29,12 +29,9 @@ class PullRequestsService extends Service {
     putValue('sort', sort, params);
     putValue('state', state, params);
 
-    return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/pulls',
-        (dynamic i) => PullRequest.fromJson(i),
-        pages: pages,
-        params: params);
+    return PaginationHelper(github).objects('GET',
+        '/repos/${slug.fullName}/pulls', (dynamic i) => PullRequest.fromJson(i),
+        pages: pages, params: params);
   }
 
   /// Fetches a single pull request.
