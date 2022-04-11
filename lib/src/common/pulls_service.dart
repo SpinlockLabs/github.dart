@@ -31,7 +31,7 @@ class PullRequestsService extends Service {
 
     return PaginationHelper(github).objects(
         'GET',
-        '/repos/${slug.fullName}/pulls?state=$state',
+        '/repos/${slug.fullName}/pulls',
         (dynamic i) => PullRequest.fromJson(i),
         pages: pages,
         params: params);
