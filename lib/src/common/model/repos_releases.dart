@@ -173,16 +173,21 @@ class CreateRelease {
   @JsonKey(name: 'prerelease')
   bool? isPrerelease;
 
+  String? discussionCategoryName;
+
+  bool generateReleaseNotes = false;
+
   CreateRelease(this.tagName);
 
-  CreateRelease.from({
-    required this.tagName,
-    required this.name,
-    required this.targetCommitish,
-    required this.isDraft,
-    required this.isPrerelease,
-    this.body,
-  });
+  CreateRelease.from(
+      {required this.tagName,
+      required this.name,
+      required this.targetCommitish,
+      required this.isDraft,
+      required this.isPrerelease,
+      this.body,
+      this.discussionCategoryName,
+      this.generateReleaseNotes = false});
 
   @override
   bool operator ==(Object other) =>
@@ -194,7 +199,9 @@ class CreateRelease {
           name == other.name &&
           body == other.body &&
           isDraft == other.isDraft &&
-          isPrerelease == other.isPrerelease;
+          isPrerelease == other.isPrerelease &&
+          generateReleaseNotes == other.generateReleaseNotes &&
+          discussionCategoryName == other.discussionCategoryName;
 
   @override
   int get hashCode =>
@@ -203,7 +210,9 @@ class CreateRelease {
       name.hashCode ^
       body.hashCode ^
       isDraft.hashCode ^
-      isPrerelease.hashCode;
+      isPrerelease.hashCode ^
+      discussionCategoryName.hashCode ^
+      generateReleaseNotes.hashCode;
 
   factory CreateRelease.fromJson(Map<String, dynamic> input) =>
       _$CreateReleaseFromJson(input);
@@ -235,4 +244,33 @@ class CreateReleaseAsset {
   ///
   /// GitHub expects the asset data in its raw binary form, rather than JSON.
   Uint8List assetData;
+}
+
+/// Holds release notes information
+@JsonSerializable()
+class ReleaseNotes {
+  ReleaseNotes(this.name, this.body);
+  String name;
+  String body;
+
+  factory ReleaseNotes.fromJson(Map<String, dynamic> input) =>
+      _$ReleaseNotesFromJson(input);
+  Map<String, dynamic> toJson() => _$ReleaseNotesToJson(this);
+}
+
+@JsonSerializable()
+class CreateReleaseNotes {
+  CreateReleaseNotes(this.owner, this.repo, this.tagName,
+      {this.targetCommitish, this.previousTagName, this.configurationFilePath});
+
+  String owner;
+  String repo;
+  String tagName;
+  String? targetCommitish;
+  String? previousTagName;
+  String? configurationFilePath;
+
+  factory CreateReleaseNotes.fromJson(Map<String, dynamic> input) =>
+      _$CreateReleaseNotesFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateReleaseNotesToJson(this);
 }

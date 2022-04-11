@@ -1,6 +1,5 @@
 import 'dart:html';
 
-import 'package:github/github.dart';
 import 'common.dart';
 
 DivElement? tableDiv;
@@ -18,7 +17,7 @@ Future<void> loadRepository() async {
   var user = params['user'] ?? 'dart-lang';
   var reponame = params['repo'] ?? 'sdk';
 
-  document.getElementById('name')!.setInnerHtml('$user/$reponame');
+  document.getElementById('name')!.text = '$user/$reponame';
 
   final repo = RepositorySlug(user, reponame);
   breakdown = await github.repositories.listLanguages(repo);
@@ -35,6 +34,7 @@ void reloadTable({int accuracy = 4}) {
   isReloadingTable = true;
   final md = generateMarkdown(accuracy);
   github.misc.renderMarkdown(md).then((html) {
+    // ignore: unsafe_html
     tableDiv!.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     isReloadingTable = false;
   });
@@ -48,15 +48,17 @@ String generateMarkdown(int accuracy) {
   final total = totalBytes(breakdown);
   final data = breakdown.toList();
 
-  var md = '|Name|Bytes|Percentage|\n';
-  md += '|-----|-----|-----|\n';
+  var md = StringBuffer('''
+|Name|Bytes|Percentage|
+|-----|-----|-----|
+''');
   data.sort((a, b) => b[1].compareTo(a[1]));
 
-  data.forEach((info) {
+  for (final info in data) {
     final String? name = info[0];
     final int bytes = info[1];
     final num percentage = (bytes / total) * 100;
-    md += '|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|\n';
-  });
-  return md;
+    md.writeln('|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|');
+  }
+  return md.toString();
 }

@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'misc.g.dart';
 
 /// Model class for a Gitignore Template.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class GitignoreTemplate {
   GitignoreTemplate({this.name, this.source});
 
@@ -15,6 +15,7 @@ class GitignoreTemplate {
 
   factory GitignoreTemplate.fromJson(Map<String, dynamic> input) =>
       _$GitignoreTemplateFromJson(input);
+  Map<String, dynamic> toJson() => _$GitignoreTemplateToJson(this);
 }
 
 /// Model class for GitHub Rate Limit Information.
@@ -44,8 +45,8 @@ class RateLimit {
   /// API docs: https://developer.github.com/v3/rate_limit/
   factory RateLimit.fromRateLimitResponse(Map<String, dynamic> response) {
     final rateJson = response['rate'] as Map<String, dynamic>;
-    final limit = int.parse(rateJson['limit']!);
-    final remaining = int.parse(rateJson['remaining']!);
+    final limit = rateJson['limit'] as int?;
+    final remaining = rateJson['remaining'] as int?;
     final resets = DateTime.fromMillisecondsSinceEpoch(rateJson['reset']!);
     return RateLimit(limit, remaining, resets);
   }

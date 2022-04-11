@@ -31,27 +31,21 @@ class Issue {
     }
   }
 
-  @JsonKey(defaultValue: 0)
   int id;
 
   /// The api url.
-  @JsonKey(defaultValue: '')
   String url;
 
   /// Url to the Issue Page
-  @JsonKey(defaultValue: '')
   String htmlUrl;
 
   /// Issue Number
-  @JsonKey(defaultValue: 0)
   int number;
 
   /// Issue State
-  @JsonKey(defaultValue: '')
   String state;
 
   /// Issue Title
-  @JsonKey(defaultValue: '')
   String title;
 
   /// User who created the issue.
@@ -68,30 +62,24 @@ class Issue {
   Milestone? milestone;
 
   /// Number of Comments
-  @JsonKey(name: 'comments', defaultValue: 0)
+  @JsonKey(name: 'comments')
   int commentsCount;
 
   /// A Pull Request
-  @JsonKey(name: 'pull_request')
   IssuePullRequest? pullRequest;
 
   /// Time that the issue was created at
-  @JsonKey(name: 'created_at')
   DateTime? createdAt;
 
   /// The time that the issue was closed at
-  @JsonKey(name: 'closed_at')
   DateTime? closedAt;
 
   /// The time that the issue was updated at
-  @JsonKey(name: 'updated_at')
   DateTime? updatedAt;
 
-  @JsonKey(defaultValue: '')
   String body;
 
   /// The user who closed the issue
-  @JsonKey(name: 'closed_by')
   User? closedBy;
 
   bool get isOpen => state == 'open';
@@ -178,10 +166,8 @@ class IssueLabel {
     this.color = '',
   });
 
-  @JsonKey(defaultValue: '')
   String name;
 
-  @JsonKey(defaultValue: '')
   String color;
 
   factory IssueLabel.fromJson(Map<String, dynamic> input) =>

@@ -1,4 +1,4 @@
-name: Dart CI
+name: Dart Checks (analyze,format,publishable)
 
 on: [push]
 
@@ -6,15 +6,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
     container:
-      image: google/dart:2.12
-    
+      image: dart:2.14
+
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
       run: pub get
     - name: Dart Analyzer
-      run: dartanalyzer .
+      run: dart analyze
     - name: Check Dart Format
-      run: dartfmt -n --set-exit-if-changed .
+      run: dart format --set-exit-if-changed -o none lib test tool example && echo Dart Format 👍 || echo Files needed Dart formatting 😢
+    - name: Check if Publishable
+      run: dart pub publish --dry-run

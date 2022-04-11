@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:github/src/common.dart';
 import 'package:meta/meta.dart';
 
@@ -5,17 +7,17 @@ import 'package:meta/meta.dart';
 /// but with a String value that is used for serialization.
 @immutable
 abstract class EnumWithValue {
-  final String value;
+  final String? value;
 
   /// The value will be used when [toJson] or [toString] will be called.
   /// It will also be used to check if two [EnumWithValue] are equal.
   const EnumWithValue(this.value);
 
   @override
-  String toString() => value;
+  String toString() => value ?? 'null';
 
   /// Returns the String value of this.
-  String toJson() => value;
+  String toJson() => value ?? 'null';
 
   /// True iff [other] is an [EnumWithValue] with the same value as this object.
   @override
@@ -60,6 +62,7 @@ RepositorySlug slugFromAPIUrl(String url) {
   return RepositorySlug(parts[0], parts[1]);
 }
 
+// ignore: avoid_classes_with_only_static_members
 abstract class StatusCodes {
   static const int OK = 200;
   static const int CREATED = 201;

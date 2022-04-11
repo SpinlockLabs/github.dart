@@ -1,3 +1,4 @@
+import 'package:github/src/common/model/pulls.dart';
 import 'package:github/src/common/util/utils.dart';
 import 'package:meta/meta.dart';
 
@@ -45,10 +46,14 @@ class CheckRunConclusion extends EnumWithValue {
   static const cancelled = CheckRunConclusion._('cancelled');
   static const timedOut = CheckRunConclusion._('timed_out');
   static const actionRequired = CheckRunConclusion._('action_required');
+  static const empty = CheckRunConclusion._(null);
 
-  const CheckRunConclusion._(String value) : super(value);
+  const CheckRunConclusion._(String? value) : super(value);
 
   factory CheckRunConclusion._fromValue(String? value) {
+    if (value == null) {
+      return empty;
+    }
     for (final level in const [
       success,
       failure,
@@ -89,6 +94,7 @@ class CheckRun {
   final int? checkSuiteId;
   final String? detailsUrl;
   final DateTime startedAt;
+  final CheckRunConclusion conclusion;
 
   const CheckRun._({
     required this.id,
@@ -99,6 +105,7 @@ class CheckRun {
     required this.name,
     required this.detailsUrl,
     required this.startedAt,
+    required this.conclusion,
   });
 
   factory CheckRun.fromJson(Map<String, dynamic> input) {
@@ -122,7 +129,24 @@ class CheckRun {
       checkSuiteId: input['check_suite']['id'],
       detailsUrl: input['details_url'],
       startedAt: DateTime.parse(input['started_at']),
+      conclusion: CheckRunConclusion._fromValue(input['conclusion']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'name': name,
+      'id': id,
+      'external_id': externalId,
+      'status': status,
+      'head_sha': externalId,
+      'check_suite': <String, dynamic>{
+        'id': checkSuiteId,
+      },
+      'details_url': detailsUrl,
+      'started_at': startedAt.toIso8601String(),
+      'conclusion': conclusion,
+    };
   }
 }
 
@@ -312,7 +336,7 @@ class CheckRunAction {
     required this.label,
     required this.description,
     required this.identifier,
-  })   : assert(label.length <= 20),
+  })  : assert(label.length <= 20),
         assert(description.length <= 40),
         assert(identifier.length <= 20);
 
@@ -325,24 +349,41 @@ class CheckRunAction {
   }
 }
 
+/// API docs: https://docs.github.com/en/rest/reference/checks#check-suites
 @immutable
 class CheckSuite {
   final int? id;
   final String? headSha;
   final CheckRunConclusion conclusion;
+  final List<PullRequest> pullRequests;
 
   const CheckSuite({
     required this.conclusion,
     required this.headSha,
     required this.id,
+    required this.pullRequests,
   });
 
   factory CheckSuite.fromJson(Map<String, dynamic> input) {
+    var pullRequestsJson = input['pull_requests'] as List<dynamic>;
+    var pullRequests = pullRequestsJson
+        .map((dynamic json) =>
+            PullRequest.fromJson(json as Map<String, dynamic>))
+        .toList();
     return CheckSuite(
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),
       headSha: input['head_sha'],
       id: input['id'],
+      pullRequests: pullRequests,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'conclusion': conclusion,
+      'head_sha': headSha,
+      'id': id,
+    };
   }
 }
 

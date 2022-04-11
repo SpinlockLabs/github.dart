@@ -1,3 +1,97 @@
+## 9.1.0
+
+* add 'create' github webhook event to hooks.dart by @XilaiZhang in https://github.com/SpinlockLabs/github.dart/pull/304
+
+## New Contributors
+* @XilaiZhang made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/304
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.0.3...9.1.0
+
+## 9.0.3
+
+* Update Language Colors March 13th 2022 by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/302
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.0.2...9.0.3
+
+## 9.0.2
+- Switched to use the lints package instead of pedantic https://github.com/SpinlockLabs/github.dart/pull/301
+
+## 9.0.1
+- Add `conclusion` property in class `CheckRun`
+
+## 9.0.0
+
+**Breaking change:** In the Gist class, the old type of files was
+```dart
+List<GistFile>? files;
+```
+and the new type is
+```dart
+Map<String, GistFile>? files;
+```
+
+**Breaking change:** In the GistFile class, the name property is now filename
+
+* Fix getting gists by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/294
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.5.0...9.0.0
+
+## 8.5.0
+
+* Adds listing and creating PR Reviews, listing users in an org by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/287
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/8.4.0...8.5.0
+
+## 8.4.0
+- added `updateComment` to update issue comments https://github.com/SpinlockLabs/github.dart/pull/286
+
+## 8.3.0
+- Support `files` field in class `GitHubComparison`
+
+## 8.2.5
+- no library code changes
+- Add auto pub publish on new releases
+
+## 8.2.4
+- Make CheckRunConclusion nullable
+
+## 8.2.3
+- Added `generateReleaseNotes` boolean to CreateRelase class to have github auto-create release notes
+- Added `generateReleaseNotes` method to RepositoriesService to have github create release notes
+  between to tags (without creating a release) and return the name and body. This is helpful when you want to add the release notes to a CHANGELOG.md before making the actual release
+## 8.2.2
+- Up minimum json_serializable to ^6.0.0, json_annotation to ^4.3.0
+- Cleanup and regenerate generated files
+- Require Dart SDK 2.14
+
+## 8.2.1
+- Add `CheckSuiteEvent` and `CheckRunEvent`
+
+## 8.2.0
+ - add more fields to the PullRequest class and fixed JSON naming bugs
+   - Added:
+     - requestedReviewers
+     - reviewCommentCount
+     - milestone
+     - rebaseable
+     - mergeableState
+     - maintainerCanModify
+     - authorAssociation
+   - Fixed (these were previously always null)
+     - commentsCount
+     - commitsCount
+     - additionsCount
+     - deletionsCount
+     - changedFilesCount
+
+## 8.1.3
+ - Add per page parameter to stars related activities https://github.com/SpinlockLabs/github.dart/pull/265
+
+## 8.1.2
+ - Fixes `RateLimit.fromRateLimitResponse` to not double cast int
+
 ## 8.1.1
   - Fix up examples and license file https://github.com/SpinlockLabs/github.dart/pull/255 https://github.com/SpinlockLabs/github.dart/pull/254 https://github.com/SpinlockLabs/github.dart/pull/253
 

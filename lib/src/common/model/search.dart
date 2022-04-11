@@ -9,7 +9,7 @@ abstract class SearchResults<T> {
   List<T>? items;
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class CodeSearchResults implements SearchResults<CodeSearchItem> {
   @JsonKey(name: 'total_count')
   @override
@@ -25,9 +25,10 @@ class CodeSearchResults implements SearchResults<CodeSearchItem> {
 
   static CodeSearchResults fromJson(Map<String, dynamic> input) =>
       _$CodeSearchResultsFromJson(input);
+  Map<String, dynamic> toJson() => _$CodeSearchResultsToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class CodeSearchItem {
   String? name;
   String? path;
@@ -57,11 +58,13 @@ class CodeSearchItem {
     }
     return result;
   }
+
+  Map<String, dynamic> toJson() => _$CodeSearchItemToJson(this);
 }
 
 // TODO: Issue Search
-// @JsonSerializable(createToJson: false)
+// @JsonSerializable()
 // class IssueSearchResults extends SearchResults<IssueSearchItem> {}
 
-// @JsonSerializable(createToJson: false)
+// @JsonSerializable()
 // class IssueSearchItem {}

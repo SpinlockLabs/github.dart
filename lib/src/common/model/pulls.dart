@@ -1,5 +1,4 @@
 import 'package:github/src/common.dart';
-import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:meta/meta.dart';
 
@@ -29,12 +28,19 @@ class PullRequest {
     this.merged,
     this.mergeable,
     this.mergedBy,
-    this.commentsCount,
-    this.commitsCount,
-    this.additionsCount,
-    this.deletionsCount,
-    this.changedFilesCount,
+    this.commentsCount = 0,
+    this.commitsCount = 0,
+    this.additionsCount = 0,
+    this.deletionsCount = 0,
+    this.changedFilesCount = 0,
     this.labels,
+    this.requestedReviewers,
+    this.reviewCommentCount = 0,
+    this.milestone,
+    this.rebaseable = false,
+    this.mergeableState = '',
+    this.maintainerCanModify = false,
+    this.authorAssociation = '',
   });
 
   /// Pull Request ID
@@ -96,22 +102,47 @@ class PullRequest {
   User? mergedBy;
 
   /// Number of comments
+  @JsonKey(name: 'comments')
   int? commentsCount;
 
   /// Number of commits
+  @JsonKey(name: 'commits')
   int? commitsCount;
 
   /// Number of additions
+  @JsonKey(name: 'additions')
   int? additionsCount;
 
   /// Number of deletions
+  @JsonKey(name: 'deletions')
   int? deletionsCount;
 
   /// Number of changed files
+  @JsonKey(name: 'changed_files')
   int? changedFilesCount;
 
   /// Pull Request Labels
   List<IssueLabel>? labels;
+
+  /// Reviewers requested for this Pull Request.
+  List<User>? requestedReviewers;
+
+  /// The number of review comments on the Pull Request.
+  @JsonKey(name: 'review_comments')
+  int? reviewCommentCount;
+
+  Milestone? milestone;
+
+  bool? rebaseable;
+
+  String? mergeableState;
+
+  bool? maintainerCanModify;
+
+  /// Ex: CONTRIBUTOR, NONE, OWNER
+  String? authorAssociation;
+
+  Repository? repo;
 
   factory PullRequest.fromJson(Map<String, dynamic> input) =>
       _$PullRequestFromJson(input);
@@ -267,3 +298,45 @@ class PullRequestFile {
       _$PullRequestFileFromJson(input);
   Map<String, dynamic> toJson() => _$PullRequestFileToJson(this);
 }
+
+@JsonSerializable()
+class PullRequestReview {
+  PullRequestReview(
+      {required this.id,
+      required this.user,
+      this.body,
+      this.state,
+      this.htmlUrl,
+      this.pullRequestUrl});
+  int id;
+  User user;
+  String? body;
+  String? state;
+  String? htmlUrl;
+  String? pullRequestUrl;
+  DateTime? submittedAt;
+  String? authorAssociation;
+  String? commitId;
+
+  factory PullRequestReview.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestReviewFromJson(input);
+  Map<String, dynamic> toJson() => _$PullRequestReviewToJson(this);
+}
+
+@JsonSerializable()
+class CreatePullRequestReview {
+  CreatePullRequestReview(this.owner, this.repo, this.pullNumber, this.event,
+      {this.body});
+
+  String owner;
+  String repo;
+  String event;
+  String? body;
+  int pullNumber;
+  // TODO List<PullRequestReviewComment> comments;
+
+  factory CreatePullRequestReview.fromJson(Map<String, dynamic> input) =>
+      _$CreatePullRequestReviewFromJson(input);
+  Map<String, dynamic> toJson() => _$CreatePullRequestReviewToJson(this);
+}
+// TODO  PullRequestReviewComment https://docs.github.com/en/rest/reference/pulls#create-a-review-for-a-pull-request

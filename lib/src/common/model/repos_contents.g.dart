@@ -6,27 +6,25 @@ part of 'repos_contents.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) {
-  return GitHubFile(
-    type: json['type'] as String?,
-    encoding: json['encoding'] as String?,
-    size: json['size'] as int?,
-    name: json['name'] as String?,
-    path: json['path'] as String?,
-    content: json['content'] as String?,
-    sha: json['sha'] as String?,
-    htmlUrl: json['html_url'] as String?,
-    gitUrl: json['git_url'] as String?,
-    downloadUrl: json['download_url'] as String?,
-    links: json['_links'] == null
-        ? null
-        : Links.fromJson(json['_links'] as Map<String, dynamic>),
-    sourceRepository: json['source_repository'] == null
-        ? null
-        : RepositorySlug.fromJson(
-            json['source_repository'] as Map<String, dynamic>),
-  );
-}
+GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) => GitHubFile(
+      type: json['type'] as String?,
+      encoding: json['encoding'] as String?,
+      size: json['size'] as int?,
+      name: json['name'] as String?,
+      path: json['path'] as String?,
+      content: json['content'] as String?,
+      sha: json['sha'] as String?,
+      htmlUrl: json['html_url'] as String?,
+      gitUrl: json['git_url'] as String?,
+      downloadUrl: json['download_url'] as String?,
+      links: json['_links'] == null
+          ? null
+          : Links.fromJson(json['_links'] as Map<String, dynamic>),
+      sourceRepository: json['source_repository'] == null
+          ? null
+          : RepositorySlug.fromJson(
+              json['source_repository'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$GitHubFileToJson(GitHubFile instance) =>
     <String, dynamic>{
@@ -44,13 +42,11 @@ Map<String, dynamic> _$GitHubFileToJson(GitHubFile instance) =>
       'source_repository': instance.sourceRepository,
     };
 
-Links _$LinksFromJson(Map<String, dynamic> json) {
-  return Links(
-    git: json['git'] == null ? null : Uri.parse(json['git'] as String),
-    self: json['self'] == null ? null : Uri.parse(json['self'] as String),
-    html: json['html'] == null ? null : Uri.parse(json['html'] as String),
-  );
-}
+Links _$LinksFromJson(Map<String, dynamic> json) => Links(
+      git: json['git'] == null ? null : Uri.parse(json['git'] as String),
+      self: json['self'] == null ? null : Uri.parse(json['self'] as String),
+      html: json['html'] == null ? null : Uri.parse(json['html'] as String),
+    );
 
 Map<String, dynamic> _$LinksToJson(Links instance) => <String, dynamic>{
       'self': instance.self?.toString(),
@@ -58,16 +54,15 @@ Map<String, dynamic> _$LinksToJson(Links instance) => <String, dynamic>{
       'html': instance.html?.toString(),
     };
 
-RepositoryContents _$RepositoryContentsFromJson(Map<String, dynamic> json) {
-  return RepositoryContents(
-    file: json['file'] == null
-        ? null
-        : GitHubFile.fromJson(json['file'] as Map<String, dynamic>),
-    tree: (json['tree'] as List<dynamic>?)
-        ?.map((e) => GitHubFile.fromJson(e as Map<String, dynamic>))
-        .toList(),
-  );
-}
+RepositoryContents _$RepositoryContentsFromJson(Map<String, dynamic> json) =>
+    RepositoryContents(
+      file: json['file'] == null
+          ? null
+          : GitHubFile.fromJson(json['file'] as Map<String, dynamic>),
+      tree: (json['tree'] as List<dynamic>?)
+          ?.map((e) => GitHubFile.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
 
 Map<String, dynamic> _$RepositoryContentsToJson(RepositoryContents instance) =>
     <String, dynamic>{
@@ -75,17 +70,15 @@ Map<String, dynamic> _$RepositoryContentsToJson(RepositoryContents instance) =>
       'tree': instance.tree,
     };
 
-CreateFile _$CreateFileFromJson(Map<String, dynamic> json) {
-  return CreateFile(
-    path: json['path'] as String?,
-    content: json['content'] as String?,
-    message: json['message'] as String?,
-    branch: json['branch'] as String?,
-    committer: json['committer'] == null
-        ? null
-        : CommitUser.fromJson(json['committer'] as Map<String, dynamic>),
-  );
-}
+CreateFile _$CreateFileFromJson(Map<String, dynamic> json) => CreateFile(
+      path: json['path'] as String?,
+      content: json['content'] as String?,
+      message: json['message'] as String?,
+      branch: json['branch'] as String?,
+      committer: json['committer'] == null
+          ? null
+          : CommitUser.fromJson(json['committer'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$CreateFileToJson(CreateFile instance) =>
     <String, dynamic>{
@@ -96,12 +89,10 @@ Map<String, dynamic> _$CreateFileToJson(CreateFile instance) =>
       'committer': instance.committer,
     };
 
-CommitUser _$CommitUserFromJson(Map<String, dynamic> json) {
-  return CommitUser(
-    json['name'] as String?,
-    json['email'] as String?,
-  );
-}
+CommitUser _$CommitUserFromJson(Map<String, dynamic> json) => CommitUser(
+      json['name'] as String?,
+      json['email'] as String?,
+    );
 
 Map<String, dynamic> _$CommitUserToJson(CommitUser instance) =>
     <String, dynamic>{
@@ -109,16 +100,15 @@ Map<String, dynamic> _$CommitUserToJson(CommitUser instance) =>
       'email': instance.email,
     };
 
-ContentCreation _$ContentCreationFromJson(Map<String, dynamic> json) {
-  return ContentCreation(
-    json['commit'] == null
-        ? null
-        : RepositoryCommit.fromJson(json['commit'] as Map<String, dynamic>),
-    json['content'] == null
-        ? null
-        : GitHubFile.fromJson(json['content'] as Map<String, dynamic>),
-  );
-}
+ContentCreation _$ContentCreationFromJson(Map<String, dynamic> json) =>
+    ContentCreation(
+      json['commit'] == null
+          ? null
+          : RepositoryCommit.fromJson(json['commit'] as Map<String, dynamic>),
+      json['content'] == null
+          ? null
+          : GitHubFile.fromJson(json['content'] as Map<String, dynamic>),
+    );
 
 Map<String, dynamic> _$ContentCreationToJson(ContentCreation instance) =>
     <String, dynamic>{

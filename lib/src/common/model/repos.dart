@@ -1,22 +1,23 @@
 import 'package:github/src/common.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 part 'repos.g.dart';
 
-@JsonSerializable(
-  createToJson: false,
-)
+@JsonSerializable()
 class GitHubComparison {
   final String? url;
   final String? status;
   final int? aheadBy;
   final int? behindBy;
   final int? totalCommits;
+  final List<CommitFile>? files;
 
-  GitHubComparison(
-      this.url, this.status, this.aheadBy, this.behindBy, this.totalCommits);
+  GitHubComparison(this.url, this.status, this.aheadBy, this.behindBy,
+      this.totalCommits, this.files);
 
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);
+  Map<String, dynamic> toJson() => _$GitHubComparisonToJson(this);
 
   @override
   String toString() {
@@ -74,15 +75,12 @@ class Repository {
       this.permissions});
 
   /// Repository Name
-  @JsonKey(defaultValue: '')
   final String name;
 
   /// Repository ID
-  @JsonKey(defaultValue: 0)
   final int id;
 
   /// Full Repository Name
-  @JsonKey(defaultValue: '')
   final String fullName;
 
   /// Repository Owner
@@ -90,88 +88,68 @@ class Repository {
   final UserInformation? owner;
 
   /// If the Repository is Private
-  @JsonKey(name: 'private', defaultValue: false)
+  @JsonKey(name: 'private')
   final bool isPrivate;
 
   /// If the Repository is a fork
-  @JsonKey(name: 'fork', defaultValue: false)
+  @JsonKey(name: 'fork')
   final bool isFork;
 
   /// Url to the GitHub Repository Page
-  @JsonKey(defaultValue: '')
   final String htmlUrl;
 
   /// Repository Description
-  @JsonKey(defaultValue: '')
   final String description;
 
   // https clone URL
-  @JsonKey(defaultValue: '')
   final String cloneUrl;
 
-  @JsonKey(defaultValue: '')
   final String sshUrl;
 
-  @JsonKey(defaultValue: '')
   final String svnUrl;
 
-  @JsonKey(defaultValue: '')
   final String gitUrl;
 
   /// Url to the Repository Homepage
-  @JsonKey(defaultValue: '')
   final String homepage;
 
   /// Repository Size
-  @JsonKey(defaultValue: 0)
   final int size;
 
   /// Repository Stars
-  @JsonKey(defaultValue: 0)
   final int stargazersCount;
 
   /// Repository Watchers
-  @JsonKey(defaultValue: 0)
   final int watchersCount;
 
   /// Repository Language
-  @JsonKey(defaultValue: '')
   final String language;
 
   /// If the Repository has Issues Enabled
-  @JsonKey(defaultValue: false)
   final bool hasIssues;
 
   /// If the Repository has the Wiki Enabled
-  @JsonKey(defaultValue: false)
   final bool hasWiki;
 
   /// If the Repository has any Downloads
-  @JsonKey(defaultValue: false)
   final bool hasDownloads;
 
   /// If the Repository has any Github Pages
-  @JsonKey(defaultValue: false)
   final bool hasPages;
 
   /// Number of Forks
-  @JsonKey(defaultValue: 0)
   final int forksCount;
 
   /// Number of Open Issues
-  @JsonKey(defaultValue: 0)
   final int openIssuesCount;
 
   /// Repository Default Branch
-  @JsonKey(defaultValue: '')
   final String defaultBranch;
 
   /// Number of Subscribers
-  @JsonKey(defaultValue: 0)
   final int subscribersCount;
 
   /// Number of users in the network
-  @JsonKey(defaultValue: 0)
   final int networkCount;
 
   /// The time the repository was created at
@@ -184,10 +162,8 @@ class Repository {
 
   final LicenseKind? license;
 
-  @JsonKey(defaultValue: false)
   final bool archived;
 
-  @JsonKey(defaultValue: false)
   final bool disabled;
 
   RepositoryPermissions? permissions;
@@ -210,15 +186,12 @@ class RepositoryPermissions {
       {this.admin = false, this.push = false, this.pull = false});
 
   /// Administrative Access
-  @JsonKey(defaultValue: false)
   final bool admin;
 
   /// Push Access
-  @JsonKey(defaultValue: false)
   final bool push;
 
   /// Pull Access
-  @JsonKey(defaultValue: false)
   final bool pull;
 
   factory RepositoryPermissions.fromJson(Map<String, dynamic> json) =>
@@ -227,7 +200,7 @@ class RepositoryPermissions {
   Map<String, dynamic> toJson() => _$RepositoryPermissionsToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Tag {
   final String name;
   final CommitInfo commit;
@@ -239,6 +212,7 @@ class Tag {
   Tag(this.name, this.commit, this.zipUrl, this.tarUrl);
 
   factory Tag.fromJson(Map<String, dynamic> input) => _$TagFromJson(input);
+  Map<String, dynamic> toJson() => _$TagToJson(this);
 
   @override
   String toString() => 'Tag: $name';
@@ -335,8 +309,8 @@ class RepositorySlug {
   String get fullName => '$owner/$name';
 
   @override
-  bool operator ==(Object obj) =>
-      obj is RepositorySlug && obj.fullName == fullName;
+  bool operator ==(Object other) =>
+      other is RepositorySlug && other.fullName == fullName;
 
   @override
   int get hashCode => fullName.hashCode;

@@ -1,6 +1,6 @@
 import 'dart:async';
+
 import 'package:github/src/common.dart';
-import 'package:github/src/common/util/pagination.dart';
 
 /// The [AuthorizationsService] handles communication with authorizations related methods
 /// of the GitHub API.

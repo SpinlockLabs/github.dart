@@ -4,7 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'notifications.g.dart';
 
 /// Model class for notifications.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class Notification {
   Notification({
     this.id,
@@ -36,10 +36,11 @@ class Notification {
 
   factory Notification.fromJson(Map<String, dynamic> input) =>
       _$NotificationFromJson(input);
+  Map<String, dynamic> toJson() => _$NotificationToJson(this);
 }
 
 /// Model class for a notification subject.
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class NotificationSubject {
   NotificationSubject({this.title, this.type, this.url, this.latestCommentUrl});
   final String? title;
@@ -51,4 +52,5 @@ class NotificationSubject {
 
   factory NotificationSubject.fromJson(Map<String, dynamic> input) =>
       _$NotificationSubjectFromJson(input);
+  Map<String, dynamic> toJson() => _$NotificationSubjectToJson(this);
 }

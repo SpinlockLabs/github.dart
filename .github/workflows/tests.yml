@@ -1,0 +1,22 @@
+name: Tests
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dart-lang/setup-dart@v1
+    - name: Install dependencies
+      run: dart pub get
+    - name: Format
+      run: dart format --output=none --set-exit-if-changed .
+    - name: Analyze
+      run: dart analyze
+    # - name: Unit tests
+    #   run: dart test test
+    # - name: Integration tests
+    #   run: dart test integration_test

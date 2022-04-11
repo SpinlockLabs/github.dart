@@ -24,6 +24,7 @@ void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
       e.hidden = false;
       e.setAttribute('rendered', '');
       e.classes.add('markdown-body');
+      // ignore: unsafe_html
       e.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     });
   }

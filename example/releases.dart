@@ -1,7 +1,5 @@
 import 'dart:html';
 
-import 'package:github/github.dart';
-
 import 'common.dart';
 
 DivElement? releasesDiv;

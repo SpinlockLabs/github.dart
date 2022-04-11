@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:github/src/common.dart';
-import 'package:github/src/common/model/users.dart';
-import 'package:github/src/common/util/pagination.dart';
 
 /// The [SearchService] handles communication with search related methods of
 /// the GitHub API.
