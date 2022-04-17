@@ -4,7 +4,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml_edit/yaml_edit.dart';
 
 ///////////////////////////////////////////////////////////
-const mainBranchName = 'main';
+const mainBranchName = 'master';
 const semverMajor = 'semver:major';
 const semverMinor = 'semver:minor';
 const semverPatch = 'semver:patch';

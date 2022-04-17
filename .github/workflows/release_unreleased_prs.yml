@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-          ref: main
+          ref: master
       - name: Release
         run: |
           git config --global user.name ${{ secrets.USER_NAME }}
