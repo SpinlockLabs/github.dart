@@ -1,3 +1,14 @@
+## 9.2.0
+
+* test auto-release by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/307
+* test PR for auto-release by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/308
+* Added assignees to Issue model for #289 by @sjhorn in https://github.com/SpinlockLabs/github.dart/pull/290
+
+## New Contributors
+* @sjhorn made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/290
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.1.1...9.2.0
+
 ## 9.1.1
 
 * Don't add state query param twice by @passsy in https://github.com/SpinlockLabs/github.dart/pull/264
