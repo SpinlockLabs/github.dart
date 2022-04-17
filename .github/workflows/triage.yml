@@ -18,7 +18,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ['untriaged']
+              labels: ['untriaged','unreleased']
             })
       - name: Comment On New Issues
         uses: actions/github-script@v3

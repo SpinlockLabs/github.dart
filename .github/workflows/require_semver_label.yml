@@ -1,4 +1,4 @@
-name: Require Semver Pull Request Label
+name: Require semver:* and unreleased Label
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize]
@@ -11,3 +11,8 @@ jobs:
           mode: exactly
           count: 1
           labels: "semver:patch, semver:minor, semver:major"
+      - uses: mheap/github-action-required-labels@v1
+        with:
+          mode: exactly
+          count: 1
+          labels: "unreleased"
