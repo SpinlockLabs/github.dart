@@ -419,19 +419,24 @@ class GitHub {
   ///
   @alwaysThrows
   void handleStatusCode(http.Response response) {
-    String? message;
+    print(response.body);
+    String? message = '';
     List<Map<String, String>>? errors;
     if (response.headers['content-type']!.contains('application/json')) {
-      final json = jsonDecode(response.body);
-      message = json['message'];
-      if (json['errors'] != null) {
-        try {
-          errors = List<Map<String, String>>.from(json['errors']);
-        } catch (_) {
-          errors = [
-            {'code': json['errors'].toString()}
-          ];
+      try {
+        final json = jsonDecode(response.body);
+        message = json['message'];
+        if (json['errors'] != null) {
+          try {
+            errors = List<Map<String, String>>.from(json['errors']);
+          } catch (_) {
+            errors = [
+              {'code': json['errors'].toString()}
+            ];
+          }
         }
+      } catch (ex) {
+        print(ex);
       }
     }
     switch (response.statusCode) {

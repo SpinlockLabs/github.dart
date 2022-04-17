@@ -164,12 +164,12 @@ class PullRequestsService extends Service {
   /// Creates a new pull request comment.
   ///
   /// API docs: https://developer.github.com/v3/pulls/comments/#create-a-comment
-  Future<IssueComment> createComment(
+  Future<PullRequestComment> createComment(
       RepositorySlug slug, int number, CreatePullRequestComment comment) {
     return github.postJSON('/repos/${slug.fullName}/pulls/$number/comments',
         body: GitHubJson.encode(comment.toJson()),
         convert: (dynamic i) => PullRequestComment.fromJson(i),
-        statusCode: 201) as Future<IssueComment>;
+        statusCode: 201);
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/pulls/comments/#edit-a-comment
