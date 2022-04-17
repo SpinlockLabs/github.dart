@@ -32,3 +32,4 @@ See the examples in the example directory to learn how to use some of the featur
 ## Contacting Us
 
 Post a question or idea: https://github.com/SpinlockLabs/github.dart/discussions
+
