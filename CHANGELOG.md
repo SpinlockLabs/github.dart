@@ -1,3 +1,10 @@
+## 9.1.1
+
+* Don't add state query param twice by @passsy in https://github.com/SpinlockLabs/github.dart/pull/264
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.1.0...9.1.1
+
 ## 9.1.0
 
 * add 'create' github webhook event to hooks.dart by @XilaiZhang in https://github.com/SpinlockLabs/github.dart/pull/304
