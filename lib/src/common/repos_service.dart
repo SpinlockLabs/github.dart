@@ -1006,7 +1006,8 @@ class RepositoriesService extends Service {
           if (getIfExists) {
             return getReleaseByTagName(slug, createRelease.tagName);
           } else {
-            throw Exception('Tag / Release already exists ${createRelease.tagName}');
+            throw Exception(
+                'Tag / Release already exists ${createRelease.tagName}');
           }
         }
       } else {
