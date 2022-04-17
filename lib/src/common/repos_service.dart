@@ -1003,7 +1003,11 @@ class RepositoriesService extends Service {
       if (alreadyExistsErrorCode != null) {
         final field = alreadyExistsErrorCode['field'];
         if (field == 'tag_name') {
-          return getReleaseByTagName(slug, createRelease.tagName);
+          if (getIfExists) {
+            return getReleaseByTagName(slug, createRelease.tagName);
+          } else {
+            throw Exception('Tag / Release already exists ${createRelease.tagName}');
+          }
         }
       } else {
         print(
