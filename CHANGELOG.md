@@ -1,3 +1,11 @@
+## 9.1.2
+
+* test auto-release by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/307
+* test PR for auto-release by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/308
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.1.1...9.1.2
+
 ## 9.1.1
 
 * Don't add state query param twice by @passsy in https://github.com/SpinlockLabs/github.dart/pull/264
