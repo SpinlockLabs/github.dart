@@ -92,7 +92,7 @@ Future<Version> getLatestVersion(RepositorySlug slug) async {
 
 Future<List<Issue>> getUnreleasedPRs() async {
   print('Loading unreleased PRs...');
-  var prs = await _gh.search.issues('repo:${_slug.fullName} is:pull-request label:unreleased state:closed', sort: 'desc').toList();
+  var prs = await _gh.search.issues('repo:${_slug.fullName} is:pull-request label:unreleased -label:no_release_on_merge  state:closed', sort: 'desc').toList();
   print('${prs.length} loaded');
   return prs;
 }
