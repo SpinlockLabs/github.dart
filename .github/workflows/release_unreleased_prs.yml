@@ -1,15 +1,16 @@
-name: Release unreleased PR
+name: Release unreleased PRs
 
 # Runs when a PR merges.
 # See https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - closed
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     container: dart:2.14.4
     permissions:
