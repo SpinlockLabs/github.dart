@@ -61,6 +61,7 @@ class CheckRunConclusion extends EnumWithValue {
       neutral,
       cancelled,
       timedOut,
+      skipped,
       actionRequired
     ]) {
       if (level.value == value) {
