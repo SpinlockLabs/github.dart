@@ -45,6 +45,7 @@ class CheckRunConclusion extends EnumWithValue {
   static const neutral = CheckRunConclusion._('neutral');
   static const cancelled = CheckRunConclusion._('cancelled');
   static const timedOut = CheckRunConclusion._('timed_out');
+  static const skipped = CheckRunConclusion._('skipped');
   static const actionRequired = CheckRunConclusion._('action_required');
   static const empty = CheckRunConclusion._(null);
 
@@ -60,6 +61,7 @@ class CheckRunConclusion extends EnumWithValue {
       neutral,
       cancelled,
       timedOut,
+      skipped,
       actionRequired
     ]) {
       if (level.value == value) {
