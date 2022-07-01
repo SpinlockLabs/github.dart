@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:github/src/common/model/pulls.dart';
 import 'package:github/src/common/util/utils.dart';
 import 'package:meta/meta.dart';
@@ -147,6 +149,11 @@ class CheckRun {
       'started_at': startedAt.toIso8601String(),
       'conclusion': conclusion,
     };
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(toJson());
   }
 }
 
