@@ -116,7 +116,6 @@ void main() {
       expect(checkRun, isNotNull);
       final checkRunString = checkRun.toString();
       expect(checkRunString, isNotNull);
-      print(checkRunString);
       expect(checkRunString == expectedToString, isTrue);
     });
   });
