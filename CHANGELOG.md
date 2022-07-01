@@ -1,3 +1,12 @@
+## 9.3.0
+
+* Added a new conclusion state to support flutter autosubmit bot by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/315
+
+## New Contributors
+* @ricardoamador made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/315
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.2.0...9.3.0
+
 ## 9.2.0
 
 * test auto-release by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/307
