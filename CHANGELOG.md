@@ -1,3 +1,11 @@
+## 9.4.0
+
+* Fix publish release workflow by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/316
+* Add support for toString to the Checkrun object. by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/318
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.3.0...9.4.0
+
 ## 9.3.0
 
 * Added a new conclusion state to support flutter autosubmit bot by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/315
