@@ -17,4 +17,4 @@ jobs:
         mkdir -p ~/.pub-cache 
         echo ${{ secrets.CREDENTIAL_JSON }} > ~/.pub-cache/credentials.json
     - name: Publish package
-      run: pub publish -f
+      run: pub publish
