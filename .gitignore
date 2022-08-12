@@ -3,3 +3,6 @@
 .pub
 packages
 pubspec.lock
+example/*.js
+example/*.js.deps
+example/*.js.map

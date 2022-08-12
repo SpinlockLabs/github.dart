@@ -124,7 +124,15 @@ class ActivityService extends Service {
   EventPoller pollUserEventsForOrganization(String user, String organization) =>
       EventPoller(github, '/users/$user/events/orgs/$organization');
 
-  // TODO: Implement listFeeds: https://developer.github.com/v3/activity/feeds/#list-feeds
+  /// Lists the Github several timeline resources in Atom format.
+  ///
+  /// The Feeds API lists all the feeds available to the authenticated user
+  ///
+  /// **Note:** _Private feeds are only returned when authenticating via Basic Auth since current feed URIs use the older, non revocable auth tokens_
+  ///
+  /// API docs: https://developer.github.com/v3/activity/feeds/#list-feeds
+  Future<Feed> listFeeds() => github.getJSON('/feeds',
+      statusCode: StatusCodes.OK, convert: (dynamic i) => Feed.fromJson(i));
 
   /// Lists all notifications for the current user.
   ///
