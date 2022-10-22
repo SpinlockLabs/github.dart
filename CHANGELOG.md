@@ -1,3 +1,12 @@
+## 9.5.0
+
+* Add 'commits' member to GitHubComparison object by @fuzzybinary in https://github.com/SpinlockLabs/github.dart/pull/330
+
+## New Contributors
+* @fuzzybinary made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/330
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.4.1...9.5.0
+
 ## 9.4.1
 
 * Update to github-script 6 by @robbecker-wf in https://github.com/SpinlockLabs/github.dart/pull/331
