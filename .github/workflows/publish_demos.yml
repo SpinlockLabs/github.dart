@@ -18,9 +18,9 @@ jobs:
     
       - name: Install and Build 🔧
         run: |
-          pub global activate webdev
-          pub get
-          pub global run webdev build -o build -- --delete-conflicting-outputs
+          dart pub global activate webdev
+          dart pub get
+          dart pub global run webdev build -o build -- --delete-conflicting-outputs
           rm build/example/packages
 
       - name: Publish 🚀

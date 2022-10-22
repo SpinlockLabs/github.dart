@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
-      run: pub get
+      run: dart pub get
     - name: Dart Analyzer
       run: dart analyze
     - name: Check Dart Format
