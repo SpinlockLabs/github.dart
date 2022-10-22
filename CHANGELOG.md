@@ -1,3 +1,10 @@
+## 9.4.1
+
+* Update to github-script 6 by @robbecker-wf in https://github.com/SpinlockLabs/github.dart/pull/331
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.4.0...9.4.1
+
 ## 9.4.0
 
 * Fix publish release workflow by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/316
