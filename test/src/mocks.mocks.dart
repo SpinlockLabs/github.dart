@@ -17,7 +17,6 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_overrides
 // ignore_for_file: unnecessary_parenthesis
-// ignore_for_file: camel_case_types
 
 class _FakeClient_0 extends _i1.Fake implements _i2.Client {}
 
