@@ -12,9 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-    - name: Setup credentials
-      run: | 
-        mkdir -p ~/.pub-cache 
-        echo ${{ secrets.CREDENTIAL_JSON }} > ~/.pub-cache/credentials.json
-    - name: Publish package
-      run: pub publish -f
+      - name: Setup credentials
+        run: | 
+          mkdir -p ~/.pub-cache 
+          echo ${{ secrets.CREDENTIAL_JSON }} > ~/.pub-cache/credentials.json
+      - name: Publish package
+        run: pub publish -f
