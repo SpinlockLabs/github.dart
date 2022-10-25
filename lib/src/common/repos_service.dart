@@ -329,6 +329,7 @@ class RepositoriesService extends Service {
     return false;
   }
 
+  /// https://docs.github.com/en/rest/collaborators/collaborators#add-a-repository-collaborator
   Future<bool> addCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
@@ -336,9 +337,9 @@ class RepositoriesService extends Service {
         .request(
           'PUT',
           '/repos/${slug.fullName}/collaborators/$user',
-          statusCode: StatusCodes.NO_CONTENT,
+          statusCode: StatusCodes.CREATED,
         )
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+        .then((response) => response.statusCode == StatusCodes.CREATED);
   }
 
   Future<bool> removeCollaborator(RepositorySlug slug, String user) async {
