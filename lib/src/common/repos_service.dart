@@ -118,6 +118,21 @@ class RepositoriesService extends Service {
     }
   }
 
+  /// Creates a repository with [repository] using a template. If an [org] is
+  /// specified, the new repository will be created under that organization. If
+  /// no [org] is specified, it will be created for the authenticated user.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#create
+  Future<Repository> createRepositoryFromTemplate(
+      RepositorySlug template, CreateRepositoryFromTemplate repository) async {
+    ArgumentError.checkNotNull(repository);
+    return github.postJSON<Map<String, dynamic>, Repository>(
+      '/repos/${template.fullName}/generate',
+      body: GitHubJson.encode(repository),
+      convert: (i) => Repository.fromJson(i),
+    );
+  }
+
   Future<LicenseDetails> getLicense(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
     return github.getJSON<Map<String, dynamic>, LicenseDetails>(
