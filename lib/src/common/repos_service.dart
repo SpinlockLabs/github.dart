@@ -168,29 +168,34 @@ class RepositoriesService extends Service {
 
   /// Edit a Repository.
   ///
-  /// API docs: https://developer.github.com/v3/repos/#edit
-  Future<Repository> editRepository(RepositorySlug slug,
-      {String? name,
-      String? description,
-      String? homepage,
-      bool? private,
-      bool? hasIssues,
-      bool? hasWiki,
-      bool? hasDownloads}) async {
+  /// API docs: https://docs.github.com/en/rest/repos/repos#update-a-repository
+  Future<Repository> editRepository(
+    RepositorySlug slug, {
+    String? name,
+    String? description,
+    String? homepage,
+    bool? private,
+    bool? hasIssues,
+    bool? hasWiki,
+    bool? hasDownloads,
+    String? defaultBranch,
+  }) async {
     ArgumentError.checkNotNull(slug);
+
     final data = createNonNullMap({
-      'name': name!,
-      'description': description!,
-      'homepage': homepage!,
-      'private': private!,
-      'has_issues': hasIssues!,
-      'has_wiki': hasWiki!,
-      'has_downloads': hasDownloads!,
-      'default_branch': 'defaultBranch'
+      'name': name,
+      'description': description,
+      'homepage': homepage,
+      'private': private,
+      'has_issues': hasIssues,
+      'has_wiki': hasWiki,
+      'has_downloads': hasDownloads,
+      'default_branch': defaultBranch,
     });
-    return github.postJSON(
+    return github.postJSON<Map<String, dynamic>, Repository>(
       '/repos/${slug.fullName}',
       body: GitHubJson.encode(data),
+      convert: (i) => Repository.fromJson(i),
       statusCode: 200,
     );
   }
