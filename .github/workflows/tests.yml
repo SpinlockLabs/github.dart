@@ -12,7 +12,7 @@ jobs:
     - uses: dart-lang/setup-dart@v1
     - name: Install dependencies
       run: dart pub get
-    # - name: Unit tests
-    #   run: dart test test
+    - name: Unit tests
+      run: dart test test
     # - name: Integration tests
     #   run: dart test integration_test
