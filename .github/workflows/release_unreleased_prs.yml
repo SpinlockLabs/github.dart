@@ -29,5 +29,5 @@ jobs:
           export PATH="$PATH":"$HOME/.pub-cache/bin"
           export GITHUB_TOKEN=${{secrets.MACHINE_GITHUB_API_TOKEN}}
           export MACHINE_GITHUB_API_TOKEN=${{secrets.MACHINE_GITHUB_API_TOKEN}}
-          pub get
+          dart pub get
           dart tool/release_unreleased_prs.dart
