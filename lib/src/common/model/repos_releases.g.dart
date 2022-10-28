@@ -101,7 +101,7 @@ CreateRelease _$CreateReleaseFromJson(Map<String, dynamic> json) =>
       ..isDraft = json['draft'] as bool?
       ..isPrerelease = json['prerelease'] as bool?
       ..discussionCategoryName = json['discussion_category_name'] as String?
-      ..generateReleaseNotes = json['generate_release_notes'] as bool;
+      ..generateReleaseNotes = json['generate_release_notes'] as bool? ?? false;
 
 Map<String, dynamic> _$CreateReleaseToJson(CreateRelease instance) =>
     <String, dynamic>{
