@@ -6,13 +6,19 @@ on:
     branches: [ master ]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        sdk: [2.17, stable]
     steps:
-    - uses: actions/checkout@v2
-    - uses: dart-lang/setup-dart@v1
-    - name: Install dependencies
-      run: dart pub get
-    - name: Unit tests
-      run: dart test test
-    # - name: Integration tests
-    #   run: dart test integration_test
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1.3
+        with:
+          sdk: ${{ matrix.sdk }}
+      - name: Install dependencies
+        run: dart pub get
+      - name: Unit tests
+        run: dart test test
+      # - name: Integration tests
+      #   run: dart test integration_test
