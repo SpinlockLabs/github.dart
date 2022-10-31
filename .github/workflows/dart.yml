@@ -4,12 +4,9 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     container:
       image: dart:2.17
-
     steps:
     - uses: actions/checkout@v1
     - name: Install dependencies
@@ -17,6 +14,6 @@ jobs:
     - name: Dart Analyzer
       run: dart analyze
     - name: Check Dart Format
-      run: dart format --set-exit-if-changed -o none lib test tool example && echo Dart Format 👍 || echo Files needed Dart formatting 😢
+      run: dart format --set-exit-if-changed -o none lib test tool example integration_test && echo Dart Format 👍 || echo Files needed Dart formatting 😢
     - name: Check if Publishable
       run: dart pub publish --dry-run

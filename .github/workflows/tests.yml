@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
         sdk: [2.17.7, stable]
     steps:
       - uses: actions/checkout@v2
@@ -19,6 +19,6 @@ jobs:
       - name: Install dependencies
         run: dart pub get
       - name: Unit tests
-        run: dart test test -r github
+        run: make test
       # - name: Integration tests
       #   run: dart test integration_test

@@ -1,310 +1,191 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:github/src/common.dart';
-import 'package:http/http.dart' as http;
-import 'package:mockito/mockito.dart';
+import 'dart:io';
+import 'package:github/github.dart';
+import 'package:nock/nock.dart';
 import 'package:test/test.dart';
 
-//import 'src/mocks.mocks.dart';
+import 'assets/responses/nocked_responses.dart' as nocked;
 
-void main() {
-  // late MockGitHub github;
-  // late GitService git;
-  // late RepositorySlug repo;
-  // const someSha = 'someSHA';
+const fakeApiUrl = 'http://fake.api.github.com';
+const date = '2014-10-02T15:21:29Z';
 
-  // setUp(() {
-  //   github = MockGitHub();
-  //   git = GitService(github);
-  //   repo = RepositorySlug('o', 'n');
-  // });
-
-  // group('getBlob()', () {
-  //   test('constructs correct path', () {
-  //     git.getBlob(repo, 'sh');
-
-  //     verify(github.getJSON('/repos/o/n/git/blobs/sh',
-  //         convert: (dynamic i) => GitBlob.fromJson(i),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('createBlob()', () {
-  //   test('constructs correct path', () {
-  //     var blob = CreateGitBlob('bbb', 'utf-8');
-  //     git.createBlob(repo, blob);
-
-  //     verify(github.postJSON(
-  //       '/repos/o/n/git/blobs',
-  //       convert: (dynamic i) => GitBlob.fromJson(i),
-  //       statusCode: StatusCodes.CREATED,
-  //       body: GitHubJson.encode(blob),
-  //     ));
-  //   });
-
-  //   test('creates valid JSON body', () {
-  //     var blob = CreateGitBlob('bbb', 'utf-8');
-
-  //     git.createBlob(repo, blob);
-  //     final body = captureSentBody(github)!;
-  //     expect(body['content'], equals('bbb'));
-  //     expect(body['encoding'], equals('utf-8'));
-  //   });
-  // });
-
-  // group('getCommit()', () {
-  //   test('constructs correct path', () {
-  //     git.getCommit(repo, 'sh');
-
-  //     verify(github.getJSON('/repos/o/n/git/commits/sh',
-  //         convert: (dynamic i) => GitCommit.fromJson(i),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('createCommit()', () {
-  //   test('constructs correct path', () {
-  //     final commit = CreateGitCommit('aMessage', 'aTreeSha');
-  //     git.createCommit(repo, commit);
-
-  //     verify(github.postJSON(
-  //       '/repos/o/n/git/commits',
-  //       convert: (dynamic i) => GitCommit.fromJson(i),
-  //       statusCode: StatusCodes.CREATED,
-  //       body: GitHubJson.encode(commit),
-  //     ));
-  //   });
-
-  //   test('creates valid JSON body', () {
-  //     // given
-  //     const date = '2014-10-02T15:21:29Z';
-
-  //     final commit = CreateGitCommit('aMessage', 'aTreeSha')
-  //       ..parents = ['parentSha1', 'parentSha2']
-  //       ..committer = GitCommitUser('cName', 'cEmail', DateTime.parse(date))
-  //       ..author = GitCommitUser('aName', 'aEmail', DateTime.parse(date));
-
-  //     // when
-  //     git.createCommit(repo, commit);
-
-  //     // then
-  //     final body = captureSentBody(github)!;
-  //     expect(body['message'], equals('aMessage'));
-  //     expect(body['tree'], equals('aTreeSha'));
-  //     expect(body['parents'], equals(['parentSha1', 'parentSha2']));
-  //     expect(body['committer']['name'], equals('cName'));
-  //     expect(body['committer']['email'], equals('cEmail'));
-  //     expect(body['committer']['date'], equals(date));
-  //     expect(body['author']['name'], equals('aName'));
-  //     expect(body['author']['email'], equals('aEmail'));
-  //     expect(body['author']['date'], equals(date));
-  //   });
-  // });
-
-  // group('getReference()', () {
-  //   test('constructs correct path', () {
-  //     git.getReference(repo, 'heads/b');
-
-  //     verify(github.getJSON('/repos/o/n/git/refs/heads/b',
-  //         convert: (dynamic i) => GitReference.fromJson(i),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('createReference()', () {
-  //   const someRef = 'refs/heads/b';
-  //   test('constructs correct path', () {
-  //     git.createReference(repo, someRef, someSha);
-
-  //     verify(github.postJSON('/repos/o/n/git/refs',
-  //         convert: (dynamic i) => GitReference.fromJson(i),
-  //         statusCode: StatusCodes.CREATED,
-  //         body: GitHubJson.encode({'ref': someRef, 'sha': someSha})));
-  //   });
-
-  //   test('creates valid JSON body', () {
-  //     git.createReference(repo, someRef, someSha);
-
-  //     final body = captureSentBody(github)!;
-  //     expect(body['ref'], equals(someRef));
-  //     expect(body['sha'], equals(someSha));
-  //   });
-  // });
-
-  // group('editReference()', () {
-  //   test('constructs correct path', () {
-  //     // given
-  //     final expectedResponse = http.Response('{}', 200);
-
-  //     when(github.request(any, any, body: any, headers: any))
-  //         .thenReturn(Future.value(expectedResponse));
-
-  //     // when
-  //     git.editReference(repo, 'heads/b', someSha);
-
-  //     // then
-  //     verify(github.request('PATCH', '/repos/o/n/git/refs/heads/b',
-  //         headers: any, body: any));
-  //   });
-
-  //   test('creates valid JSON body', () {
-  //     // given
-  //     final expectedResponse = http.Response('{}', 200);
-  //     when(github.request(any, any, body: any, headers: any))
-  //         .thenReturn(Future.value(expectedResponse));
-
-  //     // when
-  //     git.editReference(repo, 'heads/b', someSha, force: true);
-
-  //     // then
-  //     final captured = verify(github.request(
-  //       any,
-  //       any,
-  //       body: captureAny,
-  //       headers: captureAny,
-  //     )).captured;
-
-  //     final body = jsonDecode(captured[0]);
-  //     final headers = captured[1];
-
-  //     expect(body['sha'], equals(someSha));
-  //     expect(body['force'], equals(true));
-  //     expect(headers['content-length'], equals('30'));
-  //   });
-  // });
-
-  // group('deleteReference()', () {
-  //   test('constructs correct path', () {
-  //     // given
-  //     final expectedResponse = http.Response('{}', 200);
-  //     when(github.request(any, any)).thenReturn(Future.value(expectedResponse));
-
-  //     // when
-  //     git.deleteReference(repo, 'heads/b');
-
-  //     // then
-  //     verify(github.request('DELETE', '/repos/o/n/git/refs/heads/b'));
-  //   });
-  // });
-
-  // group('getTag()', () {
-  //   test('constructs correct path', () {
-  //     git.getTag(repo, someSha);
-
-  //     verify(github.getJSON('/repos/o/n/git/tags/someSHA',
-  //         convert: (dynamic i) => GitTag.fromJson(i),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('createTag()', () {
-  //   final createGitTag = CreateGitTag('v0.0.1', 'a message', someSha, 'commit',
-  //       GitCommitUser('aName', 'aEmail', DateTime.now()));
-
-  //   test('constructs correct path', () {
-  //     git.createTag(repo, createGitTag);
-
-  //     verify(github.postJSON('/repos/o/n/git/tags',
-  //         convert: (dynamic i) => GitTag.fromJson(i),
-  //         statusCode: StatusCodes.CREATED,
-  //         body: GitHubJson.encode(createGitTag)));
-  //   });
-
-  //   test('creates valid JSON body', () {
-  //     git.createTag(repo, createGitTag);
-
-  //     final body = captureSentBody(github)!;
-  //     expect(body['tag'], equals('v0.0.1'));
-  //     expect(body['message'], equals('a message'));
-  //     expect(body['object'], equals(someSha));
-  //     expect(body['type'], equals('commit'));
-  //     expect(body['tagger']['name'], equals('aName'));
-  //   });
-  // });
-
-  // group('getTree()', () {
-  //   test('constructs correct path', () {
-  //     git.getTree(repo, 'sh');
-
-  //     verify(github.getJSON('/repos/o/n/git/trees/sh',
-  //         convert: (dynamic j) => GitTree.fromJson(j),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('getTree(recursive: true)', () {
-  //   test('constructs correct path', () {
-  //     git.getTree(repo, 'sh', recursive: true);
-
-  //     verify(github.getJSON('/repos/o/n/git/trees/sh?recursive=1',
-  //         convert: (dynamic j) => GitTree.fromJson(j),
-  //         statusCode: StatusCodes.OK));
-  //   });
-  // });
-
-  // group('createTree()', () {
-  //   test('constructs correct path', () {
-  //     final createGitTree = CreateGitTree([]);
-  //     git.createTree(repo, createGitTree);
-
-  //     verify(github.postJSON('/repos/o/n/git/trees',
-  //         convert: (dynamic j) => GitTree.fromJson(j),
-  //         statusCode: StatusCodes.CREATED,
-  //         body: GitHubJson.encode(createGitTree)));
-  //   });
-
-  //   test('with sha creates valid JSON body', () {
-  //     // given
-  //     var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
-  //         sha: '44b4fc6d56897b048c772eb4087f854f46256132');
-
-  //     final tree = CreateGitTree([treeEntry]);
-
-  //     // when
-  //     git.createTree(repo, tree);
-
-  //     // then
-  //     final body = captureSentBody(github)!;
-  //     expect(body['tree'], isNotNull);
-  //     expect(body['tree'][0]['path'], equals('file.rb'));
-  //     expect(body['tree'][0]['mode'], equals('100644'));
-  //     expect(body['tree'][0]['type'], equals('blob'));
-  //     expect(body['tree'][0]['sha'],
-  //         equals('44b4fc6d56897b048c772eb4087f854f46256132'));
-  //     expect(body['tree'][0]['content'], isNull);
-  //   });
-
-  //   test('with content creates valid JSON body', () {
-  //     // given
-  //     var treeEntry = CreateGitTreeEntry('file.rb', '100644', 'blob',
-  //         content: 'some file content');
-
-  //     final tree = CreateGitTree([treeEntry]);
-
-  //     // when
-  //     git.createTree(repo, tree);
-
-  //     // then
-  //     final body = captureSentBody(github)!;
-  //     expect(body['tree'], isNotNull);
-  //     expect(body['tree'][0]['path'], equals('file.rb'));
-  //     expect(body['tree'][0]['mode'], equals('100644'));
-  //     expect(body['tree'][0]['type'], equals('blob'));
-  //     expect(body['tree'][0]['sha'], isNull);
-  //     expect(body['tree'][0]['content'], equals('some file content'));
-  //   });
-  // });
+GitHub createGithub() {
+  return GitHub(
+      endpoint: fakeApiUrl,
+      auth:
+          Authentication.withToken('0000000000000000000000000000000000000001'));
 }
 
-// Map<String, dynamic>? captureSentBody(MockGitHub github) {
-//   final bodyString = verify(github.postJSON(
-//     any,
-//     convert: any,
-//     statusCode: any,
-//     body: captureAny,
-//   )).captured.single;
+void main() {
+  late GitHub github;
+  late GitService git;
+  late RepositorySlug repo;
+  const someSha = 'someSHA';
 
-//   final body = jsonDecode(bodyString) as Map<String, dynamic>?;
-//   return body;
-// }
+  setUpAll(nock.init);
+
+  setUp(() {
+    nock.cleanAll();
+    github = createGithub();
+    git = GitService(github);
+    repo = RepositorySlug('o', 'n');
+  });
+  tearDown(nock.cleanAll);
+
+  test('getBlob()', () async {
+    nock(fakeApiUrl).get('/repos/o/n/git/blobs/sh').reply(200, nocked.getBlob);
+    final blob = await git.getBlob(repo, 'sh');
+    expect(blob.sha, '3a0f86fb8db8eea7ccbb9a95f325ddbedfb25e15');
+    expect(nock.pendingMocks.isEmpty, true);
+  });
+
+  test('createBlob()', () async {
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/blobs', '{"content":"bbb","encoding":"utf-8"}')
+        .reply(201, nocked.createBlob);
+    var blob = await git.createBlob(repo, CreateGitBlob('bbb', 'utf-8'));
+    expect(blob.content, 'bbb');
+    expect(blob.encoding, 'utf-8');
+  });
+
+  test('getCommit()', () async {
+    nock(fakeApiUrl)
+        .get('/repos/o/n/git/commits/sh')
+        .reply(200, nocked.getCommit);
+    var commit = await git.getCommit(repo, 'sh');
+    expect(commit.sha, '7638417db6d59f3c431d3e1f261cc637155684cd');
+  });
+
+  test('createCommit()', () async {
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/commits',
+            '{"message":"aMessage","tree":"aTreeSha","parents":["parentSha1","parentSha2"],"committer":{"name":"cName","email":"cEmail","date":"2014-10-02T15:21:29Z"},"author":{"name":"aName","email":"aEmail","date":"2014-10-02T15:21:29Z"}}')
+        .reply(201, nocked.createCommit);
+
+    var commit = await git.createCommit(
+        repo,
+        CreateGitCommit('aMessage', 'aTreeSha')
+          ..parents = ['parentSha1', 'parentSha2']
+          ..committer = GitCommitUser('cName', 'cEmail', DateTime.parse(date))
+          ..author = GitCommitUser('aName', 'aEmail', DateTime.parse(date)));
+    expect(commit.message, 'aMessage');
+    expect(commit.tree!.sha, 'aTreeSha');
+  });
+
+  test('getReference()', () async {
+    nock(fakeApiUrl)
+        .get('/repos/o/n/git/refs/heads/b')
+        .reply(200, nocked.getReference);
+    var ref = await git.getReference(repo, 'heads/b');
+    expect(ref.ref, 'refs/heads/b');
+  });
+
+  test('createReference()', () async {
+    const someRef = 'refs/heads/b';
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/refs', '{"ref":"refs/heads/b","sha":"someSHA"}')
+        .reply(201, nocked.createReference);
+    var ref = await git.createReference(repo, someRef, someSha);
+    expect(ref.ref, someRef);
+  });
+
+  test('editReference()', () async {
+    nock(fakeApiUrl)
+        .patch('/repos/o/n/git/refs/heads/b', '{"sha":"someSHA","force":true}')
+        .reply(200, '{}');
+
+    await git.editReference(repo, 'heads/b', someSha, force: true);
+  });
+
+  test('deleteReference()', () async {
+    nock(fakeApiUrl).delete('/repos/o/n/git/refs/heads/b').reply(200, '{}');
+    await git.deleteReference(repo, 'heads/b');
+  });
+
+  test('getTag()', () async {
+    nock(fakeApiUrl)
+        .get('/repos/o/n/git/tags/someSHA')
+        .reply(200, nocked.getTag);
+    await git.getTag(repo, someSha);
+  });
+
+  test('createTag()', () async {
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/tags',
+            '{"tag":"v0.0.1","message":"initial version","object":"someSHA","type":"commit","tagger":{"name":"Monalisa Octocat","email":"octocat@github.com","date":"$date"}}')
+        .reply(201, nocked.createTag);
+
+    final createGitTag = CreateGitTag(
+        'v0.0.1',
+        'initial version',
+        someSha,
+        'commit',
+        GitCommitUser(
+            'Monalisa Octocat', 'octocat@github.com', DateTime.parse(date)));
+
+    var tag = await git.createTag(repo, createGitTag);
+
+    expect(tag.tag, 'v0.0.1');
+    expect(tag.message, 'initial version');
+    expect(tag.tagger?.name, 'Monalisa Octocat');
+  });
+
+  test('getTree()', () async {
+    nock(fakeApiUrl)
+        .get('/repos/o/n/git/trees/sh?recursive=1')
+        .reply(200, '{}');
+    await git.getTree(repo, 'sh', recursive: true);
+  });
+
+  test('createTree()', () async {
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/trees',
+            '{"tree":[{"path":"file.rb","mode":"100644","type":"blob","sha":"44b4fc6d56897b048c772eb4087f854f46256132"}]}')
+        .reply(201, nocked.createTree);
+
+    var createTree = CreateGitTree([
+      CreateGitTreeEntry('file.rb', '100644', 'blob',
+          sha: '44b4fc6d56897b048c772eb4087f854f46256132')
+    ]);
+
+    var tree = await git.createTree(repo, createTree);
+    var entry = tree.entries?.first;
+    expect(entry?.path, 'file.rb');
+    expect(entry?.mode, '100644');
+    expect(entry?.type, 'blob');
+    expect(entry?.sha, '44b4fc6d56897b048c772eb4087f854f46256132');
+
+    nock(fakeApiUrl)
+        .post('/repos/o/n/git/trees',
+            '{"tree":[{"path":"file.rb","mode":"100644","type":"blob","content":"content"}]}')
+        .reply(201, nocked.createTree);
+
+    createTree = CreateGitTree(
+        [CreateGitTreeEntry('file.rb', '100644', 'blob', content: 'content')]);
+
+    tree = await git.createTree(repo, createTree);
+    entry = tree.entries?.first;
+    expect(entry?.path, 'file.rb');
+    expect(entry?.mode, '100644');
+    expect(entry?.type, 'blob');
+    expect(entry?.sha, '44b4fc6d56897b048c772eb4087f854f46256132');
+  });
+
+  test('code search', () async {
+    nock(fakeApiUrl)
+        .get(
+            '/search/code?q=search%20repo%3ASpinlockLabs%2Fgithub.dart%20in%3Afile&per_page=20&page=1')
+        .reply(200, nocked.searchResults);
+
+    final results = (await github.search
+            .code(
+              'search',
+              repo: 'SpinlockLabs/github.dart',
+              perPage: 20,
+              pages: 1,
+            )
+            .toList())
+        .first;
+    expect(results.totalCount, 17);
+    expect(results.items?.length, 17);
+  });
+}
