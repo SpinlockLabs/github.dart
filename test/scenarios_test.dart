@@ -39,7 +39,7 @@ Future<GitHub> createGithubWithScenario(String scenario,
 /// The fixture server must be running before running these tests
 /// The easiest way is to install node and then run
 /// npx octokit-fixtures-server
-/// 
+///
 /// TODO(robrbecker) Implement a fixture-server "light" in Dart
 /// directly using nock so we can remove the dependency on node
 /// and running a server in order to run tests
