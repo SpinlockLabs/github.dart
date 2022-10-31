@@ -12,7 +12,7 @@ jobs:
   release:
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    container: dart:2.17.7
+    container: dart
     permissions:
       contents: write
 

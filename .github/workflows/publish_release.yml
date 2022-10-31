@@ -9,7 +9,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: dart:2.17
+      image: dart
     steps:
       - name: Checkout
         uses: actions/checkout@v1
