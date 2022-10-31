@@ -1,3 +1,10 @@
+## 9.5.1
+
+* Fix up unit tests & run them in CI by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/336
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.5.0...9.5.1
+
 ## 9.5.0
 
 * Add 'commits' member to GitHubComparison object by @fuzzybinary in https://github.com/SpinlockLabs/github.dart/pull/330
