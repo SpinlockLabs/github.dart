@@ -141,8 +141,7 @@ class PullRequestsService extends Service {
 
     return github
         .request('PUT', '/repos/${slug.fullName}/pulls/$number/merge',
-            headers: headers,
-            body: GitHubJson.encode(json))
+            headers: headers, body: GitHubJson.encode(json))
         .then((response) {
       return PullRequestMerge.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);

@@ -188,4 +188,77 @@ void main() {
     expect(results.totalCount, 17);
     expect(results.items?.length, 17);
   });
+
+  group('Merge', () {
+    test('Merge() normal', () async {
+      nock(fakeApiUrl)
+          .put('/repos/o/n/pulls/1/merge', '{"merge_method":"merge"}')
+          .reply(201, nocked.mergedPR1);
+
+      var pullRequestMerge = await github.pullRequests.merge(repo, 1);
+
+      expect(pullRequestMerge.merged, true);
+      expect(pullRequestMerge.message, 'Pull Request successfully merged');
+      expect(pullRequestMerge.sha, someSha);
+    });
+
+    test('Merge() with squash', () async {
+      nock(fakeApiUrl)
+          .put('/repos/o/n/pulls/1/merge', '{"merge_method":"squash"}')
+          .reply(201, nocked.mergedPR1);
+
+      var pullRequestMerge = await github.pullRequests
+          .merge(repo, 1, mergeMethod: MergeMethod.squash);
+
+      expect(pullRequestMerge.merged, true);
+      expect(pullRequestMerge.message, 'Pull Request successfully merged');
+      expect(pullRequestMerge.sha, someSha);
+    });
+
+    test('Merge() with rebase', () async {
+      nock(fakeApiUrl)
+          .put('/repos/o/n/pulls/1/merge', '{"merge_method":"rebase"}')
+          .reply(201, nocked.mergedPR1);
+
+      var pullRequestMerge = await github.pullRequests
+          .merge(repo, 1, mergeMethod: MergeMethod.rebase);
+
+      expect(pullRequestMerge.merged, true);
+      expect(pullRequestMerge.message, 'Pull Request successfully merged');
+      expect(pullRequestMerge.sha, someSha);
+    });
+
+    test('Merge() with commitMessage', () async {
+      const commitMessage = 'Some message';
+      nock(fakeApiUrl)
+          .put('/repos/o/n/pulls/1/merge',
+              '{"commit_message":"$commitMessage","merge_method":"squash"}')
+          .reply(201, nocked.mergedPR1);
+
+      var pullRequestMerge = await github.pullRequests.merge(repo, 1,
+          message: commitMessage, mergeMethod: MergeMethod.squash);
+
+      expect(pullRequestMerge.merged, true);
+      expect(pullRequestMerge.message, 'Pull Request successfully merged');
+      expect(pullRequestMerge.sha, someSha);
+    });
+
+    test('Merge() with commitMessage, with sha', () async {
+      const commitMessage = 'Some message';
+      const commitSha = 'commitSha';
+      nock(fakeApiUrl)
+          .put('/repos/o/n/pulls/1/merge',
+              '{"commit_message":"$commitMessage","sha":"$commitSha","merge_method":"squash"}')
+          .reply(201, nocked.mergedPR1);
+
+      var pullRequestMerge = await github.pullRequests.merge(repo, 1,
+          message: commitMessage,
+          mergeMethod: MergeMethod.squash,
+          requestSha: commitSha);
+
+      expect(pullRequestMerge.merged, true);
+      expect(pullRequestMerge.message, 'Pull Request successfully merged');
+      expect(pullRequestMerge.sha, someSha);
+    });
+  });
 }

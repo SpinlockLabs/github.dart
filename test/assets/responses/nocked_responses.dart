@@ -1472,3 +1472,9 @@ var searchResults = '''{
     }
   ]
 }''';
+
+var mergedPR1 = '''{
+  "sha": "someSHA",
+  "merged": true,
+  "message": "Pull Request successfully merged"
+}''';
