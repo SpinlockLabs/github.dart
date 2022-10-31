@@ -175,6 +175,7 @@ class CreateRelease {
 
   String? discussionCategoryName;
 
+  @JsonKey(defaultValue: false)
   bool generateReleaseNotes = false;
 
   CreateRelease(this.tagName);
