@@ -1,5 +1,6 @@
 ## 9.6.0
 
+* Require Dart 2.17
 * Update to allow different merge methods in pulls_service by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/333
 
 
@@ -7,7 +8,6 @@
 
 ## 9.5.1
 
-* Require Dart 2.17
 * Fix up unit tests & run them in CI by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/336
 
 **Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.5.0...9.5.1
