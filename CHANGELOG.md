@@ -1,3 +1,10 @@
+## 9.6.0
+
+* Update to allow different merge methods in pulls_service by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/333
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.5.1...9.6.0
+
 ## 9.5.1
 
 * Require Dart 2.17
