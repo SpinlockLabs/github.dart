@@ -49,7 +49,8 @@ Future<void> main(List<String> args) async {
   for (final i in unreleased) {
     await _gh.issues.removeLabelForIssue(_slug, i.number, 'unreleased');
     await _gh.issues.addLabelsToIssue(_slug, i.number, ['released']);
-    await _gh.issues.createComment(_slug, i.number, 'Released in version $nextVersion https://github.com/$fullrepo/releases/tag/$nextVersion');
+    await _gh.issues.createComment(_slug, i.number,
+        'Released in version $nextVersion https://github.com/$fullrepo/releases/tag/$nextVersion');
   }
 
   exit(0);
@@ -92,15 +93,21 @@ Future<Version> getLatestVersion(RepositorySlug slug) async {
 
 Future<List<Issue>> getUnreleasedPRs() async {
   print('Loading unreleased PRs...');
-  var prs = await _gh.search.issues('repo:${_slug.fullName} is:pull-request label:unreleased -label:no_release_on_merge  state:closed', sort: 'desc').toList();
+  var prs = await _gh.search
+      .issues(
+          'repo:${_slug.fullName} is:pull-request label:unreleased -label:no_release_on_merge  state:closed',
+          sort: 'desc')
+      .toList();
   print('${prs.length} loaded');
   return prs;
 }
 
 String getNextVersion(Version currentVersion, List<Issue> unreleased) {
   var semvers = Set<String>();
-  for (final pr in unreleased){
-    var prlabels = pr.labels.where((element) => element.name.startsWith('semver:')).toList();
+  for (final pr in unreleased) {
+    var prlabels = pr.labels
+        .where((element) => element.name.startsWith('semver:'))
+        .toList();
     for (final l in prlabels) {
       semvers.add(l.name);
     }
@@ -118,13 +125,14 @@ String getNextVersion(Version currentVersion, List<Issue> unreleased) {
   return newVersion;
 }
 
-Future<String> generateReleaseNotes(String fromVersion, String newVersion) async {
+Future<String> generateReleaseNotes(
+    String fromVersion, String newVersion) async {
   var notes = await _gh.repositories.generateReleaseNotes(CreateReleaseNotes(
       _slug.owner, _slug.name, newVersion,
       previousTagName: fromVersion));
-  
+
   var releaseNotes = notes.body.replaceFirst('## What\'s Changed', '');
-  
+
   var r = '## $newVersion\n$releaseNotes';
   print(r);
   return r;
@@ -147,8 +155,8 @@ void updatePubspec(String newVersion) {
 }
 
 Future<Release> createRelease(String version, String target) async {
-    print('Creating release ...');
-    var release = await _gh.repositories.createRelease(
+  print('Creating release ...');
+  var release = await _gh.repositories.createRelease(
       _slug,
       CreateRelease.from(
           tagName: version,
@@ -158,9 +166,9 @@ Future<Release> createRelease(String version, String target) async {
           isDraft: false,
           isPrerelease: false));
 
-    print('Release ${release.name} created ${release.createdAt}');
-    print(release.body);
-    return release;
+  print('Release ${release.name} created ${release.createdAt}');
+  print(release.body);
+  return release;
 }
 
 void commitUpdates(String version) {

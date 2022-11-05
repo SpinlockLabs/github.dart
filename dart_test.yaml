@@ -1,0 +1,15 @@
+tags:
+  scenarios:
+    skip: |
+      Not run by default when running dart test. To run:
+        npx octokit-fixtures-server
+        dart test -P scenarios
+      or run all tests with:
+        make test
+    
+presets:
+  scenarios:
+    include_tags: scenarios
+    run_skipped: true
+  all:
+    run_skipped: true

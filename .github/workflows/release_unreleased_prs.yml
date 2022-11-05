@@ -12,7 +12,7 @@ jobs:
   release:
     if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    container: dart:2.14.4
+    container: dart
     permissions:
       contents: write
 
@@ -29,5 +29,5 @@ jobs:
           export PATH="$PATH":"$HOME/.pub-cache/bin"
           export GITHUB_TOKEN=${{secrets.MACHINE_GITHUB_API_TOKEN}}
           export MACHINE_GITHUB_API_TOKEN=${{secrets.MACHINE_GITHUB_API_TOKEN}}
-          pub get
+          dart pub get
           dart tool/release_unreleased_prs.dart

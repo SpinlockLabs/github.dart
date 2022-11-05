@@ -11,9 +11,10 @@ class GitHubComparison {
   final int? behindBy;
   final int? totalCommits;
   final List<CommitFile>? files;
+  final List<RepositoryCommit>? commits;
 
   GitHubComparison(this.url, this.status, this.aheadBy, this.behindBy,
-      this.totalCommits, this.files);
+      this.totalCommits, this.files, this.commits);
 
   factory GitHubComparison.fromJson(Map<String, dynamic> json) =>
       _$GitHubComparisonFromJson(json);

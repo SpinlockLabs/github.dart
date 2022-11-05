@@ -97,12 +97,12 @@ const checkRunJson = '''{
   ]
 }''';
 
-const String expectedToString = '{"name":"mighty_readme","id":4,"external_id":"","status":"completed","head_sha":"","check_suite":{"id":5},"details_url":"https://example.com","started_at":"2018-05-04T01:14:52.000Z","conclusion":"neutral"}';
+const String expectedToString =
+    '{"name":"mighty_readme","id":4,"external_id":"","status":"completed","head_sha":"","check_suite":{"id":5},"details_url":"https://example.com","started_at":"2018-05-04T01:14:52.000Z","conclusion":"neutral"}';
 
 void main() {
   group('Check run', () {
     test('CheckRun fromJson', () {
-      
       final checkRun = CheckRun.fromJson(jsonDecode(checkRunJson));
 
       expect(checkRun.id, 4);

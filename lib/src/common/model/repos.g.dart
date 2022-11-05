@@ -16,6 +16,9 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) =>
       (json['files'] as List<dynamic>?)
           ?.map((e) => CommitFile.fromJson(e as Map<String, dynamic>))
           .toList(),
+      (json['commits'] as List<dynamic>?)
+          ?.map((e) => RepositoryCommit.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$GitHubComparisonToJson(GitHubComparison instance) =>
@@ -26,6 +29,7 @@ Map<String, dynamic> _$GitHubComparisonToJson(GitHubComparison instance) =>
       'behind_by': instance.behindBy,
       'total_commits': instance.totalCommits,
       'files': instance.files,
+      'commits': instance.commits,
     };
 
 Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(

@@ -121,16 +121,27 @@ class PullRequestsService extends Service {
     RepositorySlug slug,
     int number, {
     String? message,
+    MergeMethod mergeMethod = MergeMethod.merge,
+    String? requestSha,
   }) {
     final json = <String, dynamic>{};
 
     if (message != null) {
       json['commit_message'] = message;
     }
+    if (requestSha != null) {
+      json['sha'] = requestSha;
+    }
+
+    json['merge_method'] = mergeMethod.name;
+
+    // Recommended Accept header when making a merge request.
+    Map<String, String>? headers = <String, String>{};
+    headers['Accept'] = 'application/vnd.github+json';
 
     return github
         .request('PUT', '/repos/${slug.fullName}/pulls/$number/merge',
-            body: GitHubJson.encode(json))
+            headers: headers, body: GitHubJson.encode(json))
         .then((response) {
       return PullRequestMerge.fromJson(
           jsonDecode(response.body) as Map<String, dynamic>);
@@ -183,4 +194,10 @@ class PullRequestsService extends Service {
       convert: (dynamic i) => PullRequestReview.fromJson(i),
     );
   }
+}
+
+enum MergeMethod {
+  merge,
+  squash,
+  rebase,
 }
