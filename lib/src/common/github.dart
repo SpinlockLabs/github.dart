@@ -21,6 +21,7 @@ class GitHub {
   GitHub({
     Authentication? auth,
     this.endpoint = 'https://api.github.com',
+    this.version = '2022-11-28',
     http.Client? client,
   })  : auth = auth ?? Authentication.anonymous(),
         client = client ?? http.Client();
@@ -29,11 +30,23 @@ class GitHub {
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
   static const _ratelimitRemainingHeader = 'x-ratelimit-remaining';
 
+  @visibleForTesting
+  static const versionHeader = 'X-GitHub-Api-Version';
+
   /// Authentication Information
   Authentication? auth;
 
   /// API Endpoint
   final String endpoint;
+
+  /// Calendar version of the GitHub API to use.
+  ///
+  /// Changing this value is unsupported. However, it may unblock you if there's
+  /// hotfix versions.
+  ///
+  /// See also:
+  ///   * https://docs.github.com/en/rest/overview/api-versions?apiVersion=2022-11-28
+  final String version;
 
   /// HTTP Client
   final http.Client client;
@@ -306,6 +319,7 @@ class GitHub {
     }
 
     headers.putIfAbsent('Accept', () => v3ApiMimeType);
+    headers.putIfAbsent(versionHeader, () => version);
 
     final response = await request(
       method,
