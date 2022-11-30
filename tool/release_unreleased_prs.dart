@@ -77,9 +77,9 @@ String run(String cmd, {List<String>? rest}) {
   if (result.stderr != null) {
     print(result.stderr);
   }
-  // if (result.exitCode != 0) {
-  //   exit(6);
-  // }
+  if (result.exitCode != 0) {
+    exit(6);
+  }
 
   return result.stdout;
 }
