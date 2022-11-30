@@ -1,3 +1,7 @@
+## 9.7.0
+* Add calendar versioning by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/338
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.6.0...9.7.0
 ## 9.6.0
 
 * Require Dart 2.17
