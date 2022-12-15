@@ -42,9 +42,9 @@ class SearchService extends Service {
         return;
       }
 
-      final items = input['items'] as List;
+      final items = input['items'] as List<Map<String, dynamic>>;
 
-      items.map((item) => Repository.fromJson(item)).forEach(controller.add);
+      items.map(Repository.fromJson).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -157,9 +157,9 @@ class SearchService extends Service {
         return;
       }
 
-      final items = input['items'] as List;
+      final items = input['items'] as List<Map<String, dynamic>>;
 
-      items.map((item) => Issue.fromJson(item)).forEach(controller.add);
+      items.map(Issue.fromJson).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -204,9 +204,9 @@ class SearchService extends Service {
         return;
       }
 
-      final items = input['items'] as List;
+      final items = input['items'] as List<Map<String, dynamic>>;
 
-      items.map((item) => User.fromJson(item)).forEach(controller.add);
+      items.map(User.fromJson).forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;

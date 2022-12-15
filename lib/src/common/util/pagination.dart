@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert' show jsonDecode;
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
@@ -101,9 +102,12 @@ class PaginationHelper {
       body: body,
       statusCode: statusCode,
     )) {
+      log(response.body);
       final json = arrayKey == null
-          ? jsonDecode(response.body) as List?
+          ? jsonDecode(response.body) as dynamic
           : (jsonDecode(response.body) as Map)[arrayKey];
+
+      log(json.toString());
 
       for (final item in json) {
         yield (item as T?)!;
