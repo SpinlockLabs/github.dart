@@ -51,6 +51,7 @@ void main() {
       expect(checkSuite.headBranch, 'main');
       expect(checkSuite.headSha, 'd6fde92930d4715a2b49857d24b940956b26d2d3');
       expect(checkSuite.conclusion, CheckRunConclusion.neutral);
+      expect(checkSuite.pullRequests.isNotEmpty, true);
     });
 
     test('CheckSuite fromJson for skipped conclusion', () {
@@ -95,6 +96,26 @@ void main() {
       expect(checkSuite.headBranch, 'master');
       expect(checkSuite.headSha, 'ce587453ced02b1526dfb4cb910479d431683101');
       expect(checkSuite.conclusion, CheckRunConclusion.skipped);
+      expect(checkSuite.pullRequests.isNotEmpty, true);
+    });
+
+    test('CheckSuite fromJson for forked repository', () {
+      /// The checkSuite Json is composed from multiple GitHub examples
+      ///
+      /// See https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28
+      /// See https://docs.github.com/en/rest/checks/suites?apiVersion=2022-11-28
+      const checkSuiteJson = '''{
+        "id": 10,
+        "head_branch": null,
+        "head_sha": "ce587453ced02b1526dfb4cb910479d431683101",
+        "conclusion": "skipped",
+        "pull_requests": []
+      }''';
+      final checkSuite = CheckSuite.fromJson(jsonDecode(checkSuiteJson));
+
+      expect(checkSuite.id, 10);
+      expect(checkSuite.headBranch, null);
+      expect(checkSuite.pullRequests.isEmpty, true);
     });
   });
 }
