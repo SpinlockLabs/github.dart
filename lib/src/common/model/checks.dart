@@ -362,12 +362,14 @@ class CheckRunAction {
 @immutable
 class CheckSuite {
   final int? id;
+  final String? headBranch;
   final String? headSha;
   final CheckRunConclusion conclusion;
   final List<PullRequest> pullRequests;
 
   const CheckSuite({
     required this.conclusion,
+    required this.headBranch,
     required this.headSha,
     required this.id,
     required this.pullRequests,
@@ -381,6 +383,7 @@ class CheckSuite {
         .toList();
     return CheckSuite(
       conclusion: CheckRunConclusion._fromValue(input['conclusion']),
+      headBranch: input['head_branch'],
       headSha: input['head_sha'],
       id: input['id'],
       pullRequests: pullRequests,
