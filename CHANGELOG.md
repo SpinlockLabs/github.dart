@@ -1,3 +1,12 @@
+## 9.8.0
+
+* Add "head_branch" field to CheckSuite object by @nehalvpatel in https://github.com/SpinlockLabs/github.dart/pull/347
+
+## New Contributors
+* @nehalvpatel made their first contribution in https://github.com/SpinlockLabs/github.dart/pull/347
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.7.0...9.8.0
+
 ## 9.7.0
 * Add calendar versioning by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/338
 
