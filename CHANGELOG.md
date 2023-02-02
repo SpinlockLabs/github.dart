@@ -1,3 +1,9 @@
+## 9.9.0
+
+* Add "author_association" field to the IssueComment object by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/348
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.8.0...9.9.0
+
 ## 9.8.0
 
 * Add "head_branch" field to CheckSuite object by @nehalvpatel in https://github.com/SpinlockLabs/github.dart/pull/347
