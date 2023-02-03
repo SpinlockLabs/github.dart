@@ -1,6 +1,6 @@
 ## 9.9.1-dev
 
-* Require Dart 2.17
+* Require Dart 2.18
 * Expose `CheckSuitesService` and `ChuckRunsService` classes.
 
 ## 9.9.0
