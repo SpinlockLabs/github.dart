@@ -6,7 +6,7 @@ import 'package:http/testing.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group(GitHub, () {  
+  group(GitHub, () {
     test('passes calendar version header', () async {
       Request? request;
       final client = MockClient((r) async {

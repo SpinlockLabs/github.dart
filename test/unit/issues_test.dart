@@ -3,7 +3,6 @@ import 'package:github/src/common/model/issues.dart';
 
 import 'package:test/test.dart';
 
-
 const String testIssueCommentJson = '''
   {
     "url": "https://api.github.com/repos/flutter/cocoon/issues/comments/1352355796",
@@ -54,7 +53,8 @@ const String testIssueCommentJson = '''
 void main() {
   group('Issue Comments', () {
     test('IssueComment from Json', () {
-      final issueComment = IssueComment.fromJson(jsonDecode(testIssueCommentJson));
+      final issueComment =
+          IssueComment.fromJson(jsonDecode(testIssueCommentJson));
       expect(1352355796, issueComment.id);
       expect('MEMBER', issueComment.authorAssociation);
       expect('CaseyHillers', issueComment.user!.login);

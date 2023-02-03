@@ -1,7 +1,8 @@
 import 'dart:html';
 
-import 'common.dart';
 import 'package:pub_semver/pub_semver.dart';
+
+import 'common.dart';
 
 late DivElement releasesDiv;
 
@@ -28,12 +29,12 @@ Future<String> loadReleaseNotes() async {
     print('No unreleased PRs');
     return '';
   }
-  var semvers = Set<String>();
-  for (var pr in unreleasedPRs) {
+  var semvers = <String>{};
+  for (final pr in unreleasedPRs) {
     var prlabels = pr.labels
         .where((element) => element.name.startsWith('semver:'))
         .toList();
-    for (var l in prlabels) {
+    for (final l in prlabels) {
       semvers.add(l.name);
     }
   }
@@ -50,7 +51,9 @@ Future<String> loadReleaseNotes() async {
     newVersion = latestVersion.nextPatch.toString();
   }
   print(newVersion);
-  if (newVersion.isEmpty) return '';
+  if (newVersion.isEmpty) {
+    return '';
+  }
 
   var notes = await github.repositories.generateReleaseNotes(CreateReleaseNotes(
       slug.owner, slug.name, newVersion,

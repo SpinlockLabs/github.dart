@@ -103,7 +103,7 @@ Future<List<Issue>> getUnreleasedPRs() async {
 }
 
 String getNextVersion(Version currentVersion, List<Issue> unreleased) {
-  var semvers = Set<String>();
+  var semvers = <String>{};
   for (final pr in unreleased) {
     var prlabels = pr.labels
         .where((element) => element.name.startsWith('semver:'))

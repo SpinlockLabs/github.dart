@@ -1,3 +1,8 @@
+## 9.10.0-dev
+
+* Require Dart 2.18
+* Expose `CheckSuitesService` and `ChuckRunsService` classes.
+
 ## 9.9.0
 
 * Add "author_association" field to the IssueComment object by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/348
