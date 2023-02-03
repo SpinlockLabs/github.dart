@@ -54,14 +54,12 @@ class OAuth2Flow {
   ///
   /// This should be displayed to the user.
   String createAuthorizeUrl() {
-    return baseUrl +
-        '/authorize' +
-        buildQueryString({
+    return '$baseUrl/authorize${buildQueryString({
           'client_id': clientId,
           'scope': scopes.join(','),
           'redirect_uri': redirectUri,
           'state': state
-        });
+        })}';
   }
 
   /// Exchanges the given [code] for a token.

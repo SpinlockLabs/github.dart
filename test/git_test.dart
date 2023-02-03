@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:github/github.dart';
 import 'package:nock/nock.dart';
 import 'package:test/test.dart';

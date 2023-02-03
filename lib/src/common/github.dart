@@ -333,7 +333,7 @@ class GitHub {
 
     final json = jsonDecode(response.body);
 
-    final T returnValue = convert(json)!;
+    final returnValue = convert(json) as T;
     _applyExpandos(returnValue, response);
     return returnValue;
   }
@@ -424,15 +424,12 @@ class GitHub {
     } else {
       return response;
     }
-
-    throw UnknownError(this);
   }
 
   ///
   /// Internal method to handle status codes
   ///
-  @alwaysThrows
-  void handleStatusCode(http.Response response) {
+  Never handleStatusCode(http.Response response) {
     print(response.body);
     String? message = '';
     List<Map<String, String>>? errors;
