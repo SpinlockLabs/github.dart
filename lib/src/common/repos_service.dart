@@ -337,7 +337,6 @@ class RepositoriesService extends Service {
         .request(
           'PUT',
           '/repos/${slug.fullName}/collaborators/$user',
-          statusCode: StatusCodes.CREATED,
         )
         .then((response) => response.statusCode == StatusCodes.CREATED || response.statusCode == StatusCodes. NO_CONTENT);
   }
