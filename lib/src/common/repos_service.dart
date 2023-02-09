@@ -339,7 +339,7 @@ class RepositoriesService extends Service {
           '/repos/${slug.fullName}/collaborators/$user',
           statusCode: StatusCodes.CREATED,
         )
-        .then((response) => response.statusCode == StatusCodes.CREATED);
+        .then((response) => response.statusCode == StatusCodes.CREATED || response.statusCode == StatusCodes. NO_CONTENT);
   }
 
   Future<bool> removeCollaborator(RepositorySlug slug, String user) async {
