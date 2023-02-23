@@ -1,3 +1,9 @@
+## 9.10.1
+
+* Pass required User-Agent HTTP header on all requests
+  * If `Authentication.basic` is used, it will be your GitHub username/application
+  * Otherwise, it will default to `github.dart`
+
 ## 9.10.0-dev
 
 * Require Dart 2.18
