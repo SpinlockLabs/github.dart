@@ -377,6 +377,9 @@ class GitHub {
       headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
     }
 
+    // See https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
+    headers.putIfAbsent('User-Agent', () => auth?.username ?? 'github.dart');
+
     if (method == 'PUT' && body == null) {
       headers.putIfAbsent('Content-Length', () => '0');
     }

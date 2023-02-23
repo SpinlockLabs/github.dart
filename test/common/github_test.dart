@@ -22,5 +22,21 @@ void main() {
       final version = request!.headers[GitHub.versionHeader];
       expect(version, github.version);
     });
+
+    test('passes required user-agent header', () async {
+      Request? request;
+      final client = MockClient((r) async {
+        request = r;
+        return Response('{}', HttpStatus.ok);
+      });
+
+      final github = GitHub(client: client);
+      await github.getJSON(''); // Make HTTP request
+
+      expect(request, isNotNull);
+      expect(request!.headers.containsKey('User-Agent'), isTrue);
+      final userAgent = request!.headers['User-Agent'];
+      expect(userAgent, 'github.dart');
+    });
   });
 }
