@@ -1,21 +1,10 @@
-name: Publish to pub
+name: Publish to pub.dev
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   publish:
-
-    runs-on: ubuntu-latest
-    container:
-      image: dart
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Setup credentials
-        run: | 
-          mkdir -p ~/.pub-cache 
-          echo ${{ secrets.CREDENTIAL_JSON }} > ~/.pub-cache/credentials.json
-      - name: Publish package
-        run: dart pub publish -f
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml
