@@ -306,6 +306,14 @@ class IssuesService extends Service {
     );
   }
 
+  /// Edits a label.
+  ///
+  /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
+  @Deprecated('See updateLabel insead.')
+  Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
+    return updateLabel(slug, name, color: color);
+  }
+
   /// Update a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
