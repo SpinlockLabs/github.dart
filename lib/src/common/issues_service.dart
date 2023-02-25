@@ -309,7 +309,7 @@ class IssuesService extends Service {
   /// Edits a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
-  @Deprecated('See updateLabel insead.')
+  @Deprecated('See updateLabel instead.')
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
     return updateLabel(slug, name, color: color);
   }
