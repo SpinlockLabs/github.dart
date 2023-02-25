@@ -44,14 +44,14 @@ class RateLimit {
   ///
   /// API docs: https://developer.github.com/v3/rate_limit/
   factory RateLimit.fromRateLimitResponse(Map<String, dynamic> response) {
-    final rateJson = response['rate'] == null
+    final rateJson = response['resources'] == null
         ? null
-        : response['rate'] as Map<String, dynamic>;
-    final limit = rateJson?['limit'] as int?;
-    final remaining = rateJson?['remaining'] as int?;
-    final resets = rateJson?['reset'] == null
+        : response['resources'] as Map<String, dynamic>;
+    final limit = rateJson?['core']['limit'] as int?;
+    final remaining = rateJson?['core']['remaining'] as int?;
+    final resets = rateJson?['core']['reset'] == null
         ? null
-        : DateTime.fromMillisecondsSinceEpoch(rateJson?['reset']);
+        : DateTime.fromMillisecondsSinceEpoch(rateJson?['core']['reset']);
     return RateLimit(limit, remaining, resets);
   }
 
