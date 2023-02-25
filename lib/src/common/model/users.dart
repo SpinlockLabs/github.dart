@@ -26,7 +26,7 @@ class User {
     this.updatedAt,
   });
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeToJson: false, includeFromJson: false)
   Map? json; // TODO remove
 
   /// User's Username

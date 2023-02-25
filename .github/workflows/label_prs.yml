@@ -12,7 +12,7 @@ jobs:
       - name: Apply unreleased label
         uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{secrets.MACHINE_GITHUB_API_TOKEN}}
           script: |
             github.rest.issues.addLabels({
               issue_number: context.issue.number,

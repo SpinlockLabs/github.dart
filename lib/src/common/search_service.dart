@@ -44,7 +44,10 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => Repository.fromJson(item)).forEach(controller.add);
+      items
+          .cast<Map<String, dynamic>>()
+          .map(Repository.fromJson)
+          .forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -94,19 +97,19 @@ class SearchService extends Service {
     query += _searchQualifier('size', size);
 
     // build up the in: qualifier based on the 2 booleans
-    var _in = '';
+    var inValue = '';
     if (inFile) {
-      _in = 'file';
+      inValue = 'file';
     }
     if (inPath) {
-      if (_in.isEmpty) {
-        _in = 'path';
+      if (inValue.isEmpty) {
+        inValue = 'path';
       } else {
-        _in = 'file,path';
+        inValue = 'file,path';
       }
     }
-    if (_in.isNotEmpty) {
-      query += ' in:$_in';
+    if (inValue.isNotEmpty) {
+      query += ' in:$inValue';
     }
 
     final params = <String, dynamic>{};
@@ -159,7 +162,10 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => Issue.fromJson(item)).forEach(controller.add);
+      items
+          .cast<Map<String, dynamic>>()
+          .map(Issue.fromJson)
+          .forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;
@@ -206,7 +212,10 @@ class SearchService extends Service {
 
       final items = input['items'] as List;
 
-      items.map((item) => User.fromJson(item)).forEach(controller.add);
+      items
+          .cast<Map<String, dynamic>>()
+          .map(User.fromJson)
+          .forEach(controller.add);
     }).onDone(controller.close);
 
     return controller.stream;

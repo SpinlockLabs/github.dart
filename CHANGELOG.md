@@ -1,3 +1,20 @@
+## 9.10.1
+
+* Pass required User-Agent HTTP header on all requests
+  * If `Authentication.basic` is used, it will be your GitHub username/application
+  * Otherwise, it will default to `github.dart`
+
+## 9.10.0-dev
+
+* Require Dart 2.18
+* Expose `CheckSuitesService` and `ChuckRunsService` classes.
+
+## 9.9.0
+
+* Add "author_association" field to the IssueComment object by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/348
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.8.0...9.9.0
+
 ## 9.8.0
 
 * Add "head_branch" field to CheckSuite object by @nehalvpatel in https://github.com/SpinlockLabs/github.dart/pull/347

@@ -123,6 +123,7 @@ IssueComment _$IssueCommentFromJson(Map<String, dynamic> json) => IssueComment(
       url: json['url'] as String?,
       htmlUrl: json['html_url'] as String?,
       issueUrl: json['issue_url'] as String?,
+      authorAssociation: json['author_association'] as String?,
     );
 
 Map<String, dynamic> _$IssueCommentToJson(IssueComment instance) =>
@@ -135,6 +136,7 @@ Map<String, dynamic> _$IssueCommentToJson(IssueComment instance) =>
       'url': instance.url,
       'html_url': instance.htmlUrl,
       'issue_url': instance.issueUrl,
+      'author_association': instance.authorAssociation,
     };
 
 IssueLabel _$IssueLabelFromJson(Map<String, dynamic> json) => IssueLabel(

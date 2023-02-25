@@ -30,6 +30,6 @@ void loadStars() {
     $stars!.append(h);
   }).onDone(() {
     querySelector('#total')!
-        .appendText(querySelectorAll('.user').length.toString() + ' stars');
+        .appendText('${querySelectorAll('.user').length} stars');
   });
 }

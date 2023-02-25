@@ -149,6 +149,7 @@ class IssueComment {
     this.url,
     this.htmlUrl,
     this.issueUrl,
+    this.authorAssociation,
   });
   int? id;
   String? body;
@@ -158,6 +159,7 @@ class IssueComment {
   String? url;
   String? htmlUrl;
   String? issueUrl;
+  String? authorAssociation;
 
   factory IssueComment.fromJson(Map<String, dynamic> input) =>
       _$IssueCommentFromJson(input);

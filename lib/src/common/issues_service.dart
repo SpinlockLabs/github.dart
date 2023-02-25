@@ -123,7 +123,7 @@ class IssuesService extends Service {
     return PaginationHelper(github).objects(
       'GET',
       pathSegment,
-      (dynamic i) => Issue.fromJson(i),
+      Issue.fromJson,
       params: params,
     );
   }
@@ -144,7 +144,7 @@ class IssuesService extends Service {
     return PaginationHelper(github).objects(
       'GET',
       '/repos/${slug.owner}/${slug.name}/issues/$issueNumber/reactions$query',
-      (dynamic i) => Reaction.fromJson(i),
+      Reaction.fromJson,
       headers: {
         'Accept': 'application/vnd.github.squirrel-girl-preview+json',
       },
@@ -169,7 +169,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/#get-a-single-issue
   Future<Issue> get(RepositorySlug slug, int issueNumber) =>
       github.getJSON('/repos/${slug.fullName}/issues/$issueNumber',
-          convert: (dynamic i) => Issue.fromJson(i));
+          convert: Issue.fromJson);
 
   /// Create an issue.
   ///
@@ -194,8 +194,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#list-assignees
   Stream<User> listAssignees(RepositorySlug slug) {
-    return PaginationHelper(github).objects('GET',
-        '/repos/${slug.fullName}/assignees', (dynamic i) => User.fromJson(i));
+    return PaginationHelper(github)
+        .objects('GET', '/repos/${slug.fullName}/assignees', User.fromJson);
   }
 
   /// Checks if a user is an assignee for the specified repository.
@@ -215,17 +215,15 @@ class IssuesService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/issues/$issueNumber/comments',
-        (dynamic i) => IssueComment.fromJson(i));
+        IssueComment.fromJson);
   }
 
   /// Lists all comments in a repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
   Stream<IssueComment> listCommentsByRepo(RepositorySlug slug) {
-    return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/issues/comments',
-        (dynamic i) => IssueComment.fromJson(i));
+    return PaginationHelper(github).objects('GET',
+        '/repos/${slug.fullName}/issues/comments', IssueComment.fromJson);
   }
 
   /// Fetches the specified issue comment.
@@ -233,7 +231,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/comments/#get-a-single-comment
   Future<IssueComment> getComment(RepositorySlug slug, int id) =>
       github.getJSON('/repos/${slug.fullName}/issues/comments/$id',
-          convert: (dynamic i) => IssueComment.fromJson(i));
+          convert: IssueComment.fromJson);
 
   /// Creates a new comment on the specified issue
   ///
@@ -244,7 +242,7 @@ class IssuesService extends Service {
     return github.postJSON(
       '/repos/${slug.fullName}/issues/$issueNumber/comments',
       body: it,
-      convert: (dynamic i) => IssueComment.fromJson(i),
+      convert: IssueComment.fromJson,
       statusCode: StatusCodes.CREATED,
     );
   }
@@ -257,7 +255,7 @@ class IssuesService extends Service {
     return github.postJSON(
       '/repos/${slug.fullName}/issues/comments/$id',
       body: it,
-      convert: (dynamic i) => IssueComment.fromJson(i),
+      convert: IssueComment.fromJson,
       statusCode: StatusCodes.OK,
     );
   }
@@ -277,10 +275,8 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#list-all-labels-for-this-repository
   Stream<IssueLabel> listLabels(RepositorySlug slug) {
-    return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/labels',
-        (dynamic i) => IssueLabel.fromJson(i));
+    return PaginationHelper(github)
+        .objects('GET', '/repos/${slug.fullName}/labels', IssueLabel.fromJson);
   }
 
   /// Fetches a single label.
@@ -288,8 +284,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#get-a-single-label
   Future<IssueLabel> getLabel(RepositorySlug slug, String name) =>
       github.getJSON('/repos/${slug.fullName}/labels/$name',
-          convert: (dynamic i) => IssueLabel.fromJson(i),
-          statusCode: StatusCodes.OK);
+          convert: IssueLabel.fromJson, statusCode: StatusCodes.OK);
 
   /// Creates a new label on the specified repository.
   ///
@@ -298,7 +293,7 @@ class IssuesService extends Service {
       RepositorySlug slug, String name, String color) {
     return github.postJSON('/repos/${slug.fullName}/labels',
         body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: (dynamic i) => IssueLabel.fromJson(i));
+        convert: IssueLabel.fromJson);
   }
 
   /// Edits a label.
@@ -307,7 +302,7 @@ class IssuesService extends Service {
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
     return github.postJSON('/repos/${slug.fullName}/labels/$name',
         body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: (dynamic i) => IssueLabel.fromJson(i));
+        convert: IssueLabel.fromJson);
   }
 
   /// Deletes a label.
@@ -327,7 +322,7 @@ class IssuesService extends Service {
     return PaginationHelper(github).objects(
         'GET',
         '/repos/${slug.fullName}/issues/$issueNumber/labels',
-        (dynamic i) => IssueLabel.fromJson(i));
+        IssueLabel.fromJson);
   }
 
   /// Adds labels to an issue.
@@ -338,10 +333,8 @@ class IssuesService extends Service {
     return github.postJSON<List<dynamic>, List<IssueLabel>>(
       '/repos/${slug.fullName}/issues/$issueNumber/labels',
       body: GitHubJson.encode(labels),
-      convert: (input) => input
-          .cast<Map<String, dynamic>>()
-          .map((i) => IssueLabel.fromJson(i))
-          .toList(),
+      convert: (input) =>
+          input.cast<Map<String, dynamic>>().map(IssueLabel.fromJson).toList(),
     );
   }
 
@@ -354,8 +347,7 @@ class IssuesService extends Service {
         .request('PUT', '/repos/${slug.fullName}/issues/$issueNumber/labels',
             body: GitHubJson.encode(labels))
         .then((response) {
-      return jsonDecode(response.body)
-          .map((Map<String, dynamic> it) => IssueLabel.fromJson(it));
+      return jsonDecode(response.body).map(IssueLabel.fromJson);
     });
   }
 
@@ -386,9 +378,7 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/milestones/#list-milestones-for-a-repository
   Stream<Milestone> listMilestones(RepositorySlug slug) {
     return PaginationHelper(github).objects(
-        'GET',
-        '/repos/${slug.fullName}/milestones',
-        (dynamic i) => Milestone.fromJson(i));
+        'GET', '/repos/${slug.fullName}/milestones', Milestone.fromJson);
   }
 
   // TODO: Implement getMilestone: https://developer.github.com/v3/issues/milestones/#get-a-single-milestone
@@ -399,8 +389,7 @@ class IssuesService extends Service {
   Future<Milestone> createMilestone(
       RepositorySlug slug, CreateMilestone request) {
     return github.postJSON('/repos/${slug.fullName}/milestones',
-        body: GitHubJson.encode(request),
-        convert: (dynamic i) => Milestone.fromJson(i));
+        body: GitHubJson.encode(request), convert: Milestone.fromJson);
   }
 
   // TODO: Implement editMilestone: https://developer.github.com/v3/issues/milestones/#update-a-milestone

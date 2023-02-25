@@ -27,8 +27,4 @@ void main() {
     print(e);
     exit(0);
   }
-
-  print('Invalid Entity Error Handling Failed');
-
-  exit(1);
 }

@@ -333,7 +333,7 @@ class GitHub {
 
     final json = jsonDecode(response.body);
 
-    final T returnValue = convert(json)!;
+    final returnValue = convert(json) as T;
     _applyExpandos(returnValue, response);
     return returnValue;
   }
@@ -376,6 +376,9 @@ class GitHub {
           base64Encode(utf8.encode('${auth!.username}:${auth!.password}'));
       headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
     }
+
+    // See https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
+    headers.putIfAbsent('User-Agent', () => auth?.username ?? 'github.dart');
 
     if (method == 'PUT' && body == null) {
       headers.putIfAbsent('Content-Length', () => '0');
@@ -424,15 +427,12 @@ class GitHub {
     } else {
       return response;
     }
-
-    throw UnknownError(this);
   }
 
   ///
   /// Internal method to handle status codes
   ///
-  @alwaysThrows
-  void handleStatusCode(http.Response response) {
+  Never handleStatusCode(http.Response response) {
     print(response.body);
     String? message = '';
     List<Map<String, String>>? errors;

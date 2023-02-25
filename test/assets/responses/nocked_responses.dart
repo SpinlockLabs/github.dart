@@ -1,4 +1,4 @@
-var getBlob = '''
+String getBlob = '''
 {
   "content": "Q29udGVudCBvZiB0aGUgYmxvYg==",
   "encoding": "base64",
@@ -8,7 +8,7 @@ var getBlob = '''
   "node_id": "Q29udGVudCBvZiB0aGUgYmxvYg=="
 }''';
 
-var createBlob = '''
+String createBlob = '''
 {
   "url": "https://api.github.com/repos/octocat/example/git/blobs/3a0f86fb8db8eea7ccbb9a95f325ddbedfb25e15",
   "sha": "3a0f86fb8db8eea7ccbb9a95f325ddbedfb25e15",
@@ -16,7 +16,7 @@ var createBlob = '''
   "encoding": "utf-8"
 }''';
 
-var getCommit = '''
+String getCommit = '''
 {
   "sha": "7638417db6d59f3c431d3e1f261cc637155684cd",
   "node_id": "MDY6Q29tbWl0NmRjYjA5YjViNTc4NzVmMzM0ZjYxYWViZWQ2OTVlMmU0MTkzZGI1ZQ==",
@@ -52,7 +52,7 @@ var getCommit = '''
   }
 }''';
 
-var createCommit = '''
+String createCommit = '''
 {
   "sha": "7638417db6d59f3c431d3e1f261cc637155684cd",
   "node_id": "MDY6Q29tbWl0NzYzODQxN2RiNmQ1OWYzYzQzMWQzZTFmMjYxY2M2MzcxNTU2ODRjZA==",
@@ -88,7 +88,7 @@ var createCommit = '''
   "html_url": "https://github.com/octocat/Hello-World/commit/7638417db6d59f3c431d3e1f261cc637155684cd"
 }''';
 
-var getReference = '''{
+String getReference = '''{
   "ref": "refs/heads/b",
   "node_id": "MDM6UmVmcmVmcy9oZWFkcy9mZWF0dXJlQQ==",
   "url": "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/featureA",
@@ -99,7 +99,7 @@ var getReference = '''{
   }
 }''';
 
-var createReference = '''{
+String createReference = '''{
   "ref": "refs/heads/b",
   "node_id": "MDM6UmVmcmVmcy9oZWFkcy9mZWF0dXJlQQ==",
   "url": "https://api.github.com/repos/octocat/Hello-World/git/refs/heads/featureA",
@@ -110,7 +110,7 @@ var createReference = '''{
   }
 }''';
 
-var getTag = '''{
+String getTag = '''{
   "node_id": "MDM6VGFnOTQwYmQzMzYyNDhlZmFlMGY5ZWU1YmM3YjJkNWM5ODU4ODdiMTZhYw==",
   "tag": "v0.0.1",
   "sha": "940bd336248efae0f9ee5bc7b2d5c985887b16ac",
@@ -134,7 +134,7 @@ var getTag = '''{
   }
 }''';
 
-var createTag = '''{
+String createTag = '''{
   "node_id": "MDM6VGFnOTQwYmQzMzYyNDhlZmFlMGY5ZWU1YmM3YjJkNWM5ODU4ODdiMTZhYw==",
   "tag": "v0.0.1",
   "sha": "940bd336248efae0f9ee5bc7b2d5c985887b16ac",
@@ -158,7 +158,7 @@ var createTag = '''{
   }
 }''';
 
-var createTree = '''{
+String createTree = '''{
   "sha": "44b4fc6d56897b048c772eb4087f854f46256132",
   "url": "https://api.github.com/repos/octocat/Hello-World/trees/44b4fc6d56897b048c772eb4087f854f46256132",
   "tree": [
@@ -174,7 +174,7 @@ var createTree = '''{
   "truncated": true
 }''';
 
-var searchResults = '''{
+String searchResults = '''{
   "total_count": 17,
   "incomplete_results": false,
   "items": [
@@ -1473,7 +1473,7 @@ var searchResults = '''{
   ]
 }''';
 
-var mergedPR1 = '''{
+String mergedPR1 = '''{
   "sha": "someSHA",
   "merged": true,
   "message": "Pull Request successfully merged"
