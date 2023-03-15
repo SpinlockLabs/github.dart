@@ -18,16 +18,12 @@ jobs:
           mode: exactly
           count: 1
           labels: "semver:patch, semver:minor, semver:major"
-          token: ${{secrets.MACHINE_GITHUB_API_TOKEN}}
-          add_comment: |
-            Add a semantic version label
-            semver:patch - non-breaking bug fixes or internal changes
-            semver:minor - non-breaking changes (additions, deprecations)
-            semver:major - contains changes that may break consumers 
+          token: ${{secrets.GITHUB_TOKEN}}
+          add_comment: Add a semantic version label (semver:patch semver:minor semver:major)
       - uses: mheap/github-action-required-labels@v3
         with:
           mode: exactly
           count: 1
           labels: "unreleased"
-          token: ${{secrets.MACHINE_GITHUB_API_TOKEN}}
+          token: ${{secrets.GITHUB_TOKEN}}
           add_comment: The unrelease label is required to track which PRs have yet to be released.
