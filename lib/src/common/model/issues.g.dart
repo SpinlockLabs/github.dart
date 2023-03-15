@@ -142,12 +142,14 @@ Map<String, dynamic> _$IssueCommentToJson(IssueComment instance) =>
 IssueLabel _$IssueLabelFromJson(Map<String, dynamic> json) => IssueLabel(
       name: json['name'] as String? ?? '',
       color: json['color'] as String? ?? '',
+      description: json['description'] as String? ?? '',
     );
 
 Map<String, dynamic> _$IssueLabelToJson(IssueLabel instance) =>
     <String, dynamic>{
       'name': instance.name,
       'color': instance.color,
+      'description': instance.description,
     };
 
 Milestone _$MilestoneFromJson(Map<String, dynamic> json) => Milestone(

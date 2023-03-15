@@ -172,11 +172,14 @@ class IssueLabel {
   IssueLabel({
     this.name = '',
     this.color = '',
+    this.description = '',
   });
 
   String name;
 
   String color;
+
+  String description;
 
   factory IssueLabel.fromJson(Map<String, dynamic> input) =>
       _$IssueLabelFromJson(input);
