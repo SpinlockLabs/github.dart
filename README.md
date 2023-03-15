@@ -36,3 +36,4 @@ Post a question or idea: https://github.com/SpinlockLabs/github.dart/discussions
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=SpinlockLabs/github.dart&type=Date)](https://star-history.com/#SpinlockLabs/github.dart&Date)
+
