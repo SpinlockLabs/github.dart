@@ -5,18 +5,11 @@ on:
 
 jobs:
   assignUnreleased:
-    name: Unreleased
+    name: Add Unreleased Label
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Apply unreleased label
-        uses: actions/github-script@v6
+      - uses: buildsville/add-remove-label@v2.0.0
         with:
-          github-token: ${{secrets.MACHINE_GITHUB_API_TOKEN}}
-          script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['unreleased']
-            })
+          token: ${{secrets.GITHUB_TOKEN}}
+          labels: Unreleased
+          type: add
