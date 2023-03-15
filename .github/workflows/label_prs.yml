@@ -8,11 +8,11 @@ jobs:
     name: Unreleased
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Apply unreleased label
         uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{secrets.MACHINE_GITHUB_API_TOKEN}}
           script: |
             github.rest.issues.addLabels({
               issue_number: context.issue.number,
