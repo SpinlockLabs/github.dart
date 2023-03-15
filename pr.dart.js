@@ -3000,8 +3000,9 @@ fA:function fA(a){this.a=a},
 fB:function fB(a){this.a=a},
 fC:function fC(a){this.a=a},
 fD:function fD(){},
-bE:function bE(a,b){this.a=a
-this.b=b},
+bE:function bE(a,b,c){this.a=a
+this.b=b
+this.c=c},
 hg:function hg(a,b,c,d,e,f,g,h,i,j,k){var _=this
 _.a=a
 _.b=b
@@ -6580,13 +6581,15 @@ A.hg.prototype={}
 A.bo.prototype={}
 A.hj.prototype={}
 A.hM.prototype={
-$1(a){var s,r
+$1(a){var s,r,q
 t.a.a(a)
 s=J.B(a)
 r=A.m(s.i(a,"name"))
 if(r==null)r=""
-s=A.m(s.i(a,"color"))
-return new A.bE(r,s==null?"":s)},
+q=A.m(s.i(a,"color"))
+if(q==null)q=""
+s=A.m(s.i(a,"description"))
+return new A.bE(r,q,s==null?"":s)},
 $S:34}
 A.hN.prototype={
 $1(a){return A.eH(t.a.a(a))},
