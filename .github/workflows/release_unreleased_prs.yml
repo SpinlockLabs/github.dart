@@ -4,9 +4,12 @@ name: Release unreleased PRs
 # See https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-when-a-pull-request-merges
 on:
   workflow_dispatch:
-  pull_request:
-    types:
-      - closed
+  
+  # Comment out for now and just use manual kickoff of the action
+  # until we can figure our permissions
+  # pull_request:
+  #   types:
+  #     - closed
 
 jobs:
   release:
