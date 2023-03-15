@@ -2,8 +2,22 @@ name: Require semver:* and unreleased Label
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize]
+
+jobs:
+  assignUnreleased:
+    name: Add Unreleased Label
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    steps:
+      - uses: buildsville/add-remove-label@v2.0.0
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          labels: Unreleased
+          type: add
+
 jobs:
   label:
+    needs: assignUnreleased
     runs-on: ubuntu-latest
     steps:
       - uses: mheap/github-action-required-labels@v3
