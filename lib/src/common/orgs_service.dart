@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:github/src/common.dart';
 import 'package:http/http.dart' as http;
@@ -35,7 +34,7 @@ class OrganizationsService extends Service {
   Future<Organization> get(String? name) => github.getJSON('/orgs/$name',
           convert: Organization.fromJson,
           statusCode: StatusCodes.OK, fail: (http.Response response) {
-        if (response.statusCode == HttpStatus.notFound) {
+        if (response.statusCode == StatusCodes.NOT_FOUND) {
           throw OrganizationNotFound(github, name);
         }
       });
@@ -70,7 +69,7 @@ class OrganizationsService extends Service {
     });
 
     return github.postJSON('/orgs/$org',
-        statusCode: HttpStatus.ok,
+        statusCode: StatusCodes.OK,
         convert: Organization.fromJson,
         body: GitHubJson.encode(map));
   }
@@ -92,7 +91,7 @@ class OrganizationsService extends Service {
   Future<Team> getTeam(int teamId) {
     return github.getJSON('/teams/$teamId',
         convert: Organization.fromJson,
-        statusCode: HttpStatus.ok) as Future<Team>;
+        statusCode: StatusCodes.OK) as Future<Team>;
   }
 
   /// Gets the team specified by its [teamName].
@@ -105,7 +104,7 @@ class OrganizationsService extends Service {
     return github.getJSON(
       'orgs/$orgName/teams/$teamName',
       convert: Team.fromJson,
-      statusCode: HttpStatus.ok,
+      statusCode: StatusCodes.OK,
     );
   }
 
@@ -127,7 +126,7 @@ class OrganizationsService extends Service {
     });
 
     return github.postJSON('/orgs/$org/teams',
-        statusCode: HttpStatus.created,
+        statusCode: StatusCodes.CREATED,
         convert: Team.fromJson,
         body: GitHubJson.encode(map));
   }
@@ -149,7 +148,7 @@ class OrganizationsService extends Service {
 
     return github.postJSON(
       '/teams/$teamId',
-      statusCode: HttpStatus.ok,
+      statusCode: StatusCodes.OK,
       convert: Team.fromJson,
       body: GitHubJson.encode(map),
     );
@@ -160,7 +159,7 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#delete-team
   Future<bool> deleteTeam(int teamId) {
     return github.request('DELETE', '/teams/$teamId').then((response) {
-      return response.statusCode == HttpStatus.noContent;
+      return response.statusCode == StatusCodes.NO_CONTENT;
     });
   }
 
@@ -181,7 +180,7 @@ class OrganizationsService extends Service {
     });
   }
 
-  /// Returns the membership status for a user in a team.
+  /// Returns the membership status for a [user] in a team with [teamId].
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future<TeamMembershipState> getTeamMembership(
@@ -190,14 +189,14 @@ class OrganizationsService extends Service {
   ) {
     return github.getJSON(
       '/teams/$teamId/memberships/$user',
-      statusCode: HttpStatus.ok,
+      statusCode: StatusCodes.OK,
       convert: (dynamic json) => TeamMembershipState(
         json['state'],
       ),
     );
   }
 
-  /// Returns the membership status for a user in a team given the [orgName].
+  /// Returns the membership status for [user] in [teamName] given the [orgName].
   ///
   /// Note that this will throw on NotFound if the user is not a member of the
   /// team. Adding a fail function to set the value does not help unless you
@@ -209,7 +208,7 @@ class OrganizationsService extends Service {
   ) {
     return github.getJSON(
       '/orgs/$orgName/teams/$teamName/memberships/$user',
-      statusCode: HttpStatus.ok,
+      statusCode: StatusCodes.OK,
       convert: (dynamic json) => TeamMembershipState(
         json['state'],
       ),
@@ -226,7 +225,7 @@ class OrganizationsService extends Service {
     final response = await github.request(
       'PUT',
       '/teams/$teamId/memberships/$user',
-      statusCode: HttpStatus.ok,
+      statusCode: StatusCodes.OK,
     );
     return TeamMembershipState(jsonDecode(response.body)['state']);
   }
@@ -239,7 +238,7 @@ class OrganizationsService extends Service {
     String user,
   ) {
     return github.request('DELETE', '/teams/$teamId/memberships/$user',
-        statusCode: HttpStatus.noContent);
+        statusCode: StatusCodes.NO_CONTENT,);
   }
 
   /// Lists the repositories that the specified team has access to.
@@ -266,7 +265,7 @@ class OrganizationsService extends Service {
       '/teams/$teamId/repos/${slug.fullName}',
     )
         .then((response) {
-      return response.statusCode == HttpStatus.noContent;
+      return response.statusCode == StatusCodes.NO_CONTENT;
     });
   }
 
@@ -283,7 +282,7 @@ class OrganizationsService extends Service {
       '/teams/$teamId/repos/${slug.fullName}',
     )
         .then((response) {
-      return response.statusCode == HttpStatus.noContent;
+      return response.statusCode == StatusCodes.NO_CONTENT;
     });
   }
 
@@ -300,7 +299,7 @@ class OrganizationsService extends Service {
       '/teams/$teamId/repos/${slug.fullName}',
     )
         .then((response) {
-      return response.statusCode == HttpStatus.noContent;
+      return response.statusCode == StatusCodes.NO_CONTENT;
     });
   }
 
@@ -370,7 +369,7 @@ class OrganizationsService extends Service {
           'POST',
           '/orgs/$org/hooks/$id/pings',
         )
-        .then((response) => response.statusCode == HttpStatus.noContent);
+        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
   /// Deletes the specified hook.
@@ -381,7 +380,7 @@ class OrganizationsService extends Service {
       '/orgs/$org/hooks/$id',
     )
         .then((response) {
-      return response.statusCode == HttpStatus.noContent;
+      return response.statusCode == StatusCodes.NO_CONTENT;
     });
   }
 }
