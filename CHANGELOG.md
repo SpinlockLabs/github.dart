@@ -1,3 +1,7 @@
+## 9.11.0
+
+* expose IssueLabel.description; update labels REST APIs by @devoncarew in https://github.com/SpinlockLabs/github.dart/pull/355
+
 ## 9.10.1
 
 * Pass required User-Agent HTTP header on all requests
