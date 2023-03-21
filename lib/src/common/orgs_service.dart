@@ -83,7 +83,8 @@ class OrganizationsService extends Service {
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team
   Future<Team> getTeam(int teamId) {
     return github.getJSON('/teams/$teamId',
-        convert: Organization.fromJson, statusCode: HttpStatus.ok) as Future<Team>;
+        convert: Organization.fromJson,
+        statusCode: HttpStatus.ok) as Future<Team>;
   }
 
   /// Gets the team specified by its [teamName].
@@ -107,7 +108,9 @@ class OrganizationsService extends Service {
     });
 
     return github.postJSON('/orgs/$org/teams',
-        statusCode: HttpStatus.created, convert: Team.fromJson, body: GitHubJson.encode(map));
+        statusCode: HttpStatus.created,
+        convert: Team.fromJson,
+        body: GitHubJson.encode(map));
   }
 
   /// Edits a Team.
@@ -156,35 +159,34 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
   Future<TeamMembershipState> getTeamMembership(int teamId, String user) {
-    return github
-        .getJSON(
-          '/teams/$teamId/memberships/$user',
-          statusCode: HttpStatus.ok,
-          convert: (dynamic json) => TeamMembershipState(json['state']),
-        );
+    return github.getJSON(
+      '/teams/$teamId/memberships/$user',
+      statusCode: HttpStatus.ok,
+      convert: (dynamic json) => TeamMembershipState(json['state']),
+    );
   }
 
   /// Returns the membership status for a user in a team given the [orgName].
-  /// 
-  /// Note that this will throw on NotFound if the user is not a member of the 
+  ///
+  /// Note that this will throw on NotFound if the user is not a member of the
   /// team. Adding a fail function to set the value does not help unless you
   /// throw out of the fail function.
   Future<TeamMembershipState> getTeamMembershipByName(
       String orgName, String teamName, String user) {
-    return github
-        .getJSON(
-          '/orgs/$orgName/teams/$teamName/memberships/$user',
-          statusCode: HttpStatus.ok,
-          convert: (dynamic json) => TeamMembershipState(json['state']),
-        );
+    return github.getJSON(
+      '/orgs/$orgName/teams/$teamName/memberships/$user',
+      statusCode: HttpStatus.ok,
+      convert: (dynamic json) => TeamMembershipState(json['state']),
+    );
   }
 
   /// Invites a user to the specified team.
   ///
   /// API docs: https://developer.github.com/v3/teams/members/#add-or-update-team-membership
   Future<TeamMembershipState> addTeamMembership(int teamId, String user) async {
-    final response = await github
-        .request('PUT', '/teams/$teamId/memberships/$user', statusCode: HttpStatus.ok);
+    final response = await github.request(
+        'PUT', '/teams/$teamId/memberships/$user',
+        statusCode: HttpStatus.ok);
     return TeamMembershipState(jsonDecode(response.body)['state']);
   }
 
