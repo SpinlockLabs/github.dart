@@ -290,19 +290,49 @@ class IssuesService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#create-a-label
   Future<IssueLabel> createLabel(
-      RepositorySlug slug, String name, String color) {
-    return github.postJSON('/repos/${slug.fullName}/labels',
-        body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: IssueLabel.fromJson);
+    RepositorySlug slug,
+    String name, {
+    String? color,
+    String? description,
+  }) {
+    return github.postJSON(
+      '/repos/${slug.fullName}/labels',
+      body: GitHubJson.encode({
+        'name': name,
+        if (color != null) 'color': color,
+        if (description != null) 'description': description,
+      }),
+      convert: IssueLabel.fromJson,
+    );
   }
 
   /// Edits a label.
   ///
   /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
+  @Deprecated('See updateLabel instead.')
   Future<IssueLabel> editLabel(RepositorySlug slug, String name, String color) {
-    return github.postJSON('/repos/${slug.fullName}/labels/$name',
-        body: GitHubJson.encode({'name': name, 'color': color}),
-        convert: IssueLabel.fromJson);
+    return updateLabel(slug, name, color: color);
+  }
+
+  /// Update a label.
+  ///
+  /// API docs: https://developer.github.com/v3/issues/labels/#update-a-label
+  Future<IssueLabel> updateLabel(
+    RepositorySlug slug,
+    String name, {
+    String? newName,
+    String? color,
+    String? description,
+  }) {
+    return github.patchJSON(
+      '/repos/${slug.fullName}/labels/$name',
+      body: GitHubJson.encode({
+        if (newName != null) 'new_name': newName,
+        if (color != null) 'color': color,
+        if (description != null) 'description': description,
+      }),
+      convert: IssueLabel.fromJson,
+    );
   }
 
   /// Deletes a label.

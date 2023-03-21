@@ -1,6 +1,6 @@
 # GitHub for Dart
 
-![](https://github.com/SpinlockLabs/github.dart/workflows/Dart%20CI/badge.svg)
+[![Dart Checks](https://github.com/SpinlockLabs/github.dart/actions/workflows/dart.yml/badge.svg)](https://github.com/SpinlockLabs/github.dart/actions/workflows/dart.yml)
 [![Pub](https://img.shields.io/pub/v/github.svg)](https://pub.dartlang.org/packages/github)
 
 This is a library for interacting with GitHub in Dart. It works on all platforms including web, server, and Flutter.

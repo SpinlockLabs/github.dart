@@ -8,7 +8,7 @@ jobs:
     name: Assign Rob
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       - name: Apply untriaged label
         uses: actions/github-script@v6
         with:

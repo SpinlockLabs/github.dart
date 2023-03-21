@@ -1,19 +1,33 @@
-name: Dart Checks (analyze,format,publishable)
+name: Dart Checks
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: dart
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        # Test with at least the declared minimum Dart version
+        sdk: [2.18.7, stable]
     steps:
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-      run: dart pub get
-    - name: Dart Analyzer
-      run: dart analyze
-    - name: Check Dart Format
-      run: dart format --set-exit-if-changed -o none lib test tool example integration_test && echo Dart Format 👍 || echo Files needed Dart formatting 😢
-    - name: Check if Publishable
-      run: dart pub publish --dry-run
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Install dependencies
+        run: dart pub get
+      - name: Dart Analyzer
+        run: dart analyze
+      - name: Check Dart Format
+        if: ${{ matrix.sdk == 'stable' }}
+        run: dart format --set-exit-if-changed -onone .
+      - name: Unit tests
+        run: dart test
+      - name: Check if Publishable
+        run: dart pub publish --dry-run
