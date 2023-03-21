@@ -85,6 +85,14 @@ class OrganizationsService extends Service {
         convert: Organization.fromJson, statusCode: 200) as Future<Team>;
   }
 
+  /// Gets the team specified by its [teamName].
+  /// 
+  /// https://docs.github.com/en/rest/teams/teams?apiVersion=2022-11-28#get-a-team-by-name
+  Future<Team> getTeamByName(String orgName, String teamName) {
+    return github.getJSON('orgs/$orgName/teams/$teamName',
+        convert: Team.fromJson, statusCode: 200);
+  }
+
   /// Creates a Team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#create-team
@@ -163,6 +171,25 @@ class OrganizationsService extends Service {
           convert: (dynamic json) => TeamMembershipState(json['state']),
         )
         .then(completer.complete);
+
+    return completer.future;
+  }
+
+  /// Returns the membership status for a user in a team given the [orgName] and [teamName].
+  Future<TeamMembershipState> getTeamMembershipByName(String orgName, String teamName, String user) {
+    final completer = Completer<TeamMembershipState>();
+
+    github.getJSON('/orgs/$orgName/teams/$teamName/memberships/$user',
+      statusCode: 200,
+      fail: (http.Response response) {
+        if (response.statusCode == 404) {
+          completer.complete(TeamMembershipState(null));
+        } else {
+          github.handleStatusCode(response);
+        }
+      }, 
+      convert: (dynamic json) => TeamMembershipState(json['state']),
+    ).then(completer.complete);
 
     return completer.future;
   }
