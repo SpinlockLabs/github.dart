@@ -237,8 +237,11 @@ class OrganizationsService extends Service {
     int teamId,
     String user,
   ) {
-    return github.request('DELETE', '/teams/$teamId/memberships/$user',
-        statusCode: StatusCodes.NO_CONTENT,);
+    return github.request(
+      'DELETE',
+      '/teams/$teamId/memberships/$user',
+      statusCode: StatusCodes.NO_CONTENT,
+    );
   }
 
   /// Lists the repositories that the specified team has access to.
