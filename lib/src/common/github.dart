@@ -433,7 +433,6 @@ class GitHub {
   /// Internal method to handle status codes
   ///
   Never handleStatusCode(http.Response response) {
-    print(response.body);
     String? message = '';
     List<Map<String, String>>? errors;
     if (response.headers['content-type']!.contains('application/json')) {
@@ -450,7 +449,7 @@ class GitHub {
           }
         }
       } catch (ex) {
-        print(ex);
+        throw UnknownError(this, ex.toString());
       }
     }
     switch (response.statusCode) {
