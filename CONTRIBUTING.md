@@ -30,6 +30,18 @@ GitHub.dart is committed to efficiency as much as possible. If your code is not 
 
 Pull Request rejections are not a bad thing. It just means you need to fix something. Perhaps it is important to define 'rejection' as it is used in this case. A rejection is when a GitHub.dart committer comments on a Pull Request with a comment like 'rejected due to incorrect formatting'.
 
+## Tests
+
+To run the complete test suite you will need to install
+`octokit/fixtures-server`.
+
+```
+npm install --global @octokit/fixtures-server
+```
+
+Tests can be run using `make test`, which will start up a local mock
+GitHub and execute tests against it using your localhost port 3000.
+
 ## Contacting Us
 
 - IRC: `#directcode on irc.esper.net and irc.freenode.net`
