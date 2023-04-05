@@ -284,6 +284,10 @@ CreatePullRequestReview _$CreatePullRequestReviewFromJson(
       json['pull_number'] as int,
       json['event'] as String,
       body: json['body'] as String?,
+      comments: (json['comments'] as List<dynamic>?)
+          ?.map((e) =>
+              PullRequestReviewComment.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$CreatePullRequestReviewToJson(
@@ -294,4 +298,83 @@ Map<String, dynamic> _$CreatePullRequestReviewToJson(
       'event': instance.event,
       'body': instance.body,
       'pull_number': instance.pullNumber,
+      'comments': instance.comments,
+    };
+
+PullRequestReviewComment _$PullRequestReviewCommentFromJson(
+        Map<String, dynamic> json) =>
+    PullRequestReviewComment(
+      authorAssociation: json['author_association'] as String?,
+      body: json['body'] as String?,
+      bodyHtml: json['body_html'] as String?,
+      bodyText: json['body_text'] as String?,
+      commitId: json['commit_id'] as String?,
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+      diffHunk: json['diff_hunk'] as String?,
+      htmlUrl: json['html_url'] as String?,
+      id: json['id'] as int?,
+      inReplyToId: json['in_reply_to_id'] as int?,
+      line: json['line'] as int?,
+      links: json['_links'] == null
+          ? null
+          : ReviewLinks.fromJson(json['_links'] as Map<String, dynamic>),
+      nodeId: json['node_id'] as String?,
+      originalCommitId: json['original_commit_id'] as String?,
+      originalLine: json['original_line'] as int?,
+      originalPosition: json['original_position'] as int?,
+      originalStartLine: json['original_start_line'] as int?,
+      path: json['path'] as String?,
+      position: json['position'] as int?,
+      pullRequestReviewId: json['pull_request_review_id'] as int?,
+      pullRequestUrl: json['pull_request_url'] as String?,
+      reactions: json['reactions'] == null
+          ? null
+          : ReactionRollup.fromJson(json['reactions'] as Map<String, dynamic>),
+      side: json['side'] as String?,
+      startLine: json['start_line'] as int?,
+      startSide: json['start_side'] as String?,
+      subjectType: json['subject_type'] as String?,
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
+      url: json['url'] as String?,
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$PullRequestReviewCommentToJson(
+        PullRequestReviewComment instance) =>
+    <String, dynamic>{
+      'author_association': instance.authorAssociation,
+      'body': instance.body,
+      'body_html': instance.bodyHtml,
+      'body_text': instance.bodyText,
+      'commit_id': instance.commitId,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'diff_hunk': instance.diffHunk,
+      'html_url': instance.htmlUrl,
+      'id': instance.id,
+      'in_reply_to_id': instance.inReplyToId,
+      'line': instance.line,
+      '_links': instance.links,
+      'node_id': instance.nodeId,
+      'original_commit_id': instance.originalCommitId,
+      'original_line': instance.originalLine,
+      'original_position': instance.originalPosition,
+      'original_start_line': instance.originalStartLine,
+      'path': instance.path,
+      'position': instance.position,
+      'pull_request_review_id': instance.pullRequestReviewId,
+      'pull_request_url': instance.pullRequestUrl,
+      'reactions': instance.reactions,
+      'side': instance.side,
+      'start_line': instance.startLine,
+      'start_side': instance.startSide,
+      'subject_type': instance.subjectType,
+      'updated_at': instance.updatedAt?.toIso8601String(),
+      'url': instance.url,
+      'user': instance.user,
     };

@@ -31,6 +31,8 @@ export 'package:github/src/common/model/repos_releases.dart';
 export 'package:github/src/common/model/repos_stats.dart';
 export 'package:github/src/common/model/repos_statuses.dart';
 export 'package:github/src/common/model/search.dart';
+export 'package:github/src/common/model/timeline.dart';
+export 'package:github/src/common/model/timeline_support.dart';
 export 'package:github/src/common/model/users.dart';
 export 'package:github/src/common/orgs_service.dart';
 export 'package:github/src/common/pulls_service.dart';

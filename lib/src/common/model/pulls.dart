@@ -90,6 +90,7 @@ class PullRequest {
 
   /// Whether or not the pull request is a draft
   bool? draft;
+
   String? mergeCommitSha;
 
   /// If the pull request was merged
@@ -157,6 +158,7 @@ class PullRequestMerge {
     this.sha,
     this.message,
   });
+
   bool? merged;
   String? sha;
   String? message;
@@ -194,16 +196,16 @@ class CreatePullRequest {
   CreatePullRequest(this.title, this.head, this.base,
       {this.draft = false, this.body});
 
-  final String? title;
-  final String? head;
-  final String? base;
+  String? title;
+  String? head;
+  String? base;
 
   /// Whether a draft PR should be created.
   ///
   /// This is currently experimental functionality since the way draft PRs are
   /// created through Github's REST API is in developer preview only - and could change at any time.
   @experimental
-  final bool? draft;
+  bool? draft;
 
   String? body;
 
@@ -231,6 +233,7 @@ class PullRequestComment {
     this.pullRequestUrl,
     this.links,
   });
+
   int? id;
   String? diffHunk;
   String? path;
@@ -280,6 +283,7 @@ class PullRequestFile {
     this.contentsUrl,
     this.patch,
   });
+
   String? sha;
   String? filename;
   String? status;
@@ -308,6 +312,7 @@ class PullRequestReview {
       this.state,
       this.htmlUrl,
       this.pullRequestUrl});
+
   int id;
   User user;
   String? body;
@@ -326,17 +331,209 @@ class PullRequestReview {
 @JsonSerializable()
 class CreatePullRequestReview {
   CreatePullRequestReview(this.owner, this.repo, this.pullNumber, this.event,
-      {this.body});
+      {this.body, this.comments});
 
   String owner;
   String repo;
   String event;
   String? body;
   int pullNumber;
-  // TODO List<PullRequestReviewComment> comments;
+  List<PullRequestReviewComment>? comments;
 
   factory CreatePullRequestReview.fromJson(Map<String, dynamic> input) =>
       _$CreatePullRequestReviewFromJson(input);
   Map<String, dynamic> toJson() => _$CreatePullRequestReviewToJson(this);
 }
-// TODO  PullRequestReviewComment https://docs.github.com/en/rest/reference/pulls#create-a-review-for-a-pull-request
+
+/// Pull Request Review Comment
+///
+/// Pull Request Review Comments are comments on a portion of the Pull Request's
+/// diff.
+@JsonSerializable()
+class PullRequestReviewComment {
+  PullRequestReviewComment({
+    this.authorAssociation,
+    this.body,
+    this.bodyHtml,
+    this.bodyText,
+    this.commitId,
+    this.createdAt,
+    this.diffHunk,
+    this.htmlUrl,
+    this.id,
+    this.inReplyToId,
+    this.line,
+    this.links,
+    this.nodeId,
+    this.originalCommitId,
+    this.originalLine,
+    this.originalPosition,
+    this.originalStartLine,
+    this.path,
+    this.position,
+    this.pullRequestReviewId,
+    this.pullRequestUrl,
+    this.reactions,
+    this.side,
+    this.startLine,
+    this.startSide,
+    this.subjectType,
+    this.updatedAt,
+    this.url,
+    this.user,
+  });
+
+  /// How the author is associated with the repository.
+  ///
+  /// Example: `OWNER`
+  String? authorAssociation;
+
+  /// The text of the comment.
+  ///
+  /// Example: `We should probably include a check for null values here.`
+  String? body;
+
+  /// Example: `"<p>comment body</p>"`
+  String? bodyHtml;
+
+  /// Example: `"comment body"`
+  String? bodyText;
+
+  /// The SHA of the commit to which the comment applies.
+  ///
+  /// Example: `6dcb09b5b57875f334f61aebed695e2e4193db5e`
+  String? commitId;
+
+  DateTime? createdAt;
+
+  /// The diff of the line that the comment refers to.
+  ///
+  /// Example: `@@ -16,33 +16,40 @@ public class Connection : IConnection...`
+  String? diffHunk;
+
+  /// HTML URL for the pull request review comment.
+  ///
+  /// Example: `https://github.com/octocat/Hello-World/pull/1#discussion-diff-1`
+  String? htmlUrl;
+
+  /// The ID of the pull request review comment.
+  int? id;
+
+  /// The comment ID to reply to.
+  int? inReplyToId;
+
+  /// The line of the blob to which the comment applies. The last line of the range
+  /// for a multi-line comment
+  int? line;
+
+  @JsonKey(name: '_links')
+  ReviewLinks? links;
+
+  /// The node ID of the pull request review comment.
+  ///
+  /// Example: `MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDEw`
+  String? nodeId;
+
+  /// The SHA of the original commit to which the comment applies.
+  ///
+  /// Example: `9c48853fa3dc5c1c3d6f1f1cd1f2743e72652840`
+  String? originalCommitId;
+
+  /// The line of the blob to which the comment applies. The last line of the range
+  /// for a multi-line comment
+  int? originalLine;
+
+  /// The index of the original line in the diff to which the comment applies. This
+  /// field is deprecated; use `original_line` instead.
+  int? originalPosition;
+
+  /// The first line of the range for a multi-line comment.
+  int? originalStartLine;
+
+  /// The relative path of the file to which the comment applies.
+  ///
+  /// Example: `config/database.yaml`
+  String? path;
+
+  /// The line index in the diff to which the comment applies. This field is deprecated;
+  /// use `line` instead.
+  int? position;
+
+  /// The ID of the pull request review to which the comment belongs.
+  int? pullRequestReviewId;
+
+  /// URL for the pull request that the review comment belongs to.
+  ///
+  /// Example: `https://api.github.com/repos/octocat/Hello-World/pulls/1`
+  String? pullRequestUrl;
+
+  /// Reaction Rollup
+  ReactionRollup? reactions;
+
+  /// The side of the diff to which the comment applies. The side of the last line
+  /// of the range for a multi-line comment
+  String? side;
+
+  /// The first line of the range for a multi-line comment.
+  int? startLine;
+
+  /// The side of the first line of the range for a multi-line comment.
+  String? startSide;
+
+  /// The level at which the comment is targeted, can be a diff line or a file.
+  String? subjectType;
+
+  DateTime? updatedAt;
+
+  /// URL for the pull request review comment
+  ///
+  /// Example: `https://api.github.com/repos/octocat/Hello-World/pulls/comments/1`
+  String? url;
+
+  User? user;
+
+  Map<String, dynamic> toJson() => _$PullRequestReviewCommentToJson(this);
+
+  factory PullRequestReviewComment.fromJson(Map<String, dynamic> input) =>
+      _$PullRequestReviewCommentFromJson(input);
+}
+
+/// This is similar to [Links] but represents a different serialization
+/// in the GitHub API.
+///
+/// It is used for [PullRequestReviewComment.links] and
+/// [ReviewEvent.links].
+class ReviewLinks {
+  ReviewLinks({
+    this.html,
+    this.pullRequest,
+    this.self,
+  });
+
+  Uri? html;
+  Uri? pullRequest;
+  Uri? self;
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{
+      'html': {'href': html?.toString()},
+      'pullRequest': {'href': pullRequest?.toString()},
+      'self': {'href': self?.toString()},
+    };
+  }
+
+  static Uri? _parseBlock(Map<String, dynamic> input, String key) {
+    if (input[key] is Map && input[key]['href'] is String) {
+      return Uri.parse(input[key]['href']! as String);
+    }
+    return null;
+  }
+
+  factory ReviewLinks.fromJson(Map<String, dynamic> input) {
+    return ReviewLinks(
+      html: _parseBlock(input, 'html'),
+      pullRequest: _parseBlock(input, 'pull_request'),
+      self: _parseBlock(input, 'self'),
+    );
+  }
+}
