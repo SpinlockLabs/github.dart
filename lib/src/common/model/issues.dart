@@ -1,5 +1,4 @@
 import 'package:github/src/common.dart';
-import 'package:github/src/common/model/users.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'issues.g.dart';
@@ -26,6 +25,24 @@ class Issue {
     this.updatedAt,
     this.body = '',
     this.closedBy,
+
+    // Properties from the Timeline API
+    this.activeLockReason,
+    this.authorAssociation,
+    this.bodyHtml,
+    this.bodyText,
+    this.commentsUrl,
+    this.draft,
+    this.eventsUrl,
+    this.labelsUrl,
+    this.locked,
+    this.nodeId,
+    this.performedViaGithubApp,
+    this.reactions,
+    this.repository,
+    this.repositoryUrl,
+    this.stateReason,
+    this.timelineUrl,
   }) {
     if (labels != null) {
       this.labels = labels;
@@ -88,6 +105,46 @@ class Issue {
 
   bool get isOpen => state == 'open';
   bool get isClosed => state == 'closed';
+
+  // The following properties were added to support the Timeline API.
+
+  String? activeLockReason;
+
+  /// How the author is associated with the repository.
+  ///
+  /// Example: `OWNER`
+  String? authorAssociation;
+
+  String? bodyHtml;
+
+  String? bodyText;
+
+  String? commentsUrl;
+
+  bool? draft;
+
+  String? eventsUrl;
+
+  String? labelsUrl;
+
+  bool? locked;
+
+  String? nodeId;
+
+  GitHubApp? performedViaGithubApp;
+
+  ReactionRollup? reactions;
+
+  Repository? repository;
+
+  String? repositoryUrl;
+
+  /// The reason for the current state
+  ///
+  /// Example: `not_planned`
+  String? stateReason;
+
+  String? timelineUrl;
 
   factory Issue.fromJson(Map<String, dynamic> input) => _$IssueFromJson(input);
   Map<String, dynamic> toJson() => _$IssueToJson(this);
@@ -204,6 +261,13 @@ class Milestone {
     this.createdAt,
     this.updatedAt,
     this.dueOn,
+
+    // Properties from the Timeline API
+    this.closedAt,
+    this.htmlUrl,
+    this.labelsUrl,
+    this.nodeId,
+    this.url,
   });
 
   /// Unique Identifier for Milestone
@@ -240,6 +304,22 @@ class Milestone {
 
   /// The due date for this milestone
   DateTime? dueOn;
+
+  // The following properties were added to support the Timeline API.
+
+  DateTime? closedAt;
+
+  /// Example: `https://github.com/octocat/Hello-World/milestones/v1.0`
+  String? htmlUrl;
+
+  /// Example: `https://api.github.com/repos/octocat/Hello-World/milestones/1/labels`
+  String? labelsUrl;
+
+  /// Example: `MDk6TWlsZXN0b25lMTAwMjYwNA==`
+  String? nodeId;
+
+  /// Example: `https://api.github.com/repos/octocat/Hello-World/milestones/1`
+  String? url;
 
   factory Milestone.fromJson(Map<String, dynamic> input) =>
       _$MilestoneFromJson(input);

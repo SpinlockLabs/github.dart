@@ -47,6 +47,29 @@ Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
       closedBy: json['closed_by'] == null
           ? null
           : User.fromJson(json['closed_by'] as Map<String, dynamic>),
+      activeLockReason: json['active_lock_reason'] as String?,
+      authorAssociation: json['author_association'] as String?,
+      bodyHtml: json['body_html'] as String?,
+      bodyText: json['body_text'] as String?,
+      commentsUrl: json['comments_url'] as String?,
+      draft: json['draft'] as bool?,
+      eventsUrl: json['events_url'] as String?,
+      labelsUrl: json['labels_url'] as String?,
+      locked: json['locked'] as bool?,
+      nodeId: json['node_id'] as String?,
+      performedViaGithubApp: json['performed_via_github_app'] == null
+          ? null
+          : GitHubApp.fromJson(
+              json['performed_via_github_app'] as Map<String, dynamic>),
+      reactions: json['reactions'] == null
+          ? null
+          : ReactionRollup.fromJson(json['reactions'] as Map<String, dynamic>),
+      repository: json['repository'] == null
+          ? null
+          : Repository.fromJson(json['repository'] as Map<String, dynamic>),
+      repositoryUrl: json['repository_url'] as String?,
+      stateReason: json['state_reason'] as String?,
+      timelineUrl: json['timeline_url'] as String?,
     );
 
 Map<String, dynamic> _$IssueToJson(Issue instance) => <String, dynamic>{
@@ -68,6 +91,22 @@ Map<String, dynamic> _$IssueToJson(Issue instance) => <String, dynamic>{
       'updated_at': instance.updatedAt?.toIso8601String(),
       'body': instance.body,
       'closed_by': instance.closedBy,
+      'active_lock_reason': instance.activeLockReason,
+      'author_association': instance.authorAssociation,
+      'body_html': instance.bodyHtml,
+      'body_text': instance.bodyText,
+      'comments_url': instance.commentsUrl,
+      'draft': instance.draft,
+      'events_url': instance.eventsUrl,
+      'labels_url': instance.labelsUrl,
+      'locked': instance.locked,
+      'node_id': instance.nodeId,
+      'performed_via_github_app': instance.performedViaGithubApp,
+      'reactions': instance.reactions,
+      'repository': instance.repository,
+      'repository_url': instance.repositoryUrl,
+      'state_reason': instance.stateReason,
+      'timeline_url': instance.timelineUrl,
     };
 
 IssueRequest _$IssueRequestFromJson(Map<String, dynamic> json) => IssueRequest(
@@ -172,6 +211,13 @@ Milestone _$MilestoneFromJson(Map<String, dynamic> json) => Milestone(
       dueOn: json['due_on'] == null
           ? null
           : DateTime.parse(json['due_on'] as String),
+      closedAt: json['closed_at'] == null
+          ? null
+          : DateTime.parse(json['closed_at'] as String),
+      htmlUrl: json['html_url'] as String?,
+      labelsUrl: json['labels_url'] as String?,
+      nodeId: json['node_id'] as String?,
+      url: json['url'] as String?,
     );
 
 Map<String, dynamic> _$MilestoneToJson(Milestone instance) => <String, dynamic>{
@@ -186,6 +232,11 @@ Map<String, dynamic> _$MilestoneToJson(Milestone instance) => <String, dynamic>{
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'due_on': instance.dueOn?.toIso8601String(),
+      'closed_at': instance.closedAt?.toIso8601String(),
+      'html_url': instance.htmlUrl,
+      'labels_url': instance.labelsUrl,
+      'node_id': instance.nodeId,
+      'url': instance.url,
     };
 
 CreateMilestone _$CreateMilestoneFromJson(Map<String, dynamic> json) =>

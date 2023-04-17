@@ -432,4 +432,15 @@ class IssuesService extends Service {
         .request('DELETE', '/repos/${slug.fullName}/milestones/$number')
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
+
+  /// Lists all timeline events for an issue.
+  ///
+  /// API docs: https://docs.github.com/en/rest/issues/timeline?apiVersion=2022-11-28
+  Stream<TimelineEvent> listTimeline(RepositorySlug slug, int issueNumber) {
+    return PaginationHelper(github).objects(
+      'GET',
+      '/repos/${slug.fullName}/issues/$issueNumber/timeline',
+      TimelineEvent.fromJson,
+    );
+  }
 }

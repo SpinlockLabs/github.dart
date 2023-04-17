@@ -98,6 +98,14 @@ CommitComment _$CommitCommentFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['updated_at'] as String),
       body: json['body'] as String?,
+      authorAssociation: json['author_association'] as String?,
+      nodeId: json['node_id'] as String?,
+      reactions: json['reactions'] == null
+          ? null
+          : ReactionRollup.fromJson(json['reactions'] as Map<String, dynamic>),
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$CommitCommentToJson(CommitComment instance) =>
@@ -112,4 +120,8 @@ Map<String, dynamic> _$CommitCommentToJson(CommitComment instance) =>
       'html_url': instance.htmlUrl,
       'url': instance.apiUrl,
       'body': instance.body,
+      'author_association': instance.authorAssociation,
+      'node_id': instance.nodeId,
+      'reactions': instance.reactions,
+      'user': instance.user,
     };

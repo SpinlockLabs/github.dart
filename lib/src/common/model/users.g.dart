@@ -29,6 +29,22 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
+      eventsUrl: json['events_url'] as String?,
+      followersUrl: json['followers_url'] as String?,
+      followingUrl: json['following_url'] as String?,
+      gistsUrl: json['gists_url'] as String?,
+      gravatarId: json['gravatar_id'] as String?,
+      nodeId: json['node_id'] as String?,
+      organizationsUrl: json['organizations_url'] as String?,
+      receivedEventsUrl: json['received_events_url'] as String?,
+      reposUrl: json['repos_url'] as String?,
+      starredAt: json['starred_at'] == null
+          ? null
+          : DateTime.parse(json['starred_at'] as String),
+      starredUrl: json['starred_url'] as String?,
+      subscriptionsUrl: json['subscriptions_url'] as String?,
+      type: json['type'] as String?,
+      url: json['url'] as String?,
     )..twitterUsername = json['twitter_username'] as String?;
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -51,6 +67,20 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'twitter_username': instance.twitterUsername,
+      'events_url': instance.eventsUrl,
+      'followers_url': instance.followersUrl,
+      'following_url': instance.followingUrl,
+      'gists_url': instance.gistsUrl,
+      'gravatar_id': instance.gravatarId,
+      'node_id': instance.nodeId,
+      'organizations_url': instance.organizationsUrl,
+      'received_events_url': instance.receivedEventsUrl,
+      'repos_url': instance.reposUrl,
+      'starred_at': instance.starredAt?.toIso8601String(),
+      'starred_url': instance.starredUrl,
+      'subscriptions_url': instance.subscriptionsUrl,
+      'type': instance.type,
+      'url': instance.url,
     };
 
 Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) => Collaborator(
@@ -119,6 +149,22 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) => CurrentUser()
       ? null
       : DateTime.parse(json['updated_at'] as String)
   ..twitterUsername = json['twitter_username'] as String?
+  ..eventsUrl = json['events_url'] as String?
+  ..followersUrl = json['followers_url'] as String?
+  ..followingUrl = json['following_url'] as String?
+  ..gistsUrl = json['gists_url'] as String?
+  ..gravatarId = json['gravatar_id'] as String?
+  ..nodeId = json['node_id'] as String?
+  ..organizationsUrl = json['organizations_url'] as String?
+  ..receivedEventsUrl = json['received_events_url'] as String?
+  ..reposUrl = json['repos_url'] as String?
+  ..starredAt = json['starred_at'] == null
+      ? null
+      : DateTime.parse(json['starred_at'] as String)
+  ..starredUrl = json['starred_url'] as String?
+  ..subscriptionsUrl = json['subscriptions_url'] as String?
+  ..type = json['type'] as String?
+  ..url = json['url'] as String?
   ..privateReposCount = json['total_private_repos'] as int?
   ..ownedPrivateReposCount = json['owned_private_repos'] as int?
   ..diskUsage = json['disk_usage'] as int?
@@ -147,6 +193,20 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
       'created_at': instance.createdAt?.toIso8601String(),
       'updated_at': instance.updatedAt?.toIso8601String(),
       'twitter_username': instance.twitterUsername,
+      'events_url': instance.eventsUrl,
+      'followers_url': instance.followersUrl,
+      'following_url': instance.followingUrl,
+      'gists_url': instance.gistsUrl,
+      'gravatar_id': instance.gravatarId,
+      'node_id': instance.nodeId,
+      'organizations_url': instance.organizationsUrl,
+      'received_events_url': instance.receivedEventsUrl,
+      'repos_url': instance.reposUrl,
+      'starred_at': instance.starredAt?.toIso8601String(),
+      'starred_url': instance.starredUrl,
+      'subscriptions_url': instance.subscriptionsUrl,
+      'type': instance.type,
+      'url': instance.url,
       'total_private_repos': instance.privateReposCount,
       'owned_private_repos': instance.ownedPrivateReposCount,
       'disk_usage': instance.diskUsage,

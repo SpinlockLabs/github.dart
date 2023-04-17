@@ -10,12 +10,6 @@ part 'reaction.g.dart';
 /// See https://developer.github.com/v3/reactions/
 @JsonSerializable()
 class Reaction {
-  final int? id;
-  final String? nodeId;
-  final User? user;
-  final String? content;
-  final DateTime? createdAt;
-
   Reaction({
     this.id,
     this.nodeId,
@@ -23,6 +17,12 @@ class Reaction {
     this.content,
     this.createdAt,
   });
+
+  int? id;
+  String? nodeId;
+  User? user;
+  String? content;
+  DateTime? createdAt;
 
   ReactionType? get type => ReactionType.fromString(content);
 
@@ -34,9 +34,10 @@ class Reaction {
 
 @immutable
 class ReactionType {
+  const ReactionType._(this.content, this.emoji);
+
   final String content;
   final String emoji;
-  const ReactionType._(this.content, this.emoji);
 
   @override
   String toString() => content;
@@ -70,4 +71,38 @@ class ReactionType {
   };
 
   static ReactionType? fromString(String? content) => _types[content!];
+}
+
+@JsonSerializable()
+class ReactionRollup {
+  ReactionRollup({
+    this.plusOne,
+    this.minusOne,
+    this.confused,
+    this.eyes,
+    this.heart,
+    this.hooray,
+    this.laugh,
+    this.rocket,
+    this.totalCount,
+    this.url,
+  });
+
+  @JsonKey(name: '+1')
+  int? plusOne;
+  @JsonKey(name: '-1')
+  int? minusOne;
+  int? confused;
+  int? eyes;
+  int? heart;
+  int? hooray;
+  int? laugh;
+  int? rocket;
+  int? totalCount;
+  String? url;
+
+  Map<String, dynamic> toJson() => _$ReactionRollupToJson(this);
+
+  factory ReactionRollup.fromJson(Map<String, dynamic> input) =>
+      _$ReactionRollupFromJson(input);
 }
