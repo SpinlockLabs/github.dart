@@ -1,3 +1,10 @@
+## 9.13.0
+
+* Add node_id to the pull request model by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/367
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.12.0...9.13.0
+
 ## 9.12.0
 
 * Add support for issue and PR timeline events via `Issue.listTimeline`.
