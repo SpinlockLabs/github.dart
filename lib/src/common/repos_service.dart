@@ -447,15 +447,47 @@ class RepositoriesService extends Service {
   }
 
   /// Lists the commits of the provided repository [slug].
+  /// 
+  /// [sha] is the SHA or branch to start listing commits from. Default: the
+  /// repository’s default branch (usually main).
+  ///
+  /// [path] will only show commits that changed that file path.
+  /// 
+  /// [author] and [committer] are the GitHub username to filter commits for.
+  /// 
+  /// [since] shows commit after this time, and [until] shows commits before
+  /// this time.
   ///
   /// API docs: https://developer.github.com/v3/repos/commits/#list-commits-on-a-repository
-  Stream<RepositoryCommit> listCommits(RepositorySlug slug) {
+  Stream<RepositoryCommit> listCommits(RepositorySlug slug, {
+    String? sha,
+    String? path,
+    String? author,
+    String? committer,
+    DateTime? since,
+    DateTime? until,
+  }) {
     ArgumentError.checkNotNull(slug);
+    final params = <String, dynamic>{
+      if (author != null)
+        'author': author,
+      if (committer != null)
+        'committer': committer,
+      if (sha != null)
+        'sha': sha,
+      if (path != null)
+        'path': path,
+      if (since != null)
+        'since': since.toIso8601String(),
+      if (until != null)
+        'until': until.toIso8601String(),
+    };
     return PaginationHelper(github)
         .objects<Map<String, dynamic>, RepositoryCommit>(
       'GET',
       '/repos/${slug.fullName}/commits',
       RepositoryCommit.fromJson,
+      params: params,
     );
   }
 
