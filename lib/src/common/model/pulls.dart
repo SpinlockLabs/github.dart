@@ -9,6 +9,7 @@ part 'pulls.g.dart';
 class PullRequest {
   PullRequest({
     this.id,
+    this.nodeId,
     this.htmlUrl,
     this.diffUrl,
     this.patchUrl,
@@ -45,6 +46,10 @@ class PullRequest {
 
   /// Pull Request ID
   int? id;
+
+  /// Unique node identification string.
+  @JsonKey(name: 'node_id')
+  String? nodeId;
 
   /// Url to the Pull Request Page
   String? htmlUrl;

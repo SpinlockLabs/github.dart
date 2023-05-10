@@ -8,6 +8,7 @@ part of 'pulls.dart';
 
 PullRequest _$PullRequestFromJson(Map<String, dynamic> json) => PullRequest(
       id: json['id'] as int?,
+      nodeId: json['node_id'] as String?,
       htmlUrl: json['html_url'] as String?,
       diffUrl: json['diff_url'] as String?,
       patchUrl: json['patch_url'] as String?,
@@ -69,6 +70,7 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) => PullRequest(
 Map<String, dynamic> _$PullRequestToJson(PullRequest instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'node_id': instance.nodeId,
       'html_url': instance.htmlUrl,
       'diff_url': instance.diffUrl,
       'patch_url': instance.patchUrl,
