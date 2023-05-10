@@ -27,17 +27,23 @@ void main() {
   test('listCommits with query params', () async {
     final repositories = create((request) async {
       expect(request.url.path, '/repos/${slug.fullName}/commits');
-      expect(request.url.query, 'author=octocat&committer=octodog&sha=abc&path=%2Fpath&since=2022-02-22T00%3A00%3A00.000&until=2023-02-22T00%3A00%3A00.000&page=1');
+      expect(
+        request.url.query,
+        'author=octocat&committer=octodog&sha=abc&path=%2Fpath&since=2022-02-22T00%3A00%3A00.000&until=2023-02-22T00%3A00%3A00.000&page=1',
+      );
       return Response(listCommits, StatusCodes.OK);
     });
-    final commits = await repositories.listCommits(slug,
-      sha: 'abc',
-      path: '/path',
-      author: 'octocat',
-      committer: 'octodog',
-      since: DateTime(2022, 2, 22),
-      until: DateTime(2023, 2, 22),
-    ).toList();
+    final commits = await repositories
+        .listCommits(
+          slug,
+          sha: 'abc',
+          path: '/path',
+          author: 'octocat',
+          committer: 'octodog',
+          since: DateTime(2022, 2, 22),
+          until: DateTime(2023, 2, 22),
+        )
+        .toList();
     expect(commits, hasLength(1));
   });
 }
