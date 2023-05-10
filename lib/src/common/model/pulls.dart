@@ -48,7 +48,6 @@ class PullRequest {
   int? id;
 
   /// Unique node identification string.
-  @JsonKey(name: 'node_id')
   String? nodeId;
 
   /// Url to the Pull Request Page
