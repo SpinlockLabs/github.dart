@@ -1,3 +1,7 @@
+## 9.12.0
+
+* Add support for issue and PR timeline events via `Issue.listTimeline`.
+
 ## 9.11.0
 
 * expose IssueLabel.description; update labels REST APIs by @devoncarew in https://github.com/SpinlockLabs/github.dart/pull/355

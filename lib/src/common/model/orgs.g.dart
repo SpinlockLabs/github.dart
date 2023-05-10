@@ -64,23 +64,66 @@ Map<String, dynamic> _$OrganizationMembershipToJson(
     };
 
 Team _$TeamFromJson(Map<String, dynamic> json) => Team(
-      name: json['name'] as String?,
+      description: json['description'] as String?,
+      htmlUrl: json['html_url'] as String?,
       id: json['id'] as int?,
-      permission: json['permission'] as String?,
+      ldapDn: json['ldap_dn'] as String?,
       membersCount: json['members_count'] as int?,
-      reposCount: json['repos_count'] as int?,
+      membersUrl: json['members_url'] as String?,
+      name: json['name'] as String?,
+      nodeId: json['node_id'] as String?,
       organization: json['organization'] == null
           ? null
           : Organization.fromJson(json['organization'] as Map<String, dynamic>),
+      parent: json['parent'] == null
+          ? null
+          : Team.fromJson(json['parent'] as Map<String, dynamic>),
+      permission: json['permission'] as String?,
+      permissions: json['permissions'] == null
+          ? null
+          : Permissions.fromJson(json['permissions'] as Map<String, dynamic>),
+      privacy: json['privacy'] as String?,
+      reposCount: json['repos_count'] as int?,
+      repositoriesUrl: json['repositories_url'] as String?,
+      slug: json['slug'] as String?,
+      url: json['url'] as String?,
     );
 
 Map<String, dynamic> _$TeamToJson(Team instance) => <String, dynamic>{
-      'name': instance.name,
+      'description': instance.description,
+      'html_url': instance.htmlUrl,
       'id': instance.id,
-      'permission': instance.permission,
+      'ldap_dn': instance.ldapDn,
       'members_count': instance.membersCount,
-      'repos_count': instance.reposCount,
+      'members_url': instance.membersUrl,
+      'name': instance.name,
+      'node_id': instance.nodeId,
       'organization': instance.organization,
+      'parent': instance.parent,
+      'permission': instance.permission,
+      'permissions': instance.permissions,
+      'privacy': instance.privacy,
+      'repos_count': instance.reposCount,
+      'repositories_url': instance.repositoriesUrl,
+      'slug': instance.slug,
+      'url': instance.url,
+    };
+
+Permissions _$PermissionsFromJson(Map<String, dynamic> json) => Permissions(
+      admin: json['admin'] as bool?,
+      maintain: json['maintain'] as bool?,
+      pull: json['pull'] as bool?,
+      push: json['push'] as bool?,
+      triage: json['triage'] as bool?,
+    );
+
+Map<String, dynamic> _$PermissionsToJson(Permissions instance) =>
+    <String, dynamic>{
+      'admin': instance.admin,
+      'maintain': instance.maintain,
+      'pull': instance.pull,
+      'push': instance.push,
+      'triage': instance.triage,
     };
 
 TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) => TeamMember(

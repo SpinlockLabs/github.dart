@@ -25,3 +25,31 @@ Map<String, dynamic> _$ReactionToJson(Reaction instance) => <String, dynamic>{
       'content': instance.content,
       'created_at': instance.createdAt?.toIso8601String(),
     };
+
+ReactionRollup _$ReactionRollupFromJson(Map<String, dynamic> json) =>
+    ReactionRollup(
+      plusOne: json['+1'] as int?,
+      minusOne: json['-1'] as int?,
+      confused: json['confused'] as int?,
+      eyes: json['eyes'] as int?,
+      heart: json['heart'] as int?,
+      hooray: json['hooray'] as int?,
+      laugh: json['laugh'] as int?,
+      rocket: json['rocket'] as int?,
+      totalCount: json['total_count'] as int?,
+      url: json['url'] as String?,
+    );
+
+Map<String, dynamic> _$ReactionRollupToJson(ReactionRollup instance) =>
+    <String, dynamic>{
+      '+1': instance.plusOne,
+      '-1': instance.minusOne,
+      'confused': instance.confused,
+      'eyes': instance.eyes,
+      'heart': instance.heart,
+      'hooray': instance.hooray,
+      'laugh': instance.laugh,
+      'rocket': instance.rocket,
+      'total_count': instance.totalCount,
+      'url': instance.url,
+    };

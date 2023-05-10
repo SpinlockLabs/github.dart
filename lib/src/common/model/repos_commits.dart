@@ -133,37 +133,56 @@ class CommitComment {
     this.htmlUrl,
     this.updatedAt,
     this.body,
+
+    // Properties from the Timeline API
+    this.authorAssociation,
+    this.nodeId,
+    this.reactions,
+    this.user,
   });
 
   /// Id of the comment
-  final int? id;
+  int? id;
 
   /// Relative path of the file on which the comment has been posted
-  final String? path;
+  String? path;
 
   /// Line on file
-  final int? line;
+  int? line;
 
   /// Position on the diff
-  final int? position;
+  int? position;
 
   /// SHA of the commit where the comment has been made
-  final String? commitId;
+  String? commitId;
 
-  final DateTime? createdAt;
+  DateTime? createdAt;
 
   /// Can be equals to [createdAt]
-  final DateTime? updatedAt;
+  DateTime? updatedAt;
 
   /// Ex: https://github.com/...
-  final String? htmlUrl;
+  String? htmlUrl;
 
   /// Ex: https://api.github.com/...
   @JsonKey(name: 'url')
-  final String? apiUrl;
+  String? apiUrl;
 
   /// Content of the comment
-  final String? body;
+  String? body;
+
+  // The following properties were added to support the Timeline API.
+
+  /// How the author is associated with the repository.
+  ///
+  /// Example: `OWNER`
+  String? authorAssociation;
+
+  String? nodeId;
+
+  ReactionRollup? reactions;
+
+  User? user;
 
   factory CommitComment.fromJson(Map<String, dynamic> input) =>
       _$CommitCommentFromJson(input);

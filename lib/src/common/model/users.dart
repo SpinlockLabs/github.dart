@@ -24,6 +24,22 @@ class User {
     this.followingCount,
     this.createdAt,
     this.updatedAt,
+
+    // Properties from the Timeline API
+    this.eventsUrl,
+    this.followersUrl,
+    this.followingUrl,
+    this.gistsUrl,
+    this.gravatarId,
+    this.nodeId,
+    this.organizationsUrl,
+    this.receivedEventsUrl,
+    this.reposUrl,
+    this.starredAt,
+    this.starredUrl,
+    this.subscriptionsUrl,
+    this.type,
+    this.url,
   });
 
   @JsonKey(includeToJson: false, includeFromJson: false)
@@ -90,6 +106,49 @@ class User {
   /// The username of the twitter account (without leading @)
   String? twitterUsername;
 
+  // The following properties were added to support the Timeline API.
+
+  /// Example: `https://api.github.com/users/octocat/events{/privacy}`
+  String? eventsUrl;
+
+  /// Example: `https://api.github.com/users/octocat/followers`
+  String? followersUrl;
+
+  /// Example: `https://api.github.com/users/octocat/following{/other_user}`
+  String? followingUrl;
+
+  /// Example: `https://api.github.com/users/octocat/gists{/gist_id}`
+  String? gistsUrl;
+
+  /// Example: `41d064eb2195891e12d0413f63227ea7`
+  String? gravatarId;
+
+  /// Example: `MDQ6VXNlcjE=`
+  String? nodeId;
+
+  /// Example: `https://api.github.com/users/octocat/orgs`
+  String? organizationsUrl;
+
+  /// Example: `https://api.github.com/users/octocat/received_events`
+  String? receivedEventsUrl;
+
+  /// Example: `https://api.github.com/users/octocat/repos`
+  String? reposUrl;
+
+  DateTime? starredAt;
+
+  /// Example: `https://api.github.com/users/octocat/starred{/owner}{/repo}`
+  String? starredUrl;
+
+  /// Example: `https://api.github.com/users/octocat/subscriptions`
+  String? subscriptionsUrl;
+
+  /// Example: `User`
+  String? type;
+
+  /// Example: `https://api.github.com/users/octocat`
+  String? url;
+
   factory User.fromJson(Map<String, dynamic> input) => _$UserFromJson(input);
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
@@ -98,13 +157,6 @@ class User {
 // https://developer.github.com/v3/repos/collaborators/#response
 @JsonSerializable()
 class Collaborator {
-  final String? login;
-  final int? id;
-  final String? htmlUrl;
-  final String? type;
-  final bool? siteAdmin;
-  final Map<String, bool>? permissions;
-
   Collaborator(
     this.login,
     this.id,
@@ -113,6 +165,13 @@ class Collaborator {
     this.siteAdmin,
     this.permissions,
   );
+
+  String? login;
+  int? id;
+  String? htmlUrl;
+  String? type;
+  bool? siteAdmin;
+  Map<String, bool>? permissions;
 
   factory Collaborator.fromJson(Map<String, dynamic> json) =>
       _$CollaboratorFromJson(json);
