@@ -1,3 +1,10 @@
+## 9.14.0
+
+* Add optional filter params on Repositories.listCommits by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/368
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.13.0...9.14.0
+
 ## 9.13.0
 
 * Add node_id to the pull request model by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/367
