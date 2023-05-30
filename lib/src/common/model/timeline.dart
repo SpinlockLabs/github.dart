@@ -69,6 +69,8 @@ class TimelineEvent {
         return MilestoneEvent.fromJson(input);
       case 'labeled':
         return LabelEvent.fromJson(input);
+      case 'line-commented':
+        return TimelineLineCommentedEvent.fromJson(input);
       case 'locked':
         return LockEvent.fromJson(input);
       case 'milestoned':
@@ -507,6 +509,8 @@ class TimelineLineCommentedEvent extends TimelineEvent {
 }
 
 /// Timeline Commit Commented Event
+///
+/// Currently no events use this class.
 @JsonSerializable()
 class TimelineCommitCommentedEvent extends TimelineEvent {
   TimelineCommitCommentedEvent({
@@ -557,6 +561,8 @@ class AssigneeEvent extends TimelineEvent {
 }
 
 /// State Change Issue Event
+///
+/// Currently no events use this class.
 @JsonSerializable()
 class StateChangeIssueEvent extends TimelineEvent {
   StateChangeIssueEvent({
