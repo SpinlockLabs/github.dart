@@ -24,7 +24,7 @@ jobs:
           rm build/example/packages
 
       - name: Publish 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.2
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build/example # The folder the action should deploy.
