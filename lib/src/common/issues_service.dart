@@ -443,4 +443,30 @@ class IssuesService extends Service {
       TimelineEvent.fromJson,
     );
   }
+
+  /// Lock an issue.
+  ///
+  /// API docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#lock-an-issue
+  ///
+  /// The `lockReason`, if specified, must be one of: `off-topic`, `too heated`, `resolved`, `spam`.
+  Future<void> lock(RepositorySlug slug, int number,
+      {String? lockReason}) async {
+    String body;
+    if (lockReason != null) {
+      body = GitHubJson.encode({'lock_reason': lockReason});
+    } else {
+      body = '{}';
+    }
+    await github.postJSON('/repos/${slug.fullName}/issues/$number/lock',
+        body: body, statusCode: 204);
+  }
+
+  /// Unlock an issue.
+  ///
+  /// API docs: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#unlock-an-issue
+  Future<void> unlock(RepositorySlug slug, int number) async {
+    await github.request(
+        'DELETE', '/repos/${slug.fullName}/issues/$number/lock',
+        statusCode: 204);
+  }
 }
