@@ -10,12 +10,12 @@ class Authentication {
   final String? password;
 
   /// Creates an [Authentication] instance that uses the specified OAuth2 [token].
-  Authentication.withToken(this.token)
+  const Authentication.withToken(this.token)
       : username = null,
         password = null;
 
   /// Creates an [Authentication] instance that has no authentication.
-  Authentication.anonymous()
+  const Authentication.anonymous()
       : token = null,
         username = null,
         password = null;

@@ -1,7 +1,7 @@
 import 'package:github/github.dart';
 
 void main() {
-  final github = GitHub(auth: Authentication.anonymous());
+  final github = GitHub(auth: const Authentication.anonymous());
 
   final crawler = RepositoryCrawler(
     github,

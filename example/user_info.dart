@@ -59,8 +59,8 @@ void loadUser() {
     });
   });
 
-  if (github.auth!.token != null) {
-    localToken!.value = github.auth!.token;
+  if (github.auth.token != null) {
+    localToken!.value = github.auth.token;
     loadBtn.click();
   }
 }

@@ -11,7 +11,7 @@ Authentication findAuthenticationFromEnvironment() {
   // search the query string parameters first
   var auth = findAuthenticationInMap(_parseQuery(window.location.href));
   auth ??= findAuthenticationInMap(window.sessionStorage);
-  return auth ?? Authentication.anonymous();
+  return auth ?? const Authentication.anonymous();
 }
 
 /// Parse the query string to a parameter `Map`
