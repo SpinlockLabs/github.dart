@@ -1,3 +1,12 @@
+## 9.15.0
+
+* Implement IssuesService.lock/unlock by @Hixie in https://github.com/SpinlockLabs/github.dart/pull/376
+* Bump JamesIves/github-pages-deploy-action from 4.4.1 to 4.4.2 by @dependabot in https://github.com/SpinlockLabs/github.dart/pull/371
+* Make GitHub.auth non-nullable by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/377
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.14.0...9.15.0
+
 ## 9.14.0
 
 * Add optional filter params on Repositories.listCommits by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/368
