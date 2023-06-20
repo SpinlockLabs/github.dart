@@ -10,8 +10,8 @@ const date = '2014-10-02T15:21:29Z';
 GitHub createGithub() {
   return GitHub(
       endpoint: fakeApiUrl,
-      auth:
-          const Authentication.withToken('0000000000000000000000000000000000000001'));
+      auth: const Authentication.withToken(
+          '0000000000000000000000000000000000000001'));
 }
 
 void main() {
