@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:github/src/common.dart';
-import 'package:github/src/common/github.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
 import 'package:test/test.dart';

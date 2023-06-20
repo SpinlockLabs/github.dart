@@ -11,7 +11,7 @@ GitHub createGithub() {
   return GitHub(
       endpoint: fakeApiUrl,
       auth:
-          Authentication.withToken('0000000000000000000000000000000000000001'));
+          const Authentication.withToken('0000000000000000000000000000000000000001'));
 }
 
 void main() {

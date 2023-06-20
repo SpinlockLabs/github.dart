@@ -10,7 +10,7 @@ import 'package:github/src/common.dart';
 /// In both contexts it delegates to [findAuthenticationInMap] to find the
 /// github token or username and password.
 Authentication findAuthenticationFromEnvironment() =>
-    Authentication.anonymous();
+    const Authentication.anonymous();
 
 /// Checks the passed in map for keys in [COMMON_GITHUB_TOKEN_ENV_KEYS].
 /// The first one that exists is used as the github token to call [Authentication.withToken] with.

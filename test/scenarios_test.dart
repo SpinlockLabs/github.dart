@@ -29,7 +29,7 @@ Future<GitHub> createGithubWithScenario(String scenario,
   return GitHub(
       endpoint: j['url'],
       auth:
-          Authentication.withToken('0000000000000000000000000000000000000001'));
+          const Authentication.withToken('0000000000000000000000000000000000000001'));
 }
 
 /// Run scenario tests against ockokits fixtures-server

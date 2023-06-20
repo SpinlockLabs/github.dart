@@ -27,5 +27,5 @@ Authentication findAuthenticationFromEnvironment() {
   }
 
   return findAuthenticationInMap(Platform.environment) ??
-      Authentication.anonymous();
+      const Authentication.anonymous();
 }
