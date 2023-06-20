@@ -23,8 +23,7 @@ class GitHub {
     this.endpoint = 'https://api.github.com',
     this.version = '2022-11-28',
     http.Client? client,
-  }) :
-        client = client ?? http.Client();
+  }) : client = client ?? http.Client();
 
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';

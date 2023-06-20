@@ -47,7 +47,10 @@ void main() {
         return Response('{}', HttpStatus.ok);
       });
 
-      final github = GitHub(client: client, auth: const Authentication.anonymous(),);
+      final github = GitHub(
+        client: client,
+        auth: const Authentication.anonymous(),
+      );
       await github.getJSON(''); // Make HTTP request
 
       expect(request, isNotNull);
