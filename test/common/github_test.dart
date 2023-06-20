@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:github/src/common.dart';
 import 'package:github/src/common/github.dart';
 import 'package:http/http.dart';
 import 'package:http/testing.dart';
@@ -37,6 +38,20 @@ void main() {
       expect(request!.headers.containsKey('User-Agent'), isTrue);
       final userAgent = request!.headers['User-Agent'];
       expect(userAgent, 'github.dart');
+    });
+
+    test('anonymous auth passes no authorization header', () async {
+      Request? request;
+      final client = MockClient((r) async {
+        request = r;
+        return Response('{}', HttpStatus.ok);
+      });
+
+      final github = GitHub(client: client, auth: const Authentication.anonymous(),);
+      await github.getJSON(''); // Make HTTP request
+
+      expect(request, isNotNull);
+      expect(request!.headers.containsKey('Authorization'), isFalse);
     });
   });
 }

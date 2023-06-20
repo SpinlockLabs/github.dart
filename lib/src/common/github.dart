@@ -19,11 +19,11 @@ class GitHub {
   /// [endpoint] is the api endpoint to use
   /// [auth] is the authentication information
   GitHub({
-    Authentication? auth,
+    this.auth = const Authentication.anonymous(),
     this.endpoint = 'https://api.github.com',
     this.version = '2022-11-28',
     http.Client? client,
-  })  : auth = auth ?? Authentication.anonymous(),
+  }) :
         client = client ?? http.Client();
 
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
@@ -34,7 +34,7 @@ class GitHub {
   static const versionHeader = 'X-GitHub-Api-Version';
 
   /// Authentication Information
-  Authentication? auth;
+  final Authentication auth;
 
   /// API Endpoint
   final String endpoint;
@@ -369,16 +369,16 @@ class GitHub {
       headers['Accept'] = preview;
     }
 
-    if (auth!.isToken) {
-      headers.putIfAbsent('Authorization', () => 'token ${auth!.token}');
-    } else if (auth!.isBasic) {
+    if (auth.isToken) {
+      headers.putIfAbsent('Authorization', () => 'token ${auth.token}');
+    } else if (auth.isBasic) {
       final userAndPass =
-          base64Encode(utf8.encode('${auth!.username}:${auth!.password}'));
+          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
       headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
     }
 
     // See https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
-    headers.putIfAbsent('User-Agent', () => auth?.username ?? 'github.dart');
+    headers.putIfAbsent('User-Agent', () => auth.username ?? 'github.dart');
 
     if (method == 'PUT' && body == null) {
       headers.putIfAbsent('Content-Length', () => '0');
@@ -493,10 +493,6 @@ class GitHub {
   /// Disposes of this GitHub Instance.
   /// No other methods on this instance should be called after this method is called.
   void dispose() {
-    // Destroy the Authentication Information
-    // This is needed for security reasons.
-    auth = null;
-
     // Closes the HTTP Client
     client.close();
   }
