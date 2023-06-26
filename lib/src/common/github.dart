@@ -33,7 +33,7 @@ class GitHub {
   static const versionHeader = 'X-GitHub-Api-Version';
 
   /// Authentication Information
-  final Authentication auth;
+  Authentication auth;
 
   /// API Endpoint
   final String endpoint;
