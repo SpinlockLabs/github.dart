@@ -1,3 +1,10 @@
+## 9.15.1
+
+* Revert immutable auth by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/378
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.15.0...9.15.1
+
 ## 9.15.0
 
 * Implement IssuesService.lock/unlock by @Hixie in https://github.com/SpinlockLabs/github.dart/pull/376
