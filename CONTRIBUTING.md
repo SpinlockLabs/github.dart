@@ -5,7 +5,7 @@ GitHub.dart is of course Open Source! We love it when people contribute!
 ## Getting Started
 
 - Make sure you have a [GitHub Account](https://github.com/signup/free).
-- Make sure the [Dart SDK](https://www.dartlang.org/tools/sdk/) is installed on your system.
+- Make sure the [Dart SDK](https://dart.dev/tools/sdk) is installed on your system.
 - Make sure you have [Git](http://git-scm.com/) installed on your system.
 - [Fork](https://help.github.com/articles/fork-a-repo) the [repository](https://github.com/SpinlockLabs/github.dart) on GitHub.
 
@@ -20,7 +20,7 @@ GitHub.dart is of course Open Source! We love it when people contribute!
 
 ## Code Style
 
-GitHub.dart follows the [Dart Style Guide](https://www.dartlang.org/articles/style-guide/). Please note that if your code is not formatted according to the guide as much as possible, we will reject your Pull Request until it is fixed. Some things such as long lines will generally be accepted, however try to make it smaller if possible.
+GitHub.dart follows the [Dart Style Guide](https://dart.dev/effective-dart/style). Please note that if your code is not formatted according to the guide as much as possible, we will reject your Pull Request until it is fixed. Some things such as long lines will generally be accepted, however try to make it smaller if possible.
 
 ## Efficiency
 
@@ -28,7 +28,7 @@ GitHub.dart is committed to efficiency as much as possible. If your code is not 
 
 ## Rejections
 
-Pull Request rejections are not a bad thing. It just means you need to fix something. Perhaps it is important to define 'rejection' as it is used in this case. A rejection is when a GitHub.dart committer comments on a Pull Request with a comment like 'rejected due to incorrect formatting'.
+Pull Request rejections are not a bad thing. It just means you need to fix something. Perhaps it is important to define 'rejection' as it is used in this case. A rejection is when a `GitHub.dart` committer comments on a Pull Request with a comment like 'rejected due to incorrect formatting'.
 
 ## Generated code
 
@@ -61,20 +61,20 @@ If you get on IRC and ask us, we can review your work and add you as a committer
 
 ## Releasing & Publishing
 
-This repo is now configured to release after every PR merge. This means a couple things for PRs that are put up:
+This repo is now configured to release after every PR merge. This means a couple of things for PRs that are put up:
 
-1. A semver label is required. A github check will remind you that you need one. Reviewers should check that it is correct. See https://semver.org/ to understand more.
+1. A semver label is required. A GitHub check will remind you that you need one. Reviewers should check that it is correct. See https://semver.org/ to understand more.
 2. There is no need to modify the version in the pubspec.yaml in your PRs. The tooling will update the version according to the semver label applied to your PR.
 3. Same thing for the CHANGELOG.md. Tooling will update it automatically after merge.
-4. A github release will be created and published to pub.dev for you.
+4. A GitHub release will be created and published to pub.dev for you.
 
 For example if your PR has `semver:minor` label applied and the latest version is 1.2.3, once merged, the tooling will:
 - update the pubspec.yaml to 1.3.0
-- Add the github auto-generated release notes with 1.3.0 to the top of the CHANGELOG.md
-- Create a release in github for 1.3.0 (which creates a git tag of 1.3.0)
+- Add the GitHub auto-generated release notes with 1.3.0 to the top of the CHANGELOG.md
+- Create a release in GitHub for 1.3.0 (which creates a git tag of 1.3.0)
 - Remove the `unreleased` label from the PR and add the `released` label
 - Comment on the PR stating the version that it was released in and link to the release
 - When the release is created, it will automatically be published to pub.dev
 
 NOTE: If you want the ability to merge a PR **WITHOUT** automatically releasing and publishing, simply add the `no_release_on_merge` label before merging. Do note that the PR has been merged though and whatever the next PR is that triggers a release will release and publish everything that has been merged. So if you want to batch a few PRs into 1 release, label them all `no_release_on_merge`. Then whichever is the last to be merged, remove that label before merging to trigger the release.
-You may also manually trigger the action to release unreleased PRs from the Actions tab in Github.
+You may also manually trigger the action to release unreleased PRs from the Actions tab in GitHub.
