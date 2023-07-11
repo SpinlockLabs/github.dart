@@ -3099,8 +3099,7 @@ hM:function hM(a,b){this.a=a
 this.b=b},
 bU:function bU(a){this.a=a},
 hO:function hO(a){this.a=a},
-e3:function e3(a,b){this.a=a
-this.b=b},
+e3:function e3(a){this.a=a},
 ob(a,b){var s=new Uint8Array(0),r=$.mM().b
 if(!r.test(a))A.E(A.cq(a,"method","Not a valid method"))
 r=t.N
@@ -7126,7 +7125,7 @@ this.b.an(0,q)},
 $S:14}
 A.hM.prototype={
 $1(a){t.p.a(a)
-this.a.aF(new A.e3("XMLHttpRequest error.",this.b.b),A.og())},
+this.a.aF(new A.e3("XMLHttpRequest error."),A.og())},
 $S:14}
 A.bU.prototype={
 cS(){var s=new A.D($.C,t.fg),r=new A.aW(s,t.gz),q=new A.fs(new A.hO(r),new Uint8Array(1024))
@@ -7136,8 +7135,7 @@ A.hO.prototype={
 $1(a){return this.a.an(0,new Uint8Array(A.jZ(t.L.a(a))))},
 $S:38}
 A.e3.prototype={
-k(a){var s=this.b.k(0)
-return"ClientException: "+this.a+", uri="+s},
+k(a){return this.a},
 $iae:1}
 A.eQ.prototype={}
 A.c4.prototype={}

@@ -3414,8 +3414,7 @@ im:function im(a,b){this.a=a
 this.b=b},
 cp:function cp(a){this.a=a},
 ip:function ip(a){this.a=a},
-ex:function ex(a,b){this.a=a
-this.b=b},
+ex:function ex(a){this.a=a},
 pI(a,b){var s=new Uint8Array(0),r=$.o8().b
 if(!r.test(a))A.C(A.cn(a,"method","Not a valid method"))
 r=t.N
@@ -8057,7 +8056,7 @@ this.b.aK(0,q)},
 $S:18}
 A.im.prototype={
 $1(a){t.p.a(a)
-this.a.b1(new A.ex("XMLHttpRequest error.",this.b.b),A.pN())},
+this.a.b1(new A.ex("XMLHttpRequest error."),A.pN())},
 $S:18}
 A.cp.prototype={
 dq(){var s=new A.B($.A,t.fg),r=new A.b5(s,t.gz),q=new A.h4(new A.ip(r),new Uint8Array(1024))
@@ -8067,8 +8066,7 @@ A.ip.prototype={
 $1(a){return this.a.aK(0,new Uint8Array(A.kT(t.L.a(a))))},
 $S:40}
 A.ex.prototype={
-k(a){var s=this.b.k(0)
-return"ClientException: "+this.a+", uri="+s},
+k(a){return this.a},
 $iV:1}
 A.fo.prototype={}
 A.dt.prototype={}
