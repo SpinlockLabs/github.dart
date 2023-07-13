@@ -1,3 +1,11 @@
+## 9.16.0
+
+* Fix links and spelling nits in markdown files by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/379
+* Support latest pkg:http by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/380
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.15.1...9.16.0
+
 ## 9.15.1
 
 * Revert immutable auth by @CaseyHillers in https://github.com/SpinlockLabs/github.dart/pull/378
