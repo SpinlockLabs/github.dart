@@ -4059,7 +4059,8 @@ iP:function iP(a,b){this.a=a
 this.b=b},
 cF:function cF(a){this.a=a},
 iR:function iR(a){this.a=a},
-eT:function eT(a){this.a=a},
+eT:function eT(a,b){this.a=a
+this.b=b},
 qS(a,b){var s=new Uint8Array(0),r=$.pl().b
 if(!r.test(a))A.G(A.cd(a,"method","Not a valid method"))
 r=t.N
@@ -9361,7 +9362,7 @@ this.b.aM(0,q)},
 $S:21}
 A.iP.prototype={
 $1(a){t.p.a(a)
-this.a.b5(new A.eT("XMLHttpRequest error."),A.qX())},
+this.a.b5(new A.eT("XMLHttpRequest error.",this.b.b),A.qX())},
 $S:21}
 A.cF.prototype={
 ej(){var s=new A.H($.I,t.jz),r=new A.ba(s,t.iq),q=new A.ht(new A.iR(r),new Uint8Array(1024))
@@ -9371,7 +9372,8 @@ A.iR.prototype={
 $1(a){return this.a.aM(0,new Uint8Array(A.lS(t.L.a(a))))},
 $S:47}
 A.eT.prototype={
-l(a){return this.a},
+l(a){var s=this.b.l(0)
+return"ClientException: "+this.a+", uri="+s},
 $ia4:1}
 A.fM.prototype={
 gck(a){var s,r
