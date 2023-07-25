@@ -368,12 +368,9 @@ class GitHub {
       headers['Accept'] = preview;
     }
 
-    if (auth.isToken) {
-      headers.putIfAbsent('Authorization', () => 'token ${auth.token}');
-    } else if (auth.isBasic) {
-      final userAndPass =
-          base64Encode(utf8.encode('${auth.username}:${auth.password}'));
-      headers.putIfAbsent('Authorization', () => 'basic $userAndPass');
+    final authHeaderValue = auth.authorizationHeaderValue();
+    if (authHeaderValue != null) {
+      headers.putIfAbsent('Authorization', () => authHeaderValue);
     }
 
     // See https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
