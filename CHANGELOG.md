@@ -1,3 +1,10 @@
+## 9.17.0
+
+* Add bearerToken constructor to Authentication class by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/381
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.16.0...9.17.0
+
 ## 9.16.0
 
 * Fix links and spelling nits in markdown files by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/379
