@@ -253,7 +253,9 @@ Map<String, dynamic> _$PullRequestFileToJson(PullRequestFile instance) =>
 PullRequestReview _$PullRequestReviewFromJson(Map<String, dynamic> json) =>
     PullRequestReview(
       id: json['id'] as int,
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
       body: json['body'] as String?,
       state: json['state'] as String?,
       htmlUrl: json['html_url'] as String?,
