@@ -88,6 +88,24 @@ Map<String, dynamic> _$CreateGitCommitToJson(CreateGitCommit instance) =>
       'author': instance.author,
     };
 
+PushGitCommit _$PushGitCommitFromJson(Map<String, dynamic> json) =>
+    PushGitCommit(
+      json['id'] as String?,
+      json['message'] as String?,
+      json['timestamp'] == null
+          ? null
+          : DateTime.parse(json['timestamp'] as String),
+      json['url'] as String?,
+    );
+
+Map<String, dynamic> _$PushGitCommitToJson(PushGitCommit instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'message': instance.message,
+      'timestamp': instance.timestamp?.toIso8601String(),
+      'url': instance.url,
+    };
+
 GitCommitUser _$GitCommitUserFromJson(Map<String, dynamic> json) =>
     GitCommitUser(
       json['name'] as String?,

@@ -235,3 +235,28 @@ class CreateEvent extends HookEvent {
 
   Map<String, dynamic> toJson() => _$CreateEventToJson(this);
 }
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class PushEvent extends HookEvent {
+  PushEvent({
+    this.ref,
+    this.before,
+    this.after,
+    this.repository,
+    this.headCommit,
+    this.commits,
+    this.sender,
+  });
+
+  factory PushEvent.fromJson(Map<String, dynamic> input) =>
+      _$PushEventFromJson(input);
+  String? ref;
+  String? before;
+  String? after;
+  Repository? repository;
+  PushGitCommit? headCommit;
+  List<PushGitCommit>? commits;
+  User? sender;
+
+  Map<String, dynamic> toJson() => _$PushEventToJson(this);
+}

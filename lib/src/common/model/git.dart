@@ -98,6 +98,28 @@ class CreateGitCommit {
   Map<String, dynamic> toJson() => _$CreateGitCommitToJson(this);
 }
 
+/// Model class for a pushed commit.
+@JsonSerializable()
+class PushGitCommit {
+  PushGitCommit(this.id, this.message, this.timestamp, this.url);
+
+  /// The commit hash.
+  String? id;
+
+  /// The commit message.
+  String? message;
+
+  /// The timestamp of the commit.
+  DateTime? timestamp;
+
+  /// The direct url to the commit.
+  String? url;
+
+  factory PushGitCommit.fromJson(Map<String, dynamic> input) =>
+      _$PushGitCommitFromJson(input);
+  Map<String, dynamic> toJson() => _$PushGitCommitToJson(this);
+}
+
 /// Model class for an author or committer of a commit. The [GitCommitUser] may
 /// not correspond to a GitHub [User].
 @JsonSerializable(includeIfNull: false)
