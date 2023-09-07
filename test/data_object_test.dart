@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:github/github.dart';
+import 'package:github/hooks.dart';
 import 'package:test/test.dart';
 
 const _licenseJson = r'''  {
@@ -29,6 +30,134 @@ const _licenseJson = r'''  {
   }
 }''';
 
+const _pushEventJson = r'''{
+  "ref": "refs/heads/main",
+  "before": "def456def456",
+  "after": "abc123abc123",
+  "base_ref": null,
+  "repository": {
+    "name": "fake-repository",
+    "id": 680238321,
+    "full_name": "fakeuser/fake-repository",
+    "owner": {
+      "login": "fakeuser",
+      "id": 102626803,
+      "avatar_url": "https://avatars.githubusercontent.com/u/102626803?v=4",
+      "html_url": "https://github.com/fakeuser"
+    },
+    "private": false,
+    "fork": false,
+    "html_url": "https://github.com/fakeuser/fake-repository",
+    "description": "",
+    "clone_url": "https://github.com/fakeuser/fake-repository.git",
+    "ssh_url": "git@github.com:fakeuser/fake-repository.git",
+    "svn_url": "https://github.com/fakeuser/fake-repository",
+    "git_url": "git://github.com/fakeuser/fake-repository.git",
+    "homepage": "",
+    "size": 1,
+    "stargazers_count": 0,
+    "watchers_count": 0,
+    "language": "",
+    "has_issues": true,
+    "has_wiki": true,
+    "has_downloads": true,
+    "has_pages": false,
+    "forks_count": 0,
+    "open_issues_count": 0,
+    "default_branch": "main",
+    "subscribers_count": 0,
+    "network_count": 0,
+    "created_at": 1692379465,
+    "pushed_at": 1694031233,
+    "updated_at": "2023-08-18T17:24:25.000Z",
+    "archived": false,
+    "disabled": false,
+    "allow_forking": true,
+    "assignees_url": "https://api.github.com/repos/fakeuser/fake-repository/assignees{/user}",
+    "blobs_url": "https://api.github.com/repos/fakeuser/fake-repository/git/blobs{/sha}",
+    "branches_url": "https://api.github.com/repos/fakeuser/fake-repository/branches{/branch}",
+    "collaborators_url": "https://api.github.com/repos/fakeuser/fake-repository/collaborators{/collaborator}",
+    "comments_url": "https://api.github.com/repos/fakeuser/fake-repository/comments{/number}",
+    "commits_url": "https://api.github.com/repos/fakeuser/fake-repository/commits{/sha}",
+    "compare_url": "https://api.github.com/repos/fakeuser/fake-repository/compare/{base}...{head}",
+    "contents_url": "https://api.github.com/repos/fakeuser/fake-repository/contents/{+path}",
+    "contributors_url": "https://api.github.com/repos/fakeuser/fake-repository/contributors",
+    "deployments_url": "https://api.github.com/repos/fakeuser/fake-repository/deployments",
+    "downloads_url": "https://api.github.com/repos/fakeuser/fake-repository/downloads",
+    "events_url": "https://api.github.com/repos/fakeuser/fake-repository/events",
+    "forks": 0,
+    "forks_url": "https://api.github.com/repos/fakeuser/fake-repository/forks",
+    "git_commits_url": "https://api.github.com/repos/fakeuser/fake-repository/git/commits{/sha}",
+    "git_refs_url": "https://api.github.com/repos/fakeuser/fake-repository/git/refs{/sha}",
+    "git_tags_url": "https://api.github.com/repos/fakeuser/fake-repository/git/tags{/sha}",
+    "has_discussions": false,
+    "has_projects": true,
+    "hooks_url": "https://api.github.com/repos/fakeuser/fake-repository/hooks",
+    "is_template": false,
+    "issue_comment_url": "https://api.github.com/repos/fakeuser/fake-repository/issues/comments{/number}",
+    "issue_events_url": "https://api.github.com/repos/fakeuser/fake-repository/issues/events{/number}",
+    "issues_url": "https://api.github.com/repos/fakeuser/fake-repository/issues{/number}",
+    "keys_url": "https://api.github.com/repos/fakeuser/fake-repository/keys{/key_id}",
+    "labels_url": "https://api.github.com/repos/fakeuser/fake-repository/labels{/name}",
+    "languages_url": "https://api.github.com/repos/fakeuser/fake-repository/languages",
+    "master_branch": "main",
+    "merges_url": "https://api.github.com/repos/fakeuser/fake-repository/merges",
+    "milestones_url": "https://api.github.com/repos/fakeuser/fake-repository/milestones{/number}",
+    "node_id": "R_kgDOKIuc8Q",
+    "notifications_url": "https://api.github.com/repos/fakeuser/fake-repository/notifications{?since,all,participating}",
+    "open_issues": 0,
+    "pulls_url": "https://api.github.com/repos/fakeuser/fake-repository/pulls{/number}",
+    "releases_url": "https://api.github.com/repos/fakeuser/fake-repository/releases{/id}",
+    "stargazers_url": "https://api.github.com/repos/fakeuser/fake-repository/stargazers",
+    "statuses_url": "https://api.github.com/repos/fakeuser/fake-repository/statuses/{sha}",
+    "subscribers_url": "https://api.github.com/repos/fakeuser/fake-repository/subscribers",
+    "subscription_url": "https://api.github.com/repos/fakeuser/fake-repository/subscription",
+    "tags_url": "https://api.github.com/repos/fakeuser/fake-repository/tags",
+    "teams_url": "https://api.github.com/repos/fakeuser/fake-repository/teams",
+    "topics": [],
+    "trees_url": "https://api.github.com/repos/fakeuser/fake-repository/git/trees{/sha}",
+    "url": "https://github.com/fakeuser/fake-repository",
+    "visibility": "public",
+    "watchers": 0,
+    "web_commit_signoff_required": false
+  },
+  "head_commit":     {
+    "id": "f1eab4d20a72fe5495183136e36584dfab447faf",
+    "message": "A message",
+    "timestamp": "2023-09-06T15:14:10.000Z",
+    "url": "fake-github-url.com"
+  },
+  "commits": [
+    {
+      "id": "f1eab4d20a72fe5495183136e36584dfab447faf",
+      "message": "A message",
+      "timestamp": "2023-09-06T15:14:10.000Z",
+      "url": "fake-github-url.com"
+    }
+  ],
+  "sender": {
+    "login": "fakeuser",
+    "id": 102626803,
+    "avatar_url": "https://avatars.githubusercontent.com/u/102626803?v=4",
+    "html_url": "https://github.com/fakeuser",
+    "site_admin": false,
+    "events_url": "https://api.github.com/users/fakeuser/events{/privacy}",
+    "followers_url": "https://api.github.com/users/fakeuser/followers",
+    "following_url": "https://api.github.com/users/fakeuser/following{/other_user}",
+    "gists_url": "https://api.github.com/users/fakeuser/gists{/gist_id}",
+    "gravatar_id": "",
+    "node_id": "U_kgDOBh318w",
+    "organizations_url": "https://api.github.com/users/fakeuser/orgs",
+    "received_events_url": "https://api.github.com/users/fakeuser/received_events",
+    "repos_url": "https://api.github.com/users/fakeuser/repos",
+    "starred_url": "https://api.github.com/users/fakeuser/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/fakeuser/subscriptions",
+    "type": "User",
+    "url": "https://api.github.com/users/fakeuser"
+  }
+}
+''';
+
 void main() {
   test('License round-trip', () {
     final licenseJson = jsonDecode(_licenseJson) as Map<String, dynamic>;
@@ -38,6 +167,16 @@ void main() {
     final toJson = instance.toJson();
 
     expect(_prettyEncode(toJson), _prettyEncode(licenseJson));
+  });
+
+  test('PushEvent round-trip', () {
+    final pushEventJson = jsonDecode(_pushEventJson) as Map<String, dynamic>;
+
+    final instance = PushEvent.fromJson(pushEventJson);
+
+    final toJson = instance.toJson();
+
+    expect(_prettyEncode(toJson), _prettyEncode(pushEventJson));
   });
 }
 

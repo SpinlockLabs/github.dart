@@ -253,10 +253,22 @@ class PushEvent extends HookEvent {
   String? ref;
   String? before;
   String? after;
+  @JsonKey(toJson: handleIntegerTimes)
   Repository? repository;
   PushGitCommit? headCommit;
   List<PushGitCommit>? commits;
   User? sender;
 
   Map<String, dynamic> toJson() => _$PushEventToJson(this);
+
+  static Map<String, dynamic>? handleIntegerTimes(Repository? repository) {
+    var repositoryMap = repository?.toJson();
+    for (final parameter in ['created_at', 'pushed_at']) {
+      if (repositoryMap?[parameter] != null) {
+        final createdAt = DateTime.parse(repositoryMap?[parameter]);
+        repositoryMap?[parameter] = createdAt.millisecondsSinceEpoch ~/ 1000;
+      }
+    }
+    return repositoryMap;
+  }
 }

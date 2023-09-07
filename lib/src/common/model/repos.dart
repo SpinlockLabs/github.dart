@@ -225,9 +225,13 @@ class Repository {
   int networkCount;
 
   /// The time the repository was created at
+  @JsonKey(fromJson: Repository.dynamicToDateTime)
+  @JsonKey(toJson: dateToGitHubIso8601)
   DateTime? createdAt;
 
   /// The last time the repository was pushed at
+  @JsonKey(fromJson: Repository.dynamicToDateTime)
+  @JsonKey(toJson: dateToGitHubIso8601)
   DateTime? pushedAt;
 
   DateTime? updatedAt;
@@ -459,6 +463,16 @@ class Repository {
 
   @override
   String toString() => 'Repository: $owner/$name';
+
+  static DateTime? dynamicToDateTime(dynamic time) {
+    if (time == null) {
+      return null;
+    }
+    if (time.runtimeType == int) {
+      return DateTime.fromMillisecondsSinceEpoch(time * 1000).toUtc();
+    }
+    return DateTime.parse(time as String).toUtc();
+  }
 }
 
 /// Model class for repository permissions.

@@ -196,7 +196,7 @@ Map<String, dynamic> _$PushEventToJson(PushEvent instance) => <String, dynamic>{
       'ref': instance.ref,
       'before': instance.before,
       'after': instance.after,
-      'repository': instance.repository,
+      'repository': PushEvent.handleIntegerTimes(instance.repository),
       'head_commit': instance.headCommit,
       'commits': instance.commits,
       'sender': instance.sender,
