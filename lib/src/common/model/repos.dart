@@ -462,14 +462,16 @@ class Repository {
   @override
   String toString() => 'Repository: $owner/$name';
 
+  /// In some cases, github webhooks send time values as an integer. This method
+  /// is added to handle those cases, but otherwise parse like normal.
   static DateTime? dynamicToDateTime(dynamic time) {
     if (time == null) {
       return null;
     }
     if (time.runtimeType == int) {
-      return DateTime.fromMillisecondsSinceEpoch(time * 1000).toUtc();
+      return DateTime.fromMillisecondsSinceEpoch(time * 1000);
     }
-    return DateTime.parse(time as String).toUtc();
+    return DateTime.parse(time as String);
   }
 }
 
