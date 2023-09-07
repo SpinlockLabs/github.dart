@@ -226,12 +226,10 @@ class Repository {
 
   /// The time the repository was created at
   @JsonKey(fromJson: Repository.dynamicToDateTime)
-  @JsonKey(toJson: dateToGitHubIso8601)
   DateTime? createdAt;
 
   /// The last time the repository was pushed at
   @JsonKey(fromJson: Repository.dynamicToDateTime)
-  @JsonKey(toJson: dateToGitHubIso8601)
   DateTime? pushedAt;
 
   DateTime? updatedAt;

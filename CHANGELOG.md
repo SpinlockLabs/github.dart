@@ -1,6 +1,7 @@
 ## 9.18.0
 
 * Adds the initial `PushEvent` object in https://github.com/SpinlockLabs/github.dart/pull/386
+* Update the `Repository` values `created_at` and `pushed_at` to handle integer times
 
 ## 9.17.0
 
