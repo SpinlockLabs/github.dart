@@ -1,3 +1,8 @@
+## 9.18.0
+
+* Adds the initial `PushEvent` object in https://github.com/SpinlockLabs/github.dart/pull/386
+* Update the `Repository` values `created_at` and `pushed_at` to handle integer times
+
 ## 9.17.0
 
 * Add bearerToken constructor to Authentication class by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/381
@@ -307,7 +312,7 @@ Map<String, GistFile>? files;
  - Clean up lints https://github.com/SpinlockLabs/github.dart/pull/202
 
 ## 6.0.5
- - Fix null errors issue https://github.com/SpinlockLabs/github.dart/issues/199 
+ - Fix null errors issue https://github.com/SpinlockLabs/github.dart/issues/199
 
 ## 6.0.4
  - This fixes #196 (https://github.com/SpinlockLabs/github.dart/issues/196)
@@ -357,10 +362,10 @@ Map<String, GistFile>? files;
 
 Deprecations:
 
-- The `draft` and `prerelease` properties in the CreateRelease and Release 
+- The `draft` and `prerelease` properties in the CreateRelease and Release
 - classes have been renamed to `isDraft` and `isPrerelease` for clarity.
-- Release.targetCommitsh has been renamed to Release.targetCommitish. 
-- The `release` parameter in RepositoriesService.createRelease 
+- Release.targetCommitsh has been renamed to Release.targetCommitish.
+- The `release` parameter in RepositoriesService.createRelease
 has been renamed to `createRelease`.
 - `RepositoriesService.getRelease` has been renamed to `RepositoriesService.getReleaseById`
 
@@ -369,7 +374,7 @@ has been renamed to `createRelease`.
  - Add access to labels on Pull Requests https://github.com/SpinlockLabs/github.dart/pull/163
  - Adding draft property to PR model https://github.com/SpinlockLabs/github.dart/pull/162
  - updateFile request must be a PUT https://github.com/SpinlockLabs/github.dart/pull/160
- 
+
 ## v5.1.0
 
  - `Repository`: added `updatedAt` and `license` fields.
@@ -386,7 +391,7 @@ has been renamed to `createRelease`.
 
 ## v5.0.0
 
-- **BREAKING** `RepositoriesService.listCollaborators` now returns 
+- **BREAKING** `RepositoriesService.listCollaborators` now returns
   `Stream<Collaborator>` instead of `Stream<User>`.
     -  `Collaborator` is a new type that includes collaborator-specific
        information.
@@ -403,7 +408,7 @@ has been renamed to `createRelease`.
   - Removed unsupported `limit` parameter.
   - Removed flaky retry logic. Instead, `NotReady` is thrown, which can be used
     to decide to retry at the call site.
-  - Made associated classes `ContributorStatistics` and 
+  - Made associated classes `ContributorStatistics` and
     `ContributorWeekStatistics` immutable. Since these classes are only meant as
     return values, we're not treating this as a breaking change.
 - Added `Stream<CodeSearchResults> github.search.code(...)` search API
@@ -433,7 +438,7 @@ has been renamed to `createRelease`.
 
 ## v2.3.2
 
-- Automatically attempt to find GitHub user information in the process environment when running on the standalone VM. 
+- Automatically attempt to find GitHub user information in the process environment when running on the standalone VM.
 - Add `ref` parameter to `getReadme` method for the repository service.
 
 ## v2.3.1
@@ -447,7 +452,7 @@ has been renamed to `createRelease`.
 - Moved `CHANGELOG` content back to repo.
 - Added `rateLimitLimit`, `rateLimitRemaining` and `rateLimitReset` to `GitHub`.
 - Added `id` to `Issue`
-- Added `direction`, `sort` and `since` optional arguments to 
+- Added `direction`, `sort` and `since` optional arguments to
   `IssueService.listByRepo`.
 
 ## v2.1.0

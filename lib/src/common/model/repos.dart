@@ -225,9 +225,11 @@ class Repository {
   int networkCount;
 
   /// The time the repository was created at
+  @JsonKey(fromJson: Repository.dynamicToDateTime)
   DateTime? createdAt;
 
   /// The last time the repository was pushed at
+  @JsonKey(fromJson: Repository.dynamicToDateTime)
   DateTime? pushedAt;
 
   DateTime? updatedAt;
@@ -459,6 +461,18 @@ class Repository {
 
   @override
   String toString() => 'Repository: $owner/$name';
+
+  /// In some cases, github webhooks send time values as an integer. This method
+  /// is added to handle those cases, but otherwise parse like normal.
+  static DateTime? dynamicToDateTime(dynamic time) {
+    if (time == null) {
+      return null;
+    }
+    if (time.runtimeType == int) {
+      return DateTime.fromMillisecondsSinceEpoch(time * 1000);
+    }
+    return DateTime.parse(time as String);
+  }
 }
 
 /// Model class for repository permissions.

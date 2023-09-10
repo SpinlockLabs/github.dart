@@ -46,9 +46,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       sshUrl: json['ssh_url'] as String? ?? '',
       svnUrl: json['svn_url'] as String? ?? '',
       defaultBranch: json['default_branch'] as String? ?? '',
-      createdAt: json['created_at'] == null
-          ? null
-          : DateTime.parse(json['created_at'] as String),
+      createdAt: Repository.dynamicToDateTime(json['created_at']),
       isPrivate: json['private'] as bool? ?? false,
       isFork: json['fork'] as bool? ?? false,
       stargazersCount: json['stargazers_count'] as int? ?? 0,
@@ -68,9 +66,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       updatedAt: json['updated_at'] == null
           ? null
           : DateTime.parse(json['updated_at'] as String),
-      pushedAt: json['pushed_at'] == null
-          ? null
-          : DateTime.parse(json['pushed_at'] as String),
+      pushedAt: Repository.dynamicToDateTime(json['pushed_at']),
       license: json['license'] == null
           ? null
           : LicenseKind.fromJson(json['license'] as Map<String, dynamic>),
