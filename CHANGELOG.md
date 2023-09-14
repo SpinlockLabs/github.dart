@@ -1,3 +1,7 @@
+## 9.18.0
+
+- Bad Release. Was: Add the 'PushEvent' webhook and associated PushCommit <https://github.com/SpinlockLabs/github.dart/pull/386>
+
 ## 9.17.0
 
 * Add bearerToken constructor to Authentication class by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/381
