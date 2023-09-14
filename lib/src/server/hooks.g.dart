@@ -173,31 +173,3 @@ Map<String, dynamic> _$CreateEventToJson(CreateEvent instance) =>
       'repository': instance.repository,
       'sender': instance.sender,
     };
-
-PushEvent _$PushEventFromJson(Map<String, dynamic> json) => PushEvent(
-      ref: json['ref'] as String?,
-      before: json['before'] as String?,
-      after: json['after'] as String?,
-      repository: json['repository'] == null
-          ? null
-          : Repository.fromJson(json['repository'] as Map<String, dynamic>),
-      headCommit: json['head_commit'] == null
-          ? null
-          : PushGitCommit.fromJson(json['head_commit'] as Map<String, dynamic>),
-      commits: (json['commits'] as List<dynamic>?)
-          ?.map((e) => PushGitCommit.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      sender: json['sender'] == null
-          ? null
-          : User.fromJson(json['sender'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$PushEventToJson(PushEvent instance) => <String, dynamic>{
-      'ref': instance.ref,
-      'before': instance.before,
-      'after': instance.after,
-      'repository': PushEvent.handleIntegerTimes(instance.repository),
-      'head_commit': instance.headCommit,
-      'commits': instance.commits,
-      'sender': instance.sender,
-    };
