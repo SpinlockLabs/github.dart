@@ -1,3 +1,10 @@
+## 9.19.0
+
+* Revert "Add the 'PushEvent' webhook and associated PushCommit object" by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/387
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.18.0...9.19.0
+
 ## 9.18.0
 
 - Bad Release. Was: Add the 'PushEvent' webhook and associated PushCommit <https://github.com/SpinlockLabs/github.dart/pull/386>
