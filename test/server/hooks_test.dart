@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js_util';
 import 'package:github/github.dart';
 import 'package:github/hooks.dart';
 import 'package:test/test.dart';
