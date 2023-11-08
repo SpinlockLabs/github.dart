@@ -7,8 +7,7 @@ class Ref {
   Ref(this.from);
   String? from;
 
-  factory Ref.fromJson(Map<String, dynamic> input) =>
-      _$RefFromJson(input);
+  factory Ref.fromJson(Map<String, dynamic> input) => _$RefFromJson(input);
   Map<String, dynamic> toJson() => _$RefToJson(this);
 }
 
@@ -17,8 +16,7 @@ class Sha {
   Sha(this.from);
   String? from;
 
-  factory Sha.fromJson(Map<String, dynamic> input) =>
-      _$ShaFromJson(input);
+  factory Sha.fromJson(Map<String, dynamic> input) => _$ShaFromJson(input);
   Map<String, dynamic> toJson() => _$ShaToJson(this);
 }
 
@@ -28,8 +26,7 @@ class Base {
   Ref? ref;
   Sha? sha;
 
-  factory Base.fromJson(Map<String, dynamic> input) =>
-      _$BaseFromJson(input);
+  factory Base.fromJson(Map<String, dynamic> input) => _$BaseFromJson(input);
   Map<String, dynamic> toJson() => _$BaseToJson(this);
 }
 
@@ -38,8 +35,7 @@ class Body {
   Body(this.from);
   String? from;
 
-  factory Body.fromJson(Map<String, dynamic> input) =>
-      _$BodyFromJson(input);
+  factory Body.fromJson(Map<String, dynamic> input) => _$BodyFromJson(input);
   Map<String, dynamic> toJson() => _$BodyToJson(this);
 }
 
@@ -48,8 +44,7 @@ class Title {
   Title({this.from});
   String? from;
 
-  factory Title.fromJson(Map<String, dynamic> input) =>
-      _$TitleFromJson(input);
+  factory Title.fromJson(Map<String, dynamic> input) => _$TitleFromJson(input);
   Map<String, dynamic> toJson() => _$TitleToJson(this);
 }
 

@@ -60,22 +60,26 @@ void main() {
 
   group('EditedPullRequest', () {
     test('deserialize with body edit', () {
-      final pullRequestEditedEvent = PullRequestEvent.fromJson(jsonDecode(prBodyEditedEvent) as Map<String, dynamic>);
+      final pullRequestEditedEvent = PullRequestEvent.fromJson(
+          jsonDecode(prBodyEditedEvent) as Map<String, dynamic>);
       final changes = pullRequestEditedEvent.changes;
       expect(changes, isNotNull);
       expect(changes!.body!.from, isNotNull);
-      assert(changes.body!.from == '**This should not land until https://github.com/flutter/buildroot/pull/790');
+      assert(changes.body!.from ==
+          '**This should not land until https://github.com/flutter/buildroot/pull/790');
     });
 
     test('deserialize with base edit', () {
-      final pullRequestEditedEvent = PullRequestEvent.fromJson(jsonDecode(prBaseEditedEvent) as Map<String, dynamic>);
+      final pullRequestEditedEvent = PullRequestEvent.fromJson(
+          jsonDecode(prBaseEditedEvent) as Map<String, dynamic>);
       final changes = pullRequestEditedEvent.changes;
       expect(changes, isNotNull);
       expect(changes!.body, isNull);
       expect(changes.base, isNotNull);
       expect(changes.base!.ref, isNotNull);
       assert(changes.base!.ref!.from == 'main');
-      assert(changes.base!.sha!.from == 'b3af5d64d3e6e2110b07d71909fc432537339659');
+      assert(changes.base!.sha!.from ==
+          'b3af5d64d3e6e2110b07d71909fc432537339659');
     });
   });
 }
