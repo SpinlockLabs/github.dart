@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:github/src/common/model/changes.dart';
+
 import 'package:json_annotation/json_annotation.dart';
+
 import '../common.dart';
+import '../common/model/changes.dart';
 
 part 'hooks.g.dart';
 
