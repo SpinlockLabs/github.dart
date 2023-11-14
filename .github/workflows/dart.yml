@@ -15,7 +15,7 @@ jobs:
         # Test with at least the declared minimum Dart version
         sdk: [2.18.7, stable]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: ${{ matrix.sdk }}
