@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:json_annotation/json_annotation.dart';
+
 import '../common.dart';
+import '../common/model/changes.dart';
 
 part 'hooks.g.dart';
 
@@ -203,12 +206,14 @@ class PullRequestEvent extends HookEvent {
     this.pullRequest,
     this.sender,
     this.repository,
+    this.changes,
   });
   String? action;
   int? number;
   PullRequest? pullRequest;
   User? sender;
   Repository? repository;
+  Changes? changes;
 
   factory PullRequestEvent.fromJson(Map<String, dynamic> input) =>
       _$PullRequestEventFromJson(input);
