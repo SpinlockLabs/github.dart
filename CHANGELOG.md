@@ -1,3 +1,10 @@
+## 9.20.0
+
+* Add a Changes object to the PullRequestEvent object so we can see what changed in edited PR events by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/390
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.19.0...9.20.0
+
 ## 9.19.0
 
 * Revert "Add the 'PushEvent' webhook and associated PushCommit object" by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/387
