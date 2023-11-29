@@ -1,3 +1,8 @@
+## 9.21.0
+
+* Update MiscService.getApiStatus() to use the v2 API
+  * `APIStatus` has been refactored to match, now exposing `page` and `status`
+
 ## 9.20.0
 
 * Add a Changes object to the PullRequestEvent object so we can see what changed in edited PR events by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/390
