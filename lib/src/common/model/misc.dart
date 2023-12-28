@@ -60,27 +60,65 @@ class RateLimit {
   Map<String, dynamic> toJson() => _$RateLimitToJson(this);
 }
 
-/// Model class for the GitHub api status.
+/// Model class for the GitHub API status.
 @JsonSerializable()
 class APIStatus {
   APIStatus({
+    this.page,
     this.status,
-    this.lastUpdatedAt,
-    this.createdOn,
-    this.message,
   });
-  final String? status;
 
-  @JsonKey(name: 'last_updated')
-  final DateTime? lastUpdatedAt;
+  /// Details about where to find more information.
+  final APIStatusPage? page;
 
-  @JsonKey(name: 'created_on')
-  final DateTime? createdOn;
-
-  @JsonKey(name: 'body')
-  final String? message;
+  /// An overview of the current status.
+  final APIStatusMessage? status;
 
   factory APIStatus.fromJson(Map<String, dynamic> input) =>
       _$APIStatusFromJson(input);
   Map<String, dynamic> toJson() => _$APIStatusToJson(this);
+}
+
+@JsonSerializable()
+class APIStatusPage {
+  const APIStatusPage({
+    this.id,
+    this.name,
+    this.url,
+    this.updatedAt,
+  });
+
+  /// Unique identifier for the current status.
+  final String? id;
+
+  final String? name;
+
+  /// Where to get more detailed information.
+  final String? url;
+
+  @JsonKey(name: 'updated_at')
+  final DateTime? updatedAt;
+
+  factory APIStatusPage.fromJson(Map<String, dynamic> input) =>
+      _$APIStatusPageFromJson(input);
+  Map<String, dynamic> toJson() => _$APIStatusPageToJson(this);
+}
+
+/// Overview class of the GitHub API status.
+@JsonSerializable()
+class APIStatusMessage {
+  const APIStatusMessage({
+    this.description,
+    this.indicator,
+  });
+
+  /// A human description of the blended component status.
+  final String? description;
+
+  /// An indicator - one of none, minor, major, or critical.
+  final String? indicator;
+
+  factory APIStatusMessage.fromJson(Map<String, dynamic> input) =>
+      _$APIStatusMessageFromJson(input);
+  Map<String, dynamic> toJson() => _$APIStatusMessageToJson(this);
 }

@@ -31,19 +31,45 @@ Map<String, dynamic> _$RateLimitToJson(RateLimit instance) => <String, dynamic>{
     };
 
 APIStatus _$APIStatusFromJson(Map<String, dynamic> json) => APIStatus(
-      status: json['status'] as String?,
-      lastUpdatedAt: json['last_updated'] == null
+      page: json['page'] == null
           ? null
-          : DateTime.parse(json['last_updated'] as String),
-      createdOn: json['created_on'] == null
+          : APIStatusPage.fromJson(json['page'] as Map<String, dynamic>),
+      status: json['status'] == null
           ? null
-          : DateTime.parse(json['created_on'] as String),
-      message: json['body'] as String?,
+          : APIStatusMessage.fromJson(json['status'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$APIStatusToJson(APIStatus instance) => <String, dynamic>{
+      'page': instance.page,
       'status': instance.status,
-      'last_updated': instance.lastUpdatedAt?.toIso8601String(),
-      'created_on': instance.createdOn?.toIso8601String(),
-      'body': instance.message,
+    };
+
+APIStatusPage _$APIStatusPageFromJson(Map<String, dynamic> json) =>
+    APIStatusPage(
+      id: json['id'] as String?,
+      name: json['name'] as String?,
+      url: json['url'] as String?,
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.parse(json['updated_at'] as String),
+    );
+
+Map<String, dynamic> _$APIStatusPageToJson(APIStatusPage instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'url': instance.url,
+      'updated_at': instance.updatedAt?.toIso8601String(),
+    };
+
+APIStatusMessage _$APIStatusMessageFromJson(Map<String, dynamic> json) =>
+    APIStatusMessage(
+      description: json['description'] as String?,
+      indicator: json['indicator'] as String?,
+    );
+
+Map<String, dynamic> _$APIStatusMessageToJson(APIStatusMessage instance) =>
+    <String, dynamic>{
+      'description': instance.description,
+      'indicator': instance.indicator,
     };
