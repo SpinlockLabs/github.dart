@@ -1,3 +1,7 @@
+## 9.22.0
+
+* Add support for the `Ghost` user when the Github user is deleted.
+
 ## 9.21.0
 
 * Update MiscService.getApiStatus() to use the v2 API
