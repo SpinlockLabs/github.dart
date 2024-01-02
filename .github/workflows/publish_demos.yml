@@ -10,7 +10,7 @@ jobs:
       image: dart
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install rsync 📚
         run: |
@@ -24,7 +24,7 @@ jobs:
           rm build/example/packages
 
       - name: Publish 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.4.2
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: gh-pages # The branch the action should deploy to.
           folder: build/example # The folder the action should deploy.

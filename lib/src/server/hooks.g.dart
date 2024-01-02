@@ -142,6 +142,9 @@ PullRequestEvent _$PullRequestEventFromJson(Map<String, dynamic> json) =>
       repository: json['repository'] == null
           ? null
           : Repository.fromJson(json['repository'] as Map<String, dynamic>),
+      changes: json['changes'] == null
+          ? null
+          : Changes.fromJson(json['changes'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PullRequestEventToJson(PullRequestEvent instance) =>
@@ -151,6 +154,7 @@ Map<String, dynamic> _$PullRequestEventToJson(PullRequestEvent instance) =>
       'pull_request': instance.pullRequest,
       'sender': instance.sender,
       'repository': instance.repository,
+      'changes': instance.changes,
     };
 
 CreateEvent _$CreateEventFromJson(Map<String, dynamic> json) => CreateEvent(

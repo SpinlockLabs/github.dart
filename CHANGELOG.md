@@ -1,3 +1,26 @@
+## 9.21.0
+
+* Update MiscService.getApiStatus() to use the v2 API
+  * `APIStatus` has been refactored to match, now exposing `page` and `status`
+
+## 9.20.0
+
+* Add a Changes object to the PullRequestEvent object so we can see what changed in edited PR events by @ricardoamador in https://github.com/SpinlockLabs/github.dart/pull/390
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.19.0...9.20.0
+
+## 9.19.0
+
+* Revert "Add the 'PushEvent' webhook and associated PushCommit object" by @robrbecker in https://github.com/SpinlockLabs/github.dart/pull/387
+
+
+**Full Changelog**: https://github.com/SpinlockLabs/github.dart/compare/9.18.0...9.19.0
+
+## 9.18.0
+
+- Bad Release. Was: Add the 'PushEvent' webhook and associated PushCommit <https://github.com/SpinlockLabs/github.dart/pull/386>
+
 ## 9.17.0
 
 * Add bearerToken constructor to Authentication class by @kevmoo in https://github.com/SpinlockLabs/github.dart/pull/381

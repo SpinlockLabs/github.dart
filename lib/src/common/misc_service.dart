@@ -68,8 +68,10 @@ class MiscService extends Service {
   }
 
   /// Gets the GitHub API Status.
+  ///
+  /// API docs: https://www.githubstatus.com/api
   Future<APIStatus> getApiStatus() =>
-      github.getJSON('https://status.github.com/api/status.json',
+      github.getJSON('https://status.github.com/api/v2/status.json',
           statusCode: StatusCodes.OK, convert: APIStatus.fromJson);
 
   /// Returns an ASCII Octocat with the specified [text].
