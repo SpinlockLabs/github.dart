@@ -311,14 +311,14 @@ class PullRequestFile {
 class PullRequestReview {
   PullRequestReview(
       {required this.id,
-      required this.user,
+      this.user,
       this.body,
       this.state,
       this.htmlUrl,
       this.pullRequestUrl});
 
   int id;
-  User user;
+  User? user;
   String? body;
   String? state;
   String? htmlUrl;
