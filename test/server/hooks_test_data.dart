@@ -1,4 +1,5 @@
 /// Json messages as dart string used for checks model tests.
+library;
 
 String checkSuiteString = checkSuiteTemplate('requested');
 

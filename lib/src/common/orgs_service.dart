@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 ///
 /// API docs: https://developer.github.com/v3/orgs/
 class OrganizationsService extends Service {
-  OrganizationsService(GitHub github) : super(github);
+  OrganizationsService(super.github);
 
   /// Lists all of the memberships in organizations for the given [userName].
   /// If [userName] is not specified we list the memberships in organizations

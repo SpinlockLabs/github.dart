@@ -8,7 +8,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/search/
 class SearchService extends Service {
-  SearchService(GitHub github) : super(github);
+  SearchService(super.github);
 
   /// Search for repositories using [query].
   /// Since the Search Rate Limit is small, this is a best effort implementation.

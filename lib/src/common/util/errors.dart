@@ -25,14 +25,13 @@ class NotReady extends GitHubError {
 /// GitHub Entity was not found
 class NotFound extends GitHubError {
   const NotFound(
-    GitHub github,
-    String msg,
-  ) : super(github, msg);
+    super.github,
+    String super.msg,
+  );
 }
 
 class BadRequest extends GitHubError {
-  const BadRequest(GitHub github, [String? msg = 'Not Found'])
-      : super(github, msg);
+  const BadRequest(super.github, [super.msg = 'Not Found']);
 }
 
 /// GitHub Repository was not found
@@ -94,11 +93,10 @@ class NotAuthenticated extends GitHubError {
 }
 
 class InvalidJSON extends BadRequest {
-  const InvalidJSON(GitHub github, [String? message = 'Invalid JSON'])
-      : super(github, message);
+  const InvalidJSON(super.github, [super.message = 'Invalid JSON']);
 }
 
 class ValidationFailed extends GitHubError {
-  const ValidationFailed(GitHub github, [String message = 'Validation Failed'])
-      : super(github, message);
+  const ValidationFailed(super.github,
+      [String super.message = 'Validation Failed']);
 }

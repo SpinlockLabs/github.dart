@@ -18,14 +18,13 @@ class ChecksService extends Service {
   /// API docs: https://developer.github.com/v3/checks/suites/
   final CheckSuitesService checkSuites;
 
-  ChecksService(GitHub github)
+  ChecksService(super.github)
       : checkRuns = CheckRunsService._(github),
-        checkSuites = CheckSuitesService._(github),
-        super(github);
+        checkSuites = CheckSuitesService._(github);
 }
 
 class CheckRunsService extends Service {
-  CheckRunsService._(GitHub github) : super(github);
+  CheckRunsService._(super.github);
 
   /// Creates a new check run for a specific commit in a repository.
   /// Your GitHub App must have the `checks:write` permission to create check runs.
@@ -235,7 +234,7 @@ class CheckRunsService extends Service {
 }
 
 class CheckSuitesService extends Service {
-  CheckSuitesService._(GitHub github) : super(github);
+  CheckSuitesService._(super.github);
 
   /// Gets a single check suite using its `id`.
   /// GitHub Apps must have the `checks:read` permission on a private repository or pull access to a public repository to get check suites.

@@ -6,7 +6,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://github.com/blog/985-git-io-github-url-shortener
 class UrlShortenerService extends Service {
-  UrlShortenerService(GitHub github) : super(github);
+  UrlShortenerService(super.github);
 
   /// Shortens the provided [url]. An optional [code] can be provided to create
   /// your own vanity URL.

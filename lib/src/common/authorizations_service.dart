@@ -10,7 +10,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/oauth_authorizations/
 class AuthorizationsService extends Service {
-  AuthorizationsService(GitHub github) : super(github);
+  AuthorizationsService(super.github);
 
   /// Lists all authorizations.
   ///

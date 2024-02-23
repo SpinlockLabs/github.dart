@@ -7,7 +7,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/misc/
 class MiscService extends Service {
-  MiscService(GitHub github) : super(github);
+  MiscService(super.github);
 
   /// Fetches all emojis available on GitHub
   /// Returns a map of the name to a url of the image.
