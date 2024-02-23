@@ -8,7 +8,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/git/blobs/
 class GitService extends Service {
-  const GitService(GitHub github) : super(github);
+  const GitService(super.github);
 
   /// Fetches a blob from [slug] for a given [sha].
   ///

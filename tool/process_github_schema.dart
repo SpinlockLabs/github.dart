@@ -20,7 +20,7 @@ List<String> wordWrap(String body) {
 
 typedef GenTypeVisitor = void Function(GenType type);
 
-abstract class GenType extends Comparable<GenType> {
+abstract class GenType implements Comparable<GenType> {
   GenType();
 
   String get name;

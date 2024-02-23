@@ -9,7 +9,7 @@ class CheckRunAnnotationLevel extends EnumWithValue {
   static const warning = CheckRunAnnotationLevel._('warning');
   static const failure = CheckRunAnnotationLevel._('failure');
 
-  const CheckRunAnnotationLevel._(String value) : super(value);
+  const CheckRunAnnotationLevel._(String super.value);
 
   factory CheckRunAnnotationLevel._fromValue(String? value) {
     switch (value) {
@@ -51,7 +51,7 @@ class CheckRunConclusion extends EnumWithValue {
   static const actionRequired = CheckRunConclusion._('action_required');
   static const empty = CheckRunConclusion._(null);
 
-  const CheckRunConclusion._(String? value) : super(value);
+  const CheckRunConclusion._(super.value);
 
   factory CheckRunConclusion._fromValue(String? value) {
     if (value == null) {
@@ -79,13 +79,13 @@ class CheckRunStatus extends EnumWithValue {
   static const queued = CheckRunStatus._('queued');
   static const inProgress = CheckRunStatus._('in_progress');
   static const completed = CheckRunStatus._('completed');
-  const CheckRunStatus._(String value) : super(value);
+  const CheckRunStatus._(String super.value);
 }
 
 class CheckRunFilter extends EnumWithValue {
   static const all = CheckRunFilter._('all');
   static const latest = CheckRunFilter._('latest');
-  const CheckRunFilter._(String value) : super(value);
+  const CheckRunFilter._(String super.value);
 }
 
 @immutable
@@ -253,7 +253,7 @@ class CheckRunAnnotation {
         assert(title.length <= 255);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (other is CheckRunAnnotation) {
       return other.annotationLevel == annotationLevel &&
           other.path == path &&

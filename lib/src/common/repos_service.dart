@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 ///
 /// API docs: https://developer.github.com/v3/repos/
 class RepositoriesService extends Service {
-  RepositoriesService(GitHub github) : super(github);
+  RepositoriesService(super.github);
 
   /// Lists the repositories of the currently authenticated user.
   ///
