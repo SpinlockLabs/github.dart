@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 ///
 /// API docs: https://developer.github.com/v3/activity/
 class ActivityService extends Service {
-  ActivityService(GitHub github) : super(github);
+  ActivityService(super.github);
 
   /// Lists public events.
   ///

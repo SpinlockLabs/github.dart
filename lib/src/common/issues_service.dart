@@ -8,7 +8,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/issues/
 class IssuesService extends Service {
-  IssuesService(GitHub github) : super(github);
+  IssuesService(super.github);
 
   /// List all issues across all the authenticated user’s visible repositories
   /// including owned repositories, member repositories, and organization repositories

@@ -8,7 +8,7 @@ import 'package:github/src/common.dart';
 ///
 /// API docs: https://developer.github.com/v3/pulls/
 class PullRequestsService extends Service {
-  PullRequestsService(GitHub github) : super(github);
+  PullRequestsService(super.github);
 
   /// Fetches several pull requests.
   ///

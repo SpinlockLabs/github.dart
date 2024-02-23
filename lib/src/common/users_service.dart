@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 ///
 /// API docs: https://developer.github.com/v3/users/
 class UsersService extends Service {
-  UsersService(GitHub github) : super(github);
+  UsersService(super.github);
 
   /// Fetches the user specified by [name].
   ///

@@ -1,3 +1,8 @@
+## 9.23.0
+
+* Require Dart 3.0.
+* Update to the latest `package:lints`.
+
 ## 9.22.0
 
 * Add support for the `Ghost` user when the Github user is deleted.

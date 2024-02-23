@@ -21,7 +21,7 @@ abstract class EnumWithValue {
 
   /// True iff [other] is an [EnumWithValue] with the same value as this object.
   @override
-  bool operator ==(dynamic other) =>
+  bool operator ==(Object other) =>
       other is EnumWithValue && value == other.value;
 
   @override

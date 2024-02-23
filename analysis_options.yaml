@@ -15,8 +15,6 @@ linter:
     - avoid_implementing_value_types
     - avoid_js_rounded_ints
     - avoid_private_typedef_functions
-    - avoid_returning_null
-    - avoid_returning_null_for_future
     - avoid_returning_this
     - avoid_setters_without_getters
     - avoid_slow_async_io

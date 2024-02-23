@@ -1,5 +1,7 @@
 /// The Core of GitHub for Dart.
 /// Contains the Models and other GitHub stuff.
+library;
+
 export 'package:github/src/common/activity_service.dart';
 export 'package:github/src/common/authorizations_service.dart';
 export 'package:github/src/common/checks_service.dart';

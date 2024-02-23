@@ -25,8 +25,8 @@ class MockHTTPClient extends http.BaseClient {
 }
 
 class MockResponse extends http.Response {
-  MockResponse(String body, Map<String, String> headers, int statusCode)
-      : super(body, statusCode, headers: headers);
+  MockResponse(super.body, Map<String, String> headers, super.statusCode)
+      : super(headers: headers);
 
   factory MockResponse.fromAsset(String name) {
     final responseData =
