@@ -1,3 +1,7 @@
+## 9.24.0
+
+* Bug fixes to the `Issue.isOpen` and `Issue.isClosed` getters.
+
 ## 9.23.0
 
 * Require Dart 3.0.
