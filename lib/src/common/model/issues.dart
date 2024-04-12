@@ -103,8 +103,8 @@ class Issue {
   /// The user who closed the issue
   User? closedBy;
 
-  bool get isOpen => state == 'OPEN';
-  bool get isClosed => state == 'CLOSED';
+  bool get isOpen => state.toUpperCase() == 'OPEN';
+  bool get isClosed => state.toUpperCase() == 'CLOSED';
 
   // The following properties were added to support the Timeline API.
 
