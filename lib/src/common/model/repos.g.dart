@@ -402,6 +402,26 @@ Map<String, dynamic> _$CreateRepositoryToJson(CreateRepository instance) =>
       'license_template': instance.licenseTemplate,
     };
 
+CreateRepositoryFromTemplate _$CreateRepositoryFromTemplateFromJson(
+        Map<String, dynamic> json) =>
+    CreateRepositoryFromTemplate(
+      json['name'] as String,
+      owner: json['owner'] as String?,
+      description: json['description'] as String?,
+      includeAllBranches: json['include_all_branches'] as bool?,
+      private: json['private'] as bool?,
+    );
+
+Map<String, dynamic> _$CreateRepositoryFromTemplateToJson(
+        CreateRepositoryFromTemplate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'owner': instance.owner,
+      'description': instance.description,
+      'include_all_branches': instance.includeAllBranches,
+      'private': instance.private,
+    };
+
 Branch _$BranchFromJson(Map<String, dynamic> json) => Branch(
       json['name'] as String?,
       json['commit'] == null
