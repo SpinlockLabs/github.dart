@@ -54,7 +54,7 @@ class CheckRunConclusion extends EnumWithValue {
   const CheckRunConclusion._(super.value);
 
   factory CheckRunConclusion._fromValue(String? value) {
-    if (value == null) {
+    if (value == null || value == 'null') {
       return empty;
     }
     for (final level in const [
