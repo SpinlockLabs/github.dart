@@ -7,12 +7,12 @@ part of 'pulls.dart';
 // **************************************************************************
 
 PullRequest _$PullRequestFromJson(Map<String, dynamic> json) => PullRequest(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       nodeId: json['node_id'] as String?,
       htmlUrl: json['html_url'] as String?,
       diffUrl: json['diff_url'] as String?,
       patchUrl: json['patch_url'] as String?,
-      number: json['number'] as int?,
+      number: (json['number'] as num?)?.toInt(),
       state: json['state'] as String?,
       title: json['title'] as String?,
       body: json['body'] as String?,
@@ -44,18 +44,18 @@ PullRequest _$PullRequestFromJson(Map<String, dynamic> json) => PullRequest(
       mergedBy: json['merged_by'] == null
           ? null
           : User.fromJson(json['merged_by'] as Map<String, dynamic>),
-      commentsCount: json['comments'] as int? ?? 0,
-      commitsCount: json['commits'] as int? ?? 0,
-      additionsCount: json['additions'] as int? ?? 0,
-      deletionsCount: json['deletions'] as int? ?? 0,
-      changedFilesCount: json['changed_files'] as int? ?? 0,
+      commentsCount: (json['comments'] as num?)?.toInt() ?? 0,
+      commitsCount: (json['commits'] as num?)?.toInt() ?? 0,
+      additionsCount: (json['additions'] as num?)?.toInt() ?? 0,
+      deletionsCount: (json['deletions'] as num?)?.toInt() ?? 0,
+      changedFilesCount: (json['changed_files'] as num?)?.toInt() ?? 0,
       labels: (json['labels'] as List<dynamic>?)
           ?.map((e) => IssueLabel.fromJson(e as Map<String, dynamic>))
           .toList(),
       requestedReviewers: (json['requested_reviewers'] as List<dynamic>?)
           ?.map((e) => User.fromJson(e as Map<String, dynamic>))
           .toList(),
-      reviewCommentCount: json['review_comments'] as int? ?? 0,
+      reviewCommentCount: (json['review_comments'] as num?)?.toInt() ?? 0,
       milestone: json['milestone'] == null
           ? null
           : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
@@ -162,11 +162,11 @@ Map<String, dynamic> _$CreatePullRequestToJson(CreatePullRequest instance) =>
 
 PullRequestComment _$PullRequestCommentFromJson(Map<String, dynamic> json) =>
     PullRequestComment(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       diffHunk: json['diff_hunk'] as String?,
       path: json['path'] as String?,
-      position: json['position'] as int?,
-      originalPosition: json['original_position'] as int?,
+      position: (json['position'] as num?)?.toInt(),
+      originalPosition: (json['original_position'] as num?)?.toInt(),
       commitId: json['commit_id'] as String?,
       originalCommitId: json['original_commit_id'] as String?,
       user: json['user'] == null
@@ -210,7 +210,7 @@ CreatePullRequestComment _$CreatePullRequestCommentFromJson(
       json['body'] as String?,
       json['commit_id'] as String?,
       json['path'] as String?,
-      json['position'] as int?,
+      (json['position'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CreatePullRequestCommentToJson(
@@ -227,9 +227,9 @@ PullRequestFile _$PullRequestFileFromJson(Map<String, dynamic> json) =>
       sha: json['sha'] as String?,
       filename: json['filename'] as String?,
       status: json['status'] as String?,
-      additionsCount: json['additions'] as int?,
-      deletionsCount: json['deletions'] as int?,
-      changesCount: json['changes'] as int?,
+      additionsCount: (json['additions'] as num?)?.toInt(),
+      deletionsCount: (json['deletions'] as num?)?.toInt(),
+      changesCount: (json['changes'] as num?)?.toInt(),
       blobUrl: json['blob_url'] as String?,
       rawUrl: json['raw_url'] as String?,
       contentsUrl: json['contents_url'] as String?,
@@ -252,7 +252,7 @@ Map<String, dynamic> _$PullRequestFileToJson(PullRequestFile instance) =>
 
 PullRequestReview _$PullRequestReviewFromJson(Map<String, dynamic> json) =>
     PullRequestReview(
-      id: json['id'] as int,
+      id: (json['id'] as num).toInt(),
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
@@ -285,7 +285,7 @@ CreatePullRequestReview _$CreatePullRequestReviewFromJson(
     CreatePullRequestReview(
       json['owner'] as String,
       json['repo'] as String,
-      json['pull_number'] as int,
+      (json['pull_number'] as num).toInt(),
       json['event'] as String,
       body: json['body'] as String?,
       comments: (json['comments'] as List<dynamic>?)
@@ -318,26 +318,26 @@ PullRequestReviewComment _$PullRequestReviewCommentFromJson(
           : DateTime.parse(json['created_at'] as String),
       diffHunk: json['diff_hunk'] as String?,
       htmlUrl: json['html_url'] as String?,
-      id: json['id'] as int?,
-      inReplyToId: json['in_reply_to_id'] as int?,
-      line: json['line'] as int?,
+      id: (json['id'] as num?)?.toInt(),
+      inReplyToId: (json['in_reply_to_id'] as num?)?.toInt(),
+      line: (json['line'] as num?)?.toInt(),
       links: json['_links'] == null
           ? null
           : ReviewLinks.fromJson(json['_links'] as Map<String, dynamic>),
       nodeId: json['node_id'] as String?,
       originalCommitId: json['original_commit_id'] as String?,
-      originalLine: json['original_line'] as int?,
-      originalPosition: json['original_position'] as int?,
-      originalStartLine: json['original_start_line'] as int?,
+      originalLine: (json['original_line'] as num?)?.toInt(),
+      originalPosition: (json['original_position'] as num?)?.toInt(),
+      originalStartLine: (json['original_start_line'] as num?)?.toInt(),
       path: json['path'] as String?,
-      position: json['position'] as int?,
-      pullRequestReviewId: json['pull_request_review_id'] as int?,
+      position: (json['position'] as num?)?.toInt(),
+      pullRequestReviewId: (json['pull_request_review_id'] as num?)?.toInt(),
       pullRequestUrl: json['pull_request_url'] as String?,
       reactions: json['reactions'] == null
           ? null
           : ReactionRollup.fromJson(json['reactions'] as Map<String, dynamic>),
       side: json['side'] as String?,
-      startLine: json['start_line'] as int?,
+      startLine: (json['start_line'] as num?)?.toInt(),
       startSide: json['start_side'] as String?,
       subjectType: json['subject_type'] as String?,
       updatedAt: json['updated_at'] == null

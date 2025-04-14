@@ -47,9 +47,9 @@ Map<String, dynamic> _$RepositoryCommitToJson(RepositoryCommit instance) =>
     };
 
 CommitStats _$CommitStatsFromJson(Map<String, dynamic> json) => CommitStats(
-      additions: json['additions'] as int?,
-      deletions: json['deletions'] as int?,
-      total: json['total'] as int?,
+      additions: (json['additions'] as num?)?.toInt(),
+      deletions: (json['deletions'] as num?)?.toInt(),
+      total: (json['total'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$CommitStatsToJson(CommitStats instance) =>
@@ -61,9 +61,9 @@ Map<String, dynamic> _$CommitStatsToJson(CommitStats instance) =>
 
 CommitFile _$CommitFileFromJson(Map<String, dynamic> json) => CommitFile(
       name: json['filename'] as String?,
-      additions: json['additions'] as int?,
-      deletions: json['deletions'] as int?,
-      changes: json['changes'] as int?,
+      additions: (json['additions'] as num?)?.toInt(),
+      deletions: (json['deletions'] as num?)?.toInt(),
+      changes: (json['changes'] as num?)?.toInt(),
       status: json['status'] as String?,
       rawUrl: json['raw_url'] as String?,
       blobUrl: json['blob_url'] as String?,
@@ -84,9 +84,9 @@ Map<String, dynamic> _$CommitFileToJson(CommitFile instance) =>
 
 CommitComment _$CommitCommentFromJson(Map<String, dynamic> json) =>
     CommitComment(
-      id: json['id'] as int?,
-      line: json['line'] as int?,
-      position: json['position'] as int?,
+      id: (json['id'] as num?)?.toInt(),
+      line: (json['line'] as num?)?.toInt(),
+      position: (json['position'] as num?)?.toInt(),
       path: json['path'] as String?,
       apiUrl: json['url'] as String?,
       commitId: json['commit_id'] as String?,

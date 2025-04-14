@@ -8,7 +8,7 @@ part of 'search.dart';
 
 CodeSearchResults _$CodeSearchResultsFromJson(Map<String, dynamic> json) =>
     CodeSearchResults()
-      ..totalCount = json['total_count'] as int?
+      ..totalCount = (json['total_count'] as num?)?.toInt()
       ..incompleteResults = json['incomplete_results'] as bool?
       ..items = CodeSearchItem.fromJsonList(json['items'] as List);
 
