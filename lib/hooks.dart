@@ -7,7 +7,6 @@
 /// Add this import if you are in a non-web environment and writing something
 /// that uses github hooks. For more information, see github hooks documentation
 /// https://developer.github.com/v3/repos/hooks/
-
-library hooks;
+library;
 
 export 'src/server/xplat_server.dart';

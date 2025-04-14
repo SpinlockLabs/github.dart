@@ -93,7 +93,6 @@ void main() {
       final github = GitHub(client: client);
       final organizationsService = OrganizationsService(github);
 
-      // ignore: omit_local_variable_types
       expect(
           () async => organizationsService.getTeamByName(
               'flutter', 'flutter-programmers'),

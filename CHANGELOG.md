@@ -1,6 +1,6 @@
 ## 9.25.0-wip
 
-* Require Dart 3.1
+* Require Dart 3.5
 * Require `package:http` `^1.0.0`.
 
 ## 9.24.0

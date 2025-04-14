@@ -1,4 +1,6 @@
+// ignore: deprecated_member_use
 import 'dart:html';
+
 import 'package:github/src/common.dart';
 import 'package:github/src/common/xplat_common.dart'
     show findAuthenticationInMap;
