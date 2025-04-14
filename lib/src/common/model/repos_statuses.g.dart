@@ -11,7 +11,7 @@ CombinedRepositoryStatus _$CombinedRepositoryStatusFromJson(
     CombinedRepositoryStatus(
       state: json['state'] as String?,
       sha: json['sha'] as String?,
-      totalCount: json['total_count'] as int?,
+      totalCount: (json['total_count'] as num?)?.toInt(),
       statuses: (json['statuses'] as List<dynamic>?)
           ?.map((e) => RepositoryStatus.fromJson(e as Map<String, dynamic>))
           .toList(),

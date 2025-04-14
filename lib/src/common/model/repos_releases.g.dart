@@ -7,7 +7,7 @@ part of 'repos_releases.dart';
 // **************************************************************************
 
 Release _$ReleaseFromJson(Map<String, dynamic> json) => Release(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       url: json['url'] as String?,
       htmlUrl: json['html_url'] as String?,
       tarballUrl: json['tarball_url'] as String?,
@@ -61,13 +61,13 @@ Map<String, dynamic> _$ReleaseToJson(Release instance) => <String, dynamic>{
     };
 
 ReleaseAsset _$ReleaseAssetFromJson(Map<String, dynamic> json) => ReleaseAsset(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       name: json['name'] as String?,
       label: json['label'] as String?,
       state: json['state'] as String?,
       contentType: json['content_type'] as String?,
-      size: json['size'] as int?,
-      downloadCount: json['download_count'] as int?,
+      size: (json['size'] as num?)?.toInt(),
+      downloadCount: (json['download_count'] as num?)?.toInt(),
       browserDownloadUrl: json['browser_download_url'] as String?,
       createdAt: json['created_at'] == null
           ? null

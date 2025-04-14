@@ -10,9 +10,9 @@ GitHubComparison _$GitHubComparisonFromJson(Map<String, dynamic> json) =>
     GitHubComparison(
       json['url'] as String?,
       json['status'] as String?,
-      json['ahead_by'] as int?,
-      json['behind_by'] as int?,
-      json['total_commits'] as int?,
+      (json['ahead_by'] as num?)?.toInt(),
+      (json['behind_by'] as num?)?.toInt(),
+      (json['total_commits'] as num?)?.toInt(),
       (json['files'] as List<dynamic>?)
           ?.map((e) => CommitFile.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -34,7 +34,7 @@ Map<String, dynamic> _$GitHubComparisonToJson(GitHubComparison instance) =>
 
 Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       name: json['name'] as String? ?? '',
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       fullName: json['full_name'] as String? ?? '',
       owner: json['owner'] == null
           ? null
@@ -51,17 +51,17 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
           : DateTime.parse(json['created_at'] as String),
       isPrivate: json['private'] as bool? ?? false,
       isFork: json['fork'] as bool? ?? false,
-      stargazersCount: json['stargazers_count'] as int? ?? 0,
-      watchersCount: json['watchers_count'] as int? ?? 0,
+      stargazersCount: (json['stargazers_count'] as num?)?.toInt() ?? 0,
+      watchersCount: (json['watchers_count'] as num?)?.toInt() ?? 0,
       language: json['language'] as String? ?? '',
       hasWiki: json['has_wiki'] as bool? ?? false,
       hasDownloads: json['has_downloads'] as bool? ?? false,
-      forksCount: json['forks_count'] as int? ?? 0,
-      openIssuesCount: json['open_issues_count'] as int? ?? 0,
-      subscribersCount: json['subscribers_count'] as int? ?? 0,
-      networkCount: json['network_count'] as int? ?? 0,
+      forksCount: (json['forks_count'] as num?)?.toInt() ?? 0,
+      openIssuesCount: (json['open_issues_count'] as num?)?.toInt() ?? 0,
+      subscribersCount: (json['subscribers_count'] as num?)?.toInt() ?? 0,
+      networkCount: (json['network_count'] as num?)?.toInt() ?? 0,
       hasIssues: json['has_issues'] as bool? ?? false,
-      size: json['size'] as int? ?? 0,
+      size: (json['size'] as num?)?.toInt() ?? 0,
       archived: json['archived'] as bool? ?? false,
       disabled: json['disabled'] as bool? ?? false,
       homepage: json['homepage'] as String? ?? '',
@@ -100,7 +100,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       deploymentsUrl: json['deployments_url'] as String?,
       downloadsUrl: json['downloads_url'] as String?,
       eventsUrl: json['events_url'] as String?,
-      forks: json['forks'] as int?,
+      forks: (json['forks'] as num?)?.toInt(),
       forksUrl: json['forks_url'] as String?,
       gitCommitsUrl: json['git_commits_url'] as String?,
       gitRefsUrl: json['git_refs_url'] as String?,
@@ -123,7 +123,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       mirrorUrl: json['mirror_url'] as String?,
       nodeId: json['node_id'] as String?,
       notificationsUrl: json['notifications_url'] as String?,
-      openIssues: json['open_issues'] as int?,
+      openIssues: (json['open_issues'] as num?)?.toInt(),
       organization: json['organization'] == null
           ? null
           : User.fromJson(json['organization'] as Map<String, dynamic>),
@@ -150,7 +150,7 @@ Repository _$RepositoryFromJson(Map<String, dynamic> json) => Repository(
       treesUrl: json['trees_url'] as String?,
       url: json['url'] as String?,
       visibility: json['visibility'] as String?,
-      watchers: json['watchers'] as int?,
+      watchers: (json['watchers'] as num?)?.toInt(),
       webCommitSignoffRequired: json['web_commit_signoff_required'] as bool?,
     );
 
@@ -320,7 +320,7 @@ Map<String, dynamic> _$CommitDataToJson(CommitData instance) =>
 CommitDataUser _$CommitDataUserFromJson(Map<String, dynamic> json) =>
     CommitDataUser(
       json['login'] as String?,
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['type'] as String?,
     );
 
@@ -347,7 +347,7 @@ Map<String, dynamic> _$CommitInfoToJson(CommitInfo instance) =>
 UserInformation _$UserInformationFromJson(Map<String, dynamic> json) =>
     UserInformation(
       json['login'] as String,
-      json['id'] as int,
+      (json['id'] as num).toInt(),
       json['avatar_url'] as String,
       json['html_url'] as String,
     );
@@ -380,7 +380,7 @@ CreateRepository _$CreateRepositoryFromJson(Map<String, dynamic> json) =>
       private: json['private'] as bool?,
       hasIssues: json['has_issues'] as bool?,
       hasDownloads: json['has_downloads'] as bool?,
-      teamId: json['team_id'] as int?,
+      teamId: (json['team_id'] as num?)?.toInt(),
       autoInit: json['auto_init'] as bool?,
       gitignoreTemplate: json['gitignore_template'] as String?,
       licenseTemplate: json['license_template'] as String?,
@@ -419,7 +419,7 @@ LicenseDetails _$LicenseDetailsFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String?,
       path: json['path'] as String?,
       sha: json['sha'] as String?,
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
       url: json['url'] == null ? null : Uri.parse(json['url'] as String),
       htmlUrl: json['html_url'] == null
           ? null

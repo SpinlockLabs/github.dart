@@ -17,8 +17,8 @@ GitHubApp _$GitHubAppFromJson(Map<String, dynamic> json) => GitHubApp(
           (json['events'] as List<dynamic>?)?.map((e) => e as String).toList(),
       externalUrl: json['external_url'] as String?,
       htmlUrl: json['html_url'] as String?,
-      id: json['id'] as int?,
-      installationsCount: json['installations_count'] as int?,
+      id: (json['id'] as num?)?.toInt(),
+      installationsCount: (json['installations_count'] as num?)?.toInt(),
       name: json['name'] as String?,
       nodeId: json['node_id'] as String?,
       owner: json['owner'] == null
@@ -69,7 +69,7 @@ DismissedReview _$DismissedReviewFromJson(Map<String, dynamic> json) =>
     DismissedReview(
       dismissalCommitId: json['dismissal_commit_id'] as String?,
       dismissalMessage: json['dismissal_message'] as String?,
-      reviewId: json['review_id'] as int?,
+      reviewId: (json['review_id'] as num?)?.toInt(),
       state: json['state'] as String?,
     );
 
@@ -83,9 +83,9 @@ Map<String, dynamic> _$DismissedReviewToJson(DismissedReview instance) =>
 
 ProjectCard _$ProjectCardFromJson(Map<String, dynamic> json) => ProjectCard(
       columnName: json['column_name'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       previousColumnName: json['previous_column_name'] as String?,
-      projectId: json['project_id'] as int?,
+      projectId: (json['project_id'] as num?)?.toInt(),
       projectUrl: json['project_url'] as String?,
       url: json['url'] as String?,
     );
@@ -160,7 +160,7 @@ TemplateRepository _$TemplateRepositoryFromJson(Map<String, dynamic> json) =>
       downloadsUrl: json['downloads_url'] as String?,
       eventsUrl: json['events_url'] as String?,
       fork: json['fork'] as bool?,
-      forksCount: json['forks_count'] as int?,
+      forksCount: (json['forks_count'] as num?)?.toInt(),
       forksUrl: json['forks_url'] as String?,
       fullName: json['full_name'] as String?,
       gitCommitsUrl: json['git_commits_url'] as String?,
@@ -175,7 +175,7 @@ TemplateRepository _$TemplateRepositoryFromJson(Map<String, dynamic> json) =>
       homepage: json['homepage'] as String?,
       hooksUrl: json['hooks_url'] as String?,
       htmlUrl: json['html_url'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       isTemplate: json['is_template'] as bool?,
       issueCommentUrl: json['issue_comment_url'] as String?,
       issueEventsUrl: json['issue_events_url'] as String?,
@@ -190,10 +190,10 @@ TemplateRepository _$TemplateRepositoryFromJson(Map<String, dynamic> json) =>
       milestonesUrl: json['milestones_url'] as String?,
       mirrorUrl: json['mirror_url'] as String?,
       name: json['name'] as String?,
-      networkCount: json['network_count'] as int?,
+      networkCount: (json['network_count'] as num?)?.toInt(),
       nodeId: json['node_id'] as String?,
       notificationsUrl: json['notifications_url'] as String?,
-      openIssuesCount: json['open_issues_count'] as int?,
+      openIssuesCount: (json['open_issues_count'] as num?)?.toInt(),
       owner: json['owner'] == null
           ? null
           : Owner.fromJson(json['owner'] as Map<String, dynamic>),
@@ -206,14 +206,14 @@ TemplateRepository _$TemplateRepositoryFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['pushed_at'] as String),
       releasesUrl: json['releases_url'] as String?,
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
       squashMergeCommitMessage: json['squash_merge_commit_message'] as String?,
       squashMergeCommitTitle: json['squash_merge_commit_title'] as String?,
       sshUrl: json['ssh_url'] as String?,
-      stargazersCount: json['stargazers_count'] as int?,
+      stargazersCount: (json['stargazers_count'] as num?)?.toInt(),
       stargazersUrl: json['stargazers_url'] as String?,
       statusesUrl: json['statuses_url'] as String?,
-      subscribersCount: json['subscribers_count'] as int?,
+      subscribersCount: (json['subscribers_count'] as num?)?.toInt(),
       subscribersUrl: json['subscribers_url'] as String?,
       subscriptionUrl: json['subscription_url'] as String?,
       svnUrl: json['svn_url'] as String?,
@@ -228,7 +228,7 @@ TemplateRepository _$TemplateRepositoryFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updated_at'] as String),
       url: json['url'] as String?,
       visibility: json['visibility'] as String?,
-      watchersCount: json['watchers_count'] as int?,
+      watchersCount: (json['watchers_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$TemplateRepositoryToJson(TemplateRepository instance) =>
@@ -329,7 +329,7 @@ Owner _$OwnerFromJson(Map<String, dynamic> json) => Owner(
       gistsUrl: json['gists_url'] as String?,
       gravatarId: json['gravatar_id'] as String?,
       htmlUrl: json['html_url'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       login: json['login'] as String?,
       nodeId: json['node_id'] as String?,
       organizationsUrl: json['organizations_url'] as String?,

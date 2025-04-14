@@ -8,7 +8,7 @@ part of 'authorizations.dart';
 
 Authorization _$AuthorizationFromJson(Map<String, dynamic> json) =>
     Authorization(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       scopes:
           (json['scopes'] as List<dynamic>?)?.map((e) => e as String).toList(),
       token: json['token'] as String?,

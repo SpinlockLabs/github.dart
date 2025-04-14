@@ -12,7 +12,7 @@ ContributorStatistics _$ContributorStatisticsFromJson(
       json['author'] == null
           ? null
           : User.fromJson(json['author'] as Map<String, dynamic>),
-      json['total'] as int?,
+      (json['total'] as num?)?.toInt(),
       (json['weeks'] as List<dynamic>?)
           ?.map((e) =>
               ContributorWeekStatistics.fromJson(e as Map<String, dynamic>))
@@ -30,10 +30,10 @@ Map<String, dynamic> _$ContributorStatisticsToJson(
 ContributorWeekStatistics _$ContributorWeekStatisticsFromJson(
         Map<String, dynamic> json) =>
     ContributorWeekStatistics(
-      json['w'] as int?,
-      json['a'] as int?,
-      json['d'] as int?,
-      json['c'] as int?,
+      (json['w'] as num?)?.toInt(),
+      (json['a'] as num?)?.toInt(),
+      (json['d'] as num?)?.toInt(),
+      (json['c'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ContributorWeekStatisticsToJson(
@@ -48,8 +48,12 @@ Map<String, dynamic> _$ContributorWeekStatisticsToJson(
 ContributorParticipation _$ContributorParticipationFromJson(
         Map<String, dynamic> json) =>
     ContributorParticipation(
-      all: (json['all'] as List<dynamic>?)?.map((e) => e as int).toList(),
-      owner: (json['owner'] as List<dynamic>?)?.map((e) => e as int).toList(),
+      all: (json['all'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
+      owner: (json['owner'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
     );
 
 Map<String, dynamic> _$ContributorParticipationToJson(
@@ -61,9 +65,11 @@ Map<String, dynamic> _$ContributorParticipationToJson(
 
 YearCommitCountWeek _$YearCommitCountWeekFromJson(Map<String, dynamic> json) =>
     YearCommitCountWeek(
-      days: (json['days'] as List<dynamic>?)?.map((e) => e as int).toList(),
-      total: json['total'] as int?,
-      timestamp: json['timestamp'] as int?,
+      days: (json['days'] as List<dynamic>?)
+          ?.map((e) => (e as num).toInt())
+          .toList(),
+      total: (json['total'] as num?)?.toInt(),
+      timestamp: (json['timestamp'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$YearCommitCountWeekToJson(
@@ -76,9 +82,9 @@ Map<String, dynamic> _$YearCommitCountWeekToJson(
 
 WeeklyChangesCount _$WeeklyChangesCountFromJson(Map<String, dynamic> json) =>
     WeeklyChangesCount(
-      timestamp: json['timestamp'] as int?,
-      additions: json['additions'] as int?,
-      deletions: json['deletions'] as int?,
+      timestamp: (json['timestamp'] as num?)?.toInt(),
+      additions: (json['additions'] as num?)?.toInt(),
+      deletions: (json['deletions'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$WeeklyChangesCountToJson(WeeklyChangesCount instance) =>
@@ -90,9 +96,9 @@ Map<String, dynamic> _$WeeklyChangesCountToJson(WeeklyChangesCount instance) =>
 
 PunchcardEntry _$PunchcardEntryFromJson(Map<String, dynamic> json) =>
     PunchcardEntry(
-      weekday: json['weekday'] as int?,
-      hour: json['hour'] as int?,
-      commits: json['commits'] as int?,
+      weekday: (json['weekday'] as num?)?.toInt(),
+      hour: (json['hour'] as num?)?.toInt(),
+      commits: (json['commits'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$PunchcardEntryToJson(PunchcardEntry instance) =>

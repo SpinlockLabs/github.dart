@@ -9,7 +9,7 @@ part of 'repos_contents.dart';
 GitHubFile _$GitHubFileFromJson(Map<String, dynamic> json) => GitHubFile(
       type: json['type'] as String?,
       encoding: json['encoding'] as String?,
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
       name: json['name'] as String?,
       path: json['path'] as String?,
       content: json['content'] as String?,

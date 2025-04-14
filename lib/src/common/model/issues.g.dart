@@ -7,10 +7,10 @@ part of 'issues.dart';
 // **************************************************************************
 
 Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       url: json['url'] as String? ?? '',
       htmlUrl: json['html_url'] as String? ?? '',
-      number: json['number'] as int? ?? 0,
+      number: (json['number'] as num?)?.toInt() ?? 0,
       state: json['state'] as String? ?? '',
       title: json['title'] as String? ?? '',
       user: json['user'] == null
@@ -29,7 +29,7 @@ Issue _$IssueFromJson(Map<String, dynamic> json) => Issue(
       milestone: json['milestone'] == null
           ? null
           : Milestone.fromJson(json['milestone'] as Map<String, dynamic>),
-      commentsCount: json['comments'] as int? ?? 0,
+      commentsCount: (json['comments'] as num?)?.toInt() ?? 0,
       pullRequest: json['pull_request'] == null
           ? null
           : IssuePullRequest.fromJson(
@@ -119,7 +119,7 @@ IssueRequest _$IssueRequestFromJson(Map<String, dynamic> json) => IssueRequest(
           ?.map((e) => e as String)
           .toList(),
       state: json['state'] as String?,
-      milestone: json['milestone'] as int?,
+      milestone: (json['milestone'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$IssueRequestToJson(IssueRequest instance) =>
@@ -148,7 +148,7 @@ Map<String, dynamic> _$IssuePullRequestToJson(IssuePullRequest instance) =>
     };
 
 IssueComment _$IssueCommentFromJson(Map<String, dynamic> json) => IssueComment(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       body: json['body'] as String?,
       user: json['user'] == null
           ? null
@@ -192,16 +192,16 @@ Map<String, dynamic> _$IssueLabelToJson(IssueLabel instance) =>
     };
 
 Milestone _$MilestoneFromJson(Map<String, dynamic> json) => Milestone(
-      id: json['id'] as int?,
-      number: json['number'] as int?,
+      id: (json['id'] as num?)?.toInt(),
+      number: (json['number'] as num?)?.toInt(),
       state: json['state'] as String?,
       title: json['title'] as String?,
       description: json['description'] as String?,
       creator: json['creator'] == null
           ? null
           : User.fromJson(json['creator'] as Map<String, dynamic>),
-      openIssuesCount: json['open_issues'] as int?,
-      closedIssuesCount: json['closed_issues'] as int?,
+      openIssuesCount: (json['open_issues'] as num?)?.toInt(),
+      closedIssuesCount: (json['closed_issues'] as num?)?.toInt(),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),

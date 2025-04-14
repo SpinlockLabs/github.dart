@@ -7,7 +7,7 @@ part of 'repos_hooks.dart';
 // **************************************************************************
 
 Hook _$HookFromJson(Map<String, dynamic> json) => Hook(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       name: json['name'] as String?,
     )
       ..events =

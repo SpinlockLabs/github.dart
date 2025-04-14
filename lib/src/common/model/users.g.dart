@@ -7,7 +7,7 @@ part of 'users.dart';
 // **************************************************************************
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       login: json['login'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       htmlUrl: json['html_url'] as String?,
@@ -19,10 +19,10 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       email: json['email'] as String?,
       hirable: json['hirable'] as bool?,
       bio: json['bio'] as String?,
-      publicReposCount: json['public_repos'] as int?,
-      publicGistsCount: json['public_gists'] as int?,
-      followersCount: json['followers'] as int?,
-      followingCount: json['following'] as int?,
+      publicReposCount: (json['public_repos'] as num?)?.toInt(),
+      publicGistsCount: (json['public_gists'] as num?)?.toInt(),
+      followersCount: (json['followers'] as num?)?.toInt(),
+      followingCount: (json['following'] as num?)?.toInt(),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -85,7 +85,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
 
 Collaborator _$CollaboratorFromJson(Map<String, dynamic> json) => Collaborator(
       json['login'] as String?,
-      json['id'] as int?,
+      (json['id'] as num?)?.toInt(),
       json['html_url'] as String?,
       json['type'] as String?,
       json['site_admin'] as bool?,
@@ -105,13 +105,13 @@ Map<String, dynamic> _$CollaboratorToJson(Collaborator instance) =>
     };
 
 Contributor _$ContributorFromJson(Map<String, dynamic> json) => Contributor(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       login: json['login'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       htmlUrl: json['html_url'] as String?,
       type: json['type'] as String?,
       siteAdmin: json['site_admin'] as bool?,
-      contributions: json['contributions'] as int?,
+      contributions: (json['contributions'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ContributorToJson(Contributor instance) =>
@@ -127,7 +127,7 @@ Map<String, dynamic> _$ContributorToJson(Contributor instance) =>
 
 CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) => CurrentUser()
   ..login = json['login'] as String?
-  ..id = json['id'] as int?
+  ..id = (json['id'] as num?)?.toInt()
   ..avatarUrl = json['avatar_url'] as String?
   ..htmlUrl = json['html_url'] as String?
   ..siteAdmin = json['site_admin'] as bool?
@@ -138,10 +138,10 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) => CurrentUser()
   ..email = json['email'] as String?
   ..hirable = json['hirable'] as bool?
   ..bio = json['bio'] as String?
-  ..publicReposCount = json['public_repos'] as int?
-  ..publicGistsCount = json['public_gists'] as int?
-  ..followersCount = json['followers'] as int?
-  ..followingCount = json['following'] as int?
+  ..publicReposCount = (json['public_repos'] as num?)?.toInt()
+  ..publicGistsCount = (json['public_gists'] as num?)?.toInt()
+  ..followersCount = (json['followers'] as num?)?.toInt()
+  ..followingCount = (json['following'] as num?)?.toInt()
   ..createdAt = json['created_at'] == null
       ? null
       : DateTime.parse(json['created_at'] as String)
@@ -165,9 +165,9 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) => CurrentUser()
   ..subscriptionsUrl = json['subscriptions_url'] as String?
   ..type = json['type'] as String?
   ..url = json['url'] as String?
-  ..privateReposCount = json['total_private_repos'] as int?
-  ..ownedPrivateReposCount = json['owned_private_repos'] as int?
-  ..diskUsage = json['disk_usage'] as int?
+  ..privateReposCount = (json['total_private_repos'] as num?)?.toInt()
+  ..ownedPrivateReposCount = (json['owned_private_repos'] as num?)?.toInt()
+  ..diskUsage = (json['disk_usage'] as num?)?.toInt()
   ..plan = json['plan'] == null
       ? null
       : UserPlan.fromJson(json['plan'] as Map<String, dynamic>);
@@ -215,9 +215,9 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
 
 UserPlan _$UserPlanFromJson(Map<String, dynamic> json) => UserPlan()
   ..name = json['name'] as String?
-  ..space = json['space'] as int?
-  ..privateReposCount = json['private_repos'] as int?
-  ..collaboratorsCount = json['collaborators'] as int?;
+  ..space = (json['space'] as num?)?.toInt()
+  ..privateReposCount = (json['private_repos'] as num?)?.toInt()
+  ..collaboratorsCount = (json['collaborators'] as num?)?.toInt();
 
 Map<String, dynamic> _$UserPlanToJson(UserPlan instance) => <String, dynamic>{
       'name': instance.name,
