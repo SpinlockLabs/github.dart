@@ -1,3 +1,8 @@
+## 9.25.0-wip
+
+* Require Dart 3.1
+* Require `package:http` `^1.0.0`.
+
 ## 9.24.0
 
 * Bug fixes to the `Issue.isOpen` and `Issue.isClosed` getters.
