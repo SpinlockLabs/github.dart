@@ -2,6 +2,7 @@
 
 @Tags(['scenarios'])
 @TestOn('vm')
+library;
 
 import 'dart:convert';
 
