@@ -31,7 +31,6 @@ class PaginationHelper {
     var page = params['page'] ?? 1;
     params['page'] = page;
 
-    // ignore: literal_only_boolean_expressions
     while (true) {
       http.Response response;
       try {

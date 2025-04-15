@@ -1,4 +1,6 @@
+// ignore: deprecated_member_use
 import 'dart:html';
+
 import 'package:github/src/common.dart';
 
 ///  Renders Markdown in HTML using the GitHub API
@@ -24,7 +26,6 @@ void renderMarkdown(GitHub github, String selector, {int indent = 4}) {
       e.hidden = false;
       e.setAttribute('rendered', '');
       e.classes.add('markdown-body');
-      // ignore: unsafe_html
       e.setInnerHtml(html, treeSanitizer: NodeTreeSanitizer.trusted);
     });
   }
