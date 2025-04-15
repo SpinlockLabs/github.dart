@@ -1,7 +1,8 @@
-## 9.25.0-wip
+## 9.25.0
 
 * Require Dart 3.1
 * Require `package:http` `^1.0.0`.
+* Fix pagination logic to use `next` link.
 
 ## 9.24.0
 
