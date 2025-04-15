@@ -329,7 +329,7 @@ class EventPoller {
   final List<String?> handledEvents = [];
 
   Timer? _timer;
-  StreamController<Event>? _controller; // ignore: close_sinks
+  StreamController<Event>? _controller;
 
   String? _lastFetched;
 
