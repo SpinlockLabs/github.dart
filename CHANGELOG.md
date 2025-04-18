@@ -1,3 +1,9 @@
+## 9.25.0
+
+* Require Dart 3.5
+* Require `package:http` `^1.0.0`.
+* Fix pagination logic to use `next` link.
+
 ## 9.24.0
 
 * Bug fixes to the `Issue.isOpen` and `Issue.isClosed` getters.

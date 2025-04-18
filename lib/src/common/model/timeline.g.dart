@@ -8,7 +8,7 @@ part of 'timeline.dart';
 
 TimelineEvent _$TimelineEventFromJson(Map<String, dynamic> json) =>
     TimelineEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -40,7 +40,7 @@ Map<String, dynamic> _$TimelineEventToJson(TimelineEvent instance) =>
     };
 
 LabelEvent _$LabelEventFromJson(Map<String, dynamic> json) => LabelEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -77,7 +77,7 @@ Map<String, dynamic> _$LabelEventToJson(LabelEvent instance) =>
 
 MilestoneEvent _$MilestoneEventFromJson(Map<String, dynamic> json) =>
     MilestoneEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -113,7 +113,7 @@ Map<String, dynamic> _$MilestoneEventToJson(MilestoneEvent instance) =>
     };
 
 RenameEvent _$RenameEventFromJson(Map<String, dynamic> json) => RenameEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -150,7 +150,7 @@ Map<String, dynamic> _$RenameEventToJson(RenameEvent instance) =>
 
 ReviewRequestEvent _$ReviewRequestEventFromJson(Map<String, dynamic> json) =>
     ReviewRequestEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -195,7 +195,7 @@ Map<String, dynamic> _$ReviewRequestEventToJson(ReviewRequestEvent instance) =>
 ReviewDismissedEvent _$ReviewDismissedEventFromJson(
         Map<String, dynamic> json) =>
     ReviewDismissedEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -233,7 +233,7 @@ Map<String, dynamic> _$ReviewDismissedEventToJson(
     };
 
 LockEvent _$LockEventFromJson(Map<String, dynamic> json) => LockEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -266,7 +266,7 @@ Map<String, dynamic> _$LockEventToJson(LockEvent instance) => <String, dynamic>{
     };
 
 ProjectEvent _$ProjectEventFromJson(Map<String, dynamic> json) => ProjectEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -302,7 +302,7 @@ Map<String, dynamic> _$ProjectEventToJson(ProjectEvent instance) =>
     };
 
 CommentEvent _$CommentEventFromJson(Map<String, dynamic> json) => CommentEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -359,7 +359,7 @@ Map<String, dynamic> _$CommentEventToJson(CommentEvent instance) =>
 
 CrossReferenceEvent _$CrossReferenceEventFromJson(Map<String, dynamic> json) =>
     CrossReferenceEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -401,7 +401,7 @@ Map<String, dynamic> _$CrossReferenceEventToJson(
 
 TimelineCommitEvent _$TimelineCommitEventFromJson(Map<String, dynamic> json) =>
     TimelineCommitEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -460,7 +460,7 @@ Map<String, dynamic> _$TimelineCommitEventToJson(
     };
 
 ReviewEvent _$ReviewEventFromJson(Map<String, dynamic> json) => ReviewEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -520,7 +520,7 @@ Map<String, dynamic> _$ReviewEventToJson(ReviewEvent instance) =>
 TimelineLineCommentedEvent _$TimelineLineCommentedEventFromJson(
         Map<String, dynamic> json) =>
     TimelineLineCommentedEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -560,7 +560,7 @@ Map<String, dynamic> _$TimelineLineCommentedEventToJson(
 TimelineCommitCommentedEvent _$TimelineCommitCommentedEventFromJson(
         Map<String, dynamic> json) =>
     TimelineCommitCommentedEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -598,7 +598,7 @@ Map<String, dynamic> _$TimelineCommitCommentedEventToJson(
 
 AssigneeEvent _$AssigneeEventFromJson(Map<String, dynamic> json) =>
     AssigneeEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null
@@ -636,7 +636,7 @@ Map<String, dynamic> _$AssigneeEventToJson(AssigneeEvent instance) =>
 StateChangeIssueEvent _$StateChangeIssueEventFromJson(
         Map<String, dynamic> json) =>
     StateChangeIssueEvent(
-      id: json['id'] as int? ?? 0,
+      id: (json['id'] as num?)?.toInt() ?? 0,
       nodeId: json['node_id'] as String?,
       url: json['url'] as String?,
       actor: json['actor'] == null

@@ -172,7 +172,7 @@ void main() {
   test('code search', () async {
     nock(fakeApiUrl)
         .get(
-            '/search/code?q=search%20repo%3ASpinlockLabs%2Fgithub.dart%20in%3Afile&per_page=20&page=1')
+            '/search/code?q=search%20repo%3ASpinlockLabs%2Fgithub.dart%20in%3Afile&per_page=20')
         .reply(200, nocked.searchResults);
 
     final results = (await github.search

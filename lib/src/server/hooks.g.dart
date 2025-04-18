@@ -132,7 +132,7 @@ Map<String, dynamic> _$IssueEventToJson(IssueEvent instance) =>
 PullRequestEvent _$PullRequestEventFromJson(Map<String, dynamic> json) =>
     PullRequestEvent(
       action: json['action'] as String?,
-      number: json['number'] as int?,
+      number: (json['number'] as num?)?.toInt(),
       pullRequest: json['pull_request'] == null
           ? null
           : PullRequest.fromJson(json['pull_request'] as Map<String, dynamic>),

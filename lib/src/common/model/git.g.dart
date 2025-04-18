@@ -11,7 +11,7 @@ GitBlob _$GitBlobFromJson(Map<String, dynamic> json) => GitBlob(
       encoding: json['encoding'] as String?,
       url: json['url'] as String?,
       sha: json['sha'] as String?,
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$GitBlobToJson(GitBlob instance) => <String, dynamic>{
@@ -50,7 +50,7 @@ GitCommit _$GitCommitFromJson(Map<String, dynamic> json) => GitCommit(
       parents: (json['parents'] as List<dynamic>?)
           ?.map((e) => GitCommit.fromJson(e as Map<String, dynamic>))
           .toList(),
-      commentCount: json['comment_count'] as int?,
+      commentCount: (json['comment_count'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$GitCommitToJson(GitCommit instance) => <String, dynamic>{
@@ -130,7 +130,7 @@ GitTreeEntry _$GitTreeEntryFromJson(Map<String, dynamic> json) => GitTreeEntry(
       json['path'] as String?,
       json['mode'] as String?,
       json['type'] as String?,
-      json['size'] as int?,
+      (json['size'] as num?)?.toInt(),
       json['sha'] as String?,
       json['url'] as String?,
     );

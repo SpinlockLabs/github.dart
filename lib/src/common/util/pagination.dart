@@ -28,10 +28,6 @@ class PaginationHelper {
       params = Map.from(params);
     }
 
-    var page = params['page'] ?? 1;
-    params['page'] = page;
-
-    // ignore: literal_only_boolean_expressions
     while (true) {
       http.Response response;
       try {
@@ -71,7 +67,8 @@ class PaginationHelper {
         break;
       }
 
-      params['page'] = ++page;
+      path = next;
+      params = null;
     }
   }
 

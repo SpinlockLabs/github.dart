@@ -100,6 +100,9 @@ const checkRunJson = '''{
 const String expectedToString =
     '{"name":"mighty_readme","id":4,"external_id":"","status":"completed","head_sha":"","check_suite":{"id":5},"details_url":"https://example.com","started_at":"2018-05-04T01:14:52.000Z","conclusion":"neutral"}';
 
+const String newCheckRun =
+    '{"name":"New CheckRun","id":12345,"external_id":"","status":"queued","head_sha":"","check_suite":{"id":123456},"details_url":"https://example.com","started_at":"2024-12-05T01:05:24.000Z","conclusion":"null"}';
+
 void main() {
   group('Check run', () {
     test('CheckRun fromJson', () {
@@ -108,6 +111,14 @@ void main() {
       expect(checkRun.id, 4);
       expect(checkRun.name, 'mighty_readme');
       expect(checkRun.conclusion, CheckRunConclusion.neutral);
+    });
+
+    test('CheckRun from freshly created and encoded', () {
+      final checkRun = CheckRun.fromJson(jsonDecode(newCheckRun));
+
+      expect(checkRun.id, 12345);
+      expect(checkRun.name, 'New CheckRun');
+      expect(checkRun.conclusion, CheckRunConclusion.empty);
     });
 
     test('CheckRun fromJson for skipped conclusion', () {

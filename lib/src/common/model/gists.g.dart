@@ -20,7 +20,7 @@ Gist _$GistFromJson(Map<String, dynamic> json) => Gist(
         (k, e) => MapEntry(k, GistFile.fromJson(e as Map<String, dynamic>)),
       ),
       htmlUrl: json['html_url'] as String?,
-      commentsCount: json['comments'] as int?,
+      commentsCount: (json['comments'] as num?)?.toInt(),
       gitPullUrl: json['git_pull_url'] as String?,
       gitPushUrl: json['git_push_url'] as String?,
       createdAt: json['created_at'] == null
@@ -48,7 +48,7 @@ Map<String, dynamic> _$GistToJson(Gist instance) => <String, dynamic>{
 
 GistFile _$GistFileFromJson(Map<String, dynamic> json) => GistFile(
       filename: json['filename'] as String?,
-      size: json['size'] as int?,
+      size: (json['size'] as num?)?.toInt(),
       rawUrl: json['raw_url'] as String?,
       type: json['type'] as String?,
       language: json['language'] as String?,
@@ -70,7 +70,7 @@ GistFork _$GistForkFromJson(Map<String, dynamic> json) => GistFork(
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -92,9 +92,9 @@ GistHistoryEntry _$GistHistoryEntryFromJson(Map<String, dynamic> json) =>
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      deletions: json['change_status/deletions'] as int?,
-      additions: json['change_status/additions'] as int?,
-      totalChanges: json['change_status/total'] as int?,
+      deletions: (json['change_status/deletions'] as num?)?.toInt(),
+      additions: (json['change_status/additions'] as num?)?.toInt(),
+      totalChanges: (json['change_status/total'] as num?)?.toInt(),
       committedAt: json['committed_at'] == null
           ? null
           : DateTime.parse(json['committed_at'] as String),
@@ -111,7 +111,7 @@ Map<String, dynamic> _$GistHistoryEntryToJson(GistHistoryEntry instance) =>
     };
 
 GistComment _$GistCommentFromJson(Map<String, dynamic> json) => GistComment(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       user: json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
