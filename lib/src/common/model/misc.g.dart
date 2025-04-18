@@ -19,8 +19,8 @@ Map<String, dynamic> _$GitignoreTemplateToJson(GitignoreTemplate instance) =>
     };
 
 RateLimit _$RateLimitFromJson(Map<String, dynamic> json) => RateLimit(
-      json['limit'] as int?,
-      json['remaining'] as int?,
+      (json['limit'] as num?)?.toInt(),
+      (json['remaining'] as num?)?.toInt(),
       json['resets'] == null ? null : DateTime.parse(json['resets'] as String),
     );
 

@@ -1,4 +1,6 @@
+// ignore: deprecated_member_use
 import 'dart:html';
+
 import 'common.dart';
 
 Future<void> main() async {

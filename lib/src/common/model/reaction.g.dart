@@ -7,7 +7,7 @@ part of 'reaction.dart';
 // **************************************************************************
 
 Reaction _$ReactionFromJson(Map<String, dynamic> json) => Reaction(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       nodeId: json['node_id'] as String?,
       user: json['user'] == null
           ? null
@@ -28,15 +28,15 @@ Map<String, dynamic> _$ReactionToJson(Reaction instance) => <String, dynamic>{
 
 ReactionRollup _$ReactionRollupFromJson(Map<String, dynamic> json) =>
     ReactionRollup(
-      plusOne: json['+1'] as int?,
-      minusOne: json['-1'] as int?,
-      confused: json['confused'] as int?,
-      eyes: json['eyes'] as int?,
-      heart: json['heart'] as int?,
-      hooray: json['hooray'] as int?,
-      laugh: json['laugh'] as int?,
-      rocket: json['rocket'] as int?,
-      totalCount: json['total_count'] as int?,
+      plusOne: (json['+1'] as num?)?.toInt(),
+      minusOne: (json['-1'] as num?)?.toInt(),
+      confused: (json['confused'] as num?)?.toInt(),
+      eyes: (json['eyes'] as num?)?.toInt(),
+      heart: (json['heart'] as num?)?.toInt(),
+      hooray: (json['hooray'] as num?)?.toInt(),
+      laugh: (json['laugh'] as num?)?.toInt(),
+      rocket: (json['rocket'] as num?)?.toInt(),
+      totalCount: (json['total_count'] as num?)?.toInt(),
       url: json['url'] as String?,
     );
 

@@ -30,7 +30,7 @@ PageBuild _$PageBuildFromJson(Map<String, dynamic> json) => PageBuild(
           ? null
           : PageBuildPusher.fromJson(json['pusher'] as Map<String, dynamic>),
       commit: json['commit'] as String?,
-      duration: json['duration'] as int?,
+      duration: (json['duration'] as num?)?.toInt(),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -53,7 +53,7 @@ Map<String, dynamic> _$PageBuildToJson(PageBuild instance) => <String, dynamic>{
 PageBuildPusher _$PageBuildPusherFromJson(Map<String, dynamic> json) =>
     PageBuildPusher(
       login: json['login'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       apiUrl: json['url'] as String?,
       htmlUrl: json['html_url'] as String?,
       type: json['type'] as String?,

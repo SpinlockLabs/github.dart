@@ -7,7 +7,7 @@ part of 'keys.dart';
 // **************************************************************************
 
 PublicKey _$PublicKeyFromJson(Map<String, dynamic> json) => PublicKey(
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       key: json['key'] as String?,
       title: json['title'] as String?,
     );

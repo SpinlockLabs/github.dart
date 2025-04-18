@@ -8,7 +8,7 @@ part of 'orgs.dart';
 
 Organization _$OrganizationFromJson(Map<String, dynamic> json) => Organization(
       login: json['login'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       htmlUrl: json['html_url'] as String?,
       avatarUrl: json['avatar_url'] as String?,
       name: json['name'] as String?,
@@ -16,10 +16,10 @@ Organization _$OrganizationFromJson(Map<String, dynamic> json) => Organization(
       blog: json['blog'] as String?,
       location: json['location'] as String?,
       email: json['email'] as String?,
-      publicReposCount: json['public_repos'] as int?,
-      publicGistsCount: json['public_gists'] as int?,
-      followersCount: json['followers'] as int?,
-      followingCount: json['following'] as int?,
+      publicReposCount: (json['public_repos'] as num?)?.toInt(),
+      publicGistsCount: (json['public_gists'] as num?)?.toInt(),
+      followersCount: (json['followers'] as num?)?.toInt(),
+      followingCount: (json['following'] as num?)?.toInt(),
       createdAt: json['created_at'] == null
           ? null
           : DateTime.parse(json['created_at'] as String),
@@ -66,9 +66,9 @@ Map<String, dynamic> _$OrganizationMembershipToJson(
 Team _$TeamFromJson(Map<String, dynamic> json) => Team(
       description: json['description'] as String?,
       htmlUrl: json['html_url'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       ldapDn: json['ldap_dn'] as String?,
-      membersCount: json['members_count'] as int?,
+      membersCount: (json['members_count'] as num?)?.toInt(),
       membersUrl: json['members_url'] as String?,
       name: json['name'] as String?,
       nodeId: json['node_id'] as String?,
@@ -83,7 +83,7 @@ Team _$TeamFromJson(Map<String, dynamic> json) => Team(
           ? null
           : Permissions.fromJson(json['permissions'] as Map<String, dynamic>),
       privacy: json['privacy'] as String?,
-      reposCount: json['repos_count'] as int?,
+      reposCount: (json['repos_count'] as num?)?.toInt(),
       repositoriesUrl: json['repositories_url'] as String?,
       slug: json['slug'] as String?,
       url: json['url'] as String?,
@@ -128,7 +128,7 @@ Map<String, dynamic> _$PermissionsToJson(Permissions instance) =>
 
 TeamMember _$TeamMemberFromJson(Map<String, dynamic> json) => TeamMember(
       login: json['login'] as String?,
-      id: json['id'] as int?,
+      id: (json['id'] as num?)?.toInt(),
       avatarUrl: json['avatar_url'] as String?,
       type: json['type'] as String?,
       siteAdmin: json['site_admin'] as bool?,

@@ -1,4 +1,5 @@
 import 'dart:async';
+// ignore: deprecated_member_use
 import 'dart:html';
 
 import 'package:github/github.dart';
@@ -13,7 +14,6 @@ export 'package:github/github.dart';
 Future<void> initViewSourceButton(String script) async {
   // query the DOM for the view source button, handle clicks
   document.querySelector('#view-source')?.onClick.listen((_) {
-    // ignore: unsafe_html
     final popup = window.open(
         'https://github.com/SpinlockLabs/github.dart/blob/master/example/$script',
         'View Source');
