@@ -95,20 +95,12 @@ GitCommitUser _$GitCommitUserFromJson(Map<String, dynamic> json) =>
       json['date'] == null ? null : DateTime.parse(json['date'] as String),
     );
 
-Map<String, dynamic> _$GitCommitUserToJson(GitCommitUser instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('name', instance.name);
-  writeNotNull('email', instance.email);
-  writeNotNull('date', dateToGitHubIso8601(instance.date));
-  return val;
-}
+Map<String, dynamic> _$GitCommitUserToJson(GitCommitUser instance) =>
+    <String, dynamic>{
+      if (instance.name case final value?) 'name': value,
+      if (instance.email case final value?) 'email': value,
+      if (dateToGitHubIso8601(instance.date) case final value?) 'date': value,
+    };
 
 GitTree _$GitTreeFromJson(Map<String, dynamic> json) => GitTree(
       json['sha'] as String?,
