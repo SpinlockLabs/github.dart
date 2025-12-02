@@ -118,6 +118,21 @@ class RepositoriesService extends Service {
     }
   }
 
+  /// Creates a repository with [repository] using a template. If an [org] is
+  /// specified, the new repository will be created under that organization. If
+  /// no [org] is specified, it will be created for the authenticated user.
+  ///
+  /// API docs: https://developer.github.com/v3/repos/#create
+  Future<Repository> createRepositoryFromTemplate(
+      RepositorySlug template, CreateRepositoryFromTemplate repository) async {
+    ArgumentError.checkNotNull(repository);
+    return github.postJSON<Map<String, dynamic>, Repository>(
+      '/repos/${template.fullName}/generate',
+      body: GitHubJson.encode(repository),
+      convert: (i) => Repository.fromJson(i),
+    );
+  }
+
   Future<LicenseDetails> getLicense(RepositorySlug slug) async {
     ArgumentError.checkNotNull(slug);
     return github.getJSON<Map<String, dynamic>, LicenseDetails>(
@@ -153,29 +168,34 @@ class RepositoriesService extends Service {
 
   /// Edit a Repository.
   ///
-  /// API docs: https://developer.github.com/v3/repos/#edit
-  Future<Repository> editRepository(RepositorySlug slug,
-      {String? name,
-      String? description,
-      String? homepage,
-      bool? private,
-      bool? hasIssues,
-      bool? hasWiki,
-      bool? hasDownloads}) async {
+  /// API docs: https://docs.github.com/en/rest/repos/repos#update-a-repository
+  Future<Repository> editRepository(
+    RepositorySlug slug, {
+    String? name,
+    String? description,
+    String? homepage,
+    bool? private,
+    bool? hasIssues,
+    bool? hasWiki,
+    bool? hasDownloads,
+    String? defaultBranch,
+  }) async {
     ArgumentError.checkNotNull(slug);
+
     final data = createNonNullMap({
-      'name': name!,
-      'description': description!,
-      'homepage': homepage!,
-      'private': private!,
-      'has_issues': hasIssues!,
-      'has_wiki': hasWiki!,
-      'has_downloads': hasDownloads!,
-      'default_branch': 'defaultBranch'
+      'name': name,
+      'description': description,
+      'homepage': homepage,
+      'private': private,
+      'has_issues': hasIssues,
+      'has_wiki': hasWiki,
+      'has_downloads': hasDownloads,
+      'default_branch': defaultBranch,
     });
-    return github.postJSON(
+    return github.postJSON<Map<String, dynamic>, Repository>(
       '/repos/${slug.fullName}',
       body: GitHubJson.encode(data),
+      convert: (i) => Repository.fromJson(i),
       statusCode: 200,
     );
   }
@@ -309,6 +329,7 @@ class RepositoriesService extends Service {
     return false;
   }
 
+  /// https://docs.github.com/en/rest/collaborators/collaborators#add-a-repository-collaborator
   Future<bool> addCollaborator(RepositorySlug slug, String user) async {
     ArgumentError.checkNotNull(slug);
     ArgumentError.checkNotNull(user);
@@ -316,9 +337,8 @@ class RepositoriesService extends Service {
         .request(
           'PUT',
           '/repos/${slug.fullName}/collaborators/$user',
-          statusCode: StatusCodes.NO_CONTENT,
         )
-        .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
+        .then((response) => response.statusCode == StatusCodes.CREATED || response.statusCode == StatusCodes. NO_CONTENT);
   }
 
   Future<bool> removeCollaborator(RepositorySlug slug, String user) async {
