@@ -1,3 +1,7 @@
+## 9.25.1
+
+* Correct request type of `IssuesService.updateComment`.
+
 ## 9.25.0
 
 * Require Dart 3.5
