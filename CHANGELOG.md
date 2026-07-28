@@ -1,3 +1,7 @@
+## 9.26.0
+
+* Added method to call rerequest a checkrun api https://github.com/SpinlockLabs/github.dart/pull/438
+
 ## 9.25.1
 
 * Correct request type of `IssuesService.updateComment`.
