@@ -76,6 +76,7 @@ class User {
   String? email;
 
   /// If this user is hirable
+  @JsonKey(name: 'hireable')
   bool? hirable;
 
   /// The User's Biography

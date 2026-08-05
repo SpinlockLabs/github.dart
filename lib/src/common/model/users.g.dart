@@ -17,7 +17,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
       blog: json['blog'] as String?,
       location: json['location'] as String?,
       email: json['email'] as String?,
-      hirable: json['hirable'] as bool?,
+      hirable: json['hireable'] as bool?,
       bio: json['bio'] as String?,
       publicReposCount: (json['public_repos'] as num?)?.toInt(),
       publicGistsCount: (json['public_gists'] as num?)?.toInt(),
@@ -58,7 +58,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'blog': instance.blog,
       'location': instance.location,
       'email': instance.email,
-      'hirable': instance.hirable,
+      'hireable': instance.hirable,
       'bio': instance.bio,
       'public_repos': instance.publicReposCount,
       'public_gists': instance.publicGistsCount,
@@ -136,7 +136,7 @@ CurrentUser _$CurrentUserFromJson(Map<String, dynamic> json) => CurrentUser()
   ..blog = json['blog'] as String?
   ..location = json['location'] as String?
   ..email = json['email'] as String?
-  ..hirable = json['hirable'] as bool?
+  ..hirable = json['hireable'] as bool?
   ..bio = json['bio'] as String?
   ..publicReposCount = (json['public_repos'] as num?)?.toInt()
   ..publicGistsCount = (json['public_gists'] as num?)?.toInt()
@@ -184,7 +184,7 @@ Map<String, dynamic> _$CurrentUserToJson(CurrentUser instance) =>
       'blog': instance.blog,
       'location': instance.location,
       'email': instance.email,
-      'hirable': instance.hirable,
+      'hireable': instance.hirable,
       'bio': instance.bio,
       'public_repos': instance.publicReposCount,
       'public_gists': instance.publicGistsCount,
