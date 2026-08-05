@@ -16,6 +16,12 @@ class UsersService extends Service {
   Future<User> getUser(String? name) =>
       github.getJSON('/users/$name', convert: User.fromJson);
 
+  /// Fetches the user specified by [id].
+  ///
+  /// API docs: https://docs.github.com/en/rest/users/users#get-a-user-using-their-id
+  Future<User> getUserById(int id) =>
+      github.getJSON('/user/$id', convert: User.fromJson);
+
   /// Updates the Current User.
   ///
   /// API docs: https://developer.github.com/v3/users/#update-the-authenticated-user
