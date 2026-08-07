@@ -661,6 +661,39 @@ class CreateRepository {
   Map<String, dynamic> toJson() => _$CreateRepositoryToJson(this);
 }
 
+/// Model class for a new repository to be created using a template.
+@JsonSerializable()
+class CreateRepositoryFromTemplate {
+  CreateRepositoryFromTemplate(
+    this.name, {
+    this.owner,
+    this.description,
+    this.includeAllBranches,
+    this.private,
+  });
+
+  /// Repository Name
+  final String name;
+
+  /// Owner Name
+  final String? owner;
+
+  /// Repository Description
+  String? description;
+
+  /// Include the directory structure and files from all branches in the
+  /// template repository, and not just the default branch. Default: false.
+  @JsonKey(name: 'include_all_branches')
+  bool? includeAllBranches = false;
+
+  /// If the repository should be private or not.
+  bool? private = false;
+
+  factory CreateRepositoryFromTemplate.fromJson(Map<String, dynamic> input) =>
+      _$CreateRepositoryFromTemplateFromJson(input);
+  Map<String, dynamic> toJson() => _$CreateRepositoryFromTemplateToJson(this);
+}
+
 /// Model class for a branch.
 @JsonSerializable()
 class Branch {
