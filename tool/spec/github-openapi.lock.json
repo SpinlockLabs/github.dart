@@ -1,0 +1,10 @@
+{
+  "repository": "github/rest-api-description",
+  "apiVersion": "2022-11-28",
+  "upstreamCommit": "022b4dc2d10306c8c583368af92e3296598c6ce3",
+  "artifactPath": "descriptions/api.github.com/api.github.com.2022-11-28.json",
+  "sha256": "586f4271c3f587dfb07200b5cb4edab7edc39c605c0db04baa82a52ec859d7cb",
+  "openApiVersion": "3.0.3",
+  "infoVersion": "1.1.4",
+  "generatorSchemaVersion": "1.0.0"
+}
