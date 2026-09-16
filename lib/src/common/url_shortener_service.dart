@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'package:github/src/common.dart';
 
-/// The [UrlShortenerService] provides a handy method to access GitHub's
-/// url shortener.
+/// The [UrlShortenerService] provides a method to access GitHub's
+/// legacy git.io url shortener.
 ///
-/// API docs: https://github.com/blog/985-git-io-github-url-shortener
+/// NOTE: The git.io service was deprecated and discontinued by GitHub in 2022.
+/// This service is retained for backwards compatibility only.
+@Deprecated(
+    'git.io was discontinued by GitHub in 2022 and is no longer operational.')
 class UrlShortenerService extends Service {
   UrlShortenerService(super.github);
 
   /// Shortens the provided [url]. An optional [code] can be provided to create
   /// your own vanity URL.
+  @Deprecated(
+      'git.io was discontinued by GitHub in 2022 and is no longer operational.')
   Future<String> shortenUrl(String url, {String? code}) {
     final params = <String, dynamic>{};
 
@@ -19,14 +24,19 @@ class UrlShortenerService extends Service {
       params['code'] = code;
     }
 
-    return github
-        .request('POST', 'http://git.io/', params: params)
-        .then((response) {
+    // Never send authentication credentials to git.io; use HTTPS.
+    return github.request('POST', 'https://git.io/',
+        params: params, headers: {}).then((response) {
       if (response.statusCode != StatusCodes.CREATED) {
         throw GitHubError(github, 'Failed to create shortened url!');
       }
 
-      return response.headers['Location']!.split('/').last;
+      final location =
+          response.headers['location'] ?? response.headers['Location'];
+      if (location == null) {
+        throw GitHubError(github, 'Missing Location header in response');
+      }
+      return location.split('/').last;
     });
   }
 }
