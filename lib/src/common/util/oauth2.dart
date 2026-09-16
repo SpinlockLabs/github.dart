@@ -87,8 +87,11 @@ class OAuth2Flow {
       if (json['error'] != null) {
         throw Exception(json['error']);
       }
-      return ExchangeResponse(json['access_token'], json['token_type'],
-          (json['scope'] as String).split(','));
+      return ExchangeResponse(
+        json['access_token'] as String?,
+        json['token_type'] as String?,
+        ((json['scope'] as String?) ?? '').split(','),
+      );
     });
   }
 }

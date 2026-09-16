@@ -51,7 +51,7 @@ class RateLimit {
     final remaining = rateJson?['remaining'] as int?;
     final resets = rateJson?['reset'] == null
         ? null
-        : DateTime.fromMillisecondsSinceEpoch(rateJson?['reset']);
+        : DateTime.fromMillisecondsSinceEpoch(rateJson!['reset'] as int);
     return RateLimit(limit, remaining, resets);
   }
 

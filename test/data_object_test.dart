@@ -41,4 +41,4 @@ void main() {
   });
 }
 
-String _prettyEncode(obj) => GitHubJson.encode(obj, indent: ' ');
+String _prettyEncode(Object obj) => GitHubJson.encode(obj, indent: ' ');

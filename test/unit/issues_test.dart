@@ -53,8 +53,8 @@ const String testIssueCommentJson = '''
 void main() {
   group('Issue Comments', () {
     test('IssueComment from Json', () {
-      final issueComment =
-          IssueComment.fromJson(jsonDecode(testIssueCommentJson));
+      final issueComment = IssueComment.fromJson(
+          jsonDecode(testIssueCommentJson) as Map<String, dynamic>);
       expect(1352355796, issueComment.id);
       expect('MEMBER', issueComment.authorAssociation);
       expect('CaseyHillers', issueComment.user!.login);

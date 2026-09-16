@@ -32,16 +32,16 @@ class MockResponse extends http.Response {
     final responseData =
         jsonDecode(asset('responses/$name.json').readAsStringSync())
             as Map<String, dynamic>;
-    final headers = responseData['headers'] as Map<String, String>;
+    final headers = (responseData['headers'] as Map).cast<String, String>();
     final dynamic body = responseData['body'];
-    final int statusCode = responseData['statusCode'];
+    final statusCode = responseData['statusCode'] as int;
     String? actualBody;
     if (body is Map || body is List) {
-      actualBody = jsonDecode(body);
+      actualBody = jsonEncode(body);
     } else {
       actualBody = body.toString();
     }
 
-    return MockResponse(actualBody!, headers, statusCode);
+    return MockResponse(actualBody, headers, statusCode);
   }
 }
