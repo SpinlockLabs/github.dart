@@ -14,10 +14,10 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/emojis/
   Future<Map<String, String>> listEmojis() {
-    final r = github.getJSON<Map, Map<String, String>>(
+    final r = github.getJSON<Map<dynamic, dynamic>, Map<String, String>>(
       '/emojis',
       statusCode: StatusCodes.OK,
-      convert: (Map json) => json.cast<String, String>(),
+      convert: (Map<dynamic, dynamic> json) => json.cast<String, String>(),
     );
     return r;
   }
@@ -26,7 +26,10 @@ class MiscService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gitignore/#listing-available-templates
   Future<List<String>> listGitignoreTemplates() {
-    return github.getJSON('/gitignore/templates') as Future<List<String>>;
+    return github.getJSON<List<dynamic>, List<String>>(
+      '/gitignore/templates',
+      convert: List<String>.from,
+    );
   }
 
   /// Gets a .gitignore template by [name].
@@ -63,7 +66,8 @@ class MiscService extends Service {
   /// API docs: https://developer.github.com/v3/rate_limit/
   Future<RateLimit> getRateLimit() {
     return github.request('GET', '/rate_limit').then((response) {
-      return RateLimit.fromRateLimitResponse(jsonDecode(response.body));
+      return RateLimit.fromRateLimitResponse(
+          jsonDecode(response.body) as Map<String, dynamic>);
     });
   }
 

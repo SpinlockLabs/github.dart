@@ -58,9 +58,18 @@ class CheckRunsService extends Service {
     CheckRunOutput? output,
     List<CheckRunAction>? actions,
   }) async {
-    assert(conclusion != null ||
-        (completedAt == null && status != CheckRunStatus.completed));
-    assert(actions == null || actions.length <= 3);
+    if (status == CheckRunStatus.completed && conclusion == null) {
+      throw ArgumentError.value(
+          conclusion, 'conclusion', 'Required when status is completed');
+    }
+    if (completedAt != null && conclusion == null) {
+      throw ArgumentError.value(
+          conclusion, 'conclusion', 'Required when completedAt is provided');
+    }
+    if (actions != null && actions.length > 3) {
+      throw ArgumentError.value(
+          actions.length, 'actions', 'A maximum of 3 actions are accepted');
+    }
     return github.postJSON<Map<String, dynamic>, CheckRun>(
       '/repos/${slug.fullName}/check-runs',
       statusCode: StatusCodes.CREATED,
@@ -109,9 +118,18 @@ class CheckRunsService extends Service {
     CheckRunOutput? output,
     List<CheckRunAction>? actions,
   }) async {
-    assert(conclusion != null ||
-        (completedAt == null && status != CheckRunStatus.completed));
-    assert(actions == null || actions.length <= 3);
+    if (status == CheckRunStatus.completed && conclusion == null) {
+      throw ArgumentError.value(
+          conclusion, 'conclusion', 'Required when status is completed');
+    }
+    if (completedAt != null && conclusion == null) {
+      throw ArgumentError.value(
+          conclusion, 'conclusion', 'Required when completedAt is provided');
+    }
+    if (actions != null && actions.length > 3) {
+      throw ArgumentError.value(
+          actions.length, 'actions', 'A maximum of 3 actions are accepted');
+    }
     return github.requestJson<Map<String, dynamic>, CheckRun>(
       'PATCH',
       '/repos/${slug.fullName}/check-runs/${checkRunToUpdate.id}',

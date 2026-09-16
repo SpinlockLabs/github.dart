@@ -146,7 +146,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#mark-as-read
   Future<bool> markNotificationsRead({DateTime? lastRead}) {
-    final data = {};
+    final data = <String, dynamic>{};
 
     if (lastRead != null) {
       data['last_read_at'] = lastRead.toIso8601String();
@@ -167,7 +167,7 @@ class ActivityService extends Service {
     RepositorySlug slug, {
     DateTime? lastRead,
   }) {
-    final data = {};
+    final data = <String, dynamic>{};
 
     if (lastRead != null) {
       data['last_read_at'] = lastRead.toIso8601String();
@@ -185,7 +185,7 @@ class ActivityService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/activity/notifications/#view-a-single-thread
   Future<Notification> getThread(String threadId) =>
-      github.getJSON('/notification/threads/$threadId',
+      github.getJSON('/notifications/threads/$threadId',
           statusCode: StatusCodes.OK, convert: Notification.fromJson);
 
   /// Mark the specified notification thread as read.
@@ -244,21 +244,17 @@ class ActivityService extends Service {
   /// Stars the specified repository for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#star-a-repository
-  Future star(RepositorySlug slug) {
-    return github.request('PUT', '/user/starred/${slug.fullName}',
-        headers: {'Content-Length': '0'}).then((response) {
-      return null;
-    });
+  Future<void> star(RepositorySlug slug) async {
+    await github.request('PUT', '/user/starred/${slug.fullName}',
+        statusCode: 204, headers: {'Content-Length': '0'});
   }
 
   /// Unstars the specified repository for the currently authenticated user.
   ///
   /// API docs: https://developer.github.com/v3/activity/starring/#unstar-a-repository
-  Future unstar(RepositorySlug slug) {
-    return github.request('DELETE', '/user/starred/${slug.fullName}',
-        headers: {'Content-Length': '0'}).then((response) {
-      return null;
-    });
+  Future<void> unstar(RepositorySlug slug) async {
+    await github.request('DELETE', '/user/starred/${slug.fullName}',
+        statusCode: 204, headers: {'Content-Length': '0'});
   }
 
   /// Lists the watchers of the specified repository.
@@ -315,10 +311,10 @@ class ActivityService extends Service {
   /// Deletes a Repository Subscription
   ///
   /// API docs: https://developer.github.com/v3/activity/watching/#delete-a-repository-subscription
-  Future deleteRepositorySubscription(RepositorySlug slug) {
+  Future<void> deleteRepositorySubscription(RepositorySlug slug) {
     return github.request('DELETE', '/repos/${slug.fullName}/subscription',
         headers: {'Content-Length': '0'}).then((response) {
-      return null;
+      return;
     });
   }
 }
@@ -355,7 +351,8 @@ class EventPoller {
 
       _lastFetched = response.headers['ETag'];
 
-      final json = List<Map<String, dynamic>>.from(jsonDecode(response.body));
+      final json = List<Map<String, dynamic>>.from(
+          jsonDecode(response.body) as Iterable<dynamic>);
 
       if (!(onlyNew && _timer == null)) {
         for (final item in json) {
@@ -399,7 +396,7 @@ class EventPoller {
     return _controller!.stream;
   }
 
-  Future stop() {
+  Future<void> stop() {
     if (_timer == null) {
       throw Exception('Polling not started.');
     }
