@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -22,12 +25,26 @@ jobs:
 
       - name: Install dependencies
         run: dart pub get
-      - name: Dart Analyzer
-        run: dart analyze
+
+      - name: Dart Analyzer (Strict mode)
+        run: dart analyze --fatal-infos
+
       - name: Check Dart Format
         if: ${{ matrix.sdk == 'stable' }}
         run: dart format --set-exit-if-changed -onone .
-      - name: Unit tests
+
+      - name: Verify Spec Sync Drift
+        if: ${{ matrix.sdk == 'stable' }}
+        run: dart run tool/spec_sync.dart --check --offline
+
+      - name: Unit and Contract Tests
         run: dart test
+
+      - name: Coverage Ratchet Check
+        if: ${{ matrix.sdk == 'stable' }}
+        run: |
+          dart test --coverage=coverage
+          dart run tool/coverage_check.dart coverage/lcov.info --min=30.0
+
       - name: Check if Publishable
         run: dart pub publish --dry-run

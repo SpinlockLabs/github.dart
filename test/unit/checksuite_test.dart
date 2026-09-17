@@ -45,7 +45,8 @@ const String expectedToString =
 void main() {
   group('Check suite', () {
     test('CheckSuite fromJson', () {
-      final checkSuite = CheckSuite.fromJson(jsonDecode(checkSuiteJson));
+      final checkSuite = CheckSuite.fromJson(
+          jsonDecode(checkSuiteJson) as Map<String, dynamic>);
 
       expect(checkSuite.id, 5);
       expect(checkSuite.headBranch, 'main');
@@ -90,7 +91,8 @@ void main() {
           }
         ]
       }''';
-      final checkSuite = CheckSuite.fromJson(jsonDecode(checkSuiteJson));
+      final checkSuite = CheckSuite.fromJson(
+          jsonDecode(checkSuiteJson) as Map<String, dynamic>);
 
       expect(checkSuite.id, 10);
       expect(checkSuite.headBranch, 'master');
@@ -111,7 +113,8 @@ void main() {
         "conclusion": "skipped",
         "pull_requests": []
       }''';
-      final checkSuite = CheckSuite.fromJson(jsonDecode(checkSuiteJson));
+      final checkSuite = CheckSuite.fromJson(
+          jsonDecode(checkSuiteJson) as Map<String, dynamic>);
 
       expect(checkSuite.id, 10);
       expect(checkSuite.headBranch, null);

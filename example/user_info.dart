@@ -53,7 +53,7 @@ void loadUser() {
       append('Created', user.createdAt);
       document.getElementById('load')!.hidden = true;
       document.getElementById('token')!.hidden = true;
-    }).catchError((e) {
+    }).catchError((Object e) {
       if (e is AccessForbidden) {
         window.alert('Invalid Token');
       }

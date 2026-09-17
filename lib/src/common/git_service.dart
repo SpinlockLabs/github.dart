@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:github/src/common.dart';
 
@@ -77,10 +76,11 @@ class GitService extends Service {
   /// API docs: https://developer.github.com/v3/git/refs/#create-a-reference
   Future<GitReference> createReference(
       RepositorySlug slug, String ref, String? sha) {
+    final formattedRef = ref.startsWith('refs/') ? ref : 'refs/$ref';
     return github.postJSON('/repos/${slug.fullName}/git/refs',
         convert: GitReference.fromJson,
         statusCode: StatusCodes.CREATED,
-        body: GitHubJson.encode({'ref': ref, 'sha': sha}));
+        body: GitHubJson.encode({'ref': formattedRef, 'sha': sha}));
   }
 
   /// Updates a reference in a repository.
@@ -92,25 +92,25 @@ class GitService extends Service {
     String? sha, {
     bool force = false,
   }) {
+    final formattedRef = ref.startsWith('refs/') ? ref.substring(5) : ref;
     final body = GitHubJson.encode({'sha': sha, 'force': force});
-    // Somehow the reference updates PATCH request needs a valid content-length.
-    final headers = {'content-length': body.length.toString()};
-
-    return github
-        .request('PATCH', '/repos/${slug.fullName}/git/refs/$ref',
-            body: body, headers: headers)
-        .then((response) {
-      return GitReference.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
-    });
+    return github.requestJson<Map<String, dynamic>, GitReference>(
+      'PATCH',
+      '/repos/${slug.fullName}/git/refs/$formattedRef',
+      statusCode: StatusCodes.OK,
+      body: body,
+      convert: GitReference.fromJson,
+    );
   }
 
   /// Deletes a reference.
   ///
   /// API docs: https://developer.github.com/v3/git/refs/#delete-a-reference
   Future<bool> deleteReference(RepositorySlug slug, String ref) {
+    final formattedRef = ref.startsWith('refs/') ? ref.substring(5) : ref;
     return github
-        .request('DELETE', '/repos/${slug.fullName}/git/refs/$ref')
+        .request('DELETE', '/repos/${slug.fullName}/git/refs/$formattedRef',
+            statusCode: StatusCodes.NO_CONTENT)
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
@@ -138,13 +138,12 @@ class GitService extends Service {
   /// and https://developer.github.com/v3/git/trees/#get-a-tree-recursively
   Future<GitTree> getTree(RepositorySlug slug, String? sha,
       {bool recursive = false}) {
-    var path = '/repos/${slug.fullName}/git/trees/$sha';
-    if (recursive) {
-      path += '?recursive=1';
-    }
-
-    return github.getJSON(path,
-        convert: GitTree.fromJson, statusCode: StatusCodes.OK);
+    return github.getJSON(
+      '/repos/${slug.fullName}/git/trees/$sha',
+      params: recursive ? {'recursive': '1'} : const {},
+      convert: GitTree.fromJson,
+      statusCode: StatusCodes.OK,
+    );
   }
 
   /// Creates a new tree in a repository.

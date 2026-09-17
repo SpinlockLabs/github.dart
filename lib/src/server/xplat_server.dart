@@ -9,7 +9,8 @@ export 'hooks.dart';
 ///
 /// Checks all the environment variables in [COMMON_GITHUB_TOKEN_ENV_KEYS] for tokens.
 /// If the above fails, the GITHUB_USERNAME and GITHUB_PASSWORD keys will be checked.
-Authentication findAuthenticationFromEnvironment() {
+Authentication findAuthenticationFromEnvironment(
+    {bool allowQueryAuth = false}) {
   if (Platform.isMacOS) {
     final result = Process.runSync(
         'security', const ['find-internet-password', '-g', '-s', 'github.com']);

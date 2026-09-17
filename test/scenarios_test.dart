@@ -26,11 +26,12 @@ Future<GitHub> createGithubWithScenario(String scenario,
     throw Exception(
         'Error loading scenario: $scenario\n${resp.statusCode}\n${resp.body}');
   }
-  var j = json.decode(resp.body);
+  var j = json.decode(resp.body) as Map<String, dynamic>;
   return GitHub(
-      endpoint: j['url'],
+      endpoint: j['url'] as String,
       auth: const Authentication.withToken(
-          '0000000000000000000000000000000000000001'));
+          '0000000000000000000000000000000000000001'),
+      allowInsecureAuth: true);
 }
 
 /// Run scenario tests against ockokits fixtures-server

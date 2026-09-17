@@ -70,7 +70,12 @@ class ReactionType {
     ':eyes:': eyes,
   };
 
-  static ReactionType? fromString(String? content) => _types[content!];
+  static ReactionType? fromString(String? content) {
+    if (content == null) {
+      return null;
+    }
+    return _types[content] ?? ReactionType._(content, content);
+  }
 }
 
 @JsonSerializable()

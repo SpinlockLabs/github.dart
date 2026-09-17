@@ -238,7 +238,8 @@ const String samplePullRequest = '''
 void main() {
   group('Pull Request fromJson', () {
     test('Node ID is collected', () {
-      final pullRequest = PullRequest.fromJson(jsonDecode(samplePullRequest));
+      final pullRequest = PullRequest.fromJson(
+          jsonDecode(samplePullRequest) as Map<String, dynamic>);
       expect(pullRequest, isNotNull);
       expect(pullRequest.nodeId, "PR_kwDOA8VHis5QItg_");
     });

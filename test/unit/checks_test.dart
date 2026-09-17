@@ -98,7 +98,7 @@ const checkRunJson = '''{
 }''';
 
 const String expectedToString =
-    '{"name":"mighty_readme","id":4,"external_id":"","status":"completed","head_sha":"","check_suite":{"id":5},"details_url":"https://example.com","started_at":"2018-05-04T01:14:52.000Z","conclusion":"neutral"}';
+    '{"name":"mighty_readme","id":4,"external_id":"","status":"completed","head_sha":"ce587453ced02b1526dfb4cb910479d431683101","check_suite":{"id":5},"details_url":"https://example.com","started_at":"2018-05-04T01:14:52.000Z","conclusion":"neutral"}';
 
 const String newCheckRun =
     '{"name":"New CheckRun","id":12345,"external_id":"","status":"queued","head_sha":"","check_suite":{"id":123456},"details_url":"https://example.com","started_at":"2024-12-05T01:05:24.000Z","conclusion":"null"}';
@@ -106,7 +106,8 @@ const String newCheckRun =
 void main() {
   group('Check run', () {
     test('CheckRun fromJson', () {
-      final checkRun = CheckRun.fromJson(jsonDecode(checkRunJson));
+      final checkRun =
+          CheckRun.fromJson(jsonDecode(checkRunJson) as Map<String, dynamic>);
 
       expect(checkRun.id, 4);
       expect(checkRun.name, 'mighty_readme');
@@ -114,7 +115,8 @@ void main() {
     });
 
     test('CheckRun from freshly created and encoded', () {
-      final checkRun = CheckRun.fromJson(jsonDecode(newCheckRun));
+      final checkRun =
+          CheckRun.fromJson(jsonDecode(newCheckRun) as Map<String, dynamic>);
 
       expect(checkRun.id, 12345);
       expect(checkRun.name, 'New CheckRun');
@@ -215,7 +217,8 @@ void main() {
           }
         ]
       }''';
-      final checkRun = CheckRun.fromJson(jsonDecode(checkRunJson));
+      final checkRun =
+          CheckRun.fromJson(jsonDecode(checkRunJson) as Map<String, dynamic>);
 
       expect(checkRun.id, 10);
       expect(checkRun.name, 'mighty_readme');
@@ -224,7 +227,8 @@ void main() {
 
     test('CheckRun toString', () {
       // indirectly tests the toJson method as well.
-      final checkRun = CheckRun.fromJson(jsonDecode(checkRunJson));
+      final checkRun =
+          CheckRun.fromJson(jsonDecode(checkRunJson) as Map<String, dynamic>);
       expect(checkRun, isNotNull);
       final checkRunString = checkRun.toString();
       expect(checkRunString, isNotNull);

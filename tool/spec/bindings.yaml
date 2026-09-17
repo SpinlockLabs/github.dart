@@ -1,0 +1,658 @@
+schemaVersion: 1.0.0
+bindings:
+  - operationId: activity/check-repo-is-starred-by-authenticated-user
+    service: ActivityService
+    method: isStarred
+    status: supported
+  - operationId: activity/delete-repo-subscription
+    service: ActivityService
+    method: deleteRepositorySubscription
+    status: supported
+  - operationId: activity/get-repo-subscription
+    service: ActivityService
+    method: isWatched
+    status: supported
+  - operationId: activity/list-events-for-authenticated-user
+    service: ActivityService
+    method: listUserEvents
+    status: supported
+  - operationId: activity/list-public-events
+    service: ActivityService
+    method: listEvents
+    status: supported
+  - operationId: activity/list-public-events-for-repo-network
+    service: ActivityService
+    method: listNetworkEvents
+    status: supported
+  - operationId: activity/list-public-org-events
+    service: ActivityService
+    method: listOrganizationEvents
+    status: supported
+  - operationId: activity/list-repo-events
+    service: ActivityService
+    method: listRepositoryEvents
+    status: supported
+  - operationId: activity/list-repos-starred-by-authenticated-user
+    service: ActivityService
+    method: listStarredRepositories
+    status: supported
+  - operationId: activity/list-stargazers-for-repo
+    service: ActivityService
+    method: listStarGazers
+    status: supported
+  - operationId: activity/list-watchers-for-repo
+    service: ActivityService
+    method: listWatches
+    status: supported
+  - operationId: activity/set-repo-subscription
+    service: ActivityService
+    method: setRepositorySubscription
+    status: supported
+  - operationId: activity/star-repo-for-authenticated-user
+    service: ActivityService
+    method: star
+    status: supported
+  - operationId: activity/unstar-repo-for-authenticated-user
+    service: ActivityService
+    method: unstar
+    status: supported
+  - operationId: checks/create
+    service: ChecksService
+    method: createCheckRun
+    status: supported
+  - operationId: checks/create-suite
+    service: ChecksService
+    method: createCheckSuite
+    status: supported
+  - operationId: checks/get
+    service: ChecksService
+    method: getCheckRun
+    status: supported
+  - operationId: checks/get-suite
+    service: ChecksService
+    method: getCheckSuite
+    status: supported
+  - operationId: checks/list-annotations
+    service: ChecksService
+    method: listCheckRunAnnotations
+    status: supported
+  - operationId: checks/list-for-ref
+    service: ChecksService
+    method: listCheckRunsForRef
+    status: supported
+  - operationId: checks/list-for-suite
+    service: ChecksService
+    method: listCheckRunsInCheckSuite
+    status: supported
+  - operationId: checks/rerequest-run
+    service: ChecksService
+    method: reRequestCheckRun
+    status: supported
+  - operationId: checks/rerequest-suite
+    service: ChecksService
+    method: reRequestCheckSuite
+    status: supported
+  - operationId: checks/set-suites-preferences
+    service: ChecksService
+    method: updatePreferencesForCheckSuites
+    status: supported
+  - operationId: checks/update
+    service: ChecksService
+    method: updateCheckRun
+    status: supported
+  - operationId: gists/check-is-starred
+    service: GistsService
+    method: isGistStarred
+    status: supported
+  - operationId: gists/create
+    service: GistsService
+    method: createGist
+    status: supported
+  - operationId: gists/create-comment
+    service: GistsService
+    method: createComment
+    status: supported
+  - operationId: gists/delete
+    service: GistsService
+    method: deleteGist
+    status: supported
+  - operationId: gists/delete-comment
+    service: GistsService
+    method: deleteComment
+    status: supported
+  - operationId: gists/fork
+    service: GistsService
+    method: forkGist
+    status: supported
+  - operationId: gists/get
+    service: GistsService
+    method: getGist
+    status: supported
+  - operationId: gists/get-comment
+    service: GistsService
+    method: getComment
+    status: supported
+  - operationId: gists/list
+    service: GistsService
+    method: listGists
+    status: supported
+  - operationId: gists/list-comments
+    service: GistsService
+    method: listComments
+    status: supported
+  - operationId: gists/list-forks
+    service: GistsService
+    method: listGistForks
+    status: supported
+  - operationId: gists/list-public
+    service: GistsService
+    method: listPublicGists
+    status: supported
+  - operationId: gists/list-starred
+    service: GistsService
+    method: listStarredGists
+    status: supported
+  - operationId: gists/list-for-user
+    service: GistsService
+    method: listUserGists
+    status: supported
+  - operationId: gists/star
+    service: GistsService
+    method: starGist
+    status: supported
+  - operationId: gists/unstar
+    service: GistsService
+    method: unstarGist
+    status: supported
+  - operationId: gists/update
+    service: GistsService
+    method: editGist
+    status: supported
+  - operationId: gists/update-comment
+    service: GistsService
+    method: editComment
+    status: supported
+  - operationId: git/create-blob
+    service: GitService
+    method: createBlob
+    status: supported
+  - operationId: git/create-commit
+    service: GitService
+    method: createCommit
+    status: supported
+  - operationId: git/create-ref
+    service: GitService
+    method: createReference
+    status: supported
+  - operationId: git/create-tag
+    service: GitService
+    method: createTag
+    status: supported
+  - operationId: git/create-tree
+    service: GitService
+    method: createTree
+    status: supported
+  - operationId: git/delete-ref
+    service: GitService
+    method: deleteReference
+    status: supported
+  - operationId: git/get-blob
+    service: GitService
+    method: getBlob
+    status: supported
+  - operationId: git/get-commit
+    service: GitService
+    method: getCommit
+    status: supported
+  - operationId: git/get-ref
+    service: GitService
+    method: getReference
+    status: supported
+  - operationId: git/get-tag
+    service: GitService
+    method: getTag
+    status: supported
+  - operationId: git/get-tree
+    service: GitService
+    method: getTree
+    status: supported
+  - operationId: git/update-ref
+    service: GitService
+    method: editReference
+    status: supported
+  - operationId: issues/create
+    service: IssuesService
+    method: create
+    status: supported
+  - operationId: issues/create-comment
+    service: IssuesService
+    method: createComment
+    status: supported
+  - operationId: issues/create-label
+    service: IssuesService
+    method: createLabel
+    status: supported
+  - operationId: issues/create-milestone
+    service: IssuesService
+    method: createMilestone
+    status: supported
+  - operationId: issues/delete-comment
+    service: IssuesService
+    method: deleteComment
+    status: supported
+  - operationId: issues/delete-label
+    service: IssuesService
+    method: deleteLabel
+    status: supported
+  - operationId: issues/delete-milestone
+    service: IssuesService
+    method: deleteMilestone
+    status: supported
+  - operationId: issues/get
+    service: IssuesService
+    method: get
+    status: supported
+  - operationId: issues/get-comment
+    service: IssuesService
+    method: getComment
+    status: supported
+  - operationId: issues/get-label
+    service: IssuesService
+    method: getLabel
+    status: supported
+  - operationId: issues/get-milestone
+    service: IssuesService
+    method: getMilestone
+    status: supported
+  - operationId: issues/list
+    service: IssuesService
+    method: listAll
+    status: supported
+  - operationId: issues/list-comments
+    service: IssuesService
+    method: listCommentsByIssue
+    status: supported
+  - operationId: issues/list-for-authenticated-user
+    service: IssuesService
+    method: listByUser
+    status: supported
+  - operationId: issues/list-for-org
+    service: IssuesService
+    method: listByOrg
+    status: supported
+  - operationId: issues/list-for-repo
+    service: IssuesService
+    method: listByRepo
+    status: supported
+  - operationId: issues/list-labels-for-repo
+    service: IssuesService
+    method: listLabels
+    status: supported
+  - operationId: issues/list-milestones
+    service: IssuesService
+    method: listMilestones
+    status: supported
+  - operationId: issues/update
+    service: IssuesService
+    method: edit
+    status: supported
+  - operationId: issues/update-comment
+    service: IssuesService
+    method: editComment
+    status: supported
+  - operationId: issues/update-label
+    service: IssuesService
+    method: editLabel
+    status: supported
+  - operationId: issues/update-milestone
+    service: IssuesService
+    method: editMilestone
+    status: supported
+  - operationId: meta/get-zen
+    service: MiscService
+    method: getZen
+    status: supported
+  - operationId: orgs/get
+    service: OrganizationsService
+    method: get
+    status: supported
+  - operationId: orgs/list
+    service: OrganizationsService
+    method: list
+    status: supported
+  - operationId: orgs/update
+    service: OrganizationsService
+    method: edit
+    status: supported
+  - operationId: pulls/create
+    service: PullRequestsService
+    method: create
+    status: supported
+  - operationId: pulls/create-review
+    service: PullRequestsService
+    method: createReview
+    status: supported
+  - operationId: pulls/get
+    service: PullRequestsService
+    method: get
+    status: supported
+  - operationId: pulls/list
+    service: PullRequestsService
+    method: list
+    status: supported
+  - operationId: pulls/list-commits
+    service: PullRequestsService
+    method: listCommits
+    status: supported
+  - operationId: pulls/list-files
+    service: PullRequestsService
+    method: listFiles
+    status: supported
+  - operationId: pulls/list-review-comments
+    service: PullRequestsService
+    method: listComments
+    status: supported
+  - operationId: pulls/list-reviews
+    service: PullRequestsService
+    method: listReviews
+    status: supported
+  - operationId: pulls/merge
+    service: PullRequestsService
+    method: merge
+    status: supported
+  - operationId: pulls/update
+    service: PullRequestsService
+    method: edit
+    status: supported
+  - operationId: rate-limit/get
+    service: MiscService
+    method: getRateLimit
+    status: supported
+  - operationId: repos/add-collaborator
+    service: RepositoriesService
+    method: addCollaborator
+    status: supported
+  - operationId: repos/check-collaborator
+    service: RepositoriesService
+    method: isCollaborator
+    status: supported
+  - operationId: repos/create-deploy-key
+    service: RepositoriesService
+    method: createDeployKey
+    status: supported
+  - operationId: repos/create-for-authenticated-user
+    service: RepositoriesService
+    method: createRepository
+    status: supported
+  - operationId: repos/create-in-org
+    service: RepositoriesService
+    method: createOrganizationRepository
+    status: supported
+  - operationId: repos/create-or-update-file-contents
+    service: RepositoriesService
+    method: createFile
+    status: supported
+  - operationId: repos/create-release
+    service: RepositoriesService
+    method: createRelease
+    status: supported
+  - operationId: repos/create-webhook
+    service: RepositoriesService
+    method: createHook
+    status: supported
+  - operationId: repos/delete
+    service: RepositoriesService
+    method: deleteRepository
+    status: supported
+  - operationId: repos/delete-deploy-key
+    service: RepositoriesService
+    method: deleteDeployKey
+    status: supported
+  - operationId: repos/delete-file
+    service: RepositoriesService
+    method: deleteFile
+    status: supported
+  - operationId: repos/delete-release
+    service: RepositoriesService
+    method: deleteRelease
+    status: supported
+  - operationId: repos/delete-release-asset
+    service: RepositoriesService
+    method: deleteReleaseAsset
+    status: supported
+  - operationId: repos/delete-webhook
+    service: RepositoriesService
+    method: deleteHook
+    status: supported
+  - operationId: repos/get
+    service: RepositoriesService
+    method: getRepository
+    status: supported
+  - operationId: repos/get-branch
+    service: RepositoriesService
+    method: getBranch
+    status: supported
+  - operationId: repos/get-content
+    service: RepositoriesService
+    method: getContents
+    status: supported
+  - operationId: repos/get-deploy-key
+    service: RepositoriesService
+    method: getDeployKey
+    status: supported
+  - operationId: repos/get-latest-release
+    service: RepositoriesService
+    method: getLatestRelease
+    status: supported
+  - operationId: repos/get-readme
+    service: RepositoriesService
+    method: getReadme
+    status: supported
+  - operationId: repos/get-release
+    service: RepositoriesService
+    method: getReleaseById
+    status: supported
+  - operationId: repos/get-release-asset
+    service: RepositoriesService
+    method: getReleaseAsset
+    status: supported
+  - operationId: repos/get-release-by-tag
+    service: RepositoriesService
+    method: getReleaseByTagName
+    status: supported
+  - operationId: repos/get-webhook
+    service: RepositoriesService
+    method: getHook
+    status: supported
+  - operationId: repos/list-branches
+    service: RepositoriesService
+    method: listBranches
+    status: supported
+  - operationId: repos/list-collaborators
+    service: RepositoriesService
+    method: listCollaborators
+    status: supported
+  - operationId: repos/list-contributors
+    service: RepositoriesService
+    method: listContributors
+    status: supported
+  - operationId: repos/list-deploy-keys
+    service: RepositoriesService
+    method: listDeployKeys
+    status: supported
+  - operationId: repos/list-for-authenticated-user
+    service: RepositoriesService
+    method: listRepositories
+    status: supported
+  - operationId: repos/list-for-org
+    service: RepositoriesService
+    method: listOrganizationRepositories
+    status: supported
+  - operationId: repos/list-for-user
+    service: RepositoriesService
+    method: listUserRepositories
+    status: supported
+  - operationId: repos/list-public
+    service: RepositoriesService
+    method: listPublicRepositories
+    status: supported
+  - operationId: repos/list-release-assets
+    service: RepositoriesService
+    method: listReleaseAssets
+    status: supported
+  - operationId: repos/list-releases
+    service: RepositoriesService
+    method: listReleases
+    status: supported
+  - operationId: repos/list-tags
+    service: RepositoriesService
+    method: listTags
+    status: supported
+  - operationId: repos/list-webhooks
+    service: RepositoriesService
+    method: listHooks
+    status: supported
+  - operationId: repos/remove-collaborator
+    service: RepositoriesService
+    method: removeCollaborator
+    status: supported
+  - operationId: repos/update
+    service: RepositoriesService
+    method: editRepository
+    status: supported
+  - operationId: repos/update-release
+    service: RepositoriesService
+    method: editRelease
+    status: supported
+  - operationId: repos/update-release-asset
+    service: RepositoriesService
+    method: editReleaseAsset
+    status: supported
+  - operationId: repos/update-webhook
+    service: RepositoriesService
+    method: editHook
+    status: supported
+  - operationId: repos/create-dispatch-event
+    service: RepositoriesService
+    method: createDispatchEvent
+    status: supported
+  - operationId: repos/get-all-topics
+    service: RepositoriesService
+    method: listTopics
+    status: supported
+  - operationId: repos/replace-all-topics
+    service: RepositoriesService
+    method: replaceTopics
+    status: supported
+  - operationId: repos/upload-release-asset
+    service: RepositoriesService
+    method: uploadReleaseAssets
+    status: supported
+  - operationId: search/code
+    service: SearchService
+    method: code
+    status: supported
+  - operationId: search/issues-and-pull-requests
+    service: SearchService
+    method: issues
+    status: supported
+  - operationId: search/repos
+    service: SearchService
+    method: repositories
+    status: supported
+  - operationId: search/users
+    service: SearchService
+    method: users
+    status: supported
+  - operationId: teams/add-or-update-membership-for-user-in-org
+    service: OrganizationsService
+    method: addOrUpdateTeamMembershipByName
+    status: supported
+  - operationId: teams/delete-in-org
+    service: OrganizationsService
+    method: deleteTeam
+    status: supported
+  - operationId: teams/get-by-name
+    service: OrganizationsService
+    method: getTeam
+    status: supported
+  - operationId: teams/get-membership-for-user-in-org
+    service: OrganizationsService
+    method: getTeamMembershipByName
+    status: supported
+  - operationId: teams/list
+    service: OrganizationsService
+    method: listTeams
+    status: supported
+  - operationId: teams/list-members-in-org
+    service: OrganizationsService
+    method: listTeamMembers
+    status: supported
+  - operationId: teams/list-repos-in-org
+    service: OrganizationsService
+    method: listTeamRepos
+    status: supported
+  - operationId: teams/remove-membership-for-user-in-org
+    service: OrganizationsService
+    method: removeTeamMembershipByName
+    status: supported
+  - operationId: teams/update-in-org
+    service: OrganizationsService
+    method: editTeam
+    status: supported
+  - operationId: users/add-email-for-authenticated-user
+    service: UsersService
+    method: addEmails
+    status: supported
+  - operationId: users/check-following-for-user
+    service: UsersService
+    method: isFollowingUser
+    status: supported
+  - operationId: users/create-public-ssh-key-for-authenticated-user
+    service: UsersService
+    method: createPublicKey
+    status: supported
+  - operationId: users/delete-email-for-authenticated-user
+    service: UsersService
+    method: deleteEmails
+    status: supported
+  - operationId: users/delete-public-ssh-key-for-authenticated-user
+    service: UsersService
+    method: deletePublicKey
+    status: supported
+  - operationId: users/follow
+    service: UsersService
+    method: followUser
+    status: supported
+  - operationId: users/get-authenticated
+    service: UsersService
+    method: getCurrentUser
+    status: supported
+  - operationId: users/get-by-username
+    service: UsersService
+    method: getUser
+    status: supported
+  - operationId: users/list
+    service: UsersService
+    method: listUsers
+    status: supported
+  - operationId: users/list-emails-for-authenticated-user
+    service: UsersService
+    method: listEmails
+    status: supported
+  - operationId: users/list-gpg-keys-for-authenticated-user
+    service: UsersService
+    method: listGpgKeys
+    status: supported
+  - operationId: users/list-public-ssh-keys-for-authenticated-user
+    service: UsersService
+    method: listPublicKeys
+    status: supported
+  - operationId: users/unfollow
+    service: UsersService
+    method: unfollowUser
+    status: supported
+  - operationId: users/update-authenticated
+    service: UsersService
+    method: editCurrentUser
+    status: supported

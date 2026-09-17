@@ -5,13 +5,18 @@ import 'package:github/src/common.dart';
 import 'package:github/src/common/xplat_common.dart'
     show findAuthenticationInMap;
 
-/// Looks for GitHub Authentication information from the browser
+/// Looks for GitHub Authentication information from the browser.
 ///
-/// Checks for query strings first, then local storage using keys in [COMMON_GITHUB_TOKEN_ENV_KEYS].
-/// If the above fails, the GITHUB_USERNAME and GITHUB_PASSWORD keys will be checked.
-Authentication findAuthenticationFromEnvironment() {
-  // search the query string parameters first
-  var auth = findAuthenticationInMap(_parseQuery(window.location.href));
+/// NOTE: Passing credentials in query strings is insecure as tokens can be
+/// leaked via logs, browser history, screenshots, and Referer headers.
+/// Extracting tokens from URL query parameters is disabled by default and deprecated.
+/// Explicitly instantiate [Authentication] or use `window.sessionStorage`.
+Authentication findAuthenticationFromEnvironment(
+    {bool allowQueryAuth = false}) {
+  Authentication? auth;
+  if (allowQueryAuth) {
+    auth = findAuthenticationInMap(_parseQuery(window.location.href));
+  }
   auth ??= findAuthenticationInMap(window.sessionStorage);
   return auth ?? const Authentication.anonymous();
 }

@@ -43,7 +43,7 @@ class User {
   });
 
   @JsonKey(includeToJson: false, includeFromJson: false)
-  Map? json; // TODO remove
+  Map<dynamic, dynamic>? json; // TODO remove
 
   /// User's Username
   String? login;

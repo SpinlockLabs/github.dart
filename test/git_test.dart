@@ -11,7 +11,8 @@ GitHub createGithub() {
   return GitHub(
       endpoint: fakeApiUrl,
       auth: const Authentication.withToken(
-          '0000000000000000000000000000000000000001'));
+          '0000000000000000000000000000000000000001'),
+      allowInsecureAuth: true);
 }
 
 void main() {
@@ -96,8 +97,9 @@ void main() {
   });
 
   test('deleteReference()', () async {
-    nock(fakeApiUrl).delete('/repos/o/n/git/refs/heads/b').reply(200, '{}');
-    await git.deleteReference(repo, 'heads/b');
+    nock(fakeApiUrl).delete('/repos/o/n/git/refs/heads/b').reply(204, '');
+    final res = await git.deleteReference(repo, 'heads/b');
+    expect(res, isTrue);
   });
 
   test('getTag()', () async {

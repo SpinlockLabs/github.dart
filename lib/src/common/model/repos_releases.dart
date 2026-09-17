@@ -86,7 +86,7 @@ class Release {
   /// Release Assets
   List<ReleaseAsset>? assets;
 
-  List? errors;
+  List<dynamic>? errors;
 
   factory Release.fromJson(Map<String, dynamic> input) =>
       _$ReleaseFromJson(input);

@@ -20,8 +20,7 @@ class CheckRunAnnotationLevel extends EnumWithValue {
       case 'failure':
         return failure;
       default:
-        throw Exception(
-            'This level of check run annotation is unimplemented: $value.');
+        return CheckRunAnnotationLevel._(value ?? 'notice');
     }
   }
 
@@ -70,8 +69,7 @@ class CheckRunConclusion extends EnumWithValue {
         return level;
       }
     }
-    throw Exception(
-        'This level of check run conclusion is unimplemented: $value.');
+    return CheckRunConclusion._(value);
   }
 }
 
@@ -124,16 +122,19 @@ class CheckRun {
         break;
       }
     }
+    final checkSuite = input['check_suite'] as Map<String, dynamic>?;
     return CheckRun._(
-      name: input['name'],
-      id: input['id'],
-      externalId: input['external_id'],
+      name: input['name'] as String?,
+      id: input['id'] as int?,
+      externalId: input['external_id'] as String?,
       status: status,
-      headSha: input['head_sha'],
-      checkSuiteId: input['check_suite']['id'],
-      detailsUrl: input['details_url'],
-      startedAt: DateTime.parse(input['started_at']),
-      conclusion: CheckRunConclusion._fromValue(input['conclusion']),
+      headSha: input['head_sha'] as String?,
+      checkSuiteId: checkSuite?['id'] as int?,
+      detailsUrl: input['details_url'] as String?,
+      startedAt: input['started_at'] != null
+          ? (DateTime.tryParse(input['started_at'] as String) ?? DateTime.now())
+          : DateTime.now(),
+      conclusion: CheckRunConclusion._fromValue(input['conclusion'] as String?),
     );
   }
 
@@ -143,7 +144,7 @@ class CheckRun {
       'id': id,
       'external_id': externalId,
       'status': status,
-      'head_sha': externalId,
+      'head_sha': headSha,
       'check_suite': <String, dynamic>{
         'id': checkSuiteId,
       },
@@ -273,16 +274,16 @@ class CheckRunAnnotation {
 
   factory CheckRunAnnotation.fromJSON(Map<String, dynamic> input) {
     return CheckRunAnnotation(
-      path: input['path'],
-      startLine: input['start_line'],
-      endLine: input['end_line'],
-      startColumn: input['start_column'],
-      endColumn: input['end_column'],
-      annotationLevel:
-          CheckRunAnnotationLevel._fromValue(input['annotation_level']),
-      title: input['title'],
-      message: input['message'],
-      rawDetails: input['raw_details'],
+      path: input['path'] as String,
+      startLine: input['start_line'] as int,
+      endLine: input['end_line'] as int,
+      startColumn: input['start_column'] as int?,
+      endColumn: input['end_column'] as int?,
+      annotationLevel: CheckRunAnnotationLevel._fromValue(
+          input['annotation_level'] as String?),
+      title: (input['title'] as String?) ?? '',
+      message: (input['message'] as String?) ?? '',
+      rawDetails: (input['raw_details'] ?? input['rax_details']) as String?,
     );
   }
 
@@ -296,7 +297,7 @@ class CheckRunAnnotation {
       'annotation_level': annotationLevel.toString(),
       'message': message,
       'title': title,
-      'rax_details': rawDetails,
+      'raw_details': rawDetails,
     });
   }
 }
@@ -376,16 +377,16 @@ class CheckSuite {
   });
 
   factory CheckSuite.fromJson(Map<String, dynamic> input) {
-    var pullRequestsJson = input['pull_requests'] as List<dynamic>;
+    var pullRequestsJson = (input['pull_requests'] as List?) ?? const [];
     var pullRequests = pullRequestsJson
         .map((dynamic json) =>
             PullRequest.fromJson(json as Map<String, dynamic>))
         .toList();
     return CheckSuite(
-      conclusion: CheckRunConclusion._fromValue(input['conclusion']),
-      headBranch: input['head_branch'],
-      headSha: input['head_sha'],
-      id: input['id'],
+      conclusion: CheckRunConclusion._fromValue(input['conclusion'] as String?),
+      headBranch: input['head_branch'] as String?,
+      headSha: input['head_sha'] as String?,
+      id: input['id'] as int?,
       pullRequests: pullRequests,
     );
   }
@@ -414,8 +415,8 @@ class AutoTriggerChecks {
 
   factory AutoTriggerChecks.fromJson(Map<String, dynamic> input) {
     return AutoTriggerChecks(
-      appId: input['app_id'],
-      setting: input['setting'],
+      appId: input['app_id'] as int,
+      setting: input['setting'] as bool?,
     );
   }
 

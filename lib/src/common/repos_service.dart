@@ -163,20 +163,21 @@ class RepositoriesService extends Service {
       bool? hasWiki,
       bool? hasDownloads}) async {
     ArgumentError.checkNotNull(slug);
-    final data = createNonNullMap({
-      'name': name!,
-      'description': description!,
-      'homepage': homepage!,
-      'private': private!,
-      'has_issues': hasIssues!,
-      'has_wiki': hasWiki!,
-      'has_downloads': hasDownloads!,
-      'default_branch': 'defaultBranch'
+    final data = createNonNullMap(<String, dynamic>{
+      'name': name,
+      'description': description,
+      'homepage': homepage,
+      'private': private,
+      'has_issues': hasIssues,
+      'has_wiki': hasWiki,
+      'has_downloads': hasDownloads,
     });
-    return github.postJSON(
+    return github.requestJson<Map<String, dynamic>, Repository>(
+      'PATCH',
       '/repos/${slug.fullName}',
       body: GitHubJson.encode(data),
-      statusCode: 200,
+      statusCode: StatusCodes.OK,
+      convert: Repository.fromJson,
     );
   }
 
@@ -594,8 +595,8 @@ class RepositoriesService extends Service {
           // it was likely a 404 – but we don't have the status code here
           // But we can guess an the JSON content
           if (input.containsKey('message')) {
-            throw GitHubError(github, input['message'],
-                apiUrl: input['documentation_url']);
+            throw GitHubError(github, input['message'] as String?,
+                apiUrl: input['documentation_url'] as String?);
           }
           contents.file = GitHubFile.fromJson(input as Map<String, dynamic>);
         } else {
@@ -1180,6 +1181,7 @@ class RepositoriesService extends Service {
             createReleaseAsset.label,
           ),
           headers: headers,
+          statusCode: StatusCodes.CREATED,
           body: createReleaseAsset.assetData,
           convert: ReleaseAsset.fromJson);
       releaseAssets.add(releaseAsset);
@@ -1321,6 +1323,52 @@ class RepositoriesService extends Service {
       body: GitHubJson.encode(crn),
       statusCode: StatusCodes.OK,
       convert: ReleaseNotes.fromJson,
+    );
+  }
+
+  /// Creates a repository dispatch event.
+  ///
+  /// API docs: https://docs.github.com/en/rest/repos/repos#create-a-repository-dispatch-event
+  Future<void> createDispatchEvent(
+    RepositorySlug slug,
+    String eventType, {
+    Map<String, dynamic>? clientPayload,
+  }) async {
+    final body = <String, dynamic>{
+      'event_type': eventType,
+      if (clientPayload != null) 'client_payload': clientPayload,
+    };
+
+    await github.request(
+      'POST',
+      '/repos/${slug.fullName}/dispatches',
+      body: GitHubJson.encode(body),
+      statusCode: 204,
+    );
+  }
+
+  /// Lists all topics for a repository.
+  ///
+  /// API docs: https://docs.github.com/en/rest/repos/repos#get-all-repository-topics
+  Future<List<String>> listTopics(RepositorySlug slug) async {
+    return github.getJSON<Map<String, dynamic>, List<String>>(
+      '/repos/${slug.fullName}/topics',
+      convert: (json) => List<String>.from(json['names'] as List? ?? []),
+    );
+  }
+
+  /// Replaces all topics for a repository.
+  ///
+  /// API docs: https://docs.github.com/en/rest/repos/repos#replace-all-repository-topics
+  Future<List<String>> replaceTopics(
+    RepositorySlug slug,
+    List<String> topics,
+  ) async {
+    return github.requestJson<Map<String, dynamic>, List<String>>(
+      'PUT',
+      '/repos/${slug.fullName}/topics',
+      body: GitHubJson.encode({'names': topics}),
+      convert: (json) => List<String>.from(json['names'] as List? ?? []),
     );
   }
 }
