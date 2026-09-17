@@ -6,8 +6,21 @@ class GitHubError implements Exception {
   final String? apiUrl;
   final GitHub github;
   final Object? source;
+  final int? statusCode;
+  final String? responseBody;
+  final Map<String, String>? responseHeaders;
+  final String? requestId;
 
-  const GitHubError(this.github, this.message, {this.apiUrl, this.source});
+  const GitHubError(
+    this.github,
+    this.message, {
+    this.apiUrl,
+    this.source,
+    this.statusCode,
+    this.responseBody,
+    this.responseHeaders,
+    this.requestId,
+  });
 
   @override
   String toString() => 'GitHub Error: $message';
@@ -26,12 +39,29 @@ class NotReady extends GitHubError {
 class NotFound extends GitHubError {
   const NotFound(
     super.github,
-    String super.msg,
-  );
+    String super.msg, {
+    super.apiUrl,
+    super.source,
+    super.statusCode = 404,
+    super.responseBody,
+    super.responseHeaders,
+    super.requestId,
+  });
 }
 
 class BadRequest extends GitHubError {
-  const BadRequest(super.github, [super.msg = 'Not Found']);
+  const BadRequest(
+    super.github, [
+    super.message = 'Bad Request',
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+  ]) : super(
+          apiUrl: apiUrl,
+          statusCode: 400,
+          responseBody: responseBody,
+          responseHeaders: responseHeaders,
+        );
 }
 
 /// GitHub Repository was not found
@@ -64,39 +94,166 @@ class TeamNotFound extends NotFound {
       : super(github, 'Team Not Found: $id');
 }
 
-/// Access was forbidden to a resource
+/// Access was forbidden to a resource (HTTP 403)
 class AccessForbidden extends GitHubError {
-  const AccessForbidden(GitHub github) : super(github, 'Access Forbidden');
+  const AccessForbidden(
+    super.github, [
+    super.message = 'Access Forbidden',
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+  ]) : super(
+          apiUrl: apiUrl,
+          statusCode: 403,
+          responseBody: responseBody,
+          responseHeaders: responseHeaders,
+        );
 }
 
-/// Client hit the rate limit.
+/// Client hit the rate limit (HTTP 429 or HTTP 403 rate limit exceeded).
 class RateLimitHit extends GitHubError {
-  const RateLimitHit(GitHub github) : super(github, 'Rate Limit Hit');
+  final DateTime? reset;
+  final int? limit;
+  final int? remaining;
+
+  const RateLimitHit(
+    GitHub github, {
+    String? message,
+    this.reset,
+    this.limit,
+    this.remaining,
+    String? apiUrl,
+    int statusCode = 429,
+    String? responseBody,
+    Map<String, String>? responseHeaders,
+    String? requestId,
+  }) : super(
+          github,
+          message ?? 'Rate Limit Hit',
+          apiUrl: apiUrl,
+          statusCode: statusCode,
+          responseBody: responseBody,
+          responseHeaders: responseHeaders,
+          requestId: requestId,
+        );
 }
 
-/// A GitHub Server Error
+/// Resource conflict (HTTP 409)
+class Conflict extends GitHubError {
+  const Conflict(
+    super.github, [
+    super.message = 'Conflict',
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+  ]) : super(
+          apiUrl: apiUrl,
+          statusCode: 409,
+          responseBody: responseBody,
+          responseHeaders: responseHeaders,
+        );
+}
+
+/// A GitHub Server Error (HTTP 500, 502, 504)
 class ServerError extends GitHubError {
-  ServerError(GitHub github, int statusCode, String? message)
-      : super(github, '${message ?? 'Server Error'} ($statusCode)');
+  ServerError(
+    GitHub github,
+    int statusCode,
+    String? message, {
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+    String? requestId,
+  }) : super(
+          github,
+          '${message ?? 'Server Error'} ($statusCode)',
+          statusCode: statusCode,
+          apiUrl: apiUrl,
+          responseHeaders: responseHeaders,
+          responseBody: responseBody,
+          requestId: requestId,
+        );
+}
+
+/// Service Unavailable (HTTP 503)
+class ServiceUnavailable extends ServerError {
+  ServiceUnavailable(
+    GitHub github, [
+    String? message,
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+    String? requestId,
+  ]) : super(
+          github,
+          503,
+          message ?? 'Service Unavailable',
+          apiUrl: apiUrl,
+          responseHeaders: responseHeaders,
+          responseBody: responseBody,
+          requestId: requestId,
+        );
 }
 
 /// An Unknown Error
 class UnknownError extends GitHubError {
-  const UnknownError(GitHub github, [String? message])
-      : super(github, message ?? 'Unknown Error');
+  const UnknownError(
+    GitHub github, [
+    String? message,
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+    int? statusCode,
+  ]) : super(
+          github,
+          message ?? 'Unknown Error',
+          apiUrl: apiUrl,
+          statusCode: statusCode,
+          responseHeaders: responseHeaders,
+          responseBody: responseBody,
+        );
 }
 
-/// GitHub Client was not authenticated
+/// GitHub Client was not authenticated (HTTP 401)
 class NotAuthenticated extends GitHubError {
-  const NotAuthenticated(GitHub github)
-      : super(github, 'Client not Authenticated');
+  const NotAuthenticated(
+    super.github, [
+    super.message = 'Client not Authenticated',
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+  ]) : super(
+          apiUrl: apiUrl,
+          statusCode: 401,
+          responseBody: responseBody,
+          responseHeaders: responseHeaders,
+        );
 }
 
 class InvalidJSON extends BadRequest {
-  const InvalidJSON(super.github, [super.message = 'Invalid JSON']);
+  const InvalidJSON(
+    super.github, [
+    super.message = 'Invalid JSON',
+    super.apiUrl,
+    super.responseHeaders,
+    super.responseBody,
+  ]);
 }
 
 class ValidationFailed extends GitHubError {
-  const ValidationFailed(super.github,
-      [String super.message = 'Validation Failed']);
+  final List<Map<String, dynamic>>? errors;
+
+  const ValidationFailed(
+    super.github, [
+    super.message = 'Validation Failed',
+    this.errors,
+    String? apiUrl,
+    Map<String, String>? responseHeaders,
+    String? responseBody,
+  ]) : super(
+          apiUrl: apiUrl,
+          statusCode: 422,
+          responseHeaders: responseHeaders,
+          responseBody: responseBody,
+        );
 }

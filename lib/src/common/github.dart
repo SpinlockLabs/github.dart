@@ -23,7 +23,48 @@ class GitHub {
     this.endpoint = 'https://api.github.com',
     this.version = '2022-11-28',
     http.Client? client,
-  }) : client = client ?? http.Client();
+    Set<String>? trustedOrigins,
+    this.allowInsecureAuth = false,
+    this.retryPolicy = const RetryPolicy(),
+    HttpTransport? transport,
+  })  : client = client ?? http.Client(),
+        trustedOrigins = trustedOrigins ?? _defaultTrustedOrigins(endpoint),
+        _transport = transport;
+
+  static Set<String> _defaultTrustedOrigins(String endpoint) {
+    final origins = <String>{};
+    final uri = Uri.tryParse(endpoint);
+    if (uri != null && uri.hasScheme && uri.hasAuthority) {
+      origins.add(uri.origin);
+    } else {
+      origins.add('https://api.github.com');
+    }
+    origins.add('https://uploads.github.com');
+    return origins;
+  }
+
+  /// Policy governing retries, exponential backoff, and rate limits.
+  final RetryPolicy retryPolicy;
+
+  /// Underlying injectable HTTP transport.
+  HttpTransport get transport => _transport ??= HttpTransport(
+        github: this,
+        client: client,
+        retryPolicy: retryPolicy,
+        trustedOrigins: trustedOrigins,
+        allowInsecureAuth: allowInsecureAuth,
+        endpoint: endpoint,
+      );
+  HttpTransport? _transport;
+
+  /// Set of trusted origins permitted to receive authentication credentials.
+  /// Defaults to the origin of [endpoint] (e.g. `https://api.github.com`) and
+  /// `https://uploads.github.com`.
+  final Set<String> trustedOrigins;
+
+  /// Whether to allow sending credentials over unencrypted HTTP.
+  /// Defaults to `false` for security. Set to `true` only for local test servers.
+  final bool allowInsecureAuth;
 
   static const _ratelimitLimitHeader = 'x-ratelimit-limit';
   static const _ratelimitResetHeader = 'x-ratelimit-reset';
@@ -51,6 +92,7 @@ class GitHub {
   final http.Client client;
 
   ActivityService? _activity;
+  // ignore: deprecated_member_use_from_same_package
   AuthorizationsService? _authorizations;
   GistsService? _gists;
   GitService? _git;
@@ -60,6 +102,7 @@ class GitHub {
   PullRequestsService? _pullRequests;
   RepositoriesService? _repositories;
   SearchService? _search;
+  // ignore: deprecated_member_use_from_same_package
   UrlShortenerService? _urlShortener;
   UsersService? _users;
   ChecksService? _checks;
@@ -98,7 +141,9 @@ class GitHub {
   ///
   /// Note: You can only access this API via Basic Authentication using your
   /// username and password, not tokens.
+  // ignore: deprecated_member_use_from_same_package
   AuthorizationsService get authorizations =>
+      // ignore: deprecated_member_use_from_same_package
       _authorizations ??= AuthorizationsService(this);
 
   /// Service for gist related methods of the GitHub API.
@@ -129,7 +174,9 @@ class GitHub {
   SearchService get search => _search ??= SearchService(this);
 
   /// Service to provide a handy method to access GitHub's url shortener.
+  // ignore: deprecated_member_use_from_same_package
   UrlShortenerService get urlShortener =>
+      // ignore: deprecated_member_use_from_same_package
       _urlShortener ??= UrlShortenerService(this);
 
   /// Service for user related methods of the GitHub API.
@@ -330,10 +377,16 @@ class GitHub {
       fail: fail,
     );
 
+    if (response.statusCode == 204 || response.body.isEmpty) {
+      return null as T;
+    }
+
     final json = jsonDecode(response.body);
 
-    final returnValue = convert(json) as T;
-    _applyExpandos(returnValue, response);
+    final returnValue = convert(json as S) as T;
+    if (returnValue != null) {
+      _applyExpandos(returnValue, response);
+    }
     return returnValue;
   }
 
@@ -355,135 +408,27 @@ class GitHub {
     void Function(http.Response response)? fail,
     String? preview,
   }) async {
-    if (rateLimitRemaining != null && rateLimitRemaining! <= 0) {
-      assert(rateLimitReset != null);
-      final now = DateTime.now();
-      final waitTime = rateLimitReset!.difference(now);
-      await Future.delayed(waitTime);
-    }
-
     headers ??= <String, String>{};
 
     if (preview != null) {
       headers['Accept'] = preview;
     }
 
-    final authHeaderValue = auth.authorizationHeaderValue();
-    if (authHeaderValue != null) {
-      headers.putIfAbsent('Authorization', () => authHeaderValue);
-    }
+    final apiRequest = ApiRequest(
+      method: method,
+      path: path,
+      headers: headers,
+      params: params ?? const {},
+      body: body,
+      successStatuses: statusCode != null ? {statusCode} : null,
+    );
 
-    // See https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#user-agent-required
-    headers.putIfAbsent('User-Agent', () => auth.username ?? 'github.dart');
-
-    if (method == 'PUT' && body == null) {
-      headers.putIfAbsent('Content-Length', () => '0');
-    }
-
-    var queryString = '';
-
-    if (params != null) {
-      queryString = buildQueryString(params);
-    }
-
-    final url = StringBuffer();
-
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      url.write(path);
-      url.write(queryString);
-    } else {
-      url.write(endpoint);
-      if (!path.startsWith('/')) {
-        url.write('/');
-      }
-      url.write(path);
-      url.write(queryString);
-    }
-
-    final request = http.Request(method, Uri.parse(url.toString()));
-    request.headers.addAll(headers);
-    if (body != null) {
-      if (body is List<int>) {
-        request.bodyBytes = body;
-      } else {
-        request.body = body.toString();
-      }
-    }
-
-    final streamedResponse = await client.send(request);
-
-    final response = await http.Response.fromStream(streamedResponse);
-
-    _updateRateLimit(response.headers);
-    if (statusCode != null && statusCode != response.statusCode) {
-      if (fail != null) {
-        fail(response);
-      }
-      handleStatusCode(response);
-    } else {
-      return response;
-    }
+    return transport.execute(apiRequest, fail: fail);
   }
 
-  ///
   /// Internal method to handle status codes
-  ///
   Never handleStatusCode(http.Response response) {
-    String? message = '';
-    List<Map<String, String>>? errors;
-    if (response.headers['content-type']!.contains('application/json')) {
-      try {
-        final json = jsonDecode(response.body);
-        message = json['message'];
-        if (json['errors'] != null) {
-          try {
-            errors = List<Map<String, String>>.from(json['errors']);
-          } catch (_) {
-            errors = [
-              {'code': json['errors'].toString()}
-            ];
-          }
-        }
-      } catch (ex) {
-        throw UnknownError(this, ex.toString());
-      }
-    }
-    switch (response.statusCode) {
-      case 404:
-        throw NotFound(this, 'Requested Resource was Not Found');
-      case 401:
-        throw AccessForbidden(this);
-      case 400:
-        if (message == 'Problems parsing JSON') {
-          throw InvalidJSON(this, message);
-        } else if (message == 'Body should be a JSON Hash') {
-          throw InvalidJSON(this, message);
-        } else {
-          throw BadRequest(this);
-        }
-      case 422:
-        final buff = StringBuffer();
-        buff.writeln();
-        buff.writeln('  Message: $message');
-        if (errors != null) {
-          buff.writeln('  Errors:');
-          for (final error in errors) {
-            final resource = error['resource'];
-            final field = error['field'];
-            final code = error['code'];
-            buff
-              ..writeln('    Resource: $resource')
-              ..writeln('    Field $field')
-              ..write('    Code: $code');
-          }
-        }
-        throw ValidationFailed(this, buff.toString());
-      case 500:
-      case 502:
-      case 504:
-        throw ServerError(this, response.statusCode, message);
-    }
-    throw UnknownError(this, message);
+    ErrorDecoder.decode(this, response);
   }
 
   /// Disposes of this GitHub Instance.
@@ -493,16 +438,21 @@ class GitHub {
     client.close();
   }
 
-  void _updateRateLimit(Map<String, String> headers) {
+  /// Updates rate limit fields from HTTP response [headers].
+  void updateRateLimit(Map<String, String> headers) {
     if (headers.containsKey(_ratelimitLimitHeader)) {
-      _rateLimitLimit = int.parse(headers[_ratelimitLimitHeader]!);
-      _rateLimitRemaining = int.parse(headers[_ratelimitRemainingHeader]!);
-      _rateLimitReset = int.parse(headers[_ratelimitResetHeader]!);
+      _rateLimitLimit = int.tryParse(headers[_ratelimitLimitHeader] ?? '');
+      _rateLimitRemaining =
+          int.tryParse(headers[_ratelimitRemainingHeader] ?? '');
+      _rateLimitReset = int.tryParse(headers[_ratelimitResetHeader] ?? '');
     }
   }
 }
 
-void _applyExpandos(dynamic target, http.Response response) {
+void _applyExpandos(Object? target, http.Response response) {
+  if (target == null || target is String || target is num || target is bool) {
+    return;
+  }
   _etagExpando[target] = response.headers['etag'];
   if (response.headers['date'] != null) {
     _dateExpando[target] = http_parser.parseHttpDate(response.headers['date']!);
