@@ -1,0 +1,98 @@
+name: Weekly GitHub OpenAPI Spec Sync
+
+on:
+  schedule:
+    # Run every Monday at 04:00 UTC
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  spec-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Check for upstream OpenAPI specification updates
+        id: check_upstream
+        run: |
+          mkdir -p .dart_tool
+          dart run tool/spec_sync.dart --offline --report-json > .dart_tool/spec_report_before.json
+          echo "Checked current spec baseline."
+
+      - name: Regenerate OpenAPI catalog and docs
+        id: run_sync
+        run: |
+          dart run tool/spec_sync.dart --update
+          git status --porcelain > .dart_tool/git_status.txt
+          if [ -s .dart_tool/git_status.txt ]; then
+            echo "changes_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changes_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate generated code and contracts
+        if: steps.run_sync.outputs.changes_detected == 'true'
+        run: |
+          dart format --output=none --set-exit-if-changed .
+          dart analyze --fatal-infos
+          dart test
+          dart pub publish --dry-run
+
+      - name: Create or update spec-sync pull request
+        if: steps.run_sync.outputs.changes_detected == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="automation/github-openapi-spec-sync"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "$BRANCH_NAME"
+          git add lib/src/common/generated/rest_contracts.g.dart docs/api-coverage.md tool/spec/
+          git commit -m "chore(spec): synchronize GitHub OpenAPI specification contracts"
+          git push --force origin "$BRANCH_NAME"
+
+          PR_TITLE="chore(spec): synchronize GitHub OpenAPI specification contracts"
+          PR_BODY="## GitHub OpenAPI Specification Sync
+
+          This automated pull request synchronizes the GitHub OpenAPI description contracts and coverage reports.
+
+          ### Summary of Changes
+          - Regenerated \`lib/src/common/generated/rest_contracts.g.dart\`
+          - Updated API coverage documentation in \`docs/api-coverage.md\`
+
+          ### Validation
+          - \`dart format\` verified
+          - \`dart analyze --fatal-infos\` passed
+          - \`dart test\` passed
+          - \`dart pub publish --dry-run\` verified
+
+          **Notice**: Review only. Never auto-merged."
+
+          gh pr create \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY" \
+            --base master \
+            --head "$BRANCH_NAME" \
+            --label "automation,spec-sync" || \
+          gh pr edit "$BRANCH_NAME" \
+            --title "$PR_TITLE" \
+            --body "$PR_BODY"

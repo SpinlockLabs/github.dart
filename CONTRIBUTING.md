@@ -38,6 +38,20 @@ To regenerate the JSON logic for the models, run:
 dart run build_runner build -d
 ```
 
+## OpenAPI Specification & Contract Sync
+
+This repository uses an OpenAPI-driven contract verification system pinned to the official GitHub REST API specification.
+
+- To check that code and documentation match the pinned OpenAPI specification:
+  ```sh
+  dart run tool/spec_sync.dart --check --offline
+  ```
+- To update or regenerate the REST contracts catalog and coverage report:
+  ```sh
+  dart run tool/spec_sync.dart --update
+  ```
+- Automated weekly pull requests (`spec_sync.yml`) monitor upstream API specification releases. Automated PRs are review-only and never auto-merged.
+
 ## Tests
 
 `dart test` will only run the unit tests.
