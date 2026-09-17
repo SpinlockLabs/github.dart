@@ -1,5 +1,8 @@
 .dart_tool
 .packages
 .pub
+.dart_pub_cache
+tool/spec/.cache
 packages
 pubspec.lock
+

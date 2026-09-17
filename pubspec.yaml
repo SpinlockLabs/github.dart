@@ -7,6 +7,7 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  crypto: ^3.0.3
   http: ^1.0.0
   http_parser: ^4.0.0
   json_annotation: ^4.9.0
@@ -17,6 +18,7 @@ dev_dependencies:
   build_test: ">=2.1.2 <4.0.0"
   build_web_compilers: '>=3.2.6 < 5.0.0'
   collection: ^1.15.0
+  dart_style: ^3.0.0
   dependency_validator: ">=3.0.0 <6.0.0"
   json_serializable: ^6.6.1
   lints: ">=5.0.0 <7.0.0"
