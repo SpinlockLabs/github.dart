@@ -15,7 +15,8 @@ void main() {
       });
 
       final github = GitHub(client: client);
-      await github.getJSON(''); // Make HTTP request
+      await github.getJSON<Map<String, dynamic>, Map<String, dynamic>>(
+          ''); // Make HTTP request
 
       expect(request, isNotNull);
       expect(request!.headers.containsKey(GitHub.versionHeader), isTrue);
@@ -31,7 +32,8 @@ void main() {
       });
 
       final github = GitHub(client: client);
-      await github.getJSON(''); // Make HTTP request
+      await github.getJSON<Map<String, dynamic>, Map<String, dynamic>>(
+          ''); // Make HTTP request
 
       expect(request, isNotNull);
       expect(request!.headers.containsKey('User-Agent'), isTrue);
@@ -50,7 +52,8 @@ void main() {
         client: client,
         auth: const Authentication.anonymous(),
       );
-      await github.getJSON(''); // Make HTTP request
+      await github.getJSON<Map<String, dynamic>, Map<String, dynamic>>(
+          ''); // Make HTTP request
 
       expect(request, isNotNull);
       expect(request!.headers.containsKey('Authorization'), isFalse);

@@ -52,11 +52,11 @@ String generateMarkdown(int accuracy) {
 |Name|Bytes|Percentage|
 |-----|-----|-----|
 ''');
-  data.sort((a, b) => b[1].compareTo(a[1]));
+  data.sort((a, b) => (b[1] as num).compareTo(a[1] as num));
 
   for (final info in data) {
-    final String? name = info[0];
-    final int bytes = info[1];
+    final name = info[0] as String?;
+    final bytes = info[1] as int;
     final num percentage = (bytes / total) * 100;
     md.writeln('|$name|$bytes|${percentage.toStringAsFixed(accuracy)}|');
   }

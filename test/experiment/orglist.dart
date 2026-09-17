@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:github/github.dart';
 
-Future main() async {
+Future<void> main() async {
   final github = GitHub();
   final repos =
       await github.repositories.listUserRepositories('dart-lang').toList();

@@ -602,7 +602,8 @@ void main(List<String> arguments) {
         'Command must be run with one argument, the file name of the schema to process.');
     exit(1);
   }
-  Object schema = json.decode(File(arguments.single).readAsStringSync());
+  final schema =
+      json.decode(File(arguments.single).readAsStringSync()) as Object;
   assure(schema is Map<String, Object?>, () => 'schema is not a JSON object');
   var rootType = process(schema as Map<String, Object?>);
   rootType.visit((GenType type) {

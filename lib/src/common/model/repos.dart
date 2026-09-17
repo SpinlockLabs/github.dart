@@ -684,9 +684,12 @@ class LanguageBreakdown {
 
   /// The Primary Language
   String get primary {
-    final list = mapToList(_data);
+    if (_data.isEmpty) {
+      return '';
+    }
+    final list = _data.entries.toList();
     list.sort((a, b) {
-      return a.value.compareTo(b.value);
+      return b.value.compareTo(a.value);
     });
     return list.first.key;
   }

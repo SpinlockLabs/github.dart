@@ -41,7 +41,7 @@ class PaginationHelper {
         if (serverErrors >= maxServerErrors) {
           break;
         }
-        await Future.delayed(serverErrorBackOff);
+        await Future<void>.delayed(serverErrorBackOff);
         continue;
       }
 
@@ -98,12 +98,15 @@ class PaginationHelper {
       body: body,
       statusCode: statusCode,
     )) {
+      final decoded = jsonDecode(response.body);
       final json = arrayKey == null
-          ? jsonDecode(response.body) as List?
-          : (jsonDecode(response.body) as Map)[arrayKey];
+          ? (decoded as List?)
+          : ((decoded as Map<String, dynamic>)[arrayKey] as List?);
 
-      for (final item in json) {
-        yield (item as T?)!;
+      if (json != null) {
+        for (final item in json) {
+          yield (item as T?)!;
+        }
       }
     }
   }

@@ -1,7 +1,7 @@
 import 'dart:async';
 import '../helper.dart';
 
-Future main() async {
+Future<void> main() async {
   const org = 'IOT-DSA';
 
   final hooks = await github.organizations.listHooks(org).toList();
