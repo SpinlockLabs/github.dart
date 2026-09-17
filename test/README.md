@@ -1,9 +1,25 @@
-# Integration Tests
+# Integration and Live Tests
 
-The integration tests will run against the live GitHub API. These tests will
-verify that the library is properly coded against the actual behavior of the
-GitHub API.
+## Unit and Contract Tests
 
+All unit tests, contract tests, security tests, and model tests run offline without external dependencies:
+
+```bash
+dart test
+```
+
+## Safe Live Smoke Tests
+
+Safe read-only smoke tests are located in `test/live/smoke_test.dart`.
+These tests only perform safe, non-destructive read operations against public GitHub endpoints:
+
+```bash
+GITHUB_LIVE_SMOKE=1 dart test test/live/smoke_test.dart
+```
+
+## Destructive Integration Tests
+
+The legacy integration tests run against the live GitHub API with write operations.
 To run these tests a GitHub repository and OAuth token will need to be defined
 in the `config/config.dart` file.
 
