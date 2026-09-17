@@ -99,32 +99,41 @@ final RegExp githubDateRemoveRegExp = RegExp(r'\.\d*');
 
 const v3ApiMimeType = 'application/vnd.github.v3+json';
 
-String buildQueryString(Map<String, dynamic> params) {
-  final queryString = StringBuffer();
-
-  if (params.isNotEmpty && !params.values.every((value) => value == null)) {
-    queryString.write('?');
-  }
-
-  var i = 0;
-  for (final key in params.keys) {
-    i++;
-    if (params[key] == null) {
+String buildQueryString(Map<String, dynamic> params,
+    {bool prefixQuestionMark = true}) {
+  final queryParts = <String>[];
+  for (final entry in params.entries) {
+    final key = entry.key;
+    final value = entry.value;
+    if (value == null) {
       continue;
     }
-    queryString.write('$key=${Uri.encodeComponent(params[key].toString())}');
-    if (i != params.keys.length) {
-      queryString.write('&');
+
+    final encodedKey = Uri.encodeQueryComponent(key);
+    if (value is Iterable) {
+      for (final item in value) {
+        if (item != null) {
+          final itemStr = item is Enum ? item.name : item.toString();
+          queryParts.add('$encodedKey=${Uri.encodeQueryComponent(itemStr)}');
+        }
+      }
+    } else {
+      final valueStr = value is Enum ? value.name : value.toString();
+      queryParts.add('$encodedKey=${Uri.encodeQueryComponent(valueStr)}');
     }
   }
-  return queryString.toString();
+
+  if (queryParts.isEmpty) {
+    return '';
+  }
+  return prefixQuestionMark ? '?${queryParts.join('&')}' : queryParts.join('&');
 }
 
 dynamic copyOf(dynamic input) {
   if (input is Iterable) {
-    return List.from(input);
+    return List<dynamic>.from(input);
   } else if (input is Map) {
-    return Map.from(input);
+    return Map<dynamic, dynamic>.from(input);
   } else {
     throw Exception('type could not be copied');
   }

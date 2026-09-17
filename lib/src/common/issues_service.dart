@@ -174,19 +174,13 @@ class IssuesService extends Service {
   /// Create an issue.
   ///
   /// API docs: https://developer.github.com/v3/issues/#create-an-issue
-  Future<Issue> create(RepositorySlug slug, IssueRequest issue) async {
-    final response = await github.request(
-      'POST',
+  Future<Issue> create(RepositorySlug slug, IssueRequest issue) {
+    return github.postJSON<Map<String, dynamic>, Issue>(
       '/repos/${slug.fullName}/issues',
+      statusCode: StatusCodes.CREATED,
       body: GitHubJson.encode(issue),
+      convert: Issue.fromJson,
     );
-
-    if (StatusCodes.isClientError(response.statusCode)) {
-      //TODO: throw a more friendly error – better this than silent failure
-      throw GitHubError(github, response.body);
-    }
-
-    return Issue.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   /// Lists all available assignees (owners and collaborators) to which issues
@@ -201,9 +195,9 @@ class IssuesService extends Service {
   /// Checks if a user is an assignee for the specified repository.
   ///
   /// API docs: https://developer.github.com/v3/issues/assignees/#check-assignee
-  Future<bool> isAssignee(RepositorySlug slug, String repoName) {
+  Future<bool> isAssignee(RepositorySlug slug, String assignee) {
     return github
-        .request('GET', '/repos/${slug.fullName}/assignees/$repoName')
+        .request('GET', '/repos/${slug.fullName}/assignees/$assignee')
         .then((response) => response.statusCode == StatusCodes.NO_CONTENT);
   }
 
@@ -373,12 +367,14 @@ class IssuesService extends Service {
   /// API docs: https://developer.github.com/v3/issues/labels/#replace-all-labels-for-an-issue
   Future<List<IssueLabel>> replaceLabelsForIssue(
       RepositorySlug slug, int issueNumber, List<String> labels) {
-    return github
-        .request('PUT', '/repos/${slug.fullName}/issues/$issueNumber/labels',
-            body: GitHubJson.encode(labels))
-        .then((response) {
-      return jsonDecode(response.body).map(IssueLabel.fromJson);
-    });
+    return github.requestJson<List<dynamic>, List<IssueLabel>>(
+      'PUT',
+      '/repos/${slug.fullName}/issues/$issueNumber/labels',
+      statusCode: StatusCodes.OK,
+      body: GitHubJson.encode(labels),
+      convert: (input) =>
+          input.cast<Map<String, dynamic>>().map(IssueLabel.fromJson).toList(),
+    );
   }
 
   /// Removes a label for an issue.
@@ -457,8 +453,12 @@ class IssuesService extends Service {
     } else {
       body = '{}';
     }
-    await github.postJSON('/repos/${slug.fullName}/issues/$number/lock',
-        body: body, statusCode: 204);
+    await github.request(
+      'PUT',
+      '/repos/${slug.fullName}/issues/$number/lock',
+      body: body,
+      statusCode: 204,
+    );
   }
 
   /// Unlock an issue.

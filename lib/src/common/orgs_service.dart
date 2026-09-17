@@ -133,6 +133,8 @@ class OrganizationsService extends Service {
 
   /// Edits a Team.
   ///
+  /// Edits a team (Legacy endpoint).
+  ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#edit-team
   Future<Team> editTeam(
     int teamId,
@@ -146,8 +148,38 @@ class OrganizationsService extends Service {
       'permission': permission,
     });
 
-    return github.postJSON(
+    return github.requestJson<Map<String, dynamic>, Team>(
+      'PATCH',
       '/teams/$teamId',
+      statusCode: StatusCodes.OK,
+      convert: Team.fromJson,
+      body: GitHubJson.encode(map),
+    );
+  }
+
+  /// Updates a team in an organization.
+  ///
+  /// API docs: https://docs.github.com/en/rest/teams/teams#update-a-team
+  Future<Team> editTeamInOrg(
+    String org,
+    String teamSlug, {
+    String? name,
+    String? description,
+    String? permission,
+    String? privacy,
+    String? notificationSetting,
+  }) {
+    final map = createNonNullMap(<String, dynamic>{
+      'name': name,
+      'description': description,
+      'permission': permission,
+      'privacy': privacy,
+      'notification_setting': notificationSetting,
+    });
+
+    return github.requestJson<Map<String, dynamic>, Team>(
+      'PATCH',
+      '/orgs/$org/teams/$teamSlug',
       statusCode: StatusCodes.OK,
       convert: Team.fromJson,
       body: GitHubJson.encode(map),
@@ -175,9 +207,10 @@ class OrganizationsService extends Service {
   }
 
   Future<bool> getTeamMemberStatus(int teamId, String user) {
-    return github.getJSON('/teams/$teamId/memberships/$user').then((json) {
-      return json['state'];
-    });
+    return github.getJSON<Map<String, dynamic>, bool>(
+      '/teams/$teamId/memberships/$user',
+      convert: (Map<String, dynamic> json) => json['state'] == 'active',
+    );
   }
 
   /// Returns the membership status for a [user] in a team with [teamId].
@@ -190,8 +223,8 @@ class OrganizationsService extends Service {
     return github.getJSON(
       '/teams/$teamId/memberships/$user',
       statusCode: StatusCodes.OK,
-      convert: (dynamic json) => TeamMembershipState(
-        json['state'],
+      convert: (Map<String, dynamic> json) => TeamMembershipState(
+        json['state'] as String?,
       ),
     );
   }
@@ -209,8 +242,8 @@ class OrganizationsService extends Service {
     return github.getJSON(
       '/orgs/$orgName/teams/$teamName/memberships/$user',
       statusCode: StatusCodes.OK,
-      convert: (dynamic json) => TeamMembershipState(
-        json['state'],
+      convert: (Map<String, dynamic> json) => TeamMembershipState(
+        json['state'] as String?,
       ),
     );
   }
@@ -227,21 +260,24 @@ class OrganizationsService extends Service {
       '/teams/$teamId/memberships/$user',
       statusCode: StatusCodes.OK,
     );
-    return TeamMembershipState(jsonDecode(response.body)['state']);
+    final map = jsonDecode(response.body) as Map<String, dynamic>;
+    return TeamMembershipState(map['state'] as String?);
   }
 
   /// Removes a user from the specified team.
   ///
   /// API docs: https://developer.github.com/v3/orgs/teams/#get-team-membership
-  Future removeTeamMembership(
+  Future<void> removeTeamMembership(
     int teamId,
     String user,
   ) {
-    return github.request(
-      'DELETE',
-      '/teams/$teamId/memberships/$user',
-      statusCode: StatusCodes.NO_CONTENT,
-    );
+    return github
+        .request(
+          'DELETE',
+          '/teams/$teamId/memberships/$user',
+          statusCode: StatusCodes.NO_CONTENT,
+        )
+        .then((_) => null);
   }
 
   /// Lists the repositories that the specified team has access to.
@@ -332,8 +368,11 @@ class OrganizationsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/orgs/hooks/#list-hooks
   Stream<Hook> listHooks(String org) {
-    return PaginationHelper(github).objects('GET', '/orgs/$org/hooks',
-        (dynamic i) => Hook.fromJson(i)..repoName = org);
+    return PaginationHelper(github).objects(
+        'GET',
+        '/orgs/$org/hooks',
+        (dynamic i) =>
+            Hook.fromJson(i as Map<String, dynamic>)..repoName = org);
   }
 
   /// Fetches a single hook by [id].
@@ -344,7 +383,8 @@ class OrganizationsService extends Service {
     int id,
   ) =>
       github.getJSON('/orgs/$org/hooks/$id',
-          convert: (dynamic i) => Hook.fromJson(i)..repoName = org);
+          convert: (Map<String, dynamic> i) =>
+              Hook.fromJson(i)..repoName = org);
 
   /// Creates an organization hook based on the specified [hook].
   ///

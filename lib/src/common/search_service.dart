@@ -22,19 +22,13 @@ class SearchService extends Service {
 
     final controller = StreamController<Repository>();
 
-    var isFirst = true;
-
     PaginationHelper(github)
         .fetchStreamed('GET', '/search/repositories',
             params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 &&
-          response.body.contains('rate limit') &&
-          isFirst) {
-        throw RateLimitHit(github);
+      if (response.statusCode != 200) {
+        github.handleStatusCode(response);
       }
-
-      isFirst = false;
 
       final input = jsonDecode(response.body);
 
@@ -120,7 +114,13 @@ class SearchService extends Service {
 
     return PaginationHelper(github)
         .fetchStreamed('GET', '/search/code', params: params, pages: pages)
-        .map((r) => CodeSearchResults.fromJson(json.decode(r.body)));
+        .map((r) {
+      if (r.statusCode != 200) {
+        github.handleStatusCode(r);
+      }
+      return CodeSearchResults.fromJson(
+          json.decode(r.body) as Map<String, dynamic>);
+    });
   }
 
   String _searchQualifier(String key, String? value) {
@@ -141,18 +141,12 @@ class SearchService extends Service {
 
     final controller = StreamController<Issue>();
 
-    var isFirst = true;
-
     PaginationHelper(github)
         .fetchStreamed('GET', '/search/issues', params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 &&
-          response.body.contains('rate limit') &&
-          isFirst) {
-        throw RateLimitHit(github);
+      if (response.statusCode != 200) {
+        github.handleStatusCode(response);
       }
-
-      isFirst = false;
 
       final input = jsonDecode(response.body);
 
@@ -191,18 +185,12 @@ class SearchService extends Service {
 
     final controller = StreamController<User>();
 
-    var isFirst = true;
-
     PaginationHelper(github)
         .fetchStreamed('GET', '/search/users', params: params, pages: pages)
         .listen((response) {
-      if (response.statusCode == 403 &&
-          response.body.contains('rate limit') &&
-          isFirst) {
-        throw RateLimitHit(github);
+      if (response.statusCode != 200) {
+        github.handleStatusCode(response);
       }
-
-      isFirst = false;
 
       final input = jsonDecode(response.body);
 

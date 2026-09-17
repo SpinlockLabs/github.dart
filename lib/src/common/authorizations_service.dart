@@ -2,31 +2,27 @@ import 'dart:async';
 
 import 'package:github/src/common.dart';
 
-/// The [AuthorizationsService] handles communication with authorizations related methods
-/// of the GitHub API.
+/// The [AuthorizationsService] handles communication with legacy OAuth authorizations.
 ///
-/// Note: You can only access this API via Basic Authentication using your
-/// username and password, not tokens.
+/// **Deprecated**: The OAuth Authorizations API was sunset by GitHub.
+/// Use modern OAuth web application flows or GitHub Apps instead.
 ///
-/// API docs: https://developer.github.com/v3/oauth_authorizations/
+/// API docs: https://docs.github.com/en/rest/overview/resources-in-the-rest-api#oauth-authorizations-api
+@Deprecated(
+    'The OAuth Authorizations API has been sunset by GitHub. Use modern OAuth or GitHub Apps.')
 class AuthorizationsService extends Service {
   AuthorizationsService(super.github);
 
   /// Lists all authorizations.
-  ///
-  /// API docs: https://developer.github.com/v3/oauth_authorizations/#list-your-authorizations
+  @Deprecated('The OAuth Authorizations API has been sunset by GitHub.')
   Stream<Authorization> listAuthorizations() {
     return PaginationHelper(github)
         .objects('GET', '/authorizations', Authorization.fromJson);
   }
 
   /// Fetches an authorization specified by [id].
-  ///
-  /// API docs: https://developer.github.com/v3/oauth_authorizations/#get-a-single-authorization
+  @Deprecated('The OAuth Authorizations API has been sunset by GitHub.')
   Future<Authorization> getAuthorization(int id) =>
       github.getJSON('/authorizations/$id',
           statusCode: 200, convert: Authorization.fromJson);
-
-  // TODO: Implement remaining API methods of authorizations:
-  // See https://developer.github.com/v3/oauth_authorizations/
 }

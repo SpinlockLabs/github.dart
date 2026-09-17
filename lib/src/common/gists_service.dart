@@ -56,7 +56,7 @@ class GistsService extends Service {
     String? description,
     bool public = false,
   }) {
-    final map = <String, dynamic>{'files': {}};
+    final map = <String, dynamic>{'files': <String, dynamic>{}};
 
     if (description != null) {
       map['description'] = description;
@@ -64,7 +64,7 @@ class GistsService extends Service {
 
     map['public'] = public;
 
-    final f = {};
+    final f = <String, dynamic>{};
 
     for (final key in files.keys) {
       f[key] = {'content': files[key]};
@@ -111,7 +111,8 @@ class GistsService extends Service {
       map['files'] = f;
     }
 
-    return github.postJSON(
+    return github.requestJson<Map<String, dynamic>, Gist>(
+      'PATCH',
       '/gists/$id',
       statusCode: 200,
       body: GitHubJson.encode(map),
@@ -125,7 +126,9 @@ class GistsService extends Service {
   ///
   /// API docs: https://developer.github.com/v3/gists/#star-a-gist
   Future<bool> starGist(String id) {
-    return github.request('POST', '/gists/$id/star').then((response) {
+    return github
+        .request('PUT', '/gists/$id/star', statusCode: 204)
+        .then((response) {
       return response.statusCode == 204;
     });
   }
@@ -176,7 +179,9 @@ class GistsService extends Service {
   /// API docs: https://developer.github.com/v3/gists/comments/#create-a-comment
   Future<GistComment> createComment(String gistId, CreateGistComment request) {
     return github.postJSON('/gists/$gistId/comments',
-        body: GitHubJson.encode(request), convert: GistComment.fromJson);
+        body: GitHubJson.encode(request),
+        convert: GistComment.fromJson,
+        statusCode: 201);
   }
 
   // TODO: Implement editComment: https://developer.github.com/v3/gists/comments/#edit-a-comment
